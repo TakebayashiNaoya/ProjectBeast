@@ -4,6 +4,21 @@
     <Filter Include="system">
       <UniqueIdentifier>{22dd8095-74f9-46df-81a1-36675a040b1f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{1b7b2952-fea0-4486-9a4f-f73a1a97000a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor">
+      <UniqueIdentifier>{4e9a1a19-485e-4cef-a382-50fa2f5b3402}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json">
+      <UniqueIdentifier>{59dd1170-d6ff-46e7-9472-b0f201b3992f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="player">
+      <UniqueIdentifier>{af170a78-3300-49f2-94d3-6a029fa34904}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -12,6 +27,25 @@
       <Filter>system</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Source\Core\HierarchicalTransform.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Transform.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParameterManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Source\Actor\Actor.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\ActorStatus.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -19,5 +53,30 @@
       <Filter>system</Filter>
     </ClInclude>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Source\Core\Transform.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\HierarchicalTransform.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\ParameterManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\CRC32.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\json.hpp">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h" />
+    <ClInclude Include="Source\Actor\Actor.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\ActorStatus.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\ActorStateMachine.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
