@@ -19,9 +19,6 @@
     <Filter Include="player">
       <UniqueIdentifier>{af170a78-3300-49f2-94d3-6a029fa34904}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI">
-      <UniqueIdentifier>{cd370b4b-3aae-482e-a312-b667b850b2cf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -48,9 +45,6 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
       <Filter>Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UIBase.cpp">
-      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +77,6 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\ActorStateMachine.h">
       <Filter>Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UIBase.h">
-      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
