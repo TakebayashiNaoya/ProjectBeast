@@ -36,7 +36,6 @@
     <ClCompile Include="Source\Core\ParameterManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp">
       <Filter>Actor</Filter>
     </ClCompile>
@@ -68,7 +67,6 @@
     <ClInclude Include="Json\json.hpp">
       <Filter>Json</Filter>
     </ClInclude>
-    <ClInclude Include="Actor.h" />
     <ClInclude Include="Source\Actor\Actor.h">
       <Filter>Actor</Filter>
     </ClInclude>
