@@ -46,6 +46,7 @@
     <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
       <Filter>Actor</Filter>
     </ClCompile>
+    <ClCompile Include="UI\UIBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -78,5 +79,6 @@
     <ClInclude Include="Source\Actor\ActorStateMachine.h">
       <Filter>Actor</Filter>
     </ClInclude>
+    <ClInclude Include="UI\UIBase.h" />
   </ItemGroup>
 </Project>
