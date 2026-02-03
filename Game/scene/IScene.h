@@ -1,4 +1,9 @@
-﻿#pragma once
+﻿/**
+ * IScene.h
+ * 全てのシーンの基底クラス
+ */
+#pragma once
+
 
 #define appScene(name)\
 public:\
@@ -6,7 +11,10 @@ static constexpr uint32_t ID(){return Hash32(#name);}
 
 static constexpr uint32_t INVALID_SCENE_ID = 0xffffffff;
 
-//基底クラス
+
+/**
+ * シーンの基底クラス
+ */
 class IScene
 {
 public:
@@ -17,6 +25,7 @@ public:
 	virtual void Update() = 0;
 	virtual void Render(RenderContext& rc) = 0;
 
-	virtual bool RequesutScene(uint32_t& id, float& waitTime) = 0;
+	/** 次のシーンを要求する。idは次のシーンのIDを返す。*/
+	virtual bool RequesutScene(uint32_t& id) = 0;
 };
 
