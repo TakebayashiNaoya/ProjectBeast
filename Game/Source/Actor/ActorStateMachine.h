@@ -1,6 +1,9 @@
-﻿#pragma once
-
-
+﻿/**
+ * @file ActorStateMachine.h
+ * @brief アクターのステートマシンの基底クラス群
+ * @author 藤谷
+ */
+#pragma once
 
 
 namespace app
@@ -8,10 +11,13 @@ namespace app
 	namespace actor
 	{
 
-		// 前方宣言
+		/** 前方宣言 */
 		class ActorStateMachine;
 
 
+		/**
+		 * @brief ステートの基底クラス
+		 */
 		class IState
 		{
 		private:
@@ -25,13 +31,19 @@ namespace app
 
 
 		public:
+			/** ステートに入ったときの処理 */
 			virtual void Enter() = 0;
+			/** ステートの更新処理 */
 			virtual void Update() = 0;
+			/** ステートから出るときの処理 */
 			virtual void Exit() = 0;
 
 
 		protected:
-			/** ステートマシンを取得する */
+			/**
+			 * @brief ステートマシンを取得する
+			 * @tparam TStateMachine ステートマシンの型
+			 */
 			template<typename TStateMachine>
 			TStateMachine* GetOwner()
 			{
@@ -40,6 +52,14 @@ namespace app
 		};
 
 
+
+
+		/*************************************************************/
+
+
+		/**
+		 * @brief アクターのステートマシンの基底クラス
+		 */
 		class ActorStateMachine
 		{
 			// ステートのマップ
@@ -56,9 +76,14 @@ namespace app
 
 
 		public:
+			ActorStateMachine();
+			virtual ~ActorStateMachine() = default;
+
+
+		public:
 			/*
-			 * ステートマシンを更新する
-			 * NOTE: ステートマシンの持ち主が毎フレーム呼び出すこと
+			 * @brief ステートマシンを更新する
+			 * @note 持ち主が毎フレーム呼び出すこと
 			 */
 			void Update();
 
@@ -68,33 +93,41 @@ namespace app
 
 
 		protected:
-			/*
-			 * ステートの変更先を取得する
+			/**
+			 * @brief ステートを追加する
+			 * @tparam TState ステートの型
+			 * @param stateID ステートID
 			 */
-			virtual IState* GetChangeState() = 0;
-
-
-			/** ステートを取得する */
-			IState* FindState(const uint8_t stateID);
-
-
-			/** ステートを追加する */
 			template<typename TState>
 			void AddState(const uint8_t stateID)
 			{
+				// 指定したIDを取得
 				auto it = m_stateMap.find(stateID);
+				// IDが外れ値の場合
 				if (it == m_stateMap.end())
 				{
+					// 既存のものを削除して警告を出す
 					delete it->second;
 					K2_ASSERT(false, "重複しています");
 				}
+				// ステートを追加
 				m_stateMap[stateID] = std::make_unique<TState>(this);
 			}
 
 
-		public:
-			ActorStateMachine();
-			virtual ~ActorStateMachine() = default;
+			/*
+			 * @brief ステートの変更先を取得する
+			 * @return 変更先のステートポインタ
+			 */
+			virtual IState* GetChangeState() = 0;
+
+
+			/**
+			 * @brief ステートを取得する
+			 * @param stateID ステートID
+			 * @return ステートポインタ
+			 */
+			IState* FindState(const uint8_t stateID);
 		};
 	}
 }
