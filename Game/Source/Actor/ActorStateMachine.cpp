@@ -46,7 +46,7 @@ namespace app
 			m_nextState = GetChangeState();
 
 			// ステートが変更されている場合
-			if (m_nextState && m_currentState == m_nextState)
+			if (m_nextState && m_currentState != m_nextState)
 			{
 				m_currentState->Exit();
 				m_currentState = m_nextState;
