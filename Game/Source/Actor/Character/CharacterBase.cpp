@@ -12,6 +12,10 @@ namespace app
 {
 	namespace actor
 	{
+		CharacterBase::~CharacterBase()
+		{
+			if (m_animationClips)  delete[] m_animationClips;
+		}
 		void CharacterBase::Init(const ModelData* data)
 		{
 			// アニメーションクリップを作成
@@ -19,8 +23,8 @@ namespace app
 
 			for (int i = 0; i < data->clipNum; ++i)
 			{
-				m_animationClips[i].Load(data->animationData->fileName);
-				m_animationClips[i].SetLoopFlag(data->animationData->isLoop);
+				m_animationClips[i].Load(data->animationData[i].fileName);
+				m_animationClips[i].SetLoopFlag(data->animationData[i].isLoop);
 			}
 
 			// モデルをセットアップ
