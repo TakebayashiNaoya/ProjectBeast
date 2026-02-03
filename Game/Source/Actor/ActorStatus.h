@@ -1,12 +1,17 @@
-﻿#pragma once
-
-
+﻿/**
+ * @file ActorStatus.h
+ * @brief アクターのステータス基底クラス
+ */
+#pragma once
 
 
 namespace app
 {
 	namespace actor
 	{
+		/**
+		 * @brief アクターのステータス基底クラス
+		 */
 		class ActorStatus
 		{
 		public:
@@ -16,8 +21,8 @@ namespace app
 
 		public:
 			/*
-			 * セットアップ
-			 * ステータスの持ち主が必ず呼び出すこと
+			 * @brief セットアップ
+			 * @note ステータスの持ち主が呼び出す
 			 */
 			virtual void Setup() = 0;
 		};

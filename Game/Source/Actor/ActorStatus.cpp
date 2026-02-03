@@ -1,6 +1,8 @@
-﻿#include "stdafx.h"
-
-
+﻿/**
+ * @file ActorStatus.cpp
+ * @brief アクターのステータス基底クラス
+ */
+#include "stdafx.h"
 
 
 namespace app
