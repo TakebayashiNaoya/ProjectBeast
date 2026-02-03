@@ -59,6 +59,17 @@ namespace app
 			CharacterController m_characterController;
 
 
+		public:
+			CharacterBase() = default;
+			virtual ~CharacterBase() override;
+
+
+		protected:
+			virtual bool Start() override;
+			virtual void Update() override;
+			virtual void Render(RenderContext& rc) override;
+
+
 		protected:
 			/**
 			 * @brief 初期化処理

@@ -16,6 +16,24 @@ namespace app
 		{
 			if (m_animationClips)  delete[] m_animationClips;
 		}
+
+
+		bool CharacterBase::Start()
+		{
+			return true;
+		}
+
+
+		void CharacterBase::Update()
+		{
+		}
+
+
+		void CharacterBase::Render(RenderContext& rc)
+		{
+		}
+
+
 		void CharacterBase::Init(const ModelData* data)
 		{
 			// アニメーションクリップを作成
