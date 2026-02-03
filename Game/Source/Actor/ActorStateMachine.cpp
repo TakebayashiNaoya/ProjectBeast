@@ -11,8 +11,8 @@ namespace app
 {
 	namespace actor
 	{
-		IState::IState()
-			: m_stateMachine(nullptr)
+		IState::IState(ActorStateMachine* stateMachine)
+			: m_stateMachine(stateMachine)
 		{
 		}
 
