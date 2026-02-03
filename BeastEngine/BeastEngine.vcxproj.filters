@@ -3,9 +3,41 @@
   <ItemGroup>
     <ClCompile Include="BeastEngine.cpp" />
     <ClCompile Include="BeastEnginePreCompile.cpp" />
+    <ClCompile Include="graphics\RenderingEngine.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
+    <ClInclude Include="graphics\RenderingEngine.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="graphics">
+      <UniqueIdentifier>{d94a64ae-566a-4bf6-800a-9d527c43b18b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="camera">
+      <UniqueIdentifier>{b7fd96d1-efcb-43d3-894f-c2d0578c7f86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collision">
+      <UniqueIdentifier>{e35aa815-2825-4cd9-92e6-14ea15f7eea4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dbg">
+      <UniqueIdentifier>{0ab57143-626c-4e30-a655-1255a5a1eb49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry">
+      <UniqueIdentifier>{4f02174c-911a-4cad-9ed7-8a9c2470d506}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="level2DRender">
+      <UniqueIdentifier>{cae7b26a-5ed7-43f3-915f-9a2f3161013c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="level3DRender">
+      <UniqueIdentifier>{614ead41-fbb6-4138-875b-cb0b952634e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="nature">
+      <UniqueIdentifier>{d40f9764-285a-406c-aa6a-50e81440c46d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
