@@ -4,10 +4,14 @@
 
 
 
+
 namespace app
 {
 	namespace actor
 	{
+		// 前方宣言
+		class ActorStatus;
+
 		class Actor : public IGameObject
 		{
 		protected:
@@ -15,6 +19,8 @@ namespace app
 			core::Transform m_transform;
 			/** モデルレンダー */
 			ModelRender m_modelRender;
+			/** ステータス */
+			std::unique_ptr<ActorStatus> m_status;
 
 
 		public:
@@ -23,7 +29,12 @@ namespace app
 
 
 			/** モデルレンダーを取得 */
-			inline ModelRender& GetModelRender() { return m_modelRender; }
+			inline ModelRender* GetModelRender() { return &m_modelRender; }
+
+
+			/** ステータスを取得する */
+			template<typename TStatus>
+			inline const TStatus* GetStatus() { return dynamic_cast<TStatus>(m_status.get()); }
 
 
 			/** 座標を設定 */
