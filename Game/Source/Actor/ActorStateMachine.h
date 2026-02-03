@@ -102,7 +102,7 @@ namespace app
 				// 指定したIDを取得
 				auto it = m_stateMap.find(stateID);
 				// IDが外れ値の場合
-				if (it == m_stateMap.end())
+				if (it != m_stateMap.end())
 				{
 					// 既存のものを削除して警告を出す
 					delete it->second;
