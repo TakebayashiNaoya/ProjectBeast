@@ -62,9 +62,7 @@ namespace app
 		 */
 		class ActorStateMachine
 		{
-			// ステートのマップ
-			// キー: uint8_t
-			// 中身: std::unique_ptr<IState>
+			/** unorderd_map<uint8_t, std::uniqueptr<IState>> */
 			using StateMap = std::unordered_map<uint8_t, std::unique_ptr<IState>>;
 		private:
 			/** ステートマップ */
