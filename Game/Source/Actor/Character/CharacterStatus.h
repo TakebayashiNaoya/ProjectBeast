@@ -1,12 +1,19 @@
-﻿#pragma once
+﻿/**
+ * @file CharacterStatus.h
+ * @brief キャラクターのステータス基底クラス
+ * @author 藤谷
+ */
+#pragma once
 #include "Source/Actor/ActorStatus.h"
-
 
 
 namespace app
 {
 	namespace actor
 	{
+		/**
+		 * @brief キャラクターのステータス基底クラス
+		 */
 		class CharacterStatus : public ActorStatus
 		{
 		protected:
@@ -31,8 +38,8 @@ namespace app
 
 		public:
 			/*
-			 * セットアップ
-			 * ステータスの持ち主が必ず呼び出すこと
+			 * @brief セットアップ
+			 * @note ステータスの持ち主が呼び出す
 			 */
 			virtual void Setup() override;
 
