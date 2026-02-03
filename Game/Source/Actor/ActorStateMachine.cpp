@@ -56,7 +56,7 @@ namespace app
 		}
 
 
-		IState* ActorStateMachine::FindState(const uint8_t stateID)
+		IState* ActorStateMachine::FindState(const uint32_t stateID)
 		{
 			// 指定したIDを取得
 			const auto& it = m_stateMap.find(stateID);
