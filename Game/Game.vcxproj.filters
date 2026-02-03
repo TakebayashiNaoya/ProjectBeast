@@ -19,6 +19,9 @@
     <Filter Include="player">
       <UniqueIdentifier>{af170a78-3300-49f2-94d3-6a029fa34904}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Actor\Character">
+      <UniqueIdentifier>{85d0773f-9781-4321-9be3-5bc7bdab4cdd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -36,7 +39,6 @@
     <ClCompile Include="Source\Core\ParameterManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp">
       <Filter>Actor</Filter>
     </ClCompile>
@@ -46,7 +48,12 @@
     <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
       <Filter>Actor</Filter>
     </ClCompile>
-    <ClCompile Include="UI\UIBase.cpp" />
+    <ClCompile Include="Source\Actor\Character\CharacterBase.cpp">
+      <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
+      <Filter>Actor\Character</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -69,7 +76,6 @@
     <ClInclude Include="Json\json.hpp">
       <Filter>Json</Filter>
     </ClInclude>
-    <ClInclude Include="Actor.h" />
     <ClInclude Include="Source\Actor\Actor.h">
       <Filter>Actor</Filter>
     </ClInclude>
@@ -79,6 +85,11 @@
     <ClInclude Include="Source\Actor\ActorStateMachine.h">
       <Filter>Actor</Filter>
     </ClInclude>
-    <ClInclude Include="UI\UIBase.h" />
+    <ClInclude Include="Source\Actor\Character\CharacterBase.h">
+      <Filter>Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
+      <Filter>Actor\Character</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
