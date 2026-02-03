@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClCompile Include="BeastEngine.cpp" />
     <ClCompile Include="BeastEnginePreCompile.cpp" />
+    <ClCompile Include="graphics\RenderingEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
+    <ClInclude Include="graphics\RenderingEngine.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
