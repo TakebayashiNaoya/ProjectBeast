@@ -228,6 +228,8 @@
     <ClCompile Include="Source\Actor\Actor.cpp" />
     <ClCompile Include="Source\Actor\ActorStateMachine.cpp" />
     <ClCompile Include="Source\Actor\ActorStatus.cpp" />
+    <ClCompile Include="Source\Actor\Character\CharacterBase.cpp" />
+    <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp" />
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp" />
     <ClCompile Include="Source\Core\ParameterManager.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
@@ -244,6 +246,8 @@
     <ClInclude Include="Source\Actor\Actor.h" />
     <ClInclude Include="Source\Actor\ActorStateMachine.h" />
     <ClInclude Include="Source\Actor\ActorStatus.h" />
+    <ClInclude Include="Source\Actor\Character\CharacterBase.h" />
+    <ClInclude Include="Source\Actor\Character\CharacterStatus.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
     <ClInclude Include="Source\Core\ParameterManager.h" />
     <ClInclude Include="Source\Core\Transform.h" />
