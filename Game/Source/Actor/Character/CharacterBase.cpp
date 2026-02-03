@@ -1,8 +1,11 @@
-﻿#include "stdafx.h"
+﻿/**
+ * @file CharacterBase.cpp
+ * @brief キャラクターの基底クラス
+ * @author 藤谷
+ */
+#include "stdafx.h"
 #include "CharacterBase.h"
 #include "CharacterStatus.h"
-
-
 
 
 namespace app
@@ -27,8 +30,8 @@ namespace app
 			// モデルレンダーを更新
 			m_modelRender.Update();
 
+			// ステータスを取得
 			const auto* status = GetStatus<CharacterStatus>();
-
 			// キャラクターコントローラーを初期化
 			m_characterController.Init(status->GetRadius(), status->GetHeight(), m_transform.m_position);
 		}

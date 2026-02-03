@@ -1,4 +1,9 @@
-﻿#pragma once
+﻿/**
+ * @file CharacterBase.h
+ * @brief キャラクターの基底クラス
+ * @author 藤谷
+ */
+#pragma once
 #include "Source/Actor/Actor.h"
 
 
@@ -8,7 +13,7 @@ namespace app
 {
 	namespace actor
 	{
-
+		/** アニメーションデータ */
 		struct AnimationData
 		{
 			/** ファイルネーム */
@@ -18,6 +23,12 @@ namespace app
 		};
 
 
+
+
+		/************************************/
+
+
+		/** モデルデータ */
 		struct ModelData
 		{
 			/** ファイルネーム */
@@ -31,6 +42,14 @@ namespace app
 		};
 
 
+
+
+		/************************************/
+
+
+		/**
+		 * @brief キャラクターの基底クラス
+		 */
 		class CharacterBase : public Actor
 		{
 		protected:
@@ -40,15 +59,20 @@ namespace app
 			CharacterController m_characterController;
 
 
-		public:
-			/** キャラクターコントローラーを取得 */
-			inline CharacterController* GetCharacterController() { return &m_characterController; }
-
-
 		protected:
-			/** 初期化 */
-			//template<typename TStatus>
+			/**
+			 * @brief 初期化処理
+			 * @param data モデルデータ
+			 */
 			void Init(const ModelData* data);
+
+
+		public:
+			/**
+			 * @brief キャラクターコントローラーを取得
+			 * @return キャラクターコントローラーのポインタ
+			 */
+			inline CharacterController* GetCharacterController() { return &m_characterController; }
 		};
 	}
 }
