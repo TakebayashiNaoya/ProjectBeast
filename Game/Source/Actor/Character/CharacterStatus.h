@@ -32,8 +32,8 @@ namespace app
 
 
 		public:
-			CharacterStatus() = default;
-			~CharacterStatus() = default;
+			CharacterStatus();
+			virtual ~CharacterStatus() override = default;
 
 
 		public:
