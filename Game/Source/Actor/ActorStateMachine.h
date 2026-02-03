@@ -26,7 +26,7 @@ namespace app
 
 
 		public:
-			IState();
+			IState(ActorStateMachine* stateMachine);
 			virtual ~IState() = default;
 
 
