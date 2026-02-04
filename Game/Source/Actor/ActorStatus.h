@@ -23,6 +23,10 @@ namespace app
 			virtual void Setup() = 0;
 
 
+			/** 更新処理 */
+			virtual void Update() = 0;
+
+
 		public:
 			ActorStatus() = default;
 			virtual ~ActorStatus() = default;

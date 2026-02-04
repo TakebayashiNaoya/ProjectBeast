@@ -12,13 +12,39 @@
  /**
   * NOTE: すべてのパラメーターに付ける
   */
+#ifdef K2_DEBUG
+#define APP_PARAM_HOT_RELOAD
+#endif
+
+
+  /**
+  * NOTE: すべてのパラメーターに付ける
+  */
+#ifdef APP_PARAM_HOT_RELOAD
+
 #define appParameter(name)\
 public:\
- static constexpr uint32_t ID() { return Hash32(#name); }
+static constexpr uint32_t ID() {return Hash32(#name);}\
+std::function<void(const nlohmann::json& j, name& p)> load;
+
+#else
+
+#define appParameter(name)\
+public:\
+static constexpr uint32_t ID() {return Hash32(#name);}
+
+#endif
 
 
   /** 基底クラス。必ず継承すること！ */
-struct IMasterParameter {};
+struct IMasterParameter
+{
+#ifdef APP_PARAM_HOT_RELOAD
+	virtual void Load(const nlohmann::json& j) {};
+	std::string m_path;         // パラメーターのファイルパス（ホットリロード用）
+	time_t m_lastWriteTime;     // 最終更新時刻
+#endif // APP_PARAM_HOT_RELOAD
+};
 
 
 
@@ -33,6 +59,14 @@ struct IMasterParameter {};
 struct MasterCharacterParameter : public IMasterParameter
 {
 	appParameter(MasterCharacterParameter);
+
+#ifdef APP_PARAM_HOT_RELOAD
+	void Load(const nlohmann::json& j) override
+	{
+		load(j, *this);
+	}
+#endif // APP_PARAM_HOT_RELOAD
+
 
 	/** 最大体力 */
 	int maxHp;
@@ -62,6 +96,13 @@ struct MasterPlayerParameter : public MasterCharacterParameter
 {
 	appParameter(MasterPlayerParameter);
 
+#ifdef APP_PARAM_HOT_RELOAD
+	void Load(const nlohmann::json& j) override
+	{
+		load(j, *this);
+	}
+#endif // APP_PARAM_HOT_RELOAD
+
 	// プレイヤー固有のパラメーターをここに追加していく
 };
 
@@ -90,6 +131,44 @@ private:
 	ParameterManager();
 	~ParameterManager();
 
+
+public:
+	/**
+	 * パラメーター操作
+	 */
+	void Update()
+	{
+#ifdef APP_PARAM_HOT_RELOAD
+		for (auto paramPair : m_parameterMap)
+		{
+			for (auto param : paramPair.second)
+			{
+				if (CheckFileModified(param))
+				{
+					std::ifstream file(param->m_path);
+					if (!file.is_open())
+					{
+						return;
+					}
+
+					nlohmann::json jsonRoot;
+					file >> jsonRoot;
+
+					ParameterVector parameters;
+
+					for (const auto& j : jsonRoot)
+					{
+						param->m_lastWriteTime = GetFileLastWriteTime(param->m_path.c_str());
+						param->Load(j);
+					}
+				}
+			}
+		}
+#endif
+	}
+
+
+
 public:
 	/// <summary>
 	/// パラメーター読み込み
@@ -110,6 +189,13 @@ public:
 		std::vector<IMasterParameter*> parameters;
 		for (const auto& j : jsonRoot) {
 			T* parameter = new T();
+
+#ifdef APP_PARAM_HOT_RELOAD
+			parameter->m_path = std::string(path);
+			parameter->m_lastWriteTime = GetFileLastWriteTime(path);
+			parameter->load = func;
+#endif
+
 			func(j, *parameter);
 			parameters.push_back(static_cast<IMasterParameter*>(parameter));
 		}
@@ -172,6 +258,34 @@ public:
 	}
 
 
+#ifdef APP_PARAM_HOT_RELOAD
+	/**
+	 * ファイル更新日時取得
+	 */
+	static time_t GetFileLastWriteTime(const char* path)
+	{
+		struct stat result;
+		// stat関数でファイル情報を取得 (0なら成功)
+		if (stat(path, &result) == 0) {
+			return result.st_mtime;
+		}
+		return 0;
+	}
+
+
+	/**
+	 * ファイル更新チェック
+	 */
+	static bool CheckFileModified(const IMasterParameter* param)
+	{
+		if (GetFileLastWriteTime(param->m_path.c_str()) > param->m_lastWriteTime)
+		{
+			return true;
+		}
+		return false;
+	}
+
+#endif // APP_PARAM_HOT_RELOAD
 
 
 	/**
