@@ -1,5 +1,11 @@
-﻿#include "stdafx.h"
+﻿/**
+ * @file UIBase.cpp
+ * @brief UIの基底クラスの実装
+ * @author 忽那
+ */
+#include "stdafx.h"
 #include "UIBase.h"
+
 
 namespace app 
 {
@@ -38,9 +44,8 @@ namespace app
 		}
 
 
-		bool UIImage::Start()
+		void UIImage::Start()
 		{
-			return true;
 		}
 
 
@@ -126,9 +131,8 @@ namespace app
 		}
 
 
-		bool UIDigit::Start()
+		void UIDigit::Start()
 		{
-			return true;
 		}
 
 
@@ -230,9 +234,8 @@ namespace app
 		}
 
 
-		bool UICanvas::Start()
+		void UICanvas::Start()
 		{
-			return true;
 		}
 
 

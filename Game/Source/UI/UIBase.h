@@ -3,10 +3,9 @@
  * @brief UIの基本的なクラス
  * @author 忽那
  */
-
 #pragma once
 #include "Source/Core/HierarchicalTransform.h"
-
+#include "IObject.h"
 
 namespace app 
 {
@@ -15,7 +14,7 @@ namespace app
 		/**
 		 * @brief UIBaseの基底クラス
 		 */
-		class UIBase : public IGameObject
+		class UIBase : public IObject
 		{
 		public:
 			/** トランスフォーム */
@@ -28,7 +27,7 @@ namespace app
 
 
 			/** 初期化処理 */
-			virtual bool Start() = 0;
+			virtual void Start() = 0;
 			/** 更新処理 */
 			virtual void Update() = 0;
 			/** 描画処理 */
@@ -70,11 +69,12 @@ namespace app
 
 
 			/** 初期化処理 */
-			virtual bool Start()override;
+			virtual void Start()override;
 			/** 更新処理 */
 			virtual void Update()override;
 			/** 描画処理 */
 			virtual void Render(RenderContext& rc)override;
+
 
 			/**
 			 * @brief 初期化
@@ -109,7 +109,7 @@ namespace app
 
 		public:
 			/** 初期化処理 */
-			virtual bool Start()override;
+			virtual void Start()override;
 			/** 更新処理 */
 			virtual void Update()override;
 			/** 描画処理 */
@@ -222,7 +222,7 @@ namespace app
 
 
 			/** 初期化処理 */
-			bool Start();
+			void Start();
 			/** 更新処理 */
 			void Update();
 			/** 描画処理 */
