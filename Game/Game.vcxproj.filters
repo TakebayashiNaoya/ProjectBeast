@@ -25,6 +25,9 @@
     <Filter Include="Source\Actor\Character\Player">
       <UniqueIdentifier>{4be53c84-5520-4489-93ed-2bfc4d00b1fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\system">
+      <UniqueIdentifier>{706b7812-7f1c-4488-854b-c24a37b2f3c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -81,6 +84,9 @@
     </ClCompile>
     <ClCompile Include="Source\UI\UIAnimation.cpp">
       <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\system\system.cpp">
+      <Filter>Source\system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\UIAnimation.h">
       <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\system\system.h">
+      <Filter>Source\system</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
