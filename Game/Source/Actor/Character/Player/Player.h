@@ -34,7 +34,7 @@ namespace app
 
 
 		private:
-			bool Start() override final;
+			void Start() override final;
 			void Update() override final;
 			void Render(RenderContext& rc) override final;
 

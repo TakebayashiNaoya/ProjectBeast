@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #pragma once
+#include "IObject.h"
 #include "Source/Core/Transform.h"
 
 
@@ -18,7 +19,7 @@ namespace app
 		/**
 		 * @brief 見た目が存在するオブジェクトの基底クラス
 		 */
-		class Actor : public IGameObject
+		class Actor : public IObject
 		{
 		public:
 			/**
@@ -62,7 +63,7 @@ namespace app
 
 		protected:
 			/** 初期化処理 */
-			virtual bool Start()override = 0;
+			virtual void Start()override = 0;
 			/** 更新処理 */
 			virtual void Update()override = 0;
 			/** 描画処理 */
