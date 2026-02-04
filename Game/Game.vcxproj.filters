@@ -1,139 +1,142 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
-    <Filter Include="system">
-      <UniqueIdentifier>{22dd8095-74f9-46df-81a1-36675a040b1f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{1b7b2952-fea0-4486-9a4f-f73a1a97000a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Actor">
-      <UniqueIdentifier>{4e9a1a19-485e-4cef-a382-50fa2f5b3402}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Util">
-      <UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Json">
-      <UniqueIdentifier>{59dd1170-d6ff-46e7-9472-b0f201b3992f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Actor\Character">
-      <UniqueIdentifier>{85d0773f-9781-4321-9be3-5bc7bdab4cdd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{ef11bf88-48df-4b7b-8298-8d5dc60c2cd7}</UniqueIdentifier>
-    <Filter Include="Actor\Character\Player">
-      <UniqueIdentifier>{6360bc73-ebe2-4067-9230-78eff1962d72}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="system\system.cpp">
-      <Filter>system</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Source\Core\HierarchicalTransform.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\Transform.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\ParameterManager.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Actor.cpp">
-      <Filter>Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\ActorStatus.cpp">
-      <Filter>Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
-      <Filter>Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\CharacterBase.cpp">
-      <Filter>Actor\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
-      <Filter>Actor\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\UIBase.cpp" />
-    <ClCompile Include="Scene\IScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\SceneManager.cpp">
-      <Filter>Scene</Filter>
-    <ClCompile Include="Source\Actor\Character\Player\Player.cpp">
-      <Filter>Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp">
-      <Filter>Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp">
-      <Filter>Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp">
-      <Filter>Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp">
-      <Filter>Actor\Character\Player</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="system\system.h">
-      <Filter>system</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="Source\Core\Transform.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\HierarchicalTransform.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\ParameterManager.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\CRC32.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Json\json.hpp">
-      <Filter>Json</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Actor.h">
-      <Filter>Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\ActorStatus.h">
-      <Filter>Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\ActorStateMachine.h">
-      <Filter>Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\CharacterBase.h">
-      <Filter>Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
-      <Filter>Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\UIBase.h" />
-    <ClInclude Include="Scene\IScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\SceneManager.h">
-      <Filter>Scene</Filter>
-    <ClInclude Include="Source\Actor\Character\Player\Player.h">
-      <Filter>Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h">
-      <Filter>Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerController.h">
-      <Filter>Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h">
-      <Filter>Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerIState.h">
-      <Filter>Actor\Character\Player</Filter>
-    </ClInclude>
-  </ItemGroup>
+	<ItemGroup>
+		<Filter Include="system">
+			<UniqueIdentifier>{22dd8095-74f9-46df-81a1-36675a040b1f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Core">
+			<UniqueIdentifier>{1b7b2952-fea0-4486-9a4f-f73a1a97000a}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Actor">
+			<UniqueIdentifier>{4e9a1a19-485e-4cef-a382-50fa2f5b3402}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Util">
+			<UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Json">
+			<UniqueIdentifier>{59dd1170-d6ff-46e7-9472-b0f201b3992f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Actor\Character">
+			<UniqueIdentifier>{85d0773f-9781-4321-9be3-5bc7bdab4cdd}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Scene">
+			<UniqueIdentifier>{ef11bf88-48df-4b7b-8298-8d5dc60c2cd7}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="Actor\Character\Player">
+			<UniqueIdentifier>{6360bc73-ebe2-4067-9230-78eff1962d72}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<ClCompile Include="stdafx.cpp" />
+		<ClCompile Include="main.cpp" />
+		<ClCompile Include="system\system.cpp">
+			<Filter>system</Filter>
+		</ClCompile>
+		<ClCompile Include="Game.cpp" />
+		<ClCompile Include="Source\Core\HierarchicalTransform.cpp">
+			<Filter>Core</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Core\Transform.cpp">
+			<Filter>Core</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Core\ParameterManager.cpp">
+			<Filter>Core</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Actor.cpp">
+			<Filter>Actor</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\ActorStatus.cpp">
+			<Filter>Actor</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\ActorStateMachine.cpp">
+			<Filter>Actor</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Character\CharacterBase.cpp">
+			<Filter>Actor\Character</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
+			<Filter>Actor\Character</Filter>
+		</ClCompile>
+		<ClCompile Include="UI\UIBase.cpp" />
+		<ClCompile Include="Scene\IScene.cpp">
+			<Filter>Scene</Filter>
+		</ClCompile>
+		<ClCompile Include="Scene\SceneManager.cpp">
+			<Filter>Scene</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Character\Player\Player.cpp">
+			<Filter>Actor\Character\Player</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp">
+			<Filter>Actor\Character\Player</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp">
+			<Filter>Actor\Character\Player</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp">
+			<Filter>Actor\Character\Player</Filter>
+		</ClCompile>
+		<ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp">
+			<Filter>Actor\Character\Player</Filter>
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="stdafx.h" />
+		<ClInclude Include="system\system.h">
+			<Filter>system</Filter>
+		</ClInclude>
+		<ClInclude Include="Game.h" />
+		<ClInclude Include="Source\Core\Transform.h">
+			<Filter>Core</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Core\HierarchicalTransform.h">
+			<Filter>Core</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Core\ParameterManager.h">
+			<Filter>Core</Filter>
+		</ClInclude>
+		<ClInclude Include="Util\CRC32.h">
+			<Filter>Util</Filter>
+		</ClInclude>
+		<ClInclude Include="Json\json.hpp">
+			<Filter>Json</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Actor.h">
+			<Filter>Actor</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\ActorStatus.h">
+			<Filter>Actor</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\ActorStateMachine.h">
+			<Filter>Actor</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Character\CharacterBase.h">
+			<Filter>Actor\Character</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Character\CharacterStatus.h">
+			<Filter>Actor\Character</Filter>
+		</ClInclude>
+		<ClInclude Include="UI\UIBase.h" />
+		<ClInclude Include="Scene\IScene.h">
+			<Filter>Scene</Filter>
+		</ClInclude>
+		<ClInclude Include="Scene\SceneManager.h">
+			<Filter>Scene</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Character\Player\Player.h">
+			<Filter>Actor\Character\Player</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h">
+			<Filter>Actor\Character\Player</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Character\Player\PlayerController.h">
+			<Filter>Actor\Character\Player</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h">
+			<Filter>Actor\Character\Player</Filter>
+		</ClInclude>
+		<ClInclude Include="Source\Actor\Character\Player\PlayerIState.h">
+			<Filter>Actor\Character\Player</Filter>
+		</ClInclude>
+	</ItemGroup>
 </Project>
