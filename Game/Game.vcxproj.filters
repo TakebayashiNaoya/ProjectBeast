@@ -22,6 +22,9 @@
     <Filter Include="Actor\Character">
       <UniqueIdentifier>{85d0773f-9781-4321-9be3-5bc7bdab4cdd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{bc6c0fb0-59ed-4574-a86b-3c0da6c51bcf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -53,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
       <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIBase.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +96,9 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
       <Filter>Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIBase.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
