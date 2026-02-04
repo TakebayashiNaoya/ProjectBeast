@@ -27,6 +27,7 @@ namespace app
 		{
 		}
 
+
 		PlayerIdleState::PlayerIdleState(ActorStateMachine* stateMachine)
 			: IState(stateMachine)
 			, m_owner(GetOwner<PlayerStateMachine>())
@@ -43,13 +44,16 @@ namespace app
 		{
 		}
 
+
 		void PlayerMoveState::Update()
 		{
 		}
 
+
 		void PlayerMoveState::Exit()
 		{
 		}
+
 
 		PlayerMoveState::PlayerMoveState(ActorStateMachine* stateMachine)
 			: IState(stateMachine)

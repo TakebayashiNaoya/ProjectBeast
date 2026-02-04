@@ -37,7 +37,7 @@ namespace app
 			 * @return ステータスのポインタ
 			 */
 			template<typename TStatus>
-			inline const TStatus* GetStatus() { return dynamic_cast<TStatus*>(m_status.get()); }
+			inline const TStatus* GetStatus() const { return dynamic_cast<TStatus*>(m_status.get()); }
 			/**
 			 * @brief 座標を設定
 			 * @param position 座標
