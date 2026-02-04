@@ -8,13 +8,18 @@
 
 namespace app
 {
+
+
+
+	class RenderContext;
+
+
 	/**
 	 * @brief ゲームで必要になるオブジェクトの基底クラス
 	 */
 	class IObject : public Noncopyable
 	{
 	public:
-		class RenderContext;
 
 
 	public:
