@@ -1,13 +1,19 @@
-﻿#pragma once
+﻿/**
+ * @file UIBase.h
+ * @brief UIの基本的なクラス
+ * @author 忽那
+ */
+
+#pragma once
 #include "Source/Core/HierarchicalTransform.h"
 
 
-namespace app {
-	namespace ui {
-		
-		
+namespace app 
+{
+	namespace ui
+	{
 		/**
-		 * UI関連のベース
+		 * @brief UIBaseの基底クラス
 		 */
 		class UIBase : public IGameObject
 		{
@@ -16,38 +22,45 @@ namespace app {
 			core::HierarchicalTransform m_transform;
 
 
-		private:
-			/** α値(白色) */
-			Vector4 m_color = Vector4::White;
-
-
-			bool m_isStart = false; //アニメーション開始フラグ
-			bool m_isStop = true;   //アニメーション中断フラグ
-			bool m_isUpdate = true; //画像更新フラグ
-			bool m_isDraw = false;  //画像描画フラグ
-
-
 		public:
 			UIBase();
 			virtual ~UIBase();
 
 
+			/** 初期化処理 */
 			virtual bool Start() = 0;
+			/** 更新処理 */
 			virtual void Update() = 0;
+			/** 描画処理 */
 			virtual void Render(RenderContext& rc) = 0;
+
+
+		private:
+			/** α値 */
+			Vector4 m_color;
 		};
 
 
 
 		/**
-		 * UIで画像を扱う場所
+		 * @brief UIの画像を扱うUIBaseの派生クラス
 		 */
 		class UIImage : public UIBase
 		{
+			/** friendclassの宣言 */
 			friend class UICanvas;
 
 
+		public:
+			/**
+			 * @brief スプライトレンダーの取得
+			 * @return スプライトレンダーのポインタ
+			 */
+			SpriteRender* GetSpriteRender() { return &m_spriteRender; }
+
+
 		protected:
+			/** スプライトレンダー */
 			SpriteRender m_spriteRender;
 
 
@@ -56,24 +69,21 @@ namespace app {
 			~UIImage();
 
 
+			/** 初期化処理 */
 			virtual bool Start()override;
+			/** 更新処理 */
 			virtual void Update()override;
+			/** 描画処理 */
 			virtual void Render(RenderContext& rc)override;
 
-
-		public:
-			/** ゲッター */
-			SpriteRender* GetSpriteRender() { return &m_spriteRender; }
-
-
 			/**
-			 * 初期化
-			 * ・アセット名
-			 * ・横幅
-			 * ・縦幅
-			 * ・座標
-			 * ・拡大縮小
-			 * ・回転
+			 * @brief 初期化
+			 * @param assetName アセット名
+			 * @param wide 横幅
+			 * @param height 縦幅
+			 * @param position 座標
+			 * @param scale 拡大縮小
+			 * @param rotation 回転
 			 */
 			void Initialize(
 					const char* assetName
@@ -88,43 +98,34 @@ namespace app {
 
 
 		/**
-		 * 数字の桁数表示用のUI関連
-		 * スコア表示などで使用
+		 * @brief 数字のスプライトのみを扱うUIBaseの派生クラス
 		 */
 		class UIDigit : public UIBase
 		{
-		private:
-			/** 画像表示の可変長配列 */
-			std::vector<SpriteRender*> m_renderList;
-
-			/** 表示用の数字 */
-			int m_number;
-			int m_requestNumber;
-			int m_digit;
-
-
-			/** 数字表示に必要な画像の名前 */
-			std::string m_assetsPath;
-
-			/** 横幅×縦幅 */
-			float m_wide;
-			float m_height;
-
-
 		public:
 			UIDigit();
 			~UIDigit();
 
 
+		public:
+			/** 初期化処理 */
+			virtual bool Start()override;
+			/** 更新処理 */
+			virtual void Update()override;
+			/** 描画処理 */
+			virtual void Render(RenderContext& rc)override;
+
+
 			/**
-			 * アセット名
-			 * 何桁かの情報(数)
-			 * 表示する数
-			 * 横幅
-			 * 縦幅
-			 * 位置
-			 * 大きさ
-			 * 回転
+			 * @brief 数字のスプライトの初期化
+			 * @param assetName アセット名
+			 * @param digit 何桁かの情報(数)
+			 * @param number 表示する数
+			 * @param wide 横幅
+			 * @param height 縦幅
+			 * @param position 位置
+			 * @param scale 大きさ
+			 * @param rotation 回転
 			 */
 			void Initialize(
 				const char* assetName,
@@ -137,13 +138,21 @@ namespace app {
 				Quaternion& rotation
 			);
 
-			/** 数字の設定 */
+
+			/**
+			 * @brief 数字の設定
+			 * @param number 数
+			 */
 			void SetNumber(const int number) { m_requestNumber = number; }
-
-			/** Spriteのゲッター */
-			std::vector<SpriteRender*>& GetSpriteRender() { return m_renderList; }
-
-			/** Spriteのラムダ式 */
+			/** 
+			 * @brief スプライトレンダー配列の取得
+			 * @return スプライトレンダー配列の参照
+			 */
+			std::vector<SpriteRender*>& GetSpriteRenderList() { return m_renderList; }
+			/**
+			 * @brief スプライトの配列のラムダ式
+			 * @param func 全てのスプライトレンダーに対して何を行うか
+			 */
 			void ForEach(const std::function<void(SpriteRender*)>& func)
 			{
 				for (auto* render : m_renderList)
@@ -151,38 +160,60 @@ namespace app {
 					func(render);
 				}
 			}
-
-
-		public:
-			virtual bool Start()override;
-			virtual void Update()override;
-			virtual void Render(RenderContext& rc)override;
-
+			 
 
 		private:
-			/**  */
+			/** 画像表示用の配列 */
+			std::vector<SpriteRender*> m_renderList;
+
+
+			/** 表示用の数字 */
+			int m_number;
+			int m_requestNumber;
+			int m_digit;
+
+
+			/** 数字用に必要な画像の名前 */
+			std::string m_assetsPath;
+
+
+			/** 横幅 */
+			float m_wide;
+			/** 縦幅 */
+			float m_height;
+
+
+			/**
+			 * @brief 桁数の更新処理
+			 * @param targetDigit 対象の桁
+			 * @param number 数
+			 */
 			void UpdateNumber(const int targetDigit, const int number);
+			/**
+			 * @brief 桁の更新処理
+			 * @param index 要素数
+			 */
 			void UpdatePosition(const int index);
 
-			/** 対象の桁 */
+
+			/** 
+			 * @brief 対象の桁
+			 * @param digit 桁
+			 */
 			int GetDigit(int digit);
 		};
 
 
 
 		/**
-		 * キャンバス
-		 * UIを作る時はこのクラス追加して
+		 * @brief UI作成時、UICanvasを追加する
 		 */
 		class UICanvas : public UIBase
 		{
+			/** friendclassの宣言 */
 			friend class UIBase;
 			friend class UIImage;
 			friend class UIDigit;
-
-		private:
-			/** 描画するUIのリスト */
-			std::vector<UIBase*> m_uiList;
 
 
 		public:
@@ -190,20 +221,30 @@ namespace app {
 			~UICanvas();
 
 
+			/** 初期化処理 */
 			bool Start();
+			/** 更新処理 */
 			void Update();
+			/** 描画処理 */
 			void Render(RenderContext& rc);
 
 
-		public:
-			/** UIの生成 */
+			/**
+			 * @brief UIの生成
+			 * @tparam T 派生クラス
+			 * @return 生成されたインスタンスを返す
+			 */
 			template<typename T>
 			T* CreateUI()
 			{
 				T* ui = new T();
 				return ui;
 			}
-		};
 
+
+		private:
+			/** 描画するUIBaseのリスト */
+			std::vector<UIBase*> m_uiList;
+		};
 	}
 }

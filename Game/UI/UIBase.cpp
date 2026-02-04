@@ -1,14 +1,19 @@
 ﻿#include "stdafx.h"
 #include "UIBase.h"
 
-namespace app {
-	namespace ui {
-		namespace {
-			const int ONE = 1;
-			const int TEN = 10;
+namespace app 
+{
+	namespace ui 
+	{
+		namespace 
+		{
+			constexpr int ONE = 1;
+			constexpr int TEN = 10;
 		}
 
+
 		UIBase::UIBase()
+			: m_color(Vector4::White)
 		{
 		}
 
@@ -16,6 +21,7 @@ namespace app {
 		UIBase::~UIBase()
 		{
 		}
+
 
 
 
@@ -47,6 +53,7 @@ namespace app {
 		{
 		}
 
+
 		void UIImage::Initialize(const char* assetName, const float wide, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation)
 		{
 			m_transform.m_localTransform.m_position = position;
@@ -68,12 +75,26 @@ namespace app {
 
 
 		UIDigit::UIDigit()
+			: m_number(0)
+			, m_requestNumber(0)
+			, m_digit(0)
+			, m_wide(0.0f)
+			, m_height(0.0f)
 		{
+			m_renderList.clear();
 		}
+
 
 		UIDigit::~UIDigit()
 		{
+			for (auto* render : m_renderList)
+			{
+				delete render;
+				render = nullptr;
+			}
+			m_renderList.clear();
 		}
+
 
 		void UIDigit::Initialize(const char* assetName, const int digit, const int number, const float wide, const float height, Vector3& pos, Vector3& scale, Quaternion& rot)
 		{
@@ -89,7 +110,8 @@ namespace app {
 
 			/** 必要な数のスプライトを生成 */
 			m_renderList.clear();
-			for (int i = 0; i < digit; i++) {
+			for (int i = 0; i < digit; i++) 
+			{
 				/** スプライトの配列の中に入れる */
 				SpriteRender* sprite = new SpriteRender();
 				m_renderList.push_back(sprite);
@@ -97,7 +119,8 @@ namespace app {
 
 
 			/** 各桁の数字を更新 */
-			for (int i = 0; i < digit; i++) {
+			for (int i = 0; i < digit; i++)
+			{
 				UpdateNumber(i + 1, m_number);
 			}
 		}
@@ -112,9 +135,11 @@ namespace app {
 		void UIDigit::Update()
 		{
 			//もし数字が変わっていたら更新
-			if (m_number != m_requestNumber) {
+			if (m_number != m_requestNumber) 
+			{
 				m_number = m_requestNumber;
-				for (int i = 0; i < m_digit; i++) {
+				for (int i = 0; i < m_digit; i++)
+				{
 					UpdateNumber(i + ONE, m_number);
 				}
 			}
@@ -122,7 +147,8 @@ namespace app {
 
 			/** トランスフォーム更新とスプライトレンダーの更新 */
 			m_transform.UpdateTransform();
-			for (int i = 0; i < m_renderList.size(); i++) {
+			for (int i = 0; i < m_renderList.size(); i++)
+			{
 				auto* spriteRender = m_renderList[i];
 				UpdatePosition(i);
 				spriteRender->SetScale(m_transform.m_worldTransform.m_scale);
@@ -134,7 +160,8 @@ namespace app {
 
 		void UIDigit::Render(RenderContext& rc)
 		{
-			for (SpriteRender* spriteRender : m_renderList) {
+			for (SpriteRender* spriteRender : m_renderList)
+			{
 				spriteRender->Draw(rc);
 			}
 		}
@@ -147,10 +174,12 @@ namespace app {
 			const int targetRenderIndex = targetDigit - ONE;
 			SpriteRender* nextRender = nullptr;
 
-			if (targetRenderIndex >= m_renderList.size()) {
+			if (targetRenderIndex >= m_renderList.size()) 
+			{
 				nextRender = m_renderList[targetRenderIndex];
 			}
-			else {
+			else
+			{
 				nextRender = new SpriteRender();
 				m_renderList.push_back(nextRender);
 			}
@@ -168,11 +197,13 @@ namespace app {
 
 		int UIDigit::GetDigit(int digit)
 		{
+			/** 警告メッセージ */
 			K2_ASSERT(digit >= ONE, "桁指定が間違えています。\n");
 			digit -= ONE;
 			int divisor = static_cast<int>(pow(TEN, digit));
 			return (m_number / divisor) % TEN;
 		}
+
 
 
 
@@ -187,7 +218,8 @@ namespace app {
 
 		UICanvas::~UICanvas()
 		{
-			for (auto* ui : m_uiList) {
+			for (auto* ui : m_uiList) 
+			{
 				/** トランスフォームの親子関係を解除 */
 				m_transform.RemoveChild(&ui->m_transform);
 				/** キャンバス上にあるuiを削除 */
@@ -208,7 +240,8 @@ namespace app {
 		{
 			m_transform.UpdateTransform();
 
-			for (auto* ui : m_uiList) {
+			for (auto* ui : m_uiList) 
+			{
 				ui->Update();
 			}
 		}
@@ -216,7 +249,8 @@ namespace app {
 
 		void UICanvas::Render(RenderContext& rc)
 		{
-			for (auto* ui : m_uiList) {
+			for (auto* ui : m_uiList)
+			{
 				ui->Render(rc);
 			}
 		}
