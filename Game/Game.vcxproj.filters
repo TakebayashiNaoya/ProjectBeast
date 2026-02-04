@@ -78,6 +78,7 @@
     <ClCompile Include="Source\UI\UIBase.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="IObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -133,5 +134,6 @@
     <ClInclude Include="Source\UI\UIBase.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
+    <ClInclude Include="IObject.h" />
   </ItemGroup>
 </Project>
