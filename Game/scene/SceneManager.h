@@ -1,6 +1,7 @@
 ﻿/**
- * SceneManager.h
- * シーンの管理をするクラス
+ * @file SceneManager.h
+ * @brief シーンの管理をするクラス
+ * @author 立山
  */
 #pragma once
 #include"Scene/IScene.h"
@@ -17,6 +18,10 @@ public:
 	SceneManagerObject();
 	~SceneManagerObject();
 
+	/**
+	 * @brief 最初のシーンを設定
+	 * @detail Start()にSceneManager::GetInstance()->CreateScene(シーン名::ID());
+	 */
 	bool Start() override;
 	void Update() override;
 	void Render(RenderContext& rc);
@@ -33,7 +38,7 @@ public:
  */
 class SceneManager
 {
-
+	/** friend宣言 */
 	friend class SceneManagerObject;
 
 
@@ -44,7 +49,7 @@ public:
 
 public:
 	/**
-	 * シングルトンインスタンスを生成
+	 * @brief シングルトンインスタンスを生成
 	 */
 	static void CreateInstance()
 	{
@@ -56,7 +61,8 @@ public:
 
 
 	/**
-	 * シングルトンインスタンスを取得
+	 * @brief シングルトンインスタンスを取得
+	 * @return シングルトンインスタンスのポインタ
 	 */
 	static SceneManager* GetInstance()
 	{
@@ -65,7 +71,7 @@ public:
 
 
 	/**
-	 * シングルトンインスタンスを破棄
+	 * @brief シングルトンインスタンスを破棄
 	 */
 	static void DestroyInstance()
 	{
@@ -89,8 +95,9 @@ private:
 
 private:
 	/**
-	 * SceneMapにシーンを追加するテンプレート関数
-	 * 追加する場合は、SceneManager.cppのコンストラクタで呼び出す
+	 * @brief SceneMapにシーンを追加するテンプレート関数
+	 * @detail 追加する場合は、SceneManagerのコンストラクタで呼び出す
+	 * @return  T型のオブジェクトをnewで生成しポインタを返す
 	 */
 	template<typename T>
 	void AddSceneMap()
@@ -102,17 +109,13 @@ private:
 	}
 
 
-	/**
-	 * シーンを生成する関数
-	 */
+	/** シーンを生成する関数 */
 	void CreateScene(const uint32_t id);
 
 
 private:
 	/** シーンマップ */
 	std::map<uint32_t, std::unique_ptr<IScene>>m_sceneMap;
-
-
 	/** 現在のシーン */
 	IScene* m_currentScene;
 

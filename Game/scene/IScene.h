@@ -25,7 +25,10 @@ public:
 	virtual void Update() = 0;
 	virtual void Render(RenderContext& rc) = 0;
 
-	/** 次のシーンを要求する。idは次のシーンのIDを返す。*/
+	/**
+	 * @brief シーンを要求
+	 * @param id シーンのID
+	 */
 	virtual bool RequesutScene(uint32_t& id) = 0;
 };
 
