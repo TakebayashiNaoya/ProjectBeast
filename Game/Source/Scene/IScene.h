@@ -5,7 +5,10 @@
  */
 #pragma once
 
-
+ /**
+  * Hash32は文字列を数値に変換するもの。数値に変換するときに別の文字列でも同じ数値になるケースがあるが、被りずらいようなアルゴリズムを使っている。
+  * constexprはコンパイル時計算。
+  */
 #define appScene(name)\
 public:\
 static constexpr uint32_t ID(){return Hash32(#name);}
