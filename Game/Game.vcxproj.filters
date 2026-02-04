@@ -22,6 +22,9 @@
     <Filter Include="Actor\Character">
       <UniqueIdentifier>{85d0773f-9781-4321-9be3-5bc7bdab4cdd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{ef11bf88-48df-4b7b-8298-8d5dc60c2cd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -53,6 +56,13 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
       <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIBase.cpp" />
+    <ClCompile Include="Scene\IScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneManager.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +100,13 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
       <Filter>Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIBase.h" />
+    <ClInclude Include="Scene\IScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneManager.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
