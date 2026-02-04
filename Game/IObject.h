@@ -1,20 +1,66 @@
+﻿/**
+ * @file IObject.h
+ * @brief ゲームオブジェクトの基底クラス
+ * @author 立山
+ */
 #pragma once
 
-#include "Level3DRender/LevelRender.h"
 
-class Player;
-
-class Game : public IGameObject
+namespace app
 {
-public:
-	Game() {}
-	~Game() {}
-	bool Start();
-	void Update();
-	void Render(RenderContext& rc);
+	/**
+	 * @brief ゲームで必要になるオブジェクトの基底クラス
+	 */
+	class IObject : public Noncopyable
+	{
+	public:
+		class RenderContext;
 
-private:
-	ModelRender m_modelRender;
-	Vector3 m_pos;
-};
 
+	public:
+		virtual void Start() = 0;
+		virtual void Update() = 0;
+		virtual void Render(RenderContext& renderContext) = 0;
+
+
+		/** 下の関数を自分で呼んでください！ */
+	public:
+		void StartWrapper()
+		{
+			if (m_isActive) {
+				Start();
+			}
+		}
+
+
+		void UpdateWrapper()
+		{
+			if (m_isActive) {
+				Update();
+			}
+		}
+
+
+		void RenderWrapper(RenderContext& renderContext)
+		{
+			if (m_isActive) {
+				Render(renderContext);
+			}
+		}
+
+
+		/**
+		 * @brief Activeフラグの設定
+		 * @param isActive Activeフラグ
+		 */
+		void SetActive(const bool isActive)
+		{
+			m_isActive = isActive;
+		}
+
+
+	protected:
+		/** Activeフラグ */
+		bool m_isActive = true;
+	};
+}
