@@ -4,6 +4,14 @@
  * @author 藤谷
  */
 #pragma once
+#include "Util/CRC32.h"
+ /**
+  * @brief 数値に変換するマクロ
+  * @param name ステート名
+  */
+#define appState(name)\
+public:\
+ static constexpr uint32_t ID() { return Hash32(#name); }
 
 
 namespace app
@@ -20,11 +28,6 @@ namespace app
 		 */
 		class IState
 		{
-		private:
-			/** ステートマシン */
-			ActorStateMachine* m_stateMachine;
-
-
 		public:
 			IState(ActorStateMachine* stateMachine);
 			virtual ~IState() = default;
@@ -49,6 +52,11 @@ namespace app
 			{
 				return dynamic_cast<TStateMachine*>(m_stateMachine);
 			}
+
+
+		private:
+			/** ステートマシン */
+			ActorStateMachine* m_stateMachine;
 		};
 
 
@@ -62,22 +70,6 @@ namespace app
 		 */
 		class ActorStateMachine
 		{
-			/** unorderd_map<uint8_t, std::uniqueptr<IState>> */
-			using StateMap = std::unordered_map<uint8_t, std::unique_ptr<IState>>;
-		private:
-			/** ステートマップ */
-			StateMap m_stateMap;
-			/** 現在のステート */
-			IState* m_currentState;
-			/** 次のステート */
-			IState* m_nextState;
-
-
-		public:
-			ActorStateMachine();
-			virtual ~ActorStateMachine() = default;
-
-
 		public:
 			/*
 			 * @brief ステートマシンを更新する
@@ -97,7 +89,7 @@ namespace app
 			 * @param stateID ステートID
 			 */
 			template<typename TState>
-			void AddState(const uint8_t stateID)
+			void AddState(const uint32_t stateID)
 			{
 				// 指定したIDを取得
 				auto it = m_stateMap.find(stateID);
@@ -109,7 +101,7 @@ namespace app
 					K2_ASSERT(false, "重複しています");
 				}
 				// ステートを追加
-				m_stateMap[stateID] = std::make_unique<TState>(this);
+				m_stateMap[TState::ID()] = std::make_unique<TState>(this);
 			}
 
 
@@ -125,7 +117,21 @@ namespace app
 			 * @param stateID ステートID
 			 * @return ステートポインタ
 			 */
-			IState* FindState(const uint8_t stateID);
+			IState* FindState(const uint32_t stateID);
+
+
+		public:
+			ActorStateMachine();
+			virtual ~ActorStateMachine() = default;
+
+
+		protected:
+			/** ステートマップ */
+			std::unordered_map<uint32_t, std::unique_ptr<IState>> m_stateMap;
+			/** 現在のステート */
+			IState* m_currentState;
+			/** 次のステート */
+			IState* m_nextState;
 		};
 	}
 }

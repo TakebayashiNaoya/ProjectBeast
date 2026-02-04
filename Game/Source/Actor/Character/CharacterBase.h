@@ -52,16 +52,25 @@ namespace app
 		 */
 		class CharacterBase : public Actor
 		{
-		protected:
-			/** アニメーションクリップ */
-			AnimationClip* m_animationClips;
-			/** キャラクターコントローラー */
-			CharacterController m_characterController;
+		public:
+			/**
+			 * @brief キャラクターコントローラーを取得
+			 * @return キャラクターコントローラーのポインタ
+			 */
+			inline CharacterController* GetCharacterController() { return &m_characterController; }
 
 
 		public:
-			CharacterBase() = default;
-			virtual ~CharacterBase() override;
+			CharacterBase();
+			virtual ~CharacterBase() override = default;
+
+
+		protected:
+			/**
+			 * @brief 初期化処理
+			 * @param data モデルデータ
+			 */
+			void Init(const ModelData& data);
 
 
 		protected:
@@ -71,19 +80,10 @@ namespace app
 
 
 		protected:
-			/**
-			 * @brief 初期化処理
-			 * @param data モデルデータ
-			 */
-			void Init(const ModelData* data);
-
-
-		public:
-			/**
-			 * @brief キャラクターコントローラーを取得
-			 * @return キャラクターコントローラーのポインタ
-			 */
-			inline CharacterController* GetCharacterController() { return &m_characterController; }
+			/** アニメーションクリップ */
+			std::unique_ptr<AnimationClip[]> m_animationClips;
+			/** キャラクターコントローラー */
+			CharacterController m_characterController;
 		};
 	}
 }

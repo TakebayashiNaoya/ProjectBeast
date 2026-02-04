@@ -12,9 +12,9 @@ namespace app
 {
 	namespace actor
 	{
-		CharacterBase::~CharacterBase()
+		CharacterBase::CharacterBase()
+			: m_animationClips(nullptr)
 		{
-			if (m_animationClips)  delete[] m_animationClips;
 		}
 
 
@@ -34,19 +34,19 @@ namespace app
 		}
 
 
-		void CharacterBase::Init(const ModelData* data)
+		void CharacterBase::Init(const ModelData& data)
 		{
 			// アニメーションクリップを作成
-			m_animationClips = new AnimationClip[data->clipNum];
+			m_animationClips = std::make_unique<AnimationClip[]>(data.clipNum);
 
-			for (int i = 0; i < data->clipNum; ++i)
+			for (int i = 0; i < data.clipNum; ++i)
 			{
-				m_animationClips[i].Load(data->animationData[i].fileName);
-				m_animationClips[i].SetLoopFlag(data->animationData[i].isLoop);
+				m_animationClips[i].Load(data.animationData[i].fileName);
+				m_animationClips[i].SetLoopFlag(data.animationData[i].isLoop);
 			}
 
 			// モデルをセットアップ
-			m_modelRender.Init(data->fileName, m_animationClips, data->clipNum, data->upAxis);
+			m_modelRender.Init(data.fileName, m_animationClips.get(), data.clipNum, data.upAxis);
 			// トランスフォームを設定
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 			// モデルレンダーを更新

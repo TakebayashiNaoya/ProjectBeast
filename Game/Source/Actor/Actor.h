@@ -20,29 +20,6 @@ namespace app
 		 */
 		class Actor : public IGameObject
 		{
-		protected:
-			/** トランスフォーム */
-			core::Transform m_transform;
-			/** モデルレンダー */
-			ModelRender m_modelRender;
-			/** ステータス */
-			std::unique_ptr<ActorStatus> m_status;
-
-
-		public:
-			Actor() = default;
-			virtual ~Actor() = default;
-
-
-		protected:
-			/** 初期化処理 */
-			virtual bool Start()override = 0;
-			/** 更新処理 */
-			virtual void Update()override = 0;
-			/** 描画処理 */
-			virtual void Render(RenderContext& rc)override = 0;
-
-
 		public:
 			/**
 			 * @brief トランスフォームを取得
@@ -76,6 +53,29 @@ namespace app
 			 * @param scale 拡大率
 			 */
 			void SetScale(const Vector3& scale) { m_transform.m_scale = scale; }
+
+
+		public:
+			Actor() = default;
+			virtual ~Actor() = default;
+
+
+		protected:
+			/** 初期化処理 */
+			virtual bool Start()override = 0;
+			/** 更新処理 */
+			virtual void Update()override = 0;
+			/** 描画処理 */
+			virtual void Render(RenderContext& rc)override = 0;
+
+
+		protected:
+			/** トランスフォーム */
+			core::Transform m_transform;
+			/** モデルレンダー */
+			ModelRender m_modelRender;
+			/** ステータス */
+			std::unique_ptr<ActorStatus> m_status;
 		};
 	}
 }
