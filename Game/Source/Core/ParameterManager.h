@@ -22,6 +22,52 @@ struct IMasterParameter {};
 
 
 
+
+/*********************************************/
+
+
+/**
+ * @brief キャラクターパラメーター
+ * @details キャラクターの基本的なパラメーターを保持する
+ */
+struct MasterCharacterParameter : public IMasterParameter
+{
+	appParameter(MasterCharacterParameter);
+
+	/** 最大体力 */
+	int maxHp;
+	/** 初期体力 */
+	int hp;
+	/** 歩行速度 */
+	float walkSpeed;
+	/** 走行速度 */
+	float runSpeed;
+	/** 体の半径 */
+	float radius;
+	/** 体の高さ */
+	float height;
+};
+
+
+
+
+/*********************************************/
+
+
+/**
+ * @brief プレイヤーパラメーター
+ * @details プレイヤー固有のパラメーターを保持する
+ */
+struct MasterPlayerParameter : public MasterCharacterParameter
+{
+	appParameter(MasterPlayerParameter);
+
+	// プレイヤー固有のパラメーターをここに追加していく
+};
+
+
+
+
 /** defineの使用終了 */
 #undef appParameter
 

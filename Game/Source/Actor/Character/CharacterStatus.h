@@ -16,34 +16,6 @@ namespace app
 		 */
 		class CharacterStatus : public ActorStatus
 		{
-		protected:
-			/** 最大体力 */
-			int m_maxHp;
-			/** 体力 */
-			int m_hp;
-			/** 移動速度(歩き) */
-			float m_walkSpeed;
-			/** 移動速度(走り) */
-			float m_runSpeed;
-			/** 半径 */
-			float m_radius;
-			/** 高さ */
-			float m_height;
-
-
-		public:
-			CharacterStatus();
-			virtual ~CharacterStatus() override = default;
-
-
-		public:
-			/*
-			 * @brief セットアップ
-			 * @note ステータスの持ち主が呼び出す
-			 */
-			virtual void Setup() override;
-
-
 		public:
 			/**
 			 * @brief 最大体力を取得
@@ -75,6 +47,34 @@ namespace app
 			 * @return 高さ
 			 */
 			inline float GetHeight() const { return m_height; }
+
+
+		public:
+			/*
+			 * @brief セットアップ
+			 * @note ステータスの持ち主が呼び出す
+			 */
+			virtual void Setup() override;
+
+
+		public:
+			CharacterStatus();
+			virtual ~CharacterStatus() override = default;
+
+
+		protected:
+			/** 最大体力 */
+			int m_maxHp;
+			/** 体力 */
+			int m_hp;
+			/** 移動速度(歩き) */
+			float m_walkSpeed;
+			/** 移動速度(走り) */
+			float m_runSpeed;
+			/** 半径 */
+			float m_radius;
+			/** 高さ */
+			float m_height;
 		};
 	}
 }

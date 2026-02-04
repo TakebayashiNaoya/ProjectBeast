@@ -16,14 +16,13 @@
     <Filter Include="Json">
       <UniqueIdentifier>{59dd1170-d6ff-46e7-9472-b0f201b3992f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="player">
-      <UniqueIdentifier>{af170a78-3300-49f2-94d3-6a029fa34904}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Actor\Character">
       <UniqueIdentifier>{85d0773f-9781-4321-9be3-5bc7bdab4cdd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{ef11bf88-48df-4b7b-8298-8d5dc60c2cd7}</UniqueIdentifier>
+    <Filter Include="Actor\Character\Player">
+      <UniqueIdentifier>{6360bc73-ebe2-4067-9230-78eff1962d72}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +62,20 @@
     </ClCompile>
     <ClCompile Include="Scene\SceneManager.cpp">
       <Filter>Scene</Filter>
+    <ClCompile Include="Source\Actor\Character\Player\Player.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp">
+      <Filter>Actor\Character\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +120,20 @@
     </ClInclude>
     <ClInclude Include="Scene\SceneManager.h">
       <Filter>Scene</Filter>
+    <ClInclude Include="Source\Actor\Character\Player\Player.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerController.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerIState.h">
+      <Filter>Actor\Character\Player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
