@@ -20,7 +20,6 @@ namespace app
 
 		void CharacterBase::Start()
 		{
-
 			// ステータスを取得
 			const auto* status = GetStatus<CharacterStatus>();
 			// キャラクターコントローラーを初期化
