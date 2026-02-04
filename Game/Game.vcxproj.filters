@@ -19,6 +19,8 @@
     <Filter Include="Actor\Character">
       <UniqueIdentifier>{85d0773f-9781-4321-9be3-5bc7bdab4cdd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{ef11bf88-48df-4b7b-8298-8d5dc60c2cd7}</UniqueIdentifier>
     <Filter Include="Actor\Character\Player">
       <UniqueIdentifier>{6360bc73-ebe2-4067-9230-78eff1962d72}</UniqueIdentifier>
     </Filter>
@@ -55,6 +57,11 @@
       <Filter>Actor\Character</Filter>
     </ClCompile>
     <ClCompile Include="UI\UIBase.cpp" />
+    <ClCompile Include="Scene\IScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneManager.cpp">
+      <Filter>Scene</Filter>
     <ClCompile Include="Source\Actor\Character\Player\Player.cpp">
       <Filter>Actor\Character\Player</Filter>
     </ClCompile>
@@ -108,6 +115,11 @@
       <Filter>Actor\Character</Filter>
     </ClInclude>
     <ClInclude Include="UI\UIBase.h" />
+    <ClInclude Include="Scene\IScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneManager.h">
+      <Filter>Scene</Filter>
     <ClInclude Include="Source\Actor\Character\Player\Player.h">
       <Filter>Actor\Character\Player</Filter>
     </ClInclude>
