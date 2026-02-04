@@ -28,9 +28,12 @@ namespace app
 			void Setup() override;
 
 
+			void Update() override;
+
+
 		public:
-			PlayerStatus() = default;
-			~PlayerStatus() override = default;
+			PlayerStatus();
+			~PlayerStatus() override;
 
 
 		private:

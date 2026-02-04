@@ -47,6 +47,7 @@ namespace app
 		bool Player::Start()
 		{
 			Init(MODEL_DATA);
+			CharacterBase::Start();
 			return true;
 		}
 
@@ -55,14 +56,13 @@ namespace app
 		{
 			//m_stateMachine->Update();
 
-			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
-			m_modelRender.Update();
+			CharacterBase::Update();
 		}
 
 
 		void Player::Render(RenderContext& rc)
 		{
-			m_modelRender.Draw(rc);
+			CharacterBase::Render(rc);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ParameterManager.cpp
  *
  * パラメーター管理
@@ -6,6 +6,9 @@
  */
 #include "stdafx.h"
 #include "ParameterManager.h"
+
+
+
 
 
 ParameterManager* ParameterManager::m_instance = nullptr; //初期化

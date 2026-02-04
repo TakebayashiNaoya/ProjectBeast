@@ -25,5 +25,10 @@ namespace app
 		void CharacterStatus::Setup()
 		{
 		}
+
+
+		void CharacterStatus::Update()
+		{
+		}
 	}
 }

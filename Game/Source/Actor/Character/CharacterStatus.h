@@ -57,6 +57,9 @@ namespace app
 			virtual void Setup() override;
 
 
+			virtual void Update() override;
+
+
 		public:
 			CharacterStatus();
 			virtual ~CharacterStatus() override = default;
