@@ -1,16 +1,25 @@
-﻿#include "stdafx.h"
+﻿/**
+ * @file SceneManager.cpp
+ * @brief シーンの管理をするクラス
+ * @author 立山
+ */
+#include "stdafx.h"
 #include "SceneManager.h"
 
+
 SceneManager* SceneManager::m_instance = nullptr;
+
 
 SceneManager::SceneManager()
 	:m_currentScene(nullptr)
 {
 }
 
+
 SceneManager::~SceneManager()
 {
 }
+
 
 void SceneManager::Update()
 {
@@ -28,12 +37,14 @@ void SceneManager::Update()
 	}
 }
 
+
 void SceneManager::Render(RenderContext& rc)
 {
 	if (m_currentScene) {
 		m_currentScene->Render(rc);
 	}
 }
+
 
 void SceneManager::CreateScene(const uint32_t id)
 {
@@ -56,20 +67,24 @@ SceneManagerObject::SceneManagerObject()
 	SceneManager::CreateInstance();
 }
 
+
 SceneManagerObject::~SceneManagerObject()
 {
 	SceneManager::DestroyInstance();
 }
+
 
 bool SceneManagerObject::Start()
 {
 	return true;
 }
 
+
 void SceneManagerObject::Update()
 {
 	SceneManager::GetInstance()->Update();
 }
+
 
 void SceneManagerObject::Render(RenderContext& rc)
 {

@@ -1,6 +1,7 @@
 ﻿/**
- * IScene.h
- * 全てのシーンの基底クラス
+ * @file IScene.h
+ * @brief シーンの基底クラス
+ * @author 立山
  */
 #pragma once
 
@@ -13,7 +14,7 @@ static constexpr uint32_t INVALID_SCENE_ID = 0xffffffff;
 
 
 /**
- * シーンの基底クラス
+ * @brief シーンの基底クラス
  */
 class IScene
 {

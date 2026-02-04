@@ -10,7 +10,7 @@
 
 
  /**
-  * ゲーム中にnewするオブジェクト
+  * @brief ゲーム中にnewするオブジェクト
   */
 class SceneManagerObject : public IGameObject
 {
@@ -34,7 +34,7 @@ public:
 
 
 /**
- * シーンの管理をするクラス
+ * @brief シーンの管理をするクラス
  */
 class SceneManager
 {
