@@ -18,14 +18,12 @@ namespace app
 		}
 
 
-		bool CharacterBase::Start()
+		void CharacterBase::Start()
 		{
-
 			// ステータスを取得
 			const auto* status = GetStatus<CharacterStatus>();
 			// キャラクターコントローラーを初期化
 			m_characterController.Init(status->GetRadius(), status->GetHeight(), m_transform.m_position);
-			return true;
 		}
 
 

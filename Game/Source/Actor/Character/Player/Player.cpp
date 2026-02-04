@@ -44,11 +44,10 @@ namespace app
 		}
 
 
-		bool Player::Start()
+		void Player::Start()
 		{
 			Init(MODEL_DATA);
 			CharacterBase::Start();
-			return true;
 		}
 
 
