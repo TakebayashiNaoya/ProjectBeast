@@ -66,6 +66,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		g_engine->EndFrame();
 	}
 
+	delete application;
+
 	K2Engine::DeleteInstance();
 
 #ifdef _DEBUG

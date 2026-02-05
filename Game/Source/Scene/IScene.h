@@ -4,6 +4,8 @@
  * @author 立山
  */
 #pragma once
+#include "Source/Util/CRC32.h"
+
 
  /**
   * Hash32は文字列を数値に変換するもの。数値に変換するときに別の文字列でも同じ数値になるケースがあるが、被りずらいようなアルゴリズムを使っている。
@@ -13,26 +15,31 @@
 public:\
 static constexpr uint32_t ID(){return Hash32(#name);}
 
-static constexpr uint32_t INVALID_SCENE_ID = 0xffffffff;
-
-
-/**
- * @brief シーンの基底クラス
- */
-class IScene
+namespace app
 {
-public:
-	IScene() {}
-	virtual ~IScene() {}
+	/** 無効なシーンID */
+	static constexpr uint32_t INVALID_SCENE_ID = 0xffffffff;
 
-	virtual bool Start() = 0;
-	virtual void Update() = 0;
-	virtual void Render(RenderContext& rc) = 0;
+
+
 
 	/**
-	 * @brief シーンを要求
-	 * @param id シーンのID
+	 * @brief シーンの基底クラス
 	 */
-	virtual bool RequesutScene(uint32_t& id) = 0;
-};
+	class IScene : public Noncopyable
+	{
+	public:
+		IScene() {}
+		virtual ~IScene() {}
 
+		virtual bool Start() = 0;
+		virtual void Update() = 0;
+		virtual void Render(RenderContext& rc) = 0;
+
+		/**
+		 * @brief シーンを要求
+		 * @param id シーンのID
+		 */
+		virtual bool RequesutScene(uint32_t& id) = 0;
+	};
+}
