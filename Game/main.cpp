@@ -4,7 +4,7 @@
 #include<dxgidebug.h>
 #include<InitGUID.h>
 
-#include "Game.h"
+#include "Source/Application.h"
 
 
 
@@ -33,8 +33,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここから初期化を行うコードを記述する。
 	//////////////////////////////////////
 
-	//Gameクラスのオブジェクトを作成。
-	NewGO<Game>(0, "game");
+	app::Application* application = new app::Application();
 
 	//////////////////////////////////////
 	// 初期化を行うコードを書くのはここまで！！！
@@ -43,10 +42,28 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
-		if (g_pad[0]->IsTrigger(enButtonA)) {
-			g_pad[0]->SetVibration(/*durationSec=*/0.5f, /*normalizedPower=*/1.0f);
-		}
-		K2Engine::GetInstance()->Execute();
+		g_engine->BeginFrame();
+
+		// 更新まわりはここから下
+
+		g_engine->ExecuteUpdate();
+		application->Update();
+
+		// 描画まわりはここから下
+
+		// レンダリングエンジンの更新。
+		g_renderingEngine->Update();
+
+		g_engine->ExecuteRender();
+		auto& renderContext = g_graphicsEngine->GetRenderContext();
+		application->Render(renderContext);
+		//レンダリングエンジンを実行。		
+		g_renderingEngine->Execute(renderContext);
+
+		//当たり判定描画。
+		g_engine->DebubDrawWorld();
+
+		g_engine->EndFrame();
 	}
 
 	K2Engine::DeleteInstance();
