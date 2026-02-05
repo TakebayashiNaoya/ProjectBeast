@@ -32,7 +32,6 @@
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp">
       <Filter>Source\Actor</Filter>
@@ -88,10 +87,10 @@
     <ClCompile Include="Source\system\system.cpp">
       <Filter>Source\system</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Game.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="Util\CRC32.h">
       <Filter>Util</Filter>
@@ -150,5 +149,6 @@
     <ClInclude Include="Source\system\system.h">
       <Filter>Source\system</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Application.h" />
   </ItemGroup>
 </Project>
