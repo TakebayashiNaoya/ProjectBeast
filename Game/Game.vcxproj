@@ -239,6 +239,7 @@
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp" />
     <ClCompile Include="Source\Core\ParameterManager.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
+    <ClCompile Include="Source\Scene\DebugScene.cpp" />
     <ClCompile Include="Source\Scene\IScene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
@@ -266,6 +267,7 @@
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
     <ClInclude Include="Source\Core\ParameterManager.h" />
     <ClInclude Include="Source\Core\Transform.h" />
+    <ClInclude Include="Source\Scene\DebugScene.h" />
     <ClInclude Include="Source\Scene\IScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\system\system.h" />

@@ -88,6 +88,9 @@
       <Filter>Source\system</Filter>
     </ClCompile>
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Scene\DebugScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -150,5 +153,8 @@
       <Filter>Source\system</Filter>
     </ClInclude>
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Scene\DebugScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
