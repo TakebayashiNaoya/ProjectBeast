@@ -20,13 +20,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BeastEngine.cpp" />
-    <ClCompile Include="BeastEnginePreCompile.cpp" />
-    <ClCompile Include="graphics\RenderingEngine.cpp" />
+    <ClCompile Include="BeastEnginePreCompile.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="graphics\ModelRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
-    <ClInclude Include="graphics\RenderingEngine.h" />
+    <ClInclude Include="graphics\IRenderer.h" />
+    <ClInclude Include="graphics\ModelRender.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -85,6 +88,11 @@
     <IncludePath>$(ProjectDIr);$(ProjectDir)../k2EngineLow/;$(ProjectDir)../k2EngineLow/MiniEngine/;$(ProjectDir)../k2EngineLow/ExEngine/;$(ProjectDir)../k2EngineLow/ExEngine/bulletPhysics/src;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/Effekseer;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)\..\exlib\$(Platform)\$(Configuration)\;$(ProjectDir)..\k2EngineLow\$(Platform)\$(Configuration)\;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/EffeseerRendererDX12;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)../;$(ProjectDir)../k2EngineLow/;$(ProjectDir)../BeastEngine/;$(IncludePath)</IncludePath>
+    <OutDir>..\exlib\$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(ProjectDir)\..\exlib\$(Platform)\$(Configuration)\;$(ProjectDir)..\k2EngineLow\$(Platform)\$(Configuration)\;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/EffeseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -127,7 +135,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>Default</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>BeastPreCompile.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>BeastEnginePreCompile.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -149,15 +157,19 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>Default</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>BeastEnginePreCompile.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <Link>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>k2EngineLow.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
