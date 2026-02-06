@@ -236,7 +236,9 @@
     <ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp" />
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Core\AppParameterMacro.cpp" />
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp" />
+    <ClCompile Include="Source\Core\IMasterParameter.cpp" />
     <ClCompile Include="Source\Core\ParameterManager.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Scene\DebugScene.cpp" />
@@ -264,7 +266,9 @@
     <ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h" />
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Core\AppParameterMacro.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
+    <ClInclude Include="Source\Core\IMasterParameter.h" />
     <ClInclude Include="Source\Core\ParameterManager.h" />
     <ClInclude Include="Source\Core\Transform.h" />
     <ClInclude Include="Source\Scene\DebugScene.h" />
