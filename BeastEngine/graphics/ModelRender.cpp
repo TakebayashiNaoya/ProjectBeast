@@ -7,6 +7,8 @@ namespace nsBeastEngine
 	ModelRender::ModelRender()
 		: m_animationClips(nullptr)
 		, m_numAnimationClips(0)
+		, m_isEnableInstancingDraw(false)
+		, m_maxInstance(1)
 	{
 	}
 
@@ -33,26 +35,26 @@ namespace nsBeastEngine
 		// アニメーション済み頂点バッファの計算処理を初期化。
 		InitComputeAnimatoinVertexBuffer(filePath, enModelUpAxis);
 
-		// GBuffer描画用のモデルを初期化。
-		InitModelOnRenderGBuffer(*g_renderingEngine, filePath, enModelUpAxis, isShadowReciever);
+		//// GBuffer描画用のモデルを初期化。
+		//InitModelOnRenderGBuffer(*g_renderingEngine, filePath, enModelUpAxis, isShadowReciever);
 
-		// ZPrepass描画用のモデルを初期化。
-		InitModelOnZprepass(*g_renderingEngine, filePath, enModelUpAxis);
+		//// ZPrepass描画用のモデルを初期化。
+		//InitModelOnZprepass(*g_renderingEngine, filePath, enModelUpAxis);
 
-		// シャドウマップ描画用のモデルを初期化。
-		InitModelOnShadowMap(*g_renderingEngine, filePath, enModelUpAxis, isFrontCullingOnDrawShadowMap);
+		//// シャドウマップ描画用のモデルを初期化。
+		//InitModelOnShadowMap(*g_renderingEngine, filePath, enModelUpAxis, isFrontCullingOnDrawShadowMap);
 
-		// 幾何学データを初期化。
-		InitGeometryDatas(maxInstance);
+		//// 幾何学データを初期化。
+		//InitGeometryDatas(maxInstance);
 
-		// 各種ワールド行列を更新する。
-		UpdateWorldMatrixInModes();
+		//// 各種ワールド行列を更新する。
+		//UpdateWorldMatrixInModes();
 
-		if (m_isRaytracingWorld) {
-			// レイトレワールドに追加。
-			g_renderingEngine->AddModelToRaytracingWorld(m_renderToGBufferModel);
-			m_addRaytracingWorldModel = &m_renderToGBufferModel;
-		}
+		//if (m_isRaytracingWorld) {
+		//	// レイトレワールドに追加。
+		//	g_renderingEngine->AddModelToRaytracingWorld(m_renderToGBufferModel);
+		//	m_addRaytracingWorldModel = &m_renderToGBufferModel;
+		//}
 	}
 
 
@@ -71,7 +73,12 @@ namespace nsBeastEngine
 
 	void ModelRender::InitAnimation(AnimationClip* animationClips, int numAnimationClips, EnModelUpAxis enModelUpAxis)
 	{
-		/** アニメーションクリップを保存 */
+		/**
+		 * TODO: アニメーションクリップを配列で渡す
+		 * アロケーションアレイ
+		 */
+
+		 /** アニメーションクリップを保存 */
 		m_animationClips = animationClips;
 		/** アニメーションクリップの数を保存 */
 		m_numAnimationClips = numAnimationClips;
@@ -80,5 +87,25 @@ namespace nsBeastEngine
 			/** アニメーションを初期化 */
 			m_animation.Init(m_skeleton, m_animationClips, numAnimationClips);
 		}
+	}
+
+
+	void ModelRender::InitComputeAnimatoinVertexBuffer(
+		const char* tkmFilePath,
+		EnModelUpAxis enModelUpAxis)
+	{
+		StructuredBuffer* worldMatrxiArraySB = nullptr;
+		if (m_isEnableInstancingDraw) {
+			worldMatrxiArraySB = &m_worldMatrixArraySB;
+		}
+
+		m_computeAnimationVertexBuffer.Init(
+			tkmFilePath,
+			m_skeleton.GetNumBones(),
+			m_skeleton.GetBoneMatricesTopAddress(),
+			enModelUpAxis,
+			m_maxInstance,
+			worldMatrxiArraySB
+		);
 	}
 }
