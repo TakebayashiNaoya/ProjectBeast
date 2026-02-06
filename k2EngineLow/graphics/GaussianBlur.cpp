@@ -1,53 +1,71 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "GaussianBlur.h"
 
 namespace nsK2EngineLow {
-	void GaussianBlur::Init(Texture* originalTexture, bool isBlurAlpha, bool isDownSample)
+	void GaussianBlur::Init(Texture* originalTexture, bool isBlurAlpha, int width, int height)
 	{
 		m_originalTexture = originalTexture;
+		m_bokeTextureWidth = width;
+		m_bokeTextureHeight = height;
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’åˆæœŸåŒ–ã€‚
+		InitRenderTargets();
+		//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆæœŸåŒ–ã€‚
+		InitSprites(isBlurAlpha);
+	}
+	void GaussianBlur::Init(Texture* originalTexture, bool isBlurAlpha, bool isDownSample)
+	{
+		if (isDownSample) {
+			m_bokeTextureWidth = originalTexture->GetWidth() / 2.0f;
+			m_bokeTextureHeight = originalTexture->GetHeight() / 2.0f;
+		}
+		else {
+			m_bokeTextureWidth = originalTexture->GetWidth();
+			m_bokeTextureHeight = originalTexture->GetHeight();
+		}
+		m_originalTexture = originalTexture;
 
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğ‰Šú‰»B
-		InitRenderTargets(isDownSample);
-		//ƒXƒvƒ‰ƒCƒg‚ğ‰Šú‰»B
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’åˆæœŸåŒ–ã€‚
+		InitRenderTargets();
+		//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆæœŸåŒ–ã€‚
 		InitSprites(isBlurAlpha);
 	}
 
 
 	void GaussianBlur::ExecuteOnGPU(RenderContext& rc, float blurPower)
 	{
-		//d‚İƒe[ƒuƒ‹‚ğXV‚·‚éB
+		//é‡ã¿ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’æ›´æ–°ã™ã‚‹ã€‚
 		UpdateWeightsTable(blurPower);
 
-		//‰¡ƒuƒ‰[‚ğÀsB
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚µ‚Ä—˜—p‚Å‚«‚é‚æ‚¤‚É‚È‚é‚Ü‚Åwait‚ğ“ü‚ê‚éB
+		//æ¨ªãƒ–ãƒ©ãƒ¼ã‚’å®Ÿè¡Œã€‚
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦åˆ©ç”¨ã§ãã‚‹ã‚ˆã†ã«ãªã‚‹ã¾ã§waitã‚’å…¥ã‚Œã‚‹ã€‚
 		rc.WaitUntilToPossibleSetRenderTarget(m_xBlurRenderTarget);
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğİ’èB
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’è¨­å®šã€‚
 		rc.SetRenderTargetAndViewport(m_xBlurRenderTarget);
 
-		//ƒhƒ[B
+		//ãƒ‰ãƒ­ãƒ¼ã€‚
 		m_xBlurSprite.Draw(rc);
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ö‚Ì‘‚«‚İI—¹‘Ò‚¿B
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æ›¸ãè¾¼ã¿çµ‚äº†å¾…ã¡ã€‚
 		rc.WaitUntilFinishDrawingToRenderTarget(m_xBlurRenderTarget);
 
-		//cƒuƒ‰[‚ğÀsB
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚µ‚Ä—˜—p‚Å‚«‚é‚æ‚¤‚É‚È‚é‚Ü‚Åwait‚ğ“ü‚ê‚éB
+		//ç¸¦ãƒ–ãƒ©ãƒ¼ã‚’å®Ÿè¡Œã€‚
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦åˆ©ç”¨ã§ãã‚‹ã‚ˆã†ã«ãªã‚‹ã¾ã§waitã‚’å…¥ã‚Œã‚‹ã€‚
 		rc.WaitUntilToPossibleSetRenderTarget(m_yBlurRenderTarget);
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğİ’èB
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’è¨­å®šã€‚
 		rc.SetRenderTargetAndViewport(m_yBlurRenderTarget);
 
-		//ƒhƒ[B
+		//ãƒ‰ãƒ­ãƒ¼ã€‚
 		m_yBlurSprite.Draw(rc);
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ö‚Ì‘‚«‚İI—¹‘Ò‚¿B
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æ›¸ãè¾¼ã¿çµ‚äº†å¾…ã¡ã€‚
 		rc.WaitUntilFinishDrawingToRenderTarget(m_yBlurRenderTarget);
 	}
 
-	void GaussianBlur::InitRenderTargets(bool isDownSample)
+	void GaussianBlur::InitRenderTargets()
 	{
 		int w = m_originalTexture->GetWidth();
 		int h = m_originalTexture->GetHeight();
-		//Xƒuƒ‰[—p‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğì¬‚·‚éB
+		//Xãƒ–ãƒ©ãƒ¼ç”¨ã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
 		m_xBlurRenderTarget.Create(
-			isDownSample ? w / 2 : w,
+			m_bokeTextureWidth,
 			h,
 			1,
 			1,
@@ -55,10 +73,10 @@ namespace nsK2EngineLow {
 			DXGI_FORMAT_UNKNOWN
 		);
 
-		//Yƒuƒ‰[—p‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğì¬‚·‚éB
+		//Yãƒ–ãƒ©ãƒ¼ç”¨ã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
 		m_yBlurRenderTarget.Create(
-			isDownSample ? w / 2 : w,
-			isDownSample ? h / 2 : h,
+			m_bokeTextureWidth,
+			m_bokeTextureHeight,
 			1,
 			1,
 			m_originalTexture->GetFormat(),
@@ -75,44 +93,44 @@ namespace nsK2EngineLow {
 		else {
 			psEntryFunc = "PSBlur";
 		}
-		//‰¡ƒuƒ‰[—p‚ÌƒXƒvƒ‰ƒCƒg‚ğ‰Šú‰»‚·‚éB
+		//æ¨ªãƒ–ãƒ©ãƒ¼ç”¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 		{
 			SpriteInitData xBlurSpriteInitData;
-			xBlurSpriteInitData.m_fxFilePath = "Assets/shader/gaussianBlur.fx";
+			xBlurSpriteInitData.m_fxFilePath = "Assets/shader/util/gaussianBlur.fx";
 			xBlurSpriteInitData.m_vsEntryPointFunc = "VSXBlur";
 			xBlurSpriteInitData.m_psEntryPoinFunc = psEntryFunc;
-			//ƒXƒvƒ‰ƒCƒg‚Ì‰ğ‘œ“x‚Ím_xBlurRenderTarget‚Æ“¯‚¶B
+			//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è§£åƒåº¦ã¯m_xBlurRenderTargetã¨åŒã˜ã€‚
 			xBlurSpriteInitData.m_width = m_xBlurRenderTarget.GetWidth();
 			xBlurSpriteInitData.m_height = m_xBlurRenderTarget.GetHeight();
-			//ƒeƒNƒXƒ`ƒƒ‚Í‹P“xƒeƒNƒXƒ`ƒƒB
+			//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¯è¼åº¦ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
 			xBlurSpriteInitData.m_textures[0] = m_originalTexture;
-			//•`‚«‚ŞƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ÌƒtƒH[ƒ}ƒbƒg‚ğw’è‚·‚éB
+			//æãè¾¼ã‚€ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æŒ‡å®šã™ã‚‹ã€‚
 			xBlurSpriteInitData.m_colorBufferFormat[0] = m_xBlurRenderTarget.GetColorBufferFormat();
-			//ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@‚Éƒuƒ‰[—p‚Ìƒpƒ‰ƒ[ƒ^[‚ğİ’è‚·‚éB
+			//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã«ãƒ–ãƒ©ãƒ¼ç”¨ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®šã™ã‚‹ã€‚
 			xBlurSpriteInitData.m_expandConstantBuffer = &m_weights;
 			xBlurSpriteInitData.m_expandConstantBufferSize = sizeof(m_weights);
 
-			//‰Šú‰»î•ñ‚ğ‚à‚Æ‚É‰¡ƒuƒ‰[—p‚ÌƒXƒvƒ‰ƒCƒg‚ğ‰Šú‰»‚·‚éB
+			//åˆæœŸåŒ–æƒ…å ±ã‚’ã‚‚ã¨ã«æ¨ªãƒ–ãƒ©ãƒ¼ç”¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 			m_xBlurSprite.Init(xBlurSpriteInitData);
 		}
-		//cƒuƒ‰[—p‚ÌƒXƒvƒ‰ƒCƒg‚ğ‰Šú‰»‚·‚éB
+		//ç¸¦ãƒ–ãƒ©ãƒ¼ç”¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 		{
 			SpriteInitData yBlurSpriteInitData;
-			yBlurSpriteInitData.m_fxFilePath = "Assets/shader/gaussianBlur.fx";
+			yBlurSpriteInitData.m_fxFilePath = "Assets/shader/util/gaussianBlur.fx";
 			yBlurSpriteInitData.m_vsEntryPointFunc = "VSYBlur";
 			yBlurSpriteInitData.m_psEntryPoinFunc = psEntryFunc;
-			//ƒXƒvƒ‰ƒCƒg‚Ì‰ğ‘œ“x‚Ím_yBlurRenderTarget‚Æ“¯‚¶B
+			//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®è§£åƒåº¦ã¯m_yBlurRenderTargetã¨åŒã˜ã€‚
 			yBlurSpriteInitData.m_width = m_yBlurRenderTarget.GetWidth();
 			yBlurSpriteInitData.m_height = m_yBlurRenderTarget.GetHeight();
-			//ƒeƒNƒXƒ`ƒƒ‚Í‰¡ƒuƒ‰[‚ğ‚©‚¯‚½‚à‚ÌB
+			//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¯æ¨ªãƒ–ãƒ©ãƒ¼ã‚’ã‹ã‘ãŸã‚‚ã®ã€‚
 			yBlurSpriteInitData.m_textures[0] = &m_xBlurRenderTarget.GetRenderTargetTexture();
-			//•`‚«‚ŞƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ÌƒtƒH[ƒ}ƒbƒg‚ğw’è‚·‚éB
+			//æãè¾¼ã‚€ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æŒ‡å®šã™ã‚‹ã€‚
 			yBlurSpriteInitData.m_colorBufferFormat[0] = m_yBlurRenderTarget.GetColorBufferFormat();
-			//ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@‚Éƒuƒ‰[—p‚Ìƒpƒ‰ƒ[ƒ^[‚ğİ’è‚·‚éB
+			//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã«ãƒ–ãƒ©ãƒ¼ç”¨ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®šã™ã‚‹ã€‚
 			yBlurSpriteInitData.m_expandConstantBuffer = &m_weights;
 			yBlurSpriteInitData.m_expandConstantBufferSize = sizeof(m_weights);
 
-			//‰Šú‰»î•ñ‚ğ‚à‚Æ‚Écƒuƒ‰[—p‚ÌƒXƒvƒ‰ƒCƒg‚ğ‰Šú‰»‚·‚éB
+			//åˆæœŸåŒ–æƒ…å ±ã‚’ã‚‚ã¨ã«ç¸¦ãƒ–ãƒ©ãƒ¼ç”¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 			m_yBlurSprite.Init(yBlurSpriteInitData);
 		}
 	}
@@ -124,7 +142,7 @@ namespace nsK2EngineLow {
 			total += 2.0f * m_weights[i];
 
 		}
-		// ‹KŠi‰»
+		// è¦æ ¼åŒ–
 		for (int i = 0; i < NUM_WEIGHTS; i++) {
 			m_weights[i] /= total;
 		}

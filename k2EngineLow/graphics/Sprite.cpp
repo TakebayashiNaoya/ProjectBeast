@@ -1,282 +1,282 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "Sprite.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
 namespace nsK2EngineLow {
-    namespace {
-        struct SSimpleVertex {
-            Vector4 pos;
-            Vector2 tex;
-        };
-    }
-    const Vector2	Sprite::DEFAULT_PIVOT = { 0.5f, 0.5f };
-    Sprite::~Sprite()
-    {
-    }
-    void Sprite::InitTextures(const SpriteInitData& initData)
-    {
-        //ƒXƒvƒ‰ƒCƒg‚Åg—p‚·‚éƒeƒNƒXƒ`ƒƒ‚ğ€”õ‚·‚éB
-        if (initData.m_ddsFilePath[0] != nullptr) {
-            //ddsƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ªw’è‚³‚ê‚Ä‚é‚Ì‚È‚çAddsƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ğì¬‚·‚éB
-            int texNo = 0;
-            while (initData.m_ddsFilePath[texNo] && texNo < MAX_TEXTURE) {
-                wchar_t wddsFilePath[1024];
-                mbstowcs(wddsFilePath, initData.m_ddsFilePath[texNo], 1023);
-                m_textures[texNo].InitFromDDSFile(wddsFilePath);
-                texNo++;
-            }
-            m_numTexture = texNo;
-        }
-        else if (initData.m_textures[0] != nullptr) {
-            //ŠO•”ƒeƒNƒXƒ`ƒƒ‚ğw’è‚³‚ê‚Ä‚¢‚éB
-            int texNo = 0;
-            while (initData.m_textures[texNo] != nullptr) {
-                m_textureExternal[texNo] = initData.m_textures[texNo];
-                texNo++;
-            }
-            m_numTexture = texNo;
-        }
-        else {
-            //ƒeƒNƒXƒ`ƒƒ‚ªw’è‚³‚ê‚Ä‚È‚¢B
-            MessageBoxA(nullptr, "initData.m_ddsFilePath‚©m_textures‚Ì‚Ç‚¿‚ç‚©‚Ég—p‚·‚éƒeƒNƒXƒ`ƒƒ‚Ìî•ñ‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B", "ƒGƒ‰[", MB_OK);
-            std::abort();
-        }
-    }
-    void Sprite::InitShader(const SpriteInitData& initData)
-    {
-        if (initData.m_fxFilePath == nullptr) {
-            MessageBoxA(nullptr, "fxƒtƒ@ƒCƒ‹‚ªw’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB", "ƒGƒ‰[", MB_OK);
-            std::abort();
-        }
+	namespace {
+		struct SSimpleVertex {
+			Vector4 pos;
+			Vector2 tex;
+		};
+	}
+	const Vector2	Sprite::DEFAULT_PIVOT = { 0.5f, 0.5f };
+	Sprite::~Sprite()
+	{
+	}
+	void Sprite::InitTextures(const SpriteInitData& initData)
+	{
+		//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã§ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’æº–å‚™ã™ã‚‹ã€‚
+		if (initData.m_ddsFilePath[0] != nullptr) {
+			//ddsãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ãŒæŒ‡å®šã•ã‚Œã¦ã‚‹ã®ãªã‚‰ã€ddsãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã™ã‚‹ã€‚
+			int texNo = 0;
+			while (initData.m_ddsFilePath[texNo] && texNo < MAX_TEXTURE) {
+				wchar_t wddsFilePath[1024];
+				mbstowcs(wddsFilePath, initData.m_ddsFilePath[texNo], 1023);
+				m_textures[texNo].InitFromDDSFile(wddsFilePath);
+				texNo++;
+			}
+			m_numTexture = texNo;
+		}
+		else if (initData.m_textures[0] != nullptr) {
+			//å¤–éƒ¨ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’æŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã€‚
+			int texNo = 0;
+			while (initData.m_textures[texNo] != nullptr) {
+				m_textureExternal[texNo] = initData.m_textures[texNo];
+				texNo++;
+			}
+			m_numTexture = texNo;
+		}
+		else {
+			//ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒæŒ‡å®šã•ã‚Œã¦ãªã„ã€‚
+			MessageBoxA(nullptr, "initData.m_ddsFilePathã‹m_texturesã®ã©ã¡ã‚‰ã‹ã«ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æƒ…å ±ã‚’è¨­å®šã—ã¦ãã ã•ã„ã€‚", "ã‚¨ãƒ©ãƒ¼", MB_OK);
+			std::abort();
+		}
+	}
+	void Sprite::InitShader(const SpriteInitData& initData)
+	{
+		if (initData.m_fxFilePath == nullptr) {
+			MessageBoxA(nullptr, "fxãƒ•ã‚¡ã‚¤ãƒ«ãŒæŒ‡å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚", "ã‚¨ãƒ©ãƒ¼", MB_OK);
+			std::abort();
+		}
 
-        //ƒVƒF[ƒ_[‚ğƒ[ƒh‚·‚éB
-        m_vs.LoadVS(initData.m_fxFilePath, initData.m_vsEntryPointFunc);
-        m_ps.LoadPS(initData.m_fxFilePath, initData.m_psEntryPoinFunc);
-    }
-    void Sprite::InitDescriptorHeap(const SpriteInitData& initData)
-    {
-        if (m_textureExternal[0] != nullptr) {
-            //ŠO•”‚ÌƒeƒNƒXƒ`ƒƒ‚ªw’è‚³‚ê‚Ä‚¢‚éB
-            for (int texNo = 0; texNo < m_numTexture; texNo++) {
-                m_descriptorHeap.RegistShaderResource(texNo, *m_textureExternal[texNo]);
-            }
-        }
-        else {
-            for (int texNo = 0; texNo < m_numTexture; texNo++) {
-                m_descriptorHeap.RegistShaderResource(texNo, m_textures[texNo]);
-            }
-        }
-        for (int exSrvNo = 0; exSrvNo < EXPAND_MAX_SPRITE_EXPAND_SRV; exSrvNo++) {
-            if (initData.m_expandShaderResoruceView[exSrvNo] != nullptr) {
-                //Šg’£ƒVƒF[ƒ_[ƒŠƒ\[ƒXƒrƒ…[B
-                m_descriptorHeap.RegistShaderResource(
-                    EXPAND_SRV_REG__START_NO + exSrvNo,
-                    *initData.m_expandShaderResoruceView[exSrvNo]
-                );
-            }
-        }
-        m_descriptorHeap.RegistConstantBuffer(0, m_constantBufferGPU);
-        if (m_userExpandConstantBufferCPU != nullptr) {
-            //ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@‚Íb1‚ÉŠÖ˜A•t‚¯‚·‚éB
-            m_descriptorHeap.RegistConstantBuffer(1, m_userExpandConstantBufferGPU);
-        }
-        m_descriptorHeap.Commit();
-    }
-    void Sprite::InitVertexBufferAndIndexBuffer(const SpriteInitData& initData)
-    {
-        float halfW = m_size.x * 0.5f;
-        float halfH = m_size.y * 0.5f;
-        //’¸“_ƒoƒbƒtƒ@‚Ìƒ\[ƒXƒf[ƒ^B
-        SSimpleVertex vertices[] =
-        {
-            {
-                Vector4(-halfW, -halfH, 0.0f, 1.0f),
-                Vector2(0.0f, 1.0f),
-            },
-            {
-                Vector4(halfW, -halfH, 0.0f, 1.0f),
-                Vector2(1.0f, 1.0f),
-            },
-            {
-                Vector4(-halfW, halfH, 0.0f, 1.0f),
-                Vector2(0.0f, 0.0f)
-            },
-            {
-                Vector4(halfW, halfH, 0.0f, 1.0f),
-                Vector2(1.0f, 0.0f)
-            }
+		//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
+		m_vs.LoadVS(initData.m_fxFilePath, initData.m_vsEntryPointFunc);
+		m_ps.LoadPS(initData.m_fxFilePath, initData.m_psEntryPoinFunc);
+	}
+	void Sprite::InitDescriptorHeap(const SpriteInitData& initData)
+	{
+		if (m_textureExternal[0] != nullptr) {
+			//å¤–éƒ¨ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã€‚
+			for (int texNo = 0; texNo < m_numTexture; texNo++) {
+				m_descriptorHeap.RegistShaderResource(texNo, *m_textureExternal[texNo]);
+			}
+		}
+		else {
+			for (int texNo = 0; texNo < m_numTexture; texNo++) {
+				m_descriptorHeap.RegistShaderResource(texNo, m_textures[texNo]);
+			}
+		}
+		for (int exSrvNo = 0; exSrvNo < EXPAND_MAX_SPRITE_EXPAND_SRV; exSrvNo++) {
+			if (initData.m_expandShaderResoruceView[exSrvNo] != nullptr) {
+				//æ‹¡å¼µã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã€‚
+				m_descriptorHeap.RegistShaderResource(
+					EXPAND_SRV_REG__START_NO + exSrvNo,
+					*initData.m_expandShaderResoruceView[exSrvNo]
+				);
+			}
+		}
+		m_descriptorHeap.RegistConstantBuffer(0, m_constantBufferGPU);
+		if (m_userExpandConstantBufferCPU != nullptr) {
+			//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã¯b1ã«é–¢é€£ä»˜ã‘ã™ã‚‹ã€‚
+			m_descriptorHeap.RegistConstantBuffer(1, m_userExpandConstantBufferGPU);
+		}
+		m_descriptorHeap.Commit();
+	}
+	void Sprite::InitVertexBufferAndIndexBuffer(const SpriteInitData& initData)
+	{
+		float halfW = m_size.x * 0.5f;
+		float halfH = m_size.y * 0.5f;
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ã‚½ãƒ¼ã‚¹ãƒ‡ãƒ¼ã‚¿ã€‚
+		SSimpleVertex vertices[] =
+		{
+			{
+				Vector4(-halfW, -halfH, 0.0f, 1.0f),
+				Vector2(0.0f, 1.0f),
+			},
+			{
+				Vector4(halfW, -halfH, 0.0f, 1.0f),
+				Vector2(1.0f, 1.0f),
+			},
+			{
+				Vector4(-halfW, halfH, 0.0f, 1.0f),
+				Vector2(0.0f, 0.0f)
+			},
+			{
+				Vector4(halfW, halfH, 0.0f, 1.0f),
+				Vector2(1.0f, 0.0f)
+			}
 
-        };
-        unsigned short indices[] = { 0,1,2,3 };
+		};
+		unsigned short indices[] = { 0,1,2,3 };
 
-        m_vertexBuffer.Init(sizeof(vertices), sizeof(vertices[0]));
-        m_vertexBuffer.Copy(vertices);
+		m_vertexBuffer.Init(sizeof(vertices), sizeof(vertices[0]));
+		m_vertexBuffer.Copy(vertices);
 
-        m_indexBuffer.Init(sizeof(indices), sizeof(indices[0]));
-        m_indexBuffer.Copy(indices);
-    }
-    void Sprite::InitPipelineState(const SpriteInitData& initData)
-    {
-        // ’¸“_ƒŒƒCƒAƒEƒg‚ğ’è‹`‚·‚éB
-        D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
-        {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        };
+		m_indexBuffer.Init(sizeof(indices), sizeof(indices[0]));
+		m_indexBuffer.Copy(indices, 0, 0, 0);
+	}
+	void Sprite::InitPipelineState(const SpriteInitData& initData)
+	{
+		// é ‚ç‚¹ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã‚’å®šç¾©ã™ã‚‹ã€‚
+		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		};
 
-        //ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğì¬B
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
-        psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
-        psoDesc.pRootSignature = m_rootSignature.Get();
-        psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vs.GetCompiledBlob());
-        psoDesc.PS = CD3DX12_SHADER_BYTECODE(m_ps.GetCompiledBlob());
-        psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-        psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ä½œæˆã€‚
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
+		psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+		psoDesc.pRootSignature = m_rootSignature.Get();
+		psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vs.GetCompiledBlob());
+		psoDesc.PS = CD3DX12_SHADER_BYTECODE(m_ps.GetCompiledBlob());
+		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-        if (initData.m_alphaBlendMode == AlphaBlendMode_Trans) {
-            //”¼“§–¾‡¬‚ÌƒuƒŒƒ“ƒhƒXƒe[ƒg‚ğì¬‚·‚éB
-            psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
-            psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-            psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-            psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-        }
-        else if (initData.m_alphaBlendMode == AlphaBlendMode_Add) {
-            //‰ÁZ‡¬B
-            psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
-            psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-            psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-            psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-        }
-        else if (initData.m_alphaBlendMode == AlphaBlendMode_Multiply) {
-            //æZ‡¬B
-            psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
-            psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-            psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-            psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-        }
+		if (initData.m_alphaBlendMode == AlphaBlendMode_Trans) {
+			//åŠé€æ˜åˆæˆã®ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
+			psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
+			psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+			psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+			psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		}
+		else if (initData.m_alphaBlendMode == AlphaBlendMode_Add) {
+			//åŠ ç®—åˆæˆã€‚
+			psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
+			psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+			psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+			psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		}
+		else if (initData.m_alphaBlendMode == AlphaBlendMode_Multiply) {
+			//ä¹—ç®—åˆæˆã€‚
+			psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
+			psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+			psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+			psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		}
 
-        psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-        psoDesc.DepthStencilState.DepthEnable = FALSE;
-        psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-        psoDesc.DepthStencilState.StencilEnable = FALSE;
-        psoDesc.SampleMask = UINT_MAX;
-        psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-        for (auto& format : initData.m_colorBufferFormat) {
-            if (format == DXGI_FORMAT_UNKNOWN) {
-                break;
-            }
-            psoDesc.RTVFormats[psoDesc.NumRenderTargets] = format;
-            psoDesc.NumRenderTargets++;
-        }
+		psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		psoDesc.DepthStencilState.DepthEnable = FALSE;
+		psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+		psoDesc.DepthStencilState.StencilEnable = FALSE;
+		psoDesc.SampleMask = UINT_MAX;
+		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		for (auto& format : initData.m_colorBufferFormat) {
+			if (format == DXGI_FORMAT_UNKNOWN) {
+				break;
+			}
+			psoDesc.RTVFormats[psoDesc.NumRenderTargets] = format;
+			psoDesc.NumRenderTargets++;
+		}
 
-        psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-        psoDesc.SampleDesc.Count = 1;
+		psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+		psoDesc.SampleDesc.Count = 1;
 
-        m_pipelineState.Init(psoDesc);
-    }
-    void Sprite::InitConstantBuffer(const SpriteInitData& initData)
-    {
-        //’è”ƒoƒbƒtƒ@‚Ì‰Šú‰»B
-        m_constantBufferGPU.Init(sizeof(m_constantBufferCPU), nullptr);
-        //ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@‚ªw’è‚³‚ê‚Ä‚¢‚éB
-        if (initData.m_expandConstantBuffer != nullptr) {
-            m_userExpandConstantBufferCPU = initData.m_expandConstantBuffer;
-            m_userExpandConstantBufferGPU.Init(
-                initData.m_expandConstantBufferSize,
-                initData.m_expandConstantBuffer
-            );
-        }
-    }
-    void Sprite::Init(const SpriteInitData& initData)
-    {
-        m_size.x = static_cast<float>(initData.m_width);
-        m_size.y = static_cast<float>(initData.m_height);
+		m_pipelineState.Init(psoDesc);
+	}
+	void Sprite::InitConstantBuffer(const SpriteInitData& initData)
+	{
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸåŒ–ã€‚
+		m_constantBufferGPU.Init(sizeof(m_constantBufferCPU), nullptr);
+		//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã€‚
+		if (initData.m_expandConstantBuffer != nullptr) {
+			m_userExpandConstantBufferCPU = initData.m_expandConstantBuffer;
+			m_userExpandConstantBufferGPU.Init(
+				initData.m_expandConstantBufferSize,
+				initData.m_expandConstantBuffer
+			);
+		}
+	}
+	void Sprite::Init(const SpriteInitData& initData)
+	{
+		m_size.x = static_cast<float>(initData.m_width);
+		m_size.y = static_cast<float>(initData.m_height);
 
-        //ƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»B
-        InitTextures(initData);
-        //’¸“_ƒoƒbƒtƒ@‚ÆƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ğ‰Šú‰»B
-        InitVertexBufferAndIndexBuffer(initData);
-        //’è”ƒoƒbƒtƒ@‚ğ‰Šú‰»B
-        InitConstantBuffer(initData);
+		//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã€‚
+		InitTextures(initData);
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–ã€‚
+		InitVertexBufferAndIndexBuffer(initData);
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–ã€‚
+		InitConstantBuffer(initData);
 
-        //ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ì‰Šú‰»B
-        m_rootSignature.Init(
-            D3D12_FILTER_MIN_MAG_MIP_LINEAR,
-            initData.textureAddressMode,
-            initData.textureAddressMode,
-            initData.textureAddressMode);
+		//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®åˆæœŸåŒ–ã€‚
+		m_rootSignature.Init(
+			D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+			initData.textureAddressMode,
+			initData.textureAddressMode,
+			initData.textureAddressMode);
 
-        //ƒVƒF[ƒ_[‚ğ‰Šú‰»B
-        InitShader(initData);
-        //ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ì‰Šú‰»B
-        InitPipelineState(initData);
-        //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğ‰Šú‰»B
-        InitDescriptorHeap(initData);
-    }
-    void Sprite::Update(const Vector3& pos, const Quaternion& rot, const Vector3& scale, const Vector2& pivot)
-    {
-        //ƒsƒ{ƒbƒg‚ğl—¶‚É“ü‚ê‚½•½sˆÚ“®s—ñ‚ğì¬B
-        //ƒsƒ{ƒbƒg‚Í^‚ñ’†‚ª0.0, 0.0A¶ã‚ª-1.0f, -1.0A‰E‰º‚ª1.0A1.0‚É‚È‚é‚æ‚¤‚É‚·‚éB
-        Vector2 localPivot = pivot;
-        localPivot.x -= 0.5f;
-        localPivot.y -= 0.5f;
-        localPivot.x *= -2.0f;
-        localPivot.y *= -2.0f;
-        //‰æ‘œ‚Ìƒn[ƒtƒTƒCƒY‚ğ‹‚ß‚éB
-        Vector2 halfSize = m_size;
-        halfSize.x *= 0.5f;
-        halfSize.y *= 0.5f;
-        Matrix mPivotTrans;
+		//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’åˆæœŸåŒ–ã€‚
+		InitShader(initData);
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®åˆæœŸåŒ–ã€‚
+		InitPipelineState(initData);
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’åˆæœŸåŒ–ã€‚
+		InitDescriptorHeap(initData);
+	}
+	void Sprite::Update(const Vector3& pos, const Quaternion& rot, const Vector3& scale, const Vector2& pivot)
+	{
+		//ãƒ”ãƒœãƒƒãƒˆã‚’è€ƒæ…®ã«å…¥ã‚ŒãŸå¹³è¡Œç§»å‹•è¡Œåˆ—ã‚’ä½œæˆã€‚
+		//ãƒ”ãƒœãƒƒãƒˆã¯çœŸã‚“ä¸­ãŒ0.0, 0.0ã€å·¦ä¸ŠãŒ-1.0f, -1.0ã€å³ä¸‹ãŒ1.0ã€1.0ã«ãªã‚‹ã‚ˆã†ã«ã™ã‚‹ã€‚
+		Vector2 localPivot = pivot;
+		localPivot.x -= 0.5f;
+		localPivot.y -= 0.5f;
+		localPivot.x *= -2.0f;
+		localPivot.y *= -2.0f;
+		//ç”»åƒã®ãƒãƒ¼ãƒ•ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹ã€‚
+		Vector2 halfSize = m_size;
+		halfSize.x *= 0.5f;
+		halfSize.y *= 0.5f;
+		Matrix mPivotTrans;
 
-        mPivotTrans.MakeTranslation(
-            { halfSize.x * localPivot.x, halfSize.y * localPivot.y, 0.0f }
-        );
-        Matrix mTrans, mRot, mScale;
-        mTrans.MakeTranslation(pos);
-        mRot.MakeRotationFromQuaternion(rot);
-        mScale.MakeScaling(scale);
-        m_world = mPivotTrans * mScale;
-        m_world = m_world * mRot;
-        m_world = m_world * mTrans;
-    }
-    void Sprite::Draw(RenderContext& renderContext)
-    {
-        //Œ»İ‚Ìƒrƒ…[ƒ|[ƒg‚©‚ç•½s“Š‰es—ñ‚ğŒvZ‚·‚éB
-        D3D12_VIEWPORT viewport = renderContext.GetViewport();
-        //todo ƒJƒƒ‰s—ñ‚Í’è”‚Ég—pB‚Ç‚¤‚¹•Ï‚¦‚È‚¢‚µEEEB
-        Matrix viewMatrix = g_camera2D->GetViewMatrix();
-        Matrix projMatrix;
-        projMatrix.MakeOrthoProjectionMatrix(viewport.Width, viewport.Height, 0.1f, 1.0f);
+		mPivotTrans.MakeTranslation(
+			{ halfSize.x * localPivot.x, halfSize.y * localPivot.y, 0.0f }
+		);
+		Matrix mTrans, mRot, mScale;
+		mTrans.MakeTranslation(pos);
+		mRot.MakeRotationFromQuaternion(rot);
+		mScale.MakeScaling(scale);
+		m_world = mPivotTrans * mScale;
+		m_world = m_world * mRot;
+		m_world = m_world * mTrans;
+	}
+	void Sprite::Draw(RenderContext& renderContext)
+	{
+		//ç¾åœ¨ã®ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã‹ã‚‰å¹³è¡ŒæŠ•å½±è¡Œåˆ—ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+		D3D12_VIEWPORT viewport = renderContext.GetViewport();
+		//todo ã‚«ãƒ¡ãƒ©è¡Œåˆ—ã¯å®šæ•°ã«ä½¿ç”¨ã€‚ã©ã†ã›å¤‰ãˆãªã„ã—ãƒ»ãƒ»ãƒ»ã€‚
+		Matrix viewMatrix = g_camera2D->GetViewMatrix();
+		Matrix projMatrix;
+		projMatrix.MakeOrthoProjectionMatrix(viewport.Width, viewport.Height, 0.1f, 1.0f);
 
-        m_constantBufferCPU.mvp = m_world * viewMatrix * projMatrix;
-        m_constantBufferCPU.mulColor = m_mulColor;
-        m_constantBufferCPU.screenParam.x = g_camera3D->GetNear();
-        m_constantBufferCPU.screenParam.y = g_camera3D->GetFar();
-        m_constantBufferCPU.screenParam.z = FRAME_BUFFER_W;
-        m_constantBufferCPU.screenParam.w = FRAME_BUFFER_H;
+		m_constantBufferCPU.mvp = m_world * viewMatrix * projMatrix;
+		m_constantBufferCPU.mulColor = m_mulColor;
+		m_constantBufferCPU.screenParam.x = g_camera3D->GetNear();
+		m_constantBufferCPU.screenParam.y = g_camera3D->GetFar();
+		m_constantBufferCPU.screenParam.z = FRAME_BUFFER_W;
+		m_constantBufferCPU.screenParam.w = FRAME_BUFFER_H;
 
-        //’è”ƒoƒbƒtƒ@‚ğXVB
-        //renderContext.UpdateConstantBuffer(m_constantBufferGPU, &m_constantBufferCPU);
-        m_constantBufferGPU.CopyToVRAM(&m_constantBufferCPU);
-        if (m_userExpandConstantBufferCPU != nullptr) {
-            //renderContext.UpdateConstantBuffer(m_userExpandConstantBufferGPU, m_userExpandConstantBufferCPU);
-            m_userExpandConstantBufferGPU.CopyToVRAM(m_userExpandConstantBufferCPU);
-        }
-        //ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ğİ’èB
-        renderContext.SetRootSignature(m_rootSignature);
-        //ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğİ’èB
-        renderContext.SetPipelineState(m_pipelineState);
-        //’¸“_ƒoƒbƒtƒ@‚ğİ’èB
-        renderContext.SetVertexBuffer(m_vertexBuffer);
-        //ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ğİ’èB
-        renderContext.SetIndexBuffer(m_indexBuffer);
-        //ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒW[‚ğİ’è‚·‚éB
-        renderContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        //ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğİ’è‚·‚éB
-        renderContext.SetDescriptorHeap(m_descriptorHeap);
-        //•`‰æ
-        renderContext.DrawIndexed(m_indexBuffer.GetCount());
-    }
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’æ›´æ–°ã€‚
+		//renderContext.UpdateConstantBuffer(m_constantBufferGPU, &m_constantBufferCPU);
+		m_constantBufferGPU.CopyToVRAM(&m_constantBufferCPU);
+		if (m_userExpandConstantBufferCPU != nullptr) {
+			//renderContext.UpdateConstantBuffer(m_userExpandConstantBufferGPU, m_userExpandConstantBufferCPU);
+			m_userExpandConstantBufferGPU.CopyToVRAM(m_userExpandConstantBufferCPU);
+		}
+		//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã‚’è¨­å®šã€‚
+		renderContext.SetRootSignature(m_rootSignature);
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’è¨­å®šã€‚
+		renderContext.SetPipelineState(m_pipelineState);
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã€‚
+		renderContext.SetVertexBuffer(m_vertexBuffer);
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã€‚
+		renderContext.SetIndexBuffer(m_indexBuffer);
+		//ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒˆãƒãƒ­ã‚¸ãƒ¼ã‚’è¨­å®šã™ã‚‹ã€‚
+		renderContext.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’è¨­å®šã™ã‚‹ã€‚
+		renderContext.SetDescriptorHeap(m_descriptorHeap);
+		//æç”»
+		renderContext.DrawIndexed(m_indexBuffer.GetCount());
+	}
 }

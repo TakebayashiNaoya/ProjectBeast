@@ -1,5 +1,5 @@
-/*!
- *@brief	ƒŒƒxƒ‹B
+ï»¿/*!
+ *@brief	ãƒ¬ãƒ™ãƒ«ã€‚
  */
 
 #include "k2EngineLowPreCompile.h"
@@ -16,7 +16,7 @@ namespace nsK2EngineLow {
 	}
 	void Level::CreateMapChip(const LevelObjectData& objData, const char* filePath)
 	{
-		//ƒtƒbƒN‚³‚ê‚È‚©‚Á‚½‚Ì‚ÅAƒ}ƒbƒvƒ`ƒbƒv‚ğì¬‚·‚éB
+		//ãƒ•ãƒƒã‚¯ã•ã‚Œãªã‹ã£ãŸã®ã§ã€ãƒãƒƒãƒ—ãƒãƒƒãƒ—ã‚’ä½œæˆã™ã‚‹ã€‚
 		auto mapChipRender = std::make_shared<MapChip>(objData, filePath);
 		m_mapChipPtrs.push_back(mapChipRender);
 	}
@@ -26,22 +26,22 @@ namespace nsK2EngineLow {
 		std::function<bool(LevelObjectData& objData)> hookFunc
 	)
 	{
-		//tklƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚éB
+		//tklãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
 		m_tklFile.Load(filePath);
 
 		MatrixTklToLevel();
 
-		//ƒ‹[ƒgƒ{[ƒ“‚Í‚¢‚ç‚È‚¢‚½‚ßAi‚ğ1‚©‚çn‚ß‚é‚±‚Æ‚ÅœŠO‚Å‚«‚éB
+		//ãƒ«ãƒ¼ãƒˆãƒœãƒ¼ãƒ³ã¯ã„ã‚‰ãªã„ãŸã‚ã€iã‚’1ã‹ã‚‰å§‹ã‚ã‚‹ã“ã¨ã§é™¤å¤–ã§ãã‚‹ã€‚
 		for (int i = 1; i < m_bonelist.size(); i++) {
 			auto bone = m_bonelist[i].get();
 			if (bone->GetParentBoneNo() == 0) {
 
-				//ƒ}ƒbƒvƒ`ƒbƒv‚ğì¬‚·‚éB
-				//s—ñ‚©‚çƒ|ƒWƒVƒ‡ƒ“‚ğì¬‚·‚éB
+				//ãƒãƒƒãƒ—ãƒãƒƒãƒ—ã‚’ä½œæˆã™ã‚‹ã€‚
+				//è¡Œåˆ—ã‹ã‚‰ãƒã‚¸ã‚·ãƒ§ãƒ³ã‚’ä½œæˆã™ã‚‹ã€‚
 				LevelObjectData levelObjData;
 				bone->CalcWorldTRS(levelObjData.position, levelObjData.rotation, levelObjData.scale);
 
-				//Zup‚ÆYup‚Ì•ÏXB
+				//Zupã¨Yupã®å¤‰æ›´ã€‚
 				float fix = levelObjData.position.y;
 				levelObjData.position.y = levelObjData.position.z;
 				levelObjData.position.z = -fix;
@@ -51,47 +51,47 @@ namespace nsK2EngineLow {
 				levelObjData.rotation.z = -fix;
 
 				std::swap(levelObjData.scale.y, levelObjData.scale.z);
-				//ZupÌYup@I‚í‚èB
+				//Zupâ‡”Yupã€€çµ‚ã‚ã‚Šã€‚
 
 				levelObjData.number = m_bonelist[i]->GetNo();
 
 				levelObjData.name = m_bonelist[i]->GetName();
 
-				//ƒpƒX‚Ìì¬
+				//ãƒ‘ã‚¹ã®ä½œæˆ
 				wchar_t filePath[256];
 				swprintf_s(filePath, L"Assets/modelData/%s.tkm", levelObjData.name);
-				//ƒ}ƒ‹ƒ`ƒoƒCƒg‚É•ÏŠ· wchar¨ char
-				//ƒx[ƒX‚Ì•¶š—ñB
+				//ãƒãƒ«ãƒãƒã‚¤ãƒˆã«å¤‰æ› wcharâ†’ char
+				//ãƒ™ãƒ¼ã‚¹ã®æ–‡å­—åˆ—ã€‚
 				size_t origsize = wcslen(filePath) + 1;
-				//•ÏŠ·‚µ‚½•¶š—ñ
+				//å¤‰æ›ã—ãŸæ–‡å­—åˆ—
 				size_t convertedChars = 0;
-				//ƒ}ƒ‹ƒ`ƒoƒCƒgŠi”[—p
+				//ãƒãƒ«ãƒãƒã‚¤ãƒˆæ ¼ç´ç”¨
 				char strCon[] = "";
-				//ƒTƒCƒY
+				//ã‚µã‚¤ã‚º
 				size_t strConSize = (strlen(strCon) + 1) * 2;
-				//•ÏŠ·Œã‚ÌƒTƒCƒYB
+				//å¤‰æ›å¾Œã®ã‚µã‚¤ã‚ºã€‚
 				const size_t newsize = origsize * 2;
-				//˜AŒ‹Œã‚ÌƒTƒCƒY
+				//é€£çµå¾Œã®ã‚µã‚¤ã‚º
 				char* cFilePath = new char[newsize + strConSize];
-				//ƒ}ƒ‹ƒ`ƒoƒCƒg‚É•ÏŠ·‚·‚éB“ü‚è‚«‚ç‚È‚¢‚à‚Ì‚ÍØ‚è‚·‚Ä
+				//ãƒãƒ«ãƒãƒã‚¤ãƒˆã«å¤‰æ›ã™ã‚‹ã€‚å…¥ã‚Šãã‚‰ãªã„ã‚‚ã®ã¯åˆ‡ã‚Šã™ã¦
 				wcstombs_s(&convertedChars, cFilePath, newsize, filePath, _TRUNCATE);
-				//•¶š—ñ‚Ì˜AŒ‹
+				//æ–‡å­—åˆ—ã®é€£çµ
 				_mbscat_s((unsigned char*)cFilePath, newsize + strConSize, (unsigned char*)strCon);
 
 
 
 
-				//Hook‚ª“o˜^Ï‚İ‚È‚ç‚Îƒ}ƒbƒvƒ`ƒbƒv‚Íì¬•s—v
-				//false ‚Ì‚Ü‚Ü‚È‚çì¬‚·‚éB
+				//HookãŒç™»éŒ²æ¸ˆã¿ãªã‚‰ã°ãƒãƒƒãƒ—ãƒãƒƒãƒ—ã¯ä½œæˆä¸è¦
+				//false ã®ã¾ã¾ãªã‚‰ä½œæˆã™ã‚‹ã€‚
 				bool isHooked = false;
-				//hookFunc‚É‚È‚É‚à“ü‚Á‚Ä‚¢‚È‚¢Sobject‚É‚Í‰½‚à‚È‚¢B
+				//hookFuncã«ãªã«ã‚‚å…¥ã£ã¦ã„ãªã„ï¼Sobjectã«ã¯ä½•ã‚‚ãªã„ã€‚
 				if (hookFunc != nullptr) {
 					isHooked = hookFunc(levelObjData);
 				}
 
-				//hook‚ªfalse‚È‚Ü‚Ü‚È‚ç‚ÎB
+				//hookãŒfalseãªã¾ã¾ãªã‚‰ã°ã€‚
 				if (isHooked == false) {
-					//ƒ}ƒbƒvƒ`ƒbƒvƒŒƒ“ƒ_[‚ğì¬B
+					//ãƒãƒƒãƒ—ãƒãƒƒãƒ—ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚’ä½œæˆã€‚
 					CreateMapChip(levelObjData, cFilePath);
 				}
 
@@ -102,8 +102,8 @@ namespace nsK2EngineLow {
 	void Level::MatrixTklToLevel()
 	{
 		m_tklFile.QuaryObject([&](TklFile::SObject& tklObj) {
-			//ƒRƒs[B
-			//ƒoƒCƒ“ƒhƒ|[ƒYB
+			//ã‚³ãƒ”ãƒ¼ã€‚
+			//ãƒã‚¤ãƒ³ãƒ‰ãƒãƒ¼ã‚ºã€‚
 			Matrix bindPoseMatrix;
 			memcpy(bindPoseMatrix.m[0], &tklObj.bindPose[0], sizeof(tklObj.bindPose[0]));
 			memcpy(bindPoseMatrix.m[1], &tklObj.bindPose[1], sizeof(tklObj.bindPose[1]));
@@ -115,8 +115,8 @@ namespace nsK2EngineLow {
 			bindPoseMatrix.m[3][3] = 1.0f;
 
 			/// <summary>
-			/// ƒoƒCƒ“ƒhƒ|[ƒY‚Ì‹ts—ñ
-			/// —ñ3‚ÍVector3•ÏŠ·‚ÌÛ‚É•s—v‚È‚Ì‚Å‰Šú‰»B
+			/// ãƒã‚¤ãƒ³ãƒ‰ãƒãƒ¼ã‚ºã®é€†è¡Œåˆ—
+			/// åˆ—3ã¯Vector3å¤‰æ›ã®éš›ã«ä¸è¦ãªã®ã§åˆæœŸåŒ–ã€‚
 			/// </summary>
 			Matrix invBindPoseMatirx;
 			memcpy(invBindPoseMatirx.m[0], &tklObj.invBindPose[0], sizeof(tklObj.invBindPose[0]));
@@ -131,11 +131,11 @@ namespace nsK2EngineLow {
 			wchar_t boneName[256];
 
 			/// <summary>
-			/// tkl‚ÌƒIƒuƒWƒFƒNƒg–¼‚ÌŒ^‚ğƒƒCƒh•¶š‚É•ÏŠ·B
+			/// tklã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåã®å‹ã‚’ãƒ¯ã‚¤ãƒ‰æ–‡å­—ã«å¤‰æ›ã€‚
 			/// char -> wchar_t
-			/// •ÏŠ·‚·‚écharŒ^‚Ì•¶š—ñB
-			/// •ÏŠ·Œ‹‰Ê‚Ìwchar_tŒ^•¶š—ñB
-			/// ƒTƒCƒY
+			/// å¤‰æ›ã™ã‚‹charå‹ã®æ–‡å­—åˆ—ã€‚
+			/// å¤‰æ›çµæœã®wchar_tå‹æ–‡å­—åˆ—ã€‚
+			/// ã‚µã‚¤ã‚º
 			/// </summary>
 			mbstowcs(boneName, tklObj.name.get(), 256);
 			BonePtr bone = std::make_unique<Bone>(
@@ -144,11 +144,11 @@ namespace nsK2EngineLow {
 				invBindPoseMatirx,
 				tklObj.parentNo,
 				tklObj.no
-				);
-			//ƒ{[ƒ“‚ğÏ‚ŞB
+			);
+			//ãƒœãƒ¼ãƒ³ã‚’ç©ã‚€ã€‚
 			m_bonelist.push_back(std::move(bone));
-			//ƒRƒs[I‚í‚èB
-		});
+			//ã‚³ãƒ”ãƒ¼çµ‚ã‚ã‚Šã€‚
+			});
 
 	}
 

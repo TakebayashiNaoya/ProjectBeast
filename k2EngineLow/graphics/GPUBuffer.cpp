@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "GPUBuffer.h"
 
 namespace nsK2EngineLow {
@@ -14,7 +14,7 @@ namespace nsK2EngineLow {
 	{
 		Release();
 		m_desc = desc;
-		//todo ‚Ü‚Æ‚ß‚½•û‚ª‚¦‚¦‚ÈB
+		//todo ã¾ã¨ã‚ãŸæ–¹ãŒãˆãˆãªã€‚
 		const D3D12_HEAP_PROPERTIES kDefaultHeapProps =
 		{
 			D3D12_HEAP_TYPE_DEFAULT,
@@ -41,7 +41,7 @@ namespace nsK2EngineLow {
 			uavDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 		}
 		else {
-			//–¢‘Î‰žB
+			//æœªå¯¾å¿œã€‚
 			std::abort();
 		}
 		auto d3dDevice = g_graphicsEngine->GetD3DDevice();
@@ -56,5 +56,12 @@ namespace nsK2EngineLow {
 	}
 	void GPUBuffer::RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 	{
+		auto device = g_graphicsEngine->GetD3DDevice();
+		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		srvDesc.Format = m_desc.Format;
+		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = m_desc.MipLevels;
+		device->CreateShaderResourceView(m_buffer, &srvDesc, descriptorHandle);
 	}
 }

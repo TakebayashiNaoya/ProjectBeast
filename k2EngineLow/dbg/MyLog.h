@@ -1,21 +1,21 @@
-/*!
- *@brief		ÉçÉO
+Ôªø/*!
+ *@brief		„É≠„Ç∞
  */
 
 #pragma once
 
 namespace nsK2EngineLow {
 	/*!
-	 *@brief	ÉçÉOèoóÕ
+	 *@brief	„É≠„Ç∞Âá∫Âäõ
 	 */
-	static inline void Log( const char* format, ... )
+	static inline void Log(const char* format, ...)
 	{
-		static char log[1024*10];
+		static char log[1024 * 10];
 		va_list va;
-		va_start( va, format );
-		vsprintf( log, format, va );
-		OutputDebugStringA( log );
-		va_end( va );
+		va_start(va, format);
+		vsprintf(log, format, va);
+		OutputDebugStringA(log);
+		va_end(va);
 	}
 	static inline void LogW(const wchar_t* format, ...)
 	{
@@ -29,8 +29,8 @@ namespace nsK2EngineLow {
 }
 
 #ifdef K2_DEBUG
-	#define K2_LOG( format, ... )	Log(format, __VA_ARGS__)
-	#define K2_LOG_W( format, ... )	LogW(format, __VA_ARGS__)
+#define K2_LOG( format, ... )	Log(format, __VA_ARGS__)
+#define K2_LOG_W( format, ... )	LogW(format, __VA_ARGS__)
 #else // _DEBUG
 #define K2_LOG( format, ... )
 #define K2_LOG_W( format, ... )

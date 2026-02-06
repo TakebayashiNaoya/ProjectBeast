@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "AI/PathFinding/Cell.h"
 #include "geometry/BSP.h"
@@ -8,26 +8,26 @@ namespace nsK2EngineLow {
 	namespace nsAI {
 		class Cell;
 		/// <summary>
-		/// ƒiƒrƒQ[ƒVƒ‡ƒ“ƒƒbƒVƒ…ƒNƒ‰ƒXB
+		/// ãƒŠãƒ“ã‚²ãƒ¼ã‚·ãƒ§ãƒ³ãƒ¡ãƒƒã‚·ãƒ¥ã‚¯ãƒ©ã‚¹ã€‚
 		/// </summary>
 		/// <remark>
-		/// 3dsMax‚©‚çnvmExporter‚ğg—p‚µ‚Äo—Í‚³‚ê‚½ƒf[ƒ^‚ğ‚à‚Æ‚É\’z‚³‚ê‚Ü‚·B
+		/// 3dsMaxã‹ã‚‰nvmExporterã‚’ä½¿ç”¨ã—ã¦å‡ºåŠ›ã•ã‚ŒãŸãƒ‡ãƒ¼ã‚¿ã‚’ã‚‚ã¨ã«æ§‹ç¯‰ã•ã‚Œã¾ã™ã€‚
 		/// </remark>
-		class NaviMesh{
+		class NaviMesh {
 		public:
 			/// <summary>
-			/// tknƒtƒ@ƒCƒ‹‚©‚çƒiƒrƒQ[ƒVƒ‡ƒ“ƒƒbƒVƒ…‚ğ\’z‚·‚éB
+			/// tknãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒŠãƒ“ã‚²ãƒ¼ã‚·ãƒ§ãƒ³ãƒ¡ãƒƒã‚·ãƒ¥ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
 			/// </summary>
-			/// <param name="tknFilePath">tknƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX</param>
+			/// <param name="tknFilePath">tknãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
 			void Init(const char* tknFilePath);
 			/// <summary>
-			/// w’è‚µ‚½À•W‚ÉÅ‚à‹ß‚¢ƒZƒ‹‚ğŒŸõ‚·‚éB
+			/// æŒ‡å®šã—ãŸåº§æ¨™ã«æœ€ã‚‚è¿‘ã„ã‚»ãƒ«ã‚’æ¤œç´¢ã™ã‚‹ã€‚
 			/// </summary>
-			/// <param name="pos">À•W</param>
-			/// <returns>ƒZƒ‹</returns>
+			/// <param name="pos">åº§æ¨™</param>
+			/// <returns>ã‚»ãƒ«</returns>
 			const Cell& FindNearestCell(const Vector3& pos) const;
 			/// <summary>
-			/// ƒZƒ‹‚Ì”‚ğæ“¾B
+			/// ã‚»ãƒ«ã®æ•°ã‚’å–å¾—ã€‚
 			/// </summary>
 			/// <returns></returns>
 			int GetNumCell() const
@@ -35,7 +35,7 @@ namespace nsK2EngineLow {
 				return static_cast<int>(m_cellArray.size());
 			}
 			/// <summary>
-			/// ƒZƒ‹‚ğæ“¾B
+			/// ã‚»ãƒ«ã‚’å–å¾—ã€‚
 			/// </summary>
 			/// <param name="cellNo"></param>
 			/// <returns></returns>
@@ -44,8 +44,8 @@ namespace nsK2EngineLow {
 				return m_cellArray.at(cellNo);
 			}
 		private:
-			std::vector< Cell > m_cellArray;	// ƒZƒ‹‚Ì”z—ñ
-			BSP m_cellCenterPosBSP;				// ƒZƒ‹‚Ì’†SÀ•W‚Å\’z‚³‚ê‚½BSP
+			std::vector< Cell > m_cellArray;	// ã‚»ãƒ«ã®é…åˆ—
+			BSP m_cellCenterPosBSP;				// ã‚»ãƒ«ã®ä¸­å¿ƒåº§æ¨™ã§æ§‹ç¯‰ã•ã‚ŒãŸBSP
 		};
 	}
 }

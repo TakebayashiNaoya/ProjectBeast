@@ -1,5 +1,5 @@
-/*!
- * @brief	ƒTƒEƒ“ƒhƒGƒ“ƒWƒ“
+ï»¿/*!
+ * @brief	ã‚µã‚¦ãƒ³ãƒ‰ã‚¨ãƒ³ã‚¸ãƒ³
  */
 
 #include "k2EngineLowPreCompile.h"
@@ -12,7 +12,7 @@ namespace nsK2EngineLow {
 
 #define NUM_PRESETS 30
 	namespace {
-		//ƒ}ƒCƒNƒƒ\ƒtƒg‚ÌƒTƒ“ƒvƒ‹‚©‚çˆø‚Á’£‚Á‚Ä‚«‚½ƒTƒEƒ“ƒhƒR[ƒ“B
+		//ãƒã‚¤ã‚¯ãƒ­ã‚½ãƒ•ãƒˆã®ã‚µãƒ³ãƒ—ãƒ«ã‹ã‚‰å¼•ã£å¼µã£ã¦ããŸã‚µã‚¦ãƒ³ãƒ‰ã‚³ãƒ¼ãƒ³ã€‚
 		// Specify sound cone to add directionality to listener for artistic effect:
 		// Emitters behind the listener are defined here to be more attenuated,
 		// have a lower LPF cutoff frequency,
@@ -80,17 +80,17 @@ namespace nsK2EngineLow {
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		unsigned int flags = 0;
 
-		//XAUDIO2‚ğ‰Šú‰»B
+		//XAUDIO2ã‚’åˆæœŸåŒ–ã€‚
 		HRESULT hr;
 		if (FAILED(hr = XAudio2Create(&m_xAudio2, flags)))
 		{
 			K2_ASSERT(false, "Faild XAudio2Create");
 		}
-		//ƒ}ƒXƒ^[ƒ{ƒŠƒ…[ƒ€‚Ìì¬B
+		//ãƒã‚¹ã‚¿ãƒ¼ãƒœãƒªãƒ¥ãƒ¼ãƒ ã®ä½œæˆã€‚
 		if (FAILED(hr = m_xAudio2->CreateMasteringVoice(&m_masteringVoice)))
 		{
 			Release();
-			K2_LOG( "Faild CreateMasteringVoice");
+			K2_LOG("Faild CreateMasteringVoice");
 			return;
 		}
 
@@ -100,7 +100,7 @@ namespace nsK2EngineLow {
 
 		m_nChannels = voiceDetails.InputChannels;
 
-		//ƒŠƒo[ƒuƒGƒtƒFƒNƒg‚ğì¬B
+		//ãƒªãƒãƒ¼ãƒ–ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ä½œæˆã€‚
 		flags = 0;
 
 		if (FAILED(hr = XAudio2CreateReverb(&m_reverbEffect, flags))) {
@@ -108,7 +108,7 @@ namespace nsK2EngineLow {
 			K2_ASSERT(false, "Faild XAudio2CreateReverb");
 			return;
 		}
-		//ƒTƒuƒ~ƒbƒNƒXƒ{ƒCƒX‚ğì¬B
+		//ã‚µãƒ–ãƒŸãƒƒã‚¯ã‚¹ãƒœã‚¤ã‚¹ã‚’ä½œæˆã€‚
 		XAUDIO2_EFFECT_DESCRIPTOR effects[] = { { m_reverbEffect, TRUE, 1 } };
 		XAUDIO2_EFFECT_CHAIN effectChain = { 1, effects };
 
@@ -120,11 +120,11 @@ namespace nsK2EngineLow {
 			K2_ASSERT(false, "Faild CreateSubmixVoice");
 			return;
 		}
-		//ƒfƒtƒHƒ‹ƒg‚ÌFXƒpƒ‰ƒ[ƒ^‚ğİ’èB
+		//ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®FXãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’è¨­å®šã€‚
 		XAUDIO2FX_REVERB_PARAMETERS native;
 		ReverbConvertI3DL2ToNative(&PRESET_PARAMS[0], &native);
 		m_submixVoice->SetEffectParameters(0, &native, sizeof(native));
-		//3DƒI[ƒfƒBƒI‚Ì‰Šú‰»B
+		//3Dã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®åˆæœŸåŒ–ã€‚
 		const float SPEEDOFSOUND = X3DAUDIO_SPEED_OF_SOUND;
 		X3DAudioInitialize(m_channelMask, SPEEDOFSOUND, m_hx3DAudio);
 		m_listener.Position = { 0.0f, 0.0f, 0.0f };
@@ -135,12 +135,12 @@ namespace nsK2EngineLow {
 			m_UseListenerCone = true;
 			m_fUseInnerRadius = true;
 			m_useRedirectToLFE = ((details.OutputFormat.dwChannelMask & SPEAKER_LOW_FREQUENCY) != 0);*/
-			//‰Šú‰»Š®—¹B
+			//åˆæœŸåŒ–å®Œäº†ã€‚
 		m_isInited = true;
 	}
 	void SoundEngine::Release()
 	{
-		//”gŒ`ƒf[ƒ^ƒoƒ“ƒN‚ğ‰ğ•úB
+		//æ³¢å½¢ãƒ‡ãƒ¼ã‚¿ãƒãƒ³ã‚¯ã‚’è§£æ”¾ã€‚
 		m_waveFileBank.Release();
 
 		if (m_submixVoice != nullptr) {
@@ -168,16 +168,16 @@ namespace nsK2EngineLow {
 		K2_ASSERT(waveFile->GetFormat()->nChannels <= INPUTCHANNELS, "Channel over");
 		IXAudio2SourceVoice* pSourceVoice;
 		if (is3DSound == false) {
-			//2DƒTƒEƒ“ƒhB
+			//2Dã‚µã‚¦ãƒ³ãƒ‰ã€‚
 			if (FAILED(m_xAudio2->CreateSourceVoice(&pSourceVoice, waveFile->GetFormat())))
 			{
-				//TODO WARNINGB
+				//TODO WARNINGã€‚
 				//TK_WARNING("Failed CreateSourceVoice");
 				return nullptr;
 			}
 		}
 		else {
-			//3DƒTƒEƒ“ƒhB
+			//3Dã‚µã‚¦ãƒ³ãƒ‰ã€‚
 			XAUDIO2_SEND_DESCRIPTOR sendDescriptors[2];
 			sendDescriptors[0].Flags = XAUDIO2_SEND_USEFILTER; // LPF direct-path
 			sendDescriptors[0].pOutputVoice = m_masteringVoice;
@@ -186,7 +186,7 @@ namespace nsK2EngineLow {
 			const XAUDIO2_VOICE_SENDS sendList = { 2, sendDescriptors };
 			if (FAILED(m_xAudio2->CreateSourceVoice(&pSourceVoice, waveFile->GetFormat(), 0, 2.0f, NULL, &sendList)))
 			{
-				//TODO WARNINGB
+				//TODO WARNINGã€‚
 				//TK_WARNING("Failed CreateSourceVoice");
 				return nullptr;
 			}
@@ -199,16 +199,16 @@ namespace nsK2EngineLow {
 		if (!m_isInited) {
 			return;
 		}
-		//ƒTƒEƒ“ƒhƒŠƒXƒi[‚Ì‘O•ûŒü‚ğŒvZB
-		//@todo ‚±‚±‚ç‚Ö‚ñ‚ÍSoundListenerƒNƒ‰ƒX‚ÉŒã‚ÅˆÚ“®‚³‚¹‚éB
-		//@todo ‘O•ûŒü‚ÌŒvZ‚à‚±‚ê‚¾‚Æ“s‡‚ªˆ«‚¢B
+		//ã‚µã‚¦ãƒ³ãƒ‰ãƒªã‚¹ãƒŠãƒ¼ã®å‰æ–¹å‘ã‚’è¨ˆç®—ã€‚
+		//@todo ã“ã“ã‚‰ã¸ã‚“ã¯SoundListenerã‚¯ãƒ©ã‚¹ã«å¾Œã§ç§»å‹•ã•ã›ã‚‹ã€‚
+		//@todo å‰æ–¹å‘ã®è¨ˆç®—ã‚‚ã“ã‚Œã ã¨éƒ½åˆãŒæ‚ªã„ã€‚
 		if (m_listener.Position.x != m_listenerPosition.x
 			|| m_listener.Position.z != m_listenerPosition.z
 			) {
-			//ƒŠƒXƒi[‚ªXZ•½–Êã‚Å“®‚¢‚Ä‚¢‚éB
+			//ãƒªã‚¹ãƒŠãƒ¼ãŒXZå¹³é¢ä¸Šã§å‹•ã„ã¦ã„ã‚‹ã€‚
 			Vector3 listenerPos;
 			listenerPos.Set(m_listener.Position);
-			//“®‚¢‚½•ª‚ğŒvZB
+			//å‹•ã„ãŸåˆ†ã‚’è¨ˆç®—ã€‚
 			Vector3 vDelta;
 			vDelta.Subtract(m_listenerPosition, listenerPos);
 			m_fListenerAngle = float(atan2(m_listener.OrientFront.x, m_listener.OrientFront.z));
@@ -220,10 +220,10 @@ namespace nsK2EngineLow {
 				m_listener.pCone = NULL;
 			}
 		}
-		//TODO ƒtƒŒ[ƒ€ŠÔ‚É‚·‚éB
+		//TODO ãƒ•ãƒ¬ãƒ¼ãƒ æ™‚é–“ã«ã™ã‚‹ã€‚
 		float deltaTime = 60.0f / 1.0f;
 		if (deltaTime > 0.0f) {
-			//ƒŠƒXƒi[‚ÌˆÚ“®‘¬“x‚ğŒvZ‚·‚éB
+			//ãƒªã‚¹ãƒŠãƒ¼ã®ç§»å‹•é€Ÿåº¦ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 			Vector3 vel;
 			vel.Set(m_listener.Position);
 			vel.Subtract(m_listenerPosition, vel);
@@ -241,7 +241,7 @@ namespace nsK2EngineLow {
 			dwCalcFlags |= X3DAUDIO_CALCULATE_REDIRECT_TO_LFE;
 		}
 
-		//3DƒTƒEƒ“ƒh‚ÌŒvZB
+		//3Dã‚µã‚¦ãƒ³ãƒ‰ã®è¨ˆç®—ã€‚
 		for (auto& soundSource : m_3dSoundSource) {
 			X3DAUDIO_EMITTER emitter;
 

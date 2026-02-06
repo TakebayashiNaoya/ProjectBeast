@@ -1,26 +1,26 @@
-#pragma once
+ï»¿#pragma once
 
 #include "tkFile/TkaFile.h"
 
 namespace nsK2EngineLow {
 	/// <summary>
-	/// ƒL[ƒtƒŒ[ƒ€
+	/// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ 
 	/// </summary>
 	struct KeyFrame {
-		uint32_t boneIndex;	//!<ƒ{[ƒ“ƒCƒ“ƒfƒbƒNƒXB
-		float time;					//!<ŠÔB
-		Matrix transform;			//!<ƒgƒ‰ƒ“ƒXƒtƒH[ƒ€B
+		uint32_t boneIndex;	//!<ãƒœãƒ¼ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã€‚
+		float time;					//!<æ™‚é–“ã€‚
+		Matrix transform;			//!<ãƒˆãƒ©ãƒ³ã‚¹ãƒ•ã‚©ãƒ¼ãƒ ã€‚
 	};
 
 	/// <summary>
-	/// ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒgB
+	/// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã€‚
 	/// </summary>
 	class AnimationEvent : public Noncopyable {
 	public:
 
 
 		/// <summary>
-		/// ƒCƒxƒ“ƒg”­¶ŠÔ‚ğİ’èB
+		/// ã‚¤ãƒ™ãƒ³ãƒˆç™ºç”Ÿæ™‚é–“ã‚’è¨­å®šã€‚
 		/// </summary>
 		/// <returns></returns>
 		float GetInvokeTime() const
@@ -29,7 +29,7 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ƒCƒxƒ“ƒg–¼‚ğæ“¾B
+		/// ã‚¤ãƒ™ãƒ³ãƒˆåã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		const wchar_t* GetEventName() const
@@ -38,7 +38,7 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ƒCƒxƒ“ƒg”­¶ŠÔ‚ğİ’èB
+		/// ã‚¤ãƒ™ãƒ³ãƒˆç™ºç”Ÿæ™‚é–“ã‚’è¨­å®šã€‚
 		/// </summary>
 		/// <param name="time"></param>
 		void SetInvokeTime(float time)
@@ -46,11 +46,11 @@ namespace nsK2EngineLow {
 			m_invokeTime = time;
 		}
 		/*!
-		*@brief	ƒCƒxƒ“ƒg–¼‚ğİ’èB
+		*@brief	ã‚¤ãƒ™ãƒ³ãƒˆåã‚’è¨­å®šã€‚
 		*/
 
 		/// <summary>
-		/// ƒCƒxƒ“ƒg–¼‚ğİ’è
+		/// ã‚¤ãƒ™ãƒ³ãƒˆåã‚’è¨­å®š
 		/// </summary>
 		/// <param name="name"></param>
 		void SetEventName(const wchar_t* name)
@@ -59,7 +59,7 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ƒCƒxƒ“ƒg‚ª”­¶Ï‚İ‚©”»’è
+		/// ã‚¤ãƒ™ãƒ³ãƒˆãŒç™ºç”Ÿæ¸ˆã¿ã‹åˆ¤å®š
 		/// </summary>
 		/// <returns></returns>
 		bool IsInvoked() const
@@ -68,7 +68,7 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ƒCƒxƒ“ƒg”­¶Ï‚İ‚Ìƒtƒ‰ƒO‚ğİ’è‚·‚éB
+		/// ã‚¤ãƒ™ãƒ³ãƒˆç™ºç”Ÿæ¸ˆã¿ã®ãƒ•ãƒ©ã‚°ã‚’è¨­å®šã™ã‚‹ã€‚
 		/// </summary>
 		/// <param name="flag"></param>
 		void SetInvokedFlag(bool flag)
@@ -76,51 +76,51 @@ namespace nsK2EngineLow {
 			m_isInvoked = flag;
 		}
 	private:
-		bool m_isInvoked = false;	//!<ƒCƒxƒ“ƒg”­¶Ï‚İH
-		float m_invokeTime = 0.0f;	//!<ƒCƒxƒ“ƒg”­¶ŠÔB
-		std::wstring m_eventName;	//!<ƒCƒxƒ“ƒg–¼B
+		bool m_isInvoked = false;	//!<ã‚¤ãƒ™ãƒ³ãƒˆç™ºç”Ÿæ¸ˆã¿ï¼Ÿ
+		float m_invokeTime = 0.0f;	//!<ã‚¤ãƒ™ãƒ³ãƒˆç™ºç”Ÿæ™‚é–“ã€‚
+		std::wstring m_eventName;	//!<ã‚¤ãƒ™ãƒ³ãƒˆåã€‚
 	};
 
 	/// <summary>
-	/// ƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒvƒNƒ‰ƒXB
+	/// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã‚¯ãƒ©ã‚¹ã€‚
 	/// </summary>
 	class AnimationClip {
 	public:
 
 		using keyFramePtrList = std::vector<KeyFrame*>;
 		/// <summary>
-		/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		/// </summary>
 		AnimationClip()
 		{
 		}
-		
+
 		/// <summary>
-		/// ƒfƒXƒgƒ‰ƒNƒ^B
+		/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 		/// </summary>
 		~AnimationClip();
 		/// <summary>
-		/// ƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒv‚ğ“¯Šúƒ[ƒhB
+		/// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã‚’åŒæœŸãƒ­ãƒ¼ãƒ‰ã€‚
 		/// </summary>
 		/// <param name="filePath"></param>
 		void Load(const char* filePath);
 
 		/// <summary>
-		/// ƒL[ƒtƒŒ[ƒ€‚ÆƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚ğ\’z‚·‚éB
+		/// ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã¨ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
 		/// </summary>
 		/// <remarks>
-		/// ƒ[ƒh‚ªI‚í‚Á‚½‚Æ‚«‚ÉŒÄ‚Ño‚µ‚Ä‚­‚¾‚³‚¢B
+		/// ãƒ­ãƒ¼ãƒ‰ãŒçµ‚ã‚ã£ãŸã¨ãã«å‘¼ã³å‡ºã—ã¦ãã ã•ã„ã€‚
 		/// </remarks>
 		void BuildKeyFramesAndAnimationEvents();
 		/*!
-		*@brief	ƒ‹[ƒv‚·‚éH
+		*@brief	ãƒ«ãƒ¼ãƒ—ã™ã‚‹ï¼Ÿ
 		*/
 		bool IsLoop() const
 		{
 			return m_isLoop;
 		}
 		/*!
-		*@brief	ƒ‹[ƒvƒtƒ‰ƒO‚ğİ’è‚·‚éB
+		*@brief	ãƒ«ãƒ¼ãƒ—ãƒ•ãƒ©ã‚°ã‚’è¨­å®šã™ã‚‹ã€‚
 		*/
 		void SetLoopFlag(bool flag)
 		{
@@ -137,18 +137,18 @@ namespace nsK2EngineLow {
 		{
 			return *m_topBoneKeyFramList;
 		}
-		
+
 		/// <summary>
-		/// ƒNƒŠƒbƒv–¼‚ğæ“¾B
+		/// ã‚¯ãƒªãƒƒãƒ—åã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		const wchar_t* GetName() const
 		{
 			return m_clipName.c_str();
 		}
-		
+
 		/// <summary>
-		/// ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚ğæ“¾B
+		/// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		std::unique_ptr<AnimationEvent[]>& GetAnimationEvent()
@@ -157,7 +157,7 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚Ì”‚ğæ“¾
+		/// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã®æ•°ã‚’å–å¾—
 		/// </summary>
 		/// <returns></returns>
 		int GetNumAnimationEvent() const
@@ -166,14 +166,14 @@ namespace nsK2EngineLow {
 		}
 	private:
 		using KeyframePtr = std::unique_ptr<KeyFrame>;
-		std::wstring m_clipName;										//!<ƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒv‚Ì–¼‘OB
-		bool m_isLoop = false;											//!<ƒ‹[ƒvƒtƒ‰ƒOB
-		std::vector<KeyframePtr>			m_keyframes;				//ƒL[ƒtƒŒ[ƒ€B
-		std::vector<keyFramePtrList>		m_keyFramePtrListArray;		//ƒ{[ƒ“‚²‚Æ‚ÌƒL[ƒtƒŒ[ƒ€‚ÌƒŠƒXƒg‚ğŠÇ—‚·‚é‚½‚ß‚Ì”z—ñB
-		std::unique_ptr<AnimationEvent[]>	m_animationEvent;			//ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒgB
-		int									m_numAnimationEvent = 0;	//ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚Ì”B
+		std::wstring m_clipName;										//!<ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã®åå‰ã€‚
+		bool m_isLoop = false;											//!<ãƒ«ãƒ¼ãƒ—ãƒ•ãƒ©ã‚°ã€‚
+		std::vector<KeyframePtr>			m_keyframes;				//ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã€‚
+		std::vector<keyFramePtrList>		m_keyFramePtrListArray;		//ãƒœãƒ¼ãƒ³ã”ã¨ã®ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®ãƒªã‚¹ãƒˆã‚’ç®¡ç†ã™ã‚‹ãŸã‚ã®é…åˆ—ã€‚
+		std::unique_ptr<AnimationEvent[]>	m_animationEvent;			//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã€‚
+		int									m_numAnimationEvent = 0;	//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã®æ•°ã€‚
 		keyFramePtrList* m_topBoneKeyFramList = nullptr;
-		TkaFile*							m_tkaFile = nullptr;		//tkaƒtƒ@ƒCƒ‹
+		TkaFile* m_tkaFile = nullptr;		//tkaãƒ•ã‚¡ã‚¤ãƒ«
 	};
 	using AnimationClipPtr = std::unique_ptr<AnimationClip>;
 }

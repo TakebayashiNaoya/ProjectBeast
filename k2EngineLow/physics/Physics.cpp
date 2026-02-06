@@ -1,9 +1,9 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "Physics.h"
 
 using namespace std;
 namespace nsK2EngineLow {
-	PhysicsWorld* PhysicsWorld::m_instance = nullptr;	//—Bˆê‚ÌƒCƒ“ƒXƒ^ƒ“ƒXB
+	PhysicsWorld* PhysicsWorld::m_instance = nullptr;	//å”¯ä¸€ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã€‚
 
 	namespace {
 		struct MyContactResultCallback : public btCollisionWorld::ContactResultCallback {
@@ -34,10 +34,19 @@ namespace nsK2EngineLow {
 			Vector3 rayEnd;
 			bool isHit = false;
 			float hitFraction = 1.0f;
-			btScalar	addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace) override			
+
+			btScalar	addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace) override
 			{
+				///---ã“ã“ã‹ã‚‰---///
+				// ç›¸æ‰‹ã® UserIndex ãŒ 1 (SetIsTrigger(true)ã•ã‚ŒãŸã‚‚ã®) ãªã‚‰ã€å•ç­”ç„¡ç”¨ã§ç„¡è¦–ã™ã‚‹
+				if (rayResult.m_collisionObject->getUserIndex() == 1) {
+					// 1.0f ã‚’è¿”ã™ã¨ã€BulletPhysicsã¯ã€Œå½“ãŸã‚‰ãªã‹ã£ãŸã€ã¨ã—ã¦å‡¦ç†ã‚’ç¶šè¡Œã—ã¾ã™
+					return 1.0f;
+				}
+				///---ã“ã“ã¾ã§---///
+
 				if (rayResult.m_hitFraction < hitFraction) {
-					// ‚±‚¿‚ç‚Ì•û‚ª‹ß‚¢B
+					// ã“ã¡ã‚‰ã®æ–¹ãŒè¿‘ã„ã€‚
 					hitPos.Lerp(rayResult.m_hitFraction, rayStart, rayEnd);
 				}
 				isHit = true;
@@ -50,37 +59,72 @@ namespace nsK2EngineLow {
 		btTransform start, end;
 		start.setIdentity();
 		end.setIdentity();
-		
+
 		start.setOrigin(btVector3(rayStart.x, rayStart.y, rayStart.z));
 		end.setOrigin(btVector3(rayEnd.x, rayEnd.y, rayEnd.z));
 		ResultConvexSweepTest result;
 		ConvexSweepTest(
-			(const btConvexShape*)collider.GetBody(), 
-			start, 
-			end, 
+			(const btConvexShape*)collider.GetBody(),
+			start,
+			end,
 			result
 		);
 		return result.isHit;
 	}
+	//bool PhysicsWorld::RayTest(const Vector3& rayStart, const Vector3& rayEnd, Vector3& hitPos) const
+	//{
+	//	btVector3 start, end;
+	//	start.setValue(rayStart.x, rayStart.y, rayStart.z);
+	//	end.setValue(rayEnd.x, rayEnd.y, rayEnd.z);
+	//	MyRayResultCallback cb;
+	//	cb.rayStart = rayStart;
+	//	cb.rayEnd = rayEnd;
+	//	m_dynamicWorld->rayTest(start, end, cb);
+	//	if (cb.isHit) {
+	//		hitPos = cb.hitPos;
+	//	}
+	//	return cb.isHit;
+	//}
+
+	/// <summary>
+	/// è‡ªä½œé–¢æ•°ã€‚
+	/// </summary>
 	bool PhysicsWorld::RayTest(const Vector3& rayStart, const Vector3& rayEnd, Vector3& hitPos) const
 	{
 		btVector3 start, end;
 		start.setValue(rayStart.x, rayStart.y, rayStart.z);
 		end.setValue(rayEnd.x, rayEnd.y, rayEnd.z);
+
+		// å…ˆã»ã©ä¿®æ­£ã—ãŸæ§‹é€ ä½“ã‚’ä½¿ã†
 		MyRayResultCallback cb;
 		cb.rayStart = rayStart;
 		cb.rayEnd = rayEnd;
+
 		m_dynamicWorld->rayTest(start, end, cb);
+
 		if (cb.isHit) {
 			hitPos = cb.hitPos;
 		}
 		return cb.isHit;
 	}
+
+
+	// @todo for test
+	void PhysicsWorld::RayTest(const Vector3& rayStart, const Vector3& rayEnd, btCollisionWorld::RayResultCallback* cb) const
+	{
+		btVector3 start, end;
+		start.setValue(rayStart.x, rayStart.y, rayStart.z);
+		end.setValue(rayEnd.x, rayEnd.y, rayEnd.z);
+		m_dynamicWorld->rayTest(start, end, *cb);
+	}
+
+
+
 	PhysicsWorld::PhysicsWorld()
 	{
 		K2_ASSERT(
 			m_instance == nullptr,
-			"PhysisWorld‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ•¡”ì‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñB"
+			"PhysisWorldã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’è¤‡æ•°ä½œã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“ã€‚"
 		);
 		Init();
 	}
@@ -102,7 +146,7 @@ namespace nsK2EngineLow {
 	{
 		Release();
 
-		//•¨—ƒGƒ“ƒWƒ“‚ğ‰Šú‰»B
+		//ç‰©ç†ã‚¨ãƒ³ã‚¸ãƒ³ã‚’åˆæœŸåŒ–ã€‚
 		///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
 		m_collisionConfig = make_unique<btDefaultCollisionConfiguration>();
 
@@ -120,12 +164,12 @@ namespace nsK2EngineLow {
 			m_overlappingPairCache.get(),
 			m_constraintSolver.get(),
 			m_collisionConfig.get()
-			);
+		);
 
 		m_dynamicWorld->setGravity(btVector3(0, -10, 0));
 
 #ifdef _DEBUG
-		//ƒfƒoƒbƒOƒƒCƒ„[ƒtƒŒ[ƒ€‚ğ‰Šú‰»B
+		//ãƒ‡ãƒãƒƒã‚°ãƒ¯ã‚¤ãƒ¤ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’åˆæœŸåŒ–ã€‚
 		m_debugWireFrame.Init();
 		m_dynamicWorld->setDebugDrawer(&m_debugWireFrame);
 #endif

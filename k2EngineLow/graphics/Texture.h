@@ -1,48 +1,53 @@
-#pragma once
+ï»¿#pragma once
 
 namespace nsK2EngineLow {
 	class Texture : public IShaderResource {
 	public:
 		/// <summary>
-		/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+		/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 		/// </summary>
 		Texture() {}
 		/// <summary>
-		/// ƒfƒXƒgƒ‰ƒNƒ^B
+		/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 		/// </summary>
 		~Texture();
 
 		/// <summary>
-		/// ƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ğƒ[ƒh‚·‚éƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		/// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		/// </summary>
-		/// <param name="filePath">ƒ[ƒh‚·‚éƒeƒNƒXƒ`ƒƒ‚Ìƒtƒ@ƒCƒ‹ƒpƒXB</param>
+		/// <param name="filePath">ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
 		explicit Texture(const wchar_t* filePath);
 
 		/// <summary>
-		/// DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»‚·‚éB
+		/// DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 		/// </summary>
-		/// <param name="filePath">ƒ[ƒh‚·‚éƒeƒNƒXƒ`ƒƒ‚Ìƒtƒ@ƒCƒ‹ƒpƒXB</param>
+		/// <param name="filePath">ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
 		void InitFromDDSFile(const wchar_t* filePath);
 		/// <summary>
-		/// ƒƒ‚ƒŠ‚©‚çƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»‚·‚éB
+		/// ãƒ¡ãƒ¢ãƒªã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 		/// </summary>
-		/// <param name="memory">ƒeƒNƒXƒ`ƒƒƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚Ìæ“ªƒAƒhƒŒƒX</param>
-		/// <param name="size">ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒYB</param>
+		/// <param name="memory">ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹</param>
+		/// <param name="size">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã€‚</param>
 		void InitFromMemory(const char* memory, unsigned int size);
 		/// <summary>
-		/// D3DƒŠƒ\[ƒX‚©‚çƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»‚·‚éB
+		/// D3Dãƒªã‚½ãƒ¼ã‚¹ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 		/// </summary>
-		/// <param name="resrouce">D3DƒŠƒ\[ƒXB</param>
+		/// <param name="resrouce">D3Dãƒªã‚½ãƒ¼ã‚¹ã€‚</param>
 		void InitFromD3DResource(ID3D12Resource* texture);
 		/// <summary>
-		/// SRV‚É“o˜^B
+		/// Textureã‚¯ãƒ©ã‚¹ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã€‚
+		/// </summary>
+		/// <param name="texture"></param>
+		void IniteFromTexture(Texture& texture);
+		/// <summary>
+		/// SRVã«ç™»éŒ²ã€‚
 		/// </summary>
 		/// <param name="descriptorHandle"></param>
 		void RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo);
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚ª—LŒø‚©”»’èB
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒæœ‰åŠ¹ã‹åˆ¤å®šã€‚
 		/// </summary>
-		/// <returns>true‚ª•Ô‚Á‚Ä‚«‚½‚ç—LŒøB</returns>
+		/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰æœ‰åŠ¹ã€‚</returns>
 		bool IsValid() const
 		{
 			return m_texture != nullptr;
@@ -52,7 +57,7 @@ namespace nsK2EngineLow {
 			return m_texture;
 		}
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚Ì•‚ğæ“¾B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		int GetWidth() const
@@ -60,7 +65,7 @@ namespace nsK2EngineLow {
 			return static_cast<int>(m_textureDesc.Width);
 		}
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³‚ğæ“¾B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		int GetHeight() const
@@ -68,7 +73,7 @@ namespace nsK2EngineLow {
 			return static_cast<int>(m_textureDesc.Height);
 		}
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚ÌƒtƒH[ƒ}ƒbƒg‚ğæ“¾B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		DXGI_FORMAT GetFormat() const
@@ -77,25 +82,25 @@ namespace nsK2EngineLow {
 		}
 	private:
 		/// <summary>
-		/// DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ğƒ[ƒhB
+		/// DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
 		void LoadTextureFromDDSFile(const wchar_t* filePath);
 		/// <summary>
-		/// ƒƒ‚ƒŠ‚©‚çƒeƒNƒXƒ`ƒƒ‚ğƒ[ƒhB
+		/// ãƒ¡ãƒ¢ãƒªã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 		/// </summary>
-		/// <param name="memory">ƒeƒNƒXƒ`ƒƒƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚Ìæ“ªƒAƒhƒŒƒXB</param>
-		/// <param name="size">ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒYB</param>
-		/// <param name="ge12">Dx12”Å‚ÌƒOƒ‰ƒtƒBƒbƒNƒXƒGƒ“ƒWƒ“</param>
-		/// <param name="device">D3DƒfƒoƒCƒX</param>
+		/// <param name="memory">ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã‚¢ãƒ‰ãƒ¬ã‚¹ã€‚</param>
+		/// <param name="size">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã€‚</param>
+		/// <param name="ge12">Dx12ç‰ˆã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ã‚¨ãƒ³ã‚¸ãƒ³</param>
+		/// <param name="device">D3Dãƒ‡ãƒã‚¤ã‚¹</param>
 		void LoadTextureFromMemory(const char* memory, unsigned int size);
 		/// <summary>
-		/// ‰ğ•úB
+		/// è§£æ”¾ã€‚
 		/// </summary>
 		void Release();
 	private:
-		ID3D12Resource* m_texture = nullptr;	//ƒeƒNƒXƒ`ƒƒB
-		D3D12_RESOURCE_DESC m_textureDesc;	//ƒeƒNƒXƒ`ƒƒî•ñ
-		bool m_isCubemap = false;				//ƒLƒ…[ƒuƒ}ƒbƒvH
+		ID3D12Resource* m_texture = nullptr;	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
+		D3D12_RESOURCE_DESC m_textureDesc;	//ãƒ†ã‚¯ã‚¹ãƒãƒ£æƒ…å ±
+		bool m_isCubemap = false;				//ã‚­ãƒ¥ãƒ¼ãƒ–ãƒãƒƒãƒ—ï¼Ÿ
 	};
 }

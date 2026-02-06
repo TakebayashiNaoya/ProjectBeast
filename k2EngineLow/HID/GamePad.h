@@ -1,101 +1,103 @@
-
+ï»¿
 
 #pragma once
 
-namespace nsK2EngineLow {	
+#include "HID/GamePadVibration.h"
+
+namespace nsK2EngineLow {
 	/// <summary>
-	/// ‰¼‘zƒ{ƒ^ƒ“’è‹`
+	/// ä»®æƒ³ãƒœã‚¿ãƒ³å®šç¾©
 	/// </summary>
 	enum EnButton {
-		enButtonUp,		//!<ãB
-		enButtonDown,		//!<‰ºB
-		enButtonLeft,		//!<¶B
-		enButtonRight,		//!<‰EB
-		enButtonA,			//!<Aƒ{ƒ^ƒ“B
-		enButtonB,			//!<Bƒ{ƒ^ƒ“B
-		enButtonX,			//!<Xƒ{ƒ^ƒ“B
-		enButtonY,			//!<Yƒ{ƒ^ƒ“B
-		enButtonSelect,	//!<ƒZƒŒƒNƒgƒ{ƒ^ƒ“B
-		enButtonStart,		//!<ƒXƒ^[ƒgƒ{ƒ^ƒ“B
-		enButtonRB1,		//!<RB1ƒ{ƒ^ƒ“B
-		enButtonRB2,		//!<RB2ƒ{ƒ^ƒ“B
-		enButtonRB3,		//!<RB3ƒ{ƒ^ƒ“B
-		enButtonLB1,		//!<LB1ƒ{ƒ^ƒ“B
-		enButtonLB2,		//!<LB2ƒ{ƒ^ƒ“B
-		enButtonLB3,		//!<LB3ƒ{ƒ^ƒ“B
-		enButtonNum,	//!<ƒ{ƒ^ƒ“‚Ì”B
+		enButtonUp,		//!<ä¸Šã€‚
+		enButtonDown,		//!<ä¸‹ã€‚
+		enButtonLeft,		//!<å·¦ã€‚
+		enButtonRight,		//!<å³ã€‚
+		enButtonA,			//!<Aãƒœã‚¿ãƒ³ã€‚
+		enButtonB,			//!<Bãƒœã‚¿ãƒ³ã€‚
+		enButtonX,			//!<Xãƒœã‚¿ãƒ³ã€‚
+		enButtonY,			//!<Yãƒœã‚¿ãƒ³ã€‚
+		enButtonSelect,	//!<ã‚»ãƒ¬ã‚¯ãƒˆãƒœã‚¿ãƒ³ã€‚
+		enButtonStart,		//!<ã‚¹ã‚¿ãƒ¼ãƒˆãƒœã‚¿ãƒ³ã€‚
+		enButtonRB1,		//!<RB1ãƒœã‚¿ãƒ³ã€‚
+		enButtonRB2,		//!<RB2ãƒœã‚¿ãƒ³ã€‚
+		enButtonRB3,		//!<RB3ãƒœã‚¿ãƒ³ã€‚
+		enButtonLB1,		//!<LB1ãƒœã‚¿ãƒ³ã€‚
+		enButtonLB2,		//!<LB2ãƒœã‚¿ãƒ³ã€‚
+		enButtonLB3,		//!<LB3ãƒœã‚¿ãƒ³ã€‚
+		enButtonNum,	//!<ãƒœã‚¿ãƒ³ã®æ•°ã€‚
 	};
 
 	/// <summary>
-	/// ƒQ[ƒ€ƒpƒbƒhƒNƒ‰ƒX
+	/// ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã‚¯ãƒ©ã‚¹
 	/// </summary>
 	class GamePad : public Noncopyable {
 	public:
-		static const int CONNECT_PAD_MAX = 4;		//Ú‘±‰Â”\‚Èƒpƒbƒh‚ÌÅ‘å”B
-		
+		static const int CONNECT_PAD_MAX = 4;		//æ¥ç¶šå¯èƒ½ãªãƒ‘ãƒƒãƒ‰ã®æœ€å¤§æ•°ã€‚
+
 		/// <summary>
-		/// ƒpƒbƒhƒXƒe[ƒ^ƒX
+		/// ãƒ‘ãƒƒãƒ‰ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹
 		/// </summary>
 		struct PAD_STATE
 		{
 			XINPUT_STATE state;
 			bool bConnected;
 		};
-		
+
 
 		/// <summary>
-		/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		/// </summary>
 		GamePad();
-	
+
 		/// <summary>
-		/// ƒfƒXƒgƒ‰ƒNƒ^
+		/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		/// </summary>
 		~GamePad();
 
 		/// <summary>
-		/// ‰Šú‰»
+		/// åˆæœŸåŒ–
 		/// </summary>
-		/// <param name="padNo">ƒpƒbƒh”Ô†</param>
+		/// <param name="padNo">ãƒ‘ãƒƒãƒ‰ç•ªå·</param>
 		void Init(int padNo)
 		{
 			m_padNo = padNo;
 		}
 		/// <summary>
-		/// ƒpƒbƒhî•ñ‚ÌXV
+		/// ãƒ‘ãƒƒãƒ‰æƒ…å ±ã®æ›´æ–°
 		/// </summary>
 		void Update();
 
 		/// <summary>
-		/// ƒpƒbƒhî•ñ‚ÌXV(ŠO•”‚©‚çƒL[“ü—Í‚ğ“n‚·ƒo[ƒWƒ‡ƒ“)
+		/// ãƒ‘ãƒƒãƒ‰æƒ…å ±ã®æ›´æ–°(å¤–éƒ¨ã‹ã‚‰ã‚­ãƒ¼å…¥åŠ›ã‚’æ¸¡ã™ãƒãƒ¼ã‚¸ãƒ§ãƒ³)
 		/// </summary>
-		/// <param name="xInputState">ƒL[“ü—Í</param>
+		/// <param name="xInputState">ã‚­ãƒ¼å…¥åŠ›</param>
 		void Update(const XINPUT_STATE& xInputState);
-		
+
 		/// <summary>
-		/// ƒ{ƒ^ƒ“‚ÌƒgƒŠƒK[”»’è
+		/// ãƒœã‚¿ãƒ³ã®ãƒˆãƒªã‚¬ãƒ¼åˆ¤å®š
 		/// </summary>
-		/// <param name="button">”»’è‚µ‚½‚¢ƒ{ƒ^ƒ“</param>
-		/// <returns>true‚ª•Ô‚Á‚Ä‚«‚½‚çƒgƒŠƒK[“ü—Í‚³‚ê‚Ä‚¢‚é</returns>
+		/// <param name="button">åˆ¤å®šã—ãŸã„ãƒœã‚¿ãƒ³</param>
+		/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰ãƒˆãƒªã‚¬ãƒ¼å…¥åŠ›ã•ã‚Œã¦ã„ã‚‹</returns>
 		bool IsTrigger(EnButton button) const
 		{
 			return m_trigger[button] != 0;
 		}
-		
+
 		/// <summary>
-		/// ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©”»’è
+		/// ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹åˆ¤å®š
 		/// </summary>
-		/// <param name="button">”»’è‚µ‚½‚¢ƒ{ƒ^ƒ“</param>
-		/// <returns>true‚ª•Ô‚Á‚Ä‚«‚½‚ç“ü—Í‚³‚ê‚Ä‚¢‚éB</returns>
+		/// <param name="button">åˆ¤å®šã—ãŸã„ãƒœã‚¿ãƒ³</param>
+		/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰å…¥åŠ›ã•ã‚Œã¦ã„ã‚‹ã€‚</returns>
 		bool IsPress(EnButton button) const
 		{
 			return m_press[button] != 0;
 		}
 
 		/// <summary>
-		/// ‰½‚©‚Ìƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚Ä‚¢‚é‚©”»’èB
+		/// ä½•ã‹ã®ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚Œã¦ã„ã‚‹ã‹åˆ¤å®šã€‚
 		/// </summary>
-		/// <returns>true‚ª•Ô‚Á‚Ä‚«‚½‚ç‰Ÿ‚³‚ê‚Ä‚¢‚éB</returns>
+		/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰æŠ¼ã•ã‚Œã¦ã„ã‚‹ã€‚</returns>
 		bool IsPressAnyKey() const
 		{
 			return IsPress(enButtonUp)
@@ -116,82 +118,93 @@ namespace nsK2EngineLow {
 				|| IsPress(enButtonLB3);
 		}
 		/// <summary>
-		/// ¶ƒXƒeƒBƒbƒN‚Ìx²‚Ì“ü—Í—Ê‚ğæ“¾
+		/// å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®xè»¸ã®å…¥åŠ›é‡ã‚’å–å¾—
 		/// </summary>
-		/// <returns>-1.0`1.0‚Ì³‹K‰»‚³‚ê‚½’l‚ğ•Ô‚·B</returns>
+		/// <returns>-1.0ï½1.0ã®æ­£è¦åŒ–ã•ã‚ŒãŸå€¤ã‚’è¿”ã™ã€‚</returns>
 		float GetLStickXF() const
 		{
 			return m_lStickX;
 		}
-		
+
 		/// <summary>
-		/// ¶ƒXƒeƒBƒbƒN‚ÌY²‚Ì“ü—Í—Ê‚ğæ“¾B
+		/// å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®Yè»¸ã®å…¥åŠ›é‡ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <returns>-1.0`1.0‚Ì³‹K‰»‚³‚ê‚½’l‚ğ•Ô‚·B</returns>
+		/// <returns>-1.0ï½1.0ã®æ­£è¦åŒ–ã•ã‚ŒãŸå€¤ã‚’è¿”ã™ã€‚</returns>
 		float GetLStickYF() const
 		{
 			return m_lStickY;
 		}
-		
+
 
 		/// <summary>
-		/// ‰EƒXƒeƒBƒbƒN‚ÌX²‚Ì“ü—Í—Ê‚ğæ“¾B
+		/// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®Xè»¸ã®å…¥åŠ›é‡ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <returns>-1.0`1.0‚Ì³‹K‰»‚³‚ê‚½’l‚ğ•Ô‚·B</returns>
+		/// <returns>-1.0ï½1.0ã®æ­£è¦åŒ–ã•ã‚ŒãŸå€¤ã‚’è¿”ã™ã€‚</returns>
 		float GetRStickXF() const
 		{
 			return m_rStickX;
 		}
-		
+
 		/// <summary>
-		/// ‰EƒXƒeƒBƒbƒN‚ÌY²‚Ì“ü—Í—Ê‚ğæ“¾
+		/// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®Yè»¸ã®å…¥åŠ›é‡ã‚’å–å¾—
 		/// </summary>
-		/// <returns>-1.0`1.0‚Ì³‹K‰»‚³‚ê‚½’l‚ğ•Ô‚·B</returns>
+		/// <returns>-1.0ï½1.0ã®æ­£è¦åŒ–ã•ã‚ŒãŸå€¤ã‚’è¿”ã™ã€‚</returns>
 		float GetRStickYF() const
 		{
 			return m_rStickY;
 		}
-		
-		
+
+
 		/// <summary>
-		/// ƒtƒŒ[ƒ€‚ÌŠJn‚ÉŒÄ‚Ño‚·•K—v‚ª‚ ‚éŠÖ”
+		/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®é–‹å§‹æ™‚ã«å‘¼ã³å‡ºã™å¿…è¦ãŒã‚ã‚‹é–¢æ•°
 		/// </summary>
 		static void BeginFrame();
 		/// <summary>
-		/// XInput‚©‚çˆø‚Á’£‚Á‚Ä‚«‚½¶ƒf[ƒ^‚ğæ“¾B
+		/// XInputã‹ã‚‰å¼•ã£å¼µã£ã¦ããŸç”Ÿãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		const XINPUT_STATE& GetXInputState()
 		{
 			return m_state.state;
 		}
+		/// <summary>
+		/// ãƒã‚¤ãƒ–ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã‚’è¨­å®šã€‚
+		/// </summary>
+		/// <param name="padNo">ãƒ‘ãƒƒãƒ‰ç•ªå·</param>
+		/// <param name="durationSec">ãƒã‚¤ãƒ–ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã®ç¶™ç¶šæ™‚é–“(0.0ï½1.0)</param>
+		/// <param name="normalizedPower">æ­£è¦åŒ–ã•ã‚ŒãŸãƒ‘ãƒ¯ãƒ¼(0.0ï½1.0)</param>
+		void SetVibration(float durationSec, float normalizedPower)
+		{
+			auto vibration = NewGO< GamePadVibration>(0);
+			vibration->Init(m_padNo, durationSec, normalizedPower);
+		}
 	private:
 		void UpdateCore(XINPUT_STATE xInputState);
 	public:
 		/// <summary>
-		/// Å‘åƒpƒbƒh”
+		/// æœ€å¤§ãƒ‘ãƒƒãƒ‰æ•°
 		/// </summary>
 		enum { MAX_PAD = 4 };
 
 		/// <summary>
-		/// XInputƒpƒbƒh‚ÌƒXƒe[ƒgB
+		/// XInputãƒ‘ãƒƒãƒ‰ã®ã‚¹ãƒ†ãƒ¼ãƒˆã€‚
 		/// </summary>
 		enum class EnXInputPadState {
-			Undef,		//•s–¾B
-			Connect,	//Ú‘±‚³‚ê‚Ä‚¢‚éB
-			Disconnect,	//Ú‘±‚³‚ê‚Ä‚¢‚È‚¢B
+			Undef,		//ä¸æ˜ã€‚
+			Connect,	//æ¥ç¶šã•ã‚Œã¦ã„ã‚‹ã€‚
+			Disconnect,	//æ¥ç¶šã•ã‚Œã¦ã„ãªã„ã€‚
 		};
 	private:
-		PAD_STATE m_state;			// ƒpƒbƒhƒXƒe[ƒgB
-		int m_padNo = 0;			// ƒpƒbƒh”Ô†B
-		int m_trigger[enButtonNum];	// ƒgƒŠƒK[“ü—Í‚Ìƒtƒ‰ƒOB
-		int m_press[enButtonNum];	// press“ü—Í‚Ìƒtƒ‰ƒOB
-		float m_lStickX = 0.0f;		// ¶ƒXƒeƒBƒbƒN‚ÌX²‚Ì“ü—Í—ÊB
-		float m_lStickY = 0.0f;		// ¶ƒXƒeƒBƒbƒN‚ÌY²‚Ì“ü—Í—ÊB
-		float m_rStickX = 0.0f;		// ‰EƒXƒeƒBƒbƒN‚ÌX²‚Ì“ü—Í—ÊB
-		float m_rStickY = 0.0f;		// ‰EƒXƒeƒBƒbƒN‚ÌY²‚Ì“ü—Í—ÊB
+		PAD_STATE m_state;			// ãƒ‘ãƒƒãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆã€‚
+		int m_padNo = 0;			// ãƒ‘ãƒƒãƒ‰ç•ªå·ã€‚
+		int m_trigger[enButtonNum];	// ãƒˆãƒªã‚¬ãƒ¼å…¥åŠ›ã®ãƒ•ãƒ©ã‚°ã€‚
+		int m_press[enButtonNum];	// presså…¥åŠ›ã®ãƒ•ãƒ©ã‚°ã€‚
+		float m_lStickX = 0.0f;		// å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®Xè»¸ã®å…¥åŠ›é‡ã€‚
+		float m_lStickY = 0.0f;		// å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®Yè»¸ã®å…¥åŠ›é‡ã€‚
+		float m_rStickX = 0.0f;		// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®Xè»¸ã®å…¥åŠ›é‡ã€‚
+		float m_rStickY = 0.0f;		// å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®Yè»¸ã®å…¥åŠ›é‡ã€‚
 
-		static EnXInputPadState m_padStates[MAX_PAD];
+		static EnXInputPadState m_padStates[MAX_PAD];	// ãƒ‘ãƒƒãƒ‰ã®çŠ¶æ…‹ã€‚
 	};
 
 	extern std::array<GamePad*, GamePad::CONNECT_PAD_MAX> g_pad;

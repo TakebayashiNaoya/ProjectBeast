@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Indexbuffer.h"
 #include "VertexBuffer.h"
@@ -7,30 +7,30 @@
 namespace nsK2EngineLow {
 	class Texture;
 
-	//ƒXƒvƒ‰ƒCƒg‚Éİ’è‚Å‚«‚éÅ‘åƒeƒNƒXƒ`ƒƒ”B
+	//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã«è¨­å®šã§ãã‚‹æœ€å¤§ãƒ†ã‚¯ã‚¹ãƒãƒ£æ•°ã€‚
 	const int MAX_TEXTURE = 32;
-	//Šg’£SRV‚ªİ’è‚³‚ê‚éƒŒƒWƒXƒ^‚ÌŠJn”Ô†B
+	//æ‹¡å¼µSRVãŒè¨­å®šã•ã‚Œã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿ã®é–‹å§‹ç•ªå·ã€‚
 	const int EXPAND_SRV_REG__START_NO = 20;
-	const int EXPAND_MAX_SPRITE_EXPAND_SRV = 32;	//Šg’£SRV‚ÌÅ‘å”B
+	const int EXPAND_MAX_SPRITE_EXPAND_SRV = 32;	//æ‹¡å¼µSRVã®æœ€å¤§æ•°ã€‚
 
 	class IShaderResource;
 
 
 	/// <summary>
-	/// ƒXƒvƒ‰ƒCƒg‚Ì‰Šú‰»ƒf[ƒ^B
+	/// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®åˆæœŸåŒ–ãƒ‡ãƒ¼ã‚¿ã€‚
 	/// </summary>
 	struct SpriteInitData {
-		std::array<const char*, MAX_TEXTURE> m_ddsFilePath = { nullptr };	//DDSƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒXB
-		std::array<Texture*, MAX_TEXTURE> m_textures = { nullptr };		//g—p‚·‚éƒeƒNƒXƒ`ƒƒBDDSƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ªw’è‚³‚ê‚Ä‚¢‚éê‡‚ÍA‚±‚Ìƒpƒ‰ƒ[ƒ^‚Í–³‹‚³‚ê‚Ü‚·B
-		const char* m_vsEntryPointFunc = "VSMain";						//’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒgB
-		const char* m_psEntryPoinFunc = "PSMain";						//ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒgB
-		const char* m_fxFilePath = nullptr;								//.fxƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒXB
-		UINT m_width = 0;												//ƒXƒvƒ‰ƒCƒg‚Ì•B
-		UINT m_height = 0;												//ƒXƒvƒ‰ƒCƒg‚Ì‚‚³B
-		void* m_expandConstantBuffer = nullptr;							//ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@
-		int m_expandConstantBufferSize = 0;								//ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@‚ÌƒTƒCƒYB
-		std::array<IShaderResource*, EXPAND_MAX_SPRITE_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };			//ƒ†[ƒU[Šg’£‚ÌƒVƒF[ƒ_[ƒŠƒ\[ƒXB
-		AlphaBlendMode m_alphaBlendMode = AlphaBlendMode_None;			//ƒAƒ‹ƒtƒ@ƒuƒŒƒ“ƒfƒBƒ“ƒOƒ‚[ƒhB
+		std::array<const char*, MAX_TEXTURE> m_ddsFilePath = { nullptr };	//DDSãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚
+		std::array<Texture*, MAX_TEXTURE> m_textures = { nullptr };		//ä½¿ç”¨ã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚DDSãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹å ´åˆã¯ã€ã“ã®ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯ç„¡è¦–ã•ã‚Œã¾ã™ã€‚
+		const char* m_vsEntryPointFunc = "VSMain";						//é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã€‚
+		const char* m_psEntryPoinFunc = "PSMain";						//ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ãƒã‚¤ãƒ³ãƒˆã€‚
+		const char* m_fxFilePath = nullptr;								//.fxãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚
+		UINT m_width = 0;												//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®å¹…ã€‚
+		UINT m_height = 0;												//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã®é«˜ã•ã€‚
+		void* m_expandConstantBuffer = nullptr;							//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡
+		int m_expandConstantBufferSize = 0;								//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã€‚
+		std::array<IShaderResource*, EXPAND_MAX_SPRITE_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };			//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã€‚
+		AlphaBlendMode m_alphaBlendMode = AlphaBlendMode_None;			//ã‚¢ãƒ«ãƒ•ã‚¡ãƒ–ãƒ¬ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã€‚
 		std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> m_colorBufferFormat = {
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			DXGI_FORMAT_UNKNOWN,
@@ -40,58 +40,58 @@ namespace nsK2EngineLow {
 			DXGI_FORMAT_UNKNOWN,
 			DXGI_FORMAT_UNKNOWN,
 			DXGI_FORMAT_UNKNOWN,
-		};	//ƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚éƒJƒ‰[ƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒgB
-		D3D12_TEXTURE_ADDRESS_MODE textureAddressMode = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;	// ƒeƒNƒXƒ`ƒƒƒAƒhƒŒƒbƒVƒ“ƒOƒ‚[ƒhB
+		};	//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã™ã‚‹ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ•ã‚¡ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã€‚
+		D3D12_TEXTURE_ADDRESS_MODE textureAddressMode = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚¢ãƒ‰ãƒ¬ãƒƒã‚·ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã€‚
 	};
 	/// <summary>
-	/// ƒXƒvƒ‰ƒCƒgƒNƒ‰ƒXB
+	/// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚¯ãƒ©ã‚¹ã€‚
 	/// </summary>
 	class Sprite : public Noncopyable {
 	public:
-		static const Vector2	DEFAULT_PIVOT;					//!<ƒsƒ{ƒbƒgB
+		static const Vector2	DEFAULT_PIVOT;					//!<ãƒ”ãƒœãƒƒãƒˆã€‚
 		virtual ~Sprite();
 		/// <summary>
-		/// ‰Šú‰»B
+		/// åˆæœŸåŒ–ã€‚
 		/// </summary>
-		/// <param name="initData">‰Šú‰»ƒf[ƒ^</param>
+		/// <param name="initData">åˆæœŸåŒ–ãƒ‡ãƒ¼ã‚¿</param>
 		void Init(const SpriteInitData& initData);
 		/// <summary>
-		/// æZƒJƒ‰[‚ğİ’èB
+		/// ä¹—ç®—ã‚«ãƒ©ãƒ¼ã‚’è¨­å®šã€‚
 		/// </summary>
-		/// <param name="mulColor">æZƒJƒ‰[B</param>
+		/// <param name="mulColor">ä¹—ç®—ã‚«ãƒ©ãƒ¼ã€‚</param>
 		void SetMulColor(const Vector4& mulColor)
 		{
 			m_mulColor = mulColor;
 		}
 		/// <summary>
-		/// æZƒJƒ‰[‚ğæ“¾B
+		/// ä¹—ç®—ã‚«ãƒ©ãƒ¼ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <returns>æZƒJƒ‰[B</returns>
+		/// <returns>ä¹—ç®—ã‚«ãƒ©ãƒ¼ã€‚</returns>
 		const Vector4& GetMulColor() const
 		{
 			return m_mulColor;
 		}
 		/// <summary>
-		/// XVB
+		/// æ›´æ–°ã€‚
 		/// </summary>
-		/// <param name="pos">À•W</param>
-		/// <param name="rot">‰ñ“]</param>
-		/// <param name="scale">Šg‘å—¦</param>
+		/// <param name="pos">åº§æ¨™</param>
+		/// <param name="rot">å›è»¢</param>
+		/// <param name="scale">æ‹¡å¤§ç‡</param>
 		/// <param name="pivot">
-		/// ƒsƒ{ƒbƒg
-		/// 0.5, 0.5‚Å‰æ‘œ‚Ì’†S‚ªŠî“_B
-		/// 0.0, 0.0‚Å‰æ‘œ‚Ì¶‰ºB
-		/// 1.0, 1.0‚Å‰æ‘œ‚Ì‰EãB
-		/// Unity‚ÌuGUI‚É€‹’B
+		/// ãƒ”ãƒœãƒƒãƒˆ
+		/// 0.5, 0.5ã§ç”»åƒã®ä¸­å¿ƒãŒåŸºç‚¹ã€‚
+		/// 0.0, 0.0ã§ç”»åƒã®å·¦ä¸‹ã€‚
+		/// 1.0, 1.0ã§ç”»åƒã®å³ä¸Šã€‚
+		/// Unityã®uGUIã«æº–æ‹ ã€‚
 		/// </param>
 		void Update(const Vector3& pos, const Quaternion& rot, const Vector3& scale, const Vector2& pivot = DEFAULT_PIVOT);
 		/// <summary>
-		/// •`‰æB
+		/// æç”»ã€‚
 		/// </summary>
-		/// <param name="renderContext">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
+		/// <param name="renderContext">ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ</param>
 		void Draw(RenderContext& renderContext);
 		/// <summary>
-		/// ƒ†[ƒU[’è‹`‚ÌŠg’£’è”ƒoƒbƒtƒ@‚ğæ“¾B
+		/// ãƒ¦ãƒ¼ã‚¶ãƒ¼å®šç¾©ã®æ‹¡å¼µå®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		ConstantBuffer& GetExpandConstantBufferGPU()
@@ -99,7 +99,7 @@ namespace nsK2EngineLow {
 			return m_userExpandConstantBufferGPU;
 		}
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚Ì•‚ğæ“¾B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <param name="texNo"></param>
 		/// <returns></returns>
@@ -108,7 +108,7 @@ namespace nsK2EngineLow {
 			return m_textures[texNo].GetWidth();
 		}
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚Ì•‚ğæ“¾B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <param name="texNo"></param>
 		/// <returns></returns>
@@ -118,59 +118,59 @@ namespace nsK2EngineLow {
 		}
 	private:
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–ã€‚
 		/// </summary>
 		/// <param name="initData"></param>
 		void InitTextures(const SpriteInitData& initData);
 		/// <summary>
-		/// ƒVƒF[ƒ_[‚ğ‰Šú‰»B
+		/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’åˆæœŸåŒ–ã€‚
 		/// </summary>
 		/// <param name="initData"></param>
 		void InitShader(const SpriteInitData& initData);
 		/// <summary>
-		/// ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğ‰Šú‰»B
+		/// ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’åˆæœŸåŒ–ã€‚
 		/// </summary>
 		/// <param name="initData"></param>
 		void InitDescriptorHeap(const SpriteInitData& initData);
 		/// <summary>
-		/// ’¸“_ƒoƒbƒtƒ@‚ÆƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ğ‰Šú‰»B
+		/// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã¨ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–ã€‚
 		/// </summary>
 		/// <param name="initData"></param>
 		void InitVertexBufferAndIndexBuffer(const SpriteInitData& initData);
 		/// <summary>
-		/// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğ‰Šú‰»‚·‚éB
+		/// ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 		/// </summary>
 		void InitPipelineState(const SpriteInitData& initData);
 		/// <summary>
-		/// ’è”ƒoƒbƒtƒ@‚ğ‰Šú‰»B
+		/// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–ã€‚
 		/// </summary>
 		/// <param name="initData"></param>
 		void InitConstantBuffer(const SpriteInitData& initData);
 	private:
-		IndexBuffer m_indexBuffer;			//ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@B
-		VertexBuffer m_vertexBuffer;		//’¸“_ƒoƒbƒtƒ@B
-		int m_numTexture = 0;				//ƒeƒNƒXƒ`ƒƒ‚Ì–‡”B
-		Texture m_textures[MAX_TEXTURE];	//ƒeƒNƒXƒ`ƒƒB
-		Texture* m_textureExternal[MAX_TEXTURE] = { nullptr };	//ŠO•”‚©‚çw’è‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
-		Vector3 m_position;				//À•WB
-		Vector2 m_size;						//ƒTƒCƒYB
-		Quaternion m_rotation;			//‰ñ“]B
-		Matrix m_world;					//ƒ[ƒ‹ƒhs—ñB
+		IndexBuffer m_indexBuffer;			//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã€‚
+		VertexBuffer m_vertexBuffer;		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã€‚
+		int m_numTexture = 0;				//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æšæ•°ã€‚
+		Texture m_textures[MAX_TEXTURE];	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚
+		Texture* m_textureExternal[MAX_TEXTURE] = { nullptr };	//å¤–éƒ¨ã‹ã‚‰æŒ‡å®šã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
+		Vector3 m_position;				//åº§æ¨™ã€‚
+		Vector2 m_size;						//ã‚µã‚¤ã‚ºã€‚
+		Quaternion m_rotation;			//å›è»¢ã€‚
+		Matrix m_world;					//ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã€‚
 
 		struct LocalConstantBuffer {
 			Matrix mvp;
 			Vector4 mulColor;
 			Vector4 screenParam;
 		};
-		LocalConstantBuffer m_constantBufferCPU;	//CPU‘¤‚Ì’è”ƒoƒbƒtƒ@B
-		ConstantBuffer		m_constantBufferGPU;	//GPU‘¤‚Ì’è”ƒoƒbƒtƒ@B
-		ConstantBuffer		m_userExpandConstantBufferGPU;	//ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@(GPU‘¤)
-		void* m_userExpandConstantBufferCPU = nullptr;		//ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@(CPU‘¤)
-		DescriptorHeap		m_descriptorHeap;		//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒvB
-		RootSignature		m_rootSignature;		//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒB
-		PipelineState		m_pipelineState;		//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒgB
-		Shader				m_vs;					//’¸“_ƒVƒF[ƒ_[B
-		Shader				m_ps;					//ƒsƒNƒZƒ‹ƒVƒF[ƒ_[B
-		Vector4				m_mulColor = Vector4::White;	//æZƒJƒ‰[B
+		LocalConstantBuffer m_constantBufferCPU;	//CPUå´ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
+		ConstantBuffer		m_constantBufferGPU;	//GPUå´ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
+		ConstantBuffer		m_userExpandConstantBufferGPU;	//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡(GPUå´)
+		void* m_userExpandConstantBufferCPU = nullptr;		//ãƒ¦ãƒ¼ã‚¶ãƒ¼æ‹¡å¼µã®å®šæ•°ãƒãƒƒãƒ•ã‚¡(CPUå´)
+		DescriptorHeap		m_descriptorHeap;		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã€‚
+		RootSignature		m_rootSignature;		//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã€‚
+		PipelineState		m_pipelineState;		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã€‚
+		Shader				m_vs;					//é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã€‚
+		Shader				m_ps;					//ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã€‚
+		Vector4				m_mulColor = Vector4::White;	//ä¹—ç®—ã‚«ãƒ©ãƒ¼ã€‚
 	};
 }

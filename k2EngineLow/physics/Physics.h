@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <memory>
 #include "DebugWireframe.h"
@@ -8,12 +8,12 @@ namespace nsK2EngineLow {
 
 	class PhysicsWorld : public Noncopyable
 	{
-		static PhysicsWorld* m_instance;	//—Bˆê‚ÌƒCƒ“ƒXƒ^ƒ“ƒXB
+		static PhysicsWorld* m_instance;	//å”¯ä¸€ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã€‚
 		std::unique_ptr<btDefaultCollisionConfiguration> 	 m_collisionConfig;
-		std::unique_ptr<btCollisionDispatcher>				 m_collisionDispatcher;	//!<Õ“Ë‰ğŒˆˆ—B
-		std::unique_ptr<btBroadphaseInterface>				 m_overlappingPairCache;	//!<ƒuƒ[ƒhƒtƒF[ƒYBÕ“Ë”»’è‚Ì}Ø‚èB
-		std::unique_ptr<btSequentialImpulseConstraintSolver> m_constraintSolver;		//!<ƒRƒ“ƒXƒgƒŒƒCƒ“ƒgƒ\ƒ‹ƒo[BS‘©ğŒ‚Ì‰ğŒˆˆ—B
-		std::unique_ptr<btDiscreteDynamicsWorld>			 m_dynamicWorld;			//!<ƒ[ƒ‹ƒhB
+		std::unique_ptr<btCollisionDispatcher>				 m_collisionDispatcher;	//!<è¡çªè§£æ±ºå‡¦ç†ã€‚
+		std::unique_ptr<btBroadphaseInterface>				 m_overlappingPairCache;	//!<ãƒ–ãƒ­ãƒ¼ãƒ‰ãƒ•ã‚§ãƒ¼ã‚ºã€‚è¡çªåˆ¤å®šã®æåˆ‡ã‚Šã€‚
+		std::unique_ptr<btSequentialImpulseConstraintSolver> m_constraintSolver;		//!<ã‚³ãƒ³ã‚¹ãƒˆãƒ¬ã‚¤ãƒ³ãƒˆã‚½ãƒ«ãƒãƒ¼ã€‚æ‹˜æŸæ¡ä»¶ã®è§£æ±ºå‡¦ç†ã€‚
+		std::unique_ptr<btDiscreteDynamicsWorld>			 m_dynamicWorld;			//!<ãƒ¯ãƒ¼ãƒ«ãƒ‰ã€‚
 #ifdef _DEBUG
 		DebugWireframe m_debugWireFrame;
 		bool m_isDrawDebugWireFrame = false;
@@ -39,14 +39,14 @@ namespace nsK2EngineLow {
 #ifdef _DEBUG
 			if (m_isDrawDebugWireFrame) {
 				m_debugWireFrame.Begin();
-				//ÀÛ‚ÉdrawLine‚ğŒÄ‚ñ‚Å‚Ü‚·B
+				//å®Ÿéš›ã«drawLineã‚’å‘¼ã‚“ã§ã¾ã™ã€‚
 				m_dynamicWorld->debugDrawWorld();
 				m_debugWireFrame.End(rc);
 			}
 #endif
 		}
 
-		//“–‚½‚è”»’è•`‰æ‚ğ—LŒø‚É‚·‚éB
+		//å½“ãŸã‚Šåˆ¤å®šæç”»ã‚’æœ‰åŠ¹ã«ã™ã‚‹ã€‚
 		void EnableDrawDebugWireFrame()
 		{
 #ifdef _DEBUG
@@ -54,7 +54,7 @@ namespace nsK2EngineLow {
 #endif
 		}
 
-		//“–‚½‚è”»’è•`‰æ‚ğ–³Œø‚É‚·‚éB
+		//å½“ãŸã‚Šåˆ¤å®šæç”»ã‚’ç„¡åŠ¹ã«ã™ã‚‹ã€‚
 		void DisableDrawDebugWireFrame()
 		{
 #ifdef _DEBUG
@@ -64,14 +64,14 @@ namespace nsK2EngineLow {
 
 		void Release();
 		/*!
-		* @brief	d—Í‚ğİ’èBB
+		* @brief	é‡åŠ›ã‚’è¨­å®šã€‚ã€‚
 		*/
 		void SetGravity(Vector3 g)
 		{
 			m_dynamicWorld->setGravity(btVector3(g.x, g.y, g.z));
 		}
 		/*!
-		* @brief	ƒ_ƒCƒiƒ~ƒbƒNƒ[ƒ‹ƒh‚ğæ“¾B
+		* @brief	ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚’å–å¾—ã€‚
 		*/
 		btDiscreteDynamicsWorld* GetDynamicWorld()
 		{
@@ -79,7 +79,7 @@ namespace nsK2EngineLow {
 		}
 
 		/*!
-		* @brief	„‘Ì‚ğ“o˜^B
+		* @brief	å‰›ä½“ã‚’ç™»éŒ²ã€‚
 		*/
 		void AddRigidBody(RigidBody& rb)
 		{
@@ -88,13 +88,13 @@ namespace nsK2EngineLow {
 
 
 		/*!
-		* @brief	„‘Ì‚ğ”jŠüB
+		* @brief	å‰›ä½“ã‚’ç ´æ£„ã€‚
 		*/
 		void RemoveRigidBody(RigidBody& rb)
 		{
 			m_dynamicWorld->removeRigidBody(rb.GetBody());
 		}
-		
+
 		void ConvexSweepTest(
 			const btConvexShape* castShape,
 			const btTransform& convexFromWorld,
@@ -106,32 +106,47 @@ namespace nsK2EngineLow {
 			m_dynamicWorld->convexSweepTest(castShape, convexFromWorld, convexToWorld, resultCallback, allowedCcdPenetration);
 		}
 		/// <summary>
-		/// •¨—ƒ[ƒ‹ƒh‚É‘Î‚µ‚ÄA“ÊŒ^ƒRƒ‰ƒCƒ_[SweepƒeƒXƒg‚ğs‚¤B
+		/// ç‰©ç†ãƒ¯ãƒ¼ãƒ«ãƒ‰ã«å¯¾ã—ã¦ã€å‡¸å‹ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼Sweepãƒ†ã‚¹ãƒˆã‚’è¡Œã†ã€‚
 		/// </summary>
-		/// <param name="collider">ƒRƒ‰ƒCƒ_[</param>
-		/// <param name="convexStart">ƒRƒ‰ƒCƒ_[‚ÌŠJnÀ•W</param>
-		/// <param name="rayEnd">ƒRƒ‰ƒCƒ_[‚ÌI—¹À•W</param>
-		/// <returns>true‚ª‚©‚¦‚Á‚Ä‚«‚½‚ç“–‚½‚Á‚Ä‚¢‚éB</returns>
+		/// <param name="collider">ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼</param>
+		/// <param name="convexStart">ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®é–‹å§‹åº§æ¨™</param>
+		/// <param name="rayEnd">ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®çµ‚äº†åº§æ¨™</param>
+		/// <returns>trueãŒã‹ãˆã£ã¦ããŸã‚‰å½“ãŸã£ã¦ã„ã‚‹ã€‚</returns>
 		bool ConvexSweepTest(ICollider& collider, const Vector3& rayStart, const Vector3& rayEnd) const;
 		/// <summary>
-		/// ƒŒƒCƒeƒXƒg‚ğÀ{B
+		/// ãƒ¬ã‚¤ãƒ†ã‚¹ãƒˆã‚’å®Ÿæ–½ã€‚
 		/// </summary>
-		/// <param name="rayStart">ƒŒƒC‚Ìn“_</param>
-		/// <param name="rayEnd">ƒŒƒC‚ÌI“_</param>
-		/// <param name="hitPos">Œğ“_‚ÌŠi”[æ</param>
-		/// <returns>true‚ª•Ô‚Á‚Ä‚«‚½‚çÕ“Ë‚µ‚Ä‚¢‚éB</returns>
+		/// <param name="rayStart">ãƒ¬ã‚¤ã®å§‹ç‚¹</param>
+		/// <param name="rayEnd">ãƒ¬ã‚¤ã®çµ‚ç‚¹</param>
+		/// <param name="hitPos">äº¤ç‚¹ã®æ ¼ç´å…ˆ</param>
+		/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰è¡çªã—ã¦ã„ã‚‹ã€‚</returns>
+		/// bool RayTest(const Vector3& rayStart, const Vector3& rayEnd, Vector3& hitPos) const;
+
+		/// <summary>
+		/// è‡ªä½œé–¢æ•°ã€‚
+		/// ãƒ¬ã‚¤ãƒ†ã‚¹ãƒˆã‚’å®Ÿæ–½ã€‚
+		/// </summary>
+		/// <param name="rayStart">ãƒ¬ã‚¤ã®å§‹ç‚¹</param>
+		/// <param name="rayEnd">ãƒ¬ã‚¤ã®çµ‚ç‚¹</param>
+		/// <param name="hitPos">äº¤ç‚¹ã®æ ¼ç´å…ˆ</param>
+		/// <returns>trueãŒè¿”ã£ã¦ããŸã‚‰è¡çªã—ã¦ã„ã‚‹ã€‚</returns>
 		bool RayTest(const Vector3& rayStart, const Vector3& rayEnd, Vector3& hitPos) const;
+
+
+		void RayTest(const Vector3& rayStart, const Vector3& rayEnd, btCollisionWorld::RayResultCallback* cb) const;
+
+
 		/*!
-		* @brief	ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒg‚ğƒ[ƒ‹ƒh‚É“o˜^B
-		*@param[in]	colliObj	ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒgB
+		* @brief	ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ã«ç™»éŒ²ã€‚
+		*@param[in]	colliObj	ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã€‚
 		*/
 		void AddCollisionObject(btCollisionObject& colliObj)
 		{
 			m_dynamicWorld->addCollisionObject(&colliObj);
 		}
 		/*!
-		* @brief	ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒg‚ğƒ[ƒ‹ƒh‚©‚çíœB
-		*@param[in]	colliObj	ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒgB
+		* @brief	ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‹ã‚‰å‰Šé™¤ã€‚
+		*@param[in]	colliObj	ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã€‚
 		*/
 		void RemoveCollisionObject(btCollisionObject& colliObj)
 		{

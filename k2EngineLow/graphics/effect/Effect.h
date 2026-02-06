@@ -1,12 +1,12 @@
-/*!
-* @brief	ƒGƒtƒFƒNƒg
+ï»¿/*!
+* @brief	ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 */
 
 #pragma once
 
 namespace nsK2EngineLow {
 	/*!
-	* @brief	ƒGƒtƒFƒNƒgB
+	* @brief	ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã€‚
 	*/
 	class Effect : public Noncopyable {
 	public:
@@ -14,37 +14,37 @@ namespace nsK2EngineLow {
 		~Effect();
 
 		/// <summary>
-		/// ‰Šú‰»B
+		/// åˆæœŸåŒ–ã€‚
 		/// </summary>
 		/// <remark>
-		/// ƒGƒtƒFƒNƒgÄ¶‚Ì‚½‚ß‚Ì€”õ‚ğs‚¢‚Ü‚·B
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆå†ç”Ÿã®ãŸã‚ã®æº–å‚™ã‚’è¡Œã„ã¾ã™ã€‚
 		/// </remark>
 		/// <param name="number"></param>
 		void Init(const int number);
 		/// <summary>
-		/// Ä¶ŠJn
+		/// å†ç”Ÿé–‹å§‹
 		/// </summary>
 		/// <remark>
-		/// ‚±‚ÌŠÖ”‚ğŒÄ‚Ño‚·‚ÆƒGƒtƒFƒNƒg‚ÌÄ¶‚ªŠJn‚³‚ê‚Ü‚·B
+		/// ã“ã®é–¢æ•°ã‚’å‘¼ã³å‡ºã™ã¨ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®å†ç”ŸãŒé–‹å§‹ã•ã‚Œã¾ã™ã€‚
 		/// </remark>
 		void Play();
 		/// <summary>
-		/// ’â~B
+		/// åœæ­¢ã€‚
 		/// </summary>              
 		void Stop()
 		{
-			//Ä¶’†‚ÌƒGƒtƒFƒNƒg‚ğ’â~‚·‚éB
+			//å†ç”Ÿä¸­ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’åœæ­¢ã™ã‚‹ã€‚
 			EffectEngine::GetInstance()->Stop(m_handle);
 		}
 		/*!
-		*@brief	À•W‚ğİ’èB
+		*@brief	åº§æ¨™ã‚’è¨­å®šã€‚
 		*/
 		void SetPosition(const Vector3& pos)
 		{
 			m_position = pos;
 		}
 		/// <summary>
-		/// À•W‚ğæ“¾B
+		/// åº§æ¨™ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		const Vector3& GetPosition() const
@@ -52,14 +52,14 @@ namespace nsK2EngineLow {
 			return m_position;
 		}
 		/*!
-		*@brief	‰ñ“]ƒNƒH[ƒ^ƒjƒIƒ“‚ğİ’èB
+		*@brief	å›è»¢ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã‚’è¨­å®šã€‚
 		*/
 		void SetRotation(const Quaternion& rot)
 		{
 			m_rotation = rot;
 		}
 		/// <summary>
-		/// ‰ñ“]ƒNƒH[ƒ^ƒjƒIƒ“‚ğæ“¾B
+		/// å›è»¢ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		const Quaternion& GetRotation() const
@@ -67,14 +67,14 @@ namespace nsK2EngineLow {
 			return m_rotation;
 		}
 		/*!
-			*@brief	Šg‘å—¦‚ğİ’èB
+			*@brief	æ‹¡å¤§ç‡ã‚’è¨­å®šã€‚
 			*/
 		void SetScale(const Vector3& scale)
 		{
 			m_scale = scale;
 		}
 		/// <summary>
-		/// Šg‘å—¦‚ğæ“¾B
+		/// æ‹¡å¤§ç‡ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		const Vector3& GetScale() const
@@ -82,21 +82,21 @@ namespace nsK2EngineLow {
 			return m_scale;
 		}
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ªÄ¶’†‚©”»’èB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãŒå†ç”Ÿä¸­ã‹åˆ¤å®šã€‚
 		/// </summary>
 		bool IsPlay() const
 		{
 			return EffectEngine::GetInstance()->IsPlay(m_handle);
 		}
 		/*!
-		 *@brief	XVB
+		 *@brief	æ›´æ–°ã€‚
 		 */
 		void Update();
 	private:
-		Effekseer::EffectRef m_effect;	//ƒGƒtƒFƒNƒg
-		int	m_handle = -1;				//Ä¶’†‚ÌƒGƒtƒFƒNƒg‚Ìƒnƒ“ƒhƒ‹B
-		Vector3 m_position;				//À•WB
-		Quaternion m_rotation;;			//‰ñ“]B
-		Vector3 m_scale = g_vec3One;	//Šg‘å—¦B
+		Effekseer::EffectRef m_effect;	//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+		int	m_handle = -1;				//å†ç”Ÿä¸­ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ãƒãƒ³ãƒ‰ãƒ«ã€‚
+		Vector3 m_position;				//åº§æ¨™ã€‚
+		Quaternion m_rotation;;			//å›è»¢ã€‚
+		Vector3 m_scale = g_vec3One;	//æ‹¡å¤§ç‡ã€‚
 	};
 }

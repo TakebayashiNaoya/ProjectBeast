@@ -1,5 +1,5 @@
-/*!
-*@brief	ƒpƒbƒhB
+ï»¿/*!
+*@brief	ãƒ‘ãƒƒãƒ‰ã€‚
 */
 #include "k2EngineLowPreCompile.h"
 #include "GamePad.h"
@@ -11,11 +11,11 @@ namespace nsK2EngineLow {
 
 	namespace {
 		/*!
-		*@brief	‰¼‘zƒ{ƒ^ƒ“‚ÆXBoxƒRƒ“ƒgƒ[ƒ‰‚Ìƒ{ƒ^ƒ“‚Æ‚ÌŠÖ˜A•t‚¯‚ğ•\‚·\‘¢‘ÌB
+		*@brief	ä»®æƒ³ãƒœã‚¿ãƒ³ã¨XBoxã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®ãƒœã‚¿ãƒ³ã¨ã®é–¢é€£ä»˜ã‘ã‚’è¡¨ã™æ§‹é€ ä½“ã€‚
 		*/
 		struct VirtualPadToXPad {
-			EnButton vButton;		//!<‰¼‘zƒ{ƒ^ƒ“B
-			DWORD	 xButton;		//!<XBoxƒRƒ“ƒgƒ[ƒ‰‚Ìƒ{ƒ^ƒ“B
+			EnButton vButton;		//!<ä»®æƒ³ãƒœã‚¿ãƒ³ã€‚
+			DWORD	 xButton;		//!<XBoxã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã®ãƒœã‚¿ãƒ³ã€‚
 		};
 
 		const VirtualPadToXPad vPadToXPadTable[enButtonNum] = {
@@ -37,12 +37,12 @@ namespace nsK2EngineLow {
 			{ enButtonLB3		, XINPUT_GAMEPAD_LEFT_THUMB },
 		};
 		/*!
-		*@brief	‰¼‘zƒ{ƒ^ƒ“‚ÆƒL[ƒ{[ƒh‚Æ‚ÌŠÖ˜A•t‚¯‚ğ•\‚·\‘¢‘ÌB
+		*@brief	ä»®æƒ³ãƒœã‚¿ãƒ³ã¨ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã¨ã®é–¢é€£ä»˜ã‘ã‚’è¡¨ã™æ§‹é€ ä½“ã€‚
 		*/
 		struct VirtualPadToKeyboard {
-			EnButton vButton;		//!<‰¼‘zƒ{ƒ^ƒ“
-			DWORD keyCoord1;		//!<ƒL[ƒ{[ƒh‚ÌƒL[ƒR[ƒhB
-			DWORD keyCoord2;		//!<ƒL[ƒ{[ƒh‚ÌƒL[ƒR[ƒhB
+			EnButton vButton;		//!<ä»®æƒ³ãƒœã‚¿ãƒ³
+			DWORD keyCoord1;		//!<ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã€‚
+			DWORD keyCoord2;		//!<ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã€‚
 		};
 		const VirtualPadToKeyboard vPadToKeyboardTable[enButtonNum] = {
 			{ enButtonUp		, VK_NUMPAD8,	'8' 		},
@@ -75,7 +75,7 @@ namespace nsK2EngineLow {
 	}
 	void GamePad::BeginFrame()
 	{
-		//‘S‚Ä–¢’è‹`‚É‚·‚éB
+		//å…¨ã¦æœªå®šç¾©ã«ã™ã‚‹ã€‚
 		for (auto& padState : m_padStates) {
 			padState = EnXInputPadState::Undef;
 		}
@@ -92,7 +92,7 @@ namespace nsK2EngineLow {
 				m_press[vPadToXPad.vButton] = 0;
 			}
 		}
-		//¶ƒgƒŠƒK[B
+		//å·¦ãƒˆãƒªã‚¬ãƒ¼ã€‚
 		if (xInputState.Gamepad.bLeftTrigger != 0) {
 			m_trigger[enButtonLB2] = 1 ^ m_press[enButtonLB2];
 			m_press[enButtonLB2] = 1;
@@ -101,7 +101,7 @@ namespace nsK2EngineLow {
 			m_trigger[enButtonLB2] = 0;
 			m_press[enButtonLB2] = 0;
 		}
-		//‰EƒgƒŠƒK[
+		//å³ãƒˆãƒªã‚¬ãƒ¼
 		if (xInputState.Gamepad.bRightTrigger != 0) {
 			m_trigger[enButtonRB2] = 1 ^ m_press[enButtonRB2];
 			m_press[enButtonRB2] = 1;
@@ -121,7 +121,7 @@ namespace nsK2EngineLow {
 			m_lStickY = 0.0f;
 		}
 		else {
-			//¶ƒXƒeƒBƒbƒN‚Ì“ü—Í—ÊB
+			//å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›é‡ã€‚
 			if (xInputState.Gamepad.sThumbLX > 0) {
 				m_lStickX = static_cast<float>(xInputState.Gamepad.sThumbLX) / SHRT_MAX;
 			}
@@ -135,7 +135,7 @@ namespace nsK2EngineLow {
 				m_lStickY = static_cast<float>(xInputState.Gamepad.sThumbLY) / -SHRT_MIN;
 			}
 
-			// “ü—Í—Ê‚ğ³‹K‰»‚·‚éB
+			// å…¥åŠ›é‡ã‚’æ­£è¦åŒ–ã™ã‚‹ã€‚
 			float t = sqrtf(m_lStickX * m_lStickX + m_lStickY * m_lStickY);
 			if (t > 0.001f) {
 				m_lStickX /= t;
@@ -154,7 +154,7 @@ namespace nsK2EngineLow {
 			m_rStickY = 0.0f;
 		}
 		else {
-			//‰EƒXƒeƒBƒbƒN‚Ì“ü—Í—ÊB
+			//å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›é‡ã€‚
 			if (xInputState.Gamepad.sThumbRX > 0) {
 				m_rStickX = static_cast<float>(xInputState.Gamepad.sThumbRX) / SHRT_MAX;
 			}
@@ -167,7 +167,7 @@ namespace nsK2EngineLow {
 			else {
 				m_rStickY = static_cast<float>(xInputState.Gamepad.sThumbRY) / -SHRT_MIN;
 			}
-			// “ü—Í—Ê‚ğ³‹K‰»‚·‚éB
+			// å…¥åŠ›é‡ã‚’æ­£è¦åŒ–ã™ã‚‹ã€‚
 			float t = sqrtf(m_rStickX * m_rStickX + m_rStickY * m_rStickY);
 			if (t > 0.001f) {
 				m_rStickX /= t;
@@ -182,35 +182,35 @@ namespace nsK2EngineLow {
 	}
 	void GamePad::Update()
 	{
-		//ƒAƒNƒeƒBƒuƒpƒbƒh‚ğ’T‚·B
+		//ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãƒ‘ãƒƒãƒ‰ã‚’æ¢ã™ã€‚
 		DWORD result = ERROR_DEVICE_NOT_CONNECTED;
 		for (int i = m_padNo; i < MAX_PAD; i++) {
 			if (m_padStates[i] == EnXInputPadState::Undef) {
-				//‚±‚Ìƒpƒbƒh‚Í–¢’²¸B
+				//ã“ã®ãƒ‘ãƒƒãƒ‰ã¯æœªèª¿æŸ»ã€‚
 				result = XInputGetState(i, &m_state.state);
 				if (result == ERROR_SUCCESS) {
-					//Ú‘±‚Å‚«‚½B
+					//æ¥ç¶šã§ããŸã€‚
 					m_padStates[i] = EnXInputPadState::Connect;
 					break;
 				}
 				else {
-					//Œq‚ª‚Á‚Ä‚¢‚È‚¢B
-					//Ÿ‚Ìƒpƒbƒh‚ğ’²‚×‚éB
+					//ç¹‹ãŒã£ã¦ã„ãªã„ã€‚
+					//æ¬¡ã®ãƒ‘ãƒƒãƒ‰ã‚’èª¿ã¹ã‚‹ã€‚
 					m_padStates[i] = EnXInputPadState::Disconnect;
 				}
 			}
 		}
 
 		if (result == ERROR_SUCCESS) {
-			//Ú‘±‚³‚ê‚Ä‚¢‚éB
+			//æ¥ç¶šã•ã‚Œã¦ã„ã‚‹ã€‚
 			m_state.bConnected = true;
 			UpdateCore(m_state.state);
-			
+
 		}
 		else {
-			//Ú‘±‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍƒL[ƒ{[ƒh‚Ì“ü—Í‚ÅƒGƒ~ƒ…ƒŒ[ƒg‚·‚éB
+			//æ¥ç¶šã•ã‚Œã¦ã„ãªã„å ´åˆã¯ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®å…¥åŠ›ã§ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆã™ã‚‹ã€‚
 			if (m_state.bConnected) {
-				//–¢Ú‘±‚É‚È‚Á‚½B
+				//æœªæ¥ç¶šã«ãªã£ãŸã€‚
 				memset(&m_state, 0, sizeof(m_state));
 				memset(m_trigger, 0, sizeof(m_trigger));
 				memset(m_press, 0, sizeof(m_press));
@@ -232,7 +232,7 @@ namespace nsK2EngineLow {
 			else if (GetAsyncKeyState(VK_DOWN)) {
 				m_rStickY = -1.0f;
 			}
-			//ƒXƒeƒBƒbƒN‚Ì“ü—Í—Ê‚ğ³‹K‰»B
+			//ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›é‡ã‚’æ­£è¦åŒ–ã€‚
 			float t = fabsf(m_rStickX) + fabsf(m_rStickY);
 			if (t > 0.0f) {
 				m_rStickX /= t;
@@ -251,7 +251,7 @@ namespace nsK2EngineLow {
 			else if (GetAsyncKeyState('S')) {
 				m_lStickY = -1.0f;
 			}
-			//ƒXƒeƒBƒbƒN‚Ì“ü—Í—Ê‚ğ³‹K‰»B
+			//ã‚¹ãƒ†ã‚£ãƒƒã‚¯ã®å…¥åŠ›é‡ã‚’æ­£è¦åŒ–ã€‚
 			t = fabsf(m_lStickX) + fabsf(m_lStickY);
 			if (t > 0.0f) {
 				m_lStickX /= t;
@@ -260,13 +260,13 @@ namespace nsK2EngineLow {
 
 			for (const VirtualPadToKeyboard& vPadToKeyboard : vPadToKeyboardTable) {
 				if (GetAsyncKeyState(vPadToKeyboard.keyCoord1)) {
-					//—Dæ‡ˆÊ‚P”Ô–Ú‚ÌƒL[B
+					//å„ªå…ˆé †ä½ï¼‘ç•ªç›®ã®ã‚­ãƒ¼ã€‚
 					m_trigger[vPadToKeyboard.vButton] = 1 ^ m_press[vPadToKeyboard.vButton];
 					m_press[vPadToKeyboard.vButton] = 1;
 				}
 				else if (vPadToKeyboard.keyCoord2 != 0xFFFFFFFF
 					&& GetAsyncKeyState(vPadToKeyboard.keyCoord2)) {
-					//—Dæ‡ˆÊ‚Q”Ô–Ú‚ÌƒL[B
+					//å„ªå…ˆé †ä½ï¼’ç•ªç›®ã®ã‚­ãƒ¼ã€‚
 					m_trigger[vPadToKeyboard.vButton] = 1 ^ m_press[vPadToKeyboard.vButton];
 					m_press[vPadToKeyboard.vButton] = 1;
 				}

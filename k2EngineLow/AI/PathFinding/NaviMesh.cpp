@@ -1,69 +1,69 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "AI/PathFinding/NaviMesh.h"
 #include "tkFile/TknFile.h"
 
 namespace nsK2EngineLow {
-namespace nsAI {
-	void NaviMesh::Init(const char* tknFilePath)
-	{
-		TknFile tknFile;
-		tknFile.Load(tknFilePath);
-		// tknƒtƒ@ƒCƒ‹‚©‚çƒZƒ‹î•ñ‚ğ\’z‚·‚éB
-		int numCell = tknFile.GetNumCell();
-		m_cellArray.resize(numCell);
-		// ƒZƒ‹‚Ì”z—ñ‚ğ\’z‚·‚éB
-		for (int cellNo = 0; cellNo < numCell; cellNo++) {
-			const auto& cellLow = tknFile.GetCell(cellNo);
-			// ’¸“_ƒf[ƒ^‚ğİ’è‚·‚éB
-			m_cellArray[cellNo].SetVertexPosition(0, cellLow.vertexPosition[0]);
-			m_cellArray[cellNo].SetVertexPosition(1, cellLow.vertexPosition[1]);
-			m_cellArray[cellNo].SetVertexPosition(2, cellLow.vertexPosition[2]);
-			// –@ü‚ğİ’è‚·‚éB
-			m_cellArray[cellNo].SetNormal(cellLow.normal);
-			// ’†SÀ•W‚ğŒvZ‚·‚éB
-			auto centerPos = cellLow.vertexPosition[0]
-				+ cellLow.vertexPosition[1]
-				+ cellLow.vertexPosition[2];
-			centerPos /= 3.0f;
-			m_cellArray[cellNo].SetCenterPosition(centerPos);
-			// —×ÚƒZƒ‹î•ñ‚ğİ’è‚·‚éB
-			for (int linkNo = 0; linkNo < 3; linkNo++) {
-				if (cellLow.linkCellNo[linkNo ] != -1) {
-					m_cellArray[cellNo].SetLinkCell(linkNo, &m_cellArray[cellLow.linkCellNo[linkNo]]);
+	namespace nsAI {
+		void NaviMesh::Init(const char* tknFilePath)
+		{
+			TknFile tknFile;
+			tknFile.Load(tknFilePath);
+			// tknãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã‚»ãƒ«æƒ…å ±ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
+			int numCell = tknFile.GetNumCell();
+			m_cellArray.resize(numCell);
+			// ã‚»ãƒ«ã®é…åˆ—ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
+			for (int cellNo = 0; cellNo < numCell; cellNo++) {
+				const auto& cellLow = tknFile.GetCell(cellNo);
+				// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
+				m_cellArray[cellNo].SetVertexPosition(0, cellLow.vertexPosition[0]);
+				m_cellArray[cellNo].SetVertexPosition(1, cellLow.vertexPosition[1]);
+				m_cellArray[cellNo].SetVertexPosition(2, cellLow.vertexPosition[2]);
+				// æ³•ç·šã‚’è¨­å®šã™ã‚‹ã€‚
+				m_cellArray[cellNo].SetNormal(cellLow.normal);
+				// ä¸­å¿ƒåº§æ¨™ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+				auto centerPos = cellLow.vertexPosition[0]
+					+ cellLow.vertexPosition[1]
+					+ cellLow.vertexPosition[2];
+				centerPos /= 3.0f;
+				m_cellArray[cellNo].SetCenterPosition(centerPos);
+				// éš£æ¥ã‚»ãƒ«æƒ…å ±ã‚’è¨­å®šã™ã‚‹ã€‚
+				for (int linkNo = 0; linkNo < 3; linkNo++) {
+					if (cellLow.linkCellNo[linkNo] != -1) {
+						m_cellArray[cellNo].SetLinkCell(linkNo, &m_cellArray[cellLow.linkCellNo[linkNo]]);
+					}
+					else {
+						m_cellArray[cellNo].SetLinkCell(linkNo, nullptr);
+					}
 				}
-				else {
-					m_cellArray[cellNo].SetLinkCell(linkNo, nullptr);
-				}
+				m_cellArray[cellNo].SetCellNo(cellNo);
 			}
-			m_cellArray[cellNo].SetCellNo(cellNo);
+			// ã‚»ãƒ«ã®ä¸­å¿ƒåº§æ¨™ã‚’åˆ©ç”¨ã—ãŸBSPãƒ„ãƒªãƒ¼ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
+			for (auto& cell : m_cellArray) {
+				// ãƒªãƒ¼ãƒ•ã‚’è¿½åŠ ã€‚
+				m_cellCenterPosBSP.AddLeaf(
+					cell.GetCenterPosition(),
+					&cell
+				);
+			}
+			m_cellCenterPosBSP.Build();
 		}
-		// ƒZƒ‹‚Ì’†SÀ•W‚ğ—˜—p‚µ‚½BSPƒcƒŠ[‚ğ\’z‚·‚éB
-		for ( auto& cell : m_cellArray) {
-			// ƒŠ[ƒt‚ğ’Ç‰ÁB
-			m_cellCenterPosBSP.AddLeaf(
-				cell.GetCenterPosition(),
-				&cell
-			);
-		}
-		m_cellCenterPosBSP.Build();
-	}
-	const Cell& NaviMesh::FindNearestCell(const Vector3& pos) const
-	{
-		const Cell* nearestCell = nullptr;
+		const Cell& NaviMesh::FindNearestCell(const Vector3& pos) const
+		{
+			const Cell* nearestCell = nullptr;
 
-		float dist = FLT_MAX;
-		m_cellCenterPosBSP.WalkTree(pos, [&](BSP::SLeaf* leaf) {
-			Cell* cell = static_cast<Cell*>(leaf->extraData);
-			auto distTmp = (cell->GetCenterPosition() - pos).Length();
-			if (distTmp < dist) {
-				//‚±‚¿‚ç‚Ì•û‚ª‹ß‚¢B
-				dist = distTmp;
-				nearestCell = cell;
-			}
-		});
-		return *nearestCell;
+			float dist = FLT_MAX;
+			m_cellCenterPosBSP.WalkTree(pos, [&](BSP::SLeaf* leaf) {
+				Cell* cell = static_cast<Cell*>(leaf->extraData);
+				auto distTmp = (cell->GetCenterPosition() - pos).Length();
+				if (distTmp < dist) {
+					//ã“ã¡ã‚‰ã®æ–¹ãŒè¿‘ã„ã€‚
+					dist = distTmp;
+					nearestCell = cell;
+				}
+				});
+			return *nearestCell;
+		}
 	}
-}
 }
 
 

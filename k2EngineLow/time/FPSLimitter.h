@@ -1,27 +1,27 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Stopwatch.h"
 namespace nsK2EngineLow {
 
 	/// <summary>
-	/// FPS‚É§ŒÀ‚ğ‚©‚¯‚éƒNƒ‰ƒXB
+	/// FPSã«åˆ¶é™ã‚’ã‹ã‘ã‚‹ã‚¯ãƒ©ã‚¹ã€‚
 	/// </summary>
 	class FPSLimitter {
 	public:
 		/// <summary>
-		/// 1ƒtƒŒ[ƒ€‚ÌŠJn‚ÉŒÄ‚Ño‚µ‚Ä‚­‚¾‚³‚¢B
+		/// 1ãƒ•ãƒ¬ãƒ¼ãƒ ã®é–‹å§‹æ™‚ã«å‘¼ã³å‡ºã—ã¦ãã ã•ã„ã€‚
 		/// </summary>
 		void BeginFrame()
 		{
 			m_sw.Start();
 		}
 		/// <summary>
-		/// w’è‚³‚ê‚½FPS‚ğ’´‚¦‚Ä“®ì‚µ‚Ä‚¢‚éê‡AƒEƒFƒCƒg‚ğ‚©‚¯‚éB
+		/// æŒ‡å®šã•ã‚ŒãŸFPSã‚’è¶…ãˆã¦å‹•ä½œã—ã¦ã„ã‚‹å ´åˆã€ã‚¦ã‚§ã‚¤ãƒˆã‚’ã‹ã‘ã‚‹ã€‚
 		/// </summary>
 		void Wait()
 		{
-			//ƒXƒsƒ“ƒƒbƒN‚ğs‚¤B
-			// 1ƒtƒŒ[ƒ€‚ÌÅ¬ŠÔ‚ğŒvZ
+			//ã‚¹ãƒ”ãƒ³ãƒ­ãƒƒã‚¯ã‚’è¡Œã†ã€‚
+			// 1ãƒ•ãƒ¬ãƒ¼ãƒ ã®æœ€å°æ™‚é–“ã‚’è¨ˆç®—
 			float frameDeltaTimeMin = 1000.0f / m_maxFPS;
 			float restTime = 0;
 			do {
@@ -30,7 +30,7 @@ namespace nsK2EngineLow {
 			} while (restTime > 1.0f);
 		}
 		/// <summary>
-		/// Œ»İİ’è‚³‚ê‚Ä‚¢‚éÅ‘åFPS‚ğæ“¾B
+		/// ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹æœ€å¤§FPSã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		int GetMaxFPS() const
@@ -38,7 +38,7 @@ namespace nsK2EngineLow {
 			return m_maxFPS;
 		}
 		/// <summary>
-		/// Å‘åFPS‚ğİ’èB
+		/// æœ€å¤§FPSã‚’è¨­å®šã€‚
 		/// </summary>
 		/// <param name="maxFps"></param>
 		void SetMaxFPS(int maxFPS)
@@ -47,6 +47,6 @@ namespace nsK2EngineLow {
 		}
 	private:
 		Stopwatch m_sw;
-		int m_maxFPS = 60;
+		int m_maxFPS = MAX_FPS;
 	};
 }

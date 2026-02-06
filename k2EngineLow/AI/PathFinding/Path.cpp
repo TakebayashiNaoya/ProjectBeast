@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "AI/PathFinding/Path.h"
 
 namespace nsK2EngineLow {
@@ -6,30 +6,30 @@ namespace nsK2EngineLow {
 		void Path::Build()
 		{
 			m_sectionArray.resize(m_pointArray.size() - 1);
-			// ƒZƒNƒVƒ‡ƒ“‚ğ\’z‚µ‚Ä‚¢‚­B
+			// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã‚’æ§‹ç¯‰ã—ã¦ã„ãã€‚
 			for (int pointNo = 0; pointNo < m_pointArray.size() - 1; pointNo++) {
 				auto& section = m_sectionArray.at(pointNo);
 				section.startPos = m_pointArray.at(pointNo);
-				section.endPos = m_pointArray.at(pointNo+1);
+				section.endPos = m_pointArray.at(pointNo + 1);
 				section.direction = section.endPos - section.startPos;
 				section.length = section.direction.Length();
 				section.direction.Normalize();
 			}
 		}
 		Vector3 Path::Move(
-			Vector3 pos, 
-			float moveSpeed, 
+			Vector3 pos,
+			float moveSpeed,
 			bool& isEnd,
 			PhysicsWorld* physicsWorld
-		){
-			if (m_sectionArray.empty() 
-				|| m_sectionNo >= m_sectionArray.size() 
-			) {
-				// ƒpƒX‚ª\’z‚³‚ê‚Ä‚¢‚È‚¢
+		) {
+			if (m_sectionArray.empty()
+				|| m_sectionNo >= m_sectionArray.size()
+				) {
+				// ãƒ‘ã‚¹ãŒæ§‹ç¯‰ã•ã‚Œã¦ã„ãªã„
 				return pos;
 			}
 			SSection& currentSection = m_sectionArray.at(m_sectionNo);
-			// ƒZƒNƒVƒ‡ƒ“‚ÌI“_‚ÉŒü‚©‚¤ƒxƒNƒgƒ‹‚ğŒvZ‚·‚éB
+			// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®çµ‚ç‚¹ã«å‘ã‹ã†ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 			Vector3 toEnd = currentSection.endPos - pos;
 			toEnd.Normalize();
 			pos += toEnd * moveSpeed;
@@ -38,10 +38,10 @@ namespace nsK2EngineLow {
 			toEnd2.Normalize();
 
 			if (toEnd.Dot(toEnd2) <= 0.0f) {
-				// Œü‚«‚ª•Ï‚í‚Á‚½‚Ì‚ÅI“_‚ğ’´‚¦‚½B
+				// å‘ããŒå¤‰ã‚ã£ãŸã®ã§çµ‚ç‚¹ã‚’è¶…ãˆãŸã€‚
 				pos = currentSection.endPos;
 				if (m_sectionNo == m_sectionArray.size() - 1) {
-					// I“_
+					// çµ‚ç‚¹
 					isEnd = true;
 				}
 				else {
@@ -50,7 +50,7 @@ namespace nsK2EngineLow {
 			}
 			if (physicsWorld) {
 				Vector3 rayStart = pos;
-				// ‚¿‚å‚Á‚ÆãB
+				// ã¡ã‚‡ã£ã¨ä¸Šã€‚
 				rayStart.y += 1.0f;
 				Vector3 rayEnd = rayStart;
 				rayEnd.y -= 1000.0f;

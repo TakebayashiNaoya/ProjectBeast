@@ -1,5 +1,5 @@
-/*!
- * @brief	‰¹Œ¹ƒNƒ‰ƒXB
+ï»¿/*!
+ * @brief	éŸ³æºã‚¯ãƒ©ã‚¹ã€‚
  */
 #include "k2EngineLowPreCompile.h"
 #include "SoundEngine.h"
@@ -37,11 +37,11 @@ namespace nsK2EngineLow {
 		m_isAvailable = false;
 		m_waveFile = g_soundEngine->GetWaveFileBank().FindWaveFile(number);
 		if (!m_waveFile) {
-			//TODO ‚±‚±‚ÉƒGƒ‰[ƒƒbƒZ[ƒWB
+			//TODO ã“ã“ã«ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã€‚
 
 			return;
 		}
-		//ƒTƒEƒ“ƒhƒ{ƒCƒXƒ\[ƒX‚ğì¬B
+		//ã‚µã‚¦ãƒ³ãƒ‰ãƒœã‚¤ã‚¹ã‚½ãƒ¼ã‚¹ã‚’ä½œæˆã€‚
 		m_sourceVoice = g_soundEngine->CreateXAudio2SourceVoice(m_waveFile.get(), is3DSound);
 		if (is3DSound) {
 			g_soundEngine->Add3DSoundSource(this);
@@ -58,7 +58,7 @@ namespace nsK2EngineLow {
 			return;
 		}
 		if (m_isPlaying) {
-			//Ä¶’†‚Ì‚à‚Ì‚ğÄŠJ‚·‚éB
+			//å†ç”Ÿä¸­ã®ã‚‚ã®ã‚’å†é–‹ã™ã‚‹ã€‚
 			m_sourceVoice->Start(0);
 		}
 		else {
@@ -86,7 +86,7 @@ namespace nsK2EngineLow {
 		buffer.Flags = XAUDIO2_END_OF_STREAM;  // tell the source voice not to expect any data after this buffer
 		buffer.AudioBytes = bufferSize;
 		if (m_sourceVoice != nullptr && bufferSize > 0) {
-			//Ä¶ŠJnB
+			//å†ç”Ÿé–‹å§‹ã€‚
 			if (FAILED(m_sourceVoice->SubmitSourceBuffer(&buffer))) {
 				Release();
 				//TK_LOG("Failed m_sourceVoice->SubmitSourceBuffer");
@@ -113,7 +113,7 @@ namespace nsK2EngineLow {
 		if (state.BuffersQueued <= 0) {
 			m_isPlaying = false;
 			if (m_isLoop) {
-				//ƒ‹[ƒvB
+				//ãƒ«ãƒ¼ãƒ—ã€‚
 				Play(m_isLoop);
 			}
 			else {
@@ -127,13 +127,18 @@ namespace nsK2EngineLow {
 		if (m_isAvailable == false) {
 			return;
 		}
-		//ƒIƒ“ƒƒ‚ƒŠÄ¶’†‚ÌXVˆ—B
+		//ã‚ªãƒ³ãƒ¡ãƒ¢ãƒªå†ç”Ÿä¸­ã®æ›´æ–°å‡¦ç†ã€‚
 		UpdateOnMemory();
 		if (m_is3DSound == true) {
-			//‰¹Œ¹‚ÌˆÚ“®‘¬“x‚ğXVB
+			//éŸ³æºã®ç§»å‹•é€Ÿåº¦ã‚’æ›´æ–°ã€‚
 			m_velocity.Subtract(m_position, m_lastFramePosition);
-			//TODO 1.0f/60.0f‚Ì‚Æ‚±‚ë‚ğƒtƒŒ[ƒ€ŠÔ‚É•ÏX‚·‚éB
+			//TODO 1.0f/60.0fã®ã¨ã“ã‚ã‚’ãƒ•ãƒ¬ãƒ¼ãƒ æ™‚é–“ã«å¤‰æ›´ã™ã‚‹ã€‚
 			m_velocity.Div(g_gameTime->GetFrameDeltaTime());
+
+			// å¤‰æ›´
+			// ãƒ‰ãƒƒãƒ—ãƒ©ãƒ¼åŠ¹æœã‚’ç„¡åŠ¹åŒ–ã™ã‚‹ãŸã‚ã«é€Ÿåº¦ã‚’0ã«è¨­å®š
+			m_velocity = Vector3::Zero;
+
 			m_lastFramePosition = m_position;
 		}
 

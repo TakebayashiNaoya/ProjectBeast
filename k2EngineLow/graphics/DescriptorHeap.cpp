@@ -1,12 +1,51 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "DescriptorHeap.h"
 
 namespace nsK2EngineLow {
 	DescriptorHeap::DescriptorHeap()
 	{
-		m_shaderResources.resize(MAX_SHADER_RESOURCE);
-		m_uavResoruces.resize(MAX_SHADER_RESOURCE);
-		m_constantBuffers.resize(MAX_CONSTANT_BUFFER);
+		Init(
+			DEFAULT_MAX_SRV,
+			DEFAULT_MAX_UAV,
+			DEFAULT_MAX_CONSTANT_BUFFER,
+			DEFAULT_MAX_SAMPLER_STATE
+		);
+
+	}
+	DescriptorHeap::~DescriptorHeap()
+	{
+		Release();
+	}
+	void DescriptorHeap::Release()
+	{
+		ReleaseD3D12Object(m_descriptorHeap);
+		m_descriptorHeap = nullptr;
+	}
+	void DescriptorHeap::Init(
+		int maxSRV,
+		int maxUAV,
+		int maxConstantBuffer,
+		int maxSamplerState
+	)
+	{
+		Release();
+
+		// å„ç¨®ãƒ¡ãƒ³ãƒå¤‰æ•°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
+		m_descriptorHeap = nullptr;
+		m_numSRV = 0;
+		m_numConstantBuffer = 0;
+		m_numUAV = 0;
+		m_numSamplerDesc = 0;
+
+		m_maxSRV = maxSRV;
+		m_maxUAV = maxUAV;
+		m_maxConstantBuffer = maxConstantBuffer;
+		m_maxSamplerState = maxSamplerState;
+
+		m_shaderResources.resize(m_maxSRV);
+		m_uavResoruces.resize(m_maxUAV);
+		m_constantBuffers.resize(m_maxConstantBuffer);
+		m_samplerDescs.resize(m_maxSamplerState);
 		for (auto& srv : m_shaderResources) {
 			srv = nullptr;
 		}
@@ -17,16 +56,11 @@ namespace nsK2EngineLow {
 			cbv = nullptr;
 		}
 	}
-	DescriptorHeap::~DescriptorHeap()
+	void DescriptorHeap::CommitSamperHeap(bool isDoubleBuffer)
 	{
 		Release();
-	}
-	void DescriptorHeap::Release()
-	{
-		ReleaseD3D12Object(m_descriptorHeap);
-	}
-	void DescriptorHeap::CommitSamperHeap()
-	{
+
+		m_isDoubleBuffer = isDoubleBuffer;
 		const auto& d3dDevice = g_graphicsEngine->GetD3DDevice();
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 
@@ -34,19 +68,18 @@ namespace nsK2EngineLow {
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-
 		auto hr = d3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_descriptorHeap));
 		if (FAILED(hr)) {
-			MessageBox(nullptr, L"DescriptorHeap::Commit ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B", L"ƒGƒ‰[", MB_OK);
+			MessageBox(nullptr, L"DescriptorHeap::Commit ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
 			std::abort();
 		}
 
-
-		for (int bufferNo = 0; bufferNo < 2; bufferNo++) {
+		int numBuffer = isDoubleBuffer ? 2 : 1;
+		for (int bufferNo = 0; bufferNo < numBuffer; bufferNo++) {
 			auto cpuHandle = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			auto gpuHandle = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 			for (int i = 0; i < m_numSamplerDesc; i++) {
-				//ƒTƒ“ƒvƒ‰ƒXƒe[ƒg‚ğƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚É“o˜^‚µ‚Ä‚¢‚­B
+				//ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«ç™»éŒ²ã—ã¦ã„ãã€‚
 				d3dDevice->CreateSampler(&m_samplerDescs[i], cpuHandle);
 				cpuHandle.ptr += g_graphicsEngine->GetSapmerDescriptorSize();
 			}
@@ -54,67 +87,77 @@ namespace nsK2EngineLow {
 		}
 
 	}
-	int g_numDescriptorHeap = 0;
-	void DescriptorHeap::Commit()
+	int DescriptorHeap::GetBackBufferNo() const
+	{
+		if (m_isDoubleBuffer) {
+			// å†…éƒ¨ã§ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡åŒ–ã—ã¦ã„ã‚‹å ´åˆã¯ã‚¨ãƒ³ã‚¸ãƒ³ã®ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã®ç•ªå·ã¨åˆã‚ã›ã‚‹ã€‚
+			return g_graphicsEngine->GetBackBufferIndex();
+		}
+		// ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡åŒ–ã—ã¦ã„ãªã„ã€‚
+		return 0;
+	}
+	void DescriptorHeap::Commit(bool isDoubleBuffer)
 	{
 		Release();
+		m_isDoubleBuffer = isDoubleBuffer;
 		const auto& d3dDevice = g_graphicsEngine->GetD3DDevice();
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 
-		srvHeapDesc.NumDescriptors = (m_numShaderResource + m_numConstantBuffer + m_numUavResource) * 2;
+		srvHeapDesc.NumDescriptors = (m_numSRV + m_numConstantBuffer + m_numUAV) * 2;
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
 
 		auto hr = d3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_descriptorHeap));
-		g_numDescriptorHeap++;
+
 		if (FAILED(hr)) {
-			MessageBox(nullptr, L"DescriptorHeap::Commit ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B", L"ƒGƒ‰[", MB_OK);
+			MessageBox(nullptr, L"DescriptorHeap::Commit ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", L"ã‚¨ãƒ©ãƒ¼", MB_OK);
 			std::abort();
 		}
 
-		//’è”ƒoƒbƒtƒ@‚âƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ğƒq[ƒv‚É‘‚«‚ñ‚Å‚¢‚­B
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚„ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ãƒ’ãƒ¼ãƒ—ã«æ›¸ãè¾¼ã‚“ã§ã„ãã€‚
 		auto cpuHandle = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		auto gpuHandle = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		for (int bufferNo = 0; bufferNo < 2; bufferNo++) {
-			//’è”ƒoƒbƒtƒ@‚ğ“o˜^‚µ‚Ä‚¢‚­B
+
+		int numBuffer = isDoubleBuffer ? 2 : 1;
+		for (int bufferNo = 0; bufferNo < numBuffer; bufferNo++) {
+			//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’ç™»éŒ²ã—ã¦ã„ãã€‚
 			for (int i = 0; i < m_numConstantBuffer; i++) {
-				//@todo bug
 				if (m_constantBuffers[i] != nullptr) {
 					m_constantBuffers[i]->RegistConstantBufferView(cpuHandle, bufferNo);
 				}
-				//Ÿ‚Éi‚ß‚éB
+				//æ¬¡ã«é€²ã‚ã‚‹ã€‚
 				cpuHandle.ptr += g_graphicsEngine->GetCbrSrvDescriptorSize();
 			}
 
-			//‘±‚¢‚ÄƒVƒF[ƒ_[ƒŠƒ\[ƒXB
-			for (int i = 0; i < m_numShaderResource; i++) {
+			//ç¶šã„ã¦ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã€‚
+			for (int i = 0; i < m_numSRV; i++) {
 				if (m_shaderResources[i] != nullptr) {
 					m_shaderResources[i]->RegistShaderResourceView(cpuHandle, bufferNo);
 				}
-				//Ÿ‚Éi‚ß‚éB
+				//æ¬¡ã«é€²ã‚ã‚‹ã€‚
 				cpuHandle.ptr += g_graphicsEngine->GetCbrSrvDescriptorSize();
 			}
 
-			//‘±‚¢‚ÄUAVB
-			for (int i = 0; i < m_numUavResource; i++) {
+			//ç¶šã„ã¦UAVã€‚
+			for (int i = 0; i < m_numUAV; i++) {
 				if (m_uavResoruces[i] != nullptr) {
 					m_uavResoruces[i]->RegistUnorderAccessView(cpuHandle, bufferNo);
 				}
-				//Ÿ‚Éi‚ß‚éB
+				//æ¬¡ã«é€²ã‚ã‚‹ã€‚
 				cpuHandle.ptr += g_graphicsEngine->GetCbrSrvDescriptorSize();
 			}
 
-			//’è”ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹‚ğŒvZB
+			//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’è¨ˆç®—ã€‚
 			m_cbGpuDescriptorStart[bufferNo] = gpuHandle;
-			//ƒVƒF[ƒ_[ƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹‚ğŒvZB
+			//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’è¨ˆç®—ã€‚
 			m_srGpuDescriptorStart[bufferNo] = gpuHandle;
 			m_srGpuDescriptorStart[bufferNo].ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * m_numConstantBuffer;
-			//UAVƒŠƒ\[ƒX‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒnƒ“ƒhƒ‹‚ğŒvZB
+			//UAVãƒªã‚½ãƒ¼ã‚¹ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ãƒãƒ³ãƒ‰ãƒ«ã‚’è¨ˆç®—ã€‚
 			m_uavGpuDescriptorStart[bufferNo] = gpuHandle;
-			m_uavGpuDescriptorStart[bufferNo].ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * (m_numShaderResource + m_numConstantBuffer);
+			m_uavGpuDescriptorStart[bufferNo].ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * (m_numSRV + m_numConstantBuffer);
 
-			gpuHandle.ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * (m_numShaderResource + m_numConstantBuffer + m_numUavResource);
+			gpuHandle.ptr += (UINT64)g_graphicsEngine->GetCbrSrvDescriptorSize() * (m_numSRV + m_numConstantBuffer + m_numUAV);
 		}
 	}
 }

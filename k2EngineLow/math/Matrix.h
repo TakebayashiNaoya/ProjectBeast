@@ -1,11 +1,11 @@
-
+ï»¿
 #pragma once
 
 #include "math/Vector.h"
 
 namespace nsK2EngineLow {
 	/// <summary>
-	/// s—ñƒNƒ‰ƒXB
+	/// è¡Œåˆ—ã‚¯ãƒ©ã‚¹ã€‚
 	/// </summary>
 	class Matrix {
 	public:
@@ -21,11 +21,11 @@ namespace nsK2EngineLow {
 			Vector4 v[4];
 			float m[4][4];
 		};
-		//’PˆÊs—ñ
+		//å˜ä½è¡Œåˆ—
 		static const Matrix Identity;
 	public:
 		/// <summary>
-		/// DirectX::XMMATRIXŒ^‚Ö‚ÌˆÃ–Ù‚ÌŒ^•ÏŠ·B
+		/// DirectX::XMMATRIXå‹ã¸ã®æš—é»™ã®å‹å¤‰æ›ã€‚
 		/// </summary>
 		/// <returns></returns>
 		operator DirectX::XMMATRIX() const
@@ -33,10 +33,10 @@ namespace nsK2EngineLow {
 			return DirectX::XMLoadFloat4x4(&mat);
 		}
 		/// <summary>
-		/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+		/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 		/// </summary>
 		/// <remarks>
-		/// ’PˆÊs—ñ‚Æ‚µ‚Ä‰Šú‰»‚³‚ê‚Ü‚·B
+		/// å˜ä½è¡Œåˆ—ã¨ã—ã¦åˆæœŸåŒ–ã•ã‚Œã¾ã™ã€‚
 		/// </remarks>
 		Matrix() {
 			mat._11 = 1.0f;
@@ -71,7 +71,7 @@ namespace nsK2EngineLow {
 
 		}
 		/// <summary>
-		/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+		/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 		/// </summary>
 		/// <param name="m"></param>
 		Matrix(const DirectX::XMFLOAT4X4& m)
@@ -79,7 +79,7 @@ namespace nsK2EngineLow {
 			mat = m;
 		}
 		/// <summary>
-		/// ‘ã“ü‰‰ZqB
+		/// ä»£å…¥æ¼”ç®—å­ã€‚
 		/// </summary>
 		/// <param name="_m"></param>
 		/// <returns></returns>
@@ -89,9 +89,9 @@ namespace nsK2EngineLow {
 			return *this;
 		}
 		/// <summary>
-		/// ƒxƒNƒgƒ‹‚Æ3x3s—ñ‚ğæZB
+		/// ãƒ™ã‚¯ãƒˆãƒ«ã¨3x3è¡Œåˆ—ã‚’ä¹—ç®—ã€‚
 		/// </summary>
-		/// <param name="vOut">æZ‚³‚ê‚éƒxƒNƒgƒ‹B</param>
+		/// <param name="vOut">ä¹—ç®—ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã€‚</param>
 		void Apply3x3(Vector3& vOut) const
 		{
 			Vector3 vTmp = vOut;
@@ -101,9 +101,9 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ƒxƒNƒgƒ‹‚És—ñ‚ğæZB
+		/// ãƒ™ã‚¯ãƒˆãƒ«ã«è¡Œåˆ—ã‚’ä¹—ç®—ã€‚
 		/// </summary>
-		/// <param name="vOut">æZ‚³‚ê‚éƒxƒNƒgƒ‹B</param>
+		/// <param name="vOut">ä¹—ç®—ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã€‚</param>
 		void Apply(Vector3& vOut) const
 		{
 			DirectX::XMStoreFloat3(
@@ -112,9 +112,9 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// ƒxƒNƒgƒ‹‚És—ñ‚ğæZB
+		/// ãƒ™ã‚¯ãƒˆãƒ«ã«è¡Œåˆ—ã‚’ä¹—ç®—ã€‚
 		/// </summary>
-		/// <param name="vOut">æZ‚³‚ê‚éƒxƒNƒgƒ‹B</param>
+		/// <param name="vOut">ä¹—ç®—ã•ã‚Œã‚‹ãƒ™ã‚¯ãƒˆãƒ«ã€‚</param>
 		void Apply(Vector4& vOut) const
 		{
 			DirectX::XMStoreFloat4(
@@ -123,9 +123,9 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// •½sˆÚ“®s—ñ‚ğì¬B
+		/// å¹³è¡Œç§»å‹•è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="trans">•½sˆÚ“®B</param>
+		/// <param name="trans">å¹³è¡Œç§»å‹•ã€‚</param>
 		void MakeTranslation(const Vector3& trans)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -138,9 +138,9 @@ namespace nsK2EngineLow {
 			MakeTranslation(Vector3(x, y, z));
 		}
 		/// <summary>
-		/// Y²ü‚è‚Ì‰ñ“]s—ñ‚ğì¬B
+		/// Yè»¸å‘¨ã‚Šã®å›è»¢è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="angle">‰ñ“]Šp“x(’PˆÊFƒ‰ƒWƒAƒ“)</param>
+		/// <param name="angle">å›è»¢è§’åº¦(å˜ä½ï¼šãƒ©ã‚¸ã‚¢ãƒ³)</param>
 		void MakeRotationY(float angle)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -149,9 +149,9 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// Z²ü‚è‚Ì‰ñ“]s—ñ‚ğì¬B
+		/// Zè»¸å‘¨ã‚Šã®å›è»¢è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="angle">‰ñ“]Šp“x(’PˆÊFƒ‰ƒWƒAƒ“)</param>
+		/// <param name="angle">å›è»¢è§’åº¦(å˜ä½ï¼šãƒ©ã‚¸ã‚¢ãƒ³)</param>
 		void MakeRotationZ(float angle)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -160,9 +160,9 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// X²ü‚è‚Ì‰ñ“]s—ñ‚ğì¬B
+		/// Xè»¸å‘¨ã‚Šã®å›è»¢è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="angle">‰ñ“]Šp“x(’PˆÊFƒ‰ƒWƒAƒ“)</param>
+		/// <param name="angle">å›è»¢è§’åº¦(å˜ä½ï¼šãƒ©ã‚¸ã‚¢ãƒ³)</param>
 		void MakeRotationX(float angle)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -171,9 +171,9 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// ƒNƒH[ƒ^ƒjƒIƒ“‚©‚ç‰ñ“]s—ñ‚ğì¬B
+		/// ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã‹ã‚‰å›è»¢è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="q">ƒNƒH[ƒ^ƒjƒIƒ“B</param>
+		/// <param name="q">ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã€‚</param>
 		void MakeRotationFromQuaternion(const Quaternion& q)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -183,10 +183,10 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// ”CˆÓ‚Ì²ü‚è‚Ì‰ñ“]s—ñ‚ğì¬B
+		/// ä»»æ„ã®è»¸å‘¨ã‚Šã®å›è»¢è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="axis">‰ñ“]²B</param>
-		/// <param name="angle">‰ñ“]Šp“xB</param>
+		/// <param name="axis">å›è»¢è»¸ã€‚</param>
+		/// <param name="angle">å›è»¢è§’åº¦ã€‚</param>
 		void MakeRotationAxis(const Vector3& axis, float angle)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -195,9 +195,9 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// Šg‘ås—ñ‚ğì¬B
+		/// æ‹¡å¤§è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="scale">Šg‘å—¦B</param>
+		/// <param name="scale">æ‹¡å¤§ç‡ã€‚</param>
 		void MakeScaling(const Vector3& scale)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -206,12 +206,12 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// “§‹•ÏŠ·s—ñ‚ğì¬B
+		/// é€è¦–å¤‰æ›è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="viewAngle">‰æŠp(’PˆÊFƒ‰ƒWƒAƒ“)</param>
-		/// <param name="aspect">ƒAƒXƒyƒNƒg”ä</param>
-		/// <param name="fNear">‹ß•½–ÊB</param>
-		/// <param name="fFar">‰“•½–ÊB</param>
+		/// <param name="viewAngle">ç”»è§’(å˜ä½ï¼šãƒ©ã‚¸ã‚¢ãƒ³)</param>
+		/// <param name="aspect">ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”</param>
+		/// <param name="fNear">è¿‘å¹³é¢ã€‚</param>
+		/// <param name="fFar">é å¹³é¢ã€‚</param>
 		void MakeProjectionMatrix(
 			float viewAngle,
 			float aspect,
@@ -225,12 +225,12 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// •½s“Š‰es—ñ‚ğì¬B
+		/// å¹³è¡ŒæŠ•å½±è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="w">ƒrƒ…[ƒ{ƒŠƒ…[ƒ€‚Ì•B</param>
-		/// <param name="h">ƒrƒ…[ƒ{ƒŠƒ…[ƒ€‚Ì‚‚³B</param>
-		/// <param name="fNear">‹ß•½–ÊB</param>
-		/// <param name="fFar">‰“•½–ÊB</param>
+		/// <param name="w">ãƒ“ãƒ¥ãƒ¼ãƒœãƒªãƒ¥ãƒ¼ãƒ ã®å¹…ã€‚</param>
+		/// <param name="h">ãƒ“ãƒ¥ãƒ¼ãƒœãƒªãƒ¥ãƒ¼ãƒ ã®é«˜ã•ã€‚</param>
+		/// <param name="fNear">è¿‘å¹³é¢ã€‚</param>
+		/// <param name="fFar">é å¹³é¢ã€‚</param>
 		void MakeOrthoProjectionMatrix(float w, float h, float fNear, float fFar)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -239,11 +239,11 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// ƒJƒƒ‰s—ñ‚ğì¬B
+		/// ã‚«ãƒ¡ãƒ©è¡Œåˆ—ã‚’ä½œæˆã€‚
 		/// </summary>
-		/// <param name="position">‹“_</param>
-		/// <param name="target">’‹“_</param>
-		/// <param name="up">ƒJƒƒ‰‚Ìã•ûŒü</param>
+		/// <param name="position">è¦–ç‚¹</param>
+		/// <param name="target">æ³¨è¦–ç‚¹</param>
+		/// <param name="up">ã‚«ãƒ¡ãƒ©ã®ä¸Šæ–¹å‘</param>
 		void MakeLookAt(const Vector3& position, const Vector3& target, const Vector3& up)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -252,7 +252,7 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// s—ñ‚Æs—ñ‚ÌæZ
+		/// è¡Œåˆ—ã¨è¡Œåˆ—ã®ä¹—ç®—
 		/// </summary>
 		/// <remarks>
 		/// *this = m0 * m1;
@@ -268,7 +268,7 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// s—ñ‚Ì‘ã“ü‰‰Zq
+		/// è¡Œåˆ—ã®ä»£å…¥æ¼”ç®—å­
 		/// </summary>
 		/// <remarks>
 		/// *this *= _m;
@@ -280,9 +280,9 @@ namespace nsK2EngineLow {
 			return *this;
 		}
 		/// <summary>
-		/// ‹ts—ñ‚ğŒvZB
+		/// é€†è¡Œåˆ—ã‚’è¨ˆç®—ã€‚
 		/// </summary>
-		/// <param name="_m">Œ³‚É‚È‚és—ñB</param>
+		/// <param name="_m">å…ƒã«ãªã‚‹è¡Œåˆ—ã€‚</param>
 		void Inverse(const Matrix& _m)
 		{
 			DirectX::XMStoreFloat4x4(
@@ -291,14 +291,14 @@ namespace nsK2EngineLow {
 			);
 		}
 		/// <summary>
-		/// ©g‚Ì‹ts—ñ‚ğŒvZB
+		/// è‡ªèº«ã®é€†è¡Œåˆ—ã‚’è¨ˆç®—ã€‚
 		/// </summary>
 		void Inverse()
 		{
 			Inverse(*this);
 		}
 		/// <summary>
-		/// “]’us—ñ‚ğŒvZB
+		/// è»¢ç½®è¡Œåˆ—ã‚’è¨ˆç®—ã€‚
 		/// </summary>
 		void Transpose()
 		{
@@ -310,10 +310,10 @@ namespace nsK2EngineLow {
 
 	};
 	/// <summary>
-	/// s—ñ“¯m‚ÌæZ
+	/// è¡Œåˆ—åŒå£«ã®ä¹—ç®—
 	/// </summary>
 	/// <remarks>
-	/// æZ‚Í¶‚©‚ç‰E‚ÉŒü‚©‚Á‚Ä‚©‚©‚Á‚Ä‚¢‚­B
+	/// ä¹—ç®—ã¯å·¦ã‹ã‚‰å³ã«å‘ã‹ã£ã¦ã‹ã‹ã£ã¦ã„ãã€‚
 	/// </remarks>
 	static inline Matrix operator*(const Matrix& m1, const Matrix m2)
 	{
@@ -322,12 +322,21 @@ namespace nsK2EngineLow {
 		return mRet;
 	}
 	/// <summary>
-	/// ’PˆÊs—ñ
+	/// å˜ä½è¡Œåˆ—
 	/// </summary>
 	const Matrix g_matIdentity = {
 		1.0f, 0.0f, 0.0f, 0.0f ,
-			0.0f, 1.0f, 0.0f, 0.0f ,
-			0.0f, 0.0f, 1.0f, 0.0f ,
-			0.0f, 0.0f, 0.0f, 1.0f
+		0.0f, 1.0f, 0.0f, 0.0f ,
+		0.0f, 0.0f, 1.0f, 0.0f ,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+	/// <summary>
+	/// é›¶è¡Œåˆ—
+	/// </summary>
+	const Matrix g_matZero = {
+		0.0f, 0.0f, 0.0f, 0.0f ,
+		0.0f, 0.0f, 0.0f, 0.0f ,
+		0.0f, 0.0f, 0.0f, 0.0f ,
+		0.0f, 0.0f, 0.0f, 0.0f
 	};
 }

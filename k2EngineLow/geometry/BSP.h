@@ -1,4 +1,4 @@
-
+ï»¿
 #pragma once
 
 #include "geometry/AABB.h"
@@ -6,20 +6,20 @@
 namespace nsK2EngineLow {
 
 	/// <summary>
-	/// BSPƒcƒŠ[
+	/// BSPãƒ„ãƒªãƒ¼
 	/// </summary>
 	class BSP {
 	private:
 		/// <summary>
-		/// •½–ÊB
+		/// å¹³é¢ã€‚
 		/// </summary>
 		struct SPlane {
-			Vector3 normal;		// •½–Ê‚Ì–@ü
-			float distance;		// •½–Ê‚Ü‚Å‚Ì‹——£B
+			Vector3 normal;		// å¹³é¢ã®æ³•ç·š
+			float distance;		// å¹³é¢ã¾ã§ã®è·é›¢ã€‚
 		};
 	public:
 		/// <summary>
-		/// BSPƒcƒŠ[‚Ì—v‘f‚Ìí—Ş
+		/// BSPãƒ„ãƒªãƒ¼ã®è¦ç´ ã®ç¨®é¡
 		/// </summary>
 		enum EnEntityType {
 			enEntityType_Node,
@@ -27,7 +27,7 @@ namespace nsK2EngineLow {
 			enEntityType_LeafList
 		};
 		/// <summary>
-		/// BSPƒcƒŠ[‚Ì—v‘f
+		/// BSPãƒ„ãƒªãƒ¼ã®è¦ç´ 
 		/// </summary>
 		struct SEntity {
 			int type = enEntityType_Node;
@@ -35,74 +35,74 @@ namespace nsK2EngineLow {
 
 		using SEntityPtr = std::shared_ptr<SEntity>;
 		/// <summary>
-		/// ƒm[ƒh
+		/// ãƒãƒ¼ãƒ‰
 		/// </summary>
-		struct SNode : public SEntity  {
-			SPlane plane;				// •ªŠ„•½–ÊB
-			SEntityPtr rightEntity;		// ‰E‚Ì—v‘f
-			SEntityPtr leftEntity;		// ¶‚Ì—v‘fB
-			Vector3 centerPos;			// ’†SÀ•WB
-			std::vector<SEntityPtr> leafArray;	// ƒm[ƒh‚ª“à•ï‚µ‚Ä‚¢‚éƒŠ[ƒtB
+		struct SNode : public SEntity {
+			SPlane plane;				// åˆ†å‰²å¹³é¢ã€‚
+			SEntityPtr rightEntity;		// å³ã®è¦ç´ 
+			SEntityPtr leftEntity;		// å·¦ã®è¦ç´ ã€‚
+			Vector3 centerPos;			// ä¸­å¿ƒåº§æ¨™ã€‚
+			std::vector<SEntityPtr> leafArray;	// ãƒãƒ¼ãƒ‰ãŒå†…åŒ…ã—ã¦ã„ã‚‹ãƒªãƒ¼ãƒ•ã€‚
 		};
 		/// <summary>
-		/// ƒŠ[ƒt
+		/// ãƒªãƒ¼ãƒ•
 		/// </summary>
 		struct SLeaf : public SEntity {
 			Vector3 position;
 			void* extraData;
 		};
 		/// <summary>
-		/// ƒŠ[ƒt‚ÌƒŠƒXƒg
+		/// ãƒªãƒ¼ãƒ•ã®ãƒªã‚¹ãƒˆ
 		/// </summary>
 		struct SLeafList : public SEntity {
 			std::vector< SEntityPtr > leafList;
 		};
 	private:
-		
-		SEntityPtr m_rootNode = nullptr;		// ƒ‹[ƒgƒm[ƒhB
-		std::vector<SEntityPtr> m_leafArray;	// ƒŠ[ƒt‚Ì”z—ñB
+
+		SEntityPtr m_rootNode = nullptr;		// ãƒ«ãƒ¼ãƒˆãƒãƒ¼ãƒ‰ã€‚
+		std::vector<SEntityPtr> m_leafArray;	// ãƒªãƒ¼ãƒ•ã®é…åˆ—ã€‚
 	public:
 		/// <summary>
-		/// ƒŠ[ƒt‚ğ’Ç‰ÁB
+		/// ãƒªãƒ¼ãƒ•ã‚’è¿½åŠ ã€‚
 		/// </summary>
 		/// <param name="aabb"></param>
-		void AddLeaf(const Vector3& position, void* extraData) 
+		void AddLeaf(const Vector3& position, void* extraData)
 		{
-			// ƒŠ[ƒt‚ğì‚éB
+			// ãƒªãƒ¼ãƒ•ã‚’ä½œã‚‹ã€‚
 			auto newEntity = std::make_shared<SLeaf>();
 			m_leafArray.emplace_back(newEntity);
 			SLeaf* leaf = static_cast<SLeaf*>(newEntity.get());
 			leaf->position = position;
 			leaf->extraData = extraData;
 			leaf->type = enEntityType_Leaf;
-			
+
 		}
 		/// <summary>
-		/// BVH‚ğ\’zB
+		/// BVHã‚’æ§‹ç¯‰ã€‚
 		/// </summary>
 		/// <remark></remark>
 		void Build();
 		/// <summary>
-		/// BSPƒcƒŠ[‚ğ’Tõ‚·‚é
+		/// BSPãƒ„ãƒªãƒ¼ã‚’æ¢ç´¢ã™ã‚‹
 		/// </summary>
 		/// <remark>
-		/// BSPƒcƒŠ[‚ğ’Tõ‚µ‚ÄAƒŠ[ƒt‚É“’B‚·‚é‚ÆAˆø”‚Åw’è‚³‚ê‚½ƒR[ƒ‹ƒoƒbƒNŠÖ”‚ªŒÄ‚Î‚ê‚Ü‚·B
+		/// BSPãƒ„ãƒªãƒ¼ã‚’æ¢ç´¢ã—ã¦ã€ãƒªãƒ¼ãƒ•ã«åˆ°é”ã™ã‚‹ã¨ã€å¼•æ•°ã§æŒ‡å®šã•ã‚ŒãŸã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ãŒå‘¼ã°ã‚Œã¾ã™ã€‚
 		/// </remark>
-		/// <param name="pos">À•W</param>
-		/// <param name="onEndWalk">’Tõ‚ªI—¹‚µ‚½‚ÉŒÄ‚Î‚ê‚éˆ—</param>
+		/// <param name="pos">åº§æ¨™</param>
+		/// <param name="onEndWalk">æ¢ç´¢ãŒçµ‚äº†ã—ãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹å‡¦ç†</param>
 		void WalkTree(const Vector3& pos, std::function<void(SLeaf* leaf)> onEndWalk) const;
 	private:
 		/// <summary>
-		/// •½–Ê‚ÅƒŠ[ƒtƒm[ƒh‚ğ•ªŠ„‚µ‚Ä‚¢‚­
+		/// å¹³é¢ã§ãƒªãƒ¼ãƒ•ãƒãƒ¼ãƒ‰ã‚’åˆ†å‰²ã—ã¦ã„ã
 		/// </summary>
 		void SplitLeafArray(
 			std::vector<SEntityPtr>& leftLeafArray,
 			std::vector<SEntityPtr>& rightLeafArray,
-			const SPlane& plane, 
+			const SPlane& plane,
 			const std::vector<SEntityPtr>& leafArray
 		);
 		/// <summary>
-		/// ‹¤•ªUs—ñ‚©‚ç•ªŠ„•½–Ê‚ğŒvZ‚·‚éB
+		/// å…±åˆ†æ•£è¡Œåˆ—ã‹ã‚‰åˆ†å‰²å¹³é¢ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 		/// </summary>
 		/// <param name="plane"></param>
 		/// <param name="covarianceMatrix"></param>
@@ -113,18 +113,18 @@ namespace nsK2EngineLow {
 			const std::vector<SEntityPtr>& leafArray
 		);
 		/// <summary>
-		/// ƒŠ[ƒtƒm[ƒh‚Ì”z—ñ‚©‚ç‹¤•ªUs—ñ‚ğŒvZ‚·‚éB
+		/// ãƒªãƒ¼ãƒ•ãƒãƒ¼ãƒ‰ã®é…åˆ—ã‹ã‚‰å…±åˆ†æ•£è¡Œåˆ—ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 		/// </summary>
-		/// <param name="covarianceMatrix">‹¤•ªUs—ñ‚ÌŒvZæ</param>
-		/// <param name="leafNodeArray">ƒŠ[ƒtƒm[ƒh‚Ì”z—ñ</param>
-		/// <param name="centerPos">ƒŠ[ƒtƒm[ƒh‚Ì’†SÀ•W</param>
+		/// <param name="covarianceMatrix">å…±åˆ†æ•£è¡Œåˆ—ã®è¨ˆç®—å…ˆ</param>
+		/// <param name="leafNodeArray">ãƒªãƒ¼ãƒ•ãƒãƒ¼ãƒ‰ã®é…åˆ—</param>
+		/// <param name="centerPos">ãƒªãƒ¼ãƒ•ãƒãƒ¼ãƒ‰ã®ä¸­å¿ƒåº§æ¨™</param>
 		void CalcCovarianceMatrixFromLeafNodeList(
-			float covarianceMatrix[3][3], 
+			float covarianceMatrix[3][3],
 			const std::vector<SEntityPtr>& leafArray,
 			const Vector3& centerPos
 		);
 		/// <summary>
-		/// ƒŠ[ƒt‚ÌƒŠƒXƒg‚©‚ç’†SÀ•W‚ğŒvZ‚·‚éB
+		/// ãƒªãƒ¼ãƒ•ã®ãƒªã‚¹ãƒˆã‹ã‚‰ä¸­å¿ƒåº§æ¨™ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 		/// </summary>
 		/// <param name="leafNodeArray"></param>
 		/// <returns></returns>
@@ -132,17 +132,17 @@ namespace nsK2EngineLow {
 			const std::vector<SEntityPtr>& leafArray
 		);
 		/// <summary>
-		/// V‚µ‚¢BSPƒcƒŠ[‚Ì—v‘f‚ğì¬‚·‚éB
+		/// æ–°ã—ã„BSPãƒ„ãƒªãƒ¼ã®è¦ç´ ã‚’ä½œæˆã™ã‚‹ã€‚
 		/// </summary>
 		/// <param name="leafNodeArray"></param>
 		SEntityPtr CreateBSPTreeEntity(const std::vector<SEntityPtr>& leafArray);
 		/// <summary>
-		/// BSPƒcƒŠ[‚ÌLeafList—v‘f‚ğì¬‚·‚éB
+		/// BSPãƒ„ãƒªãƒ¼ã®LeafListè¦ç´ ã‚’ä½œæˆã™ã‚‹ã€‚
 		/// </summary>
 		/// <param name="leafArray"></param>
 		/// <returns></returns>
 		SEntityPtr CreateBSPTreeEntity_LeafList(const std::vector<SEntityPtr>& leafArray);
-	
-		void WalkTree(SEntityPtr entity, const Vector3& pos, std::function<void(SLeaf* leaf)> onEndWalk ) const;
+
+		void WalkTree(SEntityPtr entity, const Vector3& pos, std::function<void(SLeaf* leaf)> onEndWalk) const;
 	};
 }

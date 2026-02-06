@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "FrameBuffer.h"
 
 namespace nsK2EngineLow {
@@ -12,34 +12,34 @@ namespace nsK2EngineLow {
 	)
 	{
 		Release();
-		//ƒXƒƒbƒvƒ`ƒFƒCƒ“‚ğì¬B
+		//ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã‚’ä½œæˆã€‚
 		if (!CreateSwapChain(hwnd, frameBufferWidth, frameBufferHeight, dxgiFactory, commandQueue)) {
-			//ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìì¬‚É¸”sB
-			MessageBox(hwnd, TEXT("ƒXƒƒbƒvƒ`ƒFƒCƒ“‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			//ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ä½œæˆã«å¤±æ•—ã€‚
+			MessageBox(hwnd, TEXT("ã‚¹ãƒ¯ãƒƒãƒ—ãƒã‚§ã‚¤ãƒ³ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
 
-		//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğì¬‚·‚éB
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’ä½œæˆã™ã‚‹ã€‚
 		if (!CreateDescriptorHeapForFrameBuffer(d3dDevice)) {
-			MessageBox(hwnd, TEXT("ƒtƒŒ[ƒ€ƒoƒbƒtƒ@—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			MessageBox(hwnd, TEXT("ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
 
-		//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@—p‚ÌRTV‚ğì¬‚·‚éB
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ç”¨ã®RTVã‚’ä½œæˆã™ã‚‹ã€‚
 		if (!CreateRTVForFameBuffer(d3dDevice)) {
-			MessageBox(hwnd, TEXT("ƒtƒŒ[ƒ€ƒoƒbƒtƒ@—p‚ÌRTV‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			MessageBox(hwnd, TEXT("ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ç”¨ã®RTVã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 
 		}
 
-		//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@—p‚ÌDSV‚ğì¬‚·‚éB
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ç”¨ã®DSVã‚’ä½œæˆã™ã‚‹ã€‚
 		if (!CreateDSVForFrameBuffer(d3dDevice, frameBufferWidth, frameBufferHeight)) {
-			MessageBox(hwnd, TEXT("ƒtƒŒ[ƒ€ƒoƒbƒtƒ@—p‚ÌDSV‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			MessageBox(hwnd, TEXT("ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ç”¨ã®DSVã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
 
 
-		//ƒrƒ…[ƒ|[ƒg‚ğ‰Šú‰»B
+		//ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã‚’åˆæœŸåŒ–ã€‚
 		m_viewport.TopLeftX = 0;
 		m_viewport.TopLeftY = 0;
 		m_viewport.Width = static_cast<FLOAT>(frameBufferWidth);
@@ -47,7 +47,7 @@ namespace nsK2EngineLow {
 		m_viewport.MinDepth = D3D12_MIN_DEPTH;
 		m_viewport.MaxDepth = D3D12_MAX_DEPTH;
 
-		//ƒVƒUƒŠƒ“ƒO‹éŒ`‚ğ‰Šú‰»B
+		//ã‚·ã‚¶ãƒªãƒ³ã‚°çŸ©å½¢ã‚’åˆæœŸåŒ–ã€‚
 		m_scissorRect.left = 0;
 		m_scissorRect.top = 0;
 		m_scissorRect.right = frameBufferWidth;
@@ -126,8 +126,8 @@ namespace nsK2EngineLow {
 			nullptr,
 			&swapChain
 		);
-		
-		//IDXGISwapChain3‚ÌƒCƒ“ƒ^[ƒtƒF[ƒX‚ğæ“¾B
+
+		//IDXGISwapChain3ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’å–å¾—ã€‚
 		swapChain->QueryInterface(IID_PPV_ARGS(&m_swapChain));
 		swapChain->Release();
 
@@ -136,28 +136,28 @@ namespace nsK2EngineLow {
 
 	bool FrameBuffer::CreateDescriptorHeapForFrameBuffer(ID3D12Device5* d3dDevice)
 	{
-		//RTV—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğì¬‚·‚éB
+		//RTVç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’ä½œæˆã™ã‚‹ã€‚
 		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 		desc.NumDescriptors = FRAME_BUFFER_COUNT;
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		auto hr = d3dDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_rtvHeap));
 		if (FAILED(hr)) {
-			//RTV—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìì¬‚É¸”s‚µ‚½B
+			//RTVç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
 			return false;
 		}
-		//ƒfƒBƒXƒNƒŠƒvƒ^‚ÌƒTƒCƒY‚ğæ“¾B
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
 		m_rtvDescriptorSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-		//DSV—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğì¬‚·‚éB
+		//DSVç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’ä½œæˆã™ã‚‹ã€‚
 		desc.NumDescriptors = 1;
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 		hr = d3dDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&m_dsvHeap));
 		if (FAILED(hr)) {
-			//DSV—p‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ìì¬‚É¸”s‚µ‚½B
+			//DSVç”¨ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
 			return false;
 		}
-		//ƒfƒBƒXƒNƒŠƒvƒ^‚ÌƒTƒCƒY‚ğæ“¾B
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
 		m_dsvDescriptorSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 		return true;
 	}
@@ -165,14 +165,14 @@ namespace nsK2EngineLow {
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
 
-		//ƒtƒƒ“ƒgƒoƒbƒtƒ@‚ğƒoƒbƒNƒoƒbƒtƒ@—p‚ÌRTV‚ğì¬B
+		//ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã‚’ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ç”¨ã®RTVã‚’ä½œæˆã€‚
 		for (UINT n = 0; n < FRAME_BUFFER_COUNT; n++) {
 			m_swapChain->GetBuffer(n, IID_PPV_ARGS(&m_renderTargets[n]));
 			d3dDevice->CreateRenderTargetView(
 				m_renderTargets[n], nullptr, rtvHandle
 			);
 			m_renderTargets[n]->SetName(L"FrameBuffer::RenderTargetView");
-			
+
 			rtvHandle.ptr += m_rtvDescriptorSize;
 		}
 		return true;
@@ -207,17 +207,17 @@ namespace nsK2EngineLow {
 			IID_PPV_ARGS(&m_depthStencilBuffer)
 		);
 		if (FAILED(hr)) {
-			//[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚Ìì¬‚É¸”sB
+			//æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã®ä½œæˆã«å¤±æ•—ã€‚
 			return false;
 		}
-		//ƒfƒBƒXƒNƒŠƒvƒ^‚ğì¬
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ä½œæˆ
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
 
 		d3dDevice->CreateDepthStencilView(
 			m_depthStencilBuffer, nullptr, dsvHandle
 		);
 
-		//[“xƒXƒeƒ“ƒVƒ‹ƒoƒbƒtƒ@‚ÌƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌŠJnƒAƒhƒŒƒX‚ğæ“¾B
+		//æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ«ãƒãƒƒãƒ•ã‚¡ã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã®é–‹å§‹ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã€‚
 		m_currentFrameBufferDSVHandle = m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
 
 		return true;

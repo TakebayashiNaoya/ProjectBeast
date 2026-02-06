@@ -1,4 +1,4 @@
-
+﻿
 #pragma once
 
 #include "Stopwatch.h"
@@ -9,11 +9,11 @@ namespace nsK2EngineLow {
 	class K2EngineLow;
 
 	/// <summary>
-	/// �Q�[���̎��Ԃ��Ǘ�����N���X�B
-	/// �V���O���g���p�^�[���Ő݌v����Ă��܂��B
+	/// ゲームの時間を管理するクラス。
+	/// シングルトンパターンで設計されています。
 	/// </summary>
-	class GameTime  {
-		
+	class GameTime {
+
 	public:
 		GameTime()
 		{
@@ -22,14 +22,14 @@ namespace nsK2EngineLow {
 		{
 		}
 		/// <summary>
-		/// 1�t���[���̌o�ߎ��Ԃ��Œ艻�����܂��B
+		/// 1フレームの経過時間を固定化させます。
 		/// </summary>
 		/// <remark>
-		/// �ǂ�Ȏ��ɂ�����g���̂��H
-		/// �Ⴆ�΁A���S�����^�̃I�����C���}���`�v���C�ȂǁB
-		/// ���S�����^�̃I�����C���Q�[���ł́A�e�N���C�A���g�ԂŃQ�[���̐i�s���x����v������K�v������܂��B
-		/// �ł��̂ŁA�σt���[�����[�g�łȂ��A�Œ�t���[�����[�g�ŃQ�[�������܂��B
-		/// ���̂悤�ȏꍇ�ɃQ�[�����Ԃ��Œ艻�����Ă��������B
+		/// どんな時にこれを使うのか？
+		/// 例えば、完全同期型のオンラインマルチプレイなど。
+		/// 完全同期型のオンラインゲームでは、各クライアント間でゲームの進行速度を一致させる必要があります。
+		/// ですので、可変フレームレートでなく、固定フレームレートでゲームを作ります。
+		/// そのような場合にゲーム時間を固定化させてください。
 		/// </remark>
 		/// <param name="fixedFrameDeltaTime"></param>
 		void EnableFixedFrameDeltaTime(float fixedFrameDeltaTime)
@@ -38,31 +38,32 @@ namespace nsK2EngineLow {
 			m_isFixedFrameDeltaTime = true;
 		}
 		/// <summary>
-		/// 1�t���[���̌o�ߎ��Ԃ̌Œ艻���������܂��B
+		/// 1フレームの経過時間の固定化を解除します。
 		/// </summary>
 		void DisableFixedFrameDeltaTime()
 		{
 			m_isFixedFrameDeltaTime = false;
 		}
-		
+
 		/// <summary>
-		/// 1�t���[���̌o�ߎ��Ԃ��擾(�P�ʁE�b)
+		/// 1フレームの経過時間を取得(単位・秒)
 		/// </summary>
 		/// <returns></returns>
 		const float GetFrameDeltaTime() const
 		{
 			if (m_isFixedFrameDeltaTime) {
-				// 1�t���[���̌o�ߎ��Ԃ��Œ艻����Ă���B
+				// 1フレームの経過時間が固定化されている。
 				return m_fixedFrameDeltaTime;
 			}
-			
+
 			return m_frameDeltaTime;
+			// return 1.0f / 60.0f;
 		}
 
 		/// <summary>
-		/// 1�t���[���̌o�ߎ��Ԃ��L���[�Ƀv�b�V������
+		/// 1フレームの経過時間をキューにプッシュする
 		/// </summary>
-		/// <param name="deltaTime">�o�ߎ���</param>
+		/// <param name="deltaTime">経過時間</param>
 		void PushFrameDeltaTime(float deltaTime)
 		{
 			m_frameDeltaTimeQue.push_back(deltaTime);
@@ -71,29 +72,29 @@ namespace nsK2EngineLow {
 				for (auto time : m_frameDeltaTimeQue) {
 					totalTime += time;
 				}
-				//���ϒl���Ƃ�B
+				//平均値をとる。
 				m_frameDeltaTime = min(1.0f / 30.0f, totalTime / m_frameDeltaTimeQue.size());
 				m_frameDeltaTimeQue.pop_front();
 			}
 		}
 		/// <summary>
-		/// �v���J�n
+		/// 計測開始
 		/// </summary>
 		/// <remark>
-		/// �{�֐��̓G���W�����ł̂ݎg�p���܂��B
-		/// ���[�U�[�͎g�p���Ȃ��ł��������B
+		/// 本関数はエンジン内でのみ使用します。
+		/// ユーザーは使用しないでください。
 		/// </remark>
 		void BeginMeasurement()
 		{
-			//�v���J�n�B
+			//計測開始。
 			m_sw.Start();
 		}
 		/// <summary>
-		/// �v���I��
+		/// 計測終了
 		/// </summary>
 		/// <remark>
-		/// �{�֐��̓G���W�����ł̂ݎg�p���܂��B
-		/// ���[�U�[�͎g�p���Ȃ��ł��������B
+		/// 本関数はエンジン内でのみ使用します。
+		/// ユーザーは使用しないでください。
 		/// </remark>
 		void EndMeasurement()
 		{
@@ -104,8 +105,8 @@ namespace nsK2EngineLow {
 		friend class K2EngineLow;
 		Stopwatch m_sw;
 		std::list<float> m_frameDeltaTimeQue;
-		float		m_frameDeltaTime = 1.0f / 60.0f;	// 1�t���[���̌o�ߎ��ԁB
-		bool		m_isFixedFrameDeltaTime = false;		// 1�t���[���̌o�ߎ��Ԃ��Œ艻����B
-		float		m_fixedFrameDeltaTime = 1.0f / 60.0f;	// �Œ�o�ߎ��ԁB
+		float		m_frameDeltaTime = 1.0f / 60.0f;	// 1フレームの経過時間。
+		bool		m_isFixedFrameDeltaTime = false;		// 1フレームの経過時間を固定化する。
+		float		m_fixedFrameDeltaTime = 1.0f / 60.0f;	// 固定経過時間。
 	};
 }

@@ -1,5 +1,5 @@
-/*!
-* @brief	�A�j���[�V����
+﻿/*!
+* @brief	アニメーション
 */
 
 #pragma once
@@ -13,48 +13,48 @@ namespace nsK2EngineLow {
 	using AnimationEventListener = std::function<void(const wchar_t* clipName, const wchar_t* eventName)>;
 
 	/// <summary>
-	/// �A�j���[�V�����N���X�B
+	/// アニメーションクラス。
 	/// </summary>
 	/// <remarks>
-	/// �񋟂���@�\
-	/// �P. �V���v���ȃA�j���[�V�����Đ��B
-	/// �Q. �A�j���[�V������ԁB
-	/// �R. footstep�{�[�������p�����A�j���[�V�����ړ��ʂ̌v�Z�B
-	///		�X�P���g����footstep�{�[����ǉ�����ƁA�S�̂̃{�[������A
-	///		footstep�{�[���̕��s�ړ��ʂ����O�����A�j���[�V�����Đ����s���܂��B
-	///		���O���ꂽ�ړ��ʂ�CalcFootstepDeltaValueInWorldSpace�֐��𗘗p���邱�Ƃ�
-	///		�v�Z���邱�Ƃ��ł��܂��B
-	///		���̋@�\�����p���邱�ƂŁA�A�j���[�^���쐬���������A�j���[�V�����ȂǂɈړ��ʂ�
-	///		�܂ނ��Ƃ��ł��A�A�j���[�^���Ӑ}�����ړ����s�����Ƃ��ł��܂��B
+	/// 提供する機能
+	/// １. シンプルなアニメーション再生。
+	/// ２. アニメーション補間。
+	/// ３. footstepボーンを活用したアニメーション移動量の計算。
+	///		スケルトンにfootstepボーンを追加すると、全体のボーンから、
+	///		footstepボーンの平行移動量を除外したアニメーション再生が行われます。
+	///		除外された移動量はCalcFootstepDeltaValueInWorldSpace関数を利用することで
+	///		計算することができます。
+	///		この機能を活用することで、アニメータが作成した歩きアニメーションなどに移動量を
+	///		含むことができ、アニメータが意図した移動を行うことができます。
 	/// </remarks>
 	class Animation : public Noncopyable {
 	public:
-		
+
 		/// <summary>
-		/// �������ς݂�����B
+		/// 初期化済みか判定。
 		/// </summary>
-		/// <returns>true���Ԃ��Ă����珉�����ς݁B</returns>
+		/// <returns>trueが返ってきたら初期化済み。</returns>
 		bool IsInited() const
 		{
 			return m_isInited;
 		}
 
 		/// <summary>
-		/// �������B
+		/// 初期化。
 		/// </summary>
-		/// <param name="skeleton">�A�j���[�V����������X�P���g��</param>
-		/// <param name="animClips">�A�j���[�V�����N���b�v�̔z��</param>
-		/// <param name="numAnimClip">�A�j���[�V�����N���b�v�̐�</param>
+		/// <param name="skeleton">アニメーションさせるスケルトン</param>
+		/// <param name="animClips">アニメーションクリップの配列</param>
+		/// <param name="numAnimClip">アニメーションクリップの数</param>
 		void Init(
 			Skeleton& skeleton,
 			AnimationClip* animClips,
 			int numAnimClip
 		);
 		/// <summary>
-		/// �A�j���[�V�����̍Đ��B
+		/// アニメーションの再生。
 		/// </summary>
-		/// <param name="clipNo">�A�j���[�V�����N���b�v�̔ԍ��BInit�֐��ɓn����animClipList�̕��тƂȂ�B</param>
-		/// <param name="interpolateTime">�⊮����(�P�ʁF�b)</param>
+		/// <param name="clipNo">アニメーションクリップの番号。Init関数に渡したanimClipListの並びとなる。</param>
+		/// <param name="interpolateTime">補完時間(単位：秒)</param>
 		void Play(int clipNo, float interpolateTime = 0.0f)
 		{
 			if (clipNo < m_animationClips.size()) {
@@ -62,10 +62,10 @@ namespace nsK2EngineLow {
 			}
 		}
 		/// <summary>
-		/// �A�j���[�V�����N���b�v�̃��[�v�t���O��ݒ肵�܂��B
+		/// アニメーションクリップのループフラグを設定します。
 		/// </summary>
-		/// <param name="clipName">�A�j���[�V�����N���b�v�̖��O</param>
-		/// <param name="flag">�t���O</param>
+		/// <param name="clipName">アニメーションクリップの名前</param>
+		/// <param name="flag">フラグ</param>
 		void SetAnimationClipLoopFlag(const wchar_t* clipName, bool flag)
 		{
 			auto it = std::find_if(
@@ -74,13 +74,13 @@ namespace nsK2EngineLow {
 				[clipName](auto& clip) {return clip->GetName() == clipName; }
 			);
 			if (it == m_animationClips.end()) {
-				//������Ȃ������B
+				//見つからなかった。
 				return;
 			}
 			(*it)->SetLoopFlag(flag);
 		}
 		/// <summary>
-		/// �A�j���[�V�����̍Đ����H
+		/// アニメーションの再生中？
 		/// </summary>
 		/// <returns></returns>
 		bool IsPlaying() const
@@ -90,34 +90,34 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
-		/// �A�j���[�V������i�߂�B
+		/// アニメーションを進める。
 		/// </summary>
 		/// <remarks>
-		/// �G���W����������Ă΂�܂��B
-		/// ���[�U�[�͎g�p���Ȃ��ł��������B
+		/// エンジン内部から呼ばれます。
+		/// ユーザーは使用しないでください。
 		/// </remarks>
-		/// <param name="deltaTime">�A�j���[�V������i�߂鎞��(�P�ʁF�b)</param>
+		/// <param name="deltaTime">アニメーションを進める時間(単位：秒)</param>
 		void Progress(float deltaTime);
 		/*!
-		*@brief	�A�j���[�V�����C�x���g���X�i�[��o�^�B
+		*@brief	アニメーションイベントリスナーを登録。
 		*@return
-		* �o�^���ꂽ���X�i�[�B
+		* 登録されたリスナー。
 		*/
-		
+
 		/// <summary>
-		/// �A�j���[�V�����C�x���g���X�i�[��o�^�B
+		/// アニメーションイベントリスナーを登録。
 		/// </summary>
-		/// <param name="eventListener">�o�^���郊�X�i�[�B</param>
+		/// <param name="eventListener">登録するリスナー。</param>
 		void AddAnimationEventListener(AnimationEventListener eventListener)
 		{
 			m_animationEventListeners.push_back(eventListener);
 		}
 
 		/// <summary>
-		/// �A�j���[�V�����C�x���g�����X�i�[�ɒʒm�B
+		/// アニメーションイベントをリスナーに通知。
 		/// </summary>
-		/// <param name="clipName">�C�x���g���N�������A�j���[�V�����N���b�v�̖��O</param>
-		/// <param name="eventName">�C�x���g���B</param>
+		/// <param name="clipName">イベントを起こしたアニメーションクリップの名前</param>
+		/// <param name="eventName">イベント名。</param>
 		void NotifyAnimationEventToListener(const wchar_t* clipName, const wchar_t* eventName)
 		{
 			for (auto& listener : m_animationEventListeners) {
@@ -125,16 +125,16 @@ namespace nsK2EngineLow {
 			}
 		}
 		/// <summary>
-		/// ���[���h��Ԃł̃t�b�g�X�e�b�v�̈ړ��ʂ��v�Z����B
+		/// ワールド空間でのフットステップの移動量を計算する。
 		/// </summary>
 		/// <remarks>
-		/// �t�b�g�X�e�b�v�̈ړ��ʂ́A���f���̃��[�g����̑��Έړ��ʂł��B
-		/// ���̂��߁A���[���h��Ԃɕϊ�����̂ɕ��s�ړ��ʂ͕s�v�ł��B
-		/// ���f���̉�]�N�H�[�^�j�I���Ɗg�嗦�̂ݎw�肵�Ă��������B
+		/// フットステップの移動量は、モデルのルートからの相対移動量です。
+		/// そのため、ワールド空間に変換するのに平行移動量は不要です。
+		/// モデルの回転クォータニオンと拡大率のみ指定してください。
 		/// </remarks>
-		/// <param name="rotation">���f���̉�]</param>
-		/// <param name="scale">���f���̊g�嗦</param>
-		/// <returns>���[���h��Ԃł̃t�b�g�X�e�b�v�̈ړ��ʁB</returns>
+		/// <param name="rotation">モデルの回転</param>
+		/// <param name="scale">モデルの拡大率</param>
+		/// <returns>ワールド空間でのフットステップの移動量。</returns>
 		Vector3 CalcFootstepDeltaValueInWorldSpace(Quaternion rotation, Vector3 scale) const;
 
 	private:
@@ -145,11 +145,11 @@ namespace nsK2EngineLow {
 				return;
 			}
 			if (interpolateTime == 0.0f) {
-				//�⊮�Ȃ��B
+				//補完なし。
 				m_numAnimationPlayController = 1;
 			}
 			else {
-				//�⊮����B
+				//補完あり。
 				m_numAnimationPlayController++;
 			}
 			index = GetLastAnimationControllerIndex();
@@ -159,18 +159,18 @@ namespace nsK2EngineLow {
 			m_interpolateTimeEnd = interpolateTime;
 		}
 		/// <summary>
-		/// ���[�J���|�[�Y�̍X�V�B
+		/// ローカルポーズの更新。
 		/// </summary>
-		/// <param name="deltaTime">�A�j���[�V������i�߂鎞�ԁB�P�ʁF�b�B</param>
+		/// <param name="deltaTime">アニメーションを進める時間。単位：秒。</param>
 		void UpdateLocalPose(float deltaTime);
 		/// <summary>
-		/// �O���[�o���|�[�Y�̍X�V�B
+		/// グローバルポーズの更新。
 		/// </summary>
 		void UpdateGlobalPose();
 	private:
 
 		/// <summary>
-		/// �ŏI�|�[�Y�ɂȂ�A�j���[�V�����̃����O�o�b�t�@��ł̃C���f�b�N�X���擾�B
+		/// 最終ポーズになるアニメーションのリングバッファ上でのインデックスを取得。
 		/// </summary>
 		/// <returns></returns>
 		int GetLastAnimationControllerIndex() const
@@ -178,10 +178,10 @@ namespace nsK2EngineLow {
 			return GetAnimationControllerIndex(m_startAnimationPlayController, m_numAnimationPlayController - 1);
 		}
 		/// <summary>
-		/// �A�j���[�V�����R���g���[���[�̃����O�o�b�t�@��ł̃C���f�b�N�X���擾
+		/// アニメーションコントローラーのリングバッファ上でのインデックスを取得
 		/// </summary>
-		/// <param name="startIndex">�J�n�C���f�b�N�X</param>
-		/// <param name="localIndex">���[�J���C���f�b�N�X</param>
+		/// <param name="startIndex">開始インデックス</param>
+		/// <param name="localIndex">ローカルインデックス</param>
 		/// <returns></returns>
 		int GetAnimationControllerIndex(int startIndex, int localIndex) const
 		{
@@ -189,18 +189,18 @@ namespace nsK2EngineLow {
 		}
 
 	private:
-		static const int ANIMATION_PLAY_CONTROLLER_NUM = 32;	//!<�A�j���[�V�����R���g���[���̐��B
-		std::vector<AnimationClip*>	m_animationClips;	//!<�A�j���[�V�����N���b�v�̔z��B
-		Skeleton* m_skeleton = nullptr;	//!<�A�j���[�V������K�p����X�P���g���B
-		AnimationPlayController	m_animationPlayController[ANIMATION_PLAY_CONTROLLER_NUM];	//!<�A�j���[�V�����R���g���[���B�����O�o�b�t�@�B
-		int m_numAnimationPlayController = 0;		//!<���ݎg�p���̃A�j���[�V�����Đ��R���g���[���̐��B
-		int m_startAnimationPlayController = 0;		//!<�A�j���[�V�����R���g���[���̊J�n�C���f�b�N�X�B
+		static const int ANIMATION_PLAY_CONTROLLER_NUM = 32;	//!<アニメーションコントローラの数。
+		std::vector<AnimationClip*>	m_animationClips;	//!<アニメーションクリップの配列。
+		Skeleton* m_skeleton = nullptr;	//!<アニメーションを適用するスケルトン。
+		AnimationPlayController	m_animationPlayController[ANIMATION_PLAY_CONTROLLER_NUM];	//!<アニメーションコントローラ。リングバッファ。
+		int m_numAnimationPlayController = 0;		//!<現在使用中のアニメーション再生コントローラの数。
+		int m_startAnimationPlayController = 0;		//!<アニメーションコントローラの開始インデックス。
 		float m_interpolateTime = 0.0f;
 		float m_interpolateTimeEnd = 0.0f;
-		bool m_isInterpolate = false;								//!<��Ԓ��H
-		std::vector<AnimationEventListener>	m_animationEventListeners;	//!<�A�j���[�V�����C�x���g���X�i�[�̃��X�g�B
-		Vector3 m_footstepDeltaValue = g_vec3Zero;					//footstep�{�[���̈ړ��ʁB
+		bool m_isInterpolate = false;								//!<補間中？
+		std::vector<AnimationEventListener>	m_animationEventListeners;	//!<アニメーションイベントリスナーのリスト。
+		Vector3 m_footstepDeltaValue = g_vec3Zero;					//footstepボーンの移動量。
 		bool m_isInited = false;
-		float m_deltaTimeOnUpdate = 0.0f;							//Update�֐������s�����Ƃ��̃f���^�^�C���B
+		float m_deltaTimeOnUpdate = 0.0f;							//Update関数を実行したときのデルタタイム。
 	};
 }

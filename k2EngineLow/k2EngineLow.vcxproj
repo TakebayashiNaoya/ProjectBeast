@@ -262,6 +262,7 @@
     <ClCompile Include="graphics\AnimationClip.cpp" />
     <ClCompile Include="graphics\AnimationPlayController.cpp" />
     <ClCompile Include="graphics\Camera.cpp" />
+    <ClCompile Include="graphics\ComputeAnimationVertexBuffer.cpp" />
     <ClCompile Include="graphics\ConstantBuffer.cpp" />
     <ClCompile Include="graphics\DescriptorHeap.cpp" />
     <ClCompile Include="graphics\effect\Effect.cpp" />
@@ -297,6 +298,7 @@
     <ClCompile Include="graphics\Texture.cpp" />
     <ClCompile Include="graphics\VertexBuffer.cpp" />
     <ClCompile Include="HID\GamePad.cpp" />
+    <ClCompile Include="HID\GamePadVIbration.cpp" />
     <ClCompile Include="k2EngineLow.cpp" />
     <ClCompile Include="k2EngineLowPreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -346,6 +348,7 @@
     <ClInclude Include="graphics\AnimationClip.h" />
     <ClInclude Include="graphics\AnimationPlayController.h" />
     <ClInclude Include="graphics\Camera.h" />
+    <ClInclude Include="graphics\ComputeAnimationVertexBuffer.h" />
     <ClInclude Include="graphics\ConstantBuffer.h" />
     <ClInclude Include="graphics\d3dx12.h" />
     <ClInclude Include="graphics\DescriptorHeap.h" />
@@ -375,6 +378,7 @@
     <ClInclude Include="graphics\raytracing\RaytracingPSO.h" />
     <ClInclude Include="graphics\raytracing\RaytracingShaderTable.h" />
     <ClInclude Include="graphics\raytracing\RaytracingWorld.h" />
+    <ClInclude Include="graphics\raytracing\RaytracingWorld_Inline.h" />
     <ClInclude Include="graphics\raytracing\TLASBuffer.h" />
     <ClInclude Include="graphics\RenderContext.h" />
     <ClInclude Include="graphics\RenderContext_inline.h" />
@@ -388,6 +392,7 @@
     <ClInclude Include="graphics\Texture.h" />
     <ClInclude Include="graphics\VertexBuffer.h" />
     <ClInclude Include="HID\GamePad.h" />
+    <ClInclude Include="HID\GamePadVibration.h" />
     <ClInclude Include="k2EngineLow.h" />
     <ClInclude Include="k2EngineLowPreCompile.h" />
     <ClInclude Include="level2D\CaslFile.h" />

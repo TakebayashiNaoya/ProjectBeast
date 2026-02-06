@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+﻿#include "k2EngineLowPreCompile.h"
 #include "StructuredBuffer.h"
 #include "VertexBuffer.h"
 
@@ -9,18 +9,23 @@ namespace nsK2EngineLow {
 	}
 	void RWStructuredBuffer::Release()
 	{
-		//�A���}�[�b�v
+		//アンマップ
 		CD3DX12_RANGE readRange(0, 0);
-		for (auto& buffer : m_buffersOnGPU) {
-			if (buffer) {
-				buffer->Unmap(0, &readRange);
-				ReleaseD3D12Object(buffer);
+		for (int i = 0; i < 2; i++) {
+			if (m_buffersOnGPU[i]) {
+				if (m_buffersOnCPU[i]) {
+					// メインメモリにマップしているのでアンマップを行う。
+					m_buffersOnGPU[i]->Unmap(0, &readRange);
+				}
+				ReleaseD3D12Object(m_buffersOnGPU[i]);
+				m_buffersOnGPU[i] = nullptr;
 			}
 		}
 	}
-	void RWStructuredBuffer::Init(int sizeOfElement, int numElement, void* initData)
+	void RWStructuredBuffer::Init(int sizeOfElement, int numElement, void* initData, bool isAccessCPU)
 	{
 		Release();
+		m_isAccessCPU = isAccessCPU;
 		m_sizeOfElement = sizeOfElement;
 		m_numElement = numElement;
 		auto device = g_graphicsEngine->GetD3DDevice();
@@ -29,13 +34,27 @@ namespace nsK2EngineLow {
 		int bufferNo = 0;
 
 		D3D12_HEAP_PROPERTIES prop{};
-		prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
-		prop.CreationNodeMask = 1;
-		prop.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
-		prop.Type = D3D12_HEAP_TYPE_CUSTOM;
-		prop.VisibleNodeMask = 1;
-
-		for (auto& buffer : m_buffersOnGPU) {
+		if (m_isAccessCPU) {
+			// CPUアクセスする？
+			prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;
+			prop.CreationNodeMask = 1;
+			prop.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;
+			prop.Type = D3D12_HEAP_TYPE_CUSTOM;
+			prop.VisibleNodeMask = 1;
+		}
+		else {
+			// CPUアクセスしない。
+			prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+			prop.CreationNodeMask = 1;
+			prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+			prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+			prop.VisibleNodeMask = 1;
+		}
+		// CPUからアクセスする場合はGPUがアクセスしているバッファを書き換える可能性があるので、
+		// ダブルバッファにする。
+		int numBuffer = m_isAccessCPU ? 2 : 1;
+		for (int bufferNo = 0; bufferNo < numBuffer; bufferNo++) {
+			auto& buffer = m_buffersOnGPU[bufferNo];
 			device->CreateCommittedResource(
 				&prop,
 				D3D12_HEAP_FLAG_NONE,
@@ -44,15 +63,16 @@ namespace nsK2EngineLow {
 				nullptr,
 				IID_PPV_ARGS(&buffer)
 			);
-			//�\�����o�b�t�@��CPU����A�N�Z�X�\�ȉ��z�A�h���X��ԂɃ}�b�s���O����B
-			//�}�b�v�A�A���}�b�v�̃I�[�o�[�w�b�h���y�����邽�߂ɂ͂��̃C���X�^���X�������Ă���Ԃ͍s��Ȃ��B
+			//構造化バッファをCPUからアクセス可能な仮想アドレス空間にマッピングする。
+			//マップ、アンマップのオーバーヘッドを軽減するためにはこのインスタンスが生きている間は行わない。
+			if (m_isAccessCPU)
 			{
+				// 初期データのコピーができるのは
 				CD3DX12_RANGE readRange(0, 0);        //     intend to read from this resource on the CPU.
 				buffer->Map(0, &readRange, reinterpret_cast<void**>(&m_buffersOnCPU[bufferNo]));
-			}
-			if (initData != nullptr) {
 				memcpy(m_buffersOnCPU[bufferNo], initData, m_sizeOfElement * m_numElement);
 			}
+
 			bufferNo++;
 		}
 		m_isInited = true;
@@ -63,7 +83,7 @@ namespace nsK2EngineLow {
 		m_sizeOfElement = vb.GetStrideInBytes();
 		m_numElement = vb.GetSizeInBytes() / m_sizeOfElement;
 		if (isUpdateByCPU) {
-			//���Ή��B
+			//未対応。
 			std::abort();
 		}
 		else {
@@ -72,7 +92,7 @@ namespace nsK2EngineLow {
 				gpuBuffer = vb.GetID3DResourceAddress();
 				gpuBuffer->AddRef();
 			}
-			//CPU����͕ύX�ł��Ȃ��̂Ń}�b�v���Ȃ��B
+			//CPUからは変更できないのでマップしない。
 			for (auto& cpuBuffer : m_buffersOnCPU) {
 				cpuBuffer = nullptr;
 			}
@@ -84,7 +104,7 @@ namespace nsK2EngineLow {
 		m_sizeOfElement = ib.GetStrideInBytes();
 		m_numElement = ib.GetSizeInBytes() / m_sizeOfElement;
 		if (isUpdateByCPU) {
-			//���Ή��B
+			//未対応。
 			std::abort();
 		}
 		else {
@@ -93,7 +113,7 @@ namespace nsK2EngineLow {
 				gpuBuffer = ib.GetID3DResourceAddress();
 				gpuBuffer->AddRef();
 			}
-			//CPU����͕ύX�ł��Ȃ��̂Ń}�b�v���Ȃ��B
+			//CPUからは変更できないのでマップしない。
 			for (auto& cpuBuffer : m_buffersOnCPU) {
 				cpuBuffer = nullptr;
 			}
@@ -103,15 +123,15 @@ namespace nsK2EngineLow {
 	ID3D12Resource* RWStructuredBuffer::GetD3DResoruce()
 	{
 		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		// CPUからアクセスができない場合は0番目しか使わない。
+		backBufferIndex = m_isAccessCPU ? backBufferIndex : 0;
 		return m_buffersOnGPU[backBufferIndex];
 	}
-	/// <summary>
-	/// CPU����A�N�Z�X�\�ȃ��\�[�X���擾����B
-	/// </summary>
-	/// <returns></returns>
 	void* RWStructuredBuffer::GetResourceOnCPU()
 	{
 		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		// CPUからアクセスができない場合は0番目しか使わない。
+		backBufferIndex = m_isAccessCPU ? backBufferIndex : 0;
 		return m_buffersOnCPU[backBufferIndex];
 	}
 	void RWStructuredBuffer::RegistUnorderAccessView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
@@ -119,8 +139,9 @@ namespace nsK2EngineLow {
 		if (!m_isInited) {
 			return;
 		}
+		// CPUからアクセスができない場合は0番目しか使わない。
+		bufferNo = m_isAccessCPU ? bufferNo : 0;
 		auto device = g_graphicsEngine->GetD3DDevice();
-
 		D3D12_UNORDERED_ACCESS_VIEW_DESC desc{};
 		desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 		desc.Format = DXGI_FORMAT_UNKNOWN;
@@ -138,8 +159,9 @@ namespace nsK2EngineLow {
 		if (!m_isInited) {
 			return;
 		}
+		// CPUからアクセスができない場合は0番目しか使わない。
+		bufferNo = m_isAccessCPU ? bufferNo : 0;
 		auto device = g_graphicsEngine->GetD3DDevice();
-
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
 		ZeroMemory(&srvDesc, sizeof(srvDesc));
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;

@@ -1,12 +1,27 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "GraphicsEngine.h"
 #include <pix.h>
 
 namespace nsK2EngineLow {
-	GraphicsEngine* g_graphicsEngine = nullptr;	//ƒOƒ‰ƒtƒBƒbƒNƒXƒGƒ“ƒWƒ“
-	Camera* g_camera2D = nullptr;				//2DƒJƒƒ‰B
-	Camera* g_camera3D = nullptr;				//3DƒJƒƒ‰B
+	GraphicsEngine* g_graphicsEngine = nullptr;	//ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¹ã‚¨ãƒ³ã‚¸ãƒ³
+	Camera* g_camera2D = nullptr;				//2Dã‚«ãƒ¡ãƒ©ã€‚
+	Camera* g_camera3D = nullptr;				//3Dã‚«ãƒ¡ãƒ©ã€‚
+	/// <summary>
+	/// DXRãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ã‹ã‚’èª¿ã¹ã‚‹ã€‚
+	/// </summary>
+	/// <param name="pDevice"></param>
+	/// <returns></returns>
+	bool IsSupportDXR(ID3D12Device5* pDevice)
+	{
+		D3D12_FEATURE_DATA_D3D12_OPTIONS5 options = {};
+		auto hr = pDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &options, sizeof(options));
+		if (FAILED(hr))
+		{
+			return false;
+		}
 
+		return options.RaytracingTier != D3D12_RAYTRACING_TIER_NOT_SUPPORTED;
+	}
 	GraphicsEngine::~GraphicsEngine()
 	{
 		WaitDraw();
@@ -16,7 +31,7 @@ namespace nsK2EngineLow {
 				req.d3dObject->Release();
 			}
 		}
-		//Œãn––B
+		//å¾Œå§‹æœ«ã€‚
 		if (m_commandQueue) {
 			m_commandQueue->Release();
 		}
@@ -45,13 +60,13 @@ namespace nsK2EngineLow {
 		if (m_d3dDevice) {
 			m_d3dDevice->Release();
 		}
-		
+
 		CloseHandle(m_fenceEvent);
 	}
 	void GraphicsEngine::WaitDraw()
 	{
 
-		//•`‰æI—¹‘Ò‚¿
+		//æç”»çµ‚äº†å¾…ã¡
 		// Signal and increment the fence value.
 		const UINT64 fence = m_fenceValue;
 		m_commandQueue->Signal(m_fence, fence);
@@ -64,7 +79,12 @@ namespace nsK2EngineLow {
 			WaitForSingleObject(m_fenceEvent, INFINITE);
 		}
 	}
-	bool GraphicsEngine::Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight)
+	bool GraphicsEngine::Init(
+		HWND hwnd,
+		UINT frameBufferWidth,
+		UINT frameBufferHeight,
+		const raytracing::InitData& raytracingInitData
+	)
 	{
 		//
 		g_graphicsEngine = this;
@@ -72,68 +92,73 @@ namespace nsK2EngineLow {
 		m_frameBufferWidth = frameBufferWidth;
 		m_frameBufferHeight = frameBufferHeight;
 
-		//ƒfƒoƒCƒX‚ÉƒAƒNƒZƒX‚·‚é‚½‚ß‚ÌƒCƒ“ƒ^[ƒtƒF[ƒX‚ğì¬B
+		//ãƒ‡ãƒã‚¤ã‚¹ã«ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹ãŸã‚ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã‚’ä½œæˆã€‚
 		auto dxgiFactory = CreateDXGIFactory();
 
-		//D3DƒfƒoƒCƒX‚Ìì¬B
+		//D3Dãƒ‡ãƒã‚¤ã‚¹ã®ä½œæˆã€‚
 		if (!CreateD3DDevice(dxgiFactory)) {
-			//D3DƒfƒoƒCƒX‚Ìì¬‚É¸”s‚µ‚½B
-			MessageBox(hwnd, TEXT("D3DƒfƒoƒCƒX‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			//D3Dãƒ‡ãƒã‚¤ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
+			MessageBox(hwnd, TEXT("D3Dãƒ‡ãƒã‚¤ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
-		//ƒRƒ}ƒ“ƒhƒLƒ…[‚Ìì¬B
+		// DXRã®ã‚µãƒãƒ¼ãƒˆã‚’èª¿ã¹ã‚‹ã€‚
+		if (IsSupportDXR(m_d3dDevice)) {
+			// DXRãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã¦ã€ã‹ã¤RTXã‚·ãƒªãƒ¼ã‚ºãªã‚‰ãƒ¬ã‚¤ãƒˆãƒ¬å¯èƒ½ã«ã™ã‚‹ã€‚
+			m_isPossibleRaytracing = m_isPossibleRaytracing && true;
+		}
+		//ã‚³ãƒãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ã®ä½œæˆã€‚
 		if (!CreateCommandQueue()) {
-			//ƒRƒ}ƒ“ƒhƒLƒ…[‚Ìì¬‚É¸”s‚µ‚½B
-			MessageBox(hwnd, TEXT("ƒRƒ}ƒ“ƒhƒLƒ…[‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			//ã‚³ãƒãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
+			MessageBox(hwnd, TEXT("ã‚³ãƒãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
 
-		//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚ğ‰Šú‰»
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–
 		if (!m_frameBuffer.Init(hwnd, m_d3dDevice, m_commandQueue, dxgiFactory, frameBufferWidth, frameBufferHeight)) {
-			MessageBox(hwnd, TEXT("ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			MessageBox(hwnd, TEXT("ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
 
-		//ƒRƒ}ƒ“ƒhƒAƒƒP[ƒ^‚Ìì¬B
+		//ã‚³ãƒãƒ³ãƒ‰ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã®ä½œæˆã€‚
 		for (auto& commandAllocator : m_commandAllocator) {
 			m_d3dDevice->CreateCommandAllocator(
 				D3D12_COMMAND_LIST_TYPE_DIRECT,
 				IID_PPV_ARGS(&commandAllocator));
 
 			if (!commandAllocator) {
-				MessageBox(hwnd, TEXT("ƒRƒ}ƒ“ƒhƒAƒƒP[ƒ^‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+				MessageBox(hwnd, TEXT("ã‚³ãƒãƒ³ãƒ‰ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 				return false;
 			}
 		}
 
-		//ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬B
+		//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆã€‚
 		if (!CreateCommandList()) {
-			MessageBox(hwnd, TEXT("ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			MessageBox(hwnd, TEXT("ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
 
-		//GPU‚Æ“¯Šú‚ğ‚Æ‚é‚½‚ß‚ÌƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚éB
+		//GPUã¨åŒæœŸã‚’ã¨ã‚‹ãŸã‚ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
 		if (!CreateSynchronizationWithGPUObject()) {
-			MessageBox(hwnd, TEXT("GPU‚Æ“¯Šú‚ğ‚Æ‚é‚½‚ß‚ÌƒIƒuƒWƒFƒNƒg‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B"), TEXT("ƒGƒ‰["), MB_OK);
+			MessageBox(hwnd, TEXT("GPUã¨åŒæœŸã‚’ã¨ã‚‹ãŸã‚ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚"), TEXT("ã‚¨ãƒ©ãƒ¼"), MB_OK);
 			return false;
 		}
 
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg‚Ìì¬B
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®ä½œæˆã€‚
 		m_renderContext.Init(m_commandList[m_frameIndex]);
 
 
-		//CBR_SVR‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌƒTƒCƒY‚ğæ“¾B
+		//CBR_SVRã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
 		m_cbrSrvDescriptorSize = m_d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		//Sampler‚ÌƒfƒBƒXƒNƒŠƒvƒ^‚ÌƒTƒCƒY‚ğæ“¾B
+		//Samplerã®ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã€‚
 		m_samplerDescriptorSize = m_d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
-		//‰Šú‰»‚ªI‚í‚Á‚½‚Ì‚ÅDXGI‚ğ”jŠüB
+		//åˆæœŸåŒ–ãŒçµ‚ã‚ã£ãŸã®ã§DXGIã‚’ç ´æ£„ã€‚
 		dxgiFactory->Release();
 
-		//ƒkƒ‹ƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»
+		//ãƒŒãƒ«ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’åˆæœŸåŒ–
 		m_nullTextureMaps.Init();
 
-		//ƒJƒƒ‰‚ğ‰Šú‰»‚·‚éB
+		//ã‚«ãƒ¡ãƒ©ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 		m_camera2D.SetUpdateProjMatrixFunc(Camera::enUpdateProjMatrixFunc_Ortho);
 		m_camera2D.SetWidth(static_cast<float>(m_frameBufferWidth));
 		m_camera2D.SetHeight(static_cast<float>(m_frameBufferHeight));
@@ -146,11 +171,12 @@ namespace nsK2EngineLow {
 		g_camera2D = &m_camera2D;
 		g_camera3D = &m_camera3D;
 
-		//DirectXTK—p‚ÌƒOƒ‰ƒtƒBƒbsƒNƒƒ‚ƒŠŠÇ—ƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬‚·‚éB
+		//DirectXTKç”¨ã®ã‚°ãƒ©ãƒ•ã‚£ãƒƒsã‚¯ãƒ¡ãƒ¢ãƒªç®¡ç†ã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆã™ã‚‹ã€‚
 		m_directXTKGfxMemroy = std::make_unique<DirectX::GraphicsMemory>(m_d3dDevice);
-		//ƒtƒHƒ“ƒg•`‰æƒGƒ“ƒWƒ“‚ğ‰Šú‰»B
+		//ãƒ•ã‚©ãƒ³ãƒˆæç”»ã‚¨ãƒ³ã‚¸ãƒ³ã‚’åˆæœŸåŒ–ã€‚
 		m_fontEngine.Init();
-
+		//ãƒ¬ã‚¤ãƒˆãƒ¬ã‚¨ãƒ³ã‚¸ãƒ³ã‚’åˆæœŸåŒ–ã€‚
+		m_raytracingEngine.Init(raytracingInitData);
 		return true;
 	}
 
@@ -158,7 +184,7 @@ namespace nsK2EngineLow {
 	{
 		UINT dxgiFactoryFlags = 0;
 #ifdef K2_DEBUG
-		//ƒfƒoƒbƒOƒRƒ“ƒgƒ[ƒ‰[‚ª‚ ‚ê‚ÎAƒfƒoƒbƒOƒŒƒCƒ„[‚ª‚ ‚éDXGI‚ğì¬‚·‚éB
+		//ãƒ‡ãƒãƒƒã‚°ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ãŒã‚ã‚Œã°ã€ãƒ‡ãƒãƒƒã‚°ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã‚ã‚‹DXGIã‚’ä½œæˆã™ã‚‹ã€‚
 		ID3D12Debug* debugController;
 		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
 		{
@@ -177,19 +203,19 @@ namespace nsK2EngineLow {
 	bool GraphicsEngine::CreateD3DDevice(IDXGIFactory4* dxgiFactory)
 	{
 		D3D_FEATURE_LEVEL featureLevels[] = {
-				D3D_FEATURE_LEVEL_12_1,	//Direct3D 12.1‚Ì‹@”\‚ğg‚¤B
-				D3D_FEATURE_LEVEL_12_0	//Direct3D 12.0‚Ì‹@”\‚ğg‚¤B
+				D3D_FEATURE_LEVEL_12_1,	//Direct3D 12.1ã®æ©Ÿèƒ½ã‚’ä½¿ã†ã€‚
+				D3D_FEATURE_LEVEL_12_0	//Direct3D 12.0ã®æ©Ÿèƒ½ã‚’ä½¿ã†ã€‚
 		};
 		IDXGIAdapter* adapterTmp = nullptr;
-		IDXGIAdapter* adapterVender[Num_GPUVender] = { nullptr };	//Šeƒxƒ“ƒ_[‚ÌƒAƒ_ƒvƒ^[B
-		IDXGIAdapter* adapterMaxVideoMemory = nullptr;				//Å‘åƒrƒfƒIƒƒ‚ƒŠ‚ÌƒAƒ_ƒvƒ^B
-		IDXGIAdapter* useAdapter = nullptr;							//ÅI“I‚Ég—p‚·‚éƒAƒ_ƒvƒ^B
+		IDXGIAdapter* adapterVender[Num_GPUVender] = { nullptr };	//å„ãƒ™ãƒ³ãƒ€ãƒ¼ã®ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼ã€‚
+		IDXGIAdapter* adapterMaxVideoMemory = nullptr;				//æœ€å¤§ãƒ“ãƒ‡ã‚ªãƒ¡ãƒ¢ãƒªã®ã‚¢ãƒ€ãƒ—ã‚¿ã€‚
+		IDXGIAdapter* useAdapter = nullptr;							//æœ€çµ‚çš„ã«ä½¿ç”¨ã™ã‚‹ã‚¢ãƒ€ãƒ—ã‚¿ã€‚
 		SIZE_T videoMemorySize = 0;
 		for (int i = 0; dxgiFactory->EnumAdapters(i, &adapterTmp) != DXGI_ERROR_NOT_FOUND; i++) {
 			DXGI_ADAPTER_DESC desc;
 			adapterTmp->GetDesc(&desc);
 			if (desc.DedicatedVideoMemory > videoMemorySize) {
-				//‚±‚¿‚ç‚ÌƒrƒfƒIƒƒ‚ƒŠ‚Ì•û‚ª‘½‚¢‚Ì‚ÅA‚±‚¿‚ç‚ğg‚¤B
+				//ã“ã¡ã‚‰ã®ãƒ“ãƒ‡ã‚ªãƒ¡ãƒ¢ãƒªã®æ–¹ãŒå¤šã„ã®ã§ã€ã“ã¡ã‚‰ã‚’ä½¿ã†ã€‚
 				if (adapterMaxVideoMemory != nullptr) {
 					adapterMaxVideoMemory->Release();
 				}
@@ -198,7 +224,17 @@ namespace nsK2EngineLow {
 				videoMemorySize = desc.DedicatedVideoMemory;
 			}
 			if (wcsstr(desc.Description, L"NVIDIA") != nullptr) {
-				//NVIDIA»
+				//NVIDIAè£½
+#ifdef ENABLE_DXR_ON_RTX_ONLY
+				std::wstring adapterName = desc.Description;
+				if (adapterName.find(L"RTX") != std::string::npos) {
+					// RTXã‚·ãƒªãƒ¼ã‚ºã®GPUã€‚
+					m_isPossibleRaytracing = true;
+
+				}
+#else // #ifdef ENABLE_DXR_ON_RTX_ONLY
+				m_isPossibleRaytracing = true;
+#endif // #ifdef ENABLE_DXR_ON_RTX_ONLY
 				if (adapterVender[GPU_VenderNvidia]) {
 					adapterVender[GPU_VenderNvidia]->Release();
 				}
@@ -206,7 +242,7 @@ namespace nsK2EngineLow {
 				adapterVender[GPU_VenderNvidia]->AddRef();
 			}
 			else if (wcsstr(desc.Description, L"AMD") != nullptr) {
-				//AMD»
+				//AMDè£½
 				if (adapterVender[GPU_VenderAMD]) {
 					adapterVender[GPU_VenderAMD]->Release();
 				}
@@ -214,7 +250,7 @@ namespace nsK2EngineLow {
 				adapterVender[GPU_VenderAMD]->AddRef();
 			}
 			else if (wcsstr(desc.Description, L"Intel") != nullptr) {
-				//Intel»
+				//Intelè£½
 				if (adapterVender[GPU_VenderIntel]) {
 					adapterVender[GPU_VenderIntel]->Release();
 				}
@@ -223,17 +259,17 @@ namespace nsK2EngineLow {
 			}
 			adapterTmp->Release();
 		}
-		//g—p‚·‚éƒAƒ_ƒvƒ^[‚ğŒˆ‚ß‚éB
+		//ä½¿ç”¨ã™ã‚‹ã‚¢ãƒ€ãƒ—ã‚¿ãƒ¼ã‚’æ±ºã‚ã‚‹ã€‚
 		if (adapterVender[GPU_VenderNvidia] != nullptr) {
-			//NVIDIA»‚ªÅ—Dæ
+			//NVIDIAè£½ãŒæœ€å„ªå…ˆ
 			useAdapter = adapterVender[GPU_VenderNvidia];
 		}
 		else if (adapterVender[GPU_VenderAMD] != nullptr) {
-			//Ÿ‚ÍAMD‚ª—DæB
+			//æ¬¡ã¯AMDãŒå„ªå…ˆã€‚
 			useAdapter = adapterVender[GPU_VenderAMD];
 		}
 		else {
-			//NVIDIA‚ÆAMD‚ÌGPU‚ª‚È‚¯‚ê‚ÎƒrƒfƒIƒƒ‚ƒŠ‚ªˆê”Ô‘½‚¢‚â‚Â‚ğg‚¤B
+			//NVIDIAã¨AMDã®GPUãŒãªã‘ã‚Œã°ãƒ“ãƒ‡ã‚ªãƒ¡ãƒ¢ãƒªãŒä¸€ç•ªå¤šã„ã‚„ã¤ã‚’ä½¿ã†ã€‚
 			useAdapter = adapterMaxVideoMemory;
 		}
 		for (auto featureLevel : featureLevels) {
@@ -243,7 +279,7 @@ namespace nsK2EngineLow {
 				IID_PPV_ARGS(&m_d3dDevice)
 			);
 			if (SUCCEEDED(hr)) {
-				//D3DƒfƒoƒCƒX‚Ìì¬‚É¬Œ÷‚µ‚½B
+				//D3Dãƒ‡ãƒã‚¤ã‚¹ã®ä½œæˆã«æˆåŠŸã—ãŸã€‚
 				break;
 			}
 		}
@@ -256,13 +292,13 @@ namespace nsK2EngineLow {
 			adapterMaxVideoMemory->Release();
 		}
 #ifdef K2_DEBUG
-		// Windows11‚Ì•s‹ï‡‚Ì‰ñ”ğ‘Î‰
-		// Windows11‚ÅMISMATCHING_COMMAND_LIST_TYPE‚ªo‚é‚æ‚¤‚É‚È‚Á‚Ä‚¨‚èA
-		// WindowsSDK‚Ì•s‹ï‡‚Æ‚Ì‚±‚ÆB
-		// ‹ß“ú’†‚ÉC³‚³‚ê‚é‚ç‚µ‚¢B
+		// Windows11ã®ä¸å…·åˆã®å›é¿å¯¾å¿œ
+		// Windows11ã§MISMATCHING_COMMAND_LIST_TYPEãŒå‡ºã‚‹ã‚ˆã†ã«ãªã£ã¦ãŠã‚Šã€
+		// WindowsSDKã®ä¸å…·åˆã¨ã®ã“ã¨ã€‚
+		// è¿‘æ—¥ä¸­ã«ä¿®æ­£ã•ã‚Œã‚‹ã‚‰ã—ã„ã€‚
 		// https://stackoverflow.com/questions/69805245/directx-12-application-is-crashing-in-windows-11
 		ID3D12InfoQueue* infoQueue;
-		if ( m_d3dDevice->QueryInterface(IID_PPV_ARGS(&infoQueue)) == S_OK ) {
+		if (m_d3dDevice->QueryInterface(IID_PPV_ARGS(&infoQueue)) == S_OK) {
 			D3D12_MESSAGE_ID hide[] =
 			{
 				D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE,
@@ -288,7 +324,7 @@ namespace nsK2EngineLow {
 
 		auto hr = m_d3dDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_commandQueue));
 		if (FAILED(hr)) {
-			//ƒRƒ}ƒ“ƒhƒLƒ…[‚Ìì¬‚É¸”s‚µ‚½B
+			//ã‚³ãƒãƒ³ãƒ‰ã‚­ãƒ¥ãƒ¼ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
 			return false;
 		}
 
@@ -299,7 +335,7 @@ namespace nsK2EngineLow {
 	{
 		int listNo = 0;
 		for (auto& commandList : m_commandList) {
-			//ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìì¬B
+			//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®ä½œæˆã€‚
 			m_d3dDevice->CreateCommandList(
 				0, D3D12_COMMAND_LIST_TYPE_DIRECT,
 				m_commandAllocator[listNo],
@@ -308,9 +344,9 @@ namespace nsK2EngineLow {
 			if (!commandList) {
 				return false;
 			}
-			//ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ÍŠJ‚©‚ê‚Ä‚¢‚éó‘Ô‚Åì¬‚³‚ê‚é‚Ì‚ÅA‚¢‚Á‚½‚ñ•Â‚¶‚éB
+			//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã¯é–‹ã‹ã‚Œã¦ã„ã‚‹çŠ¶æ…‹ã§ä½œæˆã•ã‚Œã‚‹ã®ã§ã€ã„ã£ãŸã‚“é–‰ã˜ã‚‹ã€‚
 			commandList->Close();
-			
+
 			listNo++;
 		}
 		return true;
@@ -319,11 +355,11 @@ namespace nsK2EngineLow {
 	{
 		m_d3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
 		if (!m_fence) {
-			//ƒtƒFƒ“ƒX‚Ìì¬‚É¸”s‚µ‚½B
+			//ãƒ•ã‚§ãƒ³ã‚¹ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
 			return false;
 		}
 		m_fenceValue = 1;
-		//“¯Šú‚ğs‚¤‚Æ‚«‚ÌƒCƒxƒ“ƒgƒnƒ“ƒhƒ‰‚ğì¬‚·‚éB
+		//åŒæœŸã‚’è¡Œã†ã¨ãã®ã‚¤ãƒ™ãƒ³ãƒˆãƒãƒ³ãƒ‰ãƒ©ã‚’ä½œæˆã™ã‚‹ã€‚
 		m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 		if (m_fenceEvent == nullptr) {
 			return false;
@@ -334,28 +370,28 @@ namespace nsK2EngineLow {
 	{
 		m_frameIndex = m_frameBuffer.GetCurrentBackBufferIndex();
 
-		//ƒJƒƒ‰‚ğXV‚·‚éB
+		//ã‚«ãƒ¡ãƒ©ã‚’æ›´æ–°ã™ã‚‹ã€‚
 		m_camera2D.Update();
 		m_camera3D.Update();
 
-		//ƒRƒ}ƒ“ƒhƒAƒƒP[ƒ^‚ğ‚ğƒŠƒZƒbƒgB
+		//ã‚³ãƒãƒ³ãƒ‰ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã‚’ã‚’ãƒªã‚»ãƒƒãƒˆã€‚
 		m_commandAllocator[m_frameIndex]->Reset();
 
 		m_renderContext.SetCommandList(m_commandList[m_frameIndex]);
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg‚àƒŠƒZƒbƒgB
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚‚ãƒªã‚»ãƒƒãƒˆã€‚
 		m_renderContext.Reset(m_commandAllocator[m_frameIndex], m_pipelineState);
 
 
-		//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚ğƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Æ‚µ‚Äİ’è‰Â”\‚É‚È‚é‚Ü‚Å‘Ò‚ÂB
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¨ã—ã¦è¨­å®šå¯èƒ½ã«ãªã‚‹ã¾ã§å¾…ã¤ã€‚
 		m_renderContext.WaitUntilToPossibleSetRenderTarget(m_frameBuffer.GetCurrentRenderTarget());
 
-		//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚ğƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ğİ’èB
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã‚’è¨­å®šã€‚
 		m_renderContext.SetRenderTarget(
 			m_frameBuffer.GetCurrentRenderTargetViewDescriptorHandle(),
 			m_frameBuffer.GetCurrentDepthStencilViewDescriptorHandle()
 		);
 		m_renderContext.SetViewportAndScissor(m_frameBuffer.GetViewport());
-		//ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚ğƒNƒŠƒAB
+		//ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢ã€‚
 		const float clearColor[] = { 0.5f, 0.5f, 0.5f, 1.0f };
 		m_renderContext.ClearRenderTargetView(m_frameBuffer.GetCurrentRenderTargetViewDescriptorHandle(), clearColor);
 		m_renderContext.ClearDepthStencilView(m_frameBuffer.GetCurrentDepthStencilViewDescriptorHandle(), 1.0f);
@@ -373,7 +409,7 @@ namespace nsK2EngineLow {
 		auto releaseReqIt = m_reqDelayRelease3d12ObjectList.begin();
 		while (releaseReqIt != m_reqDelayRelease3d12ObjectList.end()) {
 			if (releaseReqIt->delayTime == 0) {
-				// ŠJ•ú
+				// é–‹æ”¾
 				if (releaseReqIt->d3dObject) {
 					releaseReqIt->d3dObject->Release();
 				}
@@ -387,9 +423,9 @@ namespace nsK2EngineLow {
 	}
 	void GraphicsEngine::EndRender()
 	{
-		// ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚Ö‚Ì•`‚«‚İŠ®—¹‘Ò‚¿
+		// ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã¸ã®æãè¾¼ã¿å®Œäº†å¾…ã¡
 		m_renderContext.WaitUntilFinishDrawingToRenderTarget(m_frameBuffer.GetCurrentRenderTarget());
-		
+
 		if (m_isExecuteCommandList)
 		{
 #ifdef USE_FPS_LIMITTER
@@ -397,24 +433,24 @@ namespace nsK2EngineLow {
 #else
 			m_frameBuffer.Present(0);
 #endif
-			// •`‰æŠ®—¹‘Ò‚¿B
+			// æç”»å®Œäº†å¾…ã¡ã€‚
 			WaitDraw();
 		}
 
 		m_directXTKGfxMemroy->Commit(m_commandQueue);
-		//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg‚ğ•Â‚¶‚éB
+		//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’é–‰ã˜ã‚‹ã€‚
 		m_renderContext.Close();
-		//‚±‚ÌƒtƒŒ[ƒ€‚Éì¬‚µ‚½•`‰æƒRƒ}ƒ“ƒh‚ğÀs‚·‚éB
+		//ã“ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã«ä½œæˆã—ãŸæç”»ã‚³ãƒãƒ³ãƒ‰ã‚’å®Ÿè¡Œã™ã‚‹ã€‚
 		ID3D12CommandList* ppCommandLists[] = { m_commandList[m_frameIndex] };
 		m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-		// ƒRƒ}ƒ“ƒhƒŠƒXƒg‚ğGPU‚É—¬‚µ‚½ˆóB
+		// ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã‚’GPUã«æµã—ãŸå°ã€‚
 		m_isExecuteCommandList = true;
 		m_directXTKGfxMemroy->GarbageCollect();
 
-		// ƒoƒbƒNƒoƒbƒtƒ@‚ğ“ü‚ê‘Ö‚¦‚éB
+		// ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã‚’å…¥ã‚Œæ›¿ãˆã‚‹ã€‚
 		m_frameBuffer.SwapBackBuffer();
 
-		// D3D12ƒIƒuƒWƒFƒNƒg‚Ì‰ğ•úƒŠƒNƒGƒXƒg‚ğˆ—‚·‚éB
+		// D3D12ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è§£æ”¾ãƒªã‚¯ã‚¨ã‚¹ãƒˆã‚’å‡¦ç†ã™ã‚‹ã€‚
 		ExecuteRequestReleaseD3D12Object();
 
 	}

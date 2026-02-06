@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "HID/GamePad.h"
 #include "util/TResourceBank.h"
@@ -13,90 +13,97 @@ namespace nsK2EngineLow {
 	class GameTime;
 	class Texture;
 	class Font;
-
+	namespace raytracing {
+		struct InitData;
+	}
 	class K2EngineLow {
 	public:
 		/// <summary>
-		/// ƒtƒŒ[ƒ€ƒŒ[ƒgƒ‚[ƒh
+		/// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆãƒ¢ãƒ¼ãƒ‰
 		/// </summary>
 		enum EnFrameRateMode {
-			enFrameRateMode_Fix,		// ŒÅ’èƒtƒŒ[ƒ€ƒŒ[ƒgƒ‚[ƒhB
-			enFrameRateMode_Variable,	// ‰Â•ÏƒtƒŒ[ƒ€ƒŒ[ƒgƒ‚[ƒhB
+			enFrameRateMode_Fix,		// å›ºå®šãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆãƒ¢ãƒ¼ãƒ‰ã€‚
+			enFrameRateMode_Variable,	// å¯å¤‰ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆãƒ¢ãƒ¼ãƒ‰ã€‚
 		};
 		/// <summary>
-		/// ƒtƒŒ[ƒ€ƒŒ[ƒg‚ÉŠÖ‚·‚éî•ñ
+		/// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã«é–¢ã™ã‚‹æƒ…å ±
 		/// </summary>
 		struct FrameRateInfo {
-			EnFrameRateMode frameRateMode;	// ƒtƒŒ[ƒ€ƒŒ[ƒgƒ‚[ƒh
-			int maxFPS;						// Å‘åFPS
+			EnFrameRateMode frameRateMode;	// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆãƒ¢ãƒ¼ãƒ‰
+			int maxFPS;						// æœ€å¤§FPS
 		};
 		/// <summary>
-		/// ƒfƒXƒgƒ‰ƒNƒ^B
+		/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 		/// </summary>
 		~K2EngineLow();
 		/// <summary>
-		/// XVˆ—‚ğÀsB
+		/// æ›´æ–°å‡¦ç†ã‚’å®Ÿè¡Œã€‚
 		/// </summary>
 		void ExecuteUpdate();
 		/// <summary>
-		/// •`‰æˆ—‚ğÀsB
+		/// æç”»å‡¦ç†ã‚’å®Ÿè¡Œã€‚
 		/// </summary>
 		void ExecuteRender();
 		/// <summary>
-		/// “–‚½‚è”»’è•`‰æˆ—‚ğÀsB
+		/// å½“ãŸã‚Šåˆ¤å®šæç”»å‡¦ç†ã‚’å®Ÿè¡Œã€‚
 		/// </summary>
 		void DebubDrawWorld();
 		/// <summary>
-		/// ƒtƒŒ[ƒ€‚ÌŠJn‚ÉŒÄ‚Î‚ê‚éˆ—B
+		/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®é–‹å§‹æ™‚ã«å‘¼ã°ã‚Œã‚‹å‡¦ç†ã€‚
 		/// </summary>
 		void BeginFrame();
 		/// <summary>
-		/// ƒtƒŒ[ƒ€‚ÌI—¹‚ÉŒÄ‚Î‚ê‚éˆ—B
+		/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®çµ‚äº†æ™‚ã«å‘¼ã°ã‚Œã‚‹å‡¦ç†ã€‚
 		/// </summary>
 		void EndFrame();
 
 		/// <summary>
-		/// ƒQ[ƒ€ƒGƒ“ƒWƒ“‚Ì‰Šú‰»B
+		/// ã‚²ãƒ¼ãƒ ã‚¨ãƒ³ã‚¸ãƒ³ã®åˆæœŸåŒ–ã€‚
 		/// </summary>
-		void Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight);
+		void Init(
+			HWND hwnd,
+			UINT frameBufferWidth,
+			UINT frameBufferHeight,
+			const raytracing::InitData& raytracingInitData
+		);
 		/// <summary>
-		/// tksƒtƒ@ƒCƒ‹‚ğƒoƒ“ƒN‚©‚çæ“¾B
+		/// tksãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒ³ã‚¯ã‹ã‚‰å–å¾—ã€‚
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
-		/// <returns>tksƒtƒ@ƒCƒ‹Bnullptr‚ª•Ô‚Á‚Ä‚«‚½‚çƒoƒ“ƒN‚É“o˜^‚³‚ê‚Ä‚¢‚È‚¢B</returns>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+		/// <returns>tksãƒ•ã‚¡ã‚¤ãƒ«ã€‚nullptrãŒè¿”ã£ã¦ããŸã‚‰ãƒãƒ³ã‚¯ã«ç™»éŒ²ã•ã‚Œã¦ã„ãªã„ã€‚</returns>
 		TksFile* GetTksFileFromBank(const char* filePath)
 		{
 			return m_tksFileBank.Get(filePath);
 		}
 		/// <summary>
-		/// tksƒtƒ@ƒCƒ‹‚ğƒoƒ“ƒN‚É“o˜^
+		/// tksãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒ³ã‚¯ã«ç™»éŒ²
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒX</param>
-		/// <param name="tksFile">“o˜^‚·‚étksƒtƒ@ƒCƒ‹B</param>
-		void RegistTksFileToBank(const char* filePath, TksFile* tksFile) 
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
+		/// <param name="tksFile">ç™»éŒ²ã™ã‚‹tksãƒ•ã‚¡ã‚¤ãƒ«ã€‚</param>
+		void RegistTksFileToBank(const char* filePath, TksFile* tksFile)
 		{
 			m_tksFileBank.Regist(filePath, tksFile);
 		}
 		/// <summary>
-		/// tkmƒtƒ@ƒCƒ‹‚ğƒoƒ“ƒN‚©‚çæ“¾B
+		/// tkmãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒ³ã‚¯ã‹ã‚‰å–å¾—ã€‚
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒX</param>
-		/// <returns>tkmƒtƒ@ƒCƒ‹Bnullptr‚ª•Ô‚Á‚Ä‚«‚½‚çƒoƒ“ƒN‚É“o˜^‚³‚ê‚Ä‚¢‚È‚¢B</returns>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
+		/// <returns>tkmãƒ•ã‚¡ã‚¤ãƒ«ã€‚nullptrãŒè¿”ã£ã¦ããŸã‚‰ãƒãƒ³ã‚¯ã«ç™»éŒ²ã•ã‚Œã¦ã„ãªã„ã€‚</returns>
 		TkmFile* GetTkmFileFromBank(const char* filePath)
 		{
 			return m_tkmFileBank.Get(filePath);
 		}
 		/// <summary>
-		/// tkmƒtƒ@ƒCƒ‹‚ğƒoƒ“ƒN‚É“o˜^B
+		/// tkmãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒ³ã‚¯ã«ç™»éŒ²ã€‚
 		/// </summary>
-		/// <param name="filePath">tkmƒtƒ@ƒCƒ‹ƒpƒX</param>
+		/// <param name="filePath">tkmãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
 		/// <param name="tkmFile"></param>
 		void RegistTkmFileToBank(const char* filePath, TkmFile* tkmFile)
 		{
 			m_tkmFileBank.Regist(filePath, tkmFile);
 		}
 		/// <summary>
-		/// tkaƒtƒ@ƒCƒ‹‚ğƒoƒ“ƒN‚©‚çæ“¾B
+		/// tkaãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒ³ã‚¯ã‹ã‚‰å–å¾—ã€‚
 		/// </summary>
 		/// <param name="filePath"></param>
 		/// <returns></returns>
@@ -105,7 +112,7 @@ namespace nsK2EngineLow {
 			return m_tkaFileBank.Get(filePath);
 		}
 		/// <summary>
-		/// tkaƒtƒ@ƒCƒ‹‚ğƒoƒ“ƒN‚É“o˜^B
+		/// tkaãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒãƒ³ã‚¯ã«ç™»éŒ²ã€‚
 		/// </summary>
 		/// <param name="filePath"></param>
 		/// <param name="tkaFile"></param>
@@ -114,7 +121,7 @@ namespace nsK2EngineLow {
 			m_tkaFileBank.Regist(filePath, tkaFile);
 		}
 		/// <summary>
-		/// ƒVƒF[ƒ_[ƒtƒ@ƒCƒ‹ƒoƒ“ƒN‚©‚çƒVƒF[ƒ_[‚ğæ“¾B
+		/// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒ³ã‚¯ã‹ã‚‰ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’å–å¾—ã€‚
 		/// </summary>
 		/// <param name="filePath"></param>
 		/// <returns></returns>
@@ -125,19 +132,19 @@ namespace nsK2EngineLow {
 			return m_shaderBank.Get(programName.c_str());
 		}
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚ğƒoƒ“ƒN‚É“o˜^B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒãƒ³ã‚¯ã«ç™»éŒ²ã€‚
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
-		/// <param name="texture">ƒeƒNƒXƒ`ƒƒB</param>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+		/// <param name="texture">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚</param>
 		void RegistTextureToBank(const char* filePath, Texture* texture)
 		{
 			m_textureBank.Regist(filePath, texture);
 		}
 		/// <summary>
-		/// ƒoƒ“ƒN‚©‚çƒeƒNƒXƒ`ƒƒ‚ğæ“¾B
+		/// ãƒãƒ³ã‚¯ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
-		/// <returns>ƒeƒNƒXƒ`ƒƒB</returns>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+		/// <returns>ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚</returns>
 		Texture* GetTextureFromBank(const char* filePath)
 		{
 			return m_textureBank.Get(filePath);
@@ -154,25 +161,25 @@ namespace nsK2EngineLow {
 			m_shaderBank.Regist(programName.c_str(), shader);
 		}
 		/// <summary>
-		/// ƒoƒ“ƒN‚©‚çƒeƒNƒXƒ`ƒƒ‚Ì¶ƒf[ƒ^‚ğæ“¾
+		/// ãƒãƒ³ã‚¯ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”Ÿãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒX</param>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹</param>
 		/// <returns></returns>
 		LowTexture* GetLowTextureFromBank(const char* filePath)
 		{
 			return m_lowTextureBank.Get(filePath);
 		}
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚Ì¶ƒf[ƒ^‚ğƒoƒ“ƒN‚É“o˜^B
+		/// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”Ÿãƒ‡ãƒ¼ã‚¿ã‚’ãƒãƒ³ã‚¯ã«ç™»éŒ²ã€‚
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
-		/// <param name="texture">ƒeƒNƒXƒ`ƒƒB</param>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
+		/// <param name="texture">ãƒ†ã‚¯ã‚¹ãƒãƒ£ã€‚</param>
 		void RegistLowTextureToBank(const char* filePath, LowTexture* textureLow)
 		{
 			m_lowTextureBank.Regist(filePath, textureLow);
 		}
 		/// <summary>
-		/// Œ»İ‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg‚ÉŠÖ‚·‚éî•ñ‚ğæ“¾
+		/// ç¾åœ¨ã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã«é–¢ã™ã‚‹æƒ…å ±ã‚’å–å¾—
 		/// </summary>
 		/// <returns></returns>
 		const FrameRateInfo& GetFrameRateInfo() const
@@ -180,46 +187,46 @@ namespace nsK2EngineLow {
 			return m_frameRateInfo;
 		}
 		/// <summary>
-		/// ƒtƒŒ[ƒ€ƒŒ[ƒgƒ‚[ƒh‚ğİ’è‚·‚éB
+		/// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆãƒ¢ãƒ¼ãƒ‰ã‚’è¨­å®šã™ã‚‹ã€‚
 		/// </summary>
-		/// <param name="frameRateMode">EnFrameRateMode‚ğQÆ</param>
-		/// <param name="maxFPS">Å‘åFPS</param>
+		/// <param name="frameRateMode">EnFrameRateModeã‚’å‚ç…§</param>
+		/// <param name="maxFPS">æœ€å¤§FPS</param>
 		void SetFrameRateMode(EnFrameRateMode frameRateMode, int maxFPS)
 		{
 			if (frameRateMode == enFrameRateMode_Fix) {
-				// ŒÅ’èƒtƒŒ[ƒ€ƒŒ[ƒg
-				// 1ƒtƒŒ[ƒ€‚ÌŒo‰ßŠÔ‚Ì’l‚ğŒÅ’è‚É‚·‚éB
+				// å›ºå®šãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ
+				// 1ãƒ•ãƒ¬ãƒ¼ãƒ ã®çµŒéæ™‚é–“ã®å€¤ã‚’å›ºå®šã«ã™ã‚‹ã€‚
 				m_gameTime.EnableFixedFrameDeltaTime(1.0f / maxFPS);
 			}
 			else {
-				// ‰Â•ÏƒtƒŒ[ƒ€ƒŒ[ƒg
+				// å¯å¤‰ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ
 				m_gameTime.DisableFixedFrameDeltaTime();
 			}
 			m_fpsLimitter.SetMaxFPS(maxFPS);
-			// ƒtƒŒ[ƒ€ƒŒ[ƒg‚ÉŠÖ‚·‚éî•ñ‚ğ‹L‰¯B
+			// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã«é–¢ã™ã‚‹æƒ…å ±ã‚’è¨˜æ†¶ã€‚
 			m_frameRateInfo.frameRateMode = frameRateMode;
 			m_frameRateInfo.maxFPS = maxFPS;
 		}
-		
+
 	private:
 #ifdef K2_DEBUG
 		std::unique_ptr<Font> m_fpsFont;
 		std::unique_ptr<Font> m_fpsFontShadow;
 #endif
-		GraphicsEngine* m_graphicsEngine = nullptr;		// ƒOƒ‰ƒtƒBƒbƒNƒGƒ“ƒWƒ“B
-		TResourceBank<TkmFile> m_tkmFileBank;			// tkmƒtƒ@ƒCƒ‹ƒoƒ“ƒNB
-		TResourceBank<Shader> m_shaderBank;				// ƒVƒF[ƒ_[ƒoƒ“ƒN
-		TResourceBank<Texture>	m_textureBank;			// ƒeƒNƒXƒ`ƒƒƒoƒ“ƒNB
-		TResourceBank<LowTexture> m_lowTextureBank;		// ƒeƒNƒXƒ`ƒƒ‚Ì¶ƒf[ƒ^ƒoƒ“ƒNB
-		TResourceBank<TksFile> m_tksFileBank;			// TKSƒtƒ@ƒCƒ‹ƒoƒ“ƒNB
-		TResourceBank<TkaFile> m_tkaFileBank;			// TKAƒtƒ@ƒCƒ‹ƒoƒ“ƒNB
-		GamePad m_pad[GamePad::CONNECT_PAD_MAX];		// ƒQ[ƒ€ƒpƒbƒhB
+		GraphicsEngine* m_graphicsEngine = nullptr;		// ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ã‚¨ãƒ³ã‚¸ãƒ³ã€‚
+		TResourceBank<TkmFile> m_tkmFileBank;			// tkmãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒ³ã‚¯ã€‚
+		TResourceBank<Shader> m_shaderBank;				// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ãƒãƒ³ã‚¯
+		TResourceBank<Texture>	m_textureBank;			// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒ³ã‚¯ã€‚
+		TResourceBank<LowTexture> m_lowTextureBank;		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç”Ÿãƒ‡ãƒ¼ã‚¿ãƒãƒ³ã‚¯ã€‚
+		TResourceBank<TksFile> m_tksFileBank;			// TKSãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒ³ã‚¯ã€‚
+		TResourceBank<TkaFile> m_tkaFileBank;			// TKAãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒ³ã‚¯ã€‚
+		GamePad m_pad[GamePad::CONNECT_PAD_MAX];		// ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã€‚
 		GameTime m_gameTime;
-		FPSLimitter m_fpsLimitter;						// FPS‚É§ŒÀ‚ğ‚©‚¯‚éˆ—B
-		FrameRateInfo m_frameRateInfo = { enFrameRateMode_Variable , 60};
+		FPSLimitter m_fpsLimitter;						// FPSã«åˆ¶é™ã‚’ã‹ã‘ã‚‹å‡¦ç†ã€‚
+		FrameRateInfo m_frameRateInfo = { enFrameRateMode_Variable , 60 };
 	};
 
-	extern K2EngineLow* g_engine;	// ’áƒŒƒxƒ‹K2ƒGƒ“ƒWƒ“B
+	extern K2EngineLow* g_engine;	// ä½ãƒ¬ãƒ™ãƒ«K2ã‚¨ãƒ³ã‚¸ãƒ³ã€‚
 	extern GameTime* g_gameTime;
 }
 

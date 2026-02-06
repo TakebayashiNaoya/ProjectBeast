@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "DescriptorHeap.h"
 #include "RaytracingInstance.h"
@@ -12,57 +12,117 @@ namespace nsK2EngineLow {
 	class Model;
 	namespace raytracing {
 
+		/// <summary>
+		/// 初期化情報
+		/// </summary>
+		struct InitData {
+			void* m_expandShaderResource;			// 拡張シェーダーリソースの配列。
+			int		m_expandShaderResourceSize;		// 拡張シェーダーリソースのサイズの配列。
+			DXGI_FORMAT m_outputColorBufferFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;	// レイトレの結果を出力するカラーバッファのフォーマット。
+		};
+		/// <summary>
+		/// 拡張シェーダーリソース
+		/// </summary>
+		struct ExpanadSRV {
+			void Init(void* srcData, int srcDataSize)
+			{
+				m_srcData = srcData;
+				m_srcDataSize = srcDataSize;
+				m_structuredBuffer.Init(srcDataSize, 1, srcData, false);
+			}
+			void* m_srcData = nullptr;				// ソースデータ。
+			int m_srcDataSize = 0;					// ソースデータのサイズ。
+			StructuredBuffer m_structuredBuffer;	// ストラクチャードバッファ。
+		};
+		using ExpanadSRVPtr = std::unique_ptr< ExpanadSRV>;
 
 		class Engine : public Noncopyable
 		{
 		public:
+
 			/// <summary>
-			/// ���C�g���[�V���O���f�B�X�p�b�`�B
+			/// 初期化。
 			/// </summary>
-			/// <param name="rc">�����_�����O�R���e�L�X�g</param>
+			/// <param name="initData">初期化データ</param>
+			void Init(const InitData& initData);
+			/// <summary>
+			/// レイトレーシングをディスパッチ。
+			/// </summary>
+			/// <param name="rc">レンダリングコンテキスト</param>
 			void Dispatch(RenderContext& rc);
 			/// <summary>
-			/// �W�I���g����o�^�B
+			/// レイトレワールドの再構築リクエスト
 			/// </summary>
-			/// <param name="model">���f��</param>
-			void RegistGeometry(Model& model)
+			void RequestRebuildRaytracingWorld()
 			{
-				//���C�g�����[���h�ɃW�I���g����o�^�B
-				m_world.RegistGeometry(model);
+				m_isDirty = true;
 			}
 			/// <summary>
-			/// �W�I���g���̓o�^���m��B
+			/// ジオメトリを登録。
+			/// </summary>
+			/// <param name="model">ジオメトリの元となるモデル</param>
+			void RegistGeometry(Model& model)
+			{
+				//レイトレワールドにジオメトリを登録。
+				m_world.RegistGeometry(model);
+				RequestRebuildRaytracingWorld();
+			}
+			/// <summary>
+			/// ジオメトリを削除
+			/// </summary>
+			/// <param name="model">ジオメトリの元となったモデル</param>
+			void RemoveGeometry(Model& model)
+			{
+				m_world.RemoveGeometry(model);
+				RequestRebuildRaytracingWorld();
+			}
+			/// <summary>
+			/// スカイキューブボックスを設定。
+			/// </summary>
+			/// <param name="skycubeBox"></param>
+			void SetSkyCubeBox(Texture& skycubeBox)
+			{
+				if (skycubeBox.Get() != nullptr) {
+					m_skycubeBox.IniteFromTexture(skycubeBox);
+					RequestRebuildRaytracingWorld();
+				}
+			}
+			/// <summary>
+			/// レイトレの結果の出力先となるテクスチャを取得。
+			/// </summary>
+			/// <returns></returns>
+			Texture& GetOutputTexture()
+			{
+				return m_outputTexture;
+			}
+		private:
+			/// <summary>
+			/// ジオメトリの登録を確定。
 			/// </summary>
 			void CommitRegistGeometry(RenderContext& rc);
-		private:
 			/// <summary>
-			/// �V�F�[�_�[�e�[�u�����쐬�B
-			/// </summary>
-			/// <param name="rc"></param>
-			void CreateShaderTable(RenderContext& rc);
-
-			/// <summary>
-			/// �V�F�[�_�[���\�[�X���쐬�B
-			/// </summary>
-			void CreateShaderResources();
-
-		private:
-			/// <summary>
-			/// �J����
+			/// レイトレーシングで使用するカメラ構造体。
+			/// この中身を変更したら、Assets/shader/raytracing.fxも変更するように。
 			/// </summary>
 			struct Camera {
-				Matrix mRot;	//��]�s��
-				Vector3 pos;	//���_�B
-				float aspect;	//�A�X�y�N�g��B
-				float fFar;		//�����ʁB
-				float fNear;	//�ߕ��ʁB
+				Matrix mViewProjInv;	// ビュープロジェクション行列の逆行列
+				Vector3 pos;			// 視点。
+				float aspect;			// アスペクト比。
+				float fFar;				// 遠平面。
+				float fNear;			// 近平面。
+				float pad[2];			// パディング。
 			};
-			ConstantBuffer m_rayGenerationCB;			//���C�W�F�l���[�V�����̒萔�o�b�t�@�B
-			World m_world;								//���C�g�����[���h�B
-			PSO m_pipelineStateObject;					//�p�C�v���C���X�e�[�g�I�u�W�F�N�g
-			ShaderTable m_shaderTable;					//�V�F�[�_�[�e�[�u���B
-			DescriptorHeaps m_descriptorHeaps;			//���C�g���Ŏg�p����f�B�X�N���v�^�q�[�v�̊Ǘ��ҁB
-			GPUBuffer m_outputResource;					//���C�g���[�X�̌��ʂ̏o�͐�B
+			ExpanadSRVPtr m_expandSRV[2];						// 拡張シェーダーリソースビュー。
+			ConstantBuffer m_rayGenerationCB[2];				// レイジェネレーションの定数バッファ。
+			World m_world;										// レイトレワールド。
+			PSO m_pipelineStateObject[2];						// パイプラインステートオブジェクト
+			ShaderTable m_shaderTable[2];						// シェーダーテーブル。
+			DescriptorHeaps m_descriptorHeaps[2];				// レイトレで使用するディスクリプタヒープの管理者。
+			GPUBuffer m_outputResource;							// レイトレースの結果の出力先。
+			Texture m_outputTexture;							// レイトレースの結果の出力先(テクスチャ)
+			Texture m_skycubeBox;								// スカイキューブボックス。
+			bool m_isDirty = false;								// ダーティフラグ。
 		};
 	}//namespace raytracing
 }//namespace nsK2EngineLow 
+

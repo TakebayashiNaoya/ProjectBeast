@@ -1,5 +1,5 @@
-/*!
- * @brief	waveƒtƒ@ƒCƒ‹B
+ï»¿/*!
+ * @brief	waveãƒ•ã‚¡ã‚¤ãƒ«ã€‚
  */
 
 #include "k2EngineLowPreCompile.h"
@@ -22,11 +22,11 @@ namespace nsK2EngineLow {
 		m_filePath = fileName;
 		m_hmmio = mmioOpenA(const_cast<char*>(fileName), NULL, MMIO_ALLOCBUF | MMIO_READ);
 		if (m_hmmio == NULL) {
-			//TK_WARNING_MESSAGE_BOX("waveƒtƒ@ƒCƒ‹‚ÌƒI[ƒvƒ“‚É¸”s‚µ‚Ü‚µ‚½BfilePath : %s\n"
-							/*"Œ´ˆö‚Æ‚µ‚Ä‰º‹L‚Ì‚Q“_‚ªl‚¦‚ç‚ê‚Ü‚·B\n"
-							"‡@@ƒtƒ@ƒCƒ‹ƒpƒX‚ªŠÔˆá‚Á‚Ä‚¢‚éB\n"
-							"‡A@ƒtƒ@ƒCƒ‹‚ªAssetsƒtƒHƒ‹ƒ_‚Ì’†‚É‚È‚¢B\n"
-							"ã‹L‚Q“_‚ğŠm”F‚µ‚ÄA–â‘è‚ª‚È‚¢ê‡‚Íˆê“xVisualStudio‚Ìƒrƒ‹ƒh/ƒŠƒrƒ‹ƒh‚ğs‚Á‚Ä‚İ‚Ä‚­‚¾‚³‚¢B\n", fileName);*/
+			//TK_WARNING_MESSAGE_BOX("waveãƒ•ã‚¡ã‚¤ãƒ«ã®ã‚ªãƒ¼ãƒ—ãƒ³ã«å¤±æ•—ã—ã¾ã—ãŸã€‚filePath : %s\n"
+							/*"åŸå› ã¨ã—ã¦ä¸‹è¨˜ã®ï¼’ç‚¹ãŒè€ƒãˆã‚‰ã‚Œã¾ã™ã€‚\n"
+							"â‘ ã€€ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ãŒé–“é•ã£ã¦ã„ã‚‹ã€‚\n"
+							"â‘¡ã€€ãƒ•ã‚¡ã‚¤ãƒ«ãŒAssetsãƒ•ã‚©ãƒ«ãƒ€ã®ä¸­ã«ãªã„ã€‚\n"
+							"ä¸Šè¨˜ï¼’ç‚¹ã‚’ç¢ºèªã—ã¦ã€å•é¡ŒãŒãªã„å ´åˆã¯ä¸€åº¦VisualStudioã®ãƒ“ãƒ«ãƒ‰/ãƒªãƒ“ãƒ«ãƒ‰ã‚’è¡Œã£ã¦ã¿ã¦ãã ã•ã„ã€‚\n", fileName);*/
 							//TK_WARNING("Failed mmioOpen");
 			return false;
 		}
@@ -121,7 +121,7 @@ namespace nsK2EngineLow {
 	}
 	void WaveFile::ResetFile()
 	{
-		while (!m_isReadEnd) {}	//“Ç‚İ‚İ’†‚ÉƒŠƒZƒbƒg‚Í‚³‚¹‚È‚¢B
+		while (!m_isReadEnd) {}	//èª­ã¿è¾¼ã¿ä¸­ã«ãƒªã‚»ãƒƒãƒˆã¯ã•ã›ãªã„ã€‚
 		if (m_hmmio == NULL)
 			return;
 
@@ -200,10 +200,10 @@ namespace nsK2EngineLow {
 		}
 		m_isReadEnd = false;
 
-		//“Ç‚İ‚İƒXƒŒƒbƒh‚ğ—§‚Ä‚éB
+		//èª­ã¿è¾¼ã¿ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’ç«‹ã¦ã‚‹ã€‚
 		m_readAsyncThread = std::thread([this, pBuffer, sizeToRead, currentReadSize] {
 			this->Read(pBuffer, sizeToRead, currentReadSize);
-		});
+			});
 		m_isInvokeReadAsyncThread = true;
 	}
 	void WaveFile::Release()

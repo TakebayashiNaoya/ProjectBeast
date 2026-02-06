@@ -1,33 +1,33 @@
-#pragma once
+ï»¿#pragma once
 
 namespace nsK2EngineLow {
 	namespace nsAI {
 		class NaviMesh;
 		/// <summary>
-		/// ƒpƒX‚ğˆµ‚¤ƒNƒ‰ƒXB
+		/// ãƒ‘ã‚¹ã‚’æ‰±ã†ã‚¯ãƒ©ã‚¹ã€‚
 		/// </summary>
-		class Path{
+		class Path {
 		public:
 			/// <summary>
-			/// ƒpƒXã‚ğˆÚ“®‚·‚éB
+			/// ãƒ‘ã‚¹ä¸Šã‚’ç§»å‹•ã™ã‚‹ã€‚
 			/// </summary>
-			/// <param name="pos">ˆÚ“®‚³‚¹‚éÀ•W</param>
-			/// <param name="moveSpeed">ˆÚ“®‘¬“x</param>
-			/// <param name="isEnd">ƒpƒXˆÚ“®I—¹‚µ‚½‚çtrue‚ªİ’è‚³‚ê‚é</param>
+			/// <param name="pos">ç§»å‹•ã•ã›ã‚‹åº§æ¨™</param>
+			/// <param name="moveSpeed">ç§»å‹•é€Ÿåº¦</param>
+			/// <param name="isEnd">ãƒ‘ã‚¹ç§»å‹•çµ‚äº†ã—ãŸã‚‰trueãŒè¨­å®šã•ã‚Œã‚‹</param>
 			/// <param name="physicsWorld">
-			/// •¨—ƒ[ƒ‹ƒhB
-			/// •¨—ƒ[ƒ‹ƒh‚ªw’è‚³‚ê‚Ä‚¢‚é‚ÆAƒpƒXˆÚ“®Œã‚É’n–Ê‚ÉƒŒƒCƒLƒƒƒXƒg‚ğs‚¢A
-			/// À•W‚ğ’n–Ê‚ÉƒXƒiƒbƒv‚µ‚Ü‚·B
+			/// ç‰©ç†ãƒ¯ãƒ¼ãƒ«ãƒ‰ã€‚
+			/// ç‰©ç†ãƒ¯ãƒ¼ãƒ«ãƒ‰ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã¨ã€ãƒ‘ã‚¹ç§»å‹•å¾Œã«åœ°é¢ã«ãƒ¬ã‚¤ã‚­ãƒ£ã‚¹ãƒˆã‚’è¡Œã„ã€
+			/// åº§æ¨™ã‚’åœ°é¢ã«ã‚¹ãƒŠãƒƒãƒ—ã—ã¾ã™ã€‚
 			/// </param>
-			/// <returns>ˆÚ“®Œã‚ÌÀ•W</returns>
-			Vector3 Move( 
-				Vector3 pos, 
-				float moveSpeed, 
+			/// <returns>ç§»å‹•å¾Œã®åº§æ¨™</returns>
+			Vector3 Move(
+				Vector3 pos,
+				float moveSpeed,
 				bool& isEnd,
 				PhysicsWorld* physicsWorld = nullptr
 			);
 			/// <summary>
-			/// ƒNƒŠƒA
+			/// ã‚¯ãƒªã‚¢
 			/// </summary>
 			void Clear()
 			{
@@ -36,30 +36,30 @@ namespace nsK2EngineLow {
 				m_sectionArray.clear();
 			}
 			/// <summary>
-			/// ƒ|ƒCƒ“ƒg‚Ì’Ç‰ÁB
+			/// ãƒã‚¤ãƒ³ãƒˆã®è¿½åŠ ã€‚
 			/// </summary>
-			/// <param name="point">ƒ|ƒCƒ“ƒg</param>
+			/// <param name="point">ãƒã‚¤ãƒ³ãƒˆ</param>
 			void AddPoint(const Vector3& point)
 			{
 				m_pointArray.push_back(point);
 			}
 			/// <summary>
-			/// ƒpƒX‚ğ\’zB
+			/// ãƒ‘ã‚¹ã‚’æ§‹ç¯‰ã€‚
 			/// </summary>
 			void Build();
 		private:
 			/// <summary>
-			/// ƒpƒX‚ÌƒZƒNƒVƒ‡ƒ“
+			/// ãƒ‘ã‚¹ã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 			/// </summary>
 			struct SSection {
-				Vector3 startPos;	// ƒZƒNƒVƒ‡ƒ“‚ÌŠJnÀ•WB
-				Vector3 endPos;		// ƒZƒNƒVƒ‡ƒ“‚ÌI—¹À•WB
-				Vector3 direction;	// ƒZƒNƒVƒ‡ƒ“‚Ì•ûŒüB
-				float length;		// ƒZƒNƒVƒ‡ƒ“‚Ì’·‚³B
+				Vector3 startPos;	// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®é–‹å§‹åº§æ¨™ã€‚
+				Vector3 endPos;		// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®çµ‚äº†åº§æ¨™ã€‚
+				Vector3 direction;	// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®æ–¹å‘ã€‚
+				float length;		// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®é•·ã•ã€‚
 			};
-			std::vector<Vector3>	m_pointArray;	// ƒ|ƒCƒ“ƒg‚Ì”z—ñ
-			std::vector< SSection >	m_sectionArray;	// ƒZƒNƒVƒ‡ƒ“‚Ì”z—ñB
-			int m_sectionNo = 0;					// ƒZƒNƒVƒ‡ƒ“”Ô†B
+			std::vector<Vector3>	m_pointArray;	// ãƒã‚¤ãƒ³ãƒˆã®é…åˆ—
+			std::vector< SSection >	m_sectionArray;	// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®é…åˆ—ã€‚
+			int m_sectionNo = 0;					// ã‚»ã‚¯ã‚·ãƒ§ãƒ³ç•ªå·ã€‚
 		};
 	}
 }

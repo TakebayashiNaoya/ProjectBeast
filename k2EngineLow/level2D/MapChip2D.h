@@ -1,38 +1,38 @@
-#pragma once
+ï»¿#pragma once
 
 namespace nsK2EngineLow {
 	struct CaslData;
 	/// <summary>
-	/// ƒ}ƒbƒvƒ`ƒbƒv2DB
+	/// ãƒãƒƒãƒ—ãƒãƒƒãƒ—2Dã€‚
 	/// </summary>
 	class MapChip2D : public Noncopyable
 	{
 	public:
 		/// <summary>
-		/// ‰Šú‰»B
+		/// åˆæœŸåŒ–ã€‚
 		/// </summary>
-		/// <param name="caslData">Caslƒf[ƒ^B</param>
+		/// <param name="caslData">Caslãƒ‡ãƒ¼ã‚¿ã€‚</param>
 		void Init(CaslData* caslData);
 		/// <summary>
-		/// XVˆ—B
+		/// æ›´æ–°å‡¦ç†ã€‚
 		/// </summary>
 		void Update()
 		{
-			m_sprite.Update(m_position, m_rotation, m_scale,m_pivot);
+			m_sprite.Update(m_position, m_rotation, m_scale, m_pivot);
 		}
 		/// <summary>
-		/// ƒXƒvƒ‰ƒCƒg‚ğ•`‰æ‚·‚éB
+		/// ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚’æç”»ã™ã‚‹ã€‚
 		/// </summary>
-		/// <param name="renderContext">ƒŒƒ“ƒ_[ƒRƒ“ƒeƒLƒXƒgB</param>
+		/// <param name="renderContext">ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã€‚</param>
 		void Draw(RenderContext& renderContext)
 		{
 			m_sprite.Draw(renderContext);
 		}
 	private:
-		Vector3 m_position;							//À•WB
-		Quaternion m_rotation;						//‰ñ“]B
-		Vector3 m_scale = g_vec3One;				//‘å‚«‚³B
-		Sprite m_sprite;							//ƒXƒvƒ‰ƒCƒgB
-		Vector2 m_pivot = Sprite::DEFAULT_PIVOT;	//ƒsƒ{ƒbƒgB
+		Vector3 m_position;							//åº§æ¨™ã€‚
+		Quaternion m_rotation;						//å›è»¢ã€‚
+		Vector3 m_scale = g_vec3One;				//å¤§ãã•ã€‚
+		Sprite m_sprite;							//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã€‚
+		Vector2 m_pivot = Sprite::DEFAULT_PIVOT;	//ãƒ”ãƒœãƒƒãƒˆã€‚
 	};
 }

@@ -1,5 +1,5 @@
-/*!
-* @brief	ƒLƒƒƒ‰ƒNƒ^‚ÌƒRƒŠƒWƒ‡ƒ“ƒRƒ“ƒgƒ[ƒ‹B
+ï»¿/*!
+* @brief	ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã€‚
 */
 
 #include "k2EngineLowPreCompile.h"
@@ -13,43 +13,43 @@ namespace nsK2EngineLow {
 			vDst.y = vSrc.y();
 			vDst.z = vSrc.z();
 		}
-		//Õ“Ë‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚éŠÖ”ƒIƒuƒWƒFƒNƒg(’n–Ê—p)
+		//è¡çªã—ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(åœ°é¢ç”¨)
 		struct SweepResultGround : public btCollisionWorld::ConvexResultCallback
 		{
-			bool isHit = false;									//Õ“Ëƒtƒ‰ƒOB
-			Vector3 hitPos = Vector3(0.0f, -FLT_MAX, 0.0f);		//Õ“Ë“_B
-			Vector3 startPos;									//ƒŒƒC‚Ìn“_B
-			Vector3 hitNormal;									//Õ“Ë“_‚Ì–@üB
-			btCollisionObject* me = nullptr;					//©•ª©gB©•ª©g‚Æ‚ÌÕ“Ë‚ğœŠO‚·‚é‚½‚ß‚Ìƒƒ“ƒoB
-			float dist = FLT_MAX;								//Õ“Ë“_‚Ü‚Å‚Ì‹——£Bˆê”Ô‹ß‚¢Õ“Ë“_‚ğ‹‚ß‚é‚½‚ßBFLT_MAX‚Í’P¸“x‚Ì•‚“®¬”“_‚ªæ‚è‚¤‚éÅ‘å‚Ì’lB
+			bool isHit = false;									//è¡çªãƒ•ãƒ©ã‚°ã€‚
+			Vector3 hitPos = Vector3(0.0f, -FLT_MAX, 0.0f);		//è¡çªç‚¹ã€‚
+			Vector3 startPos;									//ãƒ¬ã‚¤ã®å§‹ç‚¹ã€‚
+			Vector3 hitNormal;									//è¡çªç‚¹ã®æ³•ç·šã€‚
+			btCollisionObject* me = nullptr;					//è‡ªåˆ†è‡ªèº«ã€‚è‡ªåˆ†è‡ªèº«ã¨ã®è¡çªã‚’é™¤å¤–ã™ã‚‹ãŸã‚ã®ãƒ¡ãƒ³ãƒã€‚
+			float dist = FLT_MAX;								//è¡çªç‚¹ã¾ã§ã®è·é›¢ã€‚ä¸€ç•ªè¿‘ã„è¡çªç‚¹ã‚’æ±‚ã‚ã‚‹ãŸã‚ã€‚FLT_MAXã¯å˜ç²¾åº¦ã®æµ®å‹•å°æ•°ç‚¹ãŒå–ã‚Šã†ã‚‹æœ€å¤§ã®å€¤ã€‚
 
-																//Õ“Ë‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNŠÖ”B
+			//è¡çªã—ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã€‚
 			virtual	btScalar	addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace)
 			{
 				if (convexResult.m_hitCollisionObject == me
 					|| convexResult.m_hitCollisionObject->getUserIndex() == enCollisionAttr_Character
 					|| convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT
 					) {
-					//©•ª‚ÉÕ“Ë‚µ‚½Bor ƒLƒƒƒ‰ƒNƒ^‘®«‚ÌƒRƒŠƒWƒ‡ƒ“‚ÆÕ“Ë‚µ‚½B
+					//è‡ªåˆ†ã«è¡çªã—ãŸã€‚or ã‚­ãƒ£ãƒ©ã‚¯ã‚¿å±æ€§ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³ã¨è¡çªã—ãŸã€‚
 					return 0.0f;
 				}
-				//Õ“Ë“_‚Ì–@ü‚ğˆø‚Á’£‚Á‚Ä‚­‚éB
+				//è¡çªç‚¹ã®æ³•ç·šã‚’å¼•ã£å¼µã£ã¦ãã‚‹ã€‚
 				Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
-				//ã•ûŒü‚Æ–@ü‚Ì‚È‚·Šp“x‚ğ‹‚ß‚éB
+				//ä¸Šæ–¹å‘ã¨æ³•ç·šã®ãªã™è§’åº¦ã‚’æ±‚ã‚ã‚‹ã€‚
 				float angle = hitNormalTmp.y;
 				angle = fabsf(acosf(angle));
-				if (angle < Math::PI * 0.3f		//’n–Ê‚ÌŒXÎ‚ª54“x‚æ‚è¬‚³‚¢‚Ì‚Å’n–Ê‚Æ‚İ‚È‚·B
-					|| convexResult.m_hitCollisionObject->getUserIndex() == enCollisionAttr_Ground //‚à‚µ‚­‚ÍƒRƒŠƒWƒ‡ƒ“‘®«‚ª’n–Ê‚Æw’è‚³‚ê‚Ä‚¢‚éB
+				if (angle < Math::PI * 0.3f		//åœ°é¢ã®å‚¾æ–œãŒ54åº¦ã‚ˆã‚Šå°ã•ã„ã®ã§åœ°é¢ã¨ã¿ãªã™ã€‚
+					|| convexResult.m_hitCollisionObject->getUserIndex() == enCollisionAttr_Ground //ã‚‚ã—ãã¯ã‚³ãƒªã‚¸ãƒ§ãƒ³å±æ€§ãŒåœ°é¢ã¨æŒ‡å®šã•ã‚Œã¦ã„ã‚‹ã€‚
 					) {
-					//Õ“Ë‚µ‚Ä‚¢‚éB
+					//è¡çªã—ã¦ã„ã‚‹ã€‚
 					isHit = true;
 					Vector3 hitPosTmp = *(Vector3*)&convexResult.m_hitPointLocal;
-					//Õ“Ë“_‚Ì‹——£‚ğ‹‚ß‚éBB
+					//è¡çªç‚¹ã®è·é›¢ã‚’æ±‚ã‚ã‚‹ã€‚ã€‚
 					Vector3 vDist;
 					vDist.Subtract(hitPosTmp, startPos);
 					float distTmp = vDist.Length();
 					if (dist > distTmp) {
-						//‚±‚ÌÕ“Ë“_‚Ì•û‚ª‹ß‚¢‚Ì‚ÅAÅ‹ß–T‚ÌÕ“Ë“_‚ğXV‚·‚éB
+						//ã“ã®è¡çªç‚¹ã®æ–¹ãŒè¿‘ã„ã®ã§ã€æœ€è¿‘å‚ã®è¡çªç‚¹ã‚’æ›´æ–°ã™ã‚‹ã€‚
 						hitPos = hitPosTmp;
 						hitNormal = *(Vector3*)&convexResult.m_hitNormalLocal;
 						dist = distTmp;
@@ -58,44 +58,44 @@ namespace nsK2EngineLow {
 				return 0.0f;
 			}
 		};
-		//Õ“Ë‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚éŠÖ”ƒIƒuƒWƒFƒNƒg(•Ç—p)
+		//è¡çªã—ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(å£ç”¨)
 		struct SweepResultWall : public btCollisionWorld::ConvexResultCallback
 		{
-			bool isHit = false;						//Õ“Ëƒtƒ‰ƒOB
-			Vector3 hitPos;							//Õ“Ë“_B
-			Vector3 startPos;						//ƒŒƒC‚Ìn“_B
-			float dist = FLT_MAX;					//Õ“Ë“_‚Ü‚Å‚Ì‹——£Bˆê”Ô‹ß‚¢Õ“Ë“_‚ğ‹‚ß‚é‚½‚ßBFLT_MAX‚Í’P¸“x‚Ì•‚“®¬”“_‚ªæ‚è‚¤‚éÅ‘å‚Ì’lB
-			Vector3 hitNormal;						//Õ“Ë“_‚Ì–@üB
-			btCollisionObject* me = nullptr;		//©•ª©gB©•ª©g‚Æ‚ÌÕ“Ë‚ğœŠO‚·‚é‚½‚ß‚Ìƒƒ“ƒoB
-													//Õ“Ë‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚éƒR[ƒ‹ƒoƒbƒNŠÖ”B
+			bool isHit = false;						//è¡çªãƒ•ãƒ©ã‚°ã€‚
+			Vector3 hitPos;							//è¡çªç‚¹ã€‚
+			Vector3 startPos;						//ãƒ¬ã‚¤ã®å§‹ç‚¹ã€‚
+			float dist = FLT_MAX;					//è¡çªç‚¹ã¾ã§ã®è·é›¢ã€‚ä¸€ç•ªè¿‘ã„è¡çªç‚¹ã‚’æ±‚ã‚ã‚‹ãŸã‚ã€‚FLT_MAXã¯å˜ç²¾åº¦ã®æµ®å‹•å°æ•°ç‚¹ãŒå–ã‚Šã†ã‚‹æœ€å¤§ã®å€¤ã€‚
+			Vector3 hitNormal;						//è¡çªç‚¹ã®æ³•ç·šã€‚
+			btCollisionObject* me = nullptr;		//è‡ªåˆ†è‡ªèº«ã€‚è‡ªåˆ†è‡ªèº«ã¨ã®è¡çªã‚’é™¤å¤–ã™ã‚‹ãŸã‚ã®ãƒ¡ãƒ³ãƒã€‚
+			//è¡çªã—ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã€‚
 			virtual	btScalar	addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace)
 			{
 				if (convexResult.m_hitCollisionObject == me
 					|| convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT
 					) {
-					//©•ª‚ÉÕ“Ë‚µ‚½Bor ’n–Ê‚ÉÕ“Ë‚µ‚½B
+					//è‡ªåˆ†ã«è¡çªã—ãŸã€‚or åœ°é¢ã«è¡çªã—ãŸã€‚
 					return 0.0f;
 				}
-				//Õ“Ë“_‚Ì–@ü‚ğˆø‚Á’£‚Á‚Ä‚­‚éB
+				//è¡çªç‚¹ã®æ³•ç·šã‚’å¼•ã£å¼µã£ã¦ãã‚‹ã€‚
 				Vector3 hitNormalTmp;
 				Vector3CopyFrom(hitNormalTmp, convexResult.m_hitNormalLocal);
 
-				//ã•ûŒü‚ÆÕ“Ë“_‚Ì–@ü‚Ì‚È‚·Šp“x‚ğ‹‚ß‚éB
+				//ä¸Šæ–¹å‘ã¨è¡çªç‚¹ã®æ³•ç·šã®ãªã™è§’åº¦ã‚’æ±‚ã‚ã‚‹ã€‚
 				float angle = fabsf(acosf(hitNormalTmp.y));
-				if (angle >= Math::PI * 0.3f		//’n–Ê‚ÌŒXÎ‚ª54“xˆÈã‚È‚Ì‚Å•Ç‚Æ‚İ‚È‚·B
-					|| convexResult.m_hitCollisionObject->getUserIndex() == enCollisionAttr_Character	//‚à‚µ‚­‚ÍƒRƒŠƒWƒ‡ƒ“‘®«‚ªƒLƒƒƒ‰ƒNƒ^‚È‚Ì‚Å•Ç‚Æ‚İ‚È‚·B
+				if (angle >= Math::PI * 0.3f		//åœ°é¢ã®å‚¾æ–œãŒ54åº¦ä»¥ä¸Šãªã®ã§å£ã¨ã¿ãªã™ã€‚
+					|| convexResult.m_hitCollisionObject->getUserIndex() == enCollisionAttr_Character	//ã‚‚ã—ãã¯ã‚³ãƒªã‚¸ãƒ§ãƒ³å±æ€§ãŒã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãªã®ã§å£ã¨ã¿ãªã™ã€‚
 					) {
 					isHit = true;
 					Vector3 hitPosTmp;
 					Vector3CopyFrom(hitPosTmp, convexResult.m_hitPointLocal);
 
-					//Œğ“_‚Æ‚Ì‹——£‚ğ’²‚×‚éB
+					//äº¤ç‚¹ã¨ã®è·é›¢ã‚’èª¿ã¹ã‚‹ã€‚
 					Vector3 vDist;
 					vDist.Subtract(hitPosTmp, startPos);
 					vDist.y = 0.0f;
 					float distTmp = vDist.Length();
 					if (distTmp < dist) {
-						//‚±‚ÌÕ“Ë“_‚Ì•û‚ª‹ß‚¢‚Ì‚ÅAÅ‹ß–T‚ÌÕ“Ë“_‚ğXV‚·‚éB
+						//ã“ã®è¡çªç‚¹ã®æ–¹ãŒè¿‘ã„ã®ã§ã€æœ€è¿‘å‚ã®è¡çªç‚¹ã‚’æ›´æ–°ã™ã‚‹ã€‚
 						hitPos = hitPosTmp;
 						dist = distTmp;
 						hitNormal = hitNormalTmp;
@@ -110,20 +110,20 @@ namespace nsK2EngineLow {
 	void CharacterController::Init(float radius, float height, const Vector3& position)
 	{
 		m_position = position;
-		//ƒRƒŠƒWƒ‡ƒ“ì¬B
+		//ã‚³ãƒªã‚¸ãƒ§ãƒ³ä½œæˆã€‚
 		m_radius = radius;
 		m_height = height;
 		m_collider.Init(radius, height);
 
-		//„‘Ì‚ğ‰Šú‰»B
+		//å‰›ä½“ã‚’åˆæœŸåŒ–ã€‚
 		RigidBodyInitData rbInfo;
 		rbInfo.collider = &m_collider;
 		rbInfo.mass = 0.0f;
 		m_rigidBody.Init(rbInfo);
 		btTransform& trans = m_rigidBody.GetBody()->getWorldTransform();
-		//„‘Ì‚ÌˆÊ’u‚ğXVB
+		//å‰›ä½“ã®ä½ç½®ã‚’æ›´æ–°ã€‚
 		trans.setOrigin(btVector3(position.x, position.y + m_height * 0.5f + m_radius, position.z));
-		//@todo –¢‘Î‰Btrans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
+		//@todo æœªå¯¾å¿œã€‚trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
 		m_rigidBody.GetBody()->setUserIndex(enCollisionAttr_Character);
 		m_rigidBody.GetBody()->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
 
@@ -132,70 +132,70 @@ namespace nsK2EngineLow {
 	const Vector3& CharacterController::Execute(Vector3& moveSpeed, float deltaTime)
 	{
 		if (moveSpeed.y > 0.0f) {
-			//‚Á”ò‚Ñ’†‚É‚·‚éB
+			//å¹ã£é£›ã³ä¸­ã«ã™ã‚‹ã€‚
 			m_isJump = true;
 			m_isOnGround = false;
 		}
-		//Ÿ‚ÌˆÚ“®æ‚Æ‚È‚éÀ•W‚ğŒvZ‚·‚éB
+		//æ¬¡ã®ç§»å‹•å…ˆã¨ãªã‚‹åº§æ¨™ã‚’è¨ˆç®—ã™ã‚‹ã€‚
 		Vector3 nextPosition = m_position;
-		//‘¬“x‚©‚ç‚±‚ÌƒtƒŒ[ƒ€‚Å‚ÌˆÚ“®—Ê‚ğ‹‚ß‚éBƒIƒCƒ‰[Ï•ªB
+		//é€Ÿåº¦ã‹ã‚‰ã“ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®ç§»å‹•é‡ã‚’æ±‚ã‚ã‚‹ã€‚ã‚ªã‚¤ãƒ©ãƒ¼ç©åˆ†ã€‚
 		Vector3 addPos = moveSpeed;
 		addPos.Scale(deltaTime);
 		nextPosition.Add(addPos);
 		Vector3 originalXZDir = addPos;
 		originalXZDir.y = 0.0f;
 		originalXZDir.Normalize();
-		//XZ•½–Ê‚Å‚ÌÕ“ËŒŸo‚ÆÕ“Ë‰ğŒˆ‚ğs‚¤B
+		//XZå¹³é¢ã§ã®è¡çªæ¤œå‡ºã¨è¡çªè§£æ±ºã‚’è¡Œã†ã€‚
 		{
 			int loopCount = 0;
 			while (true) {
-				//Œ»İ‚ÌÀ•W‚©‚çŸ‚ÌˆÚ“®æ‚ÖŒü‚©‚¤ƒxƒNƒgƒ‹‚ğ‹‚ß‚éB
+				//ç¾åœ¨ã®åº§æ¨™ã‹ã‚‰æ¬¡ã®ç§»å‹•å…ˆã¸å‘ã‹ã†ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ±‚ã‚ã‚‹ã€‚
 				Vector3 addPos;
 				addPos.Subtract(nextPosition, m_position);
 				Vector3 addPosXZ = addPos;
 				addPosXZ.y = 0.0f;
 				if (addPosXZ.Length() < FLT_EPSILON) {
-					//XZ•½–Ê‚Å“®‚«‚ª‚È‚¢‚Ì‚Å’²‚×‚é•K—v‚È‚µB
-					//FLT_EPSILON‚Í1‚æ‚è‘å‚«‚¢AÅ¬‚Ì’l‚Æ‚Ì·•ª‚ğ•\‚·’è”B
-					//‚Æ‚Ä‚à¬‚³‚¢’l‚Ì‚±‚Æ‚Å‚·B
+					//XZå¹³é¢ã§å‹•ããŒãªã„ã®ã§èª¿ã¹ã‚‹å¿…è¦ãªã—ã€‚
+					//FLT_EPSILONã¯1ã‚ˆã‚Šå¤§ãã„ã€æœ€å°ã®å€¤ã¨ã®å·®åˆ†ã‚’è¡¨ã™å®šæ•°ã€‚
+					//ã¨ã¦ã‚‚å°ã•ã„å€¤ã®ã“ã¨ã§ã™ã€‚
 					break;
 				}
-				//ƒJƒvƒZƒ‹ƒRƒ‰ƒCƒ_[‚Ì’†SÀ•W + ‚‚³*0.1‚ÌÀ•W‚ğposTmp‚É‹‚ß‚éB
+				//ã‚«ãƒ—ã‚»ãƒ«ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®ä¸­å¿ƒåº§æ¨™ + é«˜ã•*0.1ã®åº§æ¨™ã‚’posTmpã«æ±‚ã‚ã‚‹ã€‚
 				Vector3 posTmp = m_position;
 				posTmp.y += m_height * 0.5f + m_radius + m_height * 0.1f;
-				//ƒŒƒC‚ğì¬B
+				//ãƒ¬ã‚¤ã‚’ä½œæˆã€‚
 				btTransform start, end;
 				start.setIdentity();
 				end.setIdentity();
-				//n“_‚ÍƒJƒvƒZƒ‹ƒRƒ‰ƒCƒ_[‚Ì’†SÀ•W + 0.2‚ÌÀ•W‚ğposTmp‚É‹‚ß‚éB
+				//å§‹ç‚¹ã¯ã‚«ãƒ—ã‚»ãƒ«ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®ä¸­å¿ƒåº§æ¨™ + 0.2ã®åº§æ¨™ã‚’posTmpã«æ±‚ã‚ã‚‹ã€‚
 				start.setOrigin(btVector3(posTmp.x, posTmp.y, posTmp.z));
-				//I“_‚ÍŸ‚ÌˆÚ“®æBXZ•½–Ê‚Å‚ÌÕ“Ë‚ğ’²‚×‚é‚Ì‚ÅAy‚ÍposTmp.y‚ğİ’è‚·‚éB
+				//çµ‚ç‚¹ã¯æ¬¡ã®ç§»å‹•å…ˆã€‚XZå¹³é¢ã§ã®è¡çªã‚’èª¿ã¹ã‚‹ã®ã§ã€yã¯posTmp.yã‚’è¨­å®šã™ã‚‹ã€‚
 				end.setOrigin(btVector3(nextPosition.x, posTmp.y, nextPosition.z));
 
 				SweepResultWall callback;
 				callback.me = m_rigidBody.GetBody();
 				callback.startPos = posTmp;
-				//Õ“ËŒŸoB
+				//è¡çªæ¤œå‡ºã€‚
 				PhysicsWorld::GetInstance()->ConvexSweepTest((const btConvexShape*)m_collider.GetBody(), start, end, callback);
 
 				if (callback.isHit) {
-					//“–‚½‚Á‚½B
-					//•ÇB
+					//å½“ãŸã£ãŸã€‚
+					//å£ã€‚
 					Vector3 vT0, vT1;
-					//XZ•½–Êã‚Å‚ÌˆÚ“®Œã‚ÌÀ•W‚ğvT0‚ÉAŒğ“_‚ÌÀ•W‚ğvT1‚Éİ’è‚·‚éB
+					//XZå¹³é¢ä¸Šã§ã®ç§»å‹•å¾Œã®åº§æ¨™ã‚’vT0ã«ã€äº¤ç‚¹ã®åº§æ¨™ã‚’vT1ã«è¨­å®šã™ã‚‹ã€‚
 					vT0.Set(nextPosition.x, 0.0f, nextPosition.z);
 					vT1.Set(callback.hitPos.x, 0.0f, callback.hitPos.z);
-					//‚ß‚è‚İ‚ª”­¶‚µ‚Ä‚¢‚éˆÚ“®ƒxƒNƒgƒ‹‚ğ‹‚ß‚éB
+					//ã‚ã‚Šè¾¼ã¿ãŒç™ºç”Ÿã—ã¦ã„ã‚‹ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ±‚ã‚ã‚‹ã€‚
 					Vector3 vMerikomi;
 					vMerikomi.Subtract(vT0, vT1);
-					//XZ•½–Ê‚Å‚ÌÕ“Ë‚µ‚½•Ç‚Ì–@ü‚ğ‹‚ß‚éBB
+					//XZå¹³é¢ã§ã®è¡çªã—ãŸå£ã®æ³•ç·šã‚’æ±‚ã‚ã‚‹ã€‚ã€‚
 					Vector3 hitNormalXZ = callback.hitNormal;
 					hitNormalXZ.y = 0.0f;
 					hitNormalXZ.Normalize();
-					//‚ß‚è‚İƒxƒNƒgƒ‹‚ğ•Ç‚Ì–@ü‚ÉË‰e‚·‚éB
+					//ã‚ã‚Šè¾¼ã¿ãƒ™ã‚¯ãƒˆãƒ«ã‚’å£ã®æ³•ç·šã«å°„å½±ã™ã‚‹ã€‚
 					float fT0 = hitNormalXZ.Dot(vMerikomi);
-					//‰Ÿ‚µ–ß‚µ•Ô‚·ƒxƒNƒgƒ‹‚ğ‹‚ß‚éB
-					//‰Ÿ‚µ•Ô‚·ƒxƒNƒgƒ‹‚Í•Ç‚Ì–@ü‚ÉË‰e‚³‚ê‚½‚ß‚è‚İƒxƒNƒgƒ‹+”¼ŒaB
+					//æŠ¼ã—æˆ»ã—è¿”ã™ãƒ™ã‚¯ãƒˆãƒ«ã‚’æ±‚ã‚ã‚‹ã€‚
+					//æŠ¼ã—è¿”ã™ãƒ™ã‚¯ãƒˆãƒ«ã¯å£ã®æ³•ç·šã«å°„å½±ã•ã‚ŒãŸã‚ã‚Šè¾¼ã¿ãƒ™ã‚¯ãƒˆãƒ«+åŠå¾„ã€‚
 					Vector3 vOffset;
 					vOffset = hitNormalXZ;
 					vOffset.Scale(-fT0 + m_radius);
@@ -206,15 +206,15 @@ namespace nsK2EngineLow {
 					currentDir.y = 0.0f;
 					currentDir.Normalize();
 					if (currentDir.Dot(originalXZDir) < 0.0f) {
-						//Šp‚É“ü‚Á‚½‚ÌƒLƒƒƒ‰ƒNƒ^‚ÌU“®‚ğ–h~‚·‚é‚½‚ß‚ÉA
-						//ˆÚ“®æ‚ª‹tŒü‚«‚É‚È‚Á‚½‚çˆÚ“®‚ğƒLƒƒƒ“ƒZƒ‹‚·‚éB
+						//è§’ã«å…¥ã£ãŸæ™‚ã®ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã®æŒ¯å‹•ã‚’é˜²æ­¢ã™ã‚‹ãŸã‚ã«ã€
+						//ç§»å‹•å…ˆãŒé€†å‘ãã«ãªã£ãŸã‚‰ç§»å‹•ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹ã€‚
 						nextPosition.x = m_position.x;
 						nextPosition.z = m_position.z;
 						break;
 					}
 				}
 				else {
-					//‚Ç‚±‚Æ‚à“–‚½‚ç‚È‚¢‚Ì‚ÅI‚í‚èB
+					//ã©ã“ã¨ã‚‚å½“ãŸã‚‰ãªã„ã®ã§çµ‚ã‚ã‚Šã€‚
 					break;
 				}
 				loopCount++;
@@ -223,40 +223,40 @@ namespace nsK2EngineLow {
 				}
 			}
 		}
-		//XZ‚ÌˆÚ“®‚ÍŠm’èB
+		//XZã®ç§»å‹•ã¯ç¢ºå®šã€‚
 		m_position.x = nextPosition.x;
 		m_position.z = nextPosition.z;
-		//‰º•ûŒü‚ğ’²‚×‚éB
+		//ä¸‹æ–¹å‘ã‚’èª¿ã¹ã‚‹ã€‚
 		{
 			Vector3 addPos;
 			addPos.Subtract(nextPosition, m_position);
 
-			m_position = nextPosition;	//ˆÚ“®‚Ì‰¼Šm’èB
-										//ƒŒƒC‚ğì¬‚·‚éB
+			m_position = nextPosition;	//ç§»å‹•ã®ä»®ç¢ºå®šã€‚
+			//ãƒ¬ã‚¤ã‚’ä½œæˆã™ã‚‹ã€‚
 			btTransform start, end;
 			start.setIdentity();
 			end.setIdentity();
-			//n“_‚ÍƒJƒvƒZƒ‹ƒRƒ‰ƒCƒ_[‚Ì’†SB
+			//å§‹ç‚¹ã¯ã‚«ãƒ—ã‚»ãƒ«ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®ä¸­å¿ƒã€‚
 			start.setOrigin(btVector3(m_position.x, m_position.y + m_height * 0.5f + m_radius, m_position.z));
-			//I“_‚Í’n–Êã‚É‚¢‚È‚¢ê‡‚Í1m‰º‚ğŒ©‚éB
-			//’n–Êã‚É‚¢‚È‚­‚ÄƒWƒƒƒ“ƒv‚Åã¸’†‚Ìê‡‚Íã¸—Ê‚Ì0.01”{‰º‚ğŒ©‚éB
-			//’n–Êã‚É‚¢‚È‚­‚Ä~‰º’†‚Ìê‡‚Í‚»‚Ì‚Ü‚Ü—‰ºæ‚ğ’²‚×‚éB
+			//çµ‚ç‚¹ã¯åœ°é¢ä¸Šã«ã„ãªã„å ´åˆã¯1mä¸‹ã‚’è¦‹ã‚‹ã€‚
+			//åœ°é¢ä¸Šã«ã„ãªãã¦ã‚¸ãƒ£ãƒ³ãƒ—ã§ä¸Šæ˜‡ä¸­ã®å ´åˆã¯ä¸Šæ˜‡é‡ã®0.01å€ä¸‹ã‚’è¦‹ã‚‹ã€‚
+			//åœ°é¢ä¸Šã«ã„ãªãã¦é™ä¸‹ä¸­ã®å ´åˆã¯ãã®ã¾ã¾è½ä¸‹å…ˆã‚’èª¿ã¹ã‚‹ã€‚
 			Vector3 endPos;
 			Vector3CopyFrom(endPos, start.getOrigin());
 
 			if (m_isOnGround == false) {
 				if (addPos.y > 0.0f) {
-					//ƒWƒƒƒ“ƒv’†‚Æ‚©‚Åã¸’†B
-					//ã¸’†‚Å‚àXZ‚ÉˆÚ“®‚µ‚½Œ‹‰Ê‚ß‚è‚ñ‚Å‚¢‚é‰Â”\«‚ª‚ ‚é‚Ì‚Å‰º‚ğ’²‚×‚éB
+					//ã‚¸ãƒ£ãƒ³ãƒ—ä¸­ã¨ã‹ã§ä¸Šæ˜‡ä¸­ã€‚
+					//ä¸Šæ˜‡ä¸­ã§ã‚‚XZã«ç§»å‹•ã—ãŸçµæœã‚ã‚Šè¾¼ã‚“ã§ã„ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹ã®ã§ä¸‹ã‚’èª¿ã¹ã‚‹ã€‚
 					endPos.y -= addPos.y * 0.01f;
 				}
 				else {
-					//—‰º‚µ‚Ä‚¢‚éê‡‚Í‚»‚Ì‚Ü‚Ü‰º‚ğ’²‚×‚éB
+					//è½ä¸‹ã—ã¦ã„ã‚‹å ´åˆã¯ãã®ã¾ã¾ä¸‹ã‚’èª¿ã¹ã‚‹ã€‚
 					endPos.y += addPos.y;
 				}
 			}
 			else {
-				//’n–Êã‚É‚¢‚È‚¢ê‡‚Í1m‰º‚ğŒ©‚éB
+				//åœ°é¢ä¸Šã«ã„ãªã„å ´åˆã¯1mä¸‹ã‚’è¦‹ã‚‹ã€‚
 				endPos.y -= 100.0f;
 			}
 			end.setOrigin(btVector3(endPos.x, endPos.y, endPos.z));
@@ -264,36 +264,36 @@ namespace nsK2EngineLow {
 			callback.me = m_rigidBody.GetBody();
 			Vector3CopyFrom(callback.startPos, start.getOrigin());
 
-			//Õ“ËŒŸoB
+			//è¡çªæ¤œå‡ºã€‚
 			if (fabsf(endPos.y - callback.startPos.y) > FLT_EPSILON) {
 				PhysicsWorld::GetInstance()->ConvexSweepTest((const btConvexShape*)m_collider.GetBody(), start, end, callback);
 				if (callback.isHit) {
-					//“–‚½‚Á‚½B
+					//å½“ãŸã£ãŸã€‚
 					moveSpeed.y = 0.0f;
 					m_isJump = false;
 					m_isOnGround = true;
 					nextPosition.y = callback.hitPos.y;
 				}
 				else {
-					//’n–Êã‚É‚¢‚È‚¢B
+					//åœ°é¢ä¸Šã«ã„ãªã„ã€‚
 					m_isOnGround = false;
 
 				}
 			}
 		}
-		//ˆÚ“®Šm’èB
+		//ç§»å‹•ç¢ºå®šã€‚
 		m_position = nextPosition;
 		btRigidBody* btBody = m_rigidBody.GetBody();
-		//„‘Ì‚ğ“®‚©‚·B
+		//å‰›ä½“ã‚’å‹•ã‹ã™ã€‚
 		btBody->setActivationState(DISABLE_DEACTIVATION);
 		btTransform& trans = btBody->getWorldTransform();
-		//„‘Ì‚ÌˆÊ’u‚ğXVB
+		//å‰›ä½“ã®ä½ç½®ã‚’æ›´æ–°ã€‚
 		trans.setOrigin(btVector3(m_position.x, m_position.y + m_height * 0.5f + m_radius, m_position.z));
-		//@todo –¢‘Î‰B trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
+		//@todo æœªå¯¾å¿œã€‚ trans.setRotation(btQuaternion(rotation.x, rotation.y, rotation.z));
 		return m_position;
 	}
 	/*!
-	* @brief	€–S‚µ‚½‚±‚Æ‚ğ’Ê’mB
+	* @brief	æ­»äº¡ã—ãŸã“ã¨ã‚’é€šçŸ¥ã€‚
 	*/
 	void CharacterController::RemoveRigidBoby()
 	{

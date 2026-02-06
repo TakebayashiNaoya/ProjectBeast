@@ -1,5 +1,5 @@
-/*!
- * @brief	ƒLƒƒƒ‰ƒNƒ^ƒRƒ“ƒgƒ[ƒ‰[B
+ï»¿/*!
+ * @brief	ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã€‚
  */
 
 #pragma once
@@ -9,10 +9,10 @@
 
 namespace nsK2EngineLow {
 	/*!
-	* @brief	ƒLƒƒƒ‰ƒNƒ^ƒRƒ“ƒgƒ[ƒ‰[B
+	* @brief	ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã€‚
 	*@details
-	* ƒLƒƒƒ‰ƒNƒ^[‚Æ”wŒi‚ÌÕ“Ë‰ğŒˆ‚ğs‚¤‚±‚Æ‚ª‚Å‚«‚Ü‚·B\n
-	* ‰º‹L‚ÌƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚ğQl‚É‚µ‚Ä‚­‚¾‚³‚¢B\n
+	* ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã¨èƒŒæ™¯ã®è¡çªè§£æ±ºã‚’è¡Œã†ã“ã¨ãŒã§ãã¾ã™ã€‚\n
+	* ä¸‹è¨˜ã®ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’å‚è€ƒã«ã—ã¦ãã ã•ã„ã€‚\n
 	* Sample/Sample07
 	*/
 	class CharacterController {
@@ -25,28 +25,28 @@ namespace nsK2EngineLow {
 			RemoveRigidBoby();
 		}
 		/*!
-			* @brief	‰Šú‰»B
-			*@param[in]	radius		ƒJƒvƒZƒ‹ƒRƒ‰ƒCƒ_[‚Ì”¼ŒaB
-			*@param[in]	height		ƒJƒvƒZƒ‹ƒRƒ‰ƒCƒ_[‚Ì‚‚³B
-			*@param[in]	position	‰ŠúˆÊ’uB
+			* @brief	åˆæœŸåŒ–ã€‚
+			*@param[in]	radius		ã‚«ãƒ—ã‚»ãƒ«ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®åŠå¾„ã€‚
+			*@param[in]	height		ã‚«ãƒ—ã‚»ãƒ«ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®é«˜ã•ã€‚
+			*@param[in]	position	åˆæœŸä½ç½®ã€‚
 			*/
 		void Init(float radius, float height, const Vector3& position);
 		/*!
-			* @brief	ÀsB
-			*@param[in, out]	moveSpeed		ˆÚ“®‘¬“xB
-			*@param[in]	deltaTime		Œo‰ßŠÔB’PˆÊ‚Í•bBƒfƒtƒHƒ‹ƒg‚Å‚ÍA‚PƒtƒŒ[ƒ€‚ÌŒo‰ßŠÔ‚ª“n‚³‚ê‚Ä‚¢‚Ü‚·B
-			*@return ˆÚ“®Œã‚ÌƒLƒƒƒ‰ƒNƒ^[‚ÌÀ•WB
+			* @brief	å®Ÿè¡Œã€‚
+			*@param[in, out]	moveSpeed		ç§»å‹•é€Ÿåº¦ã€‚
+			*@param[in]	deltaTime		çµŒéæ™‚é–“ã€‚å˜ä½ã¯ç§’ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ã¯ã€ï¼‘ãƒ•ãƒ¬ãƒ¼ãƒ ã®çµŒéæ™‚é–“ãŒæ¸¡ã•ã‚Œã¦ã„ã¾ã™ã€‚
+			*@return ç§»å‹•å¾Œã®ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®åº§æ¨™ã€‚
 			*/
 		const Vector3& Execute(Vector3& moveSpeed, float deltaTime);
 		/*!
-			* @brief	À•W‚ğæ“¾B
+			* @brief	åº§æ¨™ã‚’å–å¾—ã€‚
 			*/
 		const Vector3& GetPosition() const
 		{
 			return m_position;
 		}
 		/*!
-			* @brief	À•W‚ğİ’èB
+			* @brief	åº§æ¨™ã‚’è¨­å®šã€‚
 			*/
 		void SetPosition(const Vector3& pos)
 		{
@@ -54,45 +54,45 @@ namespace nsK2EngineLow {
 		}
 
 		/*!
-			* @brief	ƒWƒƒƒ“ƒv’†‚©”»’è
+			* @brief	ã‚¸ãƒ£ãƒ³ãƒ—ä¸­ã‹åˆ¤å®š
 			*/
 		bool IsJump() const
 		{
 			return m_isJump;
 		}
 		/*!
-		* @brief	’n–Êã‚É‚¢‚é‚©”»’èB
+		* @brief	åœ°é¢ä¸Šã«ã„ã‚‹ã‹åˆ¤å®šã€‚
 		*/
 		bool IsOnGround() const
 		{
 			return m_isOnGround;
 		}
 		/*!
-		* @brief	ƒRƒ‰ƒCƒ_[‚ğæ“¾B
+		* @brief	ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’å–å¾—ã€‚
 		*/
 		CCapsuleCollider* GetCollider()
 		{
 			return &m_collider;
 		}
 		/*!
-		* @brief	„‘Ì‚ğæ“¾B
+		* @brief	å‰›ä½“ã‚’å–å¾—ã€‚
 		*/
 		RigidBody* GetRigidBody()
 		{
 			return &m_rigidBody;
 		}
 		/*!
-		* @brief	„‘Ì‚ğ•¨—ƒGƒ“ƒWƒ“‚©‚çíœBB
+		* @brief	å‰›ä½“ã‚’ç‰©ç†ã‚¨ãƒ³ã‚¸ãƒ³ã‹ã‚‰å‰Šé™¤ã€‚ã€‚
 		*/
 		void RemoveRigidBoby();
 	private:
-		bool				m_isInited = false;				//!<‰Šú‰»Ï‚İH
-		Vector3 			m_position;						//!<À•WB
-		bool 				m_isJump = false;				//!<ƒWƒƒƒ“ƒv’†H
-		bool				m_isOnGround = true;			//!<’n–Ê‚Ìã‚É‚¢‚éH
-		CCapsuleCollider	m_collider;						//!<ƒRƒ‰ƒCƒ_[B
-		float				m_radius = 0.0f;				//!<ƒJƒvƒZƒ‹ƒRƒ‰ƒCƒ_[‚Ì”¼ŒaB
-		float				m_height = 0.0f;				//!<ƒJƒvƒZƒ‹ƒRƒ‰ƒCƒ_[‚Ì‚‚³B
-		RigidBody			m_rigidBody;					//„‘ÌB
+		bool				m_isInited = false;				//!<åˆæœŸåŒ–æ¸ˆã¿ï¼Ÿ
+		Vector3 			m_position;						//!<åº§æ¨™ã€‚
+		bool 				m_isJump = false;				//!<ã‚¸ãƒ£ãƒ³ãƒ—ä¸­ï¼Ÿ
+		bool				m_isOnGround = true;			//!<åœ°é¢ã®ä¸Šã«ã„ã‚‹ï¼Ÿ
+		CCapsuleCollider	m_collider;						//!<ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã€‚
+		float				m_radius = 0.0f;				//!<ã‚«ãƒ—ã‚»ãƒ«ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®åŠå¾„ã€‚
+		float				m_height = 0.0f;				//!<ã‚«ãƒ—ã‚»ãƒ«ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼ã®é«˜ã•ã€‚
+		RigidBody			m_rigidBody;					//å‰›ä½“ã€‚
 	};
 }

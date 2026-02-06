@@ -1,101 +1,101 @@
-#pragma once
+ï»¿#pragma once
 #include "Effect.h"
 
 namespace nsK2EngineLow {
 	/// <summary>
-	/// ƒGƒtƒFƒNƒg‚ğ”­¶AÄ¶‚·‚éƒNƒ‰ƒXB
+	/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ç™ºç”Ÿã€å†ç”Ÿã™ã‚‹ã‚¯ãƒ©ã‚¹ã€‚
 	/// </summary>
 	class EffectEmitter : public IGameObject
 	{
 	public:
 		/// <summary>
-		/// ƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+		/// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 		/// </summary>
 		EffectEmitter();
 		/// <summary>
-		/// ƒfƒXƒgƒ‰ƒNƒ^B
+		/// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 		/// </summary>
 		~EffectEmitter();
 		/// <summary>
-		/// XVˆ—B
+		/// æ›´æ–°å‡¦ç†ã€‚
 		/// </summary>
 		void Update();
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ğ“Ç‚İ‚ŞB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’èª­ã¿è¾¼ã‚€ã€‚
 		/// </summary>
-		/// <param name="number">EffectEngine::GetInstance()->ResistEffect‚Åw’è‚µ‚½”Ô†B</param>
+		/// <param name="number">EffectEngine::GetInstance()->ResistEffectã§æŒ‡å®šã—ãŸç•ªå·ã€‚</param>
 		void Init(const int number);
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ğÄ¶‚·‚éB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã™ã‚‹ã€‚
 		/// </summary>
 		void Play()
 		{
 			m_effect.Play();
 		}
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ğ’â~‚·‚éB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’åœæ­¢ã™ã‚‹ã€‚
 		/// </summary>
 		void Stop()
 		{
 			m_effect.Stop();
 		}
 		/// <summary>
-		/// À•W‚ğİ’èB
+		/// åº§æ¨™ã‚’è¨­å®šã€‚
 		/// </summary>
-		/// <param name="position">À•WB/param>
+		/// <param name="position">åº§æ¨™ã€‚/param>
 		void SetPosition(const Vector3& position)
 		{
 			m_effect.SetPosition(position);
 		}
 		/// <summary>
-		/// À•W‚ğæ“¾B
+		/// åº§æ¨™ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <returns>À•WB</returns>
+		/// <returns>åº§æ¨™ã€‚</returns>
 		const Vector3& GetPosition() const
 		{
 			return m_effect.GetPosition();
 		}
 		/// <summary>
-		/// ƒXƒP[ƒ‹(Šg‘å—¦‚ğİ’è)B
+		/// ã‚¹ã‚±ãƒ¼ãƒ«(æ‹¡å¤§ç‡ã‚’è¨­å®š)ã€‚
 		/// </summary>
-		/// <param name="scale">ƒXƒP[ƒ‹(Šg‘å—¦)B</param>
+		/// <param name="scale">ã‚¹ã‚±ãƒ¼ãƒ«(æ‹¡å¤§ç‡)ã€‚</param>
 		void SetScale(const Vector3& scale)
 		{
 			m_effect.SetScale(scale);
 		}
 		/// <summary>
-		/// ƒXƒP[ƒ‹(Šg‘å—¦)‚ğæ“¾B
+		/// ã‚¹ã‚±ãƒ¼ãƒ«(æ‹¡å¤§ç‡)ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <returns>ƒXƒP[ƒ‹(Šg‘å—¦)B</returns>
+		/// <returns>ã‚¹ã‚±ãƒ¼ãƒ«(æ‹¡å¤§ç‡)ã€‚</returns>
 		const Vector3& GetScale() const
 		{
 			return m_effect.GetScale();
 		}
 		/// <summary>
-		/// ‰ñ“]‚ğİ’èB
+		/// å›è»¢ã‚’è¨­å®šã€‚
 		/// </summary>
-		/// <param name="rotation">‰ñ“]B</param>
+		/// <param name="rotation">å›è»¢ã€‚</param>
 		void SetRotation(const Quaternion& rotation)
 		{
 			m_effect.SetRotation(rotation);
 		}
 		/// <summary>
-		/// ‰ñ“]‚ğæ“¾B
+		/// å›è»¢ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <returns>‰ñ“]B</returns>
+		/// <returns>å›è»¢ã€‚</returns>
 		const Quaternion& GetRotation() const
 		{
 			m_effect.GetRotation();
 		}
 		/// <summary>
-		/// Ä¶’†‚©‚Ç‚¤‚©‚ğæ“¾B
+		/// å†ç”Ÿä¸­ã‹ã©ã†ã‹ã‚’å–å¾—ã€‚
 		/// </summary>
-		/// <returns>Ä¶’†‚È‚çtrueB</returns>
+		/// <returns>å†ç”Ÿä¸­ãªã‚‰trueã€‚</returns>
 		const bool IsPlay() const
 		{
 			return m_effect.IsPlay();
 		}
 	private:
-		Effect m_effect;					//ƒGƒtƒFƒNƒgB
+		Effect m_effect;					//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã€‚
 	};
 }

@@ -1,15 +1,15 @@
-/*!
- * @brief	ƒRƒŠƒWƒ‡ƒ“‘®«
+ï»¿/*!
+ * @brief	ã‚³ãƒªã‚¸ãƒ§ãƒ³å±æ€§
  */
 #pragma once
 
 namespace nsK2EngineLow {
 	/*!
-	 * @brief	ƒRƒŠƒWƒ‡ƒ“‘®«‚Ì‘å•ª—ŞB
+	 * @brief	ã‚³ãƒªã‚¸ãƒ§ãƒ³å±æ€§ã®å¤§åˆ†é¡ã€‚
 	 */
 	enum EnCollisionAttr {
 		enCollisionAttr_Ground,
 		enCollisionAttr_Character,
-		enCollisionAttr_User,		//ˆÈ‰º‚Éƒ†[ƒU[’è‹`‚ÌƒRƒŠƒWƒ‡ƒ“‘®«‚ğİ’è‚·‚éB
+		enCollisionAttr_User,		//ä»¥ä¸‹ã«ãƒ¦ãƒ¼ã‚¶ãƒ¼å®šç¾©ã®ã‚³ãƒªã‚¸ãƒ§ãƒ³å±æ€§ã‚’è¨­å®šã™ã‚‹ã€‚
 	};
 }

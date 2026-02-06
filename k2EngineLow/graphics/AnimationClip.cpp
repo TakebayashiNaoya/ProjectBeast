@@ -1,5 +1,5 @@
-/*!
-*@brief	ƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒvB
+ï»¿/*!
+*@brief	ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã€‚
 */
 
 #include "k2EngineLowPreCompile.h"
@@ -19,13 +19,13 @@ namespace nsK2EngineLow {
 			m_tkaFile->Load(filePath);
 			g_engine->RegistTkaFileToBank(filePath, m_tkaFile);
 		}
-		
+
 		BuildKeyFramesAndAnimationEvents();
 	}
 
 	void AnimationClip::BuildKeyFramesAndAnimationEvents()
 	{
-		//ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚Ì\’zB
+		//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¤ãƒ™ãƒ³ãƒˆã®æ§‹ç¯‰ã€‚
 		auto numAnimEvent = m_tkaFile->GetNumAnimationEvent();
 		if (numAnimEvent > 0) {
 			m_animationEvent = std::make_unique<AnimationEvent[]>(numAnimEvent);
@@ -37,10 +37,10 @@ namespace nsK2EngineLow {
 				m_animationEvent[eventNo].SetInvokeTime(animEvent.invokeTime);
 				m_animationEvent[eventNo].SetEventName(wEventName);
 				eventNo++;
-			});
+				});
 
 		}
-		//ƒL[ƒtƒŒ[ƒ€î•ñ‚Ì\’zB
+		//ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ æƒ…å ±ã®æ§‹ç¯‰ã€‚
 		m_keyframes.reserve(m_tkaFile->GetNumKeyFrame());
 		m_tkaFile->QueryKeyFrames([&](const TkaFile::KeyFrame& tkaKeyFrame) {
 			auto keyframe = std::make_unique<KeyFrame>();
@@ -53,8 +53,8 @@ namespace nsK2EngineLow {
 				keyframe->transform.m[j][2] = tkaKeyFrame.transform[j].z;
 			}
 			m_keyframes.push_back(std::move(keyframe));
-		});
-		//ƒ{[ƒ“ƒCƒ“ƒfƒbƒNƒX‚²‚Æ‚ÌƒL[ƒtƒŒ[ƒ€‚Ì˜AŒ‹ƒŠƒXƒg‚ðì¬‚·‚éB
+			});
+		//ãƒœãƒ¼ãƒ³ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã”ã¨ã®ã‚­ãƒ¼ãƒ•ãƒ¬ãƒ¼ãƒ ã®é€£çµãƒªã‚¹ãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
 		m_keyFramePtrListArray.resize(MAX_BONE);
 		for (auto& keyframe : m_keyframes) {
 			m_keyFramePtrListArray[keyframe->boneIndex].push_back(keyframe.get());

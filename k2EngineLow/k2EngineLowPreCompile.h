@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #pragma comment( lib, "xinput.lib")
@@ -36,9 +36,13 @@
 
 #include "graphics/d3dx12.h"
 
-const int MAX_RENDERING_TARGET = D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT;	//ƒŒƒ“ƒ_ƒŠƒ“ƒOƒ^[ƒQƒbƒg‚ÌÅ‘å”B
+const int MAX_RENDERING_TARGET = D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT;	//ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æœ€å¤§æ•°ã€‚
 
 using namespace Microsoft::WRL;
+
+#define USE_FPS_LIMITTER		// æœ‰åŠ¹ã§FPSã«ä¸Šé™ã‚’è¨­ã‘ã‚‹ã€‚
+static const int MAX_FPS = 60;	// æœ€å¤§FPSã€‚USE_FPS_LIMITTERãŒæœ‰åŠ¹ãªã¨ãã«ä½¿ç”¨ã•ã‚Œã‚‹ã€‚
+#define ENABLE_DXR_ON_RTX_ONLY	// æœ‰åŠ¹ã§DXRã¯RTXã‚·ãƒªãƒ¼ã‚ºã®ã¿æœ‰åŠ¹ã€‚
 
 #include "util/Noncopyable.h"
 #include "dbg/MyAssert.h"
@@ -77,13 +81,13 @@ using namespace Microsoft::WRL;
 
 #include "graphics/GaussianBlur.h"
 
-const UINT FRAME_BUFFER_W = 1600;	// ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚Ì•B
-const UINT FRAME_BUFFER_H = 900;	// ƒtƒŒ[ƒ€ƒoƒbƒtƒ@‚Ì‚‚³B
-const UINT UI_SPACE_WIDTH = 1920;	// UI‹óŠÔ‚Ì•B
-const UINT UI_SPACE_HEIGHT = 1080;	// UI‹óŠÔ‚Ì‚‚³B
-static const int MAX_BONE = 512;	// ƒ{[ƒ“‚ÌÅ‘å”B
+const UINT FRAME_BUFFER_W = 1920;	// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã®å¹…ã€‚
+const UINT FRAME_BUFFER_H = 1080;	// ãƒ•ãƒ¬ãƒ¼ãƒ ãƒãƒƒãƒ•ã‚¡ã®é«˜ã•ã€‚
+const UINT UI_SPACE_WIDTH = 1920;	// UIç©ºé–“ã®å¹…ã€‚
+const UINT UI_SPACE_HEIGHT = 1080;	// UIç©ºé–“ã®é«˜ã•ã€‚
+static const int MAX_BONE = 512;	// ãƒœãƒ¼ãƒ³ã®æœ€å¤§æ•°ã€‚
 
-#define USE_FPS_LIMITTER	// —LŒø‚ÅFPS‚ÉãŒÀ‚ğİ‚¯‚éB
+
 
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision\CollisionDispatch\btGhostObject.h"

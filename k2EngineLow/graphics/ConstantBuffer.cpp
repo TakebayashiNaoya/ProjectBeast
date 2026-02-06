@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "ConstantBuffer.h"
 
 namespace nsK2EngineLow {
@@ -13,25 +13,26 @@ namespace nsK2EngineLow {
 			if (cb != nullptr) {
 				cb->Unmap(0, &readRange);
 				ReleaseD3D12Object(cb);
+				cb = nullptr;
 			}
 		}
 	}
-	void ConstantBuffer::Init(int size, void* srcData)
+	void ConstantBuffer::Init(int size, const void* srcData, bool isDoubleBuffer)
 	{
 		Release();
+		m_isDoubleBuffer = isDoubleBuffer;
 		m_size = size;
-
-		//D3DƒfƒoƒCƒX‚ğæ“¾B
+		//D3Dãƒ‡ãƒã‚¤ã‚¹ã‚’å–å¾—ã€‚
 		auto device = g_graphicsEngine->GetD3DDevice();
 
-
-		//’è”ƒoƒbƒtƒ@‚Í256ƒoƒCƒgƒAƒ‰ƒCƒƒ“ƒg‚ª—v‹‚³‚ê‚é‚Ì‚ÅA256‚Ì”{”‚ÉØ‚èã‚°‚éB
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã¯256ãƒã‚¤ãƒˆã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆãŒè¦æ±‚ã•ã‚Œã‚‹ã®ã§ã€256ã®å€æ•°ã«åˆ‡ã‚Šä¸Šã’ã‚‹ã€‚
 		m_allocSize = (size + 256) & 0xFFFFFF00;
-		//’è”ƒoƒbƒtƒ@‚Ìì¬B
-		int bufferNo = 0;
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ä½œæˆã€‚
 		auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 		auto rDesc = CD3DX12_RESOURCE_DESC::Buffer(m_allocSize);
-		for (auto& cb : m_constantBuffer) {
+		int numBuffer = isDoubleBuffer ? 2 : 1;
+		for (int i = 0; i < numBuffer; i++) {
+			auto& cb = m_constantBuffer[i];
 			device->CreateCommittedResource(
 				&heapProp,
 				D3D12_HEAP_FLAG_NONE,
@@ -40,23 +41,31 @@ namespace nsK2EngineLow {
 				nullptr,
 				IID_PPV_ARGS(&cb)
 			);
-			//’è”ƒoƒbƒtƒ@‚ğCPU‚©‚çƒAƒNƒZƒX‰Â”\‚È‰¼‘zƒAƒhƒŒƒX‹óŠÔ‚Éƒ}ƒbƒsƒ“ƒO‚·‚éB
-			//ƒ}ƒbƒvAƒAƒ“ƒ}ƒbƒv‚ÌƒI[ƒo[ƒwƒbƒh‚ğŒyŒ¸‚·‚é‚½‚ß‚É‚Í‚±‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª¶‚«‚Ä‚¢‚éŠÔ‚Ís‚í‚È‚¢B
+			//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’CPUã‹ã‚‰ã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½ãªä»®æƒ³ã‚¢ãƒ‰ãƒ¬ã‚¹ç©ºé–“ã«ãƒãƒƒãƒ”ãƒ³ã‚°ã™ã‚‹ã€‚
+			//ãƒãƒƒãƒ—ã€ã‚¢ãƒ³ãƒãƒƒãƒ—ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ˜ãƒƒãƒ‰ã‚’è»½æ¸›ã™ã‚‹ãŸã‚ã«ã¯ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒç”Ÿãã¦ã„ã‚‹é–“ã¯è¡Œã‚ãªã„ã€‚
 			{
 				CD3DX12_RANGE readRange(0, 0);        //     intend to read from this resource on the CPU.
-				cb->Map(0, &readRange, reinterpret_cast<void**>(&m_constBufferCPU[bufferNo]));
+				cb->Map(0, &readRange, reinterpret_cast<void**>(&m_constBufferCPU[i]));
 			}
 			if (srcData != nullptr) {
-				memcpy(m_constBufferCPU[bufferNo], srcData, m_size);
+				memcpy(m_constBufferCPU[i], srcData, m_size);
 			}
-			bufferNo++;
 		}
-		//—˜—p‰Â”\‚É‚·‚éB
+		//åˆ©ç”¨å¯èƒ½ã«ã™ã‚‹ã€‚
 		m_isValid = true;
+	}
+	int ConstantBuffer::GetBackBufferNo() const
+	{
+		if (m_isDoubleBuffer) {
+			// å†…éƒ¨ã§ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡åŒ–ã—ã¦ã„ã‚‹å ´åˆã¯ã‚¨ãƒ³ã‚¸ãƒ³ã®ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã®ç•ªå·ã¨åˆã‚ã›ã‚‹ã€‚
+			return g_graphicsEngine->GetBackBufferIndex();
+		}
+		// ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡åŒ–ã—ã¦ã„ãªã„ã€‚
+		return 0;
 	}
 	void ConstantBuffer::RegistConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 	{
-		//D3DƒfƒoƒCƒX‚ğæ“¾B
+		//D3Dãƒ‡ãƒã‚¤ã‚¹ã‚’å–å¾—ã€‚
 		auto device = g_graphicsEngine->GetD3DDevice();
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
 		desc.BufferLocation = m_constantBuffer[bufferNo]->GetGPUVirtualAddress();
@@ -65,17 +74,17 @@ namespace nsK2EngineLow {
 	}
 	void ConstantBuffer::RegistConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = GetBackBufferNo();
 		RegistConstantBufferView(descriptorHandle, backBufferIndex);
 	}
 	void ConstantBuffer::CopyToVRAM(void* data)
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = GetBackBufferNo();
 		memcpy(m_constBufferCPU[backBufferIndex], data, m_size);
 	}
 	D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGPUVirtualAddress()
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = GetBackBufferNo();
 		return m_constantBuffer[backBufferIndex]->GetGPUVirtualAddress();
 	}
 }

@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "DebugWireframe.h"
 
 namespace nsK2EngineLow {
@@ -16,21 +16,21 @@ namespace nsK2EngineLow {
 		if (g_graphicsEngine == nullptr) {
 			return;
 		}
-		//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ğ‰Šú‰»B
+		//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã‚’åˆæœŸåŒ–ã€‚
 		InitRootSignature();
-		//ƒVƒF[ƒ_[‚ğ‰Šú‰»B
+		//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‚’åˆæœŸåŒ–ã€‚
 		InitSharder();
-		//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğ‰Šú‰»B
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’åˆæœŸåŒ–ã€‚
 		InitPipelineState();
-		//Å‘å’·“_”•ª‚Ìƒƒ‚ƒŠ‚Íæ‚ÉŠm•Û‚µ‚Ä‚¨‚­B
+		//æœ€å¤§é•·ç‚¹æ•°åˆ†ã®ãƒ¡ãƒ¢ãƒªã¯å…ˆã«ç¢ºä¿ã—ã¦ãŠãã€‚
 		m_vertexList.reserve(MAX_VERTEX);
-		//’¸“_ƒoƒbƒtƒ@‚Ì‰Šú‰»B
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸåŒ–ã€‚
 		InitVertexBuffer();
-		//ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Ì‰Šú‰»B
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸåŒ–ã€‚
 		InitIndexBuffer();
-		//’è”ƒoƒbƒtƒ@‚ğ‰Šú‰»B
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’åˆæœŸåŒ–ã€‚
 		InitConstantBuffer();
-		//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ğ‰Šú‰»B
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã‚’åˆæœŸåŒ–ã€‚
 		InitDescriptorHeap();
 	}
 
@@ -52,14 +52,14 @@ namespace nsK2EngineLow {
 
 	void DebugWireframe::InitPipelineState()
 	{
-		// ’¸“_ƒŒƒCƒAƒEƒg‚ğ’è‹`‚·‚éB
+		// é ‚ç‚¹ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã‚’å®šç¾©ã™ã‚‹ã€‚
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 		};
 
-		//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ğì¬B
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ä½œæˆã€‚
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
 		psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
 		psoDesc.pRootSignature = m_rootSignature.Get();
@@ -75,7 +75,7 @@ namespace nsK2EngineLow {
 		//psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		psoDesc.NumRenderTargets = 3;
-		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;		//ƒAƒ‹ƒxƒhƒJƒ‰[o—Í—pB
+		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;		//ã‚¢ãƒ«ãƒ™ãƒ‰ã‚«ãƒ©ãƒ¼å‡ºåŠ›ç”¨ã€‚
 		psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 		psoDesc.SampleDesc.Count = 1;
 		m_pipelineState.Init(psoDesc);
@@ -83,19 +83,19 @@ namespace nsK2EngineLow {
 
 	void DebugWireframe::InitVertexBuffer()
 	{
-		//’¸“_ƒoƒbƒtƒ@‚ğì¬B
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ä½œæˆã€‚
 		m_vertexBuffer.Init(sizeof(Vertex) * MAX_VERTEX, sizeof(Vertex));
 	}
 
 	void DebugWireframe::InitIndexBuffer()
 	{
-		//ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Ì‰Šú‰»B
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®åˆæœŸåŒ–ã€‚
 		m_indexBuffer.Init(sizeof(std::uint16_t) * MAX_VERTEX, sizeof(std::uint16_t));
 		static std::uint16_t indices[MAX_VERTEX];
 		for (int i = 0; i < MAX_VERTEX; i++) {
 			indices[i] = i;
 		}
-		m_indexBuffer.Copy(indices);
+		m_indexBuffer.Copy(indices, 0, 0, 0);
 	}
 
 	void DebugWireframe::InitConstantBuffer()
@@ -105,15 +105,15 @@ namespace nsK2EngineLow {
 
 	void DebugWireframe::InitDescriptorHeap()
 	{
-		//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÉƒfƒBƒXƒNƒŠƒvƒ^‚ğ“o˜^‚µ‚Ä‚¢‚­B
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’ç™»éŒ²ã—ã¦ã„ãã€‚
 		m_descriptorHeap.RegistConstantBuffer(0, m_constantBuffer);
-		//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Ö‚Ì“o˜^‚ğŠm’è‚³‚¹‚éB
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã¸ã®ç™»éŒ²ã‚’ç¢ºå®šã•ã›ã‚‹ã€‚
 		m_descriptorHeap.Commit();
 	}
 
 	void DebugWireframe::VertexBufferUpdate(const btVector3& from, const btVector3& to, const btVector3& color)
 	{
-		//’¸“_‚ğ‘‚«Š·‚¦‚éB
+		//é ‚ç‚¹ã‚’æ›¸ãæ›ãˆã‚‹ã€‚
 		Vertex vers[2];
 		vers[0].pos = Vector3(from.x(), from.y(), from.z());
 		vers[0].color = Vector3(color.x(), color.y(), color.z());
@@ -124,47 +124,47 @@ namespace nsK2EngineLow {
 		m_vertexList.push_back(vers[1]);
 
 		if (m_vertexList.size() > MAX_VERTEX) {
-			//•`‰æ‚Å‚«‚éƒ‰ƒCƒ“‚Í50–œ–{‚Ü‚ÅB‘‚â‚µ‚½‚¯‚ê‚ÎMAX_VERTEX‚ğ‘‚â‚µ‚Ä‚­‚¾‚³‚¢B
+			//æç”»ã§ãã‚‹ãƒ©ã‚¤ãƒ³ã¯50ä¸‡æœ¬ã¾ã§ã€‚å¢—ã‚„ã—ãŸã‘ã‚Œã°MAX_VERTEXã‚’å¢—ã‚„ã—ã¦ãã ã•ã„ã€‚
 			std::abort();
 		}
 	}
 
 	void DebugWireframe::ConstantBufferUpdate()
 	{
-		//’è”ƒoƒbƒtƒ@‚ÌXV(c++)B
-		//mVP‚ÌXV(ƒVƒF[ƒ_[)B
-		Matrix VP;		//ƒrƒ…[s—ñ‚ÆƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-		//ƒrƒ…[‚ÆƒvƒƒWƒFƒNƒVƒ‡ƒ“‚ÌŠ|‚¯Z
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®æ›´æ–°(c++)ã€‚
+		//mVPã®æ›´æ–°(ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼)ã€‚
+		Matrix VP;		//ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã¨ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
+		//ãƒ“ãƒ¥ãƒ¼ã¨ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³ã®æ›ã‘ç®—
 		Matrix v = g_camera3D->GetViewMatrix();
 		Matrix p = g_camera3D->GetProjectionMatrix();
 		VP.Multiply(v, p);
-		//’è”ƒoƒbƒtƒ@‚É“n‚µ‚½‚¢•Ï”‚ğŠi”[(m_constantBuffer‚Ì“à—e‚ğã‘‚«)
+		//å®šæ•°ãƒãƒƒãƒ•ã‚¡ã«æ¸¡ã—ãŸã„å¤‰æ•°ã‚’æ ¼ç´(m_constantBufferã®å†…å®¹ã‚’ä¸Šæ›¸ã)
 		m_constantBuffer.CopyToVRAM(&VP);
 	}
 
 	void DebugWireframe::RenderContextUpdate(RenderContext& rc)
 	{
-		//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ğİ’èB
+		//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã‚’è¨­å®šã€‚
 		rc.SetRootSignature(m_rootSignature);
-		//’¸“_‚ğ‚Ç‚ñ‚ÈŠ´‚¶‚É•`‰æ‚·‚é‚Ì‚©B
-		//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ìİ’èB
+		//é ‚ç‚¹ã‚’ã©ã‚“ãªæ„Ÿã˜ã«æç”»ã™ã‚‹ã®ã‹ã€‚
+		//ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®è¨­å®šã€‚
 		rc.SetPipelineState(m_pipelineState);
-		//¡‰ñ‚Í’¸“_“ñ‚Â‚ÌŠÔ‚Éü‚ğ•`‚­İ’èB
+		//ä»Šå›ã¯é ‚ç‚¹äºŒã¤ã®é–“ã«ç·šã‚’æãè¨­å®šã€‚
 		rc.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		//’¸“_ƒoƒbƒtƒ@‚ğİ’èB
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã€‚
 		rc.SetVertexBuffer(m_vertexBuffer);
-		//ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ğİ’èB
+		//ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã€‚
 		rc.SetIndexBuffer(m_indexBuffer);
-		//ƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚Éİ’èB
+		//ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãƒ’ãƒ¼ãƒ—ã«è¨­å®šã€‚
 		rc.SetDescriptorHeap(m_descriptorHeap);
-		//ƒhƒ[ƒR[ƒ‹B
+		//ãƒ‰ãƒ­ãƒ¼ã‚³ãƒ¼ãƒ«ã€‚
 		rc.DrawIndexed(static_cast<UINT>(m_vertexList.size()));
 	}
 
-	//1ƒtƒŒ[ƒ€“à‚ÉdrawLine‚Íü‚Ì”‚¾‚¯s‚¤
+	//1ãƒ•ãƒ¬ãƒ¼ãƒ å†…ã«drawLineã¯ç·šã®æ•°ã ã‘è¡Œã†
 	void DebugWireframe::drawLine(const btVector3& from, const btVector3& to, const btVector3& color)
 	{
-		//’¸“_ƒoƒbƒtƒ@‚ÌXVB
+		//é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®æ›´æ–°ã€‚
 		VertexBufferUpdate(from, to, color);
 	}
 
@@ -174,7 +174,7 @@ namespace nsK2EngineLow {
 		{
 			return;
 		}
-		//’¸“_‚ğƒRƒs[B
+		//é ‚ç‚¹ã‚’ã‚³ãƒ”ãƒ¼ã€‚
 		m_vertexBuffer.Copy(&m_vertexList.front());
 
 		ConstantBufferUpdate();
