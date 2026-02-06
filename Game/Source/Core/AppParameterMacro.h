@@ -17,6 +17,7 @@ namespace app
 
 
 /**
+* @brief ホットリロード有効化マクロ
  * @note デバッグビルド時のみ有効化
  */
 #ifdef K2_DEBUG
@@ -25,6 +26,7 @@ namespace app
 
 
  /**
+ * @brief パラメーター用マクロ定義
  * @note ホットリロード対応版
  */
 #ifdef APP_PARAM_HOT_RELOAD
