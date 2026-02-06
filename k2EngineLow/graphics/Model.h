@@ -6,8 +6,12 @@
 
 namespace nsK2EngineLow {
 	class IShaderResource;
-	class ComputeAnimationVertexBuffer;
 
+	//モデルの上方向
+	enum EnModelUpAxis {
+		enModelUpAxisY,		//モデルの上方向がY軸。
+		enModelUpAxisZ,		//モデルの上方向がZ軸。
+	};
 
 	/// <summary>
 	/// モデルの初期化データ
@@ -28,8 +32,6 @@ namespace nsK2EngineLow {
 		bool m_isDepthWrite = true;										// 深度バッファに書き込む？
 		bool m_isDepthTest = true;										// 深度テストを行う？
 		D3D12_CULL_MODE m_cullMode = D3D12_CULL_MODE_BACK;				// カリングモード。
-		ComputeAnimationVertexBuffer* m_computedAnimationVertexBuffer = nullptr;	// アニメーション済み頂点バッファを計算する処理。
-
 		std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> m_colorBufferFormat = {
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			DXGI_FORMAT_UNKNOWN,
@@ -40,7 +42,6 @@ namespace nsK2EngineLow {
 			DXGI_FORMAT_UNKNOWN,
 			DXGI_FORMAT_UNKNOWN,
 		};	//レンダリングするカラーバッファのフォーマット。
-		
 	};
 	/// <summary>
 	/// マテリアルを再初期化するためのデータ。
@@ -87,11 +88,6 @@ namespace nsK2EngineLow {
 		/// <param name="scale">拡大率</param>
 		/// <returns>ワールド行列</returns>
 		Matrix CalcWorldMatrix(Vector3 pos, Quaternion rot, Vector3 scale);
-		/// <summary>
-		/// アニメーション済み頂点バッファの計算処理をディスパッチ。
-		/// </summary>
-		/// <param name="rc">レンダリングコンテキスト</param>
-		void DispatchComputeAnimatedVertexBuffer(RenderContext& rc);
 		/// <summary>
 		/// 描画
 		/// </summary>
@@ -146,54 +142,6 @@ namespace nsK2EngineLow {
 			m_meshParts.QueryMeshAndDescriptorHeap(queryFunc);
 		}
 		/// <summary>
-		/// メッシュを取得。
-		/// </summary>
-		/// <param name="meshNo">メッシュ番号</param>
-		/// <returns>メッシュ</returns>
-		const SMesh& GetMesh(int meshNo) const
-		{
-			return m_meshParts.GetMesh(meshNo);
-		}
-		SMesh& GetMesh(int meshNo) 
-		{
-			return m_meshParts.GetMesh(meshNo);
-		}
-		/// <summary>
-		/// アニメーション済み頂点バッファの計算処理を行っている？
-		/// </summary>
-		/// <returns></returns>
-		bool IsComputedAnimationVertexBuffer() const
-		{
-			return m_meshParts.IsComputedAnimationVertexBuffer();
-		}
-		/// <summary>
-		/// アニメーション計算済み頂点バッファを取得。
-		/// </summary>
-		/// <param name="meshNo">メッシュの番号</param>
-		/// <returns>頂点バッファ</returns>
-		const VertexBuffer& GetAnimatedVertexBuffer(int meshNo) const
-		{
-			return m_meshParts.GetAnimatedVertexBuffer(meshNo);
-		}
-		VertexBuffer& GetAnimatedVertexBuffer(int meshNo)
-		{
-			return m_meshParts.GetAnimatedVertexBuffer(meshNo);
-		}
-		/// <summary>
-		/// 事前計算済みインデックスバッファを取得
-		/// </summary>
-		/// <param name="meshNo">メッシュ番号</param>
-		/// <param name="matNo">マテリアル番号</param>
-		/// <returns></returns>
-		const IndexBuffer& GetAnimatedIndexBuffer(int meshNo, int matNo) const
-		{
-			return m_meshParts.GetAnimatedIndexBuffer(meshNo, matNo);
-		}
-		IndexBuffer& GetAnimatedIndexBuffer(int meshNo, int matNo)
-		{
-			return m_meshParts.GetAnimatedIndexBuffer(meshNo, matNo);
-		}
-		/// <summary>
 		/// アルベドマップを変更。
 		/// </summary>
 		/// <remarks>
@@ -228,12 +176,11 @@ namespace nsK2EngineLow {
 		/// <param name="reInitData">再初期化データ。</param>
 		void ReInitMaterials(MaterialReInitData& reInitData);
 	private:
-		bool m_isInited = false;							// 初期化されている？
-		Matrix m_worldMatrix;								// ワールド行列。
-		TkmFile* m_tkmFile;									// tkmファイル。
-		Skeleton m_skeleton;								// スケルトン。
-		MeshParts m_meshParts;								// メッシュパーツ。
-		EnModelUpAxis m_modelUpAxis = enModelUpAxisY;		// モデルの上方向。
-		Model* m_computedAnimationVertexBuffer = nullptr;	// アニメーション後頂点バッファを計算済みのモデル。
+		bool m_isInited = false;						//初期化されている？
+		Matrix m_worldMatrix;							//ワールド行列。
+		TkmFile* m_tkmFile;								//tkmファイル。
+		Skeleton m_skeleton;							//スケルトン。
+		MeshParts m_meshParts;							//メッシュパーツ。
+		EnModelUpAxis m_modelUpAxis = enModelUpAxisY;	//モデルの上方向。
 	};
 }

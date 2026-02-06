@@ -22,34 +22,12 @@ namespace nsK2EngineLow {
 		/// インデックスデータをインデックスバッファにコピー。
 		/// </summary>
 		/// <param name="srcIndecies">コピー元のインデックスデータ。</param>
-		/// <param name="numCopy">コピーする数。０を指定するとコピー先のインデックスの数と同じだけコピーされます。</param>
-		/// <param name="copyStartAddrOffset">コピー開始アドレスのオフセット</param>
-		/// <param name="srcIndexBias">コピー元インデックスを底上げする値。</param>
-		/// <remark>
-		/// ほとんどの場合で、第２引数～第４引数は0を指定してください。
-		/// 部分的なコピーを行いたい場合はコピーする数を指定する、
-		/// numCopyやコピー先のアドレスをオフセットするcopyStartAddrOffsetに値を設定してください。
-		/// また、コピー元のインデックスの値を一律で底上げを行いたい場合はsrcIndexBiasに値を設定してください。
-		/// 例えば、srcIndexBiasに10が指定されていると、srcIndeciesに記憶されている値に+10加算したものがコピーされていきます。
-		/// </remark>
-		void Copy(uint16_t* srcIndecies, int numCopy, uint32_t copyStartAddrOffset, uint32_t srcIndexBias);
-
+		void Copy(uint16_t* srcIndecies);
 		/// <summary>
 		/// インデックスデータをインデックスバッファにコピー。
 		/// </summary>
 		/// <param name="srcIndecies">コピー元のインデックスデータ。</param>
-		/// <param name="numCopy">コピーする数。０を指定するとコピー先のインデックスの数と同じだけコピーされます。</param>
-		/// <param name="copyStartAddrOffset">コピー開始アドレスのオフセット</param>
-		/// <param name="srcIndexBias">コピー元インデックスを底上げする値。</param>
-		/// <remark>
-		/// ほとんどの場合で、第２引数～第４引数は0を指定してください。
-		/// 部分的なコピーを行いたい場合はコピーする数を指定する、
-		/// numCopyやコピー先のアドレスをオフセットするcopyStartAddrOffsetに値を設定してください。
-		/// また、コピー元のインデックスの値を一律で底上げを行いたい場合はsrcIndexBiasに値を設定してください。
-		/// 例えば、srcIndexBiasに10が指定されていると、srcIndeciesに記憶されている値に+10加算したものがコピーされていきます。
-		/// </remark>
-		void Copy(uint32_t* srcIndecies, int numCopy, uint32_t copyStartAddrOffset, uint32_t srcIndexBias);
-
+		void Copy(uint32_t* srcIndecies);
 		/// <summary>
 		/// インデックスバッファビューを取得。
 		/// </summary>
@@ -65,14 +43,6 @@ namespace nsK2EngineLow {
 		int GetCount() const
 		{
 			return m_count;
-		}
-		/// <summary>
-		/// インデックス数を設定。
-		/// </summary>
-		/// <param name="count"></param>
-		void SetCount(int count)
-		{
-			m_count = count;
 		}
 		/// <summary>
 		/// インデックスバッファのストライドを取得。

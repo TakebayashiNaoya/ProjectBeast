@@ -21,22 +21,12 @@ namespace nsK2EngineLow {
 
 		delete g_soundEngine;
 	}
-	void K2EngineLow::Init(
-		HWND hwnd,
-		UINT frameBufferWidth,
-		UINT frameBufferHeight,
-		const raytracing::InitData& raytracingInitData
-	)
+	void K2EngineLow::Init(HWND hwnd, UINT frameBufferWidth, UINT frameBufferHeight)
 	{
 		if (hwnd) {
 			//グラフィックエンジンの初期化。
 			m_graphicsEngine = new GraphicsEngine();
-			m_graphicsEngine->Init(
-				hwnd, 
-				frameBufferWidth, 
-				frameBufferHeight,
-				raytracingInitData
-			);
+			m_graphicsEngine->Init(hwnd, frameBufferWidth, frameBufferHeight);
 		}
 		g_gameTime = &m_gameTime;
 		//ゲームパッドの初期化。

@@ -1,163 +1,108 @@
 /*!
- * @brief	ƒVƒ“ƒvƒ‹‚Èƒ‚ƒfƒ‹ƒVƒF[ƒ_[B
+ * @brief	ã‚·ãƒ³ãƒ—ãƒ«ãªãƒ¢ãƒ‡ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã€‚
  */
 
 
 ////////////////////////////////////////////////
-// \‘¢‘Ì
+// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã€‚
 ////////////////////////////////////////////////
-
-// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚Ö‚Ì“ü—Í
-struct SPSIn
-{
-	float4 pos : SV_POSITION; //À•WB
-	float3 normal : NORMAL; //–@üB
-	float3 tangent : TANGENT; //ÚƒxƒNƒgƒ‹B
-	float3 biNormal : BINORMAL; //]ƒxƒNƒgƒ‹B
-	float2 uv : TEXCOORD0; //UVÀ•WB
-	float3 worldPos : TEXCOORD1; // ƒ[ƒ‹ƒhÀ•W
+//ãƒ¢ãƒ‡ãƒ«ç”¨ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡
+cbuffer ModelCb : register(b0){
+	float4x4 mWorld;
+	float4x4 mView;
+	float4x4 mProj;
 };
 
-
-///////////////////////////////////////
-// ’¸“_ƒVƒF[ƒ_[‚Ì‹¤’Êˆ—‚ğƒCƒ“ƒNƒ‹[ƒh‚·‚éB
-///////////////////////////////////////
-#include "ModelVSCommon.h"
-
-///////////////////////////////////////
-// PBRƒ‰ƒCƒeƒBƒ“ƒOŠÖŒW‚Ì’è”
-///////////////////////////////////////
-#include "PBRLighting_const.h"
-
-///////////////////////////////////////
-// ƒVƒF[ƒ_[ƒŠƒ\[ƒX
-///////////////////////////////////////
-#include "model_srv_uav_register.h"
-
-///////////////////////////////////////
-// PBRƒ‰ƒCƒeƒBƒ“ƒO
-///////////////////////////////////////
-#include "PBRLighting.h"
-
-///////////////////////////////////////
-// ƒVƒƒƒhƒEƒCƒ“ƒO
-///////////////////////////////////////
-#include "Shadowing.h"
-
-///////////////////////////////////////
-// IBL
-///////////////////////////////////////
-#include "IBL.h"
+////////////////////////////////////////////////
+// æ§‹é€ ä½“
+////////////////////////////////////////////////
+//ã‚¹ã‚­ãƒ‹ãƒ³ã‚°ç”¨ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã‚’ã²ã¨ã¾ã¨ã‚ã€‚
+struct SSkinVSIn{
+	int4  Indices  	: BLENDINDICES0;
+    float4 Weights  : BLENDWEIGHT0;
+};
+//é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã¸ã®å…¥åŠ›ã€‚
+struct SVSIn{
+	float4 pos 		: POSITION;		//ãƒ¢ãƒ‡ãƒ«ã®é ‚ç‚¹åº§æ¨™ã€‚
+	float2 uv 		: TEXCOORD0;	//UVåº§æ¨™ã€‚
+	SSkinVSIn skinVert;				//ã‚¹ã‚­ãƒ³ç”¨ã®ãƒ‡ãƒ¼ã‚¿ã€‚
+};
+//ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã¸ã®å…¥åŠ›ã€‚
+struct SPSIn{
+	float4 pos 			: SV_POSITION;	//ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ç©ºé–“ã§ã®ãƒ”ã‚¯ã‚»ãƒ«ã®åº§æ¨™ã€‚
+	float2 uv 			: TEXCOORD0;	//uvåº§æ¨™ã€‚
+};
 
 ////////////////////////////////////////////////
-// ŠÖ”’è‹`B
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ã€‚
+////////////////////////////////////////////////
+Texture2D<float4> g_albedo : register(t0);				//ã‚¢ãƒ«ãƒ™ãƒ‰ãƒãƒƒãƒ—
+StructuredBuffer<float4x4> g_boneMatrix : register(t3);	//ãƒœãƒ¼ãƒ³è¡Œåˆ—ã€‚
+sampler g_sampler : register(s0);	//ã‚µãƒ³ãƒ—ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆã€‚
+
+////////////////////////////////////////////////
+// é–¢æ•°å®šç¾©ã€‚
 ////////////////////////////////////////////////
 
-// ƒ‚ƒfƒ‹—p‚Ì’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg
-SPSIn VSMainCore(SVSIn vsIn, float4x4 mWorldLocal, uniform bool isUsePreComputedVertexBuffer)
+/// <summary>
+//ã‚¹ã‚­ãƒ³è¡Œåˆ—ã‚’è¨ˆç®—ã™ã‚‹ã€‚
+/// </summary>
+float4x4 CalcSkinMatrix(SSkinVSIn skinVert)
+{
+	float4x4 skinning = 0;	
+	float w = 0.0f;
+	[unroll]
+    for (int i = 0; i < 3; i++)
+    {
+        skinning += g_boneMatrix[skinVert.Indices[i]] * skinVert.Weights[i];
+        w += skinVert.Weights[i];
+    }
+    
+    skinning += g_boneMatrix[skinVert.Indices[3]] * (1.0f - w);
+	
+    return skinning;
+}
+
+/// <summary>
+/// é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚³ã‚¢é–¢æ•°ã€‚
+/// </summary>
+SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
 {
 	SPSIn psIn;
-    
-    // ’¸“_À•W‚ğƒ[ƒ‹ƒhÀ•WŒn‚É•ÏŠ·‚·‚éB
-    psIn.pos = CalcVertexPositionInWorldSpace(vsIn.pos, mWorldLocal, isUsePreComputedVertexBuffer);
-
-    // ’¸“_ƒVƒF[ƒ_[‚©‚çƒ[ƒ‹ƒhÀ•W‚ğo—Í
-	psIn.worldPos = psIn.pos;
-
-	psIn.pos = mul(mView, psIn.pos); // ƒ[ƒ‹ƒhÀ•WŒn‚©‚çƒJƒƒ‰À•WŒn‚É•ÏŠ·
-	psIn.pos = mul(mProj, psIn.pos); // ƒJƒƒ‰À•WŒn‚©‚çƒXƒNƒŠ[ƒ“À•WŒn‚É•ÏŠ·
-    
-	// ƒ[ƒ‹ƒh‹óŠÔ‚Ì–@üAÚƒxƒNƒgƒ‹A]ƒxƒNƒgƒ‹‚ğŒvZ‚·‚éB
-	CalcVertexNormalTangentBiNormalInWorldSpace(
-		psIn.normal,
-		psIn.tangent,
-		psIn.biNormal,
-		mWorldLocal,
-		vsIn.normal,
-		vsIn.tangent,
-		vsIn.biNormal,
-		isUsePreComputedVertexBuffer
-	);
+	float4x4 m;
+	if( hasSkin ){
+		m = CalcSkinMatrix(vsIn.skinVert);
+	}else{
+		m = mWorld;
+	}
+	psIn.pos = mul(m, vsIn.pos);
+	psIn.pos = mul(mView, psIn.pos);
+	psIn.pos = mul(mProj, psIn.pos);
 
 	psIn.uv = vsIn.uv;
-	
+
 	return psIn;
 }
+
 /// <summary>
-/// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ŠÖ”B
+/// ã‚¹ã‚­ãƒ³ãªã—ãƒ¡ãƒƒã‚·ãƒ¥ç”¨ã®é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼é–¢æ•°ã€‚
 /// </summary>
-float4 PSMainCore( SPSIn In, uniform int isSoftShadow ) 
+SPSIn VSMain(SVSIn vsIn)
 {
-	//G-Buffer‚Ì“à—e‚ğg‚Á‚Äƒ‰ƒCƒeƒBƒ“ƒO
-    //ƒAƒ‹ƒxƒhƒJƒ‰[‚ğƒTƒ“ƒvƒŠƒ“ƒOB
-    float4 albedoColor = albedoTexture.Sample(Sampler, In.uv);
-    //–@ü‚ğƒTƒ“ƒvƒŠƒ“ƒOB
-    float3 normal = normalTexture.Sample(Sampler, In.uv).xyz;
-    //ƒ[ƒ‹ƒhÀ•W‚ğƒTƒ“ƒvƒŠƒ“ƒOB
-    float3 worldPos = In.worldPos;
-    //ƒXƒyƒLƒ…ƒ‰ƒJƒ‰[‚ğƒTƒ“ƒvƒŠƒ“ƒOB
-    float3 specColor = albedoColor.xyz;
-    //‹à‘®“x‚ğƒTƒ“ƒvƒŠƒ“ƒOB
-    float metaric = metallicShadowSmoothTexture.SampleLevel(Sampler, In.uv, 0).r;
-    //ƒXƒ€[ƒX
-    float smooth = metallicShadowSmoothTexture.SampleLevel(Sampler, In.uv, 0).a;
-
-    //‰e¶¬—p‚Ìƒpƒ‰ƒ[ƒ^B
-    float shadowParam = 1.0f;
-    
-    float2 viewportPos = In.pos.xy;
-
-	 // ‹ü‚ÉŒü‚©‚Á‚ÄL‚Ñ‚éƒxƒNƒgƒ‹‚ğŒvZ‚·‚é
-    float3 toEye = normalize(light.eyePos - worldPos);
-
-    float3 lig = 0;
-    
-    for(int ligNo = 0; ligNo < NUM_DIRECTIONAL_LIGHT; ligNo++)
-    {
-        // ‰e‚Ì—‚¿‹ï‡‚ğŒvZ‚·‚éB
-        float shadow = 0.0f;
-        if( light.directionalLight[ligNo].castShadow == 1){
-            //‰e‚ğ¶¬‚·‚é‚È‚çB
-            shadow = CalcShadowRate( g_shadowMap, light.mlvp, ligNo, worldPos, isSoftShadow ) * shadowParam;
-        }
-        
-        lig += CalcLighting(
-            light.directionalLight[ligNo].direction,
-            light.directionalLight[ligNo].color,
-            normal,
-            toEye,
-            albedoColor,
-            metaric,
-            smooth,
-            specColor
-        ) * ( 1.0f - shadow );
-    }
-	
-	 if (light.isIBL == 1) {
-        // ‹ü‚©‚ç‚Ì”½ËƒxƒNƒgƒ‹‚ğ‹‚ß‚éB
-        lig += albedoColor * SampleIBLColorFromSkyCube(
-            g_skyCubeMap,
-            toEye,
-            normal,
-            smooth,
-            light.iblIntencity
-        );
-    }
-    else {
-        // ŠÂ‹«Œõ‚É‚æ‚é’êã‚°
-        lig += light.ambientLight * albedoColor;
-    }
-   
-	float4 finalColor = 1.0f;
-    finalColor.xyz = lig;
-    return float4(finalColor.xyz, albedoColor.a);
+	return VSMainCore(vsIn, false);
 }
-float4 PSMainSoftShadow(SPSIn In) : SV_Target0
+/// <summary>
+/// ã‚¹ã‚­ãƒ³ã‚ã‚Šãƒ¡ãƒƒã‚·ãƒ¥ã®é ‚ç‚¹ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼é–¢æ•°ã€‚
+/// </summary>
+SPSIn VSSkinMain( SVSIn vsIn ) 
 {
-    return PSMainCore( In, true);
+	return VSMainCore(vsIn, true);
 }
-//ƒn[ƒhƒVƒƒƒhƒE‚ğs‚¤ƒsƒNƒZƒ‹ƒVƒF[ƒ_[B
-float4 PSMainHardShadow(SPSIn In) : SV_Target0
+/// <summary>
+/// ãƒ”ã‚¯ã‚»ãƒ«ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼é–¢æ•°ã€‚
+/// </summary>
+float4 PSMain( SPSIn psIn ) : SV_Target0
 {
-    return PSMainCore( In, false);
-} 
+	float4 albedoColor = g_albedo.Sample(g_sampler, psIn.uv);
+	return albedoColor;
+}

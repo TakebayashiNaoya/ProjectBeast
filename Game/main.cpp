@@ -1,59 +1,47 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "system/system.h"
-
-#include<InitGUID.h>
-#include<dxgidebug.h>
-
-#include "Game.h"
+#include "BeastEngine.h"
 
 
+// K2EngineLowã®ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¢ã‚¯ã‚»ã‚¹ãƒã‚¤ãƒ³ãƒˆã€‚
+K2EngineLow* g_k2EngineLow = nullptr;
 
-void ReportLiveObjects()
-{
-	IDXGIDebug* pDxgiDebug;
-
-	typedef HRESULT(__stdcall* fPtr)(const IID&, void**);
-	HMODULE hDll = GetModuleHandleW(L"dxgidebug.dll");
-	fPtr DXGIGetDebugInterface = (fPtr)GetProcAddress(hDll, "DXGIGetDebugInterface");
-
-	DXGIGetDebugInterface(__uuidof(IDXGIDebug), (void**)&pDxgiDebug);
-
-	// o—ÍB
-	pDxgiDebug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_DETAIL);
-}
-
-///////////////////////////////////////////////////////////////////
-// ƒEƒBƒ“ƒhƒEƒvƒƒOƒ‰ƒ€‚ÌƒƒCƒ“ŠÖ”B
-///////////////////////////////////////////////////////////////////
+/// <summary>
+/// ãƒ¡ã‚¤ãƒ³é–¢æ•°
+/// </summary>
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	//ƒQ[ƒ€‚Ì‰Šú‰»B
+	// ã‚²ãƒ¼ãƒ ã®åˆæœŸåŒ–ã€‚
 	InitGame(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("Game"));
-	//////////////////////////////////////
-	// ‚±‚±‚©‚ç‰Šú‰»‚ğs‚¤ƒR[ƒh‚ğ‹Lq‚·‚éB
-	//////////////////////////////////////
 
-	//GameƒNƒ‰ƒX‚ÌƒIƒuƒWƒFƒNƒg‚ğì¬B
-	NewGO<Game>(0, "game");
+	// k2EngineLowã®åˆæœŸåŒ–ã€‚
+	g_k2EngineLow = new K2EngineLow();
+	g_k2EngineLow->Init(g_hWnd, FRAME_BUFFER_W, FRAME_BUFFER_H);
+	g_camera3D->SetPosition({ 0.0f, 100.0f, -200.0f });
+	g_camera3D->SetTarget({ 0.0f, 50.0f, 0.0f });
 
-	//////////////////////////////////////
-	// ‰Šú‰»‚ğs‚¤ƒR[ƒh‚ğ‘‚­‚Ì‚Í‚±‚±‚Ü‚ÅIII
-	//////////////////////////////////////
-	
-	// ‚±‚±‚©‚çƒQ[ƒ€ƒ‹[ƒvB
+
+	// ã“ã“ã‹ã‚‰ã‚²ãƒ¼ãƒ ãƒ«ãƒ¼ãƒ—ã€‚
 	while (DispatchWindowMessage())
 	{
-		if (g_pad[0]->IsTrigger(enButtonA) ){
-			g_pad[0]->SetVibration(/*durationSec=*/0.5f, /*normalizedPower=*/1.0f);
-		}
-		K2Engine::GetInstance()->Execute();
+		// ãƒ•ãƒ¬ãƒ¼ãƒ ã®é–‹å§‹æ™‚ã«å‘¼ã³å‡ºã™å¿…è¦ãŒã‚ã‚‹å‡¦ç†ã‚’å®Ÿè¡Œ
+		g_k2EngineLow->BeginFrame();
+
+		// ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®æ›´æ–°å‡¦ç†ã‚’å‘¼ã³å‡ºã™ã€‚
+		g_k2EngineLow->ExecuteUpdate();
+
+		// ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®æç”»å‡¦ç†ã‚’å‘¼ã³å‡ºã™ã€‚
+		g_k2EngineLow->ExecuteRender();
+
+		// ãƒ‡ãƒãƒƒã‚°æç”»å‡¦ç†ã‚’å®Ÿè¡Œã™ã‚‹ã€‚
+		g_k2EngineLow->DebubDrawWorld();
+
+		// ãƒ•ãƒ¬ãƒ¼ãƒ ã®çµ‚äº†æ™‚ã«å‘¼ã³å‡ºã™å¿…è¦ãŒã‚ã‚‹å‡¦ç†ã‚’å®Ÿè¡Œã€‚
+		g_k2EngineLow->EndFrame();
 	}
 
-	K2Engine::DeleteInstance();
+	delete g_k2EngineLow;
 
-#ifdef _DEBUG
-	ReportLiveObjects();
-#endif // _DEBUG
 	return 0;
 }
 

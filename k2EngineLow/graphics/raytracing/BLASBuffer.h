@@ -14,20 +14,23 @@ namespace nsK2EngineLow {
 		class BLASBuffer : public Noncopyable
 		{
 		public:
-
-			
 			/// <summary>
-			/// BLASのビルド。
+			/// 初期化。
 			/// </summary>
-			/// <remark>
-			/// BLASの再構築が不要であれば、更新のみを行います。
-			/// </remark>
-			/// <param name="rc">レンダリングコンテキスト</param>
-			/// <param name="instances">インスタンスの配列</param>
-			void Build(RenderContext& rc, const std::vector<InstancePtr>& instances, bool isUpdate);
-			
+			/// <param name="rc"></param>
+			/// <param name="instance"></param>
+			void Init(RenderContext& rc, const std::vector<InstancePtr>& instance);
+			/// <summary>
+			/// BLASBufferのリストを取得。
+			/// </summary>
+			/// <returns></returns>
+			const std::vector< AccelerationStructureBuffers>& Get() const
+			{
+				return m_bottomLevelASBuffers;
+			}
 		private:
 
+			std::vector< AccelerationStructureBuffers> m_bottomLevelASBuffers;	//BLASBuffer
 		};
 	}//namespace raytracing
 }//namespace nsK2EngineLow 

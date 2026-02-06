@@ -39,12 +39,12 @@ namespace nsK2EngineLow {
 			}
 		}
 
+
 		for (auto& goList : m_gameObjectListArray) {
 			for (auto& go : goList) {
 				go->UpdateWrapper();
 			}
 		}
-		
 		//物理エンジンのアップデートを呼び出す。
 		PhysicsWorld::GetInstance()->Update(1.0f / 60.0f);
 	}

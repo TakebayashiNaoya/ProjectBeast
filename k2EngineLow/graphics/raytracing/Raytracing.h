@@ -11,12 +11,6 @@ namespace nsK2EngineLow {
 		);
 
 		struct AccelerationStructureBuffers {
-			~AccelerationStructureBuffers()
-			{
-				Release();
-			}
-			void Release();
-			
 			ID3D12Resource* pScratch = nullptr;
 			ID3D12Resource* pResult = nullptr;
 			ID3D12Resource* pInstanceDesc = nullptr;
@@ -48,44 +42,44 @@ namespace nsK2EngineLow {
 			0
 		};
 
-		const int MAX_TRACE_RECURSION_DEPTH = 5;		// レイトレースの再帰呼び出しの最大数。
-														// これがTraceRayを再帰的に呼び出せる最大数です。
+		const int MAX_TRACE_RECURSION_DEPTH = 4;	//レイトレースの再帰呼び出しの最大数。
+														//これがTraceRayを再帰的に呼び出せる最大数です。
 														//
 			//ローカルルートシグネチャ
 		enum ELocalRootSignature {
-			eLocalRootSignature_Empty,				// 空のローカルルートシグネチャ。
-			eLocalRootSignature_Raygen,				// レイ生成シェーダー用のローカルルートシグネチャ。
-			eLocalRootSignature_PBRMaterialHit,		// PBRマテリアルにヒットしたときのローカルルートシグネチャ。
+			eLocalRootSignature_Empty,				//空のローカルルートシグネチャ。
+			eLocalRootSignature_Raygen,				//レイ生成シェーダー用のローカルルートシグネチャ。
+			eLocalRootSignature_PBRMaterialHit,		//PBRマテリアルにヒットしたときのローカルルートシグネチャ。
 		};
 		//シェーダー
 		enum EShader {
-			eShader_Raygeneration,		// カメラレイを生成するシェーダー。
-			eShader_Miss,				// カメラレイがどこにもぶつからなかった時に呼ばれるシェーダー。
-			eShader_PBRChs,				// もっとも近いポリゴンとカメラレイが交差したときに呼ばれるシェーダー。
-			eShader_ShadowChs,			// もっとも近いポリゴンとシャドウレイが交差したときに呼ばれるシェーダー。
-			eShader_ShadowMiss,			// シャドウレイがどこにもぶつからなかった時に呼ばれるシェーダー。
-			eShader_Num,				// シェーダーの数。
+			eShader_Raygeneration,		//カメラレイを生成するシェーダー。
+			eShader_Miss,				//カメラレイがどこにもぶつからなかった時に呼ばれるシェーダー。
+			eShader_PBRChs,				//もっとも近いポリゴンとカメラレイが交差したときに呼ばれるシェーダー。
+			eShader_ShadowChs,			//もっとも近いポリゴンとシャドウレイが交差したときに呼ばれるシェーダー。
+			eShader_ShadowMiss,			//シャドウレイがどこにもぶつからなかった時に呼ばれるシェーダー。
+			eShader_Num,				//シェーダーの数。
 		};
 		//シェーダーのカテゴリ。
 		enum EShaderCategory {
-			eShaderCategory_RayGenerator,	// レイを生成するシェーダー。
-			eShaderCategory_Miss,			// ミスシェーダー。
-			eShaderCategory_ClosestHit,		// もっとも近いポリゴンとレイが交差したときに呼ばれるシェーダー。
+			eShaderCategory_RayGenerator,	//レイを生成するシェーダー。
+			eShaderCategory_Miss,			//ミスシェーダー。
+			eShaderCategory_ClosestHit,		//もっとも近いポリゴンとレイが交差したときに呼ばれるシェーダー。
 		};
 
 
 		//シェーダーデータ構造体。
 		struct ShaderData {
-			const wchar_t* entryPointName;				// エントリーポイントの名前。
-			ELocalRootSignature useLocalRootSignature;	// 使用するローカルルートシグネチャ。
-			EShaderCategory category;					// カテゴリー。
-			EHitGroup hitgroup;							// ヒットグループ。
-														// カテゴリがeShaderCategory_Miss、eShaderCategory_RayGeneratorの場合、このパラメーターは無視されます。
+			const wchar_t* entryPointName;				//エントリーポイントの名前。
+			ELocalRootSignature useLocalRootSignature;	//使用するローカルルートシグネチャ。
+			EShaderCategory category;					//カテゴリー。
+			EHitGroup hitgroup;							//ヒットグループ。
+														//カテゴリがeShaderCategory_Miss、eShaderCategory_RayGeneratorの場合、このパラメーターは無視されます。
 		};
 		const ShaderData shaderDatas[] = {
 			//entryPointName	useLocalRootSignature				category						hitgroup
 			{ L"rayGen",		eLocalRootSignature_Raygen,			eShaderCategory_RayGenerator,	eHitGroup_Undef },
-			{ L"miss",			eLocalRootSignature_PBRMaterialHit,	eShaderCategory_Miss,			eHitGroup_Undef },
+			{ L"miss",			eLocalRootSignature_Empty,			eShaderCategory_Miss,			eHitGroup_Undef },
 			{ L"chs",			eLocalRootSignature_PBRMaterialHit,	eShaderCategory_ClosestHit,		eHitGroup_PBRCameraRay },
 			{ L"shadowChs",		eLocalRootSignature_PBRMaterialHit,	eShaderCategory_ClosestHit,		eHitGroup_PBRShadowRay },
 			{ L"shadowMiss",	eLocalRootSignature_Empty,			eShaderCategory_Miss,			eHitGroup_Undef },
@@ -115,19 +109,17 @@ namespace nsK2EngineLow {
 		/// この列挙子が各インスタンスに割り当てられているシェーダーリソースを表しています。
 		/// </remarks>
 		enum class ESRV_OneEntry {
-			eStartRayGenerationSRV,				// レイジェネレーションシェーダーで利用するSRVの開始番号。
-			eTLAS = eStartRayGenerationSRV,		// TLAS
-			eEndRayGenerationSRV,				// レイジェネレーションで使用されるSRVの数。
-			eAlbedoMap = eEndRayGenerationSRV,	// アルベドマップ。
-			eNormalMap,							// 法線マップ。
-			eSpecularMap,						// スペキュラマップ。
-			eReflectionMap,						// リフレクションマップ。
-			eRefractionMap,						// 屈折マップ。
-			eVertexBuffer,						// 頂点バッファ。
-			eIndexBuffer,						// インデックスバッファ。
-			eSkyCubeBox,						// スカイキューブボックス
-			eExpandShaderResrouce,				// 拡張シェーダーリソース。
-			eNum,								// SRVの数。
+			eStartRayGenerationSRV,				//レイジェネレーションシェーダーで利用するSRVの開始番号。
+			eTLAS = eStartRayGenerationSRV,		//TLAS
+			eEndRayGenerationSRV,					//レイジェネレーションで使用されるSRVの数。
+			eAlbedoMap = eEndRayGenerationSRV,	//アルベドマップ。
+			eNormalMap,							//法線マップ。
+			eSpecularMap,						//スペキュラマップ。
+			eReflectionMap,						//リフレクションマップ。
+			eRefractionMap,						//屈折マップ。
+			eVertexBuffer,						//頂点バッファ。
+			eIndexBuffer,						//インデックスバッファ。
+			eNum,			//SRVの数。
 			eNumRayGenerationSRV = eEndRayGenerationSRV - eStartRayGenerationSRV,	//レイジェネレーションシェーダーで使用するSRVの数。
 		};
 		/// <summary>

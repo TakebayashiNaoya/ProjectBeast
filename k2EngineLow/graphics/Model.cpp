@@ -45,8 +45,7 @@ namespace nsK2EngineLow {
 			initData.m_alphaBlendMode,
 			initData.m_isDepthWrite,
 			initData.m_isDepthTest,
-			initData.m_cullMode,
-			initData.m_computedAnimationVertexBuffer
+			initData.m_cullMode
 		);
 
 		UpdateWorldMatrix(g_vec3Zero, g_quatIdentity, g_vec3One);
@@ -65,7 +64,6 @@ namespace nsK2EngineLow {
 			//Z-up
 			mBias.MakeRotationX(Math::PI * -0.5f);
 		}
-
 		Matrix mTrans, mRot, mScale;
 		mTrans.MakeTranslation(pos);
 		mRot.MakeRotationFromQuaternion(rot);
@@ -85,9 +83,6 @@ namespace nsK2EngineLow {
 		});
 		//ディスクリプタヒープの再作成。
 		m_meshParts.CreateDescriptorHeaps();
-	}
-	void Model::DispatchComputeAnimatedVertexBuffer(RenderContext& rc)
-	{
 
 	}
 	void Model::Draw(

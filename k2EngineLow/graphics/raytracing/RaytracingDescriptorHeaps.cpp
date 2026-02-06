@@ -5,79 +5,59 @@
 namespace nsK2EngineLow {
 	namespace raytracing {
 		void DescriptorHeaps::Init(
-			int bufferNo,
 			World& world,
 			GPUBuffer& outputBuffer,
-			ConstantBuffer& rayGeneCB,
-			Texture& skycubeBox,
-			StructuredBuffer& expandSRV
+			ConstantBuffer& rayGeneCB
 		)
 		{
 
 			//レイトレの出力先をディスクリプタヒープに登録する。
-			m_srvUavCbvHeap.Init(
-				world.GetNumInstance() * (int)ESRV_OneEntry::eNum ,
-				1,
-				1,
-				1
-			);
 			m_srvUavCbvHeap.RegistUnorderAccessResource(0, outputBuffer);
 			m_srvUavCbvHeap.RegistConstantBuffer(0, rayGeneCB);
 			int regNo = 0;
-			world.QueryInstances(bufferNo, [&](Instance& instance)
+			world.QueryInstances([&](Instance& instance)
 			{
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eTLAS,
-					world.GetTLASBuffer(bufferNo)
+					world.GetTLASBuffer()
 				);
-				// アルベドマップをディスクリプタヒープに登録。
+				//アルベドマップをディスクリプタヒープに登録。
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eAlbedoMap,
 					instance.m_material->GetAlbedoMap()
 				);
-				// 法線マップをディスクリプタヒープに登録。
+				//法線マップをディスクリプタヒープに登録。
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eNormalMap,
 					instance.m_material->GetNormalMap()
 				);
-				// スペキュラマップをディスクリプタヒープに登録。
+				//スペキュラマップをディスクリプタヒープに登録。
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eSpecularMap,
 					instance.m_material->GetSpecularMap()
 				);
 
-				// リフレクションマップをディスクリプタヒープに登録。
+				//リフレクションマップをディスクリプタヒープに登録。
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eReflectionMap,
 					instance.m_material->GetReflectionMap()
 				);
 
-				// 屈折マップをディスクリプタヒープに登録。
+				//屈折マップをディスクリプタヒープに登録。
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eRefractionMap,
 					instance.m_material->GetRefractionMap()
 				);
-				// 頂点バッファをディスクリプタヒープに登録。
+				//頂点バッファをディスクリプタヒープに登録。
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eVertexBuffer,
 					instance.m_vertexBufferRWSB
 				);
-				// インデックスバッファをディスクリプタヒープに登録。
+				//インデックスバッファをディスクリプタヒープに登録。
 				m_srvUavCbvHeap.RegistShaderResource(
 					regNo + (int)ESRV_OneEntry::eIndexBuffer,
 					instance.m_indexBufferRWSB
 				);
-				// スカイキューブボックス
-				m_srvUavCbvHeap.RegistShaderResource(
-					regNo + (int)ESRV_OneEntry::eSkyCubeBox,
-					skycubeBox
-				);
-				// 拡張SRV
-				m_srvUavCbvHeap.RegistShaderResource(
-					regNo + (int)ESRV_OneEntry::eExpandShaderResrouce,
-					expandSRV
-				);
-				
 				regNo += (int)ESRV_OneEntry::eNum;
 
 			});
@@ -100,9 +80,8 @@ namespace nsK2EngineLow {
 
 			//サンプラステートをディスクリプタヒープに登録する。
 			m_samplerDescriptorHeap.RegistSamplerDesc(0, samplerDesc);
-			// レイトレのエンジン側でダブルバッファ化しているので、DescriptorHeapの内部でダブルバッファにはしない。
-			m_samplerDescriptorHeap.CommitSamperHeap(false);
-			m_srvUavCbvHeap.Commit(false);
+			m_samplerDescriptorHeap.CommitSamperHeap();
+			m_srvUavCbvHeap.Commit();
 		}
 	}
 }

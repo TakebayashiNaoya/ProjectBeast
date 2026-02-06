@@ -1,10 +1,10 @@
 /*!
- * @brief	スプライトシェーダー�?
+ * @brief	�X�v���C�g�p�̃V�F�[�_�[�B
  */
 
 cbuffer cb : register(b0){
-	float4x4 mvp;		// モ�?ルビュープロジェクション行�??
-	float4 mulColor;	// 乗算カラー。ピクセルシェーダーの出力結果に乗算されます�?
+	float4x4 mvp;		//���[���h�r���[�v���W�F�N�V�����s��B
+	float4 mulColor;	//��Z�J���[�B
 };
 struct VSInput{
 	float4 pos : POSITION;
@@ -16,7 +16,7 @@ struct PSInput{
 	float2 uv  : TEXCOORD0;
 };
 
-Texture2D<float4> colorTexture : register(t0);
+Texture2D<float4> colorTexture : register(t0);	//�J���[�e�N�X�`���B
 sampler Sampler : register(s0);
 
 PSInput VSMain(VSInput In) 
@@ -29,10 +29,4 @@ PSInput VSMain(VSInput In)
 float4 PSMain( PSInput In ) : SV_Target0
 {
 	return colorTexture.Sample(Sampler, In.uv) * mulColor;
-}
-float4 PSMainGamma( PSInput In ) : SV_Target0
-{
-	float4 color = colorTexture.Sample(Sampler, In.uv) * mulColor;
-	color.xyz =  pow(max( color.xyz, 0.0001f ), 1.0f/2.2f);
-	return color;
 }

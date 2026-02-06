@@ -22,10 +22,11 @@ namespace nsK2EngineLow {
 			/// </summary>
 			/// <param name="rc"></param>
 			/// <param name="instances"></param>
-			void Build(
+			void Init(
 				RenderContext& rc,
 				const std::vector<InstancePtr>& instances,
-				bool isUpdate);
+				const std::vector< AccelerationStructureBuffers>& bottomLevelASBuffers
+			);
 			/// <summary>
 			/// SRVÇ…ìoò^ÅB
 			/// </summary>
@@ -40,7 +41,6 @@ namespace nsK2EngineLow {
 				return m_topLevelASBuffers.pResult->GetGPUVirtualAddress();
 			}
 		private:
-			D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS m_inputs = {};
 			AccelerationStructureBuffers m_topLevelASBuffers;
 		};
 	}//namespace raytracing
