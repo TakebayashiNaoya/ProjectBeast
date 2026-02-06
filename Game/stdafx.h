@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "k2EngineLowPreCompile.h"
 using namespace nsK2EngineLow;
-// K2EngineLow‚ÌƒOƒ[ƒoƒ‹ƒAƒNƒZƒXƒ|ƒCƒ“ƒg
+// K2EngineLowã®ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¢ã‚¯ã‚»ã‚¹ãƒã‚¤ãƒ³ãƒˆ
 extern K2EngineLow* g_k2EngineLow;
