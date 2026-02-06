@@ -24,12 +24,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="graphics\ModelRender.cpp" />
+    <ClCompile Include="graphics\RenderingEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
     <ClInclude Include="graphics\IRenderer.h" />
     <ClInclude Include="graphics\ModelRender.h" />
+    <ClInclude Include="graphics\RenderingEngine.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

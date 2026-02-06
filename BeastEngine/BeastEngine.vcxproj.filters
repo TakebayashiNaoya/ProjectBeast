@@ -6,6 +6,9 @@
     <ClCompile Include="graphics\ModelRender.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\RenderingEngine.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -14,6 +17,9 @@
       <Filter>graphics</Filter>
     </ClInclude>
     <ClInclude Include="graphics\IRenderer.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\RenderingEngine.h">
       <Filter>graphics</Filter>
     </ClInclude>
   </ItemGroup>
