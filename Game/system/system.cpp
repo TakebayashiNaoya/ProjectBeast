@@ -1,26 +1,26 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "system.h"
 #include "graphics/GraphicsEngine.h"
 #include "sound/SoundEngine.h"
 
-HWND			g_hWnd = NULL;				//�E�B���h�E�n���h���B
+HWND			g_hWnd = NULL;				//ウィンドウハンドル。
 
 ///////////////////////////////////////////////////////////////////
-//���b�Z�[�W�v���V�[�W���B
-//hWnd�����b�Z�[�W�𑗂��Ă����E�B���h�E�̃n���h���B
-//msg�����b�Z�[�W�̎�ށB
-//wParam��lParam�͈����B���͋C�ɂ��Ȃ��Ă悢�B
+//メッセージプロシージャ。
+//hWndがメッセージを送ってきたウィンドウのハンドル。
+//msgがメッセージの種類。
+//wParamとlParamは引数。今は気にしなくてよい。
 ///////////////////////////////////////////////////////////////////
 LRESULT CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	//�����Ă������b�Z�[�W�ŏ����𕪊򂳂���B
+	//送られてきたメッセージで処理を分岐させる。
 	switch (msg)
 	{
 	case WM_DESTROY:
-		//�G���W���̔j���B
-		// �Q�[���I�u�W�F�N�g�}�l�[�W���[�̍X�V�������Ăяo���B
+		//エンジンの破棄。
+		// ゲームオブジェクトマネージャーの更新処理を呼び出す。
 		PostQuitMessage(0);
-		break;	
+		break;
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
@@ -29,44 +29,44 @@ LRESULT CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 }
 
 ///////////////////////////////////////////////////////////////////
-// �E�B���h�E�̏������B
+// ウィンドウの初期化。
 ///////////////////////////////////////////////////////////////////
 void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName)
 {
-	//�E�B���h�E�N���X�̃p�����[�^��ݒ�(�P�Ȃ�\���̂̕ϐ��̏������ł��B)
+	//ウィンドウクラスのパラメータを設定(単なる構造体の変数の初期化です。)
 	WNDCLASSEX wc =
 	{
-		sizeof(WNDCLASSEX),		//�\���̂̃T�C�Y�B
-		CS_CLASSDC,				//�E�B���h�E�̃X�^�C���B
-								//�����̎w��ŃX�N���[���o�[��������ł��邪�A�Q�[���ł͕s�v�Ȃ̂�CS_CLASSDC�ł悢�B
-		MsgProc,				//���b�Z�[�W�v���V�[�W��(��q)
-		0,						//0�ł����B
-		0,						//0�ł����B
-		GetModuleHandle(NULL),	//���̃N���X�̂��߂̃E�C���h�E�v���V�[�W��������C���X�^���X�n���h���B
-								//�����C�ɂ��Ȃ��Ă悢�B
-		NULL,					//�A�C�R���̃n���h���B�A�C�R����ς������ꍇ������ύX����B�Ƃ肠��������ł����B
-		NULL,					//�}�E�X�J�[�\���̃n���h���BNULL�̏ꍇ�̓f�t�H���g�B
-		NULL,					//�E�B���h�E�̔w�i�F�BNULL�̏ꍇ�̓f�t�H���g�B
-		NULL,					//���j���[���BNULL�ł����B
-		appName,				//�E�B���h�E�N���X�ɕt���閼�O�B
-		NULL					//NULL�ł����B
+		sizeof(WNDCLASSEX),		//構造体のサイズ。
+		CS_CLASSDC,				//ウィンドウのスタイル。
+		//ここの指定でスクロールバーをつけたりできるが、ゲームでは不要なのでCS_CLASSDCでよい。
+MsgProc,				//メッセージプロシージャ(後述)
+0,						//0でいい。
+0,						//0でいい。
+GetModuleHandle(NULL),	//このクラスのためのウインドウプロシージャがあるインスタンスハンドル。
+//何も気にしなくてよい。
+NULL,					//アイコンのハンドル。アイコンを変えたい場合ここを変更する。とりあえずこれでいい。
+NULL,					//マウスカーソルのハンドル。NULLの場合はデフォルト。
+NULL,					//ウィンドウの背景色。NULLの場合はデフォルト。
+NULL,					//メニュー名。NULLでいい。
+appName,				//ウィンドウクラスに付ける名前。
+NULL					//NULLでいい。
 	};
-	//�E�B���h�E�N���X�̓o�^�B
+	//ウィンドウクラスの登録。
 	RegisterClassEx(&wc);
 
-	// �E�B���h�E�̍쐬�B
+	// ウィンドウの作成。
 	g_hWnd = CreateWindow(
-		appName,				//�g�p����E�B���h�E�N���X�̖��O�B
-								//��قǍ쐬�����E�B���h�E�N���X�Ɠ������O�ɂ���B
-		appName,				//�E�B���h�E�̖��O�B�E�B���h�E�N���X�̖��O�ƕʖ��ł��悢�B
-		WS_OVERLAPPEDWINDOW,	//�E�B���h�E�X�^�C���B�Q�[���ł͊�{�I��WS_OVERLAPPEDWINDOW�ł����A
-		0,						//�E�B���h�E�̏���X���W�B
-		0,						//�E�B���h�E�̏���Y���W�B
-		FRAME_BUFFER_W,			//�E�B���h�E�̕��B
-		FRAME_BUFFER_H,			//�E�B���h�E�̍����B
-		NULL,					//�e�E�B���h�E�B�Q�[���ł͊�{�I��NULL�ł����B
-		NULL,					//���j���[�B����NULL�ł����B
-		hInstance,				//�A�v���P�[�V�����̃C���X�^���X�B
+		appName,				//使用するウィンドウクラスの名前。
+		//先ほど作成したウィンドウクラスと同じ名前にする。
+		appName,				//ウィンドウの名前。ウィンドウクラスの名前と別名でもよい。
+		WS_OVERLAPPEDWINDOW,	//ウィンドウスタイル。ゲームでは基本的にWS_OVERLAPPEDWINDOWでいい、
+		0,						//ウィンドウの初期X座標。
+		0,						//ウィンドウの初期Y座標。
+		FRAME_BUFFER_W,			//ウィンドウの幅。
+		FRAME_BUFFER_H,			//ウィンドウの高さ。
+		NULL,					//親ウィンドウ。ゲームでは基本的にNULLでいい。
+		NULL,					//メニュー。今はNULLでいい。
+		hInstance,				//アプリケーションのインスタンス。
 		NULL
 	);
 
@@ -75,27 +75,31 @@ void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, 
 }
 
 
-//�Q�[���̏������B
+//ゲームの初期化。
 void InitGame(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName)
 {
-	//�E�B���h�E���������B
+	//ウィンドウを初期化。
 	InitWindow(hInstance, hPrevInstance, lpCmdLine, nCmdShow, appName);
-
-	
+	//k2エンジンの初期化。
+	nsBeastEngine::BeastEngine::InitData initData;
+	initData.frameBufferWidth = FRAME_BUFFER_W;
+	initData.frameBufferHeight = FRAME_BUFFER_H;
+	initData.hwnd = g_hWnd;
+	nsBeastEngine::BeastEngine::CreateInstance(initData);
 }
-//�E�B���h�E���b�Z�[�W���f�B�X�p�b�`�Bfalse���Ԃ��Ă�����A�Q�[���I���B
+//ウィンドウメッセージをディスパッチ。falseが返ってきたら、ゲーム終了。
 bool DispatchWindowMessage()
 {
 	MSG msg = { 0 };
 	while (WM_QUIT != msg.message) {
-		//�E�B���h�E����̃��b�Z�[�W���󂯎��B
+		//ウィンドウからのメッセージを受け取る。
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 		else {
-			//�E�B���h�E���b�Z�[�W����ɂȂ����B
+			//ウィンドウメッセージが空になった。
 			break;
 		}
 	}

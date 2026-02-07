@@ -1,47 +1,66 @@
 ﻿#include "stdafx.h"
 #include "system/system.h"
-#include "BeastEngine.h"
+
+#include<dxgidebug.h>
+#include<InitGUID.h>
+
+//#include "Game.h"
 
 
-// K2EngineLowのグローバルアクセスポイント。
-K2EngineLow* g_k2EngineLow = nullptr;
+void ReportLiveObjects()
+{
+	IDXGIDebug* pDxgiDebug;
 
-/// <summary>
-/// メイン関数
-/// </summary>
+	typedef HRESULT(__stdcall* fPtr)(const IID&, void**);
+	HMODULE hDll = GetModuleHandleW(L"dxgidebug.dll");
+	fPtr DXGIGetDebugInterface = (fPtr)GetProcAddress(hDll, "DXGIGetDebugInterface");
+
+	DXGIGetDebugInterface(__uuidof(IDXGIDebug), (void**)&pDxgiDebug);
+
+	// 出力。
+	pDxgiDebug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_DETAIL);
+}
+
+///////////////////////////////////////////////////////////////////
+// ウィンドウプログラムのメイン関数。
+///////////////////////////////////////////////////////////////////
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	// ゲームの初期化。
+	//ゲームの初期化。
 	InitGame(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("Game"));
-
-	// k2EngineLowの初期化。
-	g_k2EngineLow = new K2EngineLow();
-	g_k2EngineLow->Init(g_hWnd, FRAME_BUFFER_W, FRAME_BUFFER_H);
-	g_camera3D->SetPosition({ 0.0f, 100.0f, -200.0f });
-	g_camera3D->SetTarget({ 0.0f, 50.0f, 0.0f });
+	//////////////////////////////////////
+	// ここから初期化を行うコードを記述する。
+	//////////////////////////////////////
 
 
-	// ここからゲームループ。
+	/** 当たり判定を可視化 */
+	PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
+
+	/**
+	 * ゲームオブジェクトの生成
+	 */
+	 //auto* game = new Game();
+
+	 //////////////////////////////////////
+	 // 初期化を行うコードを書くのはここまで！！！
+	 //////////////////////////////////////
+
+	 // ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
-		// フレームの開始時に呼び出す必要がある処理を実行
-		g_k2EngineLow->BeginFrame();
-
-		// ゲームオブジェクトマネージャーの更新処理を呼び出す。
-		g_k2EngineLow->ExecuteUpdate();
-
-		// ゲームオブジェクトマネージャーの描画処理を呼び出す。
-		g_k2EngineLow->ExecuteRender();
-
-		// デバッグ描画処理を実行する。
-		g_k2EngineLow->DebubDrawWorld();
-
-		// フレームの終了時に呼び出す必要がある処理を実行。
-		g_k2EngineLow->EndFrame();
+		nsBeastEngine::BeastEngine::GetInstance()->Execute();
 	}
 
-	delete g_k2EngineLow;
+	/**
+	 * ゲームオブジェクトの破棄
+	 */
+	 //delete game;
 
+	nsBeastEngine::BeastEngine::DeleteInstance();
+
+#ifdef _DEBUG
+	ReportLiveObjects();
+#endif // _DEBUG
 	return 0;
 }
 

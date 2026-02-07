@@ -16,12 +16,16 @@ namespace nsBeastEngine
 		~RenderingEngine();
 
 
-	private:
+	public:
+
 		/**
 		 * @brief レンダリングパイプラインの初期化
 		 * @param isSoftShadow	ソフトシャドウを使用するかどうか
 		 */
 		void Init(bool isSoftShadow);
+
+
+	private:
 
 		/**
 		 * @brief メインレンダリングターゲットの初期化

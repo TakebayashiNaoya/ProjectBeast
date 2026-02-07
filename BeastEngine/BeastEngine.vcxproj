@@ -31,6 +31,7 @@
     <ClInclude Include="BeastEnginePreCompile.h" />
     <ClInclude Include="graphics\IRenderer.h" />
     <ClInclude Include="graphics\ModelRender.h" />
+    <ClInclude Include="graphics\MyRenderer.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
