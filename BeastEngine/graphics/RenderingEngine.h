@@ -4,6 +4,7 @@
  * @author 竹林尚哉
  */
 #pragma once
+#include "MyRenderer.h"
 
 
 namespace nsBeastEngine
