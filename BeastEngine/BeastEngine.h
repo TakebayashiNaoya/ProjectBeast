@@ -6,7 +6,7 @@
 #pragma once
 
 
-namespace nsBeast
+namespace nsBeastEngine
 {
 	/**
 	 * @brief BeastEngine
@@ -39,6 +39,7 @@ namespace nsBeast
 			HWND hwnd;				/**	ウィドウハンドル */
 			UINT frameBufferWidth;	/**	フレームバッファの幅 */
 			UINT frameBufferHeight;	/**	フレームバッファの高さ */
+			bool isSoftShadow;		/**	ソフトシャドウを使用するかどうか */
 		};
 		/**
 		 * @brief BeastEngineの初期化
@@ -72,8 +73,12 @@ namespace nsBeast
 	private:
 		/** BeastEngineのインスタンス */
 		static BeastEngine* m_instance;
+
+		RenderingEngine m_renderingEngine;					// レンダリングエンジン。
+
 	};
 
 	/** グローバルにアクセスできる変数 */
 	extern BeastEngine* g_beastEngine;
+	extern RenderingEngine* g_renderingEngine;
 }

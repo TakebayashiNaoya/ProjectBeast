@@ -2,15 +2,17 @@
  * @file BeastEngine.cpp
  * @brief BeastEngineクラスの実装
  */
-#include "BeastEngine.h"
 #include "BeastEnginePreCompile.h"
+#include "BeastEngine.h"
 
 
-namespace nsBeast
+namespace nsBeastEngine
 {
 	/** 静的メンバ変数の実体を定義 */
 	BeastEngine* BeastEngine::m_instance = nullptr;
 	BeastEngine* g_beastEngine = nullptr;
+
+	RenderingEngine* g_renderingEngine = nullptr;
 
 
 	void BeastEngine::CreateInstance(const InitData& initData)
@@ -37,22 +39,24 @@ namespace nsBeast
 	void BeastEngine::Init(const InitData& initData)
 	{
 		g_beastEngine = this;
+		g_renderingEngine = &m_renderingEngine;
 
-		// K2EngineLowの初期化
-		// レイトレ用の設定は一旦ダミーか最小限で渡す
-		raytracing::InitData raytracingInitData = { 0 };
+		raytracing::InitData raytracintInitData;
+		raytracintInitData.m_expandShaderResource = &m_renderingEngine.GetRaytracingLightData();
+		raytracintInitData.m_expandShaderResourceSize = sizeof(m_renderingEngine.GetRaytracingLightData());
 
 		m_k2EngineLow.Init(
 			initData.hwnd,
 			initData.frameBufferWidth,
 			initData.frameBufferHeight,
-			raytracingInitData
+			raytracintInitData
 		);
 
 		/**
 		 * TODO: 本来はRenderingEngineの初期化を行うが、K2のレンダラーは使わないのでここではコメントアウトする
 		 * m_renderingEngine.Init(initData.isSoftShadow);
 		 */
+		m_renderingEngine.Init(initData.isSoftShadow);
 
 		if (g_camera3D) {
 			g_camera3D->SetPosition({ 0.0f, 100.0f, -200.0f }); /** 手前・上に配置 */
