@@ -9,16 +9,29 @@
 #include <fstream>
 
 
-
 namespace app
 {
 	namespace core
 	{
-		ParameterManager* ParameterManager::m_instance = nullptr; //初期化
+		/** シングルトンインスタンス初期化 */
+		ParameterManager* ParameterManager::m_instance = nullptr;
 
 
 		ParameterManager::ParameterManager()
 		{
+			m_parameterMap.clear();
+		}
+
+
+		ParameterManager::~ParameterManager()
+		{
+			for (auto paramPair : m_parameterMap)
+			{
+				for (const auto& param : paramPair.second)
+				{
+					delete param;
+				}
+			}
 			m_parameterMap.clear();
 		}
 
@@ -30,7 +43,7 @@ namespace app
 			{
 				for (const auto& param : paramPair.second)
 				{
-					if (CheckFileModified(param.get()))
+					if (CheckFileModified(param))
 					{
 						std::ifstream file(param->m_path);
 						if (!file.is_open())
@@ -43,7 +56,7 @@ namespace app
 
 						ParameterVector parameters;
 
-						for (const auto& j : jsonRoot)
+						for (auto& j : jsonRoot)
 						{
 							param->m_lastWriteTime = GetFileLastWriteTime(param->m_path.c_str());
 							param->Load(j);

@@ -20,6 +20,8 @@ namespace app
 			std::string m_path;         // パラメーターのファイルパス（ホットリロード用）
 			time_t m_lastWriteTime;     // 最終更新時刻
 #endif // APP_PARAM_HOT_RELOAD
+
+			virtual ~IMasterParameter() = default;
 		};
 	}
 }

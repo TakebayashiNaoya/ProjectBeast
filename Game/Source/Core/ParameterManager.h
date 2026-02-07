@@ -6,6 +6,7 @@
 #pragma once
 #include "Json/json.hpp"
 #include "Source/Core/AppParameterMacro.h"
+#include <fstream>
 
 
 namespace app
@@ -21,32 +22,48 @@ namespace app
 		class ParameterManager : public Noncopyable
 		{
 		private:
-			// 複数パラメーターがあっても良いように
-			using ParameterVector = std::vector<std::unique_ptr<IMasterParameter>>;
-			// 各パラメーターごとに保持する
+
+			using ParameterVector = std::vector<IMasterParameter*>;
+
 			using ParameterMap = std::map<uint32_t, ParameterVector>;
 
-		private:
-			ParameterMap m_parameterMap;  // パラメーターを保持
+
+		public:
+#ifdef APP_PARAM_HOT_RELOAD
+			/**
+			 * @brief ファイル更新日時取得
+			 */
+			static time_t GetFileLastWriteTime(const char* path);
+
+
+			/**
+			 * @brief ファイル更新チェック
+			 */
+			static bool CheckFileModified(const IMasterParameter* param);
+
+#endif // APP_PARAM_HOT_RELOAD
+
+
 
 		private:
 			ParameterManager();
-			~ParameterManager() = default;
+			~ParameterManager();
 
 
 		public:
 			/**
-			 * パラメーター操作
+			 * パラメーターを更新
 			 */
 			void Update();
 
 
 		public:
-			/// <summary>
-			/// パラメーター読み込み
-			/// NOTE: Unloadも呼ぶことを忘れないように
-			///       第2引数のラムダ式でテンプレートで指定する型の情報に変換する
-			/// </summary>
+			/**
+			 * @brief パラメーター読み込み
+			 * @tparam T パラメーター型
+			 * @param path ファイルパス
+			 * @param func JSONからパラメーター型に変換する関数
+			 */
 			template <typename T>
 			void LoadParameter(const char* path, const std::function<void(const nlohmann::json& json, T& p)>& func)
 			{
@@ -59,8 +76,8 @@ namespace app
 				file >> jsonRoot;
 
 				ParameterVector parameters;
-				for (const auto& j : jsonRoot) {
-					T* parameter = std::make_unique<T>();
+				for (auto& j : jsonRoot) {
+					auto parameter = new T;
 
 #ifdef APP_PARAM_HOT_RELOAD
 					parameter->m_path = std::string(path);
@@ -69,35 +86,41 @@ namespace app
 #endif
 
 					func(j, *parameter);
-					parameters.emplace_back(std::move(parameter));
+					parameters.push_back(parameter);
 				}
 
-				m_parameterMap.emplace(T::ID(), std::move(parameters));
+				m_parameterMap.emplace(T::ID(), parameters);
 			}
 
-			/// <summary>
-			/// パラメーター解放
-			/// </summary>
+
+			/**
+			 * @brief パラメーターアンロード
+			 * @tparam T パラメーター型
+			 */
 			template <typename T>
 			void UnloadParameter()
 			{
 				m_parameterMap.erase(T::ID());
 			}
 
-			/// <summary>
-			/// 1つだけパラメーターを取得する
-			/// </summary>
+
+		public:
+			/**
+			 * @brief パラメーターを１つ取得する
+			 * @tparam T パラメーター型
+			 */
 			template <typename T>
 			const T* GetParameter(const int index = 0) const
 			{
 				const auto parameters = GetParameters<T>();
 				if (parameters.size() == 0) { return nullptr; }
-				if (parameters.size() <= index) { return nullptr; }
+				if (parameters.size() >= index) { return nullptr; }
 				return parameters[index];
 			}
-			/// <summary>
-			/// 複数パラメーターを取得する
-			/// </summary>
+			/**
+			 * @brief パラメーターを全て取得する
+			 * @tparam T パラメーター型
+			 */
 			template <typename T>
 			inline const std::vector<T*> GetParameters() const
 			{
@@ -105,14 +128,14 @@ namespace app
 				auto it = m_parameterMap.find(T::ID());
 				if (it != m_parameterMap.end()) {
 					for (const auto& parameter : it->second) {
-						parameters.push_back(static_cast<T*>(parameter.get()));
+						parameters.push_back(static_cast<T*>(parameter));
 					}
 				}
 				return parameters;
 			}
-			/// <summary>
-			/// パラメーターをラムダ式で回すForEach
-			/// </summary>
+			/**
+			 * @brief パラメーターを全て処理する
+			 */
 			template <typename T>
 			void ForEach(std::function<void(const T&)> func) const
 			{
@@ -123,28 +146,15 @@ namespace app
 			}
 
 
-#ifdef APP_PARAM_HOT_RELOAD
-			/**
-			 * ファイル更新日時取得
-			 */
-			static time_t GetFileLastWriteTime(const char* path);
+		private:
+			/** パラメーターマップ */
+			ParameterMap m_parameterMap;
 
 
-			/**
-			 * ファイル更新チェック
-			 */
-			static bool CheckFileModified(const IMasterParameter* param);
-
-#endif // APP_PARAM_HOT_RELOAD
-
-
-			/**
-			 * シングルトン用
-			 */
 		public:
-			/// <summary>
-			/// インスタンスを作る
-			/// </summary>
+			/**
+			 * @brief インスタンスを生成
+			 */
 			static void CreateInstance()
 			{
 				if (m_instance == nullptr)
@@ -153,17 +163,19 @@ namespace app
 				}
 			}
 
-			/// <summary>
-			/// インスタンスを取得
-			/// </summary>
-			static ParameterManager& Get()
+			/**
+			 * @brief インスタンスを取得
+			 * @return シングルトンインスタンスのポインタ
+			 */
+			static ParameterManager* Get()
 			{
-				return *m_instance;
+				return m_instance;
 			}
 
-			/// <summary>
-			/// インスタンスを破棄
-			/// </summary>
+
+			/**
+			 * @brief インスタンスを破棄
+			 */
 			static void DestroyInstance()
 			{
 				if (m_instance != nullptr)
@@ -174,7 +186,8 @@ namespace app
 			}
 
 		private:
-			static ParameterManager* m_instance; //シングルトンインスタンス
+			/** シングルトンインスタンス */
+			static ParameterManager* m_instance;
 		};
 	}
 }
