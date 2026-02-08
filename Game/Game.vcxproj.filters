@@ -91,6 +91,9 @@
     <ClCompile Include="Source\Scene\DebugScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Util\Curve.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -155,6 +158,9 @@
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Scene\DebugScene.h">
       <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\Curve.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
