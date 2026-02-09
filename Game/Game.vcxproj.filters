@@ -93,6 +93,17 @@
     </ClCompile>
     <ClCompile Include="Source\Util\Curve.cpp">
       <Filter>Util</Filter>
+    <ClCompile Include="Source\Core\AppParameterMacro.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\IMasterParameter.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerParameter.cpp">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp">
+      <Filter>Source\Actor\Character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +172,17 @@
     </ClInclude>
     <ClInclude Include="Source\Util\Curve.h">
       <Filter>Util</Filter>
+    <ClInclude Include="Source\Core\AppParameterMacro.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\IMasterParameter.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerParameter.h">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterParameter.h">
+      <Filter>Source\Actor\Character</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
