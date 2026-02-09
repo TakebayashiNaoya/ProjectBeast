@@ -91,6 +91,8 @@
     <ClCompile Include="Source\Scene\DebugScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Util\Curve.cpp">
+      <Filter>Util</Filter>
     <ClCompile Include="Source\Core\AppParameterMacro.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -168,6 +170,8 @@
     <ClInclude Include="Source\Scene\DebugScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Util\Curve.h">
+      <Filter>Util</Filter>
     <ClInclude Include="Source\Core\AppParameterMacro.h">
       <Filter>Source\Core</Filter>
     </ClInclude>

@@ -249,6 +249,7 @@
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\UIBase.cpp" />
+    <ClCompile Include="Source\Util\Curve.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -281,6 +282,7 @@
     <ClInclude Include="Source\system\system.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIBase.h" />
+    <ClInclude Include="Source\Util\Curve.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\CRC32.h" />
   </ItemGroup>
