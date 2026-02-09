@@ -4,12 +4,26 @@
  * @author 忽那
  */
 #pragma once
+#include <algorithm>
 
 
 namespace app
 {
 	namespace util
 	{
+		// 汎用的なclamp関数テンプレート
+		template <typename T>
+		T clamp(T value, T low, T high) {
+			if (value < low) {
+				return low;
+			}
+			if (value > high) {
+				return high;
+			}
+			return value;
+		}
+
+
 		/**
 		 * @brief イージングの種類
 		 * @brief 線形補間、イーズイン、イーズアウト、イーズインアウト
@@ -26,8 +40,8 @@ namespace app
 
 
 
-		/** 
-		 * @brief 汎用的なCurveテンプレート 
+		/**
+		 * @brief 汎用的なCurveテンプレート
 		 */
 		template<typename T>
 		class Curve
@@ -53,15 +67,15 @@ namespace app
 
 		public:
 			Curve()
-				:	m_duration(1.0f)
-				,	m_currentTime(0.0f)
-				,	m_isPlaying(false)
-				,	m_direction(0)
+				: m_duration(1.0f)
+				, m_currentTime(0.0f)
+				, m_isPlaying(false)
+				, m_direction(0)
 			{
 			}
 
 
-			/** 
+			/**
 			 * @brief 初期化
 			 * @param start 始める数値
 			 * @param end 終わる数値
@@ -70,16 +84,16 @@ namespace app
 			 * @param LoopMode loopMode = LoopMode::Once 片道
 			 */
 			void Initialize(
-					const T& start
-				,	const T& end
-				,	const float timeSec
-				,	const EasingType type = EasingType::EaseOut
-				,	const LoopMode loopMode = LoopMode::Once
+				const T& start
+				, const T& end
+				, const float timeSec
+				, const EasingType type = EasingType::EaseOut
+				, const LoopMode loopMode = LoopMode::Once
 			)
 			{
 				m_startValue = start;
 				m_endValue = end;
-				m_duration.max(0.0001f, timeSec);
+				m_duration.max<float>(0.0001f, timeSec);
 				m_easingType = type;
 				m_loopMode = loopMode;
 				m_currentTime = 0.0f;
@@ -109,7 +123,7 @@ namespace app
 				if (!m_isPlaying)return;
 
 				/** 時間を進める */
-				m_currentTime += m_loopMode == LoopMode::PingPong ? deltaTime * m_direction * : deltaTime;
+				m_currentTime += m_loopMode == LoopMode::PingPong ? deltaTime * m_direction : deltaTime;
 
 				/** 終了判定とループ判定 */
 				if (m_currentTime >= m_duration)
@@ -126,7 +140,7 @@ namespace app
 					else if (m_loopMode == LoopMode::PingPong)
 					{
 						m_currentTime = m_duration;
-						m_directoin = -1;
+						m_direction = -1;
 					}
 				}
 				else if (m_currentTime <= 0.0f)
@@ -145,7 +159,11 @@ namespace app
 				/**
 				 * @brief clamp関数を使って0.0f~1.0fの範囲に収める
 				 */
-				float t = std::clamp<float>(m_currentTime / m_duration, 0.0f, 1.0f);
+
+
+				float t = clamp<float>(m_currentTime / m_duration, 0.0f, 1.0f);
+				float rete = ApplyEasingInternal(t);
+				return m_startValue + (m_endValue - m_startValue) * rete;
 			}
 
 
@@ -153,27 +171,27 @@ namespace app
 			bool IsPlaying()const { return m_isPlaying; }
 
 
-			private:
-				/** イージング適用 */
-				float ApplyEasingInternal(float t)const
+		private:
+			/** イージング適用 */
+			float ApplyEasingInternal(float t)const
+			{
+				switch (m_easingType)
 				{
-					switch (m_easingType)
-					{
-						/** 等速 */
-					case EasingType::Liner:      return t;
-						/** 加速 */
-					case EasingType::EaseIn:     return t * t;
-						/** 加減速 */
-					case EasingType::EaseOut:    return t * (2.0f - t);
-						/** 
-						 * @brief 加速した後ゆっくり減速する
-						 */
-					case EasingType::EaseInOut:
-						if (t < 0.5f)return 2.0f * t * t;
-						else         return -1.0f + (4.0f - 2.0f * t) * t;
-					}
-					return t;
+					/** 等速 */
+				case EasingType::Liner:      return t;
+					/** 加速 */
+				case EasingType::EaseIn:     return t * t;
+					/** 加減速 */
+				case EasingType::EaseOut:    return t * (2.0f - t);
+					/**
+					 * @brief 加速した後ゆっくり減速する
+					 */
+				case EasingType::EaseInOut:
+					if (t < 0.5f)return 2.0f * t * t;
+					else         return -1.0f + (4.0f - 2.0f * t) * t;
 				}
+				return t;
+			}
 		};
 
 
