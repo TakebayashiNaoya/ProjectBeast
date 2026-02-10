@@ -114,7 +114,7 @@ namespace app
 			{
 				const auto parameters = GetParameters<T>();
 				if (parameters.size() == 0) { return nullptr; }
-				if (parameters.size() >= index) { return nullptr; }
+				if (parameters.size() < index) { return nullptr; }
 				return parameters[index];
 			}
 			/**

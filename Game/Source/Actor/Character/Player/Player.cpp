@@ -53,7 +53,7 @@ namespace app
 
 		void Player::Update()
 		{
-			//m_stateMachine->Update();
+			m_stateMachine->Update();
 
 			CharacterBase::Update();
 		}
