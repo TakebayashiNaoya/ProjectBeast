@@ -50,13 +50,7 @@ namespace app
 
 		void PlayerStatus::Update()
 		{
-			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterPlayerParameter>();
-			m_maxHp = parameter->maxHp;
-			m_hp = parameter->hp;
-			m_walkSpeed = parameter->walkSpeed;
-			m_runSpeed = parameter->runSpeed;
-			m_radius = parameter->radius;
-			m_height = parameter->height;
+			Setup();
 		}
 	}
 }
