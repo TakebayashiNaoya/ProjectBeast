@@ -20,7 +20,7 @@ namespace app
 	{
 
 		/** 前方宣言 */
-		class ActorStateMachine;
+		class StateMachineBase;
 
 
 		/**
@@ -29,7 +29,7 @@ namespace app
 		class IState
 		{
 		public:
-			IState(ActorStateMachine* stateMachine);
+			IState() = default;
 			virtual ~IState() = default;
 
 
@@ -40,23 +40,6 @@ namespace app
 			virtual void Update() = 0;
 			/** ステートから出るときの処理 */
 			virtual void Exit() = 0;
-
-
-		protected:
-			/**
-			 * @brief ステートマシンを取得する
-			 * @tparam TStateMachine ステートマシンの型
-			 */
-			template<typename TStateMachine>
-			TStateMachine* GetOwner()
-			{
-				return dynamic_cast<TStateMachine*>(m_stateMachine);
-			}
-
-
-		private:
-			/** ステートマシン */
-			ActorStateMachine* m_stateMachine;
 		};
 
 
@@ -68,7 +51,7 @@ namespace app
 		/**
 		 * @brief アクターのステートマシンの基底クラス
 		 */
-		class ActorStateMachine
+		class StateMachineBase
 		{
 		public:
 			/*
@@ -88,20 +71,22 @@ namespace app
 			 * @tparam TState ステートの型
 			 * @param stateID ステートID
 			 */
-			template<typename TState>
-			void AddState(const uint32_t stateID)
+			template<typename TState, typename TStateMachine>
+			void AddState(TStateMachine&& stateMachine)
 			{
+				// IDを取得
+				const uint32_t stateID = TState::ID();
 				// 指定したIDを取得
 				auto it = m_stateMap.find(stateID);
 				// IDが外れ値の場合
 				if (it != m_stateMap.end())
 				{
 					// 既存のものを削除して警告を出す
-					delete it->second;
+					delete it->second.get();
 					K2_ASSERT(false, "重複しています");
 				}
 				// ステートを追加
-				m_stateMap[TState::ID()] = std::make_unique<TState>(this);
+				m_stateMap[stateID] = std::make_unique<TState>(std::forward<TStateMachine>(stateMachine));
 			}
 
 
@@ -121,8 +106,8 @@ namespace app
 
 
 		public:
-			ActorStateMachine();
-			virtual ~ActorStateMachine() = default;
+			StateMachineBase();
+			virtual ~StateMachineBase() = default;
 
 
 		protected:

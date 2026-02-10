@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/ActorStateMachine.h"
+#include "Source/Core/StateMachineBase.h"
 
 
 namespace app
@@ -20,8 +20,12 @@ namespace app
 		/**
 		 * @brief プレイヤーのステートマシンクラス
 		 */
-		class PlayerStateMachine : public ActorStateMachine
+		class PlayerStateMachine : public StateMachineBase
 		{
+		public:
+
+
+
 		public:
 			/** ステートの変更先を取得する */
 			IState* GetChangeState();
