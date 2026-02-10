@@ -1,11 +1,9 @@
 ﻿/**
  * @file StageSystem.h
- * @brief ステージのレイアウト管理
+ * @brief ステージ上のオブジェクトを管理するシステム
  * @author 藤谷
  */
 #pragma once
-#include "IObject.h"
-#include "IStage.h"
 #include "json/json.hpp"
 
 

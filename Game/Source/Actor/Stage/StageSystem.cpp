@@ -1,6 +1,6 @@
 ﻿/**
  * @file Actor.cpp
- * @brief 見た目が存在するオブジェクトの基底クラス
+ * @brief ステージ上のオブジェクトを管理するシステム
  * @author 藤谷
  */
 #include "stdafx.h"
