@@ -81,9 +81,6 @@
     <ClCompile Include="Source\Scene\SceneManager.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\UIBase.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\UIAnimation.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
@@ -96,7 +93,7 @@
     </ClCompile>
     <ClCompile Include="Source\Util\Curve.cpp">
       <Filter>Util</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Source\Core\AppParameterMacro.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -114,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp">
       <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\UIParts.cpp">
+      <Filter>Source\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,9 +167,6 @@
     <ClInclude Include="Source\Scene\SceneManager.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\UIBase.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\UIAnimation.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
@@ -182,7 +179,7 @@
     </ClInclude>
     <ClInclude Include="Source\Util\Curve.h">
       <Filter>Util</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="Source\Core\AppParameterMacro.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
@@ -200,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Stage\StageSystem.h">
       <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\UIParts.h">
+      <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
