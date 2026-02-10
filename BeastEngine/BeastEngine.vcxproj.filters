@@ -4,31 +4,40 @@
     <ClCompile Include="BeastEngine.cpp" />
     <ClCompile Include="BeastEnginePreCompile.cpp" />
     <ClCompile Include="graphics\ModelRender.cpp">
-      <Filter>graphics</Filter>
+      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="graphics\RenderingEngine.cpp">
-      <Filter>graphics</Filter>
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Light\SceneLight.cpp">
+      <Filter>Graphics\Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
     <ClInclude Include="graphics\ModelRender.h">
-      <Filter>graphics</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="graphics\IRenderer.h">
-      <Filter>graphics</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="graphics\RenderingEngine.h">
-      <Filter>graphics</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="graphics\MyRenderer.h">
-      <Filter>graphics</Filter>
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Light\SceneLight.h">
+      <Filter>Graphics\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="graphics">
+    <Filter Include="Graphics">
       <UniqueIdentifier>{208d30c3-2e7d-4a27-a4c7-e116a639c77a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Light">
+      <UniqueIdentifier>{b5a34f6b-6814-4378-a0e6-0e35d5d221a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
