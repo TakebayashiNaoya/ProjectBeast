@@ -4,7 +4,7 @@
 #include<dxgidebug.h>
 #include<InitGUID.h>
 
-//#include "Game.h"
+#include "Test.h"
 
 
 void ReportLiveObjects()
@@ -39,13 +39,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	/**
 	 * ゲームオブジェクトの生成
 	 */
-	 //auto* game = new Game();
+	auto* game = NewGO<Test>(0);
 
-	 //////////////////////////////////////
-	 // 初期化を行うコードを書くのはここまで！！！
-	 //////////////////////////////////////
+	//////////////////////////////////////
+	// 初期化を行うコードを書くのはここまで！！！
+	//////////////////////////////////////
 
-	 // ここからゲームループ。
+	// ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
 		nsBeastEngine::BeastEngine::GetInstance()->Execute();
