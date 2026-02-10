@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/ActorStateMachine.h"
+#include "Source/Core/StateMachineBase.h"
 
 
 namespace app
@@ -16,11 +16,30 @@ namespace app
 		class PlayerStateMachine;
 
 
+		class PlayerIState : public IState
+		{
+		public:
+			virtual void Enter() override {}
+			virtual void Update() override {}
+			virtual void Exit() override {}
+
+
+		public:
+			PlayerIState(PlayerStateMachine* owner);
+			~PlayerIState() override = default;
+
+
+		protected:
+			PlayerStateMachine* m_owner;
+		};
+
+
 		/**
 		 * @brief プレイヤーの待機ステートクラス
 		 */
-		class PlayerIdleState : public IState
+		class PlayerIdleState : public PlayerIState
 		{
+			appState(PlayerIdleState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -29,13 +48,8 @@ namespace app
 
 
 		public:
-			PlayerIdleState(ActorStateMachine* stateMachine);
+			PlayerIdleState(PlayerStateMachine* owner);
 			~PlayerIdleState() override = default;
-
-
-		private:
-			/** ステートマシーン */
-			PlayerStateMachine* m_owner;
 		};
 
 
@@ -47,8 +61,9 @@ namespace app
 		/**
 		 * @brief プレイヤーの移動ステートクラス
 		 */
-		class PlayerMoveState : public IState
+		class PlayerMoveState : public PlayerIState
 		{
+			appState(PlayerMoveState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -56,14 +71,9 @@ namespace app
 			void Exit() override final;
 
 
-		private:
-			PlayerMoveState(ActorStateMachine* stateMachine);
+		public:
+			PlayerMoveState(PlayerStateMachine* owner);
 			~PlayerMoveState() override = default;
-
-
-		private:
-			/** ステートマシーン */
-			PlayerStateMachine* m_owner;
 		};
 	}
 }

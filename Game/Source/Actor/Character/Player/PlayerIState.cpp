@@ -13,6 +13,18 @@ namespace app
 {
 	namespace actor
 	{
+
+		PlayerIState::PlayerIState(PlayerStateMachine* owner)
+			: m_owner(owner)
+		{
+		}
+
+
+
+
+		/************************************/
+
+
 		void PlayerIdleState::Enter()
 		{
 		}
@@ -20,6 +32,7 @@ namespace app
 
 		void PlayerIdleState::Update()
 		{
+			m_owner->ChangeState();
 		}
 
 
@@ -28,9 +41,8 @@ namespace app
 		}
 
 
-		PlayerIdleState::PlayerIdleState(ActorStateMachine* stateMachine)
-			: IState(stateMachine)
-			, m_owner(GetOwner<PlayerStateMachine>())
+		PlayerIdleState::PlayerIdleState(PlayerStateMachine* owner)
+			: PlayerIState(owner)
 		{
 		}
 
@@ -55,9 +67,8 @@ namespace app
 		}
 
 
-		PlayerMoveState::PlayerMoveState(ActorStateMachine* stateMachine)
-			: IState(stateMachine)
-			, m_owner(GetOwner<PlayerStateMachine>())
+		PlayerMoveState::PlayerMoveState(PlayerStateMachine* owner)
+			: PlayerIState(owner)
 		{
 		}
 	}
