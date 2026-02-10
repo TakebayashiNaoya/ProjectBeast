@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #pragma once
+#include "ActorStatus.h"
 #include "IObject.h"
 #include "Source/Core/Transform.h"
 
@@ -13,7 +14,7 @@ namespace app
 	namespace actor
 	{
 		/** 前方宣言 */
-		class ActorStatus;
+		//class ActorStatus;
 
 
 		/**

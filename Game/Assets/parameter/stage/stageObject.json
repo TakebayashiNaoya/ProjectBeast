@@ -1,0 +1,27 @@
+﻿{
+  "StageObject": {
+    "object": [
+      {
+        "objectName": "floor1",
+        "fileName": "Assets/modelData/stage/floor.tkm",
+        "position": [ 0, 0, 1000 ],
+        "rotation": [ 0, 0, 0, 0],
+        "scale": [ 1, 1, 1 ]
+      },
+      {
+        "objectName": "floor2",
+        "fileName": "Assets/modelData/stage/floor.tkm",
+        "position": [ 0, 0, 3000 ],
+        "rotation": [ 0, 0, 0, 0 ],
+        "scale": [ 1, 1, 1 ]
+      },
+      {
+        "objectName": "floor3",
+        "fileName": "Assets/modelData/stage/floor.tkm",
+        "position": [ 0, 0, 0 ],
+        "rotation": [ 0, 0, 0, 0 ],
+        "scale": [ 1, 1, 1 ]
+      }
+    ]
+  }
+}
