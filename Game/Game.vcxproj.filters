@@ -28,6 +28,9 @@
     <Filter Include="Source\system">
       <UniqueIdentifier>{706b7812-7f1c-4488-854b-c24a37b2f3c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Actor\Stage">
+      <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -102,6 +105,12 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp">
       <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\IStage.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\StageSystem.cpp">
+      <Filter>Source\Actor\Stage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +188,12 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\CharacterParameter.h">
       <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\IStage.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\StageSystem.h">
+      <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
