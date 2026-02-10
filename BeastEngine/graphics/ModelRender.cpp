@@ -13,6 +13,11 @@ namespace nsBeastEngine
 	}
 
 
+	ModelRender::~ModelRender()
+	{
+	}
+
+
 	void ModelRender::Init(
 		const char* filePath,
 		AnimationClip* animationClips,
@@ -107,5 +112,22 @@ namespace nsBeastEngine
 			m_maxInstance,
 			worldMatrxiArraySB
 		);
+	}
+
+
+	void ModelRender::Update()
+	{
+		// アニメーションの更新などをここで行う
+		// 例: m_animation.Progress(g_gameTime->GetFrameDeltaTime());
+
+		// とりあえず今は空でもOK
+	}
+
+
+	void ModelRender::Draw(RenderContext& rc)
+	{
+		// ここで描画コマンドを発行する
+
+		// まだ実装していないなら空でもOK
 	}
 }
