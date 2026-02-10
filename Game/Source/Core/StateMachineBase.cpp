@@ -4,25 +4,14 @@
  * @author 藤谷
  */
 #include "stdafx.h"
-#include "ActorStateMachine.h"
+#include "StateMachineBase.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-		IState::IState(ActorStateMachine* stateMachine)
-			: m_stateMachine(stateMachine)
-		{
-		}
-
-
-
-
-		/***************************************/
-
-
-		ActorStateMachine::ActorStateMachine()
+		StateMachineBase::StateMachineBase()
 			: m_currentState(nullptr)
 			, m_nextState(nullptr)
 		{
@@ -30,7 +19,7 @@ namespace app
 		}
 
 
-		void ActorStateMachine::Update()
+		void StateMachineBase::Update()
 		{
 			// ステートを変更する
 			ChangeState();
@@ -40,7 +29,7 @@ namespace app
 		}
 
 
-		void ActorStateMachine::ChangeState()
+		void StateMachineBase::ChangeState()
 		{
 			// 変更先のステートを取得する
 			m_nextState = GetChangeState();
@@ -56,7 +45,7 @@ namespace app
 		}
 
 
-		IState* ActorStateMachine::FindState(const uint32_t stateID)
+		IState* StateMachineBase::FindState(const uint32_t stateID)
 		{
 			// 指定したIDを取得
 			const auto& it = m_stateMap.find(stateID);
