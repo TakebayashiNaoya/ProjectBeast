@@ -39,9 +39,6 @@
     <ClCompile Include="Source\Actor\Actor.cpp">
       <Filter>Source\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
-      <Filter>Source\Actor</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Actor\ActorStatus.cpp">
       <Filter>Source\Actor</Filter>
     </ClCompile>
@@ -96,7 +93,7 @@
     </ClCompile>
     <ClCompile Include="Source\Util\Curve.cpp">
       <Filter>Util</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="Source\Core\AppParameterMacro.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -115,6 +112,9 @@
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp">
       <Filter>Source\Actor\Stage</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\StateMachineBase.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -123,9 +123,6 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Actor.h">
-      <Filter>Source\Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\ActorStateMachine.h">
       <Filter>Source\Actor</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\ActorStatus.h">
@@ -182,7 +179,7 @@
     </ClInclude>
     <ClInclude Include="Source\Util\Curve.h">
       <Filter>Util</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="Source\Core\AppParameterMacro.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
@@ -200,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Stage\StageSystem.h">
       <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\StateMachineBase.h">
+      <Filter>Source\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
