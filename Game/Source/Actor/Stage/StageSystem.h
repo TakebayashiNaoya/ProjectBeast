@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "json/json.hpp"
+#include <fstream>
 
 
 #ifdef K2_DEBUG
@@ -26,28 +27,16 @@ namespace app
 		class StageSystem : public Noncopyable
 		{
 		public:
-			struct StageObjectInfo
-			{
-				uint8_t objectType;
-				uint8_t objectNum;
-				std::unique_ptr<IStageObject> object;
-			};
-
-
-
-			enum class EnObjectType : uint8_t
-			{
-				enObjectType_Floor = 0,
-				enObjectType_Max
-			};
-
-
-		public:
 			/**
 			 * @brief ステージオブジェクトを生成
-			 * @param item JSONのオブジェクト情報
 			 */
-			void CreateStageObject();
+			void CreateStageObject(const nlohmann::json& json);
+
+
+			/**
+			 * @brief ステージオブジェクトを削除
+			 */
+			void DeleteStageObject(const nlohmann::json& json);
 
 
 		public:
@@ -69,10 +58,13 @@ namespace app
 #endif // APP_ENABLE_OBJECT_LAYOUT_HOTRELOAD
 
 
+			using ObjectKey = std::string;
+			using Object = std::unique_ptr<IStageObject>;
+
 			/** jsonファイルネーム */
 			std::string m_jsonFileName;
-			/** オブジェクトのリスト */
-			std::vector<StageObjectInfo*> m_objectList;
+			/** オブジェクトのマップ */
+			std::unordered_map<ObjectKey, Object> m_objectMap;
 
 
 		public:
