@@ -250,6 +250,7 @@
     <ClCompile Include="Source\Scene\IScene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
+    <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
@@ -286,6 +287,7 @@
     <ClInclude Include="Source\Scene\IScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\system\system.h" />
+    <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIParts.h" />

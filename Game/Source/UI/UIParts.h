@@ -44,8 +44,6 @@ namespace app
 			}
 
 
-			/** 初期化処理 */
-			virtual void Start() = 0;
 			/** 更新処理 */
 			virtual void Update() = 0;
 			/** 描画処理 */
