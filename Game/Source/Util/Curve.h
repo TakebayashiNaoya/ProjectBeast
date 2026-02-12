@@ -93,7 +93,7 @@ namespace app
 			{
 				m_startValue = start;
 				m_endValue = end;
-				m_duration.max<float>(0.0001f, timeSec);
+				m_duration = std::max<float>(0.0001f, timeSec);
 				m_easingType = type;
 				m_loopMode = loopMode;
 				m_currentTime = 0.0f;
@@ -154,7 +154,7 @@ namespace app
 			}
 
 			/** 現在の値を取得 */
-			T GetCurrentValue()const
+			const T GetCurrentValue() const
 			{
 				/**
 				 * @brief clamp関数を使って0.0f~1.0fの範囲に収める
@@ -173,7 +173,7 @@ namespace app
 
 		private:
 			/** イージング適用 */
-			float ApplyEasingInternal(float t)const
+			float ApplyEasingInternal(float t) const
 			{
 				switch (m_easingType)
 				{
