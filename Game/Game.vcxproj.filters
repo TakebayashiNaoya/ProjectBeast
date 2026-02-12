@@ -39,9 +39,6 @@
     <ClCompile Include="Source\Actor\Actor.cpp">
       <Filter>Source\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
-      <Filter>Source\Actor</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Actor\ActorStatus.cpp">
       <Filter>Source\Actor</Filter>
     </ClCompile>
@@ -126,9 +123,6 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Actor.h">
-      <Filter>Source\Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\ActorStateMachine.h">
       <Filter>Source\Actor</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\ActorStatus.h">
