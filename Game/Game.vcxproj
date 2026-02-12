@@ -226,7 +226,6 @@
   <ItemGroup>
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp" />
     <ClCompile Include="Source\Actor\ActorStateMachine.cpp" />
     <ClCompile Include="Source\Actor\ActorStatus.cpp" />
@@ -251,6 +250,7 @@
     <ClCompile Include="Source\Scene\IScene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
+    <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
@@ -262,7 +262,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IObject.h" />
-    <ClInclude Include="Menu.h" />
     <ClInclude Include="Source\Actor\Actor.h" />
     <ClInclude Include="Source\Actor\ActorStateMachine.h" />
     <ClInclude Include="Source\Actor\ActorStatus.h" />
@@ -287,6 +286,7 @@
     <ClInclude Include="Source\Scene\IScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\system\system.h" />
+    <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\Util\Curve.h" />
