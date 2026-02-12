@@ -227,7 +227,6 @@
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp" />
-    <ClCompile Include="Source\Actor\ActorStateMachine.cpp" />
     <ClCompile Include="Source\Actor\ActorStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterBase.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp" />
@@ -263,7 +262,6 @@
   <ItemGroup>
     <ClInclude Include="IObject.h" />
     <ClInclude Include="Source\Actor\Actor.h" />
-    <ClInclude Include="Source\Actor\ActorStateMachine.h" />
     <ClInclude Include="Source\Actor\ActorStatus.h" />
     <ClInclude Include="Source\Actor\Character\CharacterBase.h" />
     <ClInclude Include="Source\Actor\Character\CharacterParameter.h" />
