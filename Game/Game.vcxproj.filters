@@ -115,6 +115,7 @@
     <ClCompile Include="Source\UI\UIParts.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -201,5 +202,6 @@
     <ClInclude Include="Source\UI\UIParts.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Menu.h" />
   </ItemGroup>
 </Project>
