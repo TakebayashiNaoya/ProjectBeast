@@ -74,10 +74,8 @@ namespace app
 			template<typename TState, typename TStateMachine>
 			void AddState(TStateMachine&& stateMachine)
 			{
-				// IDを取得
-				const uint32_t stateID = TState::ID();
 				// 指定したIDを取得
-				auto it = m_stateMap.find(stateID);
+				auto it = m_stateMap.find(TState::ID());
 				// IDが外れ値の場合
 				if (it != m_stateMap.end())
 				{
@@ -86,7 +84,7 @@ namespace app
 					K2_ASSERT(false, "重複しています");
 				}
 				// ステートを追加
-				m_stateMap[stateID] = std::make_unique<TState>(std::forward<TStateMachine>(stateMachine));
+				m_stateMap[TState::ID()] = std::make_unique<TState>(std::forward<TStateMachine>(stateMachine));
 			}
 
 

@@ -32,7 +32,6 @@ namespace app
 
 		void PlayerIdleState::Update()
 		{
-			m_owner->ChangeState();
 		}
 
 
