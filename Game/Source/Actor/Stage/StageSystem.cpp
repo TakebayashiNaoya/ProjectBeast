@@ -22,6 +22,8 @@ namespace
 	const char* STAGE_OBJECT_KEY = "StageObject";
 	/** オブジェクト配列のキー */
 	const char* OBJECT_ARRAY_KEY = "object";
+	/** オブジェクトネームのキー */
+	const char* OBJECT_NAME = "objectName";
 
 	/** ステージ上に配置できる最大の数 : 512 */
 	constexpr uint32_t MAX_OBJECT_NUM = 0x200;
@@ -29,9 +31,16 @@ namespace
 
 	/**
 	 * @brief jsonファイルからVector3を変換する
+	 * @param arr json配列
 	 */
 	Vector3 ParseVector3(const nlohmann::json& arr)
 	{
+		// 配列のサイズと型をチェック
+		if (arr.size() != 3 || !arr.is_number())
+		{
+			return Vector3::Zero;
+		}
+
 		return Vector3(
 			arr[0].get<float>(),
 			arr[1].get<float>(),
@@ -40,24 +49,37 @@ namespace
 	}
 
 
+	/**
+	 * @brief jsonファイルからQuaternionを変換する
+	 * @param arr json配列
+	 */
 	Quaternion ParseRotation(const nlohmann::json& arr)
 	{
-		Quaternion rot;
-		rot.x = arr[0].get<float>();
-		rot.y = arr[1].get<float>();
-		rot.z = arr[2].get<float>();
-		rot.w = arr[3].get<float>();
+		// 配列のサイズと型をチェック
+		if (arr.size() != 4 || !arr.is_number())
+		{
+			return Quaternion::Identity;
+		}
 
-
-		return rot;
+		return Quaternion(
+			arr[0].get<float>(),
+			arr[1].get<float>(),
+			arr[2].get<float>(),
+			arr[3].get<float>()
+		);
 	}
 
 
-	void LoadTransform(app::actor::IStageObject* object, const nlohmann::json& item)
+	/**
+	 * @brief ステージオブジェクトのトランスフォーム情報を読み込む
+	 * @param object ステージオブジェクト
+	 * @param json トランスフォーム情報のjson
+	 */
+	void LoadTransform(app::actor::IStageObject* object, const nlohmann::json& json)
 	{
-		const Vector3 position = ParseVector3(item["position"]);
-		const Quaternion rotation = ParseRotation(item["rotation"]);
-		const Vector3 scale = ParseVector3(item["scale"]);
+		const Vector3 position = ParseVector3(json["position"]);
+		const Quaternion rotation = ParseRotation(json["rotation"]);
+		const Vector3 scale = ParseVector3(json["scale"]);
 
 		object->SetPosition(position);
 		object->SetRotation(rotation);
@@ -67,7 +89,9 @@ namespace
 
 
 	/**
-	 *
+	 * @brief ステージオブジェクトを初期化する
+	 * @param object ステージオブジェクト
+	 * @param item jsonデータ
 	 */
 	void InitializeStageObject(app::actor::IStageObject* object, const nlohmann::json& item)
 	{
@@ -82,30 +106,37 @@ namespace
 
 	/**
 	 * @brief jsonファイルの読み込みを試す
-	 * @param file 読み込み用変数
 	 * @param json jsonファイル
 	 * @param jsonFileName jsonのファイルパス
 	 * @param time
 	 */
-	bool TryRoadJsonFile(std::ifstream& file, nlohmann::json& json, const std::string jsonFileName, time_t& time)
+	bool TryRoadJsonFile(nlohmann::json& json, const std::string& jsonFileName, time_t& time)
 	{
+		struct stat st;
+
+		// ファイルの更新時間が変わっていなかった場合
+		if (stat(jsonFileName.c_str(), &st) != 0
+			|| time == st.st_mtime)
+		{
+			// 読み込む必要なし
+			return false;
+		}
+
+		// ファイルストリームを開く
+		std::fstream file(jsonFileName);
+
 		// ファイルが開けなかった場合
 		if (!file.is_open()) {
 			// 読み込み失敗
 			return false;
 		}
-		struct stat st;
-		// ファイルの更新時間が変わっていなかった場合
-		if (stat(jsonFileName.c_str(), &st) != 0
-			|| time == st.st_mtime)
-		{
-			// 読み込み失敗
-			return false;
-		}
+
+		nlohmann::json jsonTemp;
+
 		// jsonの読み込みを試す
 		try
 		{
-			file >> json;
+			file >> jsonTemp;
 		}
 		// 例外が発生した場合
 		catch (...)
@@ -113,14 +144,13 @@ namespace
 			// 読み込み失敗
 			return false;
 		}
+		// 読み込んだjsonを保存
+		json = std::move(jsonTemp);
 		// 更新時間を保存
 		time = st.st_mtime;
 		// 読み込み成功
 		return true;
 	}
-
-
-
 }
 
 
@@ -128,25 +158,24 @@ namespace app
 {
 	namespace actor
 	{
-		/** インスタンスを初期化 */
-		StageSystem* StageSystem::m_instance = nullptr;
-
-
 		void StageSystem::CreateStageObject(const nlohmann::json& json)
 		{
 			// JSON内の確認
 			for (const auto& objData : json[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const auto& objectKey = objData["name"].get<std::string>();
+				const auto& objectKey = objData[OBJECT_NAME].get<std::string>();
 
-				// マップ内を検索
-				auto it = m_objectMap.find(objectKey);
-				// 既存のものがあるかチェック
-				if (it != m_objectMap.end())
+				if (!m_objectMap.empty())
 				{
-					// スキップ
-					continue;
+					// マップ内を検索
+					auto it = m_objectMap.find(objectKey);
+					// 既存のものがあるかチェック
+					if (it != m_objectMap.end())
+					{
+						// スキップ
+						continue;
+					}
 				}
 
 				// ここに来たということは既存のものはないので生成
@@ -162,30 +191,51 @@ namespace app
 		void StageSystem::DeleteStageObject(const nlohmann::json& json)
 		{
 			// オブジェクトマップが保持しているをキーを保存するための配列
-			std::unordered_set<ObjectKey> havingKeySet;
+			std::unordered_set<ObjectKey> toBeDeleted;
 
+			// オブジェクトマップが空の場合は処理しない
+			if (m_objectMap.empty()) return;
+
+
+			// 保持しているキーをすべて保存
 			for (const auto& obj : m_objectMap)
 			{
-				havingKeySet.insert(obj.first);
+				toBeDeleted.insert(obj.first);
 			}
 
-			// JSON内の確認
-			for (auto& objData : json[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
+			// JSON内のオブジェクトキーをもとに削除対象から外す
+			for (const auto& objData : json[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const std::string objectKey = objData["name"].get<std::string>();
-				// 保持しているキーの中から削除対象のキーを探す
-				havingKeySet.erase(objectKey);
+				const std::string& objectKey = objData[OBJECT_NAME].get<std::string>();
+				toBeDeleted.erase(objectKey);
 			}
 
-
 			// 削除対象のキーをもとにオブジェクトを削除
-			for (const auto& key : havingKeySet)
+			for (const auto& key : toBeDeleted)
 			{
 				m_objectMap.erase(key);
 			}
 		}
 
+
+		void StageSystem::ReloadTransform(const nlohmann::json& j)
+		{
+			// 必要なデータが存在するかチェック
+			if (!j.contains(STAGE_OBJECT_KEY)) return;
+			if (!j[STAGE_OBJECT_KEY].contains(OBJECT_ARRAY_KEY)) return;
+
+
+
+			assert(j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY].is_array());
+
+			for (auto& obj : m_objectMap)
+			{
+				assert(obj.second != nullptr);
+
+				LoadTransform(obj.second.get(), j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY]);
+			}
+		}
 
 
 		StageSystem::StageSystem()
@@ -205,12 +255,11 @@ namespace app
 			}
 
 #ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
-			// ホットリロードチェック
-			std::ifstream file(m_jsonFileName);
+
 			nlohmann::json json;
 
 			// JSONの読み込みを試す
-			if (!TryRoadJsonFile(file, json, m_jsonFileName, m_lastUpdateTime))
+			if (!TryRoadJsonFile(json, m_jsonFileName, m_lastUpdateTime))
 			{
 				// 失敗した場合処理しない
 				return;
@@ -245,18 +294,8 @@ namespace app
 		}
 
 
-		void StageSystem::ReloadTransform(const nlohmann::json& j)
-		{
-			// 必要なデータが存在するかチェック
-			if (!j.contains(STAGE_OBJECT_KEY)) return;
-			if (!j[STAGE_OBJECT_KEY].contains(OBJECT_ARRAY_KEY)) return;
-
-			for (auto& obj : m_objectMap)
-			{
-				LoadTransform(obj.second.get(), j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY]);
-			}
-		}
-
+		/** インスタンスを初期化 */
+		StageSystem* StageSystem::m_instance = nullptr;
 	}
 }
 

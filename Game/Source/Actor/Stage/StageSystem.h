@@ -4,9 +4,9 @@
  * @author 藤谷
  */
 #pragma once
+#include "IStage.h"
 #include "json/json.hpp"
 #include <fstream>
-
 
 #ifdef K2_DEBUG
 #define ENABLE_OBJECT_LAYOUT_HOTRELOAD
@@ -17,10 +17,6 @@ namespace app
 {
 	namespace actor
 	{
-		/** 前方宣言 */
-		class IStageObject;
-
-
 		/**
 		 *　@brief ステージシステム
 		 */
@@ -68,6 +64,7 @@ namespace app
 
 
 		public:
+			/** インスタンス生成 */
 			static void CreateInstance()
 			{
 				if (m_instance == nullptr)
@@ -77,6 +74,7 @@ namespace app
 			}
 
 
+			/** インスタンス破棄 */
 			static void DestroyInstance()
 			{
 				if (m_instance != nullptr)
@@ -87,6 +85,7 @@ namespace app
 			}
 
 
+			/** インスタンス取得 */
 			static StageSystem* GetInstance()
 			{
 				return m_instance;
