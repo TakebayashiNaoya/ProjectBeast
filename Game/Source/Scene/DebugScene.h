@@ -1,6 +1,6 @@
 ﻿/**
- * @file IScene.h
- * @brief シーンの基底クラス
+ * @file DebugScene.h
+ * @brief デバッグシーン
  * @author 立山
  */
 #pragma once
