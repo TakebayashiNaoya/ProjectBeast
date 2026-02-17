@@ -121,6 +121,9 @@
     <ClCompile Include="Source\UI\Layout.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\NPCController.cpp">
+      <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -215,6 +218,9 @@
     </ClInclude>
     <ClInclude Include="Source\Types.h">
       <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\NPCController.h">
+      <Filter>Source\Actor\Character</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
