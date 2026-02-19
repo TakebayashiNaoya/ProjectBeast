@@ -21,7 +21,8 @@ namespace app
 
 	public:
 		/**
-		 * @briefシングルトンインスタンスを生成
+		 * @brief シングルトンインスタンスを生成
+		 * @brief GameSceneのコンストラクタで呼び出す。
 		 */
 		static void CreateInstance()
 		{
@@ -38,6 +39,10 @@ namespace app
 		}
 
 
+		/**
+		 * @brief シングルトンインスタンスを削除
+		 * @brief GameSceneのデストラクタで呼び出す
+		 */
 		static void DestroyInstance()
 		{
 			if (m_instance != nullptr)
