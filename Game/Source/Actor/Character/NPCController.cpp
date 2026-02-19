@@ -111,11 +111,11 @@ namespace app
 
 		/** 各ステートの処理はこの下に書いていく */
 
+
 		/** 待機 */
 		void NPCController::EnterIdle(NPCController* npc)
 		{
-			float r = rand() % 2 >= 1 ? true : false;
-			npc->m_targetPosition = Vector3(0.0f, 0.0f, r ? 10.0f : -10.0f);
+
 		}
 
 		void NPCController::UpdateIdle(NPCController* npc)
@@ -128,10 +128,7 @@ namespace app
 
 		int NPCController::CheckIdle(NPCController* npc)
 		{
-			if (rand() % 10 >= 5)
-			{
-				return enAIState_Move;
-			}
+
 			return enAIState_Invalid;
 		}
 
@@ -139,29 +136,12 @@ namespace app
 		/** 移動 */
 		void NPCController::EnterMove(NPCController* npc)
 		{
-			bool isXReverce = rand() % 2 >= 1 ? true : false;
-			bool isZReverce = rand() % 2 >= 1 ? true : false;
-			npc->m_targetPosition = Vector3(rand() % 300 * (isXReverce ? 1.0f : -1.0f), 0.0f, rand() % 300 * (isZReverce ? 1.0f : -1.0f));
+
 		}
 
 		void NPCController::UpdateMove(NPCController* npc)
 		{
-			Vector3& pos = npc->m_target->m_transform.m_position;
 
-			// 目標方向
-			Vector3 dir = npc->m_targetPosition - pos;
-
-			float distance = dir.Length();
-
-			// まだ遠いなら移動
-			if (distance > 0.1f)
-			{
-				dir.Normalize();
-
-				float speed = 5.0f;
-
-				pos += dir * speed * g_gameTime->GetFrameDeltaTime();
-			}
 		}
 
 		void NPCController::ExitMove(NPCController* npc)
@@ -170,15 +150,7 @@ namespace app
 
 		int NPCController::CheckMove(NPCController* npc)
 		{
-			Vector3& pos = npc->m_target->m_transform.m_position;
 
-			float distance = (npc->m_targetPosition - pos).Length();
-
-			// 到達したらIdleへ
-			if (distance < 0.5f)
-			{
-				return enAIState_Idle;
-			}
 			return enAIState_Invalid;
 		}
 
