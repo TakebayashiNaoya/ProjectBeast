@@ -232,6 +232,7 @@
     <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCController.cpp" />
+    <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp" />
     <ClCompile Include="Source\Actor\Character\Player\Player.cpp" />
     <ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp" />
     <ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="Source\Actor\Character\CharacterParameter.h" />
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h" />
     <ClInclude Include="Source\Actor\Character\NPCController.h" />
+    <ClInclude Include="Source\Actor\Character\NPCControllerManager.h" />
     <ClInclude Include="Source\Actor\Character\Player\Player.h" />
     <ClInclude Include="Source\Actor\Character\Player\PlayerController.h" />
     <ClInclude Include="Source\Actor\Character\Player\PlayerIState.h" />
