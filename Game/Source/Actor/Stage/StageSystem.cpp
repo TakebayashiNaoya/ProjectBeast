@@ -35,12 +35,6 @@ namespace
 	 */
 	Vector3 ParseVector3(const nlohmann::json& arr)
 	{
-		// 配列のサイズと型をチェック
-		if (arr.size() != 3 || !arr.is_number())
-		{
-			return Vector3::Zero;
-		}
-
 		return Vector3(
 			arr[0].get<float>(),
 			arr[1].get<float>(),
@@ -55,12 +49,6 @@ namespace
 	 */
 	Quaternion ParseRotation(const nlohmann::json& arr)
 	{
-		// 配列のサイズと型をチェック
-		if (arr.size() != 4 || !arr.is_number())
-		{
-			return Quaternion::Identity;
-		}
-
 		return Quaternion(
 			arr[0].get<float>(),
 			arr[1].get<float>(),
