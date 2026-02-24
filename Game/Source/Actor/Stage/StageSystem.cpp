@@ -211,13 +211,16 @@ namespace app
 
 
 
-			assert(j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY].is_array());
-
-			for (auto& obj : m_objectMap)
+			for (const auto& objData : j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
-				assert(obj.second != nullptr);
+				// オブジェクトキーを取得
+				const ObjectKey& objKey = objData[OBJECT_NAME].get<std::string>();
 
-				LoadTransform(obj.second.get(), j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY]);
+				auto it = m_objectMap.find(objKey);
+				// 既存のものがなければスキップ
+				if (it == m_objectMap.end()) continue;
+
+				LoadTransform(it->second.get(), objData);
 			}
 		}
 
