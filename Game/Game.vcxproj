@@ -296,9 +296,9 @@
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
+    <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Util\CRC32.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
