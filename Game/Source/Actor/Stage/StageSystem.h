@@ -35,6 +35,12 @@ namespace app
 			void DeleteStageObject(const nlohmann::json& json);
 
 
+			/**
+			 * @briefトランスフォームの情報を読み込み直す
+			 */
+			void ReloadTransform(const nlohmann::json& j);
+
+
 		public:
 			StageSystem();
 			~StageSystem() = default;
@@ -44,8 +50,6 @@ namespace app
 			void Update();
 			/** 描画処理 */
 			void Render(RenderContext& rc);
-			/** トランスフォームの情報を読み込み直す */
-			void ReloadTransform(const nlohmann::json& j);
 
 
 		private:
@@ -93,6 +97,7 @@ namespace app
 
 
 		private:
+			/** シングルトンインスタンス */
 			static StageSystem* m_instance;
 		};
 	}
