@@ -158,12 +158,8 @@ namespace app
 				{
 					// マップ内を検索
 					auto it = m_objectMap.find(objectKey);
-					// 既存のものがあるかチェック
-					if (it != m_objectMap.end())
-					{
-						// スキップ
-						continue;
-					}
+					// 既存のものがあればスキップ
+					if (it != m_objectMap.end()) continue;
 				}
 
 				// ここに来たということは既存のものはないので生成
