@@ -111,7 +111,7 @@ namespace
 		}
 
 		// ファイルストリームを開く
-		std::fstream file(jsonFileName);
+		std::ifstream file(jsonFileName);
 
 		// ファイルが開けなかった場合
 		if (!file.is_open()) {
