@@ -118,13 +118,16 @@ namespace app
 
 		}
 
+
 		void NPCController::UpdateIdle(NPCController* npc)
 		{
 		}
 
+
 		void NPCController::ExitIdle(NPCController* npc)
 		{
 		}
+
 
 		int NPCController::CheckIdle(NPCController* npc)
 		{
@@ -133,20 +136,24 @@ namespace app
 		}
 
 
+
 		/** 移動 */
 		void NPCController::EnterMove(NPCController* npc)
 		{
 
 		}
 
+
 		void NPCController::UpdateMove(NPCController* npc)
 		{
 
 		}
 
+
 		void NPCController::ExitMove(NPCController* npc)
 		{
 		}
+
 
 		int NPCController::CheckMove(NPCController* npc)
 		{
@@ -155,18 +162,22 @@ namespace app
 		}
 
 
+
 		/** ジャンプ */
 		void NPCController::EnterJump(NPCController* npc)
 		{
 		}
 
+
 		void NPCController::UpdateJump(NPCController* npc)
 		{
 		}
 
+
 		void NPCController::ExitJump(NPCController* npc)
 		{
 		}
+
 
 		int NPCController::CheckJump(NPCController* npc)
 		{
@@ -174,18 +185,22 @@ namespace app
 		}
 
 
+
 		/** 泳ぐ */
 		void NPCController::EnterSwim(NPCController* npc)
 		{
 		}
 
+
 		void NPCController::UpdateSwim(NPCController* npc)
 		{
 		}
 
+
 		void NPCController::ExitSwim(NPCController* npc)
 		{
 		}
+
 
 		int NPCController::CheckSwim(NPCController* npc)
 		{
