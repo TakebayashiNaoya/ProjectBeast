@@ -4,155 +4,179 @@
  * @author 立山
  */
 #pragma once
-#include "IObject.h"
 
 
 namespace app {
 
-	class NPCController :public IObject
+	namespace actor
 	{
-
-	public:
-		NPCController();
-		~NPCController();
-		void Start() override;
-		void Update() override;
-		void Render(RenderContext& renderContext) override;
+		class Player;
 
 
-	public:
-		static void Initialize();
-
-
-	private:
-		/**
-		 * 関数ポインタ
-		 */
-		using EnterFunc = void (*)(NPCController*);
-		using UpdateFunc = void (*)(NPCController*);
-		using ExitFunc = void (*)(NPCController*);
-		using CheckFunc = int (*)(NPCController*);
-
-	private:
-		/** AI思考処理 */
-		struct AIState
+		class NPCController :public Noncopyable
 		{
-			EnterFunc enter;
-			UpdateFunc update;
-			ExitFunc exit;
-			CheckFunc check;
-		};
+
+		public:
+			NPCController();
+			~NPCController();
+			bool Start();
+			void Update();
+			void Render(RenderContext& renderContext);
 
 
-	private:
-		/**
-		 * @enum EnAIStateID
-		 * 思考パターンのID
-		*/
-		enum EnAIStateID
-		{
-			enAIState_Idle,
-			enAIState_Move,
-			enAIState_Jump,
-			enAIState_Swim,
-
-			enAIState_Num,
-			enAIState_Invalid = -1
-		};
-
-
-	private:
-		void ChangeState(EnAIStateID nextState);
-
-
-	private:
-		static std::map<EnAIStateID, AIState> m_stateMap;
-
-
-	private:
-		/**
-		 * @brief AIStateを登録する関数
-		 * @param id ステートのID
-		 * @param enter Enter関数
-		 * @param update Update関数
-		 * @param exit Exit関数
-		 * @param check Check関数
-		 */
-		static void RegisterState(const EnAIStateID id, EnterFunc enter, UpdateFunc update, ExitFunc exit, CheckFunc check)
-		{
-			AIState state;
-			/** 引数が nullptr ならDoNothingを入れる */
-			state.enter = (enter != nullptr) ? enter : DoNothing;
-			state.update = (update != nullptr) ? update : DoNothing;
-			state.exit = (exit != nullptr) ? exit : DoNothing;
-			state.check = (check != nullptr) ? check : CheckNothing;
-			// mapに登録
-			m_stateMap.emplace(id, state);
-		}
-
-
-		/** AIStateを探す */
-		AIState* FindAIState(const EnAIStateID id)
-		{
-			auto it = m_stateMap.find(id);
-			if (it != m_stateMap.end()) {
-				return &it->second;
+		public:
+			/**
+			 * @brief 操作対象の設定
+			 * @brief Playerは後々Enemy等に変更する
+			 */
+			void SetTarget(actor::Player* target)
+			{
+				m_target = target;
 			}
-			return nullptr;
-		}
 
 
-		/**
-		 * 何もしない関数
-		 */
-		static void  DoNothing(NPCController*) {};
-		/** 遷移なし */
-		static int CheckNothing(NPCController*) { return -1; }
+		public:
+			static void Initialize();
 
 
-	private:
-		/**
-		 * 待機
-		 */
-		static void EnterIdle(NPCController* npc);
-		static void UpdateIdle(NPCController* npc);
-		static void ExitIdle(NPCController* npc);
-		static int CheckIdle(NPCController* npc);
+		private:
+			/**
+			 * 関数ポインタ
+			 */
+			using EnterFunc = void (*)(NPCController*);
+			using UpdateFunc = void (*)(NPCController*);
+			using ExitFunc = void (*)(NPCController*);
+			using CheckFunc = int (*)(NPCController*);
+
+		private:
+			/** AI思考処理 */
+			struct AIState
+			{
+				EnterFunc enter;
+				UpdateFunc update;
+				ExitFunc exit;
+				CheckFunc check;
+			};
 
 
-		/**
-		 * 移動
-		 */
-		static void EnterMove(NPCController* npc);
-		static void UpdateMove(NPCController* npc);
-		static void ExitMove(NPCController* npc);
-		static int CheckMove(NPCController* npc);
+		private:
+			/**
+			 * @enum EnAIStateID
+			 * 思考パターンのID
+			 */
+			enum EnAIStateID
+			{
+				enAIState_Idle,
+				enAIState_Move,
+				enAIState_Jump,
+				enAIState_Swim,
+
+				enAIState_Num,
+				enAIState_Invalid = -1
+			};
 
 
-		/**
-		 * ジャンプ
-		 */
-		static void EnterJump(NPCController* npc);
-		static void UpdateJump(NPCController* npc);
-		static void ExitJump(NPCController* npc);
-		static int CheckJump(NPCController* npc);
+		private:
+			void ChangeState(EnAIStateID nextState);
 
 
-		/**
-		 * 泳ぐ
-		 */
-		static void EnterSwim(NPCController* npc);
-		static void UpdateSwim(NPCController* npc);
-		static void ExitSwim(NPCController* npc);
-		static int CheckSwim(NPCController* npc);
+		private:
+			static std::map<EnAIStateID, AIState> m_stateMap;
 
 
-	private:
+		private:
+			/**
+			 * @brief AIStateを登録する関数
+			 * @param id ステートのID
+			 * @param enter Enter関数
+			 * @param update Update関数
+			 * @param exit Exit関数
+			 * @param check Check関数
+			 */
+			static void RegisterState(const EnAIStateID id, EnterFunc enter, UpdateFunc update, ExitFunc exit, CheckFunc check)
+			{
+				AIState state;
+				/** 引数が nullptr ならDoNothingを入れる */
+				state.enter = (enter != nullptr) ? enter : DoNothing;
+				state.update = (update != nullptr) ? update : DoNothing;
+				state.exit = (exit != nullptr) ? exit : DoNothing;
+				state.check = (check != nullptr) ? check : CheckNothing;
+				// mapに登録
+				m_stateMap.emplace(id, state);
+			}
 
-		/** 現在の状態 */
-		EnAIStateID m_currentState = enAIState_Idle;
-		/** 初期化処理をしたか */
-		bool m_isInitialized = false;
 
-	};
+			/** AIStateを探す */
+			AIState* FindAIState(const EnAIStateID id)
+			{
+				auto it = m_stateMap.find(id);
+				if (it != m_stateMap.end()) {
+					return &it->second;
+				}
+				return nullptr;
+			}
+
+
+			/**
+			 * 何もしない関数
+			 */
+			static void  DoNothing(NPCController*) {};
+			/** 遷移なし */
+			static int CheckNothing(NPCController*) { return -1; }
+
+
+		private:
+			/**
+			 * 待機
+			 */
+			static void EnterIdle(NPCController* npc);
+			static void UpdateIdle(NPCController* npc);
+			static void ExitIdle(NPCController* npc);
+			static int CheckIdle(NPCController* npc);
+
+
+			/**
+			 * 移動
+			 */
+			static void EnterMove(NPCController* npc);
+			static void UpdateMove(NPCController* npc);
+			static void ExitMove(NPCController* npc);
+			static int CheckMove(NPCController* npc);
+
+
+			/**
+			 * ジャンプ
+			 */
+			static void EnterJump(NPCController* npc);
+			static void UpdateJump(NPCController* npc);
+			static void ExitJump(NPCController* npc);
+			static int CheckJump(NPCController* npc);
+
+
+			/**
+			 * 泳ぐ
+			 */
+			static void EnterSwim(NPCController* npc);
+			static void UpdateSwim(NPCController* npc);
+			static void ExitSwim(NPCController* npc);
+			static int CheckSwim(NPCController* npc);
+
+
+		private:
+
+			actor::Player* m_target = nullptr;
+			float m_elapsedTime = 0.0f;
+
+			/** targetの前回の位置を保持 */
+			Vector3 prePosition = Vector3::Zero;
+
+			Vector3 m_targetPosition = Vector3::Zero;
+			bool isFind = false;
+			/** 現在の状態 */
+			EnAIStateID m_currentState = enAIState_Idle;
+			/** 初期化処理をしたか */
+			bool m_isInitialized = false;
+
+		};
+	}
 }
