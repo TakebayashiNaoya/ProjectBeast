@@ -42,6 +42,12 @@ namespace app
 		void StopSE(const SoundHandle handle);
 
 
+		/** Voiceの再生 */
+		SoundHandle PlayVoice(const int kind, const bool isLoop = false, const bool is3D = false);
+		/** Voiceの停止 */
+		void StopVoice(const SoundHandle handle);
+
+
 		SoundSource* FindSE(const SoundHandle handle)
 		{
 			auto it = m_seList.find(handle);
@@ -129,6 +135,7 @@ namespace app
 
 		void ApplyBGMVolume();
 		void ApplySEVolume();
+		void ApplyVoiceVolume();
 
 
 	private:
@@ -136,6 +143,8 @@ namespace app
 		SoundSource* m_bgm = nullptr;
 		/** SE用のサウンドソースインスタンスを保持する */
 		std::map<SoundHandle, SoundSource*> m_seList;
+		/** Voice用のサウンドソースインスタンスを保持する */
+		std::map<SoundHandle, SoundSource*> m_voiceList;
 		/**
 		 * マップで参照するようにハンドル数を保持
 		 */

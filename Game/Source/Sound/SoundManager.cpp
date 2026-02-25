@@ -14,6 +14,10 @@ namespace app
 
 
 	SoundManager::SoundManager()
+		: m_masterVolume(1.0f)
+		, m_bgmVolume(1.0f)
+		, m_seVolume(1.0f)
+		, m_voiceVolume(1.0f)
 	{
 		m_seList.clear();
 
@@ -38,6 +42,7 @@ namespace app
 			auto* se = it.second;
 			/** 再生が終わっているなら削除 */
 			if (!se->IsPlaying()) {
+				delete se;
 				eraseList.push_back(key);
 			}
 		}
@@ -81,6 +86,7 @@ namespace app
 		}
 		auto* se = new SoundSource;
 		se->Init(kind, is3D);
+		se->SetVolume(m_masterVolume * m_seVolume);
 		se->Play(isLoop);
 
 		m_seList.emplace(m_soundHandleCount++, se);
@@ -96,6 +102,24 @@ namespace app
 			return;
 		}
 		se->Stop();
+	}
+
+
+	SoundHandle SoundManager::PlayVoice(const int kind, const bool isLoop, const bool is3D)
+	{
+		/** ハンドルが最大数になったら使えない */
+		if (m_soundHandleCount == INVALID_SOUND_HANDLE) {
+			K2_ASSERT(false, "サウンドの再生が多いです。\n");
+			return INVALID_SOUND_HANDLE;
+		}
+		auto* voice = new SoundSource;
+		voice->Init(kind, is3D);
+		voice->SetVolume(m_masterVolume * m_voiceVolume);
+		voice->Play(isLoop);
+
+		m_seList.emplace(m_soundHandleCount++, voice);
+
+		return m_soundHandleCount;
 	}
 
 
@@ -128,6 +152,8 @@ namespace app
 	void SoundManager::SetVoiceVolume(float volume)
 	{
 		m_voiceVolume = std::clamp(volume, 0.0f, 1.0f);
+
+		ApplyVoiceVolume();
 	}
 
 
@@ -145,6 +171,15 @@ namespace app
 		for (auto& se : m_seList)
 		{
 			se.second->SetVolume(m_masterVolume * m_seVolume);
+		}
+	}
+
+
+	void SoundManager::ApplyVoiceVolume()
+	{
+		for (auto& voice : m_seList)
+		{
+			voice.second->SetVolume(m_masterVolume * m_voiceVolume);
 		}
 	}
 }
