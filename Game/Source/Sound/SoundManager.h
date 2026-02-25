@@ -4,6 +4,7 @@
  * @author 立山
  */
 #pragma once
+#include "Source/Sound/Types.h"
 
 
 namespace app
