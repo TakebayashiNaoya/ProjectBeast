@@ -130,6 +130,7 @@ namespace app
 
 		ApplyBGMVolume();
 		ApplySEVolume();
+		ApplyVoiceVolume();
 	}
 
 
