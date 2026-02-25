@@ -53,6 +53,39 @@ namespace app
 
 
 	public:
+		/** 全体の音量設定 */
+		void SetMasterVolume(float volume);
+		/** BGMの音量設定 */
+		void SetBGMVolume(float volume);
+		/** SEの音量設定 */
+		void SetSEVolume(float volume);
+		/** Voiceの音量設定 */
+		void SetVoiceVolume(float volume);
+
+
+		/** 全体の音量を取得 */
+		float GetMasterVolume() const
+		{
+			return m_masterVolume;
+		}
+		/** BGMの音量を取得 */
+		float GetBGMVolume() const
+		{
+			return m_bgmVolume;
+		}
+		/** SEの音量を取得 */
+		float GetSEVolume() const
+		{
+			return m_seVolume;
+		}
+		/** Voiceの音量を取得 */
+		float GetVoiceVolume() const
+		{
+			return m_voiceVolume;
+		}
+
+
+	public:
 		/**
 		 * インスタンスを作成
 		 * @detail main.cppで呼び出す
@@ -89,6 +122,15 @@ namespace app
 
 
 	private:
+		SoundManager();
+		~SoundManager();
+
+
+		void ApplyBGMVolume();
+		void ApplySEVolume();
+
+
+	private:
 		/** BGM用のサウンドソースインスタンスを保持する */
 		SoundSource* m_bgm = nullptr;
 		/** SE用のサウンドソースインスタンスを保持する */
@@ -100,8 +142,14 @@ namespace app
 
 
 	private:
-		SoundManager();
-		~SoundManager();
+		/** 全体の音量 */
+		float m_masterVolume = 1.0f;
+		/** BGMの音量 */
+		float m_bgmVolume = 1.0f;
+		/** SEの音量 */
+		float m_seVolume = 1.0f;
+		/** ボイスの音量 */
+		float m_voiceVolume = 1.0f;
 
 
 	private:

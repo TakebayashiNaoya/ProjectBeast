@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "SoundManager.h"
+#include <algorithm>
 
 
 namespace app
@@ -52,6 +53,8 @@ namespace app
 		/** 初期化 */
 		m_bgm->Init(kind);
 		m_bgm->Play(true);
+
+		ApplyBGMVolume();
 	}
 
 
@@ -88,5 +91,55 @@ namespace app
 			return;
 		}
 		se->Stop();
+	}
+
+
+	void SoundManager::SetMasterVolume(float volume)
+	{
+		m_masterVolume = std::clamp(volume, 0.0f, 1.0f);
+
+
+		ApplyBGMVolume();
+		ApplySEVolume();
+	}
+
+
+	void SoundManager::SetBGMVolume(float volume)
+	{
+		m_bgmVolume = std::clamp(volume, 0.0f, 1.0f);
+
+		ApplyBGMVolume();
+	}
+
+
+	void SoundManager::SetSEVolume(float volume)
+	{
+		m_seVolume = std::clamp(volume, 0.0f, 1.0f);
+
+		ApplySEVolume();
+	}
+
+
+	void SoundManager::SetVoiceVolume(float volume)
+	{
+		m_voiceVolume = std::clamp(volume, 0.0f, 1.0f);
+	}
+
+
+	void SoundManager::ApplyBGMVolume()
+	{
+		if (m_bgm)
+		{
+			m_bgm->SetVolume(m_masterVolume * m_bgmVolume);
+		}
+	}
+
+
+	void SoundManager::ApplySEVolume()
+	{
+		for (auto& se : m_seList)
+		{
+			se.second->SetVolume(m_masterVolume * m_seVolume);
+		}
 	}
 }
