@@ -16,6 +16,11 @@ namespace app
 	SoundManager::SoundManager()
 	{
 		m_seList.clear();
+
+		for (int i = 0; i < ARRAYSIZE(soundInformation); i++) {
+			const auto& info = soundInformation[i];
+			g_soundEngine->ResistWaveFileBank(i, info.assetPath.c_str());
+		}
 	}
 
 
