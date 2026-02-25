@@ -117,6 +117,7 @@ namespace app
 
 		/**
 		 * インスタンスを削除
+		 * @detail main.cppで呼び出す
 		 */
 		static void DestroyInstance()
 		{
