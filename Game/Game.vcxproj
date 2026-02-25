@@ -226,6 +226,8 @@
   <ItemGroup>
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Achivement\Achievement.cpp" />
+    <ClCompile Include="Source\Achivement\AchievementManager.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp" />
     <ClCompile Include="Source\Actor\ActorStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterBase.cpp" />
@@ -266,6 +268,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IObject.h" />
+    <ClInclude Include="Source\Achivement\Achievement.h" />
+    <ClInclude Include="Source\Achivement\AchievementManager.h" />
     <ClInclude Include="Source\Actor\Actor.h" />
     <ClInclude Include="Source\Actor\ActorStatus.h" />
     <ClInclude Include="Source\Actor\Character\CharacterBase.h" />
@@ -299,9 +303,9 @@
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
+    <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Util\CRC32.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

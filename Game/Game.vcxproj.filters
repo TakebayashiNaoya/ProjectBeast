@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Util">
-      <UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source">
       <UniqueIdentifier>{b38c812a-f22f-4096-80d4-94f769775328}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,12 @@
     </Filter>
     <Filter Include="Source\Sound">
       <UniqueIdentifier>{aabee1f5-f07e-444b-9b88-76bb30eb9087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Util">
+      <UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Achievement">
+      <UniqueIdentifier>{8dd5c9a7-828b-46f3-9b18-9042d2de824e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -91,9 +94,6 @@
     <ClCompile Include="Source\Scene\DebugScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Util\Curve.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\AppParameterMacro.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -133,13 +133,19 @@
     <ClCompile Include="Source\Sound\SoundManager.cpp">
       <Filter>Source\Sound</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Util\Curve.cpp">
+      <Filter>Source\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Achivement\Achievement.cpp">
+      <Filter>Source\Achievement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Achivement\AchievementManager.cpp">
+      <Filter>Source\Achievement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="IObject.h" />
-    <ClInclude Include="Util\CRC32.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Actor\Actor.h">
       <Filter>Source\Actor</Filter>
     </ClInclude>
@@ -192,9 +198,6 @@
     <ClInclude Include="Source\Scene\DebugScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Util\Curve.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Core\AppParameterMacro.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
@@ -239,6 +242,18 @@
     </ClInclude>
     <ClInclude Include="Source\Sound\Types.h">
       <Filter>Source\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\CRC32.h">
+      <Filter>Source\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\Curve.h">
+      <Filter>Source\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Achivement\Achievement.h">
+      <Filter>Source\Achievement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Achivement\AchievementManager.h">
+      <Filter>Source\Achievement</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
