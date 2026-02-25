@@ -237,5 +237,8 @@
     <ClInclude Include="Source\Sound\SoundManager.h">
       <Filter>Source\Sound</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Sound\Types.h">
+      <Filter>Source\Sound</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
