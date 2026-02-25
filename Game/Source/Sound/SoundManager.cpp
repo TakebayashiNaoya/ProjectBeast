@@ -36,17 +36,33 @@ namespace app
 	void SoundManager::Update()
 	{
 		/** SEリストから再生していないものがあれば削除する */
-		std::vector<SoundHandle> eraseList;
+		std::vector<SEHandle> eraseSEList;
 		for (auto& it : m_seList) {
 			const auto key = it.first;
 			auto* se = it.second;
 			/** 再生が終わっているなら削除 */
 			if (!se->IsPlaying()) {
 				delete se;
-				eraseList.push_back(key);
+				eraseSEList.push_back(key);
 			}
 		}
-		for (const auto& key : eraseList) {
+		for (const auto& key : eraseSEList) {
+			m_seList.erase(key);
+		}
+
+
+		/** Voiceリストから再生していないものがあれば削除する */
+		std::vector<VoiceHandle> eraseVoiceList;
+		for (auto& it : m_voiceList) {
+			const auto key = it.first;
+			auto* voice = it.second;
+			/** 再生が終わっているなら削除 */
+			if (!voice->IsPlaying()) {
+				delete voice;
+				eraseVoiceList.push_back(key);
+			}
+		}
+		for (const auto& key : eraseVoiceList) {
 			m_seList.erase(key);
 		}
 	}
@@ -77,12 +93,12 @@ namespace app
 	}
 
 
-	SoundHandle SoundManager::PlaySE(const int kind, const bool isLoop, const bool is3D)
+	SEHandle SoundManager::PlaySE(const int kind, const bool isLoop, const bool is3D)
 	{
 		/** ハンドルが最大数になったら使えない */
-		if (m_soundHandleCount == INVALID_SOUND_HANDLE) {
+		if (m_soundHandleCount == INVALID_SE_HANDLE) {
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
-			return INVALID_SOUND_HANDLE;
+			return INVALID_SE_HANDLE;
 		}
 		auto* se = new SoundSource;
 		se->Init(kind, is3D);
@@ -95,7 +111,7 @@ namespace app
 	}
 
 
-	void SoundManager::StopSE(const SoundHandle handle)
+	void SoundManager::StopSE(const SEHandle handle)
 	{
 		auto* se = FindSE(handle);
 		if (se == nullptr) {
@@ -105,19 +121,19 @@ namespace app
 	}
 
 
-	SoundHandle SoundManager::PlayVoice(const int kind, const bool isLoop, const bool is3D)
+	VoiceHandle SoundManager::PlayVoice(const int kind, const bool isLoop, const bool is3D)
 	{
 		/** ハンドルが最大数になったら使えない */
-		if (m_soundHandleCount == INVALID_SOUND_HANDLE) {
+		if (m_soundHandleCount == INVALID_VOICE_HANDLE) {
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
-			return INVALID_SOUND_HANDLE;
+			return INVALID_VOICE_HANDLE;
 		}
 		auto* voice = new SoundSource;
 		voice->Init(kind, is3D);
 		voice->SetVolume(m_masterVolume * m_voiceVolume);
 		voice->Play(isLoop);
 
-		m_seList.emplace(m_soundHandleCount++, voice);
+		m_voiceList.emplace(m_soundHandleCount++, voice);
 
 		return m_soundHandleCount;
 	}
@@ -178,7 +194,7 @@ namespace app
 
 	void SoundManager::ApplyVoiceVolume()
 	{
-		for (auto& voice : m_seList)
+		for (auto& voice : m_voiceList)
 		{
 			voice.second->SetVolume(m_masterVolume * m_voiceVolume);
 		}

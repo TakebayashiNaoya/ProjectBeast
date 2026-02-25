@@ -9,10 +9,15 @@
 
 namespace app
 {
-	/** サウンド用のハンドル名 */
-	using SoundHandle = uint32_t;
+	/** SE用のハンドル名 */
+	using SEHandle = uint32_t;
 	/** ハンドル無効値 */
-	static constexpr SoundHandle INVALID_SOUND_HANDLE = 0xffffffff;
+	static constexpr SEHandle INVALID_SE_HANDLE = 0xffffffff;
+
+	/** Voice用のハンドル名 */
+	using VoiceHandle = uint32_t;
+	/** ハンドル無効値 */
+	static constexpr VoiceHandle INVALID_VOICE_HANDLE = 0xffffffff;
 
 
 	/**
@@ -37,18 +42,18 @@ namespace app
 
 
 		/** SEの再生 */
-		SoundHandle PlaySE(const int kind, const bool isLoop = false, const bool is3D = false);
+		SEHandle PlaySE(const int kind, const bool isLoop = false, const bool is3D = false);
 		/** SEの停止 */
-		void StopSE(const SoundHandle handle);
+		void StopSE(const SEHandle handle);
 
 
 		/** Voiceの再生 */
-		SoundHandle PlayVoice(const int kind, const bool isLoop = false, const bool is3D = false);
+		VoiceHandle PlayVoice(const int kind, const bool isLoop = false, const bool is3D = false);
 		/** Voiceの停止 */
-		void StopVoice(const SoundHandle handle);
+		void StopVoice(const VoiceHandle handle);
 
 
-		SoundSource* FindSE(const SoundHandle handle)
+		SoundSource* FindSE(const SEHandle handle)
 		{
 			auto it = m_seList.find(handle);
 			if (it != m_seList.end()) {
@@ -143,13 +148,13 @@ namespace app
 		/** BGM用のサウンドソースインスタンスを保持する */
 		SoundSource* m_bgm = nullptr;
 		/** SE用のサウンドソースインスタンスを保持する */
-		std::map<SoundHandle, SoundSource*> m_seList;
+		std::map<SEHandle, SoundSource*> m_seList;
 		/** Voice用のサウンドソースインスタンスを保持する */
-		std::map<SoundHandle, SoundSource*> m_voiceList;
+		std::map<SEHandle, SoundSource*> m_voiceList;
 		/**
 		 * マップで参照するようにハンドル数を保持
 		 */
-		SoundHandle m_soundHandleCount = 0;
+		SEHandle m_soundHandleCount = 0;
 
 
 	private:
