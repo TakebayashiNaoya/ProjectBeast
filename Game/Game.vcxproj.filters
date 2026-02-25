@@ -28,6 +28,9 @@
     <Filter Include="Source\Actor\Stage">
       <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Sound">
+      <UniqueIdentifier>{aabee1f5-f07e-444b-9b88-76bb30eb9087}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Util">
       <UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
     </Filter>
@@ -126,6 +129,9 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp">
       <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sound\SoundManager.cpp">
+      <Filter>Source\Sound</Filter>
     </ClCompile>
     <ClCompile Include="Source\Util\Curve.cpp">
       <Filter>Source\Util</Filter>
@@ -230,6 +236,12 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h">
       <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sound\SoundManager.h">
+      <Filter>Source\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sound\Types.h">
+      <Filter>Source\Sound</Filter>
     </ClInclude>
     <ClInclude Include="Source\Util\CRC32.h">
       <Filter>Source\Util</Filter>
