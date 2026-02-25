@@ -226,6 +226,8 @@
   <ItemGroup>
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Achivement\Achievement.cpp" />
+    <ClCompile Include="Source\Achivement\AchievementManager.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp" />
     <ClCompile Include="Source\Actor\ActorStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterBase.cpp" />
@@ -265,6 +267,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IObject.h" />
+    <ClInclude Include="Source\Achivement\Achievement.h" />
+    <ClInclude Include="Source\Achivement\AchievementManager.h" />
     <ClInclude Include="Source\Actor\Actor.h" />
     <ClInclude Include="Source\Actor\ActorStatus.h" />
     <ClInclude Include="Source\Actor\Character\CharacterBase.h" />
