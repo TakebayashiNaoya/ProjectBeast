@@ -34,11 +34,9 @@ namespace app
 
 		void UpdateWrapper()
 		{
-			if (m_isPause)
+			if (!m_isPause && m_isActive)
 			{
-				if (m_isActive) {
-					Update();
-				}
+				Update();
 			}
 		}
 
