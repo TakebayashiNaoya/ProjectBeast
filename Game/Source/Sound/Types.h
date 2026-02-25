@@ -27,7 +27,7 @@ namespace app
 
 		enSoundKind_Voice,
 		/** 下にVoiceの設定 */
-		enSoundKind_Penguin = enSoundKind_Voice,
+		enSoundKind_bootA = enSoundKind_Voice,
 
 		/** Voiceの設定はここまで */
 
@@ -53,6 +53,6 @@ namespace app
 		//BGM
 		SoundInformation("Assets/sound/BGM/InGame.wav"),
 		//Voice
-		SoundInformation("Assets/sound/Voice/penguin.wav")
+		SoundInformation("Assets/sound/Voice/bootA.wav")
 	};
 }
