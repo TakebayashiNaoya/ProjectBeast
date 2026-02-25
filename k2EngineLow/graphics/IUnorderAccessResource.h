@@ -1,10 +1,10 @@
-﻿
+
 namespace nsK2EngineLow {
 	class IUnorderAccessResrouce : public IShaderResource {
 	public:
 		virtual ~IUnorderAccessResrouce() {};
 		/// <summary>
-		/// UAVに登録。
+		/// UAV�ɓo�^�B
 		/// </summary>
 		/// <param name=""></param>
 		/// <param name="bufferNo"></param>

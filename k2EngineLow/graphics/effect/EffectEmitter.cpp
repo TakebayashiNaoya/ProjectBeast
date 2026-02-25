@@ -1,4 +1,4 @@
-﻿#include "k2EngineLowPreCompile.h"
+#include "k2EngineLowPreCompile.h"
 #include "EffectEmitter.h"
 
 namespace nsK2EngineLow {

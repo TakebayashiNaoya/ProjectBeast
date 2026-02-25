@@ -1,4 +1,4 @@
-ï»¿#include "k2EngineLowPreCompile.h"
+#include "k2EngineLowPreCompile.h"
 #include "RigidBody.h"
 
 namespace nsK2EngineLow {
@@ -18,12 +18,12 @@ namespace nsK2EngineLow {
 		}
 
 		btRigidBody::btRigidBodyConstructionInfo btRbInfo(
-			initData.mass,
-			m_myMotionState.get(),
-			shape,
+			initData.mass, 
+			m_myMotionState.get(), 
+			shape, 
 			btLocalInteria
 		);
-		//åç™ºåŠ›ã‚’è¨­å®šã€‚
+		//”½”­—Í‚ğİ’èB
 		btRbInfo.m_restitution = initData.restitution;
 		m_rigidBody = std::make_unique<btRigidBody>(btRbInfo);
 

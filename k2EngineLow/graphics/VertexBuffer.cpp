@@ -1,4 +1,4 @@
-﻿#include "k2EngineLowPreCompile.h"
+#include "k2EngineLowPreCompile.h"
 #include "VertexBuffer.h"
 
 namespace nsK2EngineLow {
@@ -26,20 +26,10 @@ namespace nsK2EngineLow {
 			IID_PPV_ARGS(&m_vertexBuffer));
 
 		m_vertexBuffer->SetName(L"VertexBuffer");
-		//頂点バッファのビューを作成。
+		//���_�o�b�t�@�̃r���[���쐬�B
 		m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
 		m_vertexBufferView.SizeInBytes = size;
 		m_vertexBufferView.StrideInBytes = stride;
-	}
-	void VertexBuffer::Init(RWStructuredBuffer& rwStructuredBuffer)
-	{
-		Release();
-		m_vertexBuffer = rwStructuredBuffer.GetD3DResoruce();
-		m_vertexBuffer->AddRef();
-		//頂点バッファのビューを作成。
-		m_vertexBufferView.BufferLocation = m_vertexBuffer->GetGPUVirtualAddress();
-		m_vertexBufferView.SizeInBytes = rwStructuredBuffer.GetSize();
-		m_vertexBufferView.StrideInBytes = rwStructuredBuffer.GetStride();
 	}
 	void VertexBuffer::Copy(void* srcVertices)
 	{

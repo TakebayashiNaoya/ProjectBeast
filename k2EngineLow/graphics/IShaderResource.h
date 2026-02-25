@@ -1,4 +1,4 @@
-﻿
+
 namespace nsK2EngineLow {
 	class IShaderResource : public Noncopyable {
 	public:
@@ -6,7 +6,7 @@ namespace nsK2EngineLow {
 		{
 		}
 		/// <summary>
-		/// SRVに登録。
+		/// SRV�ɓo�^�B
 		/// </summary>
 		/// <param name="descriptorHandle"></param>
 		virtual void RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo) = 0;
