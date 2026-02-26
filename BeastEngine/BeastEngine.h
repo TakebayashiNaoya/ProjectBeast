@@ -8,6 +8,10 @@
 
 namespace nsBeastEngine
 {
+	/** 前方宣言 */
+	class SceneLight;
+	class RenderingEngine;
+
 	/**
 	 * @brief BeastEngine
 	 * @details 自作エンジン
@@ -15,11 +19,7 @@ namespace nsBeastEngine
 	class BeastEngine
 	{
 	private:
-		/**
-		 * @brief K2EngineLowの実体
-		 * @details BeastEngineはこれを操作してゲームを動かす
-		 */
-		K2EngineLow m_k2EngineLow;
+
 
 		// RenderingEngine m_renderingEngine; // ← これはK2のレンダラーなので一旦削除！
 
@@ -39,7 +39,6 @@ namespace nsBeastEngine
 			HWND hwnd;				/**	ウィドウハンドル */
 			UINT frameBufferWidth;	/**	フレームバッファの幅 */
 			UINT frameBufferHeight;	/**	フレームバッファの高さ */
-			bool isSoftShadow;		/**	ソフトシャドウを使用するかどうか */
 		};
 		/**
 		 * @brief BeastEngineの初期化
@@ -50,6 +49,13 @@ namespace nsBeastEngine
 		 * @brief エンジンの処理を実行
 		 */
 		void Execute();
+
+
+	private:
+		/** K2EngineLowの実体 */
+		K2EngineLow m_k2EngineLow;
+		/** レンダリングエンジン */
+		RenderingEngine m_renderingEngine;
 
 
 		/**
@@ -73,9 +79,6 @@ namespace nsBeastEngine
 	private:
 		/** BeastEngineのインスタンス */
 		static BeastEngine* m_instance;
-
-		RenderingEngine m_renderingEngine;					// レンダリングエンジン。
-
 	};
 
 	/** グローバルにアクセスできる変数 */
