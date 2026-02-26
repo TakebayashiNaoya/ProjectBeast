@@ -32,6 +32,15 @@ namespace app
 	void SceneManager::Update()
 	{
 		if (m_currentScene) {
+
+			if (g_pad[0]->IsTrigger(enButtonSelect))
+			{
+				m_isPause = !m_isPause;
+			}
+			if (m_isPause) {
+				return;
+			}
+
 			m_currentScene->Update();
 			if (m_currentScene->RequesutScene(m_nextSceneId)) {
 				delete m_currentScene;

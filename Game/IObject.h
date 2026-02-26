@@ -34,7 +34,8 @@ namespace app
 
 		void UpdateWrapper()
 		{
-			if (m_isActive) {
+			if (m_isActive && !m_isPause)
+			{
 				Update();
 			}
 		}
@@ -58,8 +59,20 @@ namespace app
 		}
 
 
+		/**
+		 * @brief Pauseフラグの設定
+		 * @param isPause Pauseフラグ
+		 */
+		void SetPause(const bool isPause)
+		{
+			m_isPause = isPause;
+		}
+
+
 	protected:
 		/** Activeフラグ */
 		bool m_isActive = true;
+		/** Pauseフラグ */
+		bool m_isPause = false;
 	};
 }
