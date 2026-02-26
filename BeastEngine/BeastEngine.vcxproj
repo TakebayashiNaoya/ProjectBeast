@@ -23,6 +23,7 @@
     <ClCompile Include="BeastEnginePreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Graphics\FontRender.cpp" />
     <ClCompile Include="Graphics\Light\SceneLight.cpp" />
     <ClCompile Include="graphics\ModelRender.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
@@ -31,6 +32,7 @@
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
+    <ClInclude Include="Graphics\FontRender.h" />
     <ClInclude Include="graphics\IRenderer.h" />
     <ClInclude Include="Graphics\Light\SceneLight.h" />
     <ClInclude Include="graphics\ModelRender.h" />

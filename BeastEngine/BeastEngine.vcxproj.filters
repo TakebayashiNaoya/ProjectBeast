@@ -15,6 +15,9 @@
     <ClCompile Include="Graphics\SpriteRender.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\FontRender.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -35,6 +38,9 @@
       <Filter>Graphics\Light</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\SpriteRender.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\FontRender.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
