@@ -6,10 +6,10 @@
 
 #include "k2EngineLowPreCompile.h"
 using namespace nsK2EngineLow;
+#include "Graphics/IRenderer.h"
 //#include "collision/CollisionObject.h"
 #include "Graphics/RenderingEngine.h"
 #include "BeastEngine.h"
-#include "Graphics/IRenderer.h"
 //#include "geometry/AABB.h"
 #include "Graphics/ModelRender.h"
 //#include "graphics/SpriteRender.h"

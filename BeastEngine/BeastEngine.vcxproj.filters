@@ -12,6 +12,9 @@
     <ClCompile Include="Graphics\Light\SceneLight.cpp">
       <Filter>Graphics\Light</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\SpriteRender.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -30,6 +33,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\Light\SceneLight.h">
       <Filter>Graphics\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\SpriteRender.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
