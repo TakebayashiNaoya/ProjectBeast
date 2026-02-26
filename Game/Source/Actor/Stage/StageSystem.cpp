@@ -49,12 +49,19 @@ namespace
 	 */
 	Quaternion ParseRotation(const nlohmann::json& arr)
 	{
-		return Quaternion(
-			arr[0].get<float>(),
-			arr[1].get<float>(),
-			arr[2].get<float>(),
-			arr[3].get<float>()
-		);
+		// 回転を度数法で取得
+		Vector3 rotDeg = ParseVector3(arr);
+		// クォータニオンに変換
+		Quaternion rotX, rotY, rotZ;
+		rotX.SetRotationDegX(rotDeg.x);
+		rotY.SetRotationDegY(rotDeg.y);
+		rotZ.SetRotationDegZ(rotDeg.z);
+		// 乗算して合成
+		Quaternion result = rotY;
+		result *= rotX;
+		result *= rotZ;
+
+		return result;
 	}
 
 
@@ -66,7 +73,7 @@ namespace
 	void LoadTransform(app::actor::IStageObject* object, const nlohmann::json& json)
 	{
 		const Vector3 position = ParseVector3(json["position"]);
-		const Quaternion rotation = ParseRotation(json["rotation"]);
+		const Quaternion rotation = ParseRotation(json["rotationDeg"]);
 		const Vector3 scale = ParseVector3(json["scale"]);
 
 		object->SetPosition(position);
