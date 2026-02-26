@@ -57,6 +57,26 @@ namespace app
 		}
 
 
+	public:
+		/**
+		 * @brief Pauseフラグの設定
+		 * @param isPause Pauseフラグ
+		 */
+		void SetPause(const bool isPause)
+		{
+			m_isPause = isPause;
+		}
+
+
+		/**
+		 * @brief Pauseフラグの取得
+		 */
+		bool IsPause() const
+		{
+			return m_isPause;
+		}
+
+
 	private:
 		/** 次のシーンID */
 		uint32_t m_nextSceneId = INVALID_SCENE_ID;
@@ -97,5 +117,9 @@ namespace app
 	private:
 		/** シングルトンインスタンス */
 		static SceneManager* m_instance;
+
+
+	private:
+		bool m_isPause = false;
 	};
 }
