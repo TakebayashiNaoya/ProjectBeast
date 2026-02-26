@@ -14,6 +14,7 @@ public:
 
 private:
 	nsBeastEngine::ModelRender m_modelRender;
+	nsBeastEngine::SpriteRender m_spriteRender;
 	Vector3 m_pos;
 };
 
