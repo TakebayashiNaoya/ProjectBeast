@@ -11,30 +11,38 @@ namespace nsBeastEngine
 {
 	RenderingEngine::RenderingEngine()
 	{
+		g_renderingEngine = this;
 	}
 
 
 	RenderingEngine::~RenderingEngine()
 	{
+		g_renderingEngine = nullptr;
 	}
 
 
-	void RenderingEngine::Init(bool isSoftShadow)
+	void RenderingEngine::Init()
 	{
-		/** メインレンダリングターゲットの初期化 */
-		InitMainRenderTarget();
+		// 現段階では空でOKです。
+		// 後々、ここにレンダーターゲットやシャドウマップの初期化が入ります。
 	}
 
 
-	void RenderingEngine::InitMainRenderTarget()
+	void RenderingEngine::AddRenderObject(IRenderer* renderObject)
 	{
-		m_mainRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
-			1,
-			1,
-			g_mainRenderTargetFormat.colorBufferFormat,
-			g_mainRenderTargetFormat.depthBufferFormat
-		);
+		if (renderObject != nullptr) {
+			m_renderObjects.push_back(renderObject); // リストに追加
+		}
+	}
+
+	void RenderingEngine::Execute(RenderContext& rc)
+	{
+		// 1. 登録されたオブジェクトの2D描画を順に実行
+		for (auto* obj : m_renderObjects) {
+			obj->OnRender2D(rc);
+		}
+
+		// 2. 描画が終わったらリストを空にして、次のフレームに備える
+		m_renderObjects.clear();
 	}
 }

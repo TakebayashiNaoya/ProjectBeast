@@ -10,51 +10,30 @@
 
 namespace nsBeastEngine
 {
-	class RenderingEngine : public Noncopyable
+	class RenderingEngine
 	{
 	public:
 		RenderingEngine();
 		~RenderingEngine();
 
-
-	public:
 		/**
-		 * @brief レンダリングパイプラインの初期化
-		 * @param isSoftShadow	ソフトシャドウを使用するかどうか
+		 * @brief レンダリングエンジンの初期化\
 		 */
-		void Init(bool isSoftShadow);
+		void Init();
 
 		/**
-		 * @brief レイトレ用のライトデータ
+		 * @brief 描画オブジェクトをリストに登録する（予約）
 		 */
-		struct RaytracingLightData
-		{
-			DirectionalLight m_directionalLight;  /** ディレクショナルライト */
-			Vector3 m_ambientLight;               /** 環境光（IBLテクスチャが指定されていない場合に利用される） */
-			float m_iblIntencity;                 /** IBL強度 */
-			int m_enableIBLTexture;               /** IBLテクスチャが指定されている */
-		};
+		void AddRenderObject(IRenderer* renderObject);
+
 		/**
-		 * @brief レイトレ用のライトデータを取得
-		 * @return レイトレ用のライトデータ
+		 * 溜まったリストを一気に描画する
 		 */
-		RaytracingLightData& GetRaytracingLightData()
-		{
-			return m_raytracingLightData;
-		}
+		void Execute(RenderContext& rc);
 
 
 	private:
-		/**
-		 * @brief メインレンダリングターゲットの初期化
-		 */
-		void InitMainRenderTarget();
-
-
-	private:
-		/**	メインレンダリングターゲット */
-		RenderTarget m_mainRenderTarget;
-		/** レイトレ用のライトデータ */
-		RaytracingLightData m_raytracingLightData;
+		/** 描画するオブジェクトの予約リスト */
+		std::vector<IRenderer*> m_renderObjects;
 	};
 }
