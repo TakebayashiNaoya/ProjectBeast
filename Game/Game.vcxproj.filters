@@ -136,10 +136,10 @@
     <ClCompile Include="Source\Util\Curve.cpp">
       <Filter>Source\Util</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Achivement\Achievement.cpp">
+    <ClCompile Include="Source\Achivement\AchievementManager.cpp">
       <Filter>Source\Achievement</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Achivement\AchievementManager.cpp">
+    <ClCompile Include="Source\Achivement\AchievementBase.cpp">
       <Filter>Source\Achievement</Filter>
     </ClCompile>
   </ItemGroup>
@@ -249,10 +249,10 @@
     <ClInclude Include="Source\Util\Curve.h">
       <Filter>Source\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Achivement\Achievement.h">
+    <ClInclude Include="Source\Achivement\AchievementManager.h">
       <Filter>Source\Achievement</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Achivement\AchievementManager.h">
+    <ClInclude Include="Source\Achivement\AchievementBase.h">
       <Filter>Source\Achievement</Filter>
     </ClInclude>
   </ItemGroup>
