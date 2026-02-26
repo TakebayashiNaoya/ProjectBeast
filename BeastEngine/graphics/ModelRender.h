@@ -4,7 +4,7 @@
  * @author 竹林尚哉
  */
 #pragma once
-#include "graphics/ComputeAnimationVertexBuffer.h"
+ //#include "graphics/ComputeAnimationVertexBuffer.h"
 #include "graphics/IRenderer.h"  
 
 
@@ -57,6 +57,38 @@ namespace nsBeastEngine
 		 */
 		void InitComputeAnimatoinVertexBuffer(const char* tkmFilePath, EnModelUpAxis enModelUpAxis);
 
+		/**
+		 * @brief GBuffer描画用のモデルの初期化
+		 * @param renderingEngine	レンダリングエンジン
+		 * @param filePath			tkmファイルパス
+		 * @param enModelUpAxis		モデルの上方向の軸
+		 * @param isShadowReciever	シャドウレシーバーかどうか
+		 */
+		void InitModelOnRenderGBuffer(RenderingEngine& renderingEngine, const char* tkmFilePath, EnModelUpAxis enModelUpAxis, bool isShadowReciever);
+
+		/**
+		 * @brief 各種モデルの頂点シェーダーのエントリーポイントを設定
+		 * @param modelInitData	モデルの初期化データ
+		 */
+		void SetupVertexShaderEntryPointFunc(ModelInitData& modelInitData);
+
+		/**
+		 * @brief ZPrepass描画用のモデルの初期化
+		 * @param renderingEngine	レンダリングエンジン
+		 * @param tkmFilePath		tkmファイルのファイルパス
+		 * @param modelUpAxis		モデルの上方向の
+		 */
+		void InitModelOnZprepass(RenderingEngine& renderingEngine, const char* tkmFilePath, EnModelUpAxis modelUpAxis);
+
+		/**
+		 * @brief シャドウマップ描画用のモデルの初期化
+		 * @param renderingEngine				レンダリングエンジン
+		 * @param tkmFilePath					tkmファイルパス
+		 * @param modelUpAxis					モデルの上方向の軸
+		 * @param isFrontCullingOnDrawShadowMap シャドウマップ描画時にフロントカリングするかどうか
+		 */
+		void InitModelOnShadowMap(RenderingEngine& renderingEngine, const char* tkmFilePath, EnModelUpAxis modelUpAxis, bool isFrontCullingOnDrawShadowMap);
+
 
 	private:
 		/** スケルトン */
@@ -74,8 +106,14 @@ namespace nsBeastEngine
 		/** ワールド行列の配列のストラクチャードバッファ */
 		StructuredBuffer m_worldMatrixArraySB;
 		/** アニメーション済み頂点バッファの計算処理 */
-		ComputeAnimationVertexBuffer m_computeAnimationVertexBuffer;
+		//ComputeAnimationVertexBuffer m_computeAnimationVertexBuffer;
 		/** 最大インスタンス数 */
 		int	m_maxInstance;
+
+		/** RenderToGBufferで描画されるモデル */
+		Model m_renderToGBufferModel;
+
+		/** ZPrepassで描画されるモデル */
+		Model m_zprepassModel;
 	};
 }
