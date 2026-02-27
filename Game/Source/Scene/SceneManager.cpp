@@ -5,7 +5,10 @@
  */
 #include "stdafx.h"
 #include "DebugScene.h"
+#include "InGameScene.h"
+#include "ResultScene.h"
 #include "SceneManager.h"
+#include "TitleScene.h"
 
 
 namespace app
@@ -18,6 +21,9 @@ namespace app
 	{
 		// ここでシーン追加
 		AddSceneMap<app::DebugScene>();
+		AddSceneMap<app::TitleScene>();
+		AddSceneMap<app::InGameScene>();
+		AddSceneMap<app::ResultScene>();
 
 		// 初期シーン生成
 		CreateScene(app::DebugScene::ID());
@@ -69,7 +75,8 @@ namespace app
 		if (it == m_sceneMap.end()) {
 			K2_ASSERT(false, "新規シーンが追加されていません。\n");
 		}
-		m_currentScene = it->second();
+		auto& createSceneFunc = it->second;
+		m_currentScene = createSceneFunc();
 		m_currentScene->Start();
 	}
 }
