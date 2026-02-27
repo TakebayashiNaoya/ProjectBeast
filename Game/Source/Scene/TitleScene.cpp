@@ -4,6 +4,7 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include "InGameScene.h"
 #include "TitleScene.h"
 
 
@@ -27,6 +28,10 @@ namespace app
 
 	void TitleScene::Update()
 	{
+		if (g_pad[0]->IsTrigger(enButtonA))
+		{
+			m_nextScene = true;
+		}
 	}
 
 
@@ -37,6 +42,10 @@ namespace app
 
 	bool TitleScene::RequesutScene(uint32_t& id)
 	{
+		if (m_nextScene) {
+			id = InGameScene::ID();
+			return true;
+		}
 		return false;
 	}
 }

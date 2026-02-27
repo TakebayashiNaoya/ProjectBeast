@@ -23,5 +23,9 @@ namespace app
 		void Render(RenderContext& rc) override;
 
 		bool RequesutScene(uint32_t& id) override;
+
+
+	private:
+		bool m_nextScene = false;
 	};
 }

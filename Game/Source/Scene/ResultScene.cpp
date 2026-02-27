@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "ResultScene.h"
+#include "TitleScene.h"
 
 
 namespace app
@@ -27,6 +28,10 @@ namespace app
 
 	void ResultScene::Update()
 	{
+		if (g_pad[0]->IsTrigger(enButtonA))
+		{
+			m_nextScene = true;
+		}
 	}
 
 
@@ -37,6 +42,10 @@ namespace app
 
 	bool ResultScene::RequesutScene(uint32_t& id)
 	{
+		if (m_nextScene) {
+			id = TitleScene::ID();
+			return true;
+		}
 		return false;
 	}
 }
