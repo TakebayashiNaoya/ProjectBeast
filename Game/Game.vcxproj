@@ -260,6 +260,7 @@
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
+    <ClCompile Include="Source\Util\JsonConverter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -305,6 +306,7 @@
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />
+    <ClInclude Include="Source\Util\JsonConverter.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

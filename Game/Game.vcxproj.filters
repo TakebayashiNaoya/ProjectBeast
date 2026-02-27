@@ -142,6 +142,9 @@
     <ClCompile Include="Source\Achivement\AchievementBase.cpp">
       <Filter>Source\Achievement</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Util\JsonConverter.cpp">
+      <Filter>Source\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -254,6 +257,9 @@
     </ClInclude>
     <ClInclude Include="Source\Achivement\AchievementBase.h">
       <Filter>Source\Achievement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\JsonConverter.h">
+      <Filter>Source\Util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
