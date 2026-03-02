@@ -18,8 +18,8 @@ namespace app
 
 
 		public:
-			void Enable() { m_IsEnable = true; }
-			void Disable() { m_IsEnable = false; }
+			void IsEnable() { m_IsEnable = true; }
+			void IsDisable() { m_IsEnable = false; }
 
 
 		public:

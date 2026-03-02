@@ -11,9 +11,13 @@ namespace app
 {
 	namespace core
 	{
-		Fade::Fade()
-		{
+		Fade* Fade::m_instance = nullptr;
 
+
+		Fade::Fade()
+			:m_IsEnable(false)
+		{
+			m_fadeRender.Init("Assets/sprite/Loading.DDS", 1920.0f, 1080.0f);
 		}
 
 
