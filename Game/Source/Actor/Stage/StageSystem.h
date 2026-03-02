@@ -6,7 +6,7 @@
 #pragma once
 #include "IStage.h"
 #include "json/json.hpp"
-#include <fstream>
+
 
 #ifdef K2_DEBUG
 #define ENABLE_OBJECT_LAYOUT_HOTRELOAD
@@ -61,8 +61,6 @@ namespace app
 			using ObjectKey = std::string;
 			using Object = std::unique_ptr<IStageObject>;
 
-			/** jsonファイルネーム */
-			std::string m_jsonFileName;
 			/** オブジェクトのマップ */
 			std::unordered_map<ObjectKey, Object> m_objectMap;
 
