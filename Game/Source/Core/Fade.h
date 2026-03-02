@@ -8,7 +8,7 @@
 
 namespace app
 {
-	namespace fade
+	namespace core
 	{
 		class Fade
 		{
@@ -20,6 +20,7 @@ namespace app
 		public:
 			void Enable() { m_IsEnable = true; }
 			void Disable() { m_IsEnable = false; }
+
 
 		public:
 			static void Create()
