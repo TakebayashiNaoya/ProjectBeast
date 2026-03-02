@@ -1,6 +1,6 @@
 ﻿/**
  * @file SpriteRender.h
- * @brief 2Dスプライト描画クラス
+ * @brief フォントレンダークラス
  * @author 竹林尚哉
  */
 #pragma once
@@ -18,6 +18,7 @@ namespace nsBeastEngine
 			, m_rotation(0.0f)
 			, m_scale(1.0f)
 			, m_pivot(Sprite::DEFAULT_PIVOT)
+			, m_text(L"")
 			, m_color(Vector4::White)
 		{
 		}

@@ -13,7 +13,7 @@ using namespace nsK2EngineLow;
 //#include "geometry/AABB.h"
 #include "Graphics/ModelRender.h"
 #include "graphics/SpriteRender.h"
-//#include "graphics/FontRender.h"
+#include "graphics/FontRender.h"
 #include "Graphics/light/SceneLight.h"
 //#include "nature/SkyCube.h"
 //#include "Level3DRender/LevelRender.h"
