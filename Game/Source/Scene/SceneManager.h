@@ -81,6 +81,9 @@ namespace app
 		/** 次のシーンID */
 		uint32_t m_nextSceneId = INVALID_SCENE_ID;
 
+		float m_elapsedTime = 0.0f;
+		float m_waitTime = 0.0f;
+
 
 	private:
 		SceneManager();

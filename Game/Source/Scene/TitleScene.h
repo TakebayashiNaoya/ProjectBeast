@@ -22,10 +22,14 @@ namespace app
 		void Update() override;
 		void Render(RenderContext& rc) override;
 
-		bool RequesutScene(uint32_t& id) override;
+		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
 
 	private:
 		bool m_nextScene = false;
+
+
+	private:
+		SpriteRender m_titleRender;
 	};
 }

@@ -9,6 +9,12 @@
 
 namespace app
 {
+	namespace actor
+	{
+		class Player;
+	}
+
+
 	class InGameScene : public IScene
 	{
 		appScene(InGameScene);
@@ -22,10 +28,12 @@ namespace app
 		void Update() override;
 		void Render(RenderContext& rc) override;
 
-		bool RequesutScene(uint32_t& id) override;
+		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
 
 	private:
 		bool m_nextScene = false;
+
+		actor::Player* m_player = nullptr;
 	};
 }

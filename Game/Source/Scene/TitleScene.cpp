@@ -22,6 +22,7 @@ namespace app
 
 	bool TitleScene::Start()
 	{
+		m_titleRender.Init("Assets/sprite/Title.DDS", 1920.0f, 1080.0f);
 		return true;
 	}
 
@@ -37,13 +38,15 @@ namespace app
 
 	void TitleScene::Render(RenderContext& rc)
 	{
+		m_titleRender.Draw(rc);
 	}
 
 
-	bool TitleScene::RequesutScene(uint32_t& id)
+	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		if (m_nextScene) {
 			id = InGameScene::ID();
+			waitTime = 3.0f;
 			return true;
 		}
 		return false;

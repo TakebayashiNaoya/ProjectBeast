@@ -22,6 +22,7 @@ namespace app
 
 	bool ResultScene::Start()
 	{
+		m_resultRender.Init("Assets/sprite/Result.DDS", 1920.0f, 1080.0f);
 		return true;
 	}
 
@@ -37,13 +38,15 @@ namespace app
 
 	void ResultScene::Render(RenderContext& rc)
 	{
+		m_resultRender.Draw(rc);
 	}
 
 
-	bool ResultScene::RequesutScene(uint32_t& id)
+	bool ResultScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		if (m_nextScene) {
 			id = TitleScene::ID();
+			waitTime = 3.0f;
 			return true;
 		}
 		return false;
