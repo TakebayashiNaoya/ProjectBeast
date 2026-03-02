@@ -24,6 +24,18 @@ namespace app
 			 */
 			static bool IsLoadJsonFile(nlohmann::json& json, const std::string& filePath);
 			/**
+			 * @brief jsonからintを読み込む
+			 * @param json 読み込むjsonファイル
+			 * @return 読み込んだint
+			 */
+			static int ToInt(const nlohmann::json& json);
+			/**
+			 * @brief jsonからuint32_tを読み込む
+			 * @param json 読み込むjsonファイル
+			 * @return 読み込んだuint32_t
+			 */
+			static uint32_t ToUInt32(const nlohmann::json& json);
+			/**
 			 * @brief jsonからfloatを読み込む
 			 * @param json 読み込むjsonファイル
 			 * @return 読み込んだfloat

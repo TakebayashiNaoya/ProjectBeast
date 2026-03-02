@@ -43,6 +43,18 @@ namespace app
 		}
 
 
+		int JsonConverter::ToInt(const nlohmann::json& json)
+		{
+			return json.get<int>();
+		}
+
+
+		uint32_t JsonConverter::ToUInt32(const nlohmann::json& json)
+		{
+			return json.get<uint32_t>();
+		}
+
+
 		float JsonConverter::ToFloat(const nlohmann::json& json)
 		{
 			return json.get<float>();
