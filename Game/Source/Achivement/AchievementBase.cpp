@@ -41,6 +41,7 @@ namespace app
 
 		AchievementBase::~AchievementBase()
 		{
+			m_flags.clear();
 		}
 
 

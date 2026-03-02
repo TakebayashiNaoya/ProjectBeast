@@ -12,8 +12,12 @@
 namespace
 {
 	/** アチーブメントのデータファイルのパス */
-	const char* ACHIEVE_JSON_FILE_PATH = "Assets/parameter/achievement/achievementList.json";
+	const char* JSON_FILE_PATH = "Assets/parameter/achievement/achievementList.json";
 
+	/** アチーブメントリストのキー */
+	const char* ACHIEVE_LIST_KEY = "AchievementList";
+	/** アチーブメントのキー */
+	const char* ACHIEVE_KEY = "Achievement";
 }
 
 
@@ -51,7 +55,6 @@ namespace app
 
 
 		AchievementManager::AchievementManager()
-			: m_achieveFilePath(ACHIEVE_JSON_FILE_PATH)
 		{
 		}
 
@@ -71,7 +74,7 @@ namespace app
 				// タイプを取得
 				const std::string type = app::util::JsonConverter::ToString(achieveData["type"]);
 
-				Achieve achieve;
+				Achieve newAchieve;
 
 				// タイプに応じてアチーブメントを作成
 
@@ -79,7 +82,7 @@ namespace app
 				if (type == "counter")
 				{
 					// カウンタータイプのアチーブメントを作成
-					achieve = std::make_unique<CounterAchievement>();
+					newAchieve = std::make_unique<CounterAchievement>();
 				}
 				if (type == "location")
 				{
@@ -88,12 +91,12 @@ namespace app
 				}
 
 				// アチーブメントを初期化
-				achieve->Init(json);
+				newAchieve->Init(json);
 
 				// 登録したキーを取得
-				uint32_t key = achieve->GetID();
+				uint32_t key = newAchieve->GetID();
 				// マップに追加
-				m_achievementMap.emplace(key, std::move(achieve));
+				m_achievementMap.emplace(key, std::move(newAchieve));
 			}
 		}
 

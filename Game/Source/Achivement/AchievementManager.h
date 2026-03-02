@@ -54,8 +54,6 @@ namespace app
 
 
 		private:
-			/**< アチーブメントのデータファイルのパス */
-			std::string m_achieveFilePath;
 			/** アチーブメントのマップ */
 			std::unordered_map<AchieveKey, Achieve> m_achievementMap;
 
