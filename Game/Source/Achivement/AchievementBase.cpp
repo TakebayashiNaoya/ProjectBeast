@@ -6,22 +6,7 @@
 #include "stdafx.h"
 #include "AchievementBase.h"
 #include "Source/Util/CRC32.h"
-
-
-namespace
-{
-	/**
-	 * @brief jsonからVector3をパースする関数
-	 */
-	Vector3 ParseVector3(const nlohmann::json& arr)
-	{
-		return Vector3(
-			arr[0].get<float>(),
-			arr[1].get<float>(),
-			arr[2].get<float>()
-		);
-	}
-}
+#include "Source/Util/JsonConverter.h"
 
 
 namespace app
@@ -37,7 +22,8 @@ namespace app
 
 		void AchievementBase::InitAchievementBase(const nlohmann::json& json)
 		{
-			m_name = json["name"].get<std::string>();
+			m_name = app::util::JsonConverter::ToString(json["name"]);
+			m_name = app::util::JsonConverter::ToString(json["condition"]);
 			m_id = Hash32(m_name.c_str());
 		}
 
@@ -83,7 +69,7 @@ namespace app
 
 		void CounterAchievement::InitAchievementImpl(const nlohmann::json& json)
 		{
-			m_targetValue = json["targetValue"].get<uint32_t>();
+			m_targetValue = app::util::JsonConverter::ToUInt32(json["targetValue"]);
 		}
 
 
@@ -106,8 +92,8 @@ namespace app
 
 		void LocationAchievement::InitAchievementImpl(const nlohmann::json& json)
 		{
-			m_targetLocation = ParseVector3(json["targetLocation"]);
-			m_enableDistance = json["thresholdDistance"].get<float>();
+			m_targetLocation = app::util::JsonConverter::ToVector3(json["targetLocation"]);
+			m_enableDistance = app::util::JsonConverter::ToFloat(json["enableDistance"]);
 		}
 	}
 }

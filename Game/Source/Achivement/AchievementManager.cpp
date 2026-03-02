@@ -5,9 +5,8 @@
  */
 #include "stdafx.h"
 #include "AchievementManager.h"
-#include "Json/json.hpp"
 #include "Source/Util/CRC32.h"
-#include <fstream>
+#include "Source/Util/JsonConverter.h"
 
 
 namespace
@@ -15,27 +14,6 @@ namespace
 	/** アチーブメントのデータファイルのパス */
 	const char* ACHIEVE_JSON_FILE_PATH = "Assets/parameter/achievement/achievementList.json";
 
-
-
-	bool TryOpenJsonFile(const std::string& filePath, nlohmann::json& json)
-	{
-		nlohmann::json jsonTemp;
-		std::ifstream file(filePath);
-		if (!file.is_open())
-		{
-			return false;
-		}
-		try
-		{
-			file >> jsonTemp;
-		}
-		catch (...)
-		{
-			return false;
-		}
-		json = std::move(jsonTemp);
-		return true;
-	}
 }
 
 
@@ -47,18 +25,18 @@ namespace app
 		{
 			nlohmann::json json;
 			// JSONの読み込みを試す
-			if (!TryOpenJsonFile(m_achieveFilePath, json))
+			if (!app::util::JsonConverter::IsLoadJsonFile(json, JSON_FILE_PATH))
 			{
 				// 読み込み失敗
 				return;
 			}
 
 			// JSON内の確認
-			if (!json.contains("AchievementList")) return;
-			if (!json["AchievementList"].contains("Achievement")) return;
+			if (!json.contains(ACHIEVE_LIST_KEY)) return;
+			if (!json[ACHIEVE_LIST_KEY].contains(ACHIEVE_KEY)) return;
 
 
-			CreateAchievement(json["AchievementList"]["Achievement"]);
+			CreateAchievement(json[ACHIEVE_LIST_KEY][ACHIEVE_KEY]);
 		}
 
 
@@ -88,8 +66,10 @@ namespace app
 		{
 			for (const auto& achieveData : json)
 			{
-				std::string type;
-				achieveData.at("type").get_to(type);
+				// タイプのキーが存在しない場合はエラー
+				K2_ASSERT(achieveData.contains("type"), "typeが未設定");
+				// タイプを取得
+				const std::string type = app::util::JsonConverter::ToString(achieveData["type"]);
 
 				Achieve achieve;
 
