@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #pragma once
+#include "Json/json.hpp"
 
 
 namespace app
@@ -13,22 +14,13 @@ namespace app
 		/**
 		 * @brief アチーブメントの基底クラス
 		 */
-		class Achievement : public Noncopyable
+		class AchievementBase : public Noncopyable
 		{
 		public:
 			/**
-			 * @brief アチーブメントを初期化
-			 * @param name アチーブメントの名前
-			 * @param description アチーブメントの説明
-			 * @param id アチーブメントのID
-			 * @param conditionFunc アチーブメントの達成条件を満たしているかどうかを判定する関数
+			 * @brief 初期化処理
 			 */
-			void InitializeAchievement(
-				const std::string& name
-				, const std::string& description
-				, uint32_t id
-				, std::function<bool()> conditionFunc
-			);
+			void Init(const nlohmann::json& json);
 
 
 		public:
@@ -62,19 +54,37 @@ namespace app
 		public:
 			/**
 			 * @brief 更新処理
-			 * @details アチーブメントの達成フラグを更新
 			 */
-			void Update();
+			virtual void Update() = 0;
 
 
 		public:
-			Achievement();
-			virtual ~Achievement();
+			AchievementBase();
+			virtual ~AchievementBase();
 
 
 		protected:
-			/**< アチーブメントの達成条件を満たしているかどうかを判定する関数 */
+			/**
+			 * @brief アチーブメントを初期化
+			 * @param name アチーブメントの名前
+			 * @param description アチーブメントの説明
+			 * @param id アチーブメントのID
+			 */
+			void InitAchievementBase(const nlohmann::json& json);
+
+
+			/**
+			 * @brief 派生先の条件用変数を初期化する関数
+			 * @todo 派生先の条件用変数を初期化する関数を実装する
+			 */
+			virtual void InitAchievementImpl(const nlohmann::json& json) = 0;
+
+
+		protected:
+			/** アチーブメントの達成条件を満たしているかどうかを判定する関数 */
 			std::function<bool()> m_conditionFunc;
+			/** アチーブメントの達成を管理するフラグ群 */
+			std::vector<bool> m_flags;
 
 
 			/** アチーブメントの名前 */
@@ -99,7 +109,7 @@ namespace app
 		 * @brief カウンタータイプのアチーブメントクラス
 		 * @details カウンターアチーブメントは、特定の条件を満たす回数をカウントし、その回数が目標値に達したときに達成されるアチーブメントです。
 		 */
-		class CounterAchievement : public Achievement
+		class CounterAchievement : public AchievementBase
 		{
 		public:
 			/**
@@ -115,8 +125,17 @@ namespace app
 
 
 		public:
+			/** 更新処理 */
+			void Update() override final;
+
+
+		public:
 			CounterAchievement();
 			~CounterAchievement() override;
+
+
+		private:
+			void InitAchievementImpl(const nlohmann::json& json) override final;
 
 
 		protected:
@@ -132,7 +151,11 @@ namespace app
 		/*************************************************/
 
 
-		class LocationAchievement : public Achievement
+		/**
+		 * @brief ロケーションタイプのアチーブメントクラス
+		 * @details ロケーションアチーブメントは、特定の位置に到達したときに達成されるアチーブメントです。
+		 */
+		class LocationAchievement : public AchievementBase
 		{
 		public:
 			LocationAchievement();
@@ -140,7 +163,14 @@ namespace app
 
 
 		private:
-			std::vector<bool> m_flags;
+			void InitAchievementImpl(const nlohmann::json& json) override final;
+
+
+		private:
+			/** 目標の位置 */
+			Vector3 m_targetLocation;
+			/** 達成するための距離の閾値 */
+			float m_enableDistance;
 		};
 	}
 }
