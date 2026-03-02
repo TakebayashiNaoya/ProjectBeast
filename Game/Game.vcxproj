@@ -245,6 +245,7 @@
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Core\AppParameterMacro.cpp" />
+    <ClCompile Include="Source\Core\Fade.cpp" />
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp" />
     <ClCompile Include="Source\Core\IMasterParameter.cpp" />
     <ClCompile Include="Source\Core\ParameterManager.cpp" />
@@ -290,6 +291,7 @@
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Core\AppParameterMacro.h" />
+    <ClInclude Include="Source\Core\Fade.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
     <ClInclude Include="Source\Core\IMasterParameter.h" />
     <ClInclude Include="Source\Core\ParameterManager.h" />
