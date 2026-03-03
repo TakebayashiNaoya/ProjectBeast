@@ -39,7 +39,7 @@ namespace nsBeastEngine
 		}
 
 		/** シャドウマップテクスチャ */
-		modelInitData.m_expandShaderResoruceView[0] = &g_renderingEngine->GetShadowMap();
+		//modelInitData.m_expandShaderResoruceView[0] = &g_renderingEngine->GetShadowMap();
 
 		/** シーンライト */
 		modelInitData.m_expandConstantBuffer = g_sceneLight->GetLight();
@@ -47,12 +47,12 @@ namespace nsBeastEngine
 		m_model.Init(modelInitData);
 
 		/** シャドウマップテクスチャ */
-		modelInitData.m_expandShaderResoruceView[0] = nullptr;
+		//modelInitData.m_expandShaderResoruceView[0] = nullptr;
 
-		modelInitData.m_fxFilePath = "Assets/shader/DrawShadowMap.fx";
-		modelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
-		modelInitData.m_expandConstantBuffer = &g_sceneLight->GetLVP();
-		m_shadowModels.Init(modelInitData);
+		//modelInitData.m_fxFilePath = "Assets/shader/DrawShadowMap.fx";
+		//modelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
+		//modelInitData.m_expandConstantBuffer = &g_sceneLight->GetLVP();
+		//m_shadowModels.Init(modelInitData);
 	}
 
 
