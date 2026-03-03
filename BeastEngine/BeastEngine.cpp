@@ -12,6 +12,7 @@ namespace nsBeastEngine
 	/** 静的メンバ変数の実体を定義 */
 	BeastEngine* BeastEngine::m_instance = nullptr;
 	BeastEngine* g_beastEngine = nullptr;
+	SceneLight* g_sceneLight = nullptr;
 	RenderingEngine* g_renderingEngine = nullptr;
 
 

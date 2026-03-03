@@ -83,5 +83,6 @@ namespace nsBeastEngine
 
 	/** グローバルにアクセスできる変数 */
 	extern BeastEngine* g_beastEngine;
+	extern SceneLight* g_sceneLight;
 	extern RenderingEngine* g_renderingEngine;
 }
