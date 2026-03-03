@@ -18,13 +18,24 @@ namespace app
 
 
 		public:
-			void Enable() { m_isEnable = true; }
-			void Disable() { m_isEnable = false; }
+			/**
+			 * @brief フェードアウトを開始する
+			 * @param duration フェードアウトが完了するまでの時間
+			 */
+			void FadeOut(float duration);
+			/**
+			 * @brief フェードインを開始する
+			 * @param duration フェードインが完了するまでの時間
+			 */
+			void FadeIn(float duration);
 
 
 		public:
-			void FadeOut(float duration);
-			void FadeIn(float duration);
+			/** 現在フェードをしているか */
+			bool IsFading() const
+			{
+				return m_state != FadeState::None;
+			}
 
 
 		public:
@@ -55,6 +66,7 @@ namespace app
 
 
 		private:
+			/** フェードの処理 */
 			void FadeProcess();
 
 
@@ -67,12 +79,30 @@ namespace app
 
 
 		private:
-			float m_timer = 0.0f;
-			float m_duration = 1.0f;
-			bool m_isFadeOut = false;
-			bool m_isFadeIn = false;
+			/**
+			 * @enum class FadeState
+			 * @brief フェードの状態
+			 */
+			enum class FadeState
+			{
+				/** 何もしていない状態 */
+				None,
+				/** フェードイン */
+				FadeIn,
+				/** フェードアウト */
+				FadeOut,
+			};
 
-			bool m_isEnable = false;
+
+		private:
+			FadeState m_state = FadeState::None;
+
+
+			/** フェードの経過時間 */
+			float m_timer = 0.0f;
+
+			/** フェードが完了するまでの時間 */
+			float m_duration = 0.0f;
 		};
 	}
 }

@@ -40,34 +40,40 @@ namespace app
 
 	void SceneManager::Update()
 	{
+		float delta = g_gameTime->GetFrameDeltaTime();
+
 		if (m_currentScene) {
 
 			if (g_pad[0]->IsTrigger(enButtonSelect))
 			{
 				m_isPause = !m_isPause;
 			}
-			if (m_isPause) {
-				return;
+			if (!m_isPause) {
+				m_currentScene->Update();
 			}
 
-			m_currentScene->Update();
-			if (m_currentScene->RequesutScene(m_nextSceneId, m_waitTime)) {
-				delete m_currentScene;
-				m_currentScene = nullptr;
-
-				core::Fade::Get().Enable();
+			if (m_nextSceneId == INVALID_SCENE_ID)
+			{
+				if (m_currentScene->RequesutScene(m_nextSceneId, m_waitTime)) {
+					m_elapsedTime = 0.0f;
+					core::Fade::Get().FadeOut(m_waitTime);
+				}
 			}
 		}
 
 		if (m_nextSceneId != INVALID_SCENE_ID) {
-			m_elapsedTime += g_gameTime->GetFrameDeltaTime();
+			m_elapsedTime += delta;
+
 			if (m_elapsedTime >= m_waitTime) {
+				delete m_currentScene;
+				m_currentScene = nullptr;
+
+				core::Fade::Get().FadeIn(m_waitTime);
 				CreateScene(m_nextSceneId);
+
+				m_nextSceneId = INVALID_SCENE_ID;
 				m_waitTime = 0.0f;
 				m_elapsedTime = 0.0f;
-				m_nextSceneId = INVALID_SCENE_ID;
-
-				core::Fade::Get().Disable();
 			}
 		}
 	}

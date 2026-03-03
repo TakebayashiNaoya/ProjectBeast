@@ -15,7 +15,6 @@ namespace app
 
 
 		Fade::Fade()
-			:m_isEnable(false)
 		{
 			m_fadeRender.Init("Assets/sprite/Loading.DDS", 1920.0f, 1080.0f);
 		}
@@ -29,7 +28,7 @@ namespace app
 
 		void Fade::Update()
 		{
-			if (!m_isEnable) {
+			if (m_state == FadeState::None) {
 				return;
 			}
 			FadeProcess();
@@ -41,23 +40,21 @@ namespace app
 		{
 			float delta = g_gameTime->GetFrameDeltaTime();
 
-			if (m_isFadeIn)
+			if (m_state == FadeState::FadeIn)
 			{
 				m_timer -= delta;
 				if (m_timer <= 0.0f)
 				{
 					m_timer = 0.0f;
-					m_isFadeIn = false;
-					m_isEnable = false;
+					m_state = FadeState::None;
 				}
 			}
-			else if (m_isFadeOut)
+			else if (m_state == FadeState::FadeOut)
 			{
 				m_timer += delta;
 				if (m_timer >= m_duration)
 				{
 					m_timer = m_duration;
-					m_isFadeOut = false;
 				}
 			}
 		}
@@ -65,29 +62,28 @@ namespace app
 
 		void Fade::FadeIn(float duration)
 		{
+			m_state = FadeState::FadeIn;
 			m_duration = duration;
-			m_timer = 0.0f;
-			m_isFadeOut = false;
-			m_isFadeIn = true;
-			m_isEnable = true;
+			m_timer = duration;
 		}
 
 
 		void Fade::FadeOut(float duration)
 		{
+			m_state = FadeState::FadeOut;
 			m_duration = duration;
 			m_timer = 0.0f;
-			m_isFadeOut = true;
-			m_isFadeIn = false;
-			m_isEnable = true;
 		}
 
 
 		void Fade::Render(RenderContext& rc)
 		{
-			if (!m_isEnable) {
+			if (m_state == FadeState::None) {
 				return;
 			}
+			float alpha = m_timer / m_duration;
+			alpha = std::clamp(alpha, 0.0f, 1.0f);
+			m_fadeRender.SetMulColor({ 1.0f,1.0f,1.0f,alpha });
 			m_fadeRender.Draw(rc);
 		}
 	}
