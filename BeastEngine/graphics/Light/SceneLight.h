@@ -20,9 +20,9 @@ namespace nsBeastEngine
 	struct SDirectionLight
 	{
 		Vector3 m_direction;	/** ディレクションライトの方向 */
-		float	pad0;
+		float	padding0;
 		Vector3 m_color;		/** ディレクションライトの色 */
-		float	pad1;
+		float	padding1;
 		Matrix	m_LVP;			/** ライトビュープロジェクション行列 */
 
 
@@ -31,9 +31,9 @@ namespace nsBeastEngine
 		 */
 		SDirectionLight()
 			: m_direction(Vector3::Zero)
-			, pad0(0.0f)
+			, padding0(0.0f)
 			, m_color(Vector3::Zero)
-			, pad1(0.0f)
+			, padding1(0.0f)
 			, m_LVP(Matrix::Identity)
 		{
 		}
@@ -98,12 +98,12 @@ namespace nsBeastEngine
 	 */
 	struct SPointLight
 	{
-		Vector3 m_position;		/** 位置 */
-		int		m_isUse;		/** 使用中かどうか */
-		Vector3	m_color;		/** 色 */
-		float	m_range;		/** 影響範囲 */
+		Vector3 m_position;			/** 位置 */
+		int		m_isUsed;			/** 使用中かどうか */
+		Vector3	m_color;			/** 色 */
+		float	m_range;			/** 影響範囲 */
 		Vector3 m_positionInView;	/** カメラ空間での座標 */
-		float   pad0;
+		float   padding;
 
 
 		/**
@@ -111,11 +111,11 @@ namespace nsBeastEngine
 		 */
 		SPointLight()
 			: m_position(Vector3::Zero)
-			, m_isUse(false)
+			, m_isUsed(false)
 			, m_color(Vector3::Zero)
 			, m_range(0.0f)
 			, m_positionInView(Vector3::Zero)
-			, pad0(0.0f)
+			, padding(0.0f)
 		{
 		}
 
@@ -169,9 +169,9 @@ namespace nsBeastEngine
 		/**
 		 * @brief 使用中にする
 		 */
-		void Use()
+		void SetIsUsed()
 		{
-			m_isUse = true;
+			m_isUsed = true;
 		}
 
 		/**
@@ -189,13 +189,13 @@ namespace nsBeastEngine
 	struct SSpotLight
 	{
 		Vector3 m_position;			/** 位置 */
-		int		m_isUse;		/** ライトの使用状況 */
-		Vector3 m_color;		/** 色 */
-		float	m_range;		/** 影響範囲 */
-		Vector3 m_direction;	/** 向き */
-		float	m_angle;		/** 射出角度 */
+		int		m_isUsed;			/** ライトの使用状況 */
+		Vector3 m_color;			/** 色 */
+		float	m_range;			/** 影響範囲 */
+		Vector3 m_direction;		/** 向き */
+		float	m_angle;			/** 射出角度 */
 		Vector3 m_positionInView;	/** カメラ空間での座標 */
-		float	pad;
+		float	padding;
 
 
 		/**
@@ -203,13 +203,13 @@ namespace nsBeastEngine
 		 */
 		SSpotLight()
 			: m_position(Vector3::Zero)
-			, m_isUse(false)
+			, m_isUsed(false)
 			, m_color(Vector3::Zero)
 			, m_range(0.0f)
 			, m_direction(Vector3::Zero)
 			, m_angle(0.0f)
 			, m_positionInView(Vector3::Zero)
-			, pad(0.0f)
+			, padding(0.0f)
 		{
 		}
 
@@ -292,9 +292,9 @@ namespace nsBeastEngine
 		/**
 		 * @brief 使用中にする
 		 */
-		void Use()
+		void SetIsUsed()
 		{
-			m_isUse = true;
+			m_isUsed = true;
 		}
 
 		/**
@@ -315,9 +315,9 @@ namespace nsBeastEngine
 	struct SHemisphereLight
 	{
 		Vector3 m_groundColor;	/** 地面の色 */
-		float pad0;
+		float padding0;
 		Vector3 m_skyColor;		/** 空の色 */
-		float pad1;
+		float padding1;
 		Vector3 m_groundNormal;	/** 地面の法線 */
 
 
@@ -326,9 +326,9 @@ namespace nsBeastEngine
 		 */
 		SHemisphereLight()
 			: m_groundColor(Vector3::Zero)
-			, pad0(0.0f)
+			, padding0(0.0f)
 			, m_skyColor(Vector3::Zero)
-			, pad1(0.0f)
+			, padding1(0.0f)
 			, m_groundNormal(Vector3::Up)
 		{
 		}
@@ -407,20 +407,20 @@ namespace nsBeastEngine
 		SPointLight			m_pointLight[MAX_POINT_LIGHT];	/** ポイントライト */
 		SSpotLight			m_spotLight[MAX_SPOT_LIGHT];	/** スポットライト */
 		SHemisphereLight	m_hemisphereLight;				/** 半球ライト */
-		int					m_numPointLig;					/** ポイントライトの使用数 */
-		Vector3				m_cameraPos;					/** カメラの向いている方向 */
-		int					m_numSpotLig;					/** スポットライトの使用数 */
-		Vector3				m_ambientLight;					/** 環境光の色 */
+		int					m_usedPointLightCount;			/** ポイントライトの使用数 */
+		Vector3				m_cameraPosition;				/** カメラの向いている方向 */
+		int					m_usedSpotLightCount;			/** スポットライトの使用数 */
+		Vector3				m_ambientLightColor;			/** 環境光の色 */
 
 
 		/**
 		 * @brief コンストラクタ
 		 */
 		Light()
-			: m_numPointLig(0)
-			, m_cameraPos(Vector3::Zero)
-			, m_numSpotLig(0)
-			, m_ambientLight(Vector3::Zero)
+			: m_usedPointLightCount(0)
+			, m_cameraPosition(Vector3::Zero)
+			, m_usedSpotLightCount(0)
+			, m_ambientLightColor(Vector3::Zero)
 		{
 		}
 
@@ -429,7 +429,7 @@ namespace nsBeastEngine
 		 */
 		void SetCameraPos()
 		{
-			m_cameraPos = g_camera3D->GetPosition();
+			m_cameraPosition = g_camera3D->GetPosition();
 		}
 
 		/**
@@ -438,7 +438,7 @@ namespace nsBeastEngine
 		 */
 		void SetAmbientLight(const Vector3& color)
 		{
-			m_ambientLight = color;
+			m_ambientLightColor = color;
 		}
 		/**
 		 * @brief 環境光の色の設定
@@ -480,7 +480,7 @@ namespace nsBeastEngine
 		 */
 		void SetLightPos(const Vector3& pos)
 		{
-			m_lightPos = pos;
+			m_lightPosition = pos;
 		}
 
 		/**
@@ -490,7 +490,7 @@ namespace nsBeastEngine
 		 * @param z z座標
 		 */
 		void RemoveLightPos() {
-			m_lightPos = Vector3::Zero;
+			m_lightPosition = Vector3::Zero;
 		}
 
 		/**
@@ -539,7 +539,7 @@ namespace nsBeastEngine
 
 	private:
 		/** ディレクションライトの位置 */
-		Vector3 m_lightPos = Vector3::Zero;
+		Vector3 m_lightPosition = Vector3::Zero;
 		/** 未使用のポイントライトのキュー */
 		std::deque< SPointLight* > m_unusePointLightQueue;
 		/** 未使用のスポットライトのキュー */
