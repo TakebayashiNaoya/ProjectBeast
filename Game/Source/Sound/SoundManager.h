@@ -100,7 +100,7 @@ namespace app
 	public:
 		/**
 		 * インスタンスを作成
-		 * @detail main.cppで呼び出す
+		 * @detail Application.cppで呼び出す
 		 */
 		static void CreateInstance()
 		{
@@ -122,7 +122,7 @@ namespace app
 
 		/**
 		 * インスタンスを削除
-		 * @detail main.cppで呼び出す
+		 * @detail Application.cppで呼び出す
 		 */
 		static void DestroyInstance()
 		{
