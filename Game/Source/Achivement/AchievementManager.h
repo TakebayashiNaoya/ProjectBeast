@@ -4,13 +4,17 @@
  * @author 藤谷
  */
 #pragma once
-#include "Achievement.h"
+#include "AchievementBase.h"
+#include "Json/json.hpp"
 
 
 namespace app
 {
 	namespace achievement
 	{
+
+
+
 		/**
 		* @brief アチーブメントの管理クラス
 		*/
@@ -42,11 +46,11 @@ namespace app
 			 * @brief アチーブメントを作成する
 			 * @todo 未実装なので、この先実装する
 			 */
-			void CreateAchievement();
+			void CreateAchievement(const nlohmann::json& json);
 
 
-			using AchieveKey = std::string;
-			using Achieve = std::unique_ptr<Achievement>;
+			using AchieveKey = uint32_t;
+			using Achieve = std::unique_ptr<AchievementBase>;
 
 
 		private:

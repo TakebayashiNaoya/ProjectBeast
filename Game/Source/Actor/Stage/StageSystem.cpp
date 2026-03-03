@@ -5,10 +5,9 @@
  */
 #include "stdafx.h"
 #include "IStage.h"
+#include "Source/Util/JsonConverter.h"
 #include "StageSystem.h"
 #include <unordered_set>
-
-
 
 
  /**
@@ -17,7 +16,7 @@
 namespace
 {
 	/** JSONのファイルネーム */
-	const char* JSON_FILE_NAME = "Assets/parameter/stage/stageObject.json";
+	const char* JSON_FILE_PATH = "Assets/parameter/stage/stageObject.json";
 	/** ステージオブジェクトのキー */
 	const char* STAGE_OBJECT_KEY = "StageObject";
 	/** オブジェクト配列のキー */
@@ -30,27 +29,13 @@ namespace
 
 
 	/**
-	 * @brief jsonファイルからVector3を変換する
-	 * @param arr json配列
-	 */
-	Vector3 ParseVector3(const nlohmann::json& arr)
-	{
-		return Vector3(
-			arr[0].get<float>(),
-			arr[1].get<float>(),
-			arr[2].get<float>()
-		);
-	}
-
-
-	/**
 	 * @brief jsonファイルからQuaternionを変換する
 	 * @param arr json配列
 	 */
-	Quaternion ParseRotation(const nlohmann::json& arr)
+	Quaternion ToRotation(const nlohmann::json& arr)
 	{
 		// 回転を度数法で取得
-		Vector3 rotDeg = ParseVector3(arr);
+		Vector3 rotDeg = app::util::JsonConverter::ToVector3(arr);
 		// クォータニオンに変換
 		Quaternion rotX, rotY, rotZ;
 		rotX.SetRotationDegX(rotDeg.x);
@@ -72,9 +57,9 @@ namespace
 	 */
 	void LoadTransform(app::actor::IStageObject* object, const nlohmann::json& json)
 	{
-		const Vector3 position = ParseVector3(json["position"]);
-		const Quaternion rotation = ParseRotation(json["rotationDeg"]);
-		const Vector3 scale = ParseVector3(json["scale"]);
+		const Vector3 position = app::util::JsonConverter::ToVector3(json["position"]);
+		const Quaternion rotation = ToRotation(json["rotationDeg"]);
+		const Vector3 scale = app::util::JsonConverter::ToVector3(json["scale"]);
 
 		object->SetPosition(position);
 		object->SetRotation(rotation);
@@ -90,7 +75,7 @@ namespace
 	 */
 	void InitializeStageObject(app::actor::IStageObject* object, const nlohmann::json& item)
 	{
-		const std::string fileName = item["fileName"].get<std::string>();
+		const std::string fileName = app::util::JsonConverter::ToString(item["fileName"]);
 
 		object->Init(fileName.c_str());
 
@@ -117,32 +102,16 @@ namespace
 			return false;
 		}
 
-		// ファイルストリームを開く
-		std::ifstream file(jsonFileName);
-
-		// ファイルが開けなかった場合
-		if (!file.is_open()) {
-			// 読み込み失敗
-			return false;
-		}
-
-		nlohmann::json jsonTemp;
-
-		// jsonの読み込みを試す
-		try
-		{
-			file >> jsonTemp;
-		}
-		// 例外が発生した場合
-		catch (...)
+		// jsonファイルを読み込む
+		if (!app::util::JsonConverter::IsLoadJsonFile(json, jsonFileName))
 		{
 			// 読み込み失敗
 			return false;
 		}
-		// 読み込んだjsonを保存
-		json = std::move(jsonTemp);
+
 		// 更新時間を保存
 		time = st.st_mtime;
+
 		// 読み込み成功
 		return true;
 	}
@@ -159,7 +128,7 @@ namespace app
 			for (const auto& objData : json[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const auto& objectKey = objData[OBJECT_NAME].get<std::string>();
+				const ObjectKey objectKey = app::util::JsonConverter::ToString(objData[OBJECT_NAME]);
 
 				if (!m_objectMap.empty())
 				{
@@ -170,7 +139,7 @@ namespace app
 				}
 
 				// ここに来たということは既存のものはないので生成
-				auto newObject = std::make_unique<IStageObject>();
+				Object newObject = std::make_unique<IStageObject>();
 				// オブジェクトを初期化
 				InitializeStageObject(newObject.get(), objData);
 				// マップに追加
@@ -198,12 +167,12 @@ namespace app
 			for (const auto& objData : json[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const std::string& objectKey = objData[OBJECT_NAME].get<std::string>();
+				const ObjectKey objectKey = app::util::JsonConverter::ToString(objData[OBJECT_NAME]);
 				toBeDeleted.erase(objectKey);
 			}
 
 			// 削除対象のキーをもとにオブジェクトを削除
-			for (const auto& key : toBeDeleted)
+			for (const ObjectKey& key : toBeDeleted)
 			{
 				m_objectMap.erase(key);
 			}
@@ -221,7 +190,7 @@ namespace app
 			for (const auto& objData : j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const ObjectKey& objKey = objData[OBJECT_NAME].get<std::string>();
+				const ObjectKey& objKey = app::util::JsonConverter::ToString(objData[OBJECT_NAME]);
 
 				auto it = m_objectMap.find(objKey);
 				// 既存のものがなければスキップ
@@ -233,8 +202,7 @@ namespace app
 
 
 		StageSystem::StageSystem()
-			: m_jsonFileName(JSON_FILE_NAME)
-			, m_lastUpdateTime(0)
+			: m_lastUpdateTime(0)
 		{
 			/** マップのメモリを確保 */
 			m_objectMap.reserve(MAX_OBJECT_NUM);
@@ -253,7 +221,7 @@ namespace app
 			nlohmann::json json;
 
 			// JSONの読み込みを試す
-			if (!TryRoadJsonFile(json, m_jsonFileName, m_lastUpdateTime))
+			if (!TryRoadJsonFile(json, JSON_FILE_PATH, m_lastUpdateTime))
 			{
 				// 失敗した場合処理しない
 				return;
