@@ -18,8 +18,13 @@ namespace app
 
 
 		public:
-			void IsEnable() { m_IsEnable = true; }
-			void IsDisable() { m_IsEnable = false; }
+			void Enable() { m_isEnable = true; }
+			void Disable() { m_isEnable = false; }
+
+
+		public:
+			void FadeOut(float duration);
+			void FadeIn(float duration);
 
 
 		public:
@@ -50,12 +55,24 @@ namespace app
 
 
 		private:
+			void FadeProcess();
+
+
+		private:
 			static Fade* m_instance;
 
 
 		private:
 			SpriteRender m_fadeRender;
-			bool m_IsEnable = false;
+
+
+		private:
+			float m_timer = 0.0f;
+			float m_duration = 1.0f;
+			bool m_isFadeOut = false;
+			bool m_isFadeIn = false;
+
+			bool m_isEnable = false;
 		};
 	}
 }

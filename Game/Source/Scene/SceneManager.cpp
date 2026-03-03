@@ -29,7 +29,7 @@ namespace app
 		AddSceneMap<app::ResultScene>();
 
 		// 初期シーン生成
-		CreateScene(app::DebugScene::ID());
+		CreateScene(app::TitleScene::ID());
 	}
 
 
@@ -55,7 +55,7 @@ namespace app
 				delete m_currentScene;
 				m_currentScene = nullptr;
 
-				core::Fade::Get().IsEnable();
+				core::Fade::Get().Enable();
 			}
 		}
 
@@ -67,7 +67,7 @@ namespace app
 				m_elapsedTime = 0.0f;
 				m_nextSceneId = INVALID_SCENE_ID;
 
-				core::Fade::Get().IsDisable();
+				core::Fade::Get().Disable();
 			}
 		}
 	}
