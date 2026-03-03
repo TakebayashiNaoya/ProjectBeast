@@ -39,6 +39,7 @@ namespace app
 		/**
 		 * @brief シーンを要求
 		 * @param id シーンのID
+		 * @param waitTime シーン遷移するまでの時間
 		 */
 		virtual bool RequesutScene(uint32_t& id, float& waitTime) = 0;
 	};
