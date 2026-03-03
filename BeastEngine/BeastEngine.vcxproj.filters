@@ -18,6 +18,15 @@
     <ClCompile Include="Graphics\FontRender.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\Light\HemisphereLight.cpp">
+      <Filter>Graphics\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\Light\PointLight.cpp">
+      <Filter>Graphics\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\Light\SpotLight.cpp">
+      <Filter>Graphics\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -42,6 +51,15 @@
     </ClInclude>
     <ClInclude Include="Graphics\FontRender.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\Light\HemisphereLight.h">
+      <Filter>Graphics\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\Light\PointLight.h">
+      <Filter>Graphics\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\Light\SpotLight.h">
+      <Filter>Graphics\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
