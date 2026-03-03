@@ -40,6 +40,6 @@ namespace app
 		 * @brief シーンを要求
 		 * @param id シーンのID
 		 */
-		virtual bool RequesutScene(uint32_t& id) = 0;
+		virtual bool RequesutScene(uint32_t& id, float& waitTime) = 0;
 	};
 }

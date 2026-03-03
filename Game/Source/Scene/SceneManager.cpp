@@ -4,8 +4,14 @@
  * @author 立山
  */
 #include "stdafx.h"
+
 #include "DebugScene.h"
+#include "InGameScene.h"
+#include "ResultScene.h"
 #include "SceneManager.h"
+#include "TitleScene.h"
+
+#include "Source/Core/Fade.h"
 
 
 namespace app
@@ -18,6 +24,9 @@ namespace app
 	{
 		// ここでシーン追加
 		AddSceneMap<app::DebugScene>();
+		AddSceneMap<app::TitleScene>();
+		AddSceneMap<app::InGameScene>();
+		AddSceneMap<app::ResultScene>();
 
 		// 初期シーン生成
 		CreateScene(app::DebugScene::ID());
@@ -42,15 +51,24 @@ namespace app
 			}
 
 			m_currentScene->Update();
-			if (m_currentScene->RequesutScene(m_nextSceneId)) {
+			if (m_currentScene->RequesutScene(m_nextSceneId, m_waitTime)) {
 				delete m_currentScene;
 				m_currentScene = nullptr;
+
+				core::Fade::Get().IsEnable();
 			}
 		}
 
 		if (m_nextSceneId != INVALID_SCENE_ID) {
-			CreateScene(m_nextSceneId);
-			m_nextSceneId = INVALID_SCENE_ID;
+			m_elapsedTime += g_gameTime->GetFrameDeltaTime();
+			if (m_elapsedTime >= m_waitTime) {
+				CreateScene(m_nextSceneId);
+				m_waitTime = 0.0f;
+				m_elapsedTime = 0.0f;
+				m_nextSceneId = INVALID_SCENE_ID;
+
+				core::Fade::Get().IsDisable();
+			}
 		}
 	}
 
@@ -69,7 +87,8 @@ namespace app
 		if (it == m_sceneMap.end()) {
 			K2_ASSERT(false, "新規シーンが追加されていません。\n");
 		}
-		m_currentScene = it->second();
+		auto& createSceneFunc = it->second;
+		m_currentScene = createSceneFunc();
 		m_currentScene->Start();
 	}
 }

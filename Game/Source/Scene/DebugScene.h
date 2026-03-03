@@ -22,6 +22,6 @@ namespace app
 		void Update() override;
 		void Render(RenderContext& rc) override;
 
-		bool RequesutScene(uint32_t& id) override;
+		bool RequesutScene(uint32_t& id, float& waitTime) override;
 	};
 }

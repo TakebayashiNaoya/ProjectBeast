@@ -35,7 +35,7 @@ namespace app
 	}
 
 
-	bool DebugScene::RequesutScene(uint32_t& id)
+	bool DebugScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		return false;
 	}
