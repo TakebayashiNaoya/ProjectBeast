@@ -27,6 +27,9 @@
     <ClCompile Include="graphics\Light\SpotLight.cpp">
       <Filter>Graphics\Light</Filter>
     </ClCompile>
+    <ClCompile Include="Nature\SkyCube.cpp">
+      <Filter>Nature</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -61,6 +64,9 @@
     <ClInclude Include="graphics\Light\SpotLight.h">
       <Filter>Graphics\Light</Filter>
     </ClInclude>
+    <ClInclude Include="Nature\SkyCube.h">
+      <Filter>Nature</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -68,6 +74,9 @@
     </Filter>
     <Filter Include="Graphics\Light">
       <UniqueIdentifier>{b5a34f6b-6814-4378-a0e6-0e35d5d221a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Nature">
+      <UniqueIdentifier>{3536668a-c182-4f51-8baf-7fbfc29f0ed6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

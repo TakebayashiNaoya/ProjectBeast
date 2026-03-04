@@ -31,6 +31,7 @@
     <ClCompile Include="graphics\ModelRender.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
+    <ClCompile Include="Nature\SkyCube.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -45,6 +46,7 @@
     <ClInclude Include="graphics\MyRenderer.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
+    <ClInclude Include="Nature\SkyCube.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
