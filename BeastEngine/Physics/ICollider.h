@@ -8,7 +8,7 @@
 class btCollisionShape;
 
 
-namespace nsK2EngineLow
+namespace nsBeastEngine
 {
 	/**
 	 * @brief コライダーのインターフェースクラス
