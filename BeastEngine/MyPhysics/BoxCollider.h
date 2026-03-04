@@ -21,7 +21,8 @@ namespace nsBeastEngine
 		void Create(const Vector3& size);
 
 		/**
-		 * @brief コライダーを取得
+		 * @brief BulletPhysicsのコリジョン形状を取得
+		 * @return コリジョン形状
 		 */
 		btCollisionShape* GetBody() const override
 		{
