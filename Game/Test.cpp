@@ -14,6 +14,13 @@ bool Test::Start()
 
 void Test::Update()
 {
+	if (g_pad[0]->IsPress(enButtonB)) {
+		m_pos.x -= 1.0f;
+	}
+	if (g_pad[0]->IsPress(enButtonA)) {
+		m_pos.x += 1.0f;
+	}
+	m_modelRender.SetPosition(m_pos);
 	// g_renderingEngine->DisableRaytracing();
 	m_modelRender.Update();
 }
