@@ -9,6 +9,7 @@ bool Test::Start()
 	m_fontRender.SetText(L"BeastEngine Test!");
 	m_fontRender.SetPosition(100.0f, 100.0f); // 画面の見やすい位置に
 	m_fontRender.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	InitSky();
 	return true;
 }
 
@@ -30,4 +31,17 @@ void Test::Render(RenderContext& rc)
 	m_modelRender.Draw(rc);
 	m_spriteRender.Draw(rc);
 	m_fontRender.Draw(rc);
+}
+
+void Test::InitSky()
+{
+	// 現在の空を破棄。
+	DeleteGO(m_skyCube);
+
+	m_skyCube = NewGO<nsBeastEngine::SkyCube>(0, "skycube");
+	m_skyCube->SetType((nsBeastEngine::EnSkyCubeType)m_skyCubeType);
+	m_skyCube->SetScale(100.0f);
+
+	// 環境光の計算のためのIBLテクスチャをセットする。
+	//nsBeastEngine::g_renderingEngine->nsBeastEngine::SetAmbientByIBLTexture(m_skyCube->GetTextureFilePath(), 0.1f);
 }
