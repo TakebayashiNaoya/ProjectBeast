@@ -1,5 +1,11 @@
-﻿#include "BeastEnginePreCompile.h"
+﻿/**
+ * @file SpriteRender.cpp
+ * @brief 2Dスプライト描画クラスの実装
+ * @author 竹林尚哉
+ */
+#include "BeastEnginePreCompile.h"
 #include "SpriteRender.h"
+
 
 namespace nsBeastEngine
 {

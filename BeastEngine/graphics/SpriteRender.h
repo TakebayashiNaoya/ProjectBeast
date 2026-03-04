@@ -8,21 +8,12 @@
 
 namespace nsBeastEngine
 {
+	/**
+	 * 2Dスプライト描画クラス
+	 */
 	class SpriteRender :public IRenderer
 	{
 	public:
-		SpriteRender() = default;
-		~SpriteRender() = default;
-
-		/**
-		 * @brief 画像の初期化用関数
-		 * @param filePath			画像ファイルのパス
-		 * @param width				画像の横幅のサイズ
-		 * @param height			画像の縦幅のサイズ
-		 * @param alphaBlendMode	アルファブレンドモード
-		 */
-		void Init(const char* filePath, const float width, const float height, AlphaBlendMode alphaBlendMode = AlphaBlendMode_Trans);
-
 		/**
 		 * @brief 位置の設定
 		 * @param position	位置
@@ -73,6 +64,27 @@ namespace nsBeastEngine
 			m_pivot = pivot;
 		}
 
+
+	public:
+		SpriteRender()
+			: m_sprite()
+			, m_pivot(Sprite::DEFAULT_PIVOT)
+			, m_position(Vector3::Zero)
+			, m_scale(Vector3::One)
+			, m_rotation(Quaternion::Identity)
+		{
+		}
+		~SpriteRender() = default;
+
+		/**
+		 * @brief 画像の初期化用関数
+		 * @param filePath			画像ファイルのパス
+		 * @param width				画像の横幅のサイズ
+		 * @param height			画像の縦幅のサイズ
+		 * @param alphaBlendMode	アルファブレンドモード
+		 */
+		void Init(const char* filePath, const float width, const float height, AlphaBlendMode alphaBlendMode = AlphaBlendMode_Trans);
+
 		/**
 		 * @brief 更新処理
 		 */
@@ -103,13 +115,13 @@ namespace nsBeastEngine
 		/** スプライト */
 		Sprite		m_sprite;
 		/** 基点 */
-		Vector2		m_pivot = Sprite::DEFAULT_PIVOT;
+		Vector2		m_pivot;
 		/** 位置 */
-		Vector3		m_position = Vector3::Zero;
+		Vector3		m_position;
 		/** 大きさ */
-		Vector3		m_scale = Vector3::One;
+		Vector3		m_scale;
 		/** 回転 */
-		Quaternion	m_rotation = Quaternion::Identity;
+		Quaternion	m_rotation;
 	};
 }
 
