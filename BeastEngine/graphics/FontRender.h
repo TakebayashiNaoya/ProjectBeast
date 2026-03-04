@@ -11,19 +11,6 @@ namespace nsBeastEngine
 	class FontRender :public IRenderer
 	{
 	public:
-		static const int MAX_TEXT_SIZE = 256;
-
-		FontRender()
-			: m_position(Vector3::Zero)
-			, m_rotation(0.0f)
-			, m_scale(1.0f)
-			, m_pivot(Sprite::DEFAULT_PIVOT)
-			, m_text(L"")
-			, m_color(Vector4::White)
-		{
-		}
-		~FontRender() = default;
-
 		/**
 		 * @brief 文字の設定
 		 * @param text 文字列
@@ -100,6 +87,21 @@ namespace nsBeastEngine
 			m_color = color;
 		}
 
+
+	public:
+		static const int MAX_TEXT_SIZE = 256;
+
+		FontRender()
+			: m_position(Vector3::Zero)
+			, m_rotation(0.0f)
+			, m_scale(1.0f)
+			, m_pivot(Sprite::DEFAULT_PIVOT)
+			, m_text(L"")
+			, m_color(Vector4::White)
+		{
+		}
+		~FontRender() = default;
+
 		/**
 		 * @brief 描画処理
 		 * @param rc レンダリングコンテキスト
@@ -122,19 +124,19 @@ namespace nsBeastEngine
 
 	private:
 		/** フォント */
-		Font		m_font;
+		Font	m_font;
 		/** 位置 */
-		Vector3		m_position;
+		Vector3	m_position;
 		/** 回転 */
-		float		m_rotation;
+		float	m_rotation;
 		/** 大きさ */
-		float		m_scale;
+		float	m_scale;
 		/** 基点 */
-		Vector2		m_pivot;
+		Vector2	m_pivot;
 		/** 描画する文字列 */
-		wchar_t		m_text[MAX_TEXT_SIZE];
+		wchar_t	m_text[MAX_TEXT_SIZE];
 		/** 色 */
-		Vector4		m_color;
+		Vector4	m_color;
 	};
 }
 
