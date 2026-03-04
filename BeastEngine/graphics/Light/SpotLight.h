@@ -11,19 +11,6 @@ namespace nsBeastEngine
 	class SpotLight
 	{
 	public:
-		SpotLight();
-		~SpotLight() = default;
-
-		/**
-		 * @brief スポットライトの初期化
-		 * @param position	位置
-		 * @param color		色
-		 * @param range		影響距離
-		 * @param direction	ライトの向き
-		 * @param angle		ライトの影響範囲
-		 */
-		void Init(const Vector3& position, const Vector3& color, const float& range, const Vector3& direction, const float angle);
-
 		/**
 		 * @brief スポットライトの位置の設定
 		 * @param position	位置
@@ -106,6 +93,22 @@ namespace nsBeastEngine
 		{
 			m_spotLight->m_isUsed = true;
 		}
+
+
+	public:
+		SpotLight();
+		~SpotLight() = default;
+
+		/**
+		 * @brief スポットライトの初期化
+		 * @param position	位置
+		 * @param color		色
+		 * @param range		影響距離
+		 * @param direction	ライトの向き
+		 * @param angle		ライトの影響範囲
+		 */
+		void Init(const Vector3& position, const Vector3& color, const float& range, const Vector3& direction, const float angle);
+
 
 
 	private:
