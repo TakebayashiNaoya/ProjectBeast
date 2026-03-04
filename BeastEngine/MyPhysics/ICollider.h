@@ -1,5 +1,7 @@
 ﻿/**
+ * @file ICollider.h
  * @brief コライダーのインターフェースクラス
+ * @author 竹林尚哉
  */
 #pragma once
 
