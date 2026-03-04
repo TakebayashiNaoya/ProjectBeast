@@ -98,8 +98,8 @@ namespace nsBeastEngine
 
 	void ModelRender::UpdateWorldMatrixInModes()
 	{
-		m_model.UpdateWorldMatrix(m_pos, m_rot, m_sca);
-		m_shadowModels.UpdateWorldMatrix(m_pos, m_rot, m_sca);
+		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 	}
 
 
