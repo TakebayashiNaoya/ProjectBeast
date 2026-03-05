@@ -5,8 +5,7 @@
  */
 #pragma once
 #include "Source/Actor/Actor.h"
-
-
+#include "Physics/CharacterController.h"	// あとで確認
 
 
 namespace app
@@ -57,7 +56,7 @@ namespace app
 			 * @brief キャラクターコントローラーを取得
 			 * @return キャラクターコントローラーのポインタ
 			 */
-			inline CharacterController* GetCharacterController() { return &m_characterController; }
+			inline nsBeastEngine::nsCollision::CharacterController* GetCharacterController() { return &m_characterController; }
 
 
 		public:
@@ -83,7 +82,7 @@ namespace app
 			/** アニメーションクリップ */
 			std::unique_ptr<AnimationClip[]> m_animationClips;
 			/** キャラクターコントローラー */
-			CharacterController m_characterController;
+			nsBeastEngine::nsCollision::CharacterController m_characterController;
 		};
 	}
 }

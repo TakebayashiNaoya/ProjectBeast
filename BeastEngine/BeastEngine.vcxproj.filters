@@ -48,16 +48,31 @@
     <ClCompile Include="Physics\Physics.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\PhysicsGhostObject.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\PhysicsStaticObject.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\RigidBody.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="Physics\SphereCollider.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\GhostBody.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicalBody.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\GhostPrimitive.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\GhostBodyManager.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BoundingVolume.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BroadphaseImpl.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BroadphaseInterface.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -121,16 +136,34 @@
     <ClInclude Include="Physics\Physics.h">
       <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\PhysicsGhostObject.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\PhysicsStaticObject.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\RigidBody.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="Physics\SphereCollider.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\GhostBody.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PhysicalBody.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\GhostPrimitive.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Types.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\GhostBodyManager.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\BroadphaseInterface.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\BoundingVolume.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\BroadphaseImpl.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

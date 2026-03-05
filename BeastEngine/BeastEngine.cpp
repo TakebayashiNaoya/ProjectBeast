@@ -34,7 +34,7 @@ namespace nsBeastEngine
 			initData.frameBufferWidth,
 			initData.frameBufferHeight
 		);
-		
+
 		if (g_camera3D) {
 			g_camera3D->SetPosition({ 0.0f, 100.0f, -200.0f }); /** 手前・上に配置 */
 			g_camera3D->SetTarget({ 0.0f, 50.0f, 0.0f });       /** 原点より少し上を見る */

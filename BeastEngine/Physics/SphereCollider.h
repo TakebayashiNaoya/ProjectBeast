@@ -6,17 +6,21 @@
 
 #include "ICollider.h"
 
-namespace nsBeastEngine {
-	class SphereCollider : public ICollider
+namespace nsBeastEngine
+{
+	namespace nsCollision
 	{
-	public:
-
-		void Create(const float radius);
-		btCollisionShape* GetBody() const override
+		class SphereCollider : public ICollider
 		{
-			return m_shape.get();
-		}
-	private:
-		std::unique_ptr<btSphereShape>	m_shape;
-	};
+		public:
+
+			void Create(const float radius);
+			btCollisionShape* GetBody() const override
+			{
+				return m_shape.get();
+			}
+		private:
+			std::unique_ptr<btSphereShape>	m_shape;
+		};
+	}
 }

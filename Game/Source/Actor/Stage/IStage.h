@@ -45,7 +45,7 @@ namespace app
 
 		private:
 			/** 物理静的オブジェクト */
-			PhysicsStaticObject m_physicsStaticObject;
+			//PhysicsStaticObject m_physicsStaticObject;
 		};
 	}
 }
