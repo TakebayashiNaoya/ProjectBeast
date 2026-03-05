@@ -1,0 +1,103 @@
+﻿/**
+ * @file StageSystem.h
+ * @brief ステージ上のオブジェクトを管理するシステム
+ * @author 藤谷
+ */
+#pragma once
+#include "IStage.h"
+#include "json/json.hpp"
+
+
+#ifdef K2_DEBUG
+#define ENABLE_OBJECT_LAYOUT_HOTRELOAD
+#endif
+
+
+namespace app
+{
+	namespace actor
+	{
+		/**
+		 *　@brief ステージシステム
+		 */
+		class StageSystem : public Noncopyable
+		{
+		public:
+			/**
+			 * @brief ステージオブジェクトを生成
+			 */
+			void CreateStageObject(const nlohmann::json& json);
+
+
+			/**
+			 * @brief ステージオブジェクトを削除
+			 */
+			void DeleteStageObject(const nlohmann::json& json);
+
+
+			/**
+			 * @briefトランスフォームの情報を読み込み直す
+			 */
+			void ReloadTransform(const nlohmann::json& j);
+
+
+		public:
+			StageSystem();
+			~StageSystem() = default;
+
+
+			/** 更新処理 */
+			void Update();
+			/** 描画処理 */
+			void Render(RenderContext& rc);
+
+
+		private:
+#ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
+			time_t m_lastUpdateTime = 0;
+#endif // APP_ENABLE_OBJECT_LAYOUT_HOTRELOAD
+
+
+			using ObjectKey = std::string;
+			using Object = std::unique_ptr<IStageObject>;
+
+			/** オブジェクトのマップ */
+			std::unordered_map<ObjectKey, Object> m_objectMap;
+
+
+		public:
+			/** インスタンス生成 */
+			static void CreateInstance()
+			{
+				if (m_instance == nullptr)
+				{
+					m_instance = new StageSystem();
+				}
+			}
+
+
+			/** インスタンス破棄 */
+			static void DestroyInstance()
+			{
+				if (m_instance != nullptr)
+				{
+					delete m_instance;
+					m_instance = nullptr;
+				}
+			}
+
+
+			/** インスタンス取得 */
+			static StageSystem* GetInstance()
+			{
+				return m_instance;
+			}
+
+
+		private:
+			/** シングルトンインスタンス */
+			static StageSystem* m_instance;
+		};
+	}
+}
+

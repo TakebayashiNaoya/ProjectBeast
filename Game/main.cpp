@@ -1,10 +1,11 @@
 ﻿#include "stdafx.h"
-#include "system/system.h"
+#include "Source/system/system.h"
 
 #include<dxgidebug.h>
 #include<InitGUID.h>
 
-#include "Test.h"
+#include "Source/Application.h"
+
 
 
 void ReportLiveObjects()
@@ -32,14 +33,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここから初期化を行うコードを記述する。
 	//////////////////////////////////////
 
-
-	/** 当たり判定を可視化 */
-	//PhysicsWorld::GetInstance()->EnableDrawDebugWireFrame();
-
-	/**
-	 * ゲームオブジェクトの生成
-	 */
-	auto* game = NewGO<Test>(0);
+	app::Application* application = new app::Application();
 
 	//////////////////////////////////////
 	// 初期化を行うコードを書くのはここまで！！！
@@ -48,8 +42,31 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
-		nsBeastEngine::BeastEngine::GetInstance()->Execute();
+		g_engine->BeginFrame();
+
+		// 更新まわりはここから下
+
+		g_engine->ExecuteUpdate();
+		application->Update();
+
+		// 描画まわりはここから下
+
+		// レンダリングエンジンの更新。
+		g_renderingEngine->Update();
+
+		g_engine->ExecuteRender();
+		auto& renderContext = g_graphicsEngine->GetRenderContext();
+		application->Render(renderContext);
+		//レンダリングエンジンを実行。		
+		g_renderingEngine->Execute(renderContext);
+
+		//当たり判定描画。
+		g_engine->DebubDrawWorld();
+
+		g_engine->EndFrame();
 	}
+
+	delete application;
 
 	/**
 	 * ゲームオブジェクトの破棄

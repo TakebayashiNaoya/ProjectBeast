@@ -1,22 +1,290 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="system">
-      <UniqueIdentifier>{22dd8095-74f9-46df-81a1-36675a040b1f}</UniqueIdentifier>
+    <Filter Include="Source">
+      <UniqueIdentifier>{b38c812a-f22f-4096-80d4-94f769775328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Scene">
+      <UniqueIdentifier>{d62a2ce1-ab2a-46f9-b644-f1540da5b7e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor">
+      <UniqueIdentifier>{e868b53b-57d1-4329-9910-c48a40ebf6cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core">
+      <UniqueIdentifier>{389db189-d25e-4be0-a402-9eae342f25ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI">
+      <UniqueIdentifier>{bde9173b-0987-41ce-b6aa-f7bb0e192e40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character">
+      <UniqueIdentifier>{cd3ea93b-69ad-46c4-83e2-cd7a71456c33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character\Player">
+      <UniqueIdentifier>{4be53c84-5520-4489-93ed-2bfc4d00b1fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\system">
+      <UniqueIdentifier>{706b7812-7f1c-4488-854b-c24a37b2f3c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Stage">
+      <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Sound">
+      <UniqueIdentifier>{aabee1f5-f07e-444b-9b88-76bb30eb9087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Util">
+      <UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Achievement">
+      <UniqueIdentifier>{8dd5c9a7-828b-46f3-9b18-9042d2de824e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="system\system.cpp">
-      <Filter>system</Filter>
+    <ClCompile Include="IObject.cpp" />
+    <ClCompile Include="Source\Actor\Actor.cpp">
+      <Filter>Source\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\ActorStatus.cpp">
+      <Filter>Source\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterBase.cpp">
+      <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
+      <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\Player.cpp">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HierarchicalTransform.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParameterManager.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Transform.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\IScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\SceneManager.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\UIAnimation.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\system\system.cpp">
+      <Filter>Source\system</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Scene\DebugScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\AppParameterMacro.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\IMasterParameter.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerParameter.cpp">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp">
+      <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\IStage.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\StageSystem.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\UIParts.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\StateMachineBase.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Layout.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\NPCController.cpp">
+      <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp">
+      <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Sound\SoundManager.cpp">
+      <Filter>Source\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Util\Curve.cpp">
+      <Filter>Source\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Achivement\AchievementManager.cpp">
+      <Filter>Source\Achievement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Achivement\AchievementBase.cpp">
+      <Filter>Source\Achievement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\TitleScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\InGameScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\ResultScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Fade.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Util\JsonConverter.cpp">
+      <Filter>Source\Util</Filter>
     </ClCompile>
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="system\system.h">
-      <Filter>system</Filter>
+    <ClInclude Include="IObject.h" />
+    <ClInclude Include="Source\Actor\Actor.h">
+      <Filter>Source\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\ActorStatus.h">
+      <Filter>Source\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterBase.h">
+      <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
+      <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\Player.h">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerController.h">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerIState.h">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\HierarchicalTransform.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\ParameterManager.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Transform.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\IScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\SceneManager.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\UIAnimation.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\system\system.h">
+      <Filter>Source\system</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Scene\DebugScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\AppParameterMacro.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\IMasterParameter.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerParameter.h">
+      <Filter>Source\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterParameter.h">
+      <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\IStage.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\StageSystem.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\UIParts.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\StateMachineBase.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Layout.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Types.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\NPCController.h">
+      <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\NPCControllerManager.h">
+      <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sound\SoundManager.h">
+      <Filter>Source\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sound\Types.h">
+      <Filter>Source\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\CRC32.h">
+      <Filter>Source\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\Curve.h">
+      <Filter>Source\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Achivement\AchievementManager.h">
+      <Filter>Source\Achievement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Achivement\AchievementBase.h">
+      <Filter>Source\Achievement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\TitleScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\InGameScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\ResultScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Fade.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\JsonConverter.h">
+      <Filter>Source\Util</Filter>
     </ClInclude>
     <ClInclude Include="Test.h" />
   </ItemGroup>

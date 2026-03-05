@@ -1,0 +1,19 @@
+﻿{
+  "AchievementList" : {
+    "Achievement" : [
+      {
+        "name" : "",
+        "type" : "",
+        "condition" : "",
+        "targetValue": 0
+      },
+      {
+        "name" : "",
+        "type" : "",
+        "condition" : "",
+        "targetLocation": [ 0, 0, 0 ],
+        "enableDistance" :  0
+      }
+    ]
+  }
+}
