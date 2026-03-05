@@ -37,6 +37,12 @@
     <Filter Include="Source\Achievement">
       <UniqueIdentifier>{8dd5c9a7-828b-46f3-9b18-9042d2de824e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Actor\Character\penguin">
+      <UniqueIdentifier>{96a86590-7162-4a66-aa1f-738d6c97706b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character\penguin\daddyPernguin">
+      <UniqueIdentifier>{c62219a9-2e76-4037-98f6-90b7912d25b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -158,6 +164,21 @@
       <Filter>Source\Util</Filter>
     </ClCompile>
     <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStateMachine.cpp">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStatus.cpp">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguin.cpp">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinIState.cpp">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinParameter.cpp">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -287,5 +308,20 @@
       <Filter>Source\Util</Filter>
     </ClInclude>
     <ClInclude Include="Test.h" />
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStateMachine.h">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStatus.h">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguin.h">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinIState.h">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinParameter.h">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
