@@ -32,6 +32,16 @@
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
     <ClCompile Include="Nature\SkyCube.cpp" />
+    <ClCompile Include="Physics\BoxCollider.cpp" />
+    <ClCompile Include="Physics\CapsuleCollider.cpp" />
+    <ClCompile Include="Physics\CharacterController.cpp" />
+    <ClCompile Include="Physics\DebugWireframe.cpp" />
+    <ClCompile Include="Physics\MeshCollider.cpp" />
+    <ClCompile Include="Physics\Physics.cpp" />
+    <ClCompile Include="Physics\PhysicsGhostObject.cpp" />
+    <ClCompile Include="Physics\PhysicsStaticObject.cpp" />
+    <ClCompile Include="Physics\RigidBody.cpp" />
+    <ClCompile Include="Physics\SphereCollider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -47,6 +57,18 @@
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
     <ClInclude Include="Nature\SkyCube.h" />
+    <ClInclude Include="Physics\BoxCollider.h" />
+    <ClInclude Include="Physics\CapsuleCollider.h" />
+    <ClInclude Include="Physics\CharacterController.h" />
+    <ClInclude Include="Physics\CollisionAttr.h" />
+    <ClInclude Include="Physics\DebugWireframe.h" />
+    <ClInclude Include="Physics\ICollider.h" />
+    <ClInclude Include="Physics\MeshCollider.h" />
+    <ClInclude Include="Physics\Physics.h" />
+    <ClInclude Include="Physics\PhysicsGhostObject.h" />
+    <ClInclude Include="Physics\PhysicsStaticObject.h" />
+    <ClInclude Include="Physics\RigidBody.h" />
+    <ClInclude Include="Physics\SphereCollider.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
