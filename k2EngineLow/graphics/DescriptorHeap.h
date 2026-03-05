@@ -15,20 +15,6 @@ namespace nsK2EngineLow {
 		/// </summary>
 		~DescriptorHeap();
 		/// <summary>
-		/// 初期化
-		/// </summary>
-		/// <param name="maxSRV">ディスクリプタヒープに登録できるSRVの最大数</param>
-		/// <param name="maxUAV">ディスクリプタヒープに登録できるUAVの最大数</param>
-		/// <param name="maxConstantBuffer">ディスクリプタヒープに登録できる定数バッファの最大数</param>
-		/// <param name="maxSamplerState">ディスクリプタヒープに登録できるサンプラステートの最大数</param>
-		/// <param name=""></param>
-		void Init(
-			int maxSRV, 
-			int maxUAV, 
-			int maxConstantBuffer, 
-			int maxSamplerState
-		);
-		/// <summary>
 		/// 
 		/// </summary>
 		/// <returns></returns>
@@ -77,7 +63,7 @@ namespace nsK2EngineLow {
 				registerNo,
 				&sr,
 				&m_shaderResources.front(),
-				m_numSRV,
+				m_numShaderResource,
 				static_cast<int>(m_shaderResources.size()),
 				L"DescriptorHeap::RegistShaderResource() レジスタ番号が範囲外です。"
 			);
@@ -96,7 +82,7 @@ namespace nsK2EngineLow {
 				registerNo,
 				&sr,
 				&m_uavResoruces.front(),
-				m_numUAV,
+				m_numUavResource,
 				static_cast<int>(m_uavResoruces.size()),
 				L"DescriptorHeap::RegistUnorderAccessResource() レジスタ番号が範囲外です。"
 			);
@@ -133,25 +119,21 @@ namespace nsK2EngineLow {
 			RegistResource(
 				registerNo,
 				desc,
-				&m_samplerDescs.front(),
+				m_samplerDescs,
 				m_numSamplerDesc,
-				static_cast<int>(m_samplerDescs.size()),
+				MAX_SAMPLER_STATE,
 				L"DescriptorHeap::RegistSamplerDesc() レジスタ番号が範囲外です。"
 			);
 		}
 		/// <summary>
 		/// ディスクリプタヒープへの登録を確定。
 		/// </summary>
-		void Commit(bool isDoubleBuffer = true);
+		void Commit();
 		/// <summary>
 		/// サンプラステート用のディスクリプタヒープへの登録。
 		/// </summary>
-		void CommitSamperHeap(bool isDoubleBuffer = true);
-		/// <summary>
-		/// バックバッファの番号を取得。
-		/// </summary>
-		/// <returns></returns>
-		int GetBackBufferNo() const;
+		void CommitSamperHeap();
+
 		/// <summary>
 		/// 定数バッファのディスクリプタの開始ハンドルを取得。
 		/// </summary>
@@ -176,7 +158,7 @@ namespace nsK2EngineLow {
 		/// <returns></returns>
 		bool IsRegistShaderResource() const
 		{
-			return m_numSRV != 0;
+			return m_numShaderResource != 0;
 		}
 		/// <summary>
 		/// 定数バッファが一つでも登録されているか判定。
@@ -192,7 +174,7 @@ namespace nsK2EngineLow {
 		/// <returns></returns>
 		bool IsRegistUavResource() const
 		{
-			return m_numUAV != 0;
+			return m_numUavResource != 0;
 		}
 		/// <summary>
 		/// UAVディスクリプタが始まる配列番号を取得する。
@@ -206,7 +188,7 @@ namespace nsK2EngineLow {
 		/// <returns></returns>
 		int GetOffsetUAVDescriptorFromTableStart() const
 		{
-			return m_numSRV + m_numConstantBuffer;
+			return m_numShaderResource + m_numConstantBuffer;
 		}
 		/// <summary>
 		/// SRVディスクリプタが始まる配列番号を取得する。
@@ -227,7 +209,7 @@ namespace nsK2EngineLow {
 		/// <returns></returns>
 		int GetOffsetConstantBufferDescriptorFromTableStart() const
 		{
-			return m_numSRV + m_numUAV;
+			return m_numShaderResource + m_numUavResource;
 		}
 	private:
 		/// <summary>
@@ -268,25 +250,19 @@ namespace nsK2EngineLow {
 		}
 	private:
 		enum {
-			DEFAULT_MAX_SRV = 128,				// シェーダーリソースの最大数のデフォルト値。
-			DEFAULT_MAX_UAV = 128,				// UAVの最大数のデフォルト値
-			DEFAULT_MAX_CONSTANT_BUFFER = 32,	// 定数バッファの最大数のデフォルト値。
-			DEFAULT_MAX_SAMPLER_STATE = 16,		// サンプラステートの最大数のデフォルト値。
+			MAX_SHADER_RESOURCE = 128,	//シェーダーリソースの最大数。
+			MAX_CONSTANT_BUFFER = 32,	//定数バッファの最大数。
+			MAX_SAMPLER_STATE = 16,		//サンプラステートの最大数。
 		};
-		int m_maxSRV = DEFAULT_MAX_SRV;							// SRVの最大数。
-		int m_maxUAV = DEFAULT_MAX_UAV;							// UAVの最大数。
-		int m_maxConstantBuffer = DEFAULT_MAX_CONSTANT_BUFFER;	// 定数バッファの最大数
-		int m_maxSamplerState = DEFAULT_MAX_SAMPLER_STATE;		// サンプラステートの最大数。
-		int m_numSRV = 0;										// シェーダーリソースの数。
-		int m_numConstantBuffer = 0;							// 定数バッファの数。
-		int m_numUAV = 0;										// アンオーダーアクセスリソースの数。
-		int m_numSamplerDesc = 0;								// サンプラの数。
-		bool m_isDoubleBuffer = true;							// ダブルバッファ？
-		ID3D12DescriptorHeap* m_descriptorHeap = { nullptr };	//ディスクリプタヒープ。
+		int m_numShaderResource = 0;	//シェーダーリソースの数。
+		int m_numConstantBuffer = 0;	//定数バッファの数。
+		int m_numUavResource = 0;		//アンオーダーアクセスリソースの数。
+		int m_numSamplerDesc = 0;		//サンプラの数。
+		ID3D12DescriptorHeap* m_descriptorHeap = { nullptr };					//ディスクリプタヒープ。
 		std::vector<IShaderResource*> m_shaderResources;		//シェーダーリソース。
 		std::vector < IUnorderAccessResrouce*> m_uavResoruces;	//UAVリソース。
 		std::vector < ConstantBuffer*> m_constantBuffers;		//定数バッファ。
-		std::vector< D3D12_SAMPLER_DESC > m_samplerDescs;		//サンプラステート。
+		D3D12_SAMPLER_DESC m_samplerDescs[MAX_SAMPLER_STATE];						//サンプラステート。
 		D3D12_GPU_DESCRIPTOR_HANDLE m_cbGpuDescriptorStart[2];						//定数バッファのディスクリプタヒープの開始ハンドル。
 		D3D12_GPU_DESCRIPTOR_HANDLE m_srGpuDescriptorStart[2];						//シェーダーリソースのディスクリプタヒープの開始ハンドル。
 		D3D12_GPU_DESCRIPTOR_HANDLE m_uavGpuDescriptorStart[2];						//UAVリソースのディスクリプタヒープの開始ハンドル。

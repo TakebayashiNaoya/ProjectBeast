@@ -2,30 +2,12 @@
 #include "GaussianBlur.h"
 
 namespace nsK2EngineLow {
-	void GaussianBlur::Init(Texture* originalTexture, bool isBlurAlpha, int width, int height)
-	{
-		m_originalTexture = originalTexture;
-		m_bokeTextureWidth = width;
-		m_bokeTextureHeight = height;
-		//レンダリングターゲットを初期化。
-		InitRenderTargets();
-		//スプライトを初期化。
-		InitSprites(isBlurAlpha);
-	}
 	void GaussianBlur::Init(Texture* originalTexture, bool isBlurAlpha, bool isDownSample)
 	{
-		if (isDownSample) {
-			m_bokeTextureWidth = originalTexture->GetWidth() / 2.0f;
-			m_bokeTextureHeight = originalTexture->GetHeight() / 2.0f;
-		}
-		else {
-			m_bokeTextureWidth = originalTexture->GetWidth();
-			m_bokeTextureHeight = originalTexture->GetHeight();
-		}
 		m_originalTexture = originalTexture;
 
 		//レンダリングターゲットを初期化。
-		InitRenderTargets();
+		InitRenderTargets(isDownSample);
 		//スプライトを初期化。
 		InitSprites(isBlurAlpha);
 	}
@@ -59,13 +41,13 @@ namespace nsK2EngineLow {
 		rc.WaitUntilFinishDrawingToRenderTarget(m_yBlurRenderTarget);
 	}
 
-	void GaussianBlur::InitRenderTargets()
+	void GaussianBlur::InitRenderTargets(bool isDownSample)
 	{
 		int w = m_originalTexture->GetWidth();
 		int h = m_originalTexture->GetHeight();
 		//Xブラー用のレンダリングターゲットを作成する。
 		m_xBlurRenderTarget.Create(
-			m_bokeTextureWidth,
+			isDownSample ? w / 2 : w,
 			h,
 			1,
 			1,
@@ -75,8 +57,8 @@ namespace nsK2EngineLow {
 
 		//Yブラー用のレンダリングターゲットを作成する。
 		m_yBlurRenderTarget.Create(
-			m_bokeTextureWidth,
-			m_bokeTextureHeight,
+			isDownSample ? w / 2 : w,
+			isDownSample ? h / 2 : h,
 			1,
 			1,
 			m_originalTexture->GetFormat(),
@@ -96,7 +78,7 @@ namespace nsK2EngineLow {
 		//横ブラー用のスプライトを初期化する。
 		{
 			SpriteInitData xBlurSpriteInitData;
-			xBlurSpriteInitData.m_fxFilePath = "Assets/shader/util/gaussianBlur.fx";
+			xBlurSpriteInitData.m_fxFilePath = "Assets/shader/gaussianBlur.fx";
 			xBlurSpriteInitData.m_vsEntryPointFunc = "VSXBlur";
 			xBlurSpriteInitData.m_psEntryPoinFunc = psEntryFunc;
 			//スプライトの解像度はm_xBlurRenderTargetと同じ。
@@ -116,7 +98,7 @@ namespace nsK2EngineLow {
 		//縦ブラー用のスプライトを初期化する。
 		{
 			SpriteInitData yBlurSpriteInitData;
-			yBlurSpriteInitData.m_fxFilePath = "Assets/shader/util/gaussianBlur.fx";
+			yBlurSpriteInitData.m_fxFilePath = "Assets/shader/gaussianBlur.fx";
 			yBlurSpriteInitData.m_vsEntryPointFunc = "VSYBlur";
 			yBlurSpriteInitData.m_psEntryPoinFunc = psEntryFunc;
 			//スプライトの解像度はm_yBlurRenderTargetと同じ。

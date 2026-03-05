@@ -146,33 +146,6 @@
     <ClCompile Include="math\Vector.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="physics\SphereCollider.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\BoxCollider.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\CapsuleCollider.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\CharacterController.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\DebugWireframe.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\MeshCollider.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\Physics.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\PhysicsStaticObject.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\RigidBody.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
     <ClCompile Include="sound\SoundEngine.cpp">
       <Filter>sound</Filter>
     </ClCompile>
@@ -193,9 +166,6 @@
     </ClCompile>
     <ClCompile Include="sound\WaveFile.cpp">
       <Filter>sound</Filter>
-    </ClCompile>
-    <ClCompile Include="physics\PhysicsGhostObject.cpp">
-      <Filter>physics</Filter>
     </ClCompile>
     <ClCompile Include="k2EngineLow.cpp" />
     <ClCompile Include="online\SyncOnlineTwoPlayerMatchEngine.cpp">
@@ -224,12 +194,6 @@
     </ClCompile>
     <ClCompile Include="graphics\FrameBuffer.cpp">
       <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics\ComputeAnimationVertexBuffer.cpp">
-      <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="HID\GamePadVIbration.cpp">
-      <Filter>HID</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -405,39 +369,6 @@
     <ClInclude Include="math\Matrix.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="physics\RigidBody.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\SphereCollider.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\BoxCollider.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\CapsuleCollider.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\CharacterController.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\CollisionAttr.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\DebugWireframe.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\ICollider.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\MeshCollider.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\Physics.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\PhysicsStaticObject.h">
-      <Filter>physics</Filter>
-    </ClInclude>
     <ClInclude Include="sound\WaveFileBank.h">
       <Filter>sound</Filter>
     </ClInclude>
@@ -467,9 +398,6 @@
     </ClInclude>
     <ClInclude Include="util\TResourceBank.h">
       <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="physics\PhysicsGhostObject.h">
-      <Filter>physics</Filter>
     </ClInclude>
     <ClInclude Include="k2EngineLow.h" />
     <ClInclude Include="dbg\MyLog.h">
@@ -505,15 +433,6 @@
     <ClInclude Include="graphics\FrameBuffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\ComputeAnimationVertexBuffer.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics\raytracing\RaytracingWorld_Inline.h">
-      <Filter>graphics\raytracing</Filter>
-    </ClInclude>
-    <ClInclude Include="HID\GamePadVibration.h">
-      <Filter>HID</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">
@@ -546,9 +465,6 @@
     <Filter Include="math">
       <UniqueIdentifier>{57cde7f7-bbdb-44ec-b390-214df5ff4ef3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="physics">
-      <UniqueIdentifier>{cfadd14f-05c4-4289-8c2e-75469d98d6fb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sound">
       <UniqueIdentifier>{b4bfd2b2-754c-4112-8c0d-bd8ec2eaf701}</UniqueIdentifier>
     </Filter>
@@ -572,9 +488,6 @@
     </Filter>
     <Filter Include="AI\PathFinding">
       <UniqueIdentifier>{72d94fe6-e599-4523-8e54-81df808c96fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="dxc">
-      <UniqueIdentifier>{496d48ba-26ca-419f-9db8-b1cea244c1c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

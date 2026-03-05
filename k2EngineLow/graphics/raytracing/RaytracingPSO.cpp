@@ -204,14 +204,9 @@ namespace nsK2EngineLow {
 			desc.desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE;
 			return desc;
 		}
-		void PSO::Release()
-		{
-			ReleaseD3D12Object(m_pipelineState);
-			m_pipelineState = nullptr;
-		}
+
 		void PSO::Init(const DescriptorHeaps& descriptorHeaps)
 		{
-			Release();
 			m_srvUavCbvHeap = &descriptorHeaps.GetSrvUavCbvDescriptorHeap();
 			using namespace BuildSubObjectHelper;
 
@@ -221,7 +216,7 @@ namespace nsK2EngineLow {
 			//DXILライブラリを作成。
 			//レイトレーシング用のシェーダーをロード。
 			Shader raytraceShader;
-			raytraceShader.LoadRaytracing(L"Assets/shader/raytracing.fx");
+			raytraceShader.LoadRaytracing(L"Assets/shader/sample.fx");
 
 			D3D12_EXPORT_DESC libExport[eShader_Num];
 			for (int i = 0; i < eShader_Num; i++) {
@@ -295,8 +290,8 @@ namespace nsK2EngineLow {
 			struct RayPayload
 			{
 				Vector4 color;
+				Vector4 reflectionColor;
 				Vector4 hit_depth;
-				Vector4 cameraPos;
 			};
 			shaderConfig.Init(sizeof(float) * 2, sizeof(RayPayload));
 			subobjects[index] = shaderConfig.subobject; // 

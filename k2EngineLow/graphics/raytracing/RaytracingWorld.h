@@ -21,53 +21,46 @@ namespace nsK2EngineLow {
 			/// <summary>
 			/// ジオメトリを登録。
 			/// </summary>
-			/// <param name="model">ジオメトリの元となるモデル</param>
+			/// <param name="model">モデル</param>
 			void RegistGeometry(Model& model);
-			/// <summary>
-			/// ジオメトリを削除
-			/// </summary>
-			/// <param name="model">ジオメトリの元となったモデル</param>
-			void RemoveGeometry(Model& model);
 			/// <summary>
 			/// ジオメトリの登録を確定。
 			/// </summary>
 			void CommitRegistGeometry(RenderContext& rc);
-			
-			/// <summary>
-			/// レイトレワールドを構築。
-			/// </summary>
-			void Build( RenderContext& rc );
-
 			/// <summary>
 			/// レイトレワールドのインスタンスに対してクエリを行う。
 			/// </summary>
-			/// <param name="bufferNo">バッファの番号</param>
-			/// <param name="queryFunc">クエリ関数</param>
-			void QueryInstances(int bufferNo, std::function<void(Instance&)> queryFunc) const;
-			
+			/// <param name="queryFunc"></param>
+			void QueryInstances(std::function<void(Instance&)> queryFunc) const
+			{
+				for (auto& instance : m_instances) {
+					queryFunc(*instance);
+				}
+			}
 			/// <summary>
 			/// インスタンスの数を取得。
 			/// </summary>
 			/// <returns></returns>
-			int GetNumInstance() const;
-			
+			int GetNumInstance() const
+			{
+				return static_cast<int>(m_instances.size());
+			}
 			/// <summary>
 			/// BLASバッファーを取得。
 			/// </summary>
 			/// <returns></returns>
-			const BLASBuffer& GetBLASBuffer(int bufferNo);
-			
+			const BLASBuffer& GetBLASBuffer()
+			{
+				return m_blasBuffer;
+			}
 			/// <summary>
 			/// TLASバッファーを取得。
 			/// </summary>
 			/// <returns></returns>
-			TLASBuffer& GetTLASBuffer(int bufferNo);
-			
-		private:
-			/// <summary>
-			/// レイトレのインスタンスを作成。
-			/// </summary>
-			void CreateRaytracingInstance(Model& model, int bufferNo);
+			TLASBuffer& GetTLASBuffer()
+			{
+				return m_topLevelASBuffers;
+			}
 		private:
 			/// <summary>
 			/// カメラ
@@ -79,11 +72,10 @@ namespace nsK2EngineLow {
 				float fFar;		//遠平面。
 				float fNear;	//近平面。
 			};
-			
-			Camera m_camera;								// レイトレワールドのカメラ。
-			std::vector<InstancePtr> m_instances[2];		// レイトレワールドのインスタンの配列。
-			BLASBuffer m_blasBuffer[2];						// BLAS
-			TLASBuffer m_topLevelASBuffers[2];				// TLAS
+			Camera m_camera;									//レイトレワールドのカメラ。
+			std::vector<InstancePtr> m_instances;		//レイトレワールドのインスタンの配列。
+			BLASBuffer m_blasBuffer;							//BLAS
+			TLASBuffer m_topLevelASBuffers;						//TLAS
 		};
 	}//namespace raytracing
 }

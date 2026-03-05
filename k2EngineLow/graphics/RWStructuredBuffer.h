@@ -20,8 +20,7 @@ namespace nsK2EngineLow {
 		/// <param name="sizeOfElement">エレメントのサイズ。</param>
 		/// <param name="numElement">エレメントの数。</param>
 		/// <param name="initData">初期データ。</param>
-		/// <param name="isAccessCPU">CPUからアクセスする？</param>
-		void Init(int sizeOfElement, int numElement, void* initData, bool isAccessCPU);
+		void Init(int sizeOfElement, int numElement, void* initData);
 		/// <summary>
 		/// 頂点バッファを使用して構造化バッファを初期化。
 		/// </summary>
@@ -67,22 +66,7 @@ namespace nsK2EngineLow {
 		/// </summary>
 		/// <returns></returns>
 		void* GetResourceOnCPU();
-		/// <summary>
-		/// バッファサイズを取得。
-		/// </summary>
-		/// <returns></returns>
-		int GetSize() const
-		{
-			return m_sizeOfElement * m_numElement;
-		}
-		/// <summary>
-		/// 1要素のサイズを取得。
-		/// </summary>
-		/// <returns></returns>
-		int GetStride() const
-		{
-			return m_sizeOfElement;
-		}
+
 		ID3D12Resource* GetD3DResoruce();
 	private:
 		/// <summary>
@@ -92,9 +76,8 @@ namespace nsK2EngineLow {
 	private:
 		ID3D12Resource* m_buffersOnGPU[2] = { nullptr };
 		void* m_buffersOnCPU[2] = { nullptr };		//CPU側からアクセスできるするストラクチャバッファのアドレス。
-		int m_numElement = 0;				// 要素数。
-		int m_sizeOfElement = 0;			// エレメントのサイズ。
-		bool m_isInited = false;			// 初期化済み？
-		bool m_isAccessCPU = false;			// CPUからアクセスする？
+		int m_numElement = 0;				//要素数。
+		int m_sizeOfElement = 0;			//エレメントのサイズ。
+		bool m_isInited = false;			//初期化済み？
 	};
 }

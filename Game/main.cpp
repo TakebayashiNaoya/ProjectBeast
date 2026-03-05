@@ -68,7 +68,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	delete application;
 
-	K2Engine::DeleteInstance();
+	/**
+	 * ゲームオブジェクトの破棄
+	 */
+	 //delete game;
+
+	nsBeastEngine::BeastEngine::DeleteInstance();
 
 #ifdef _DEBUG
 	ReportLiveObjects();

@@ -157,6 +157,7 @@
     <ClCompile Include="Source\Util\JsonConverter.cpp">
       <Filter>Source\Util</Filter>
     </ClCompile>
+    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -285,5 +286,6 @@
     <ClInclude Include="Source\Util\JsonConverter.h">
       <Filter>Source\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Test.h" />
   </ItemGroup>
 </Project>

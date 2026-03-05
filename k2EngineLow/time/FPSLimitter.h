@@ -47,6 +47,6 @@ namespace nsK2EngineLow {
 		}
 	private:
 		Stopwatch m_sw;
-		int m_maxFPS = MAX_FPS;
+		int m_maxFPS = 60;
 	};
 }

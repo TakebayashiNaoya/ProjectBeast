@@ -15,20 +15,10 @@ namespace nsK2EngineLow {
 		/// </remark>
 		class ShaderTable : public Noncopyable {
 		public:
-			
-			~ShaderTable() 
-			{
-				Release();
-			}
-			/// <summary>
-			/// 解放
-			/// </summary>
-			void Release();
 			/// <summary>
 			/// シェーダーテーブルを初期化。
 			/// </summary>
 			void Init(
-				int bufferNo,
 				const World& world,
 				const PSO& pso,
 				const DescriptorHeaps& descriptorHeaps
@@ -87,7 +77,7 @@ namespace nsK2EngineLow {
 			/// </summary>
 			void CalcShaderTableEntrySize();
 		private:
-			ID3D12Resource* m_shaderTable = nullptr;			//シェーダーテーブル。
+			ID3D12ResourcePtr m_shaderTable;			//シェーダーテーブル。
 			uint32_t m_shaderTableEntrySize = 0;
 			int m_numRayGenShader = 0;
 			int m_numMissShader = 0;

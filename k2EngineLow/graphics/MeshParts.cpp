@@ -3,20 +3,18 @@
 #include "Skeleton.h"
 #include "Material.h"
 #include "IndexBuffer.h"
-#include "ComputeAnimationVertexBuffer.h"
 
 namespace nsK2EngineLow {
-	static TResourceBank<Material>& GetMaterialBank()
-	{
-		static TResourceBank<Material> materialBank;
-		return materialBank;
-	}
 	MeshParts::~MeshParts()
 	{
 		for (auto& mesh : m_meshs) {
 			//インデックスバッファを削除。
 			for (auto& ib : mesh->m_indexBufferArray) {
 				delete ib;
+			}
+			//マテリアルを削除。
+			for (auto& mat : mesh->m_materials) {
+				delete mat;
 			}
 			//メッシュを削除。
 			delete mesh;
@@ -35,8 +33,7 @@ namespace nsK2EngineLow {
 		AlphaBlendMode alphaBlendMode,
 		bool isDepthWrite,
 		bool isDepthTest,
-		D3D12_CULL_MODE cullMode,
-		ComputeAnimationVertexBuffer* computedAnimationVertexBuffer
+		D3D12_CULL_MODE cullMode
 	)
 	{
 		m_meshs.resize(tkmFile.GetNumMesh());
@@ -56,8 +53,7 @@ namespace nsK2EngineLow {
 				alphaBlendMode,
 				isDepthWrite,
 				isDepthTest,
-				cullMode,
-				computedAnimationVertexBuffer
+				cullMode
 			);
 			meshNo++;
 		});
@@ -136,28 +132,16 @@ namespace nsK2EngineLow {
 		AlphaBlendMode alphaBlendMode,
 		bool isDepthWrite,
 		bool isDepthTest,
-		D3D12_CULL_MODE cullMode,
-		ComputeAnimationVertexBuffer* computedAnimationVertexBuffer
+		D3D12_CULL_MODE cullMode
 	) {
 		//1. 頂点バッファを作成。
 		int numVertex = (int)tkmMesh.vertexBuffer.size();
 		int vertexStride = sizeof(TkmFile::SVertex);
 		auto mesh = new SMesh;
 		mesh->skinFlags.reserve(tkmMesh.materials.size());
-
 		mesh->m_vertexBuffer.Init(vertexStride * numVertex, vertexStride);
 		mesh->m_vertexBuffer.Copy((void*)&tkmMesh.vertexBuffer[0]);
-		/*
-		if (dispatchComputedAnimationVertexBuffer) {
-			// アニメーション済み頂点を記憶するためのバッファを作成。
-			mesh->m_animatedVertexBuffer.Init(vertexStride * numVertex, vertexStride);
-			mesh->m_animatedVertexBuffer.Copy((void*)&tkmMesh.vertexBuffer[0]);
-			// アニメーション済み頂点バッファのRWStructuredBufferを初期化。
-			mesh->m_animatedVertexBufferRWSB.Init(mesh->m_animatedVertexBuffer, false);
-		}
-		*/
-		m_computedAnimationVertexBuffer = computedAnimationVertexBuffer;
-		
+
 		auto SetSkinFlag = [&](int index) {
 			if (tkmMesh.vertexBuffer[index].skinWeights.x > 0.0f) {
 				//スキンがある。
@@ -175,7 +159,7 @@ namespace nsK2EngineLow {
 			for (auto& tkIb : tkmMesh.indexBuffer16Array) {
 				auto ib = new IndexBuffer;
 				ib->Init(static_cast<int>(tkIb.indices.size()) * 2, 2);
-				ib->Copy((uint16_t*)&tkIb.indices.at(0), 0, 0, 0);
+				ib->Copy((uint16_t*)&tkIb.indices.at(0));
 
 				//スキンがあるかどうかを設定する。
 				SetSkinFlag(tkIb.indices[0]);
@@ -189,7 +173,7 @@ namespace nsK2EngineLow {
 			for (auto& tkIb : tkmMesh.indexBuffer32Array) {
 				auto ib = new IndexBuffer;
 				ib->Init(static_cast<int>(tkIb.indices.size()) * 4, 4);
-				ib->Copy((uint32_t*)&tkIb.indices.at(0), 0, 0, 0);
+				ib->Copy((uint32_t*)&tkIb.indices.at(0));
 
 				//スキンがあるかどうかを設定する。
 				SetSkinFlag(tkIb.indices[0]);
@@ -198,56 +182,25 @@ namespace nsK2EngineLow {
 			}
 		}
 		//3. マテリアルを作成。
-		auto& materialBank = GetMaterialBank();
 		mesh->m_materials.reserve(tkmMesh.materials.size());
 		for (auto& tkmMat : tkmMesh.materials) {
-			char materiayKey[MAX_PATH];
-			sprintf_s(
-				materiayKey,
-				MAX_PATH,
-				"%s, %s, %s, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %s",
+			auto mat = new Material;
+			mat->InitFromTkmMaterila(
+				tkmMat,
 				fxFilePath,
 				vsEntryPointFunc,
 				vsSkinEntryPointFunc,
 				psEntryPointFunc,
-				(int)colorBufferFormat[0],
-				(int)colorBufferFormat[1],
-				(int)colorBufferFormat[2],
-				(int)colorBufferFormat[3],
-				(int)colorBufferFormat[4],
-				(int)colorBufferFormat[5],
-				(int)colorBufferFormat[6],
-				(int)colorBufferFormat[7],
+				colorBufferFormat,
+				NUM_SRV_ONE_MATERIAL,
+				NUM_CBV_ONE_MATERIAL,
+				NUM_CBV_ONE_MATERIAL * materialNum,
+				NUM_SRV_ONE_MATERIAL * materialNum,
 				alphaBlendMode,
 				isDepthWrite,
 				isDepthTest,
-				cullMode,
-				tkmMat.albedoMapFileName.empty() ? "none" : tkmMat.albedoMapFileName.c_str(),
-				tkmMat.normalMapFileName.empty() ? "none" : tkmMat.normalMapFileName.c_str(),
-				tkmMat.specularMapFileName.empty() ? "none" : tkmMat.specularMapFileName.c_str()
+				cullMode
 			);
-			auto mat = materialBank.Get(materiayKey);
-			if (mat == nullptr) {
-				mat = new Material();
-
-				mat->InitFromTkmMaterila(
-					tkmMat,
-					fxFilePath,
-					vsEntryPointFunc,
-					vsSkinEntryPointFunc,
-					psEntryPointFunc,
-					colorBufferFormat,
-					NUM_SRV_ONE_MATERIAL,
-					NUM_CBV_ONE_MATERIAL,
-					NUM_CBV_ONE_MATERIAL * materialNum,
-					NUM_SRV_ONE_MATERIAL * materialNum,
-					alphaBlendMode,
-					isDepthWrite,
-					isDepthTest,
-					cullMode
-				);
-				materialBank.Regist(materiayKey, mat);
-			}
 			//作成したマテリアル数をカウントする。
 			materialNum++;
 			mesh->m_materials.push_back(mat);
@@ -256,22 +209,7 @@ namespace nsK2EngineLow {
 		m_meshs[meshNo] = mesh;
 
 	}
-	const VertexBuffer& MeshParts::GetAnimatedVertexBuffer(int meshNo)  const
-	{
-		return m_computedAnimationVertexBuffer->GetAnimatedVertexBuffer(meshNo);
-	}
-	VertexBuffer& MeshParts::GetAnimatedVertexBuffer(int meshNo)
-	{
-		return m_computedAnimationVertexBuffer->GetAnimatedVertexBuffer(meshNo);
-	}
-	const IndexBuffer& MeshParts::GetAnimatedIndexBuffer(int meshNo, int matNo) const
-	{
-		return m_computedAnimationVertexBuffer->GetAnimatedIndexBuffer(meshNo, matNo);
-	}
-	IndexBuffer& MeshParts::GetAnimatedIndexBuffer(int meshNo, int matNo)
-	{
-		return m_computedAnimationVertexBuffer->GetAnimatedIndexBuffer(meshNo, matNo);
-	}
+
 	void MeshParts::BindSkeleton(Skeleton& skeleton)
 	{
 		m_skeleton = &skeleton;
@@ -309,39 +247,23 @@ namespace nsK2EngineLow {
 			m_boneMatricesStructureBuffer.Update(m_skeleton->GetBoneMatricesTopAddress());
 		}
 		int descriptorHeapNo = 0;
-		int meshNo = 0;
 		for (auto& mesh : m_meshs) {
-			if (m_computedAnimationVertexBuffer){
-				// 頂点バッファの事前計算処理が指定されているので、計算済み頂点バッファを取得する。
-				rc.SetVertexBuffer(m_computedAnimationVertexBuffer->GetAnimatedVertexBuffer(meshNo));
-			}
-			else {
-				rc.SetVertexBuffer(mesh->m_vertexBuffer);
-			}
-			
+			//1. 頂点バッファを設定。
+			rc.SetVertexBuffer(mesh->m_vertexBuffer);
 			//マテリアルごとにドロー。
 			for (int matNo = 0; matNo < mesh->m_materials.size(); matNo++) {
 				//このマテリアルが貼られているメッシュの描画開始。
-				mesh->m_materials[matNo]->BeginRender(
-					rc, 
-					mesh->skinFlags[matNo]
-				);
+				mesh->m_materials[matNo]->BeginRender(rc, mesh->skinFlags[matNo]);
 				//2. ディスクリプタヒープを設定。
 				rc.SetDescriptorHeap(m_descriptorHeap);
 				//3. インデックスバッファを設定。
-				IndexBuffer* ib = nullptr;
-				if (m_computedAnimationVertexBuffer) {
-					ib = &m_computedAnimationVertexBuffer->GetAnimatedIndexBuffer(meshNo, matNo);
-				}
-				else {
-					ib = mesh->m_indexBufferArray[matNo];
-				}
+				auto& ib = mesh->m_indexBufferArray[matNo];
 				rc.SetIndexBuffer(*ib);
+
 				//4. ドローコールを実行。
 				rc.DrawIndexedInstance(ib->GetCount(), numInstance);
 				descriptorHeapNo++;
 			}
-			meshNo++;
 		}
 	}
 }

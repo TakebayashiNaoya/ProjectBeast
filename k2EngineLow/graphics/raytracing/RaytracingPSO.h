@@ -21,13 +21,6 @@ namespace nsK2EngineLow {
 			};
 		public:
 			/// <summary>
-			/// デストラクタ
-			/// </summary>
-			~PSO()
-			{
-				Release();
-			}
-			/// <summary>
 			/// パイプラインステートオブジェクトを初期化。
 			/// </summary>
 			void Init(const DescriptorHeaps& descriptorHeaps);
@@ -43,17 +36,16 @@ namespace nsK2EngineLow {
 			{
 				return m_emptyRootSignature;
 			}
-			ID3D12StateObject* Get()
+			ID3D12StateObjectPtr Get()
 			{
 				return m_pipelineState;
 			}
 		private:
-			void Release();
 			RootSignatureDesc CreateRayGenRootSignatureesc();
 			RootSignatureDesc CreatePBRMatterialHitRootSignatureDesc();
 		private:
-			const DescriptorHeap* m_srvUavCbvHeap = nullptr;	// SRV_UAV_CBV用のディスクリプタヒープ。
-			ID3D12StateObject* m_pipelineState = nullptr;		// パイプラインステート
+			const DescriptorHeap* m_srvUavCbvHeap = nullptr;		//SRV_UAV_CBV用のディスクリプタヒープ。
+			ID3D12StateObjectPtr m_pipelineState;					//パイプラインステート
 			ID3D12RootSignaturePtr m_emptyRootSignature;
 		};
 	}

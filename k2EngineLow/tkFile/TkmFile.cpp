@@ -153,7 +153,7 @@ namespace nsK2EngineLow {
 					binormal.v[i] = -ABC.z / ABC.x;
 				}
 			}
-			
+
 			tangent.Normalize();
 			binormal.Normalize();
 
@@ -169,17 +169,6 @@ namespace nsK2EngineLow {
 		for (auto& vert : mesh.vertexBuffer) {
 			vert.tangent.Normalize();
 			vert.binormal.Normalize();
-			if (vert.tangent.Length() < 0.001f) {
-				if (vert.normal.y > 0.998f) {
-					// 法線がほぼY軸を向いている。
-					vert.tangent = g_vec3AxisX;
-				}
-				else {
-					vert.tangent = g_vec3AxisY;
-				}
-				vert.binormal.Cross(vert.normal, vert.tangent);
-				vert.binormal.Normalize();
-			}
 		}
 
 	}
@@ -270,7 +259,7 @@ namespace nsK2EngineLow {
 					}
 					else {
 						char errorMessage[256];
-						sprintf(errorMessage, "テクスチャのロードに失敗しました。%s\n", texFilePath.c_str());
+						sprintf(errorMessage, "テクスチャのロードに失敗しました。%s\n", texFilePath);
 						if (isOutputErrorCodeTTY == false) {
 							MessageBoxA(nullptr, errorMessage, "エラー", MB_OK);
 						}
@@ -467,10 +456,10 @@ namespace nsK2EngineLow {
 				vertex.binormal = g_vec3Zero;
 				vertex.uv.Set(vertexTmp.uv[0], vertexTmp.uv[1]);
 				vertex.skinWeights.Set(vertexTmp.weights[0], vertexTmp.weights[1], vertexTmp.weights[2], vertexTmp.weights[3]);
-				vertex.indices[0] = vertexTmp.indices[0];
-				vertex.indices[1] = vertexTmp.indices[1];
-				vertex.indices[2] = vertexTmp.indices[2];
-				vertex.indices[3] = vertexTmp.indices[3];
+				vertex.indices[0] = vertexTmp.indices[0] != -1 ? vertexTmp.indices[0] : 0;
+				vertex.indices[1] = vertexTmp.indices[1] != -1 ? vertexTmp.indices[1] : 0;
+				vertex.indices[2] = vertexTmp.indices[2] != -1 ? vertexTmp.indices[2] : 0;
+				vertex.indices[3] = vertexTmp.indices[3] != -1 ? vertexTmp.indices[3] : 0;
 
 				m_bpsOnVertexPosition.AddLeaf(vertex.pos, &vertex.normal);
 			}
