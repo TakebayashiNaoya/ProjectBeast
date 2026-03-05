@@ -102,6 +102,15 @@ namespace nsBeastEngine
 		);
 
 		/**
+		 * @brief 海の初期化用関数
+		 * @param initData		モデルの初期化データ
+		 * @param tkmFilePath	tkmファイルのファイルパス
+		 */
+		void InitOcean(ModelInitData& initData, const char* tkmFilePath);
+
+		void InitModelOnZprepass(const char* tkmFilePath, EnModelUpAxis modelUpAxis, bool isSkyCube);
+
+		/**
 		 * @brief アニメーションの再生
 		 * @param animNo			アニメーションクリップの番号
 		 * @param interpolateTime	補完時間(単位：秒)
@@ -204,5 +213,18 @@ namespace nsBeastEngine
 		int				m_numAnimationClips;
 		/** アニメーションの再生速度 */
 		float			m_animationSpeed;
+
+		/** フォワードレンダリングで描画するか */
+		bool m_isFowardRender = false;
+		/** 反射で映りこむかどうか */
+		std::map<ReflectLayer, bool> m_enableReflection;
+		/** フォワードレンダリングで描画されるモデル */
+		Model m_frowardRenderModel;
+		/** インスタンシング描画が有効か */
+		bool m_isEnableInstancingDraw = false;
+		/** ワールド行列の配列のストラクチャードバッファ */
+		StructuredBuffer m_worldMatrixArraySB;
+		/** ZPrepassで描画されるモデル */
+		Model m_zprepassModel;
 	};
 }

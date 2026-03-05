@@ -9,6 +9,7 @@ using namespace nsK2EngineLow;
 //#include "collision/CollisionObject.h"
 #include "Graphics/IRenderer.h"
 #include "Graphics/RenderingEngine.h"
+#include "Graphics/GraphicsEnums.h"
 //#include "geometry/AABB.h"
 
 #include "Graphics/ModelRender.h"
@@ -29,9 +30,11 @@ using namespace nsK2EngineLow;
 #include "Graphics/light/SpotLight.h"
 #include "Graphics/light/PointLight.h"
 
-
 #include "BeastEngine.h"
 #include "Nature/SkyCube.h"
+#include "Nature/PlaneReflectionPass.h"
+#include "Nature/Ocean.h"
+
 //#include "Level3DRender/LevelRender.h"
 //#include "graphics/light/VolumeSpotLight.h"
 //#include "graphics/light/VolumePointLight.h"

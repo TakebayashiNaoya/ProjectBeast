@@ -75,6 +75,12 @@
     <ClCompile Include="Physics\BroadphaseInterface.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="Nature\Ocean.cpp">
+      <Filter>Nature</Filter>
+    </ClCompile>
+    <ClCompile Include="Nature\PlaneReflectionPass.cpp">
+      <Filter>Nature</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -165,6 +171,15 @@
     </ClInclude>
     <ClInclude Include="Physics\BroadphaseImpl.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Nature\Ocean.h">
+      <Filter>Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Nature\PlaneReflectionPass.h">
+      <Filter>Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\GraphicsEnums.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

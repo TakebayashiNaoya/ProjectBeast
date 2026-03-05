@@ -31,6 +31,8 @@
     <ClCompile Include="graphics\ModelRender.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
+    <ClCompile Include="Nature\Ocean.cpp" />
+    <ClCompile Include="Nature\PlaneReflectionPass.cpp" />
     <ClCompile Include="Nature\SkyCube.cpp" />
     <ClCompile Include="Physics\BoundingVolume.cpp" />
     <ClCompile Include="Physics\BoxCollider.cpp" />
@@ -52,6 +54,7 @@
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
     <ClInclude Include="Graphics\FontRender.h" />
+    <ClInclude Include="graphics\GraphicsEnums.h" />
     <ClInclude Include="graphics\IRenderer.h" />
     <ClInclude Include="graphics\Light\HemisphereLight.h" />
     <ClInclude Include="graphics\Light\PointLight.h" />
@@ -61,6 +64,8 @@
     <ClInclude Include="graphics\MyRenderer.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
+    <ClInclude Include="Nature\Ocean.h" />
+    <ClInclude Include="Nature\PlaneReflectionPass.h" />
     <ClInclude Include="Nature\SkyCube.h" />
     <ClInclude Include="Physics\BoundingVolume.h" />
     <ClInclude Include="Physics\BoxCollider.h" />

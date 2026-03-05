@@ -13,6 +13,6 @@ namespace nsBeastEngine
 		: m_hemisphereLight(nullptr)
 	{
 		/** 半球ライトを取得 */
-		m_hemisphereLight = g_sceneLight->GetHemisphereLight();
+		//m_hemisphereLight = g_sceneLight->GetHemisphereLight();
 	}
 }
