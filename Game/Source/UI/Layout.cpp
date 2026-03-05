@@ -35,6 +35,15 @@ namespace
 /**
  * @brief パース関連
  */
+Vector2 ParseVector2(const nlohmann::json& arr)
+{
+	return Vector2(
+		arr[0].get<float>(),
+		arr[1].get<float>()
+	);
+}
+
+
 Vector3 ParseVector3(const nlohmann::json& arr)
 {
 	return Vector3(
@@ -96,11 +105,71 @@ void InitializeUIParts(app::ui::UIIcon* image, const nlohmann::json& item)
 	const Vector4 color = ParseColor(item["color"]);
 
 
-	image->Initialize(assetName.c_str(), w, h);
+	image->Initialize(assetName.c_str(), w, h, position, scale, rotation, color);
 	image->m_transform.m_localTransform.m_position = position;
 	image->m_transform.m_localTransform.m_scale = scale;
 	image->m_transform.m_localTransform.m_rotation = rotation;
 	image->m_color = color;
+}
+
+
+void InitializeUIParts(app::ui::UIGauge* gauge, const nlohmann::json& item)
+{
+	const std::string asset = item["asset"].get<std::string>();
+	const float w = item["width"].get<float>();
+	const float h = item["height"].get<float>();
+	const Vector3 position = ParseVector3(item["position"]);
+	const Vector3 scale = ParseVector3(item["scale"]);
+	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
+	const Vector4 color = ParseColor(item["color"]);
+	const Vector2 pivot = ParseVector2(item["pivot"]);
+
+
+	gauge->Initialize(asset.c_str(), w, h, position, scale, rotation, color, pivot);
+	gauge->m_transform.m_localTransform.m_position = position;
+	gauge->m_transform.m_localTransform.m_scale = scale;
+	gauge->m_transform.m_localTransform.m_rotation = rotation;
+	gauge->m_color = color;
+	gauge->m_pivot = pivot;
+}
+
+
+void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
+{
+	const std::string asset = item["asset"].get<std::string>();
+	const float w = item["width"].get<float>();
+	const float h = item["height"].get<float>();
+	const Vector3 position = ParseVector3(item["position"]);
+	const Vector3 scale = ParseVector3(item["scale"]);
+	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
+	const Vector4 color = ParseColor(item["color"]);
+
+
+	button->Initialize(asset.c_str(), w, h, position, scale, rotation,color);
+	button->m_transform.m_localTransform.m_position = position;
+	button->m_transform.m_localTransform.m_scale = scale;
+	button->m_transform.m_localTransform.m_rotation = rotation;
+	button->m_color = color;
+}
+
+
+void InitializeUIParts(app::ui::UIDigit* digit, const nlohmann::json& item)
+{
+	const std::string asset = item["asset"].get<std::string>();
+	const int digitNumber = item["digit"].get<int>();
+	const int number = item["number"].get<int>();
+	const float w = item["width"].get<float>();
+	const float h = item["height"].get<float>();
+	const Vector3 position = ParseVector3(item["position"]);
+	const Vector3 scale = ParseVector3(item["scale"]);
+	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
+
+
+	digit->Initialize(asset.c_str(), digitNumber, number, w, h, position, scale, rotation);
+	digit->SetNumber(number);
+	digit->m_transform.m_localTransform.m_position = position;
+	digit->m_transform.m_localTransform.m_scale = scale;
+	digit->m_transform.m_localTransform.m_rotation = rotation;
 }
 
 
@@ -112,7 +181,7 @@ namespace app
 		{
 			m_menu->Update();
 
-#ifdef APP_ENABLE_LAYOUT_HOTRELOAD
+#ifdef APP_ENEBLE_LAYOUT_HOTRELOAD
 			/** ホットリロードチェック */
 			struct stat st;
 			if (stat(m_filePath.c_str(), &st) == 0)
@@ -165,7 +234,7 @@ namespace app
 				auto* ui = CreateUI(canvas, type, key, item);
 				m_menu->RegisterUI(key, ui);
 			}
-			m_menu->IntializeLogic();
+			m_menu->InitializeLogic();
 		}
 
 
@@ -175,9 +244,30 @@ namespace app
 			{
 				canvas->CreateUI<UIIcon>(key);
 				auto* image = canvas->FindUI<UIIcon>(key);
-				InitializeUIParts(image, key);
+				InitializeUIParts(image, item);
 				return image;
 			}
+			if (type == "UIGauge")
+			{
+				canvas->CreateUI<UIGauge>(key);
+				auto* gauge = canvas->FindUI<UIGauge>(key);
+				InitializeUIParts(gauge, item);
+				return gauge;
+			}
+			//if (type == "UIButton")
+			//{
+			//	canvas->CreateUI<UIButton>(key);
+			//	auto* button = canvas->FindUI<UIButton>(key);
+			//	InitializeUIParts(button, item);
+			//	return button;
+			//}
+			//if (type == "UIDigit")
+			//{
+			//	canvas->CreateUI<UIDigit>(key);
+			//	auto* digit = canvas->FindUI<UIDigit>(key);
+			//	InitializeUIParts(digit, item);
+			//	return digit;
+			//}
 			return nullptr;
 		}
 	}
