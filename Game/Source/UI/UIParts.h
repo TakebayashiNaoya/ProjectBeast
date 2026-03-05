@@ -33,7 +33,7 @@ namespace app
 			UIBase()
 				: m_color(Vector4::White)
 				, m_pivot(0.5f,0.5f)
-				, m_isDraw(false)
+				, m_isDraw(true)
 			{
 				m_uiAnimationMap.clear();
 			}
@@ -214,7 +214,15 @@ namespace app
 			 * @param width 横
 			 * @param height 縦
 			 */
-			void Initialize(const char* assetName, const float width, const float height);
+			void Initialize(
+					const char* assetName
+				,   const float width
+				,   const float height
+				,	const Vector3& position
+				,	const Vector3& scale
+				,	const Quaternion& rotation
+				,	const Vector4& color
+			);
 		};
 
 
@@ -241,6 +249,27 @@ namespace app
 			virtual void Update()override;
 			/** 描画処理 */
 			virtual void Render(RenderContext& rc)override;
+
+
+			/**
+			 * @brief 初期化
+			 * @param assetName アセット名
+			 * @param width 横幅
+			 * @param height 縦幅
+			 * @param position 位置
+			 * @param scale スケール
+			 * @param rotation 回転
+			 * @param color カラー
+			 */
+			void Initialize(
+					const char* assetName
+				,	const float width
+				,	const float height
+				,	const Vector3& position
+				,	const Vector3& scale
+				,	const Quaternion& rotation
+				,	const Vector4& color
+			);
 		};
 
 
@@ -269,6 +298,7 @@ namespace app
 			 * @param position 座標
 			 * @param scale スケール
 			 * @param rotation 回転
+			 * @param pivot 基底軸
 			 */
 			void Initialize(
 					const char* assetName
@@ -277,6 +307,8 @@ namespace app
 				,	const Vector3& position
 				,	const Vector3& scale
 				,	const Quaternion& rotation
+				,	const Vector4& color
+				,	const Vector2& pivot
 			);
 		};
 
@@ -316,9 +348,9 @@ namespace app
 				const int number,
 				const float wide,
 				const float height,
-				Vector3& position,
-				Vector3& scale,
-				Quaternion& rotation
+				const Vector3& position,
+				const Vector3& scale,
+				const Quaternion& rotation
 			);
 
 
@@ -404,6 +436,7 @@ namespace app
 			friend class UIImage;
 			friend class UIDigit;
 			friend class UIButton;
+			friend class UIGauge;
 
 
 		public:
@@ -459,8 +492,6 @@ namespace app
 
 
 		private:
-			/** 描画するUIBaseのリスト */
-			std::vector<UIBase*> m_uiList;
 			/**
 			 * @brief キーと値を保持する
 			 * @brief 各UI自体に親子関係持たせたいけど使わない可能性があるので、
