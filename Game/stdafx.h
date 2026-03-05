@@ -3,7 +3,7 @@
 
 #include "BeastEnginePreCompile.h"
 using namespace nsK2EngineLow;
-using namespace nsK2Engine;
+using namespace nsBeastEngine;
 
 
 #include "Source/Types.h"
