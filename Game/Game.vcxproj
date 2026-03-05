@@ -233,6 +233,11 @@
     <ClCompile Include="Source\Actor\Character\CharacterBase.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\Enemy.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyController.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStateMachine.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCController.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp" />
     <ClCompile Include="Source\Actor\Character\Player\Player.cpp" />
@@ -281,6 +286,11 @@
     <ClInclude Include="Source\Actor\Character\CharacterBase.h" />
     <ClInclude Include="Source\Actor\Character\CharacterParameter.h" />
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\Enemy.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyController.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStateMachine.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStatus.h" />
     <ClInclude Include="Source\Actor\Character\NPCController.h" />
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h" />
     <ClInclude Include="Source\Actor\Character\Player\Player.h" />
