@@ -233,6 +233,11 @@
     <ClCompile Include="Source\Actor\Character\CharacterBase.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp" />
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguin.cpp" />
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinIState.cpp" />
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinParameter.cpp" />
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStateMachine.cpp" />
+    <ClCompile Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCController.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp" />
     <ClCompile Include="Source\Actor\Character\Player\Player.cpp" />
@@ -281,6 +286,11 @@
     <ClInclude Include="Source\Actor\Character\CharacterBase.h" />
     <ClInclude Include="Source\Actor\Character\CharacterParameter.h" />
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h" />
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguin.h" />
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinIState.h" />
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinParameter.h" />
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStateMachine.h" />
+    <ClInclude Include="Source\Actor\Character\DaddyPenguin\DaddyPenguinStatus.h" />
     <ClInclude Include="Source\Actor\Character\NPCController.h" />
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h" />
     <ClInclude Include="Source\Actor\Character\Player\Player.h" />
