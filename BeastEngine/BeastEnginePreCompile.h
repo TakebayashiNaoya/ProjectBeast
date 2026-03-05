@@ -16,13 +16,13 @@ using namespace nsK2EngineLow;
 #include "Graphics/FontRender.h"
 
 //#include "Physics/ICollider.h"
+#include "Physics/Physics.h"
 #include "Physics/BoxCollider.h"
 #include "Physics/SphereCollider.h"
 #include "Physics/CapsuleCollider.h"
 #include "Physics/MeshCollider.h"
 #include "Physics/RigidBody.h"
 #include "Physics/CharacterController.h"
-#include "Physics/PhysicsStaticObject.h"
 
 #include "Graphics/light/SceneLight.h"
 #include "Graphics/light/HemisphereLight.h"
@@ -31,7 +31,6 @@ using namespace nsK2EngineLow;
 
 
 #include "BeastEngine.h"
-
 #include "Nature/SkyCube.h"
 //#include "Level3DRender/LevelRender.h"
 //#include "graphics/light/VolumeSpotLight.h"

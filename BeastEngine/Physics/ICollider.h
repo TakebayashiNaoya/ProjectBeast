@@ -12,15 +12,18 @@ class btCollisionShape;
 
 namespace nsBeastEngine
 {
-	/**
-	 * @brief コライダーのインターフェースクラス
-	 */
-	class ICollider : public Noncopyable
+	namespace nsCollision
 	{
-	public:
 		/**
-		 * @brief コライダーを取得
+		 * @brief コライダーのインターフェースクラス
 		 */
-		virtual btCollisionShape* GetBody() const = 0;
-	};
+		class ICollider : public Noncopyable
+		{
+		public:
+			/**
+			 * @brief コライダーを取得
+			 */
+			virtual btCollisionShape* GetBody() const = 0;
+		};
+	}
 }

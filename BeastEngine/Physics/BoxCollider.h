@@ -9,29 +9,32 @@
 
 namespace nsBeastEngine
 {
-	/**
-	 * @brief ボックスコライダー。
-	 */
-	class BoxCollider : public ICollider
+	namespace nsCollision
 	{
-	public:
 		/**
-		 * @brief 生成
+		 * @brief ボックスコライダー。
 		 */
-		void Create(const Vector3& size);
-
-		/**
-		 * @brief BulletPhysicsのコリジョン形状を取得
-		 * @return コリジョン形状
-		 */
-		btCollisionShape* GetBody() const override
+		class BoxCollider : public ICollider
 		{
-			return shape.get();
-		}
+		public:
+			/**
+			 * @brief 生成
+			 */
+			void Create(const Vector3& size);
+
+			/**
+			 * @brief BulletPhysicsのコリジョン形状を取得
+			 * @return コリジョン形状
+			 */
+			btCollisionShape* GetBody() const override
+			{
+				return m_shape.get();
+			}
 
 
-	private:
-		/** 当たり判定用ボックス */
-		std::unique_ptr<btBoxShape>	shape;
-	};
+		private:
+			/** 当たり判定用ボックス */
+			std::unique_ptr<btBoxShape>	m_shape;
+		};
+	}
 }
