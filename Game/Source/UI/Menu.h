@@ -26,7 +26,7 @@ namespace app
 
 
 			/** 更新処理 */
-			void Update()
+			virtual void Update()
 			{
 				if (m_canvas)
 				{
@@ -36,7 +36,7 @@ namespace app
 
 
 			/** 描画機能処理 */
-			void Render(RenderContext& rc)
+			virtual void Render(RenderContext& rc)
 			{
 				if (m_canvas)
 				{
@@ -114,12 +114,12 @@ namespace app
 			 * @brief UIのロジック初期化処理
 			 * @brief ここに「ボタンが押された時の処理」等を書く
 			 */
-			virtual void IntializeLogic()
+			virtual void InitializeLogic()
 			{
 			}
 
 
-		private:
+		protected:
 			/** UICanvasを生成 */
 			std::unique_ptr<UICanvas>m_canvas = nullptr;
 			/** キーと値の保持 */
