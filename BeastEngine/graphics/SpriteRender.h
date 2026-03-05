@@ -18,6 +18,16 @@ namespace nsBeastEngine
 		 * @brief 位置の設定
 		 * @param position	位置
 		 */
+		void SetPosition(const Vector3& position)
+		{
+			m_position.x = position.x;
+			m_position.y = position.y;
+			m_position.z = position.z;
+		}
+		/**
+		 * @brief 位置の設定
+		 * @param position	位置
+		 */
 		void SetPosition(const Vector2& position)
 		{
 			m_position.x = position.x;
@@ -54,6 +64,16 @@ namespace nsBeastEngine
 			m_scale.y = scale.y;
 			m_scale.z = 0.0f;
 		}
+		/**
+		 * @brief 大きさの設定
+		 * @param scale	大きさ
+		 */
+		void SetScale(const Vector3& scale)
+		{
+			m_scale.x = scale.x;
+			m_scale.y = scale.y;
+			m_scale.z = 0;
+		}
 
 		/**
 		 * @brief 基点の設定
@@ -62,6 +82,15 @@ namespace nsBeastEngine
 		void SetPivot(const Vector2& pivot)
 		{
 			m_pivot = pivot;
+		}
+
+		/**
+		 * @brief 乗算カラーの設定
+		 * @param mulColor	乗算カラー
+		 */
+		void SetMulColor(const Vector4& mulColor)
+		{
+			m_sprite.SetMulColor(mulColor);
 		}
 
 
