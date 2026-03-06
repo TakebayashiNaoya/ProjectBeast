@@ -319,6 +319,7 @@ namespace nsBeastEngine
 		Vector3 m_skyColor;		/** 空の色 */
 		float padding1;
 		Vector3 m_groundNormal;	/** 地面の法線 */
+		float padding2;
 
 
 		/**
