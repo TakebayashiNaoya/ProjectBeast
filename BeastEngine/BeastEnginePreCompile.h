@@ -35,6 +35,8 @@ using namespace nsK2EngineLow;
 #include "Nature/PlaneReflectionPass.h"
 #include "Nature/Ocean.h"
 
+#include "Resource/ResourceManager.h"
+
 //#include "Level3DRender/LevelRender.h"
 //#include "graphics/light/VolumeSpotLight.h"
 //#include "graphics/light/VolumePointLight.h"

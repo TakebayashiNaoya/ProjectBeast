@@ -1,4 +1,5 @@
-﻿#include "ResourceManager.h"
+﻿#include "BeastEnginePreCompile.h"
+#include "ResourceManager.h"
 
 // ============================================================
 //  スレッド制御

@@ -81,6 +81,9 @@
     <ClCompile Include="Nature\PlaneReflectionPass.cpp">
       <Filter>Nature</Filter>
     </ClCompile>
+    <ClCompile Include="Resource\ResourceManager.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -181,6 +184,9 @@
     <ClInclude Include="graphics\GraphicsEnums.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Resource\ResourceManager.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -194,6 +200,9 @@
     </Filter>
     <Filter Include="Physics">
       <UniqueIdentifier>{339029f3-ca70-419a-8414-cf7e1eb1567e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{72e20d92-4345-4646-9155-7f21c180bf74}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
