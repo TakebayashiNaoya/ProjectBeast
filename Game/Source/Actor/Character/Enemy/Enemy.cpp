@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "Enemy.h"
 #include "EnemyStateMachine.h"
+#include "EnemyStatus.h"
 
 
 namespace app
@@ -15,7 +16,7 @@ namespace app
 		Enemy::Enemy()
 		{
 			m_stateMachine = std::make_unique<EnemyStateMachine>(this);
-
+			m_status = std::make_unique<EnemyStatus>();
 			m_status->Setup();
 		}
 
@@ -28,6 +29,8 @@ namespace app
 
 		void Enemy::Update()
 		{
+			m_stateMachine->Update();
+
 			CharacterBase::Update();
 		}
 
