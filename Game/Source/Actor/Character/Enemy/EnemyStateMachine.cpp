@@ -57,32 +57,65 @@ namespace app
 
 		IState* EnemyStateMachine::GetChangeState()
 		{
-			return FindState(EnemyIdleState::ID());
-			return nullptr;
+			if (CanChangeWandering())
+			{
+				return m_currentState = FindState(EnemyWanderingState::ID());
+			}
+			if (CanChangeChace())
+			{
+				return m_currentState = FindState(EnemyChaceState::ID());
+			}
+			if (CanChangeAttack())
+			{
+				return m_currentState = FindState(EnemyAttackState::ID());
+			}
+
+			return m_currentState = FindState(EnemyIdleState::ID());
 		}
 
 
 		bool EnemyStateMachine::CanChangeIdle() const
 		{
-			return true;
+			if (m_stickLAmount < 0.01f) {
+				return true;
+			}
+			return false;
 		}
 
 
 		bool EnemyStateMachine::CanChangeWandering() const
 		{
-			return true;
+			if (m_stickLAmount > 0.01f) {
+				return true;
+			}
+			return false;
 		}
 
 
 		bool EnemyStateMachine::CanChangeChace() const
 		{
-			return true;
+			if (m_isDash && m_direction.Length() > 0.01f) {
+				return true;
+			}
+			return false;
 		}
 
 
 		bool EnemyStateMachine::CanChangeAttack() const
 		{
-			return true;
+			if (!m_canAttack) {
+				return false;
+			}
+			if (m_actionButtonX) {
+				return true;
+			}
+			return false;
+		}
+
+
+		void EnemyStateMachine::Setup(Enemy* owner)
+		{
+			m_owner = owner;
 		}
 	}
 }

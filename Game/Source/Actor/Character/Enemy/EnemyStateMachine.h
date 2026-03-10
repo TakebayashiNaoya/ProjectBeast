@@ -16,6 +16,8 @@ namespace app
 		class EnemyStatus;
 		class EnemyIState;
 
+		class Player;
+
 
 		class EnemyStateMachine :public StateMachineBase
 		{
@@ -40,6 +42,108 @@ namespace app
 			Enemy* GetOwner() { return m_owner; }
 
 			EnemyStatus* GetOwnerStatus() { return m_ownerStatus; }
+
+
+		public:
+			/** 方向のゲッター */
+			const Vector3& GetDirection() { return m_direction; }
+			/** 方向のセッター */
+			void SetDirection(const Vector3& direction) { m_direction = direction; }
+
+
+			/**
+			 * @brief 移動ベクトルのゲッター
+			 */
+			const Vector3& GetMoveVector()const { return m_moveVector; }
+			/**
+			 * @brief 移動ベクトルのセッター
+			 */
+			void SetMoveVector(const Vector3& moveVector) { m_moveVector = moveVector; }
+
+
+			/**
+			 * @brief 座標のゲッター
+			 */
+			const Vector3& GetPosition() const { return m_position; }
+			/**
+			 * @brief 座標のセッター
+			 */
+			void SetPosition(const Vector3& position) { m_position = position; }
+
+
+			/**
+			 * @brief スケールのゲッター
+			 */
+			const Vector3& GetScale()const { return m_scale; }
+			/**
+			 * @brief スケールのセッター
+			 */
+			void SetScale(const Vector3& scale) { m_scale = scale; }
+
+
+			/**
+			 * @brief 回転のゲッター
+			 */
+			const Quaternion& GetRotation()const { return m_rotation; }
+			/**
+			 * @brief 回転のセッター
+			 */
+			void SetRotation(const Quaternion& rotation) { m_rotation = rotation; }
+
+
+			/**
+			 * @brief ダッシュの設定
+			 */
+			void SetDash(const bool isDash) { m_isDash = isDash; }
+
+
+			/**
+			 * @brief Aボタンを押せるかの設定
+			 */
+			void SetActionButtonA(const bool isActionButtonA) { m_actionButtonA = isActionButtonA; }
+			/**
+			 * @brief Aボタンを押したか取得
+			 */
+			bool IsActionButtonA() const { return m_actionButtonA; }
+
+
+			/**
+			 * @brief Xボタンを押せるかの設定
+			 */
+			void SetActionButtonX(const bool isActionButtonX) { m_actionButtonX = isActionButtonX; }
+			/**
+			 * @brief Xボタンを押したか取得
+			 */
+			bool IsActionButtonX() const { return m_actionButtonA; }
+
+
+			/**
+			 * @brief 入力量を設定
+			 */
+			void SetStickLAmount(const float stickAmount) { m_stickLAmount = stickAmount; }
+
+
+			/**
+			 * @brief 入力量の取得
+			 */
+			float GetStickLAmount() const { return m_stickLAmount; }
+
+
+			/**
+			 * @brief 近くのペンギンの設定
+			 */
+			void SetNearPenguin(const bool isNearPneguin) { m_isNearPenguin = isNearPneguin; }
+
+
+			/**
+			 * @brief 攻撃ができるかの設定
+			 */
+			void SetCanAttack(const bool isCanAttack) { m_canAttack = isCanAttack; }
+			/**
+			 * @brief 攻撃ができるかの取得
+			 */
+			bool CanAttack() const { return m_canAttack; }
+
 
 
 		private:
@@ -76,11 +180,29 @@ namespace app
 			/** 回転 */
 			Quaternion m_rotation = Quaternion::Identity;
 
+			/** プレイヤーの位置 */
+			Vector3 m_playerPosition = Vector3::Zero;
+
+			/** プレイヤークラスのポインタ */
+			Player* m_targetPlayer = nullptr;
+
 			/** 左スティックの入力量 */
 			float m_stickLAmount = 0.0f;
 
 			/** ダッシュできるかどうか */
 			bool m_isDash = false;
+
+			/** Aボタンを押せるかどうか */
+			bool m_actionButtonA = false;
+
+			/** Xボタンを押せるかどうか */
+			bool m_actionButtonX = false;
+
+			/** ペンギンが近くにいるか */
+			bool m_isNearPenguin = false;
+
+			/** 攻撃できるか */
+			bool m_canAttack = false;
 		};
 	}
 }
