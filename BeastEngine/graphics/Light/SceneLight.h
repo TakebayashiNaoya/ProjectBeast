@@ -34,7 +34,7 @@ namespace nsBeastEngine
 			, padding0(0.0f)
 			, m_color(Vector3::Zero)
 			, padding1(0.0f)
-			, m_LVP(Matrix::Identity)
+			//, m_LVP(Matrix::Identity)
 		{
 		}
 
@@ -83,7 +83,7 @@ namespace nsBeastEngine
 		 */
 		void UpdateLVP(const Matrix LVP)
 		{
-			m_LVP = LVP;
+			//m_LVP = LVP;
 		}
 	};
 
@@ -319,6 +319,7 @@ namespace nsBeastEngine
 		Vector3 m_skyColor;		/** 空の色 */
 		float padding1;
 		Vector3 m_groundNormal;	/** 地面の法線 */
+		float padding2;
 
 
 		/**
@@ -408,7 +409,7 @@ namespace nsBeastEngine
 		SSpotLight			m_spotLight[MAX_SPOT_LIGHT];	/** スポットライト */
 		SHemisphereLight	m_hemisphereLight;				/** 半球ライト */
 		int					m_usedPointLightCount;			/** ポイントライトの使用数 */
-		Vector3				m_cameraPosition;				/** カメラの向いている方向 */
+		Vector3				m_cameraPosition;				/** カメラの座標 */
 		int					m_usedSpotLightCount;			/** スポットライトの使用数 */
 		Vector3				m_ambientLightColor;			/** 環境光の色 */
 
@@ -417,8 +418,8 @@ namespace nsBeastEngine
 		 * @brief コンストラクタ
 		 */
 		Light()
-			: m_usedPointLightCount(0)
-			, m_cameraPosition(Vector3::Zero)
+			: /*m_usedPointLightCount(0)
+			, */m_cameraPosition(Vector3::Zero)
 			, m_usedSpotLightCount(0)
 			, m_ambientLightColor(Vector3::Zero)
 		{
@@ -508,14 +509,14 @@ namespace nsBeastEngine
 		/**
 		 * @brief 半球ライトの取得
 		 */
-		SHemisphereLight* GetHemisphereLight()
-		{
-			return &m_light.m_hemisphereLight;
-		}
+		 //SHemisphereLight* GetHemisphereLight()
+		 //{
+		 //	return &m_light.m_hemisphereLight;
+		 //}
 
-		/**
-		 * @brief ライトの取得
-		 */
+		 /**
+		  * @brief ライトの取得
+		  */
 		Light* GetLight()
 		{
 			return &m_light;
@@ -526,7 +527,9 @@ namespace nsBeastEngine
 		 */
 		Matrix& GetLVP()
 		{
-			return m_light.m_drectionLight.m_LVP;
+			static Matrix m;
+			return m;
+			//return m_light.m_drectionLight.m_LVP;
 		}
 
 
