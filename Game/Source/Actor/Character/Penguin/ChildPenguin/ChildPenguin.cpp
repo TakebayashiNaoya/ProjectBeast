@@ -1,10 +1,13 @@
 ﻿/**
- * @file ChildPenguinBase.cpp
- * @brief 子ペンギンの基底クラス
+ * @file ChildPenguin.cpp
+ * @brief 子ペンギンクラス
  * @author 藤谷
  */
 #include "stdafx.h"
 #include "ChildPenguin.h"
+#include "ChildPenguinStateMachine.h"
+#include "ChildPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 
 
 namespace app
@@ -12,17 +15,37 @@ namespace app
 	namespace actor
 	{
 
+		namespace
+		{
+			const ModelData MODEL_DATA =
+			{
+				"Assets/modelData/penguin/childPenguin/ChildPenguin.tkm",
+				ANIMATION_DATA,
+				EnModelUpAxis::enModelUpAxisY,
+				std::size(ANIMATION_DATA)
+			};
+		}
+
+
+		ChildPenguin::ChildPenguin()
+		{
+			m_stateMachine = std::make_unique<ChildPenguinStateMachine>(this);
+			m_status = std::make_unique<ChildPenguinStatus>();
+			m_status->Setup();
+		}
+
+
 		void ChildPenguin::Start()
 		{
-			// ペンギンの初期化
-			PenguinBase::Init(PenguinBase::EnPenguinType::Child);
-			// 基底クラスのStartを呼び出す
+			CharacterBase::Init(MODEL_DATA);
 			PenguinBase::Start();
 		}
 
 
 		void ChildPenguin::Update()
 		{
+			m_stateMachine->Update();
+
 			PenguinBase::Update();
 		}
 
@@ -31,10 +54,5 @@ namespace app
 		{
 			PenguinBase::Render(rc);
 		}
-
-
-		ChildPenguin::ChildPenguin()
-			: m_childPenguinType(EnChildPenguinType::Max)
-		{}
 	}
 }

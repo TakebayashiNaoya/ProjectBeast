@@ -1,6 +1,6 @@
 ﻿/**
  * @file ChildPenguin.h
- * @brief 子ペンギンの基底クラス
+ * @brief 子ペンギンクラス
  * @author 藤谷
  */
 #pragma once
@@ -16,51 +16,33 @@ namespace app
 
 
 		/**
-		 * @brief 子ペンギンの基底クラス
+		 * @brief 親ペンギンクラス
 		 */
 		class ChildPenguin : public PenguinBase
 		{
 		public:
 			/**
-			 * @brief 子ペンギンの種類
+			 * @brief 子ペンギンのタイプ
 			 */
 			enum class EnChildPenguinType : uint8_t
 			{
 				// 世話焼き
-				Caring,
-				// おちょこちょい
+				Caring = 0,
+				// おっちょこちょい
 				Clumsy,
-				// 真面目
-				Serious,
 				// 甘えん坊
 				Spoiled,
-				Max
+				// しっかり者
+				Serious,
 			};
 
 
 		public:
 			/**
-			 * @brief 子ペンギンの種類を取得
-			 * @return 子ペンギンの種類
+			 * @brief ステートマシンを取得
+			 * @return ステートマシンのポインタ
 			 */
-			inline EnChildPenguinType GetChildPenguinType() const
-			{
-				return m_childPenguinType;
-			}
-			/**
-			 * @brief 子ペンギンの種類を設定
-			 * @param childPenguinType 子ペンギンの種類
-			 */
-			inline void SetChildPenguinType(const EnChildPenguinType childPenguinType)
-			{
-				m_childPenguinType = childPenguinType;
-			}
-
-
-		private:
-			void Start() override final;
-			void Update() override final;
-			void Render(RenderContext& rc) override final;
+			inline ChildPenguinStateMachine* GetStateMachine() { return m_stateMachine.get(); }
 
 
 		public:
@@ -69,8 +51,12 @@ namespace app
 
 
 		private:
-			/** 子ペンギンの種類 */
-			EnChildPenguinType m_childPenguinType;
+			void Start() override final;
+			void Update() override final;
+			void Render(RenderContext& rc) override final;
+
+
+		private:
 			/** ステートマシン */
 			std::unique_ptr<ChildPenguinStateMachine> m_stateMachine;
 		};
