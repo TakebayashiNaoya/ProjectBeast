@@ -236,6 +236,7 @@
     <ClCompile Include="Source\Actor\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyController.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCController.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="Source\Actor\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyController.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyStatus.h" />
     <ClInclude Include="Source\Actor\Character\NPCController.h" />
