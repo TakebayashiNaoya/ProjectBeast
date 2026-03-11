@@ -4,8 +4,10 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include "EnemyController.h"
 #include "EnemyIState.h"
 #include "EnemyStateMachine.h"
+#include "EnemyStatus.h"
 
 
 namespace app
@@ -14,8 +16,7 @@ namespace app
 	{
 		EnemyIState::EnemyIState(EnemyStateMachine* owner)
 			: m_owner(owner)
-		{
-		}
+		{}
 
 
 
@@ -24,24 +25,20 @@ namespace app
 
 
 		void EnemyIdleState::Enter()
-		{
-		}
+		{}
 
 
 		void EnemyIdleState::Update()
-		{
-		}
+		{}
 
 
 		void EnemyIdleState::Exit()
-		{
-		}
+		{}
 
 
 		EnemyIdleState::EnemyIdleState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
-		{
-		}
+		{}
 
 
 
@@ -63,8 +60,8 @@ namespace app
 
 			const Vector3& moveDirection = m_owner->GetDirection();
 			// NOTE:Statusの設定が出来たらコメントを解除する
-			//const Vector3 move = m_owner->GetOwnerStatus()->GetSpeed();
-			//m_owner->SetMoveVector(move);
+			const Vector3 move = moveDirection * m_owner->GetOwnerStatus()->GetWalkSpeed();
+			m_owner->SetMoveVector(move);
 		}
 
 
@@ -76,8 +73,7 @@ namespace app
 
 		EnemyWanderingState::EnemyWanderingState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
-		{
-		}
+		{}
 
 
 
@@ -100,13 +96,13 @@ namespace app
 			const Vector3& moveDirection = m_owner->GetDirection();
 
 			// NOTE:Statusの設定が出来たらコメントを解除する
-			//const float moveSpeed = m_owner->GetOwnerStatus()->GetSpeed();
-			//const float dashSpeed = m_owner->GetOwnerStatus()->GetDashSpeed();
-			//const float moveDashSpeed = moveSpeed * dashSpeed;
+			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
+			const float dashSpeed = m_owner->GetOwnerStatus()->GetRunSpeed();
+			const float moveDashSpeed = moveSpeed * dashSpeed;
 
-			//const Vector3 move = moveDirection * moveDashSpeed;
+			const Vector3 move = moveDirection * moveDashSpeed;
 
-			//m_owner->SetMoveVector(move);
+			m_owner->SetMoveVector(move);
 		}
 
 
@@ -118,8 +114,7 @@ namespace app
 
 		EnemyChaceState::EnemyChaceState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
-		{
-		}
+		{}
 
 
 
@@ -134,8 +129,7 @@ namespace app
 
 
 		void EnemyAttackState::Update()
-		{
-		}
+		{}
 
 
 		void EnemyAttackState::Exit()
@@ -146,7 +140,6 @@ namespace app
 
 		EnemyAttackState::EnemyAttackState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
-		{
-		}
+		{}
 	}
 }

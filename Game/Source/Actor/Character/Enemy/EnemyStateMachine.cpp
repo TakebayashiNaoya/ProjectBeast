@@ -4,6 +4,7 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include "Enemy.h"
 #include "EnemyIState.h"
 #include "EnemyStateMachine.h"
 
@@ -24,7 +25,7 @@ namespace app
 
 
 			// 初期ステートの設定
-			m_currentState = FindState(EnemyIdleState::ID());
+			m_currentState = FindState(EnemyWanderingState::ID());
 		}
 
 
@@ -57,6 +58,10 @@ namespace app
 
 		IState* EnemyStateMachine::GetChangeState()
 		{
+			if (CanChangeIdle())
+			{
+				return m_currentState = FindState(EnemyIdleState::ID());
+			}
 			if (CanChangeWandering())
 			{
 				return m_currentState = FindState(EnemyWanderingState::ID());
@@ -116,6 +121,13 @@ namespace app
 		void EnemyStateMachine::Setup(Enemy* owner)
 		{
 			m_owner = owner;
+			//m_ownerStatus = owner->GetStatus<EnemyStatus>();
+		}
+
+
+		void EnemyStateMachine::PlayAnimation(const int animationIndex)
+		{
+			m_owner->GetModelRender()->PlayAnimation(animationIndex);
 		}
 	}
 }

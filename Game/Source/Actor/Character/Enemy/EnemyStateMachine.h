@@ -43,6 +43,8 @@ namespace app
 
 			EnemyStatus* GetOwnerStatus() { return m_ownerStatus; }
 
+			void PlayAnimation(const int animationIndex);
+
 
 		public:
 			/** 方向のゲッター */

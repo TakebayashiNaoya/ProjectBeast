@@ -13,6 +13,30 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			AnimationData ANIMATION_DATA[] =
+			{
+				{ "Assets/animData/idle.tka", true },
+				{ "Assets/animData/walk.tka", true },
+				{ "Assets/animData/run.tka", true },
+				{ "Assets/animData/jump.tka", false }
+			};
+
+
+			ModelData MODEL_DATA =
+			{
+				"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
+				ANIMATION_DATA,
+				//nullptr,
+				EnModelUpAxis::enModelUpAxisY,
+				std::size(ANIMATION_DATA)
+				//0
+			};
+
+		}
+
+
 		Enemy::Enemy()
 		{
 			m_stateMachine = std::make_unique<EnemyStateMachine>(this);
@@ -23,6 +47,7 @@ namespace app
 
 		void Enemy::Start()
 		{
+			//Init(MODEL_DATA);
 			CharacterBase::Start();
 		}
 

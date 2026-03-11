@@ -15,13 +15,11 @@ namespace app
 	namespace actor
 	{
 		EnemyController::EnemyController()
-		{
-		}
+		{}
 
 
 		EnemyController::~EnemyController()
-		{
-		}
+		{}
 
 
 		bool EnemyController::Start()
@@ -34,22 +32,28 @@ namespace app
 		{
 			auto* targetStateMachine = m_target->GetEnemyStateMachine();
 
+			targetStateMachine->SetActionButtonA(GetPad()->IsTrigger(enButtonA));
+
+			targetStateMachine->SetActionButtonX(GetPad()->IsTrigger(enButtonX));
+
+
 			if (IsInputStickL())
 			{
 				// 左スティックの方向
+				targetStateMachine->SetRotation(ComputeRotation());
 
 				//左スティックの入力量を取得
+				targetStateMachine->SetDirection(GetStickL());
 
 			}
 			// スティックの入力量を設定する
 			// 0～1の範囲で入力量を取得
-
+			targetStateMachine->SetStickLAmount(GetStickL().Length());
 		}
 
 
 		void EnemyController::Render(RenderContext& renderContext)
-		{
-		}
+		{}
 
 
 		Vector3 EnemyController::GetStickL()
