@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #include "stdafx.h"
-#include "ChildPenguinBase.h"
+#include "ChildPenguin.h"
 
 
 namespace app
@@ -12,7 +12,7 @@ namespace app
 	namespace actor
 	{
 
-		void ChildPenguinBase::Start()
+		void ChildPenguin::Start()
 		{
 			// ペンギンの初期化
 			PenguinBase::Init(PenguinBase::EnPenguinType::Child);
@@ -21,28 +21,20 @@ namespace app
 		}
 
 
-		void ChildPenguinBase::Update()
+		void ChildPenguin::Update()
 		{
 			PenguinBase::Update();
 		}
 
 
-		void ChildPenguinBase::Render(RenderContext& rc)
+		void ChildPenguin::Render(RenderContext& rc)
 		{
 			PenguinBase::Render(rc);
 		}
 
 
-		void ChildPenguinBase::Init(const EnChildPenguinType childPenguinType)
-		{
-			// 子ペンギンの種類を保存
-			m_childPenguinType = childPenguinType;
-		}
-
-
-		ChildPenguinBase::ChildPenguinBase()
+		ChildPenguin::ChildPenguin()
 			: m_childPenguinType(EnChildPenguinType::Max)
-		{
-		}
+		{}
 	}
 }

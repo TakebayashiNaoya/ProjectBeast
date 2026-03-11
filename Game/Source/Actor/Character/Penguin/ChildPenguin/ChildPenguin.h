@@ -1,5 +1,5 @@
 ﻿/**
- * @file ChildPenguinBase.h
+ * @file ChildPenguin.h
  * @brief 子ペンギンの基底クラス
  * @author 藤谷
  */
@@ -11,10 +11,14 @@ namespace app
 {
 	namespace actor
 	{
+		/** 前方宣言 */
+		class ChildPenguinStateMachine;
+
+
 		/**
 		 * @brief 子ペンギンの基底クラス
 		 */
-		class ChildPenguinBase : public PenguinBase
+		class ChildPenguin : public PenguinBase
 		{
 		public:
 			/**
@@ -34,28 +38,41 @@ namespace app
 			};
 
 
-		protected:
-			virtual void Start() override;
-			virtual void Update() override;
-			virtual void Render(RenderContext& rc) override;
-
-
-		protected:
+		public:
 			/**
-			 * @brief 初期化
+			 * @brief 子ペンギンの種類を取得
+			 * @return 子ペンギンの種類
+			 */
+			inline EnChildPenguinType GetChildPenguinType() const
+			{
+				return m_childPenguinType;
+			}
+			/**
+			 * @brief 子ペンギンの種類を設定
 			 * @param childPenguinType 子ペンギンの種類
 			 */
-			void Init(const EnChildPenguinType childPenguinType);
+			inline void SetChildPenguinType(const EnChildPenguinType childPenguinType)
+			{
+				m_childPenguinType = childPenguinType;
+			}
+
+
+		private:
+			void Start() override final;
+			void Update() override final;
+			void Render(RenderContext& rc) override final;
 
 
 		public:
-			ChildPenguinBase();
-			virtual ~ChildPenguinBase() override = default;
+			ChildPenguin();
+			virtual ~ChildPenguin() override = default;
 
 
-		protected:
+		private:
 			/** 子ペンギンの種類 */
 			EnChildPenguinType m_childPenguinType;
+			/** ステートマシン */
+			std::unique_ptr<ChildPenguinStateMachine> m_stateMachine;
 		};
 	}
 }
