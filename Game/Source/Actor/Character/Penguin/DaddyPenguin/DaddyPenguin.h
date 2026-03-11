@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/CharacterBase.h"
+#include "Source/Actor/Character/Penguin/PenguinBase.h"
 
 
 namespace app
@@ -18,7 +18,7 @@ namespace app
 		/**
 		 * @brief 親ペンギンクラス
 		 */
-		class DaddyPenguin : public CharacterBase
+		class DaddyPenguin : public PenguinBase
 		{
 		public:
 			/**
