@@ -56,6 +56,67 @@ namespace nsBeastEngine
 	}
 
 
+	void ModelRender::InitOcean(ModelInitData& initData, const char* tkmFilePath)
+	{
+		m_isFowardRender = true;
+		m_enableReflection[ReflectLayer::enOcean] = false;
+
+		initData.m_colorBufferFormat[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		m_frowardRenderModel.Init(initData);
+		m_frowardRenderModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		//InitModelOnZprepass(tkmFilePath, enModelUpAxisZ);
+		//InitInstancingDraw(1);
+	}
+
+
+	void ModelRender::InitModelOnZprepass(const char* tkmFilePath, EnModelUpAxis modelUpAxis, bool isSkyCube)
+	{
+		ModelInitData modelInitData;
+		modelInitData.m_tkmFilePath = tkmFilePath;
+		modelInitData.m_fxFilePath = "Assets/shader/ZPrepass.fx";
+		modelInitData.m_modelUpAxis = modelUpAxis;
+
+		//ノンスキンメッシュ用の頂点シェーダーのエントリーポイントを指定する。
+		modelInitData.m_vsEntryPointFunc = "VSMain";
+
+		//アニメーションがあるならVSSkinMainを指定。
+		if (m_animationClips != nullptr)
+		{
+			//スケルトンを指定する。
+			modelInitData.m_skeleton = &m_skeleton;
+
+			if (m_isEnableInstancingDraw) {
+				modelInitData.m_vsSkinEntryPointFunc = "VSSkinInstancingMain";
+			}
+			else {
+				modelInitData.m_vsSkinEntryPointFunc = "VSSkinMain";
+			}
+
+		}
+		else
+		{
+			if (m_isEnableInstancingDraw) {
+				modelInitData.m_vsEntryPointFunc = "VSInstancingMain";
+			}
+			else {
+				modelInitData.m_vsEntryPointFunc = "VSMain";
+			}
+		}
+
+		if (isSkyCube) {
+			modelInitData.m_psEntryPointFunc = "PSSkyCubeMain";
+		}
+
+		modelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		if (m_isEnableInstancingDraw) {
+			// インスタンシング描画を行う場合は、拡張SRVにインスタンシング描画用のデータを設定する。
+			modelInitData.m_expandShaderResoruceView[0] = &m_worldMatrixArraySB;
+		}
+
+		m_zprepassModel.Init(modelInitData);
+	}
+
+
 	void ModelRender::OnRenderShadowMap(RenderContext& rc)
 	{
 		m_shadowModels.Draw(rc);
@@ -120,7 +181,12 @@ namespace nsBeastEngine
 
 	void ModelRender::Draw(RenderContext& rc)
 	{
-		g_renderingEngine->RegisterModel(&m_model);
+		if (m_isFowardRender) {
+			g_renderingEngine->RegisterModel(&m_frowardRenderModel);
+		}
+		else {
+			g_renderingEngine->RegisterModel(&m_model);
+		}
 		g_renderingEngine->AddRenderObject(this);
 	}
 }

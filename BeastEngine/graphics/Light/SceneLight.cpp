@@ -11,45 +11,47 @@ namespace nsBeastEngine
 {
 	SPointLight* SceneLight::NewPointLight()
 	{
-		/** ライトの数が上限に達していたら作らない */
-		if (m_light.m_usedPointLightCount >= MAX_POINT_LIGHT) return nullptr;
+		///** ライトの数が上限に達していたら作らない */
+		//if (m_light.m_usedPointLightCount >= MAX_POINT_LIGHT) return nullptr;
 
-		/** 昇順でライトを登録 */
-		for (int i = 0; i <= MAX_POINT_LIGHT; i++)
-		{
-			/** 使用されていないライトがあったら使用中にして登録する */
-			if (m_light.m_pointLight[i].m_isUsed == false)
-			{
-				/* ライトを使用中にする */
-				m_light.m_pointLight[i].SetIsUsed();
-				/* ライトの数を増やす */
-				m_light.m_usedPointLightCount++;
-				/** 使用中にしたポイントライトのアドレスを返す */
-				return &m_light.m_pointLight[i];
-			}
-		}
+		///** 昇順でライトを登録 */
+		//for (int i = 0; i <= MAX_POINT_LIGHT; i++)
+		//{
+		//	/** 使用されていないライトがあったら使用中にして登録する */
+		//	if (m_light.m_pointLight[i].m_isUsed == false)
+		//	{
+		//		/* ライトを使用中にする */
+		//		m_light.m_pointLight[i].SetIsUsed();
+		//		/* ライトの数を増やす */
+		//		m_light.m_usedPointLightCount++;
+		//		/** 使用中にしたポイントライトのアドレスを返す */
+		//		return &m_light.m_pointLight[i];
+		//	}
+		//}
+		return nullptr;
 	}
 
 
 	SSpotLight* SceneLight::NewSpotLight()
 	{
-		/** ライトの数が上限に達していたら作らない */
-		if (m_light.m_usedSpotLightCount >= MAX_SPOT_LIGHT) return nullptr;
+		///** ライトの数が上限に達していたら作らない */
+		//if (m_light.m_usedSpotLightCount >= MAX_SPOT_LIGHT) return nullptr;
 
-		/** 昇順でライトを登録 */
-		for (int i = 0; i <= MAX_SPOT_LIGHT; i++)
-		{
-			/** 使用されていないライトがあったら使用中にして登録する */
-			if (m_light.m_spotLight[i].m_isUsed == false)
-			{
-				/* ライトを使用中にする */
-				m_light.m_spotLight[i].SetIsUsed();
-				/* ライトの数を増やす */
-				m_light.m_usedSpotLightCount++;
-				/** 使用中にしたスポットライトのアドレスを返す */
-				return &m_light.m_spotLight[i];
-			}
-		}
+		///** 昇順でライトを登録 */
+		//for (int i = 0; i <= MAX_SPOT_LIGHT; i++)
+		//{
+		//	/** 使用されていないライトがあったら使用中にして登録する */
+		//	if (m_light.m_spotLight[i].m_isUsed == false)
+		//	{
+		//		/* ライトを使用中にする */
+		//		m_light.m_spotLight[i].SetIsUsed();
+		//		/* ライトの数を増やす */
+		//		m_light.m_usedSpotLightCount++;
+		//		/** 使用中にしたスポットライトのアドレスを返す */
+		//		return &m_light.m_spotLight[i];
+		//	}
+		//}
+		return nullptr;
 	}
 
 
@@ -60,7 +62,7 @@ namespace nsBeastEngine
 		m_light.m_drectionLight.SetColor(1.7f, 1.7f, 1.7f);
 		/** カメラの位置の登録 */
 		m_light.m_cameraPosition = g_camera3D->GetPosition();
-		m_light.m_drectionLight.m_LVP = g_camera3D->GetViewProjectionMatrix();
+		//m_light.m_drectionLight.m_LVP = g_camera3D->GetViewProjectionMatrix();
 		/** 環境光の設定 */
 		m_light.SetAmbientLight(0.5f, 0.5f, 0.5f);
 	}
