@@ -28,6 +28,8 @@ namespace app
 			/** 描画するかのフラグ */
 			bool m_isDraw;
 
+			uint32_t key_;
+
 
 		public:
 			UIBase()
@@ -48,6 +50,14 @@ namespace app
 			virtual void Update() = 0;
 			/** 描画処理 */
 			virtual void Render(RenderContext& rc) = 0;
+
+
+		public:
+			void SetKey(const uint32_t key)
+			{
+				key_ = key;
+			}
+			uint32_t GetKey() const { return key_; }
 
 
 		public:
@@ -431,12 +441,12 @@ namespace app
 		 */
 		class UICanvas : public UIBase
 		{
-			/** friendclassの宣言 */
 			friend class UIBase;
 			friend class UIImage;
-			friend class UIDigit;
-			friend class UIButton;
 			friend class UIGauge;
+			friend class UIIcon;
+			friend class UIText;
+			friend class UIButton;
 
 
 		public:
@@ -444,60 +454,46 @@ namespace app
 			~UICanvas();
 
 
-			/** 更新処理 */
-			void Update();
-			/** 描画処理 */
-			void Render(RenderContext& rc);
+			void Update() override;
+			void Render(RenderContext& rc) override;
 
 
 		public:
-			/**
-			 * @brief UIの生成
-			 * @tparam T 派生クラス
-			 * @return 生成されたインスタンスを返す
-			 */
-			template<typename T>
+			template <typename T>
 			void CreateUI(const uint32_t key)
 			{
 				auto ui = std::make_unique<T>();
+				ui->SetKey(key);
 				ui->m_transform.SetParent(&m_transform);
-				m_uiMap.emplace(key, std::move(ui));
+				uiList_.push_back(std::move(ui));
 			}
 
-			
-			/**
-			 * @brief キーを消去
-			 * @param key UIBaseのキーを消去
-			 */
+
 			void RemoveUI(const uint32_t key)
 			{
-				m_uiMap.erase(key);
+				// TODO:本当はstd::find使いたい
+				for (auto it = uiList_.begin(); it != uiList_.end(); it++) {
+					if ((*it)->GetKey() == key) {
+						uiList_.erase(it);
+						break;
+					}
+				}
 			}
 
 
-			/**
-			 * @brief キーを探す(セカンドの中身を取得)
-			 * @param key UIBaseのキー
-			 */
-			template<typename T>
+			template <typename T>
 			T* FindUI(const uint32_t key)
 			{
-				auto it = m_uiMap.find(key);
-				if (it != m_uiMap.end())
-				{
-					return dynamic_cast<T*>(it->second.get());
+				// TODO:本当はstd::find使いたい
+				for (auto it = uiList_.begin(); it != uiList_.end(); it++) {
+					if ((*it)->GetKey() == key) {
+						return dynamic_cast<T*>(it->get());
+					}
 				}
 				return nullptr;
 			}
-
-
 		private:
-			/**
-			 * @brief キーと値を保持する
-			 * @brief 各UI自体に親子関係持たせたいけど使わない可能性があるので、
-			 * 一旦ここだけにしてみる
-			 */
-			std::unordered_map<uint32_t, std::unique_ptr<UIBase>>m_uiMap;
+			std::vector<std::unique_ptr<UIBase>> uiList_;
 		};
 	}
 }

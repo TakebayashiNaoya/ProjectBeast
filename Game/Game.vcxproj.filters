@@ -158,6 +158,9 @@
       <Filter>Source\Util</Filter>
     </ClCompile>
     <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Source\UI\SoundOptionMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -287,5 +290,8 @@
       <Filter>Source\Util</Filter>
     </ClInclude>
     <ClInclude Include="Test.h" />
+    <ClInclude Include="Source\UI\SoundOptionMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

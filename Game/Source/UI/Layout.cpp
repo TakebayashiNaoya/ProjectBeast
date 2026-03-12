@@ -170,6 +170,7 @@ void InitializeUIParts(app::ui::UIDigit* digit, const nlohmann::json& item)
 	digit->m_transform.m_localTransform.m_position = position;
 	digit->m_transform.m_localTransform.m_scale = scale;
 	digit->m_transform.m_localTransform.m_rotation = rotation;
+	digit->m_color = Vector4::White;
 }
 
 
@@ -261,13 +262,13 @@ namespace app
 			//	InitializeUIParts(button, item);
 			//	return button;
 			//}
-			//if (type == "UIDigit")
-			//{
-			//	canvas->CreateUI<UIDigit>(key);
-			//	auto* digit = canvas->FindUI<UIDigit>(key);
-			//	InitializeUIParts(digit, item);
-			//	return digit;
-			//}
+			if (type == "UIDigit")
+			{
+				canvas->CreateUI<UIDigit>(key);
+				auto* digit = canvas->FindUI<UIDigit>(key);
+				InitializeUIParts(digit, item);
+				return digit;
+			}
 			return nullptr;
 		}
 	}

@@ -208,6 +208,11 @@ namespace app
 
 		UIDigit::~UIDigit()
 		{
+			for (const auto* render : m_renderList)
+			{
+				delete render;
+				render = nullptr;
+			}
 		}
 
 
@@ -292,7 +297,7 @@ namespace app
 
 			/** 対象の桁の数字 */
 			const int targetDigitNumber = GetDigit(targetDigit);
-			std::string assetName = m_assetsPath + "/.dds";
+			std::string assetName = m_assetsPath + "/0.dds";
 			assetName[assetName.size() - 5] = '0' + targetDigitNumber;
 			nextRender->Init(assetName.c_str(), m_wide, m_height);
 		}
@@ -325,30 +330,30 @@ namespace app
 
 		UICanvas::UICanvas()
 		{
-			m_uiMap.clear();
+			uiList_.clear();
 		}
 
 
 		UICanvas::~UICanvas()
 		{
-			m_uiMap.clear();
+			uiList_.clear();
 		}
 
 
 		void UICanvas::Update()
 		{
-			for (auto& ui : m_uiMap)
+			for (auto& ui : uiList_)
 			{
-				ui.second->Update();
+				ui->Update();
 			}
 		}
 
 
 		void UICanvas::Render(RenderContext& rc)
 		{
-			for (auto& ui : m_uiMap)
+			for (auto& ui : uiList_)
 			{
-				ui.second->Render(rc);
+				ui->Render(rc);
 			}
 		}
 	}

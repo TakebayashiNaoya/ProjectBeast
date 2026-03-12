@@ -261,6 +261,7 @@
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
+    <ClCompile Include="Source\UI\SoundOptionMenu.cpp" />
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
@@ -311,6 +312,7 @@
     <ClInclude Include="Source\Types.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
+    <ClInclude Include="Source\UI\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\Util\CRC32.h" />
