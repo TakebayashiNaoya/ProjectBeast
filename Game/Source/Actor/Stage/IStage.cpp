@@ -14,7 +14,7 @@ namespace app
 		void IStageObject::Start()
 		{
 			/** 物理判定を作成 */
-			m_physicsStaticObject.CreateFromModel(m_modelRender.GetModel(), m_modelRender.GetModel().GetWorldMatrix());
+			//m_physicsStaticObject.CreateFromModel(m_modelRender.GetModel(), m_modelRender.GetModel().GetWorldMatrix());
 		}
 
 

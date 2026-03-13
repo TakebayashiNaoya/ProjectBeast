@@ -10,10 +10,13 @@
 
 namespace nsBeastEngine
 {
-	void BoxCollider::Create(const Vector3& size)
+	namespace nsCollision
 	{
-		/** BulletのbtBoxShapeは半分のサイズを指定する必要があるため、0.5倍して渡す */
-		shape = std::make_unique<btBoxShape>(btVector3(size.x * 0.5f, size.y * 0.5f, size.z * 0.5f));
+		void BoxCollider::Create(const Vector3& size)
+		{
+			/** BulletのbtBoxShapeは半分のサイズを指定する必要があるため、0.5倍して渡す */
+			m_shape = std::make_unique<btBoxShape>(btVector3(size.x * 0.5f, size.y * 0.5f, size.z * 0.5f));
+		}
 	}
 }
 

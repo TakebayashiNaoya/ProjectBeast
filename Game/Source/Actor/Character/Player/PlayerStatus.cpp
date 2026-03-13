@@ -13,10 +13,17 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** プレイヤーのパラメーターのファイルパス */
+			const char* PARAMETER_FILE_PATH = "Assets/parameter/character/player/PlayerParameter.json";
+		}
+
+
 		PlayerStatus::PlayerStatus()
 		{
 			// 外部ファイルを読み込み
-			core::ParameterManager::Get()->LoadParameter<MasterPlayerParameter>("Assets/parameter/player/PlayerParameter.json", [](const nlohmann::json& j, MasterPlayerParameter& parameter)
+			core::ParameterManager::Get()->LoadParameter<MasterPlayerParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterPlayerParameter& parameter)
 				{
 					parameter.maxHp = j["maxHp"].get<int>();
 					parameter.hp = j["hp"].get<int>();

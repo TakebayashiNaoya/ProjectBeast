@@ -48,17 +48,41 @@
     <ClCompile Include="Physics\Physics.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\PhysicsGhostObject.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics\PhysicsStaticObject.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Physics\RigidBody.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="Physics\SphereCollider.cpp">
       <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\GhostBody.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicalBody.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\GhostPrimitive.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\GhostBodyManager.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BoundingVolume.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BroadphaseImpl.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BroadphaseInterface.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Nature\Ocean.cpp">
+      <Filter>Nature</Filter>
+    </ClCompile>
+    <ClCompile Include="Nature\PlaneReflectionPass.cpp">
+      <Filter>Nature</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource\ResourceManager.cpp">
+      <Filter>Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,17 +145,47 @@
     <ClInclude Include="Physics\Physics.h">
       <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\PhysicsGhostObject.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\PhysicsStaticObject.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\RigidBody.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="Physics\SphereCollider.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\GhostBody.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PhysicalBody.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\GhostPrimitive.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Types.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\GhostBodyManager.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\BroadphaseInterface.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\BoundingVolume.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\BroadphaseImpl.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Nature\Ocean.h">
+      <Filter>Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Nature\PlaneReflectionPass.h">
+      <Filter>Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\GraphicsEnums.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\ResourceManager.h">
+      <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +200,9 @@
     </Filter>
     <Filter Include="Physics">
       <UniqueIdentifier>{339029f3-ca70-419a-8414-cf7e1eb1567e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{72e20d92-4345-4646-9155-7f21c180bf74}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

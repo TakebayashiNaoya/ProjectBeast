@@ -5,9 +5,13 @@
 #include "Physics.h"
 #include "SphereCollider.h"
 
-namespace nsBeastEngine {
-	void SphereCollider::Create(const float radius)
+namespace nsBeastEngine
+{
+	namespace nsCollision
 	{
-		m_shape = std::make_unique<btSphereShape>(radius);
+		void SphereCollider::Create(const float radius)
+		{
+			m_shape = std::make_unique<btSphereShape>(radius);
+		}
 	}
 }

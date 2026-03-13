@@ -144,6 +144,7 @@ namespace nsBeastEngine
 			model->Draw(rc);
 		}
 		// m_postEffect.Render(rc, m_mainRenderTarget); // ★一時コメントアウト
+		EffectEngine::GetInstance()->Draw();
 		Render2D(rc);
 		CopyMainRenderTargetToFrameBufferSprite(rc);
 		m_registerModels.clear();
