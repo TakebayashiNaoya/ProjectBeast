@@ -24,15 +24,16 @@ namespace app
 			};
 
 
-			ModelData MODEL_DATA =
-			{
-				"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
-				ANIMATION_DATA,
-				//nullptr,
-				EnModelUpAxis::enModelUpAxisY,
-				std::size(ANIMATION_DATA)
-				//0
-			};
+			static const ModelData ENEMY_MODEL_DATA =
+				ModelData(
+					"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
+					//"Assets/modelData/unityChan.tkm",
+					//ANIMATION_DATA,
+					nullptr,
+					EnModelUpAxis::enModelUpAxisY,
+					//std::size(ANIMATION_DATA)
+					0
+				);
 
 		}
 
@@ -47,7 +48,7 @@ namespace app
 
 		void Enemy::Start()
 		{
-			//Init(MODEL_DATA);
+			Init(ENEMY_MODEL_DATA);
 			CharacterBase::Start();
 		}
 

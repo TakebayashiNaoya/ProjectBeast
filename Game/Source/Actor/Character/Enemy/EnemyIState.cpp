@@ -25,7 +25,9 @@ namespace app
 
 
 		void EnemyIdleState::Enter()
-		{}
+		{
+
+		}
 
 
 		void EnemyIdleState::Update()
@@ -47,9 +49,7 @@ namespace app
 
 
 		void EnemyWanderingState::Enter()
-		{
-
-		}
+		{}
 
 
 		void EnemyWanderingState::Update()
@@ -82,9 +82,7 @@ namespace app
 
 
 		void EnemyChaceState::Enter()
-		{
-
-		}
+		{}
 
 
 		void EnemyChaceState::Update()
