@@ -1,0 +1,234 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"MasterVolumeTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/TextMasterVolume.dds",
+                "width":160,
+                "height":50,
+                "position":[ -540, 130, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"VoiceVolumeTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/TextVoiceVolume.dds",
+                "width":130,
+                "height":50,
+                "position":[ -555, 20, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SEVolumeTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/TextSEVolume.dds",
+                "width":90,
+                "height":48,
+                "position":[ -555, -92, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"BGMVolumeTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/TextBGMVolume.dds",
+                "width":150,
+                "height":50,
+                "position":[ -548, -200, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]  
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundOptionTitleBackFrameIcon",
+                "asset":"Assets/spriteData/UI/Frame/TitleFrame.dds",
+                "width":900,
+                "height":118,
+                "position":[ -330, 290, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 100]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundOptionTitleIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/TextSoundOption.dds",
+                "width":600,
+                "height":70,
+                "position":[ -330, 300, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundOptionLowGroundIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/LowGround.dds",
+                "width":680,
+                "height":40,
+                "position":[ -289, 244, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIGauge",
+                "name":"SoundOptionMasterGauge",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "width":1000,
+                "height":50,
+                "position":[ -420, 130, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0, 0.5]
+            },
+            {
+                "type":"UIGauge",
+                "name":"SoundOptionVoiceGauge",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "width":1000,
+                "height":50,
+                "position":[ -420, 20, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0, 0.5]
+            },
+            {
+                "type":"UIGauge",
+                "name":"SoundOptionSEGauge",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "width":1000,
+                "height":50,
+                "position":[ -420, -90, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0, 0.5]
+            },
+            {
+                "type":"UIGauge",
+                "name":"SoundOptionBGMGauge",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "width":1000,
+                "height":50,
+                "position":[ -420, -200, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0, 0.5]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundKnobMasterIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "width":40,
+                "height":78,
+                "position":[ 580, 130, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundKnobVoiceIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "width":40,
+                "height":78,
+                "position":[ 580, 20, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundKnobSEIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "width":40,
+                "height":78,
+                "position":[ 580, -90, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundKnobBGMIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "width":40,
+                "height":78,
+                "position":[ 580 , -200, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundLeftArrowIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/LeftArrowIcon.dds",
+                "width":80,
+                "height":60,
+                "position":[ -700, 290, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 200]
+            },
+            {
+                "type":"UIDigit",
+                "name":"SoundMasterDigit",
+                "asset":"Assets/spriteData/UI/Number",
+                "digit":3,
+                "number":100,
+                "width":30,
+                "height":40,
+                "position":[ 700, 130, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0
+            },
+            {
+                "type":"UIDigit",
+                "name":"SoundVoiceDigit",
+                "asset":"Assets/spriteData/UI/Number",
+                "digit":3,
+                "number":100,
+                "width":30,
+                "height":40,
+                "position":[ 700, 20, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0
+            },
+            {
+                "type":"UIDigit",
+                "name":"SoundSEDigit",
+                "asset":"Assets/spriteData/UI/Number",
+                "digit":3,
+                "number":100,
+                "width":30,
+                "height":40,
+                "position":[ 700, -90, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0
+            },
+            {
+                "type":"UIDigit",
+                "name":"SoundBGMDigit",
+                "asset":"Assets/spriteData/UI/Number",
+                "digit":3,
+                "number":100,
+                "width":30,
+                "height":40,
+                "position":[ 700, -200, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0
+            }
+        ]
+    }
+}
