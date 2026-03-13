@@ -14,15 +14,14 @@ namespace app
 		/** 前方宣言 */
 		class Enemy;
 		class EnemyStatus;
-		class EnemyIState;
 
 		class Player;
 
 
-		class EnemyStateMachine :public StateMachineBase
+		class EnemyStateMachine :public core::StateMachineBase
 		{
 		public:
-			IState* GetChangeState();
+			core::IState* GetChangeState();
 
 
 		public:
@@ -166,8 +165,8 @@ namespace app
 			EnemyStatus* m_ownerStatus = nullptr;
 
 			/** 今のステータス */
-			IState* m_currentState = nullptr;
-			IState* m_nextState = nullptr;
+			core::IState* m_currentState = nullptr;
+			core::IState* m_nextState = nullptr;
 
 			/** プレイヤーの方向を取る変数(スティック入力の方向) */
 			Vector3 m_direction = Vector3::Zero;

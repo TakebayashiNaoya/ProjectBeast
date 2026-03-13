@@ -24,16 +24,16 @@ namespace app
 			};
 
 
-			static const ModelData ENEMY_MODEL_DATA =
-				ModelData(
-					"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
-					//"Assets/modelData/unityChan.tkm",
-					//ANIMATION_DATA,
-					nullptr,
-					EnModelUpAxis::enModelUpAxisY,
-					//std::size(ANIMATION_DATA)
-					0
-				);
+			ModelData ENEMY_MODEL_DATA =
+			{
+				"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
+				//"Assets/modelData/unityChan.tkm",
+				//ANIMATION_DATA,
+				nullptr,
+				EnModelUpAxis::enModelUpAxisY,
+				//std::size(ANIMATION_DATA)
+				0
+			};
 
 		}
 
