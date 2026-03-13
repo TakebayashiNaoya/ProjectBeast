@@ -177,6 +177,7 @@
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -322,5 +323,6 @@
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h" />
   </ItemGroup>
 </Project>

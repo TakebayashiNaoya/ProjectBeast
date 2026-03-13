@@ -66,7 +66,8 @@ namespace app
 			enum EnEnemyStateID
 			{
 				enEnemyState_Idle,
-				enEnemyState_Move,
+				enEnemyState_Wandering,
+				enEnemyState_Chase,
 				enEnemyState_Jump,
 				enEnemyState_Swim,
 				enEnemyState_Attack,
@@ -136,12 +137,21 @@ namespace app
 
 
 			/**
-			 * 移動
+			 * 徘徊
 			 */
-			static void EnterMove(EnemyController* enemy);
-			static void UpdateMove(EnemyController* enemy);
-			static void ExitMove(EnemyController* enemy);
-			static int CheckMove(EnemyController* enemy);
+			static void EnterWandering(EnemyController* enemy);
+			static void UpdateWandering(EnemyController* enemy);
+			static void ExitWandering(EnemyController* enemy);
+			static int CheckWandering(EnemyController* enemy);
+
+
+			/**
+			 * チェイス
+			 */
+			static void EnterChase(EnemyController* enemy);
+			static void UpdateChase(EnemyController* enemy);
+			static void ExitChase(EnemyController* enemy);
+			static int CheckChase(EnemyController* enemy);
 
 
 			/**

@@ -4,9 +4,9 @@
  * @author 立山
  */
 #include "stdafx.h"
-#include "EnemyController.h"
-
 #include "Enemy.h"
+#include "EnemyController.h"
+#include "EnemyControllerManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 
 
@@ -16,6 +16,8 @@ namespace app
 	{
 		// static変数の初期化
 		std::map<EnemyController::EnEnemyStateID, EnemyController::AIState> EnemyController::m_stateMap;
+
+
 		EnemyController::EnemyController()
 		{
 			static bool ini = false;
@@ -24,11 +26,15 @@ namespace app
 				Initialize();
 				ini = true;
 			}
+
+			EnemyControllerManager::GetInstance()->Register(this);
 		}
 
 
 		EnemyController::~EnemyController()
-		{}
+		{
+			EnemyControllerManager::GetInstance()->UnRegister(this);
+		}
 
 
 		bool EnemyController::Start()
@@ -90,8 +96,10 @@ namespace app
 		{
 			/** 待機 */
 			RegisterState(enEnemyState_Idle, EnterIdle, UpdateIdle, ExitIdle, CheckIdle);
-			/** 移動 */
-			RegisterState(enEnemyState_Move, EnterMove, UpdateMove, ExitMove, CheckMove);
+			/** 徘徊 */
+			RegisterState(enEnemyState_Wandering, EnterWandering, UpdateWandering, ExitWandering, CheckWandering);
+			/** チェイス */
+			RegisterState(enEnemyState_Chase, EnterChase, UpdateChase, ExitChase, CheckChase);
 			/** ジャンプ */
 			RegisterState(enEnemyState_Jump, EnterJump, UpdateJump, ExitJump, CheckJump);
 			/** 泳ぐ */
@@ -121,32 +129,87 @@ namespace app
 
 		int EnemyController::CheckIdle(EnemyController* enemy)
 		{
-
 			return enEnemyState_Invalid;
 		}
 
 
 
 		/** 移動 */
-		void EnemyController::EnterMove(EnemyController* enemy)
+		void EnemyController::EnterWandering(EnemyController* enemy)
 		{
+			bool isXReverse = rand() % 2 >= 1;
+			bool isZReverse = rand() % 2 >= 1;
 
+			enemy->m_targetPosition = Vector3(
+				static_cast<float>(rand() % 300) * (isXReverse ? 1.0f : -1.0f),
+				0.0f,
+				static_cast<float>(rand() % 300) * (isZReverse ? 1.0f : -1.0f)
+			);
 		}
 
 
-		void EnemyController::UpdateMove(EnemyController* enemy)
+		void EnemyController::UpdateWandering(EnemyController* enemy)
 		{
+			Vector3 pos = enemy->m_target->GetTransform().m_position;
 
+			// 目標方向
+			Vector3 dir = enemy->m_targetPosition - pos;
+
+			float distance = dir.Length();
+
+			// まだ遠いなら移動
+			if (distance > 0.1f)
+			{
+				dir.Normalize();
+
+				float speed = 5.0f;
+
+				pos += dir * speed * g_gameTime->GetFrameDeltaTime();
+			}
 		}
 
 
-		void EnemyController::ExitMove(EnemyController* enemy)
+		void EnemyController::ExitWandering(EnemyController* enemy)
 		{}
 
 
-		int EnemyController::CheckMove(EnemyController* enemy)
+		int EnemyController::CheckWandering(EnemyController* enemy)
+		{
+			Vector3 pos = enemy->m_target->GetTransform().m_position;
+
+			float distance = (enemy->m_targetPosition - pos).Length();
+
+			// 到達したらIdleへ
+			if (distance < 0.5f)
+			{
+				return enEnemyState_Idle;
+			}
+
+			return enEnemyState_Invalid;
+		}
+
+
+		/** チェイス */
+		void EnemyController::EnterChase(EnemyController* enemy)
 		{
 
+		}
+
+
+		void EnemyController::UpdateChase(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::ExitChase(EnemyController* enemy)
+		{
+
+		}
+
+
+		int EnemyController::CheckChase(EnemyController* enemy)
+		{
 			return enEnemyState_Invalid;
 		}
 
