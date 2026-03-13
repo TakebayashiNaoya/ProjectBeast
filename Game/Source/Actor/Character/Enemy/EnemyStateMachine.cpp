@@ -60,22 +60,22 @@ namespace app
 		{
 			if (CanChangeIdle())
 			{
-				return m_currentState = FindState(EnemyIdleState::ID());
+				return FindState(EnemyIdleState::ID());
 			}
 			if (CanChangeWandering())
 			{
-				return m_currentState = FindState(EnemyWanderingState::ID());
+				return FindState(EnemyWanderingState::ID());
 			}
 			if (CanChangeChace())
 			{
-				return m_currentState = FindState(EnemyChaceState::ID());
+				return FindState(EnemyChaceState::ID());
 			}
 			if (CanChangeAttack())
 			{
-				return m_currentState = FindState(EnemyAttackState::ID());
+				return FindState(EnemyAttackState::ID());
 			}
 
-			return m_currentState = FindState(EnemyIdleState::ID());
+			return FindState(EnemyIdleState::ID());
 		}
 
 

@@ -14,8 +14,17 @@ namespace app
 {
 	namespace actor
 	{
+		// static変数の初期化
+		std::map<EnemyController::EnEnemyStateID, EnemyController::AIState> EnemyController::m_stateMap;
 		EnemyController::EnemyController()
-		{}
+		{
+			static bool ini = false;
+			if (!ini)
+			{
+				Initialize();
+				ini = true;
+			}
+		}
 
 
 		EnemyController::~EnemyController()
@@ -30,25 +39,28 @@ namespace app
 
 		void EnemyController::Update()
 		{
-			auto* targetStateMachine = m_target->GetEnemyStateMachine();
-
-			targetStateMachine->SetActionButtonA(GetPad()->IsTrigger(enButtonA));
-
-			targetStateMachine->SetActionButtonX(GetPad()->IsTrigger(enButtonX));
-
-
-			if (IsInputStickL())
-			{
-				// 左スティックの方向
-				targetStateMachine->SetRotation(ComputeRotation());
-
-				//左スティックの入力量を取得
-				targetStateMachine->SetDirection(GetStickL());
-
+			auto* currentState = FindAIState(m_currentState);
+			if (currentState == nullptr) {
+				K2_ASSERT(false, "対象の処理が見つかりません\n");
+				return;
 			}
-			// スティックの入力量を設定する
-			// 0～1の範囲で入力量を取得
-			targetStateMachine->SetStickLAmount(GetStickL().Length());
+
+			/** 初回起動時のEnter処理 */
+			if (!m_isInitialized) {
+				currentState->enter(this);
+				m_isInitialized = true;
+			}
+
+			/** 遷移判定 */
+			const int nextState = currentState->check(this);
+			if (nextState != -1 && nextState != m_currentState) {
+				ChangeState((EnEnemyStateID)nextState);
+				currentState = FindAIState(m_currentState);
+			}
+
+			/** 現在のステートのアップデート */
+			currentState->update(this);
+
 		}
 
 
@@ -56,42 +68,146 @@ namespace app
 		{}
 
 
-		Vector3 EnemyController::GetStickL()
+		void EnemyController::ChangeState(EnEnemyStateID nextState)
 		{
-			// 左スティックの入力量を取得
-			Vector3 stickL;
-			stickL.x = GetPad()->GetLStickXF();
-			stickL.y = GetPad()->GetLStickYF();
+			/** 指定したnextStateがおかしい */
+			if (nextState < enEnemyState_Invalid || nextState >= enEnemyState_Num) {
+				return;
+			}
 
-			// カメラの前方向と右方向のベクトルを取得
-			Vector3 forward = g_camera3D->GetForward();
-			Vector3 right = g_camera3D->GetRight();
-
-			//y方向には移動しない
-			forward.y = 0.0f;
-			right.y = 0.0f;
-
-			//左スティックの入力量を加算
-			right *= stickL.x;
-			forward *= stickL.y;
-
-			Vector3 direction = right + forward;
-			//正規化
-			direction.Normalize();
-
-			return direction;
+			auto* currentState = FindAIState(m_currentState);
+			/** 現在のステートのExit処理 */
+			currentState->exit(this);
+			/** ステートの更新 */
+			m_currentState = nextState;
+			/** 新しいステートのEnterを呼ぶ */
+			currentState = FindAIState(m_currentState);
+			currentState->enter(this);
 		}
 
 
-		Quaternion EnemyController::ComputeRotation()
+		void EnemyController::Initialize()
 		{
-			//スティックの方向
-			Vector3 direction = GetStickL();
-			// スティック入力を使ってY軸回転の情報を得る
-			Quaternion qRot;
-			qRot.SetRotationYFromDirectionXZ(direction);
+			/** 待機 */
+			RegisterState(enEnemyState_Idle, EnterIdle, UpdateIdle, ExitIdle, CheckIdle);
+			/** 移動 */
+			RegisterState(enEnemyState_Move, EnterMove, UpdateMove, ExitMove, CheckMove);
+			/** ジャンプ */
+			RegisterState(enEnemyState_Jump, EnterJump, UpdateJump, ExitJump, CheckJump);
+			/** 泳ぐ */
+			RegisterState(enEnemyState_Swim, EnterSwim, UpdateSwim, ExitSwim, CheckSwim);
+			/** 攻撃 */
+			RegisterState(enEnemyState_Attack, EnterAttack, UpdateAttack, ExitAttack, CheckAttack);
+		}
 
-			return qRot;
+
+		/** 各ステートの処理はこの下に書いていく */
+
+
+			/** 待機 */
+		void EnemyController::EnterIdle(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::UpdateIdle(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::ExitIdle(EnemyController* enemy)
+		{}
+
+
+		int EnemyController::CheckIdle(EnemyController* enemy)
+		{
+
+			return enEnemyState_Invalid;
+		}
+
+
+
+		/** 移動 */
+		void EnemyController::EnterMove(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::UpdateMove(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::ExitMove(EnemyController* enemy)
+		{}
+
+
+		int EnemyController::CheckMove(EnemyController* enemy)
+		{
+
+			return enEnemyState_Invalid;
+		}
+
+
+
+		/** ジャンプ */
+		void EnemyController::EnterJump(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::UpdateJump(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::ExitJump(EnemyController* enemy)
+		{}
+
+
+		int EnemyController::CheckJump(EnemyController* enemy)
+		{
+			return enEnemyState_Invalid;
+		}
+
+
+
+		/** 泳ぐ */
+		void EnemyController::EnterSwim(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::UpdateSwim(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::ExitSwim(EnemyController* enemy)
+		{}
+
+
+		int EnemyController::CheckSwim(EnemyController* enemy)
+		{
+			return enEnemyState_Invalid;
+		}
+
+
+
+		/** 攻撃 */
+		void EnemyController::EnterAttack(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::UpdateAttack(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::ExitAttack(EnemyController* enemy)
+		{}
+
+
+		int EnemyController::CheckAttack(EnemyController* enemy)
+		{
+			return enEnemyState_Invalid;
 		}
 	}
 }
