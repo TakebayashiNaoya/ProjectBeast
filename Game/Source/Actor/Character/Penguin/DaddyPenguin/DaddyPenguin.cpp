@@ -7,12 +7,25 @@
 #include "DaddyPenguin.h"
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 
 
 namespace app
 {
 	namespace actor
 	{
+
+		namespace
+		{
+			const ModelData MODEL_DATA =
+			{
+				"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
+				ANIMATION_DATA,
+				EnModelUpAxis::enModelUpAxisY,
+				std::size(ANIMATION_DATA)
+			};
+		}
+
 
 		DaddyPenguin::DaddyPenguin()
 		{
@@ -24,7 +37,7 @@ namespace app
 
 		void DaddyPenguin::Start()
 		{
-			PenguinBase::Init(EnPenguinType::Daddy);
+			CharacterBase::Init(MODEL_DATA);
 			PenguinBase::Start();
 		}
 
