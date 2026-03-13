@@ -37,6 +37,9 @@
     <Filter Include="Source\Achievement">
       <UniqueIdentifier>{8dd5c9a7-828b-46f3-9b18-9042d2de824e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Actor\Character\Enemy">
+      <UniqueIdentifier>{43478fe8-bc95-4006-80d2-755fcfe20067}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Actor\Character\penguin">
       <UniqueIdentifier>{96a86590-7162-4a66-aa1f-738d6c97706b}</UniqueIdentifier>
     </Filter>
@@ -167,6 +170,27 @@
       <Filter>Source\Util</Filter>
     </ClCompile>
     <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\Enemy.cpp">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyController.cpp">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStateMachine.cpp">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStatus.cpp">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp" />
+     <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp" />
+     <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
@@ -341,6 +365,27 @@
       <Filter>Source\Util</Filter>
     </ClInclude>
     <ClInclude Include="Test.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\Enemy.h">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyController.h">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStateMachine.h">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStatus.h">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h" />
+     <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h" />
+     <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\SoundOptionMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
