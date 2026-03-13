@@ -56,7 +56,7 @@ namespace app
 		}
 
 
-		IState* EnemyStateMachine::GetChangeState()
+		core::IState* EnemyStateMachine::GetChangeState()
 		{
 			if (CanChangeIdle())
 			{

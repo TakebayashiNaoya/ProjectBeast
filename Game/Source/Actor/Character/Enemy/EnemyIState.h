@@ -16,7 +16,7 @@ namespace app
 		class EnemyStateMachine;
 
 
-		class EnemyIState :public IState
+		class EnemyIState :public core::IState
 		{
 		public:
 			virtual void Enter() override {}
