@@ -9,7 +9,7 @@
 
 namespace app
 {
-	namespace actor
+	namespace core
 	{
 		StateMachineBase::StateMachineBase()
 			: m_currentState(nullptr)
