@@ -20,7 +20,7 @@ namespace app
 		/**
 		 * @brief プレイヤーのステートマシンクラス
 		 */
-		class PlayerStateMachine : public StateMachineBase
+		class PlayerStateMachine : public core::StateMachineBase
 		{
 		public:
 
@@ -28,7 +28,7 @@ namespace app
 
 		public:
 			/** ステートの変更先を取得する */
-			IState* GetChangeState();
+			core::IState* GetChangeState();
 
 
 		public:

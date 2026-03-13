@@ -229,9 +229,11 @@
     <ClCompile Include="Source\Achivement\AchievementBase.cpp" />
     <ClCompile Include="Source\Achivement\AchievementManager.cpp" />
     <ClCompile Include="Source\Actor\Actor.cpp" />
+    <ClCompile Include="Source\Actor\ActorStateMachine.cpp" />
     <ClCompile Include="Source\Actor\ActorStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterBase.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp" />
+    <ClCompile Include="Source\Actor\Character\CharacterStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCController.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp" />
@@ -290,9 +292,11 @@
     <ClInclude Include="Source\Achivement\AchievementBase.h" />
     <ClInclude Include="Source\Achivement\AchievementManager.h" />
     <ClInclude Include="Source\Actor\Actor.h" />
+    <ClInclude Include="Source\Actor\ActorStateMachine.h" />
     <ClInclude Include="Source\Actor\ActorStatus.h" />
     <ClInclude Include="Source\Actor\Character\CharacterBase.h" />
     <ClInclude Include="Source\Actor\Character\CharacterParameter.h" />
+    <ClInclude Include="Source\Actor\Character\CharacterStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h" />
     <ClInclude Include="Source\Actor\Character\NPCController.h" />
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h" />

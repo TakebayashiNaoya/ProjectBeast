@@ -38,6 +38,11 @@ namespace app
 			 */
 			inline float GetRunSpeed() const { return m_runSpeed; }
 			/**
+			 * @brief 泳ぎ速度を取得
+			 * @return 泳ぎ速度
+			 */
+			inline float GetSwimSpeed() const { return m_swimSpeed; }
+			/**
 			 * @brief 半径を取得
 			 * @return 半径
 			 */
@@ -74,6 +79,8 @@ namespace app
 			float m_walkSpeed;
 			/** 移動速度(走り) */
 			float m_runSpeed;
+			/** 移動速度(泳ぎ) */
+			float m_swimSpeed;
 			/** 半径 */
 			float m_radius;
 			/** 高さ */
