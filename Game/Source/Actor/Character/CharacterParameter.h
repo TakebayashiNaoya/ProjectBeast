@@ -35,6 +35,8 @@ namespace app
 			float walkSpeed;
 			/** 走行速度 */
 			float runSpeed;
+			/** 泳ぐ速度 */
+			float swimSpeed;
 			/** 体の半径 */
 			float radius;
 			/** 体の高さ */
