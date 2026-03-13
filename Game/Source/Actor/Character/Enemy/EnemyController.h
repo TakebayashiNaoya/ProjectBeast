@@ -182,10 +182,10 @@ namespace app
 
 
 		private:
-			Enemy* m_target;
+			Enemy* m_target = nullptr;
 
 			/** targetの前回の位置を保持 */
-			Vector3 prePosition = Vector3::Zero;
+			Vector3 m_prePosition = Vector3::Zero;
 
 			Vector3 m_targetPosition = Vector3::Zero;
 			bool isFind = false;

@@ -121,7 +121,7 @@ namespace app
 		void EnemyStateMachine::Setup(Enemy* owner)
 		{
 			m_owner = owner;
-			//m_ownerStatus = owner->GetStatus<EnemyStatus>();
+			//m_ownerStatus = static_cast<const EnemyStatus*>(owner->GetStatus());
 		}
 
 

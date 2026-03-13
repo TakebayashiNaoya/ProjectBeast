@@ -7,7 +7,9 @@
 #include "Enemy.h"
 #include "EnemyController.h"
 #include "EnemyControllerManager.h"
+
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Player/Player.h"
 
 
 namespace app
@@ -19,6 +21,7 @@ namespace app
 
 
 		EnemyController::EnemyController()
+			:m_target(nullptr)
 		{
 			static bool ini = false;
 			if (!ini)
@@ -129,6 +132,9 @@ namespace app
 
 		int EnemyController::CheckIdle(EnemyController* enemy)
 		{
+			if (rand() % 10 >= 5) {
+				return enEnemyState_Wandering;
+			}
 			return enEnemyState_Invalid;
 		}
 
@@ -136,36 +142,12 @@ namespace app
 
 		/** 移動 */
 		void EnemyController::EnterWandering(EnemyController* enemy)
-		{
-			bool isXReverse = rand() % 2 >= 1;
-			bool isZReverse = rand() % 2 >= 1;
-
-			enemy->m_targetPosition = Vector3(
-				static_cast<float>(rand() % 300) * (isXReverse ? 1.0f : -1.0f),
-				0.0f,
-				static_cast<float>(rand() % 300) * (isZReverse ? 1.0f : -1.0f)
-			);
-		}
+		{}
 
 
 		void EnemyController::UpdateWandering(EnemyController* enemy)
 		{
-			Vector3 pos = enemy->m_target->GetTransform().m_position;
 
-			// 目標方向
-			Vector3 dir = enemy->m_targetPosition - pos;
-
-			float distance = dir.Length();
-
-			// まだ遠いなら移動
-			if (distance > 0.1f)
-			{
-				dir.Normalize();
-
-				float speed = 5.0f;
-
-				pos += dir * speed * g_gameTime->GetFrameDeltaTime();
-			}
 		}
 
 
@@ -175,16 +157,9 @@ namespace app
 
 		int EnemyController::CheckWandering(EnemyController* enemy)
 		{
-			Vector3 pos = enemy->m_target->GetTransform().m_position;
-
-			float distance = (enemy->m_targetPosition - pos).Length();
-
-			// 到達したらIdleへ
-			if (distance < 0.5f)
-			{
-				return enEnemyState_Idle;
+			if (rand() % 10 >= 5) {
+				return enEnemyState_Chase;
 			}
-
 			return enEnemyState_Invalid;
 		}
 
@@ -198,7 +173,22 @@ namespace app
 
 		void EnemyController::UpdateChase(EnemyController* enemy)
 		{
+			auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
 
+			if (player == nullptr) return;
+			if (enemy->m_target == nullptr) return;
+
+			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			Vector3 playerPos = player->GetTransform().m_position;
+
+			Vector3 dir = playerPos - enemyPos;
+			dir.Normalize();
+
+			float speed = 3.0f;
+
+			Vector3 newPos = enemyPos + dir * speed * g_gameTime->GetFrameDeltaTime();
+
+			enemy->m_target->SetPosition(newPos);
 		}
 
 
@@ -210,6 +200,19 @@ namespace app
 
 		int EnemyController::CheckChase(EnemyController* enemy)
 		{
+			auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
+			if (player == nullptr) return enEnemyState_Invalid;
+
+			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			Vector3 playerPos = player->GetTransform().m_position;
+
+			float distance = (playerPos - enemyPos).Length();
+
+			if (distance < 2.0f)
+			{
+				return enEnemyState_Attack;
+			}
+
 			return enEnemyState_Invalid;
 		}
 

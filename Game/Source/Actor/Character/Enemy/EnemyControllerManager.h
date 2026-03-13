@@ -11,6 +11,7 @@ namespace app
 	namespace actor
 	{
 		class EnemyController;
+		class Player;
 	}
 
 	class EnemyControllerManager
@@ -61,6 +62,18 @@ namespace app
 		void UnRegister(actor::EnemyController* npc);
 
 
+	public:
+		void SetPlayer(actor::Player* player)
+		{
+			m_player = player;
+		}
+
+		actor::Player* GetPlayer() const
+		{
+			return m_player;
+		}
+
+
 	private:
 		EnemyControllerManager();
 		~EnemyControllerManager();
@@ -72,5 +85,7 @@ namespace app
 
 	private:
 		static EnemyControllerManager* m_instance;
+
+		actor::Player* m_player = nullptr;
 	};
 }
