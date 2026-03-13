@@ -69,9 +69,19 @@ namespace app
 		}
 
 
-		void UIIcon::Initialize(const char* assetName, const float width, const float height)
+		void UIIcon::Initialize(const char* assetName, const float width, const float height,const Vector3& position,const Vector3& scale,const Quaternion& rotation, const Vector4& color)
 		{
+			m_transform.m_localTransform.m_position = position;
+			m_transform.m_localTransform.m_scale = scale;
+			m_transform.m_localTransform.m_rotation = rotation;
+			m_color = color;
+
 			m_spriteRender.Init(assetName, width, height);
+			m_spriteRender.SetPosition(position);
+			m_spriteRender.SetScale(scale);
+			m_spriteRender.SetRotation(rotation);
+			m_spriteRender.SetMulColor(color);
+			m_spriteRender.Update();
 		}
 
 
@@ -93,12 +103,37 @@ namespace app
 
 		void UIButton::Update()
 		{
+			m_transform.UpdateTransform();
+
+			m_spriteRender.SetPosition(m_transform.m_localTransform.m_position);
+			m_spriteRender.SetScale(m_transform.m_localTransform.m_scale);
+			m_spriteRender.SetRotation(m_transform.m_localTransform.m_rotation);
+			m_spriteRender.Update();
 		}
 
 
 		void UIButton::Render(RenderContext& rc)
 		{
+			if (m_isDraw)
+			{
+				m_spriteRender.Draw(rc);
+			}
+		}
 
+		void UIButton::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector4& color)
+		{
+			m_transform.m_localTransform.m_position = position;
+			m_transform.m_localTransform.m_scale = scale;
+			m_transform.m_localTransform.m_rotation = rotation;
+			m_color = color;
+
+
+			m_spriteRender.Init(assetName, width, height);
+			m_spriteRender.SetPosition(position);
+			m_spriteRender.SetScale(scale);
+			m_spriteRender.SetRotation(rotation);
+			m_spriteRender.SetMulColor(color);
+			m_spriteRender.Update();
 		}
 
 
@@ -120,8 +155,10 @@ namespace app
 
 		void UIGauge::Update()
 		{
-			m_transform.UpdateTransform();
+			UpdateAnimation();
 
+			m_spriteRender.SetMulColor(m_color);
+			m_transform.UpdateTransform();
 			m_spriteRender.SetPosition(m_transform.m_localTransform.m_position);
 			m_spriteRender.SetScale(m_transform.m_localTransform.m_scale);
 			m_spriteRender.SetRotation(m_transform.m_localTransform.m_rotation);
@@ -135,16 +172,20 @@ namespace app
 		}
 
 
-		void UIGauge::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation)
+		void UIGauge::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector4& color,const Vector2& pivot)
 		{
 			m_transform.m_localTransform.m_position = position;
 			m_transform.m_localTransform.m_scale = scale;
 			m_transform.m_localTransform.m_rotation = rotation;
+			m_color = color;
+			m_pivot = pivot;
 
 			m_spriteRender.Init(assetName, width, height);
 			m_spriteRender.SetPosition(position);
 			m_spriteRender.SetScale(scale);
 			m_spriteRender.SetRotation(rotation);
+			m_spriteRender.SetMulColor(color);
+			m_spriteRender.SetPivot(pivot);
 			m_spriteRender.Update();
 		}
 
@@ -167,6 +208,11 @@ namespace app
 
 		UIDigit::~UIDigit()
 		{
+			for (const auto* render : m_renderList)
+			{
+				delete render;
+				render = nullptr;
+			}
 		}
 
 
@@ -203,7 +249,7 @@ namespace app
 		}
 
 
-		void UIDigit::Initialize(const char* assetName, const int digit, const int number, const float wide, const float height, Vector3& position, Vector3& scale, Quaternion& rotation)
+		void UIDigit::Initialize(const char* assetName, const int digit, const int number, const float wide, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation)
 		{
 			m_assetsPath = assetName;
 			m_digit = digit;
@@ -251,7 +297,7 @@ namespace app
 
 			/** 対象の桁の数字 */
 			const int targetDigitNumber = GetDigit(targetDigit);
-			std::string assetName = m_assetsPath + "/.dds";
+			std::string assetName = m_assetsPath + "/0.dds";
 			assetName[assetName.size() - 5] = '0' + targetDigitNumber;
 			nextRender->Init(assetName.c_str(), m_wide, m_height);
 		}
@@ -284,30 +330,30 @@ namespace app
 
 		UICanvas::UICanvas()
 		{
-			m_uiMap.clear();
+			uiList_.clear();
 		}
 
 
 		UICanvas::~UICanvas()
 		{
-			m_uiMap.clear();
+			uiList_.clear();
 		}
 
 
 		void UICanvas::Update()
 		{
-			for (auto& ui : m_uiMap)
+			for (auto& ui : uiList_)
 			{
-				ui.second->Update();
+				ui->Update();
 			}
 		}
 
 
 		void UICanvas::Render(RenderContext& rc)
 		{
-			for (auto& ui : m_uiMap)
+			for (auto& ui : uiList_)
 			{
-				ui.second->Render(rc);
+				ui->Render(rc);
 			}
 		}
 	}
