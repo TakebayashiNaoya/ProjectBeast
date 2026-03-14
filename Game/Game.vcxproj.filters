@@ -185,10 +185,10 @@
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp">
      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp">
      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp">
@@ -380,10 +380,10 @@
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h">
      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h">
      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\SoundOptionMenu.h">
