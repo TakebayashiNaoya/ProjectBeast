@@ -32,10 +32,9 @@ namespace app
 		}
 
 
-		CharacterStateMachine::CharacterStateMachine(CharacterBase* ownerCharacter, CharacterStatus* characterStatus)
+		CharacterStateMachine::CharacterStateMachine(CharacterBase* ownerCharacter)
 			: ActorStateMachine(ownerCharacter)
 			, m_ownerCharacter(ownerCharacter)
-			, m_characterStatus(characterStatus)
 			, m_moveDirection(Vector3::Zero)
 			, m_moveSpeed(0.0f)
 			, m_isDash(false)

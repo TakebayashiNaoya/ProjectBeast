@@ -123,15 +123,13 @@ namespace app
 
 
 		public:
-			CharacterStateMachine(CharacterBase* ownerCharacter, CharacterStatus* characterStatus);
+			CharacterStateMachine(CharacterBase* ownerCharacter);
 			virtual ~CharacterStateMachine() override = default;
 
 
 		protected:
 			/** キャラクターのオーナー */
 			CharacterBase* m_ownerCharacter;
-			/** キャラクターのステータス */
-			CharacterStatus* m_characterStatus;
 
 
 			/** 移動方向 */
