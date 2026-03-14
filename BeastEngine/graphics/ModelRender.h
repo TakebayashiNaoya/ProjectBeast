@@ -63,13 +63,13 @@ namespace nsBeastEngine
 		 * @brief モデルの取得
 		 * @return モデル
 		 */
-		inline Model& GetModel() { return m_model; }
+		 //inline Model& GetModel() { return m_model; }
 
-		/**
-		 * @brief アニメーションが再生中か
-		 * @return 再生中ならtrue
-		 */
-		inline bool IsPlayingAnimation() const { return m_animation.IsPlaying(); }
+		 /**
+		  * @brief アニメーションが再生中か
+		  * @return 再生中ならtrue
+		  */
+		inline bool IsPlayingAnimation() const { return m_animationResource->GetAnimation()->IsPlaying(); }
 
 
 	public:
@@ -81,8 +81,7 @@ namespace nsBeastEngine
 			, m_maxInstance(1)
 			, m_numAnimationClips(0)
 			, m_animationSpeed(1.0f)
-		{
-		};
+		{};
 		~ModelRender() = default;
 
 		/**
@@ -117,7 +116,7 @@ namespace nsBeastEngine
 		 */
 		void PlayAnimation(int animNo, float interpolateTime = 0.0f)
 		{
-			m_animation.Play(animNo, interpolateTime);
+			m_animationResource->GetAnimation()->Play(animNo, interpolateTime);
 		}
 
 		/**
@@ -132,7 +131,7 @@ namespace nsBeastEngine
 		 */
 		void AddAnimationEvent(AnimationEventListener eventListener)
 		{
-			m_animation.AddAnimationEventListener(eventListener);
+			m_animationResource->GetAnimation()->AddAnimationEventListener(eventListener);
 		}
 
 		/**
@@ -196,13 +195,13 @@ namespace nsBeastEngine
 		/** 回転 */
 		Quaternion		m_rotation;
 		/** モデル */
-		Model			m_model;
+		//Model			m_model;
 		/** シャドウマップ用モデル */
 		Model			m_shadowModels;
 		/** ボーン */
 		Skeleton		m_skeleton;
 		/** アニメーション */
-		Animation		m_animation;
+		//Animation		m_animation;
 		/** アニメーションクリップ */
 		AnimationClip* m_animationClips;
 		/** シャドウマップ用のカメラパラメータを格納する定数バッファ */
@@ -226,5 +225,11 @@ namespace nsBeastEngine
 		StructuredBuffer m_worldMatrixArraySB;
 		/** ZPrepassで描画されるモデル */
 		Model m_zprepassModel;
+
+
+		/** モデルリソース */
+		std::shared_ptr<ModelResource> m_modelResource;
+		/** アニメーションクリップリソース */
+		std::shared_ptr<AnimationResource> m_animationResource;
 	};
 }

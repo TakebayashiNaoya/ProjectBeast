@@ -11,7 +11,7 @@ namespace nsBeastEngine
 {
 	void ModelRender::Init(
 		const char* filePath,
-		AnimationClip* animationeClips,
+		AnimationClip* animationClips,
 		int numAnimationClips,
 		bool islighting,
 		EnModelUpAxis enModelUpAxiz)
@@ -19,7 +19,7 @@ namespace nsBeastEngine
 		/** スケルトンの初期化 */
 		InitSkeleton(filePath);
 		/** アニメーションの初期化 */
-		InitAnimation(animationeClips, numAnimationClips, enModelUpAxiz);
+		InitAnimation(animationClips, numAnimationClips, enModelUpAxiz);
 
 		ModelInitData modelInitData;
 		/** tkmファイルのファイルパスの指定 */
@@ -34,7 +34,7 @@ namespace nsBeastEngine
 		/** シェーダーのエントリーポイントの設定 */
 		SetupShaderEntryPointFunc(modelInitData);
 		/** アニメーションがある場合はスケルトンを渡す */
-		if (animationeClips != nullptr) {
+		if (animationClips != nullptr) {
 			modelInitData.m_skeleton = &m_skeleton;
 		}
 
@@ -44,7 +44,9 @@ namespace nsBeastEngine
 		/** シーンライト */
 		modelInitData.m_expandConstantBuffer = g_sceneLight->GetLight();
 		modelInitData.m_expandConstantBufferSize = sizeof(Light);
-		m_model.Init(modelInitData);
+
+		m_modelResource = ResourceManager::GetInstance().Load<ModelResource>(filePath);
+		m_modelResource->SetInitData(modelInitData);
 
 		/** シャドウマップテクスチャ */
 		//modelInitData.m_expandShaderResoruceView[0] = nullptr;
@@ -141,7 +143,10 @@ namespace nsBeastEngine
 		m_animationClips = animtionClips;
 		m_numAnimationClips = numAnimationClips;
 		if (m_animationClips != nullptr) {
-			m_animation.Init(m_skeleton, m_animationClips, numAnimationClips);
+			m_animationResource = ResourceManager::GetInstance().Load<AnimationResource>("animationResource");
+			m_animationResource->SetSkeleton(&m_skeleton);
+			m_animationResource->SetAnimationClips(m_animationClips, m_numAnimationClips);
+			//m_animationResource->GetAnimation()->Init(m_skeleton, m_animationClips, numAnimationClips);
 		}
 	}
 
@@ -159,33 +164,42 @@ namespace nsBeastEngine
 
 	void ModelRender::UpdateWorldMatrixInModes()
 	{
-		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_modelResource->GetModel()->UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 	}
 
 
 	void ModelRender::Update()
 	{
+		/** モデルの読み込みが完了していたらアニメーションを進める */
+		if (m_modelResource->IsCompleted() == false) return;
+
 		/** モデルのワールド行列を更新する */
 		UpdateWorldMatrixInModes();
 
+
+		if (m_animationResource->IsCompleted() == false) return;
+
 		/** スケルトンのボーン行列を更新する */
 		if (m_skeleton.IsInited()) {
-			m_skeleton.Update(m_model.GetWorldMatrix());
+			m_skeleton.Update(m_modelResource->GetModel()->GetWorldMatrix());
 		}
 
 		/** アニメーションを進める */
-		m_animation.Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);
+		m_animationResource->GetAnimation()->Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);
 	}
 
 
 	void ModelRender::Draw(RenderContext& rc)
 	{
+		/** モデルの読み込みが完了していたらアニメーションを進める */
+		if (m_modelResource->IsCompleted() == false) return;
+
 		if (m_isFowardRender) {
 			g_renderingEngine->RegisterModel(&m_frowardRenderModel);
 		}
 		else {
-			g_renderingEngine->RegisterModel(&m_model);
+			g_renderingEngine->RegisterModel(m_modelResource->GetModel());
 		}
 		g_renderingEngine->AddRenderObject(this);
 	}

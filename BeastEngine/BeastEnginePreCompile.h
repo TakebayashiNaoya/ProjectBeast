@@ -12,6 +12,10 @@ using namespace nsK2EngineLow;
 #include "Graphics/GraphicsEnums.h"
 //#include "geometry/AABB.h"
 
+#include "Resource/ResourceManager.h"
+#include "Resource/ModelResource.h"
+#include "Resource/AnimationClipResource.h"
+
 #include "Graphics/ModelRender.h"
 #include "Graphics/SpriteRender.h"
 #include "Graphics/FontRender.h"
@@ -35,7 +39,6 @@ using namespace nsK2EngineLow;
 #include "Nature/PlaneReflectionPass.h"
 #include "Nature/Ocean.h"
 
-#include "Resource/ResourceManager.h"
 
 //#include "Level3DRender/LevelRender.h"
 //#include "graphics/light/VolumeSpotLight.h"

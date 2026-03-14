@@ -49,6 +49,8 @@
     <ClCompile Include="Physics\Physics.cpp" />
     <ClCompile Include="Physics\RigidBody.cpp" />
     <ClCompile Include="Physics\SphereCollider.cpp" />
+    <ClCompile Include="Resource\AnimationClipResource.cpp" />
+    <ClCompile Include="Resource\ModelResource.cpp" />
     <ClCompile Include="Resource\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +88,8 @@
     <ClInclude Include="Physics\RigidBody.h" />
     <ClInclude Include="Physics\SphereCollider.h" />
     <ClInclude Include="Physics\Types.h" />
+    <ClInclude Include="Resource\AnimationClipResource.h" />
+    <ClInclude Include="Resource\ModelResource.h" />
     <ClInclude Include="Resource\ResourceManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

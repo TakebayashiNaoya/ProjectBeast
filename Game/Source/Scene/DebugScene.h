@@ -23,5 +23,8 @@ namespace app
 		void Render(RenderContext& rc) override;
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
+
+		ModelRender m_modelRender[100];
+		AnimationClip* m_animationClip[100];
 	};
 }
