@@ -71,7 +71,7 @@ namespace app
 			}
 
 
-		protected:
+		public:
 			/**
 			 * @brief 移動処理
 			 */

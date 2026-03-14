@@ -8,6 +8,7 @@
 #include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 
 
 namespace app
@@ -17,8 +18,7 @@ namespace app
 
 		DaddyPenguinIState::DaddyPenguinIState(DaddyPenguinStateMachine* owner)
 			: m_owner(owner)
-		{
-		}
+		{}
 
 
 
@@ -27,24 +27,20 @@ namespace app
 
 
 		void DaddyPenguinIdleState::Enter()
-		{
-		}
+		{}
 
 
 		void DaddyPenguinIdleState::Update()
-		{
-		}
+		{}
 
 
 		void DaddyPenguinIdleState::Exit()
-		{
-		}
+		{}
 
 
 		DaddyPenguinIdleState::DaddyPenguinIdleState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
-		{
-		}
+		{}
 
 
 
@@ -52,24 +48,28 @@ namespace app
 		/************************************/
 
 
-		void DaddyPenguinMoveState::Enter()
+		void DaddyPenguinSneakState::Enter()
 		{
+			const float moveSpeed = m_owner->GetDaddyPenguinStatus()->GetSneakSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->SetMoveDirection(Vector3::Right);
+			m_owner->PlayAnimation(10);
 		}
 
 
-		void DaddyPenguinMoveState::Update()
+		void DaddyPenguinSneakState::Update()
 		{
+			m_owner->CharacterStateMachine::Move();
 		}
 
 
-		void DaddyPenguinMoveState::Exit()
-		{
-		}
+		void DaddyPenguinSneakState::Exit()
+		{}
 
 
-		DaddyPenguinMoveState::DaddyPenguinMoveState(DaddyPenguinStateMachine* owner)
+		DaddyPenguinSneakState::DaddyPenguinSneakState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
-		{
-		}
+		{}
+
 	}
 }

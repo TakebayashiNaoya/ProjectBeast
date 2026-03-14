@@ -44,7 +44,7 @@ namespace app
 		void CharacterBase::Init(const ModelData& data)
 		{
 			// アニメーションクリップを作成
-			m_animationClips = std::make_unique<AnimationClip[]>(data.clipNum);
+			m_animationClips = new AnimationClip[data.clipNum];
 
 			for (int i = 0; i < data.clipNum; ++i)
 			{
@@ -53,7 +53,7 @@ namespace app
 			}
 
 			// モデルをセットアップ
-			m_modelRender.Init(data.fileName, m_animationClips.get(), data.clipNum, true, data.upAxis);
+			m_modelRender.Init(data.fileName, m_animationClips, data.clipNum, true, data.upAxis);
 			// トランスフォームを設定
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 			// モデルレンダーを更新

@@ -4,8 +4,8 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Actor.h"
 #include "Physics/CharacterController.h"	// あとで確認
+#include "Source/Actor/Actor.h"
 
 
 namespace app
@@ -80,7 +80,7 @@ namespace app
 
 		protected:
 			/** アニメーションクリップ */
-			std::unique_ptr<AnimationClip[]> m_animationClips;
+			AnimationClip* m_animationClips;
 			/** キャラクターコントローラー */
 			nsBeastEngine::nsCollision::CharacterController m_characterController;
 		};

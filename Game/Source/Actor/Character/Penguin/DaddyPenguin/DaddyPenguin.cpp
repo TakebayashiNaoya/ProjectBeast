@@ -29,9 +29,9 @@ namespace app
 
 		DaddyPenguin::DaddyPenguin()
 		{
-			m_stateMachine = std::make_unique<DaddyPenguinStateMachine>(this);
 			m_status = std::make_unique<DaddyPenguinStatus>();
 			m_status->Setup();
+			m_stateMachine = std::make_unique<DaddyPenguinStateMachine>(this);
 		}
 
 

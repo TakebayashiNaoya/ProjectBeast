@@ -7,34 +7,36 @@
 #include "DaddyPenguin.h"
 #include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
+#include "DaddyPenguinStatus.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-		DaddyPenguinStateMachine::DaddyPenguinStateMachine(DaddyPenguin* player)
-			: StateMachineBase()
-			, m_player(player)
+		DaddyPenguinStateMachine::DaddyPenguinStateMachine(DaddyPenguin* ownerDaddyPenguin)
+			: CharacterStateMachine(ownerDaddyPenguin)
+			, m_ownerDaddyPenguin(ownerDaddyPenguin)
 		{
 			// ステートの追加
 			AddState<DaddyPenguinIdleState>(this);
-			AddState<DaddyPenguinMoveState>(this);
+			AddState<DaddyPenguinSneakState>(this);
 
 			// 初期ステートの設定
-			m_currentState = FindState(DaddyPenguinIdleState::ID());
+			m_currentState = FindState(DaddyPenguinSneakState::ID());
+			m_currentState->Enter();
 		}
 
 
-		void DaddyPenguinStateMachine::PlayAnimation(const uint8_t animationID)
+		const DaddyPenguinStatus* DaddyPenguinStateMachine::GetDaddyPenguinStatus() const
 		{
-			m_player->GetModelRender()->PlayAnimation(animationID);
+			return m_ownerDaddyPenguin->GetStatus<DaddyPenguinStatus>();
 		}
 
 
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
-			return FindState(DaddyPenguinIdleState::ID());
+			return FindState(DaddyPenguinSneakState::ID());
 			return nullptr;
 		}
 	}
