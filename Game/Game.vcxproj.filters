@@ -1,435 +1,430 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source">
-      <UniqueIdentifier>{b38c812a-f22f-4096-80d4-94f769775328}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Scene">
-      <UniqueIdentifier>{d62a2ce1-ab2a-46f9-b644-f1540da5b7e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor">
-      <UniqueIdentifier>{e868b53b-57d1-4329-9910-c48a40ebf6cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Core">
-      <UniqueIdentifier>{389db189-d25e-4be0-a402-9eae342f25ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\UI">
-      <UniqueIdentifier>{bde9173b-0987-41ce-b6aa-f7bb0e192e40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character">
-      <UniqueIdentifier>{cd3ea93b-69ad-46c4-83e2-cd7a71456c33}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\Player">
-      <UniqueIdentifier>{4be53c84-5520-4489-93ed-2bfc4d00b1fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\system">
-      <UniqueIdentifier>{706b7812-7f1c-4488-854b-c24a37b2f3c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Stage">
-      <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Sound">
-      <UniqueIdentifier>{aabee1f5-f07e-444b-9b88-76bb30eb9087}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Util">
-      <UniqueIdentifier>{2c64130f-259c-4ee0-ac48-0968335db825}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Achievement">
-      <UniqueIdentifier>{8dd5c9a7-828b-46f3-9b18-9042d2de824e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\Enemy">
-      <UniqueIdentifier>{43478fe8-bc95-4006-80d2-755fcfe20067}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\penguin">
-      <UniqueIdentifier>{96a86590-7162-4a66-aa1f-738d6c97706b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\penguin\daddyPernguin">
-      <UniqueIdentifier>{c62219a9-2e76-4037-98f6-90b7912d25b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\penguin\ChildPenguin">
-      <UniqueIdentifier>{25d9ee0e-41a8-4178-bf79-b80371945ac2}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="IObject.cpp" />
-    <ClCompile Include="Source\Actor\Actor.cpp">
-      <Filter>Source\Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\ActorStatus.cpp">
-      <Filter>Source\Actor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\CharacterBase.cpp">
-      <Filter>Source\Actor\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
-      <Filter>Source\Actor\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\Player.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\HierarchicalTransform.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\ParameterManager.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\Transform.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\IScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\SceneManager.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\UIAnimation.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\system\system.cpp">
-      <Filter>Source\system</Filter>
-    </ClCompile>
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Application.cpp" />
-    <ClCompile Include="Source\Scene\DebugScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\AppParameterMacro.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\IMasterParameter.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerParameter.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp">
-      <Filter>Source\Actor\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Stage\IStage.cpp">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Stage\StageSystem.cpp">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\UIParts.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Menu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\StateMachineBase.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Layout.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\NPCController.cpp">
-      <Filter>Source\Actor\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp">
-      <Filter>Source\Actor\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Sound\SoundManager.cpp">
-      <Filter>Source\Sound</Filter>
-    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Test.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp">
-      <Filter>Source\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Achivement\AchievementManager.cpp">
-      <Filter>Source\Achievement</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Achivement\AchievementBase.cpp">
-      <Filter>Source\Achievement</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\TitleScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\InGameScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\ResultScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\Fade.cpp">
-      <Filter>Source\Core</Filter>
+      <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="Source\Util\JsonConverter.cpp">
-      <Filter>Source\Util</Filter>
+      <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Test.cpp" />
-    <ClCompile Include="Source\Actor\Character\Enemy\Enemy.cpp">
-      <Filter>Source\Actor\Character\Enemy</Filter>
+    <ClCompile Include="Source\UI\Layout.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyController.cpp">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStateMachine.cpp">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStatus.cpp">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp" />
-     <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp" />
-     <Filter>Source\Actor\Character\Enemy</Filter>
+    <ClCompile Include="Source\UI\Menu.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp">
-      <Filter>Source\UI</Filter>
+      <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.cpp">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClCompile Include="Source\UI\UIAnimation.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.cpp">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClCompile Include="Source\UI\UIParts.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinParameter.cpp">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClCompile Include="Source\system\system.cpp">
+      <Filter>system</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStateMachine.cpp">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClCompile Include="Source\Sound\SoundManager.cpp">
+      <Filter>Sound</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStatus.cpp">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClCompile Include="Source\Scene\DebugScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\PenguinBase.cpp">
-      <Filter>Source\Actor\Character\penguin</Filter>
+    <ClCompile Include="Source\Scene\InGameScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinIState.cpp">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClCompile Include="Source\Scene\IScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinParameter.cpp">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClCompile Include="Source\Scene\ResultScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStateMachine.cpp">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClCompile Include="Source\Scene\SceneManager.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.cpp">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClCompile Include="Source\Scene\TitleScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\PenguinAnimationData.cpp">
-      <Filter>Source\Actor\Character\penguin</Filter>
+    <ClCompile Include="Source\Core\AppParameterMacro.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.cpp">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClCompile Include="Source\Core\Fade.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\HierarchicalTransform.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\IMasterParameter.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\ParameterManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\StateMachineBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Transform.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Achivement\AchievementBase.cpp">
+      <Filter>Achivement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Achivement\AchievementManager.cpp">
+      <Filter>Achivement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Actor.cpp">
+      <Filter>Actor</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
-      <Filter>Source\Actor</Filter>
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\ActorStatus.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\IStage.cpp">
+      <Filter>Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\StageSystem.cpp">
+      <Filter>Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterBase.cpp">
+      <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp">
+      <Filter>Actor\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\CharacterStateMachine.cpp">
-      <Filter>Source\Actor\Character</Filter>
+      <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
+      <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\NPCController.cpp">
+      <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp">
+      <Filter>Actor\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\Player.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerParameter.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp">
+      <Filter>Actor\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\Enemy.cpp">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyController.cpp">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStateMachine.cpp">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyStatus.cpp">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinAnimationData.cpp">
+      <Filter>Actor\Character\Penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinBase.cpp">
+      <Filter>Actor\Character\Penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.cpp">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinIState.cpp">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinParameter.cpp">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStateMachine.cpp">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.cpp">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.cpp">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.cpp">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinParameter.cpp">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStateMachine.cpp">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStatus.cpp">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="IObject.h" />
-    <ClInclude Include="Source\Actor\Actor.h">
-      <Filter>Source\Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\ActorStatus.h">
-      <Filter>Source\Actor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\CharacterBase.h">
-      <Filter>Source\Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
-      <Filter>Source\Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\Player.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerController.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerIState.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\HierarchicalTransform.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\ParameterManager.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\Transform.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Scene\IScene.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Scene\SceneManager.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\UIAnimation.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\system\system.h">
-      <Filter>Source\system</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\Scene\DebugScene.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\AppParameterMacro.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\IMasterParameter.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerParameter.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\CharacterParameter.h">
-      <Filter>Source\Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Stage\IStage.h">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Stage\StageSystem.h">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\UIParts.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Menu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\StateMachineBase.h">
-      <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Layout.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Types.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\NPCController.h">
-      <Filter>Source\Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\NPCControllerManager.h">
-      <Filter>Source\Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Sound\SoundManager.h">
-      <Filter>Source\Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Sound\Types.h">
-      <Filter>Source\Sound</Filter>
-    </ClInclude>
+    <ClInclude Include="Source\Types.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Test.h" />
     <ClInclude Include="Source\Util\CRC32.h">
-      <Filter>Source\Util</Filter>
+      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Source\Util\Curve.h">
-      <Filter>Source\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Achivement\AchievementManager.h">
-      <Filter>Source\Achievement</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Achivement\AchievementBase.h">
-      <Filter>Source\Achievement</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Scene\TitleScene.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Scene\InGameScene.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Scene\ResultScene.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Core\Fade.h">
-      <Filter>Source\Core</Filter>
+      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Source\Util\JsonConverter.h">
-      <Filter>Source\Util</Filter>
+      <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Test.h" />
-    <ClInclude Include="Source\Actor\Character\Enemy\Enemy.h">
-      <Filter>Source\Actor\Character\Enemy</Filter>
+    <ClInclude Include="Source\UI\Layout.h">
+      <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyController.h">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStateMachine.h">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStatus.h">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h">
-      <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h" />
-     <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h" />
-     <Filter>Source\Actor\Character\Enemy</Filter>
+    <ClInclude Include="Source\UI\Menu.h">
+      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\SoundOptionMenu.h">
-      <Filter>Source\UI</Filter>
+      <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.h">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClInclude Include="Source\UI\UIAnimation.h">
+      <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.h">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClInclude Include="Source\UI\UIParts.h">
+      <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinParameter.h">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClInclude Include="Source\system\system.h">
+      <Filter>system</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStateMachine.h">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClInclude Include="Source\Sound\SoundManager.h">
+      <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStatus.h">
-      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    <ClInclude Include="Source\Sound\Types.h">
+      <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\PenguinBase.h">
-      <Filter>Source\Actor\Character\penguin</Filter>
+    <ClInclude Include="Source\Scene\DebugScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinIState.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClInclude Include="Source\Scene\InGameScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinParameter.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClInclude Include="Source\Scene\IScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStateMachine.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClInclude Include="Source\Scene\ResultScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClInclude Include="Source\Scene\SceneManager.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\PenguinAnimationData.h">
-      <Filter>Source\Actor\Character\penguin</Filter>
+    <ClInclude Include="Source\Scene\TitleScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    <ClInclude Include="Source\Core\AppParameterMacro.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Fade.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\HierarchicalTransform.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\IMasterParameter.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\ParameterManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\StateMachineBase.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Transform.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Achivement\AchievementBase.h">
+      <Filter>Achivement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Achivement\AchievementManager.h">
+      <Filter>Achivement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Actor.h">
+      <Filter>Actor</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\ActorStateMachine.h">
-      <Filter>Source\Actor</Filter>
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\ActorStatus.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\IStage.h">
+      <Filter>Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\StageSystem.h">
+      <Filter>Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterBase.h">
+      <Filter>Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterParameter.h">
+      <Filter>Actor\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\CharacterStateMachine.h">
-      <Filter>Source\Actor\Character</Filter>
+      <Filter>Actor\Character</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
+      <Filter>Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\NPCController.h">
+      <Filter>Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\NPCControllerManager.h">
+      <Filter>Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\Player.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerController.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerIState.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerParameter.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h">
+      <Filter>Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\Enemy.h">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyController.h">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStateMachine.h">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyStatus.h">
+      <Filter>Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinAnimationData.h">
+      <Filter>Actor\Character\Penguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinBase.h">
+      <Filter>Actor\Character\Penguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.h">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinIState.h">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinParameter.h">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStateMachine.h">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.h">
+      <Filter>Actor\Character\Penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.h">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.h">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinParameter.h">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStateMachine.h">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStatus.h">
+      <Filter>Actor\Character\Penguin\DaddyPenguin</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Achivement">
+      <UniqueIdentifier>{b6b3b03b-743d-4cda-beb7-a368411551e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor">
+      <UniqueIdentifier>{5e7477d9-a056-4754-8eae-e0c391d61851}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{4c714b3b-8c2a-4cf0-bb59-abadde693b04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{10d7bcf8-abae-4c37-8a05-a21c841d014a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{29d18908-0621-4fb5-9617-1625bec3c212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{a05f4ba2-be5f-495c-80a3-054fa307f7fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{cd6f3dcd-0ff1-4dba-84a1-020db4fa4953}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\Character">
+      <UniqueIdentifier>{db1eb699-a533-4eab-aeb2-7ffbc31c71b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\Stage">
+      <UniqueIdentifier>{e6724fc9-8865-4957-a862-726741ddb3d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\Character\Enemy">
+      <UniqueIdentifier>{f21634d2-4b85-41c9-954b-cc00e184c395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\Character\Penguin">
+      <UniqueIdentifier>{b0d2f3c2-f984-4899-afb6-6810fb1514fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\Character\Player">
+      <UniqueIdentifier>{45b53fb6-f1b8-4d53-9a93-643c1094719f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\Character\Penguin\ChildPenguin">
+      <UniqueIdentifier>{adefd54a-a57d-43a3-84ba-05e6d953fb92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Actor\Character\Penguin\DaddyPenguin">
+      <UniqueIdentifier>{ee310e32-ffc8-47be-bcb3-d2d37e908b0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="system">
+      <UniqueIdentifier>{08c0b093-1da2-4072-b35e-6e35891efbed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
