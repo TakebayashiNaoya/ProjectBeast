@@ -135,7 +135,7 @@ namespace app
 			if (rand() % 10 >= 5) {
 				return enEnemyState_Wandering;
 			}
-			return enEnemyState_Invalid;
+			return enEnemyState_Wandering;
 		}
 
 

@@ -131,9 +131,15 @@ namespace app
 
 
 			/**
+			 * @brief ペンギンを発見
+			 */
+			void SetIsFindPenguin(const bool isFindPenguin) { m_isFindPenguin = isFindPenguin };
+
+
+			/**
 			 * @brief 近くのペンギンの設定
 			 */
-			void SetNearPenguin(const bool isNearPneguin) { m_isNearPenguin = isNearPneguin; }
+			void SetIsNearPenguin(const bool isNearPneguin) { m_isNearPenguin = isNearPneguin; }
 
 
 			/**
@@ -198,6 +204,9 @@ namespace app
 
 			/** Xボタンを押せるかどうか */
 			bool m_actionButtonX = false;
+
+			/** ペンギンを見つけたか */
+			bool m_isFindPenguin = false;
 
 			/** ペンギンが近くにいるか */
 			bool m_isNearPenguin = false;

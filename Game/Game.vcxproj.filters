@@ -186,10 +186,10 @@
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp">
-     <Filter>Source\Actor\Character\Enemy</Filter>
+      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp">
-     <Filter>Source\Actor\Character\Enemy</Filter>
+      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp">
       <Filter>Source\UI</Filter>
@@ -236,6 +236,7 @@
     <ClCompile Include="Source\Actor\Character\CharacterStateMachine.cpp">
       <Filter>Source\Actor\Character</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -381,10 +382,10 @@
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h">
-     <Filter>Source\Actor\Character\Enemy</Filter>
+      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h">
-     <Filter>Source\Actor\Character\Enemy</Filter>
+      <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\SoundOptionMenu.h">
       <Filter>Source\UI</Filter>
@@ -431,5 +432,6 @@
     <ClInclude Include="Source\Actor\Character\CharacterStateMachine.h">
       <Filter>Source\Actor\Character</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyTypes.h" />
   </ItemGroup>
 </Project>

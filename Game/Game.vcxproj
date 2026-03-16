@@ -242,6 +242,7 @@
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyStatus.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyTypes.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCController.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.cpp" />
@@ -312,6 +313,7 @@
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyStatus.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyTypes.h" />
     <ClInclude Include="Source\Actor\Character\NPCController.h" />
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.h" />

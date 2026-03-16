@@ -16,7 +16,7 @@ namespace app
 		EnemyStatus::EnemyStatus()
 		{
 			// 外部ファイルを読み込み
-			core::ParameterManager::Get()->LoadParameter<MasterEnemyParameter>("Assets/parameter/player/PlayerParameter.json", [](const nlohmann::json& j, MasterEnemyParameter& parameter)
+			core::ParameterManager::Get()->LoadParameter<MasterEnemyParameter>("Assets/parameter/enemy/EnemyParameter.json", [](const nlohmann::json& j, MasterEnemyParameter& parameter)
 				{
 					parameter.maxHp = j["maxHp"].get<int>();
 					parameter.hp = j["hp"].get<int>();

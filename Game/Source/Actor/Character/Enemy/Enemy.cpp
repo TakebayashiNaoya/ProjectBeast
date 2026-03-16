@@ -17,6 +17,8 @@ namespace app
 		{
 			AnimationData ANIMATION_DATA[] =
 			{
+				{ "Assets/animData/bear/idle.tka", true },
+				{ "Assets/animData/bear/walk.tka", true },
 				{ "Assets/animData/bear/attack.tka", true },
 
 			};

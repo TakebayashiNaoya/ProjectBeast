@@ -8,6 +8,8 @@
 #include "EnemyIState.h"
 #include "EnemyStateMachine.h"
 
+#include "EnemyStatus.h"
+
 
 namespace app
 {
@@ -99,7 +101,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeChace() const
 		{
-			if (m_isDash && m_direction.Length() > 0.01f) {
+			if (m_isFindPenguin) {
 				return true;
 			}
 			return false;
@@ -121,7 +123,7 @@ namespace app
 		void EnemyStateMachine::Setup(Enemy* owner)
 		{
 			m_owner = owner;
-			//m_ownerStatus = static_cast<const EnemyStatus*>(owner->GetStatus());
+			m_ownerStatus = owner->GetStatus<EnemyStatus>();
 		}
 
 
