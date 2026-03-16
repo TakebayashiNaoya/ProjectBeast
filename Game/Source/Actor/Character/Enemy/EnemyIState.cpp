@@ -122,7 +122,7 @@ namespace app
 
 		void EnemyAttackState::Enter()
 		{
-
+			m_owner->PlayAnimation(0);
 		}
 
 
