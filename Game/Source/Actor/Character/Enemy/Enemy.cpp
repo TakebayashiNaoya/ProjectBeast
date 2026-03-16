@@ -17,22 +17,17 @@ namespace app
 		{
 			AnimationData ANIMATION_DATA[] =
 			{
-				{ "Assets/animData/idle.tka", true },
-				{ "Assets/animData/walk.tka", true },
-				{ "Assets/animData/run.tka", true },
-				{ "Assets/animData/jump.tka", false }
+				{ "Assets/animData/bear/attack.tka", true },
+
 			};
 
 
 			ModelData ENEMY_MODEL_DATA =
 			{
-				"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
-				//"Assets/modelData/unityChan.tkm",
-				//ANIMATION_DATA,
-				nullptr,
+				"Assets/modelData/whiteBear/WhiteBear.tkm",
+				ANIMATION_DATA,
 				EnModelUpAxis::enModelUpAxisY,
-				//std::size(ANIMATION_DATA)
-				0
+				std::size(ANIMATION_DATA)
 			};
 
 		}
