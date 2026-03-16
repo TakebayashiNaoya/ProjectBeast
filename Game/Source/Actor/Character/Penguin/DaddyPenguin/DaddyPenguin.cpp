@@ -29,6 +29,8 @@ namespace app
 
 		DaddyPenguin::DaddyPenguin()
 		{
+			CharacterBase::Init(MODEL_DATA);
+
 			m_status = std::make_unique<DaddyPenguinStatus>();
 			m_status->Setup();
 			m_stateMachine = std::make_unique<DaddyPenguinStateMachine>(this);
@@ -37,7 +39,7 @@ namespace app
 
 		void DaddyPenguin::Start()
 		{
-			CharacterBase::Init(MODEL_DATA);
+
 			PenguinBase::Start();
 		}
 
