@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/CharacterStateMachine.h"
+#include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
 
 
 namespace app
@@ -20,7 +20,7 @@ namespace app
 		/**
 		 * @brief 親ペンギンのステートマシンクラス
 		 */
-		class DaddyPenguinStateMachine : public CharacterStateMachine
+		class DaddyPenguinStateMachine : public PenguinStateMachine
 		{
 			// ここに親ペンギン固有のセッター関数を追加していく
 		public:
