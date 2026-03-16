@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/CharacterStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinStatus.h"
 
 
 namespace app
@@ -14,15 +14,10 @@ namespace app
 		/**
 		 * @brief 親ペンギンのステータスクラス
 		 */
-		class DaddyPenguinStatus : public CharacterStatus
+		class DaddyPenguinStatus : public PenguinStatus
 		{
 		public:
 			// ここに親ペンギン固有のステータス用のゲッター関数を追加していく
-			/**
-			 * @brief 移動速度(スニーク)を取得
-			 * @return 移動速度(スニーク)
-			 */
-			inline float GetSneakSpeed() const { return m_sneakSpeed; }
 
 
 		public:
@@ -43,8 +38,6 @@ namespace app
 
 		private:
 			// ここに親ペンギン固有のステータスを追加していく
-			/** 移動速度(スニーク) */
-			float m_sneakSpeed;
 		};
 	}
 }

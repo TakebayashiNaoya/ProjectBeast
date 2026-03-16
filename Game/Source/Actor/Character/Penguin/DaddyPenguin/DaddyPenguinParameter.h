@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/CharacterParameter.h"
+#include "Source/Actor/Character/Penguin/PenguinParameter.h"
 
 
 namespace app
@@ -15,7 +15,7 @@ namespace app
 		 * @brief 親ペンギンパラメーター
 		 * @details 親ペンギン固有のパラメーターを保持する
 		 */
-		struct MasterDaddyPenguinParameter : public MasterCharacterParameter
+		struct MasterDaddyPenguinParameter : public MasterPenguinParameter
 		{
 			appParameter(MasterDaddyPenguinParameter);
 
@@ -27,8 +27,6 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			// 親ペンギン固有のパラメーターをここに追加していく
-			/** スニークの速さ */
-			float sneakSpeed;
 		};
 	}
 }
