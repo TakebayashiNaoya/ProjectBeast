@@ -133,7 +133,7 @@ namespace app
 			/**
 			 * @brief ペンギンを発見
 			 */
-			void SetIsFindPenguin(const bool isFindPenguin) { m_isFindPenguin = isFindPenguin };
+			void SetIsFindPenguin(const bool isFindPenguin) { m_isFindPenguin = isFindPenguin; }
 
 
 			/**

@@ -121,6 +121,65 @@ namespace app
 		/************************************/
 
 
+		void EnemyJumpState::Enter()
+		{
+
+		}
+
+
+		void EnemyJumpState::Update()
+		{
+
+		}
+
+
+		void EnemyJumpState::Exit()
+		{
+
+		}
+
+
+		EnemyJumpState::EnemyJumpState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{
+
+		}
+
+
+
+
+		/************************************/
+
+
+		void EnemySwimState::Enter()
+		{
+
+		}
+
+
+		void EnemySwimState::Update()
+		{
+
+		}
+
+
+		void EnemySwimState::Exit()
+		{
+
+		}
+
+		EnemySwimState::EnemySwimState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{
+
+		}
+
+
+
+
+		/************************************/
+
+
 		void EnemyAttackState::Enter()
 		{
 			m_owner->PlayAnimation(static_cast<uint8_t>(EnemyAnimationType::Attack));

@@ -64,13 +64,13 @@ namespace app
 			{
 				return FindState(EnemyIdleState::ID());
 			}
-			if (CanChangeWandering())
-			{
-				return FindState(EnemyWanderingState::ID());
-			}
 			if (CanChangeChace())
 			{
 				return FindState(EnemyChaceState::ID());
+			}
+			if (CanChangeWandering())
+			{
+				return FindState(EnemyWanderingState::ID());
 			}
 			if (CanChangeAttack())
 			{

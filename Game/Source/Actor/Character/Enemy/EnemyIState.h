@@ -112,6 +112,54 @@ namespace app
 
 
 		/**
+		 * @brief エネミーのジャンプステートクラス
+		 */
+		class EnemyJumpState :public EnemyIState
+		{
+			appState(EnemyJumpState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemyJumpState(EnemyStateMachine* owner);
+			~EnemyJumpState() override = default;
+		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief エネミーの泳ぎステートクラス
+		 */
+		class EnemySwimState :public EnemyIState
+		{
+			appState(EnemySwimState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemySwimState(EnemyStateMachine* owner);
+			~EnemySwimState() override = default;
+		};
+
+
+
+
+		/************************************/
+
+
+		/**
 		 * @brief エネミーの攻撃ステートクラス
 		 */
 		class EnemyAttackState :public EnemyIState
