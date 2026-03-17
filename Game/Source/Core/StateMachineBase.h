@@ -16,7 +16,7 @@ public:\
 
 namespace app
 {
-	namespace actor
+	namespace core
 	{
 
 		/** 前方宣言 */

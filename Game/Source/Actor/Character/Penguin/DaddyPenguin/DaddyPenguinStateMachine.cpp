@@ -32,7 +32,7 @@ namespace app
 		}
 
 
-		IState* DaddyPenguinStateMachine::GetChangeState()
+		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
 			return FindState(DaddyPenguinIdleState::ID());
 			return nullptr;

@@ -25,7 +25,7 @@ namespace app
 		}
 
 
-		IState* PlayerStateMachine::GetChangeState()
+		core::IState* PlayerStateMachine::GetChangeState()
 		{
 			return FindState(PlayerIdleState::ID());
 			return nullptr;

@@ -73,7 +73,7 @@ namespace app
 		};
 
 
-		class DaddyPenguinIState : public IState
+		class DaddyPenguinIState : public core::IState
 		{
 		public:
 			virtual void Enter() override {}

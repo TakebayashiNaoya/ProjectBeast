@@ -16,7 +16,7 @@ namespace app
 		class PlayerStateMachine;
 
 
-		class PlayerIState : public IState
+		class PlayerIState : public core::IState
 		{
 		public:
 			virtual void Enter() override {}

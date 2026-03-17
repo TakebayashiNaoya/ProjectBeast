@@ -20,7 +20,7 @@ namespace app
 		/**
 		 * @brief 親ペンギンのステートマシンクラス
 		 */
-		class ChildPenguinStateMachine : public StateMachineBase
+		class ChildPenguinStateMachine : public core::StateMachineBase
 		{
 			// ここに親ペンギン固有のセッター関数を追加していく
 		public:
@@ -30,7 +30,7 @@ namespace app
 			// ここに親ペンギン固有のゲッター関数を追加していく
 		public:
 			/** ステートの変更先を取得する */
-			IState* GetChangeState();
+			core::IState* GetChangeState();
 
 
 		public:
