@@ -24,6 +24,11 @@ namespace app
 			 */
 			inline float GetSneakSpeed() const { return m_sneakSpeed; }
 			/**
+			 * @brief 移動速度(スライド)を取得
+			 * @return 移動速度(スライド)
+			 */
+			inline float GetSlideSpeed() const { return m_slideSpeed; }
+			/**
 			 * @brief ジャンプパワーを取得
 			 * @return ジャンプパワー
 			 */
@@ -50,6 +55,8 @@ namespace app
 			// ここにペンギン共通のステータスを追加していく
 			/** 移動速度(スニーク) */
 			float m_sneakSpeed;
+			/** 移動速度(スライド) */
+			float m_slideSpeed;
 			/** ジャンプパワー */
 			float m_jumpPower;
 		};

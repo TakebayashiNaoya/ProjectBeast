@@ -31,6 +31,7 @@ namespace app
 					parameter.runSpeed = j["runSpeed"].get<float>();
 					parameter.swimSpeed = j["swimSpeed"].get<float>();
 					parameter.sneakSpeed = j["sneakSpeed"].get<float>();
+					parameter.slideSpeed = j["slideSpeed"].get<float>();
 					parameter.jumpPower = j["jumpPower"].get<float>();
 					parameter.radius = j["radius"].get<float>();
 					parameter.height = j["height"].get<float>();
@@ -55,6 +56,7 @@ namespace app
 			m_runSpeed = parameter->runSpeed;
 			m_swimSpeed = parameter->swimSpeed;
 			m_sneakSpeed = parameter->sneakSpeed;
+			m_slideSpeed = parameter->slideSpeed;
 			m_jumpPower = parameter->jumpPower;
 			m_radius = parameter->radius;
 			m_height = parameter->height;
