@@ -34,6 +34,7 @@ namespace app
 			m_status = std::make_unique<DaddyPenguinStatus>();
 			m_status->Setup();
 			m_stateMachine = std::make_unique<DaddyPenguinStateMachine>(this);
+			m_characterStateMachine = m_stateMachine.get();
 		}
 
 
@@ -46,6 +47,7 @@ namespace app
 
 		void DaddyPenguin::Update()
 		{
+			m_stateMachine->PlayerControllerInput();
 			m_stateMachine->Update();
 
 			PenguinBase::Update();
