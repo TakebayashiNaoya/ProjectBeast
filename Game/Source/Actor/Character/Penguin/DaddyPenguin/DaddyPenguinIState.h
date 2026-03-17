@@ -197,5 +197,29 @@ namespace app
 			DaddyPenguinSlideEndState(DaddyPenguinStateMachine* owner);
 			~DaddyPenguinSlideEndState() override = default;
 		};
-	};
+
+
+
+
+		/*****************************************/
+
+
+		/**
+		 * @brief 親ペンギンの命令ステートクラス
+		 */
+		class DaddyPenguinCommandShoutState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinCommandShoutState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinCommandShoutState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinCommandShoutState() override = default;
+		};
+	}
 }

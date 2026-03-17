@@ -208,5 +208,28 @@ namespace app
 			: DaddyPenguinIState(owner)
 		{}
 
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinCommandShoutState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
+		}
+
+
+		void DaddyPenguinCommandShoutState::Update()
+		{}
+
+
+		void DaddyPenguinCommandShoutState::Exit()
+		{}
+
+
+		DaddyPenguinCommandShoutState::DaddyPenguinCommandShoutState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
 	}
 }
