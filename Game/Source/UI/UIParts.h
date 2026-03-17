@@ -322,8 +322,7 @@ namespace app
 			);
 		};
 
-
-
+		
 		/**
 		 * @brief 数字のスプライトのみを扱うUIBaseの派生クラス
 		 */
@@ -445,7 +444,6 @@ namespace app
 			friend class UIImage;
 			friend class UIGauge;
 			friend class UIIcon;
-			friend class UIText;
 			friend class UIButton;
 
 

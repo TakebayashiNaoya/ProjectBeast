@@ -103,6 +103,9 @@ namespace app
 
 		void UIButton::Update()
 		{
+			UpdateAnimation();
+
+			m_spriteRender.SetMulColor(m_color);
 			m_transform.UpdateTransform();
 
 			m_spriteRender.SetPosition(m_transform.m_localTransform.m_position);
@@ -119,6 +122,7 @@ namespace app
 				m_spriteRender.Draw(rc);
 			}
 		}
+
 
 		void UIButton::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector4& color)
 		{
@@ -140,7 +144,7 @@ namespace app
 
 
 
-		/****************************************/
+		/***************************************/
 
 
 		UIGauge::UIGauge()

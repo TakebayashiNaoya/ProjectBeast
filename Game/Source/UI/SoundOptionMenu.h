@@ -81,8 +81,21 @@ namespace app
 			 */
 			void InitializeDigit();
 
+			/**
+			 * @brief 戻るフラグ
+			 * @return 戻るフラグを取得
+			 */
+			bool IsBack()const { return m_isBack; }
+			/**
+			 * @biref 戻るフラグを設定
+			 * @param isReturn 戻るフラグ
+			 */
+			void SetBack(bool isBack)const { m_isBack = isBack; }
 			
+
 		private:
+			/** 戻るボタンのフラグ */
+			mutable bool m_isBack;
 			SoundType m_currentSoundType;
 
 

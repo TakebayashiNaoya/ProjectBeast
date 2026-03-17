@@ -36,6 +36,11 @@ namespace app
 	}
 
 
+	void ResultScene::PauseUpdate()
+	{
+	}
+
+
 	void ResultScene::Render(RenderContext& rc)
 	{
 		m_resultRender.Draw(rc);
