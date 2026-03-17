@@ -16,31 +16,32 @@ namespace app
 		namespace
 		{
 			/** 重力 */
-			constexpr float GRAVITY = -9.8f;
+			constexpr float GRAVITY = -9.8f * 5;
+			/** 地面(仮) */
+			constexpr float GROUND = 0.0f;
 		}
 
 
 		void PenguinStateMachine::Jump()
 		{
-			m_currentJumpPower += GRAVITY;
-			const float jumpPower = m_jumpPower + m_currentJumpPower;
-			Vector3 jumpVector = Vector3::Up * jumpPower;
-			Vector3 nextPosition = m_ownerActor->GetTransform().m_position + jumpVector;
+			// 先に移動処理を行う
+			Move();
 
-			m_ownerActor->SetPosition(nextPosition);
+			// 滞空時間を加算
+			m_airTime += g_gameTime->GetFrameDeltaTime();
+			// ジャンプパワーと重力から現在のジャンプパワーを計算
+			const float jumpPower = m_jumpPower + GRAVITY * m_airTime;
 
-			if (nextPosition.y < 0.0f)
-			{
-				nextPosition.y = 0.0f;
-			}
+			m_ownerCharacter->GetCharacterController()->Jump(jumpPower);
 		}
 
 
 		PenguinStateMachine::PenguinStateMachine(PenguinBase* ownerPenguinBase)
 			: CharacterStateMachine(ownerPenguinBase)
 			, m_ownerPenguinBase(ownerPenguinBase)
-			, m_currentJumpPower(0.0f)
+			, m_airTime(0.0f)
 			, m_jumpPower(0.0f)
+			, m_isJump(false)
 		{}
 
 
@@ -48,5 +49,7 @@ namespace app
 		{
 			return nullptr;
 		}
+
+
 	}
 }

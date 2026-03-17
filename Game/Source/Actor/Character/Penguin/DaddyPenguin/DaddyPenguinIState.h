@@ -14,6 +14,7 @@ namespace app
 
 		/** 前方宣言 */
 		class DaddyPenguinStateMachine;
+		class DaddyPenguinStatus;
 
 
 		class DaddyPenguinIState : public core::IState
@@ -30,7 +31,10 @@ namespace app
 
 
 		protected:
+			/** ステートのオーナー */
 			DaddyPenguinStateMachine* m_owner;
+			/** オーナーのステータス */
+			DaddyPenguinStatus* m_ownerStatus;
 		};
 
 
@@ -75,6 +79,53 @@ namespace app
 			DaddyPenguinSneakState(DaddyPenguinStateMachine* owner);
 			~DaddyPenguinSneakState() override = default;
 		};
-	}
-}
 
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief 親ペンギンのダッシュステートクラス
+		 */
+		class DaddyPenguinRunState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinRunState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinRunState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinRunState() override = default;
+		};
+
+
+
+
+		/***************************************/
+
+
+		/**
+		 * @brief 親ペンギンのジャンプステートクラス
+		 */
+		class DaddyPenguinJumpState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinJumpState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinJumpState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinJumpState() override = default;
+		};
+	};
+}

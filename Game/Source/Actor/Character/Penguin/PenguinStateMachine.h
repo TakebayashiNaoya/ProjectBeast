@@ -29,6 +29,21 @@ namespace app
 			{
 				m_jumpPower = jumpPower;
 			}
+			/**
+			 * @brief ジャンプするかどうかを設定
+			 * @param isJump ジャンプするかどうか
+			 */
+			inline void SetIsJump(const bool isJump)
+			{
+				m_isJump = isJump;
+			}
+			/**
+			 * @brief 滞空時間を設定
+			 */
+			inline void SetAirTime(const float airTime)
+			{
+				m_airTime = airTime;
+			}
 
 
 			// ここに親ペンギン共通のゲッター関数を追加していく
@@ -41,8 +56,17 @@ namespace app
 			{
 				return m_jumpPower;
 			}
+			/**
+			 * @brief ジャンプするかどうかを取得
+			 * @return ジャンプするかどうか
+			 */
+			inline bool GetIsJump() const
+			{
+				return m_isJump;
+			}
 
 
+			/** ステートの変更先を取得する */
 			virtual core::IState* GetChangeState() override;
 
 
@@ -53,18 +77,31 @@ namespace app
 			void Jump();
 
 
+		protected:
+			/**
+			 * @brief ジャンプステートに切り替えられるかどうか
+			 * @return ジャンプステートに切り替えられるかどうか
+			 */
+			bool CanChangeJumpState() const
+			{
+				return m_isJump && IsOnGround();
+			}
+
+
 		public:
 			PenguinStateMachine(PenguinBase* ownerPenguinBase);
 			~PenguinStateMachine() = default;
 
 
-		private:
+		protected:
 			/** 親ペンギンのポインタ */
 			PenguinBase* m_ownerPenguinBase;
-			/** 現在のジャンプパワー */
-			float m_currentJumpPower;
+			/** 滞空時間 */
+			float m_airTime;
 			/** ジャンプパワー */
 			float m_jumpPower;
+			/**ジャンプするかどうか */
+			bool m_isJump;
 		};
 	}
 }

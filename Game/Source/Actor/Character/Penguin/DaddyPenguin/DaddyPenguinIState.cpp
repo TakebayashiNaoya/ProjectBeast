@@ -9,6 +9,7 @@
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
 
 
 namespace app
@@ -27,7 +28,10 @@ namespace app
 
 
 		void DaddyPenguinIdleState::Enter()
-		{}
+		{
+			m_owner->SetMoveSpeed(0.0f);
+			m_owner->PlayAnimation(EnPenguinAnimationID::IdleStanding);
+		}
 
 
 		void DaddyPenguinIdleState::Update()
@@ -52,14 +56,13 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetDaddyPenguinStatus()->GetSneakSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-			m_owner->SetMoveDirection(Vector3::Right);
-			m_owner->PlayAnimation(10);
+			m_owner->PlayAnimation(EnPenguinAnimationID::MoveWalk);
 		}
 
 
 		void DaddyPenguinSneakState::Update()
 		{
-			m_owner->CharacterStateMachine::Move();
+			m_owner->Move();
 		}
 
 
@@ -71,5 +74,62 @@ namespace app
 			: DaddyPenguinIState(owner)
 		{}
 
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinRunState::Enter()
+		{
+			const float moveSpeed = m_owner->GetDaddyPenguinStatus()->GetRunSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnPenguinAnimationID::MoveRun);
+		}
+
+
+		void DaddyPenguinRunState::Update()
+		{
+			m_owner->Move();
+		}
+
+
+		void DaddyPenguinRunState::Exit()
+		{}
+
+
+		DaddyPenguinRunState::DaddyPenguinRunState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinJumpState::Enter()
+		{
+			const float jumpPower = m_owner->GetDaddyPenguinStatus()->GetJumpPower();
+			const float moveSpeed = m_owner->GetDaddyPenguinStatus()->GetSneakSpeed();
+			m_owner->SetJumpPower(jumpPower);
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);
+		}
+
+
+		void DaddyPenguinJumpState::Update()
+		{
+			m_owner->Jump();
+		}
+
+
+		void DaddyPenguinJumpState::Exit()
+		{}
+
+
+		DaddyPenguinJumpState::DaddyPenguinJumpState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
 	}
 }

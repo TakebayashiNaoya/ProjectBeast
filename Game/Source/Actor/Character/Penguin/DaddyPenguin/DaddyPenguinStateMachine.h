@@ -44,9 +44,19 @@ namespace app
 			~DaddyPenguinStateMachine() = default;
 
 
+		public:
+			/**
+			 * @brief プレイヤーコントローラーの入力処理
+			 * @note 後にプレイヤーコントローラーに処理を移す
+			 */
+			void PlayerControllerInput();
+
+
 		private:
 			/** 親ペンギンのポインタ */
 			DaddyPenguin* m_ownerDaddyPenguin;
+			/** 親ペンギンのステータス */
+			DaddyPenguinStatus* m_daddyPenguinStatus;
 		};
 	}
 }
