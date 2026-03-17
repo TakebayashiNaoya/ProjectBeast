@@ -51,6 +51,10 @@ namespace app
 			if (!m_isPause) {
 				m_currentScene->Update();
 			}
+			else
+			{
+				m_currentScene->PauseUpdate();
+			}
 
 			if (m_nextSceneId == INVALID_SCENE_ID)
 			{

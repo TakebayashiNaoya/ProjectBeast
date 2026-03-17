@@ -4,6 +4,7 @@
  * @author 立山
  */
 #include "stdafx.h"
+#if defined(APP_DEBUG)
 #include "DebugScene.h"
 
 
@@ -27,6 +28,12 @@ namespace app
 
 	void DebugScene::Update()
 	{
+		
+	}
+
+
+	void DebugScene::PauseUpdate()
+	{
 	}
 
 
@@ -39,4 +46,4 @@ namespace app
 	{
 		return false;
 	}
-}
+}#endif

@@ -46,6 +46,14 @@ namespace app
 			 */
 			void Reload();
 
+			/**
+			 * @brief MenuBaseを取得
+			 * @return MenuBaseのポインタを取得
+			 */
+			template<typename T>
+			const T* GetMenu() { return dynamic_cast<T*>(m_menu.get()); }
+			//T* GetMenu() { return dynamic_cast<T*>(m_menu.get()); }
+			
 
 		private:
 #ifdef APP_ENEBLE_LAYOUT_HOTRELOAD
