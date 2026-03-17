@@ -199,31 +199,31 @@ namespace app
 		{
 			if (enemy->m_target == nullptr) return;
 
-			Vector3 dis = enemy->m_targetPosition - enemy->m_target->GetTransform().m_position;
-			auto* stateMachine = enemy->m_target->GetEnemyStateMachine();
+			//Vector3 dis = enemy->m_targetPosition - enemy->m_target->GetTransform().m_position;
+			//auto* stateMachine = enemy->m_target->GetEnemyStateMachine();
 
-			if (dis.Length() < 0.5f)
-			{
-				// 新しい目的地
-				bool x = rand() % 2 >= 1;
-				bool z = rand() % 2 >= 1;
+			//if (dis.Length() < 0.5f)
+			//{
+			//	// 新しい目的地
+			//	bool x = rand() % 2 >= 1;
+			//	bool z = rand() % 2 >= 1;
 
-				Vector3 base = enemy->m_target->GetTransform().m_position;
+			//	Vector3 base = enemy->m_target->GetTransform().m_position;
 
-				enemy->m_targetPosition = base + Vector3(
-					rand() % 50 * (x ? 1.0f : -1.0f),
-					0.0f,
-					rand() % 50 * (z ? 1.0f : -1.0f)
-				);
+			//	enemy->m_targetPosition = base + Vector3(
+			//		rand() % 50 * (x ? 1.0f : -1.0f),
+			//		0.0f,
+			//		rand() % 50 * (z ? 1.0f : -1.0f)
+			//	);
 
-				return;
-			}
+			//	return;
+			//}
 
-			Vector3 dir = dis;
-			dir.Normalize();
+			//Vector3 dir = dis;
+			//dir.Normalize();
 
-			stateMachine->SetMoveDirection(dir);
-			stateMachine->SetStickLAmount(1.0f);
+			//stateMachine->SetMoveDirection(dir);
+			//stateMachine->SetStickLAmount(1.0f);
 		}
 
 
@@ -238,35 +238,38 @@ namespace app
 
 		int EnemyController::CheckWandering(EnemyController* enemy)
 		{
-			if (enemy->m_target == nullptr) return enEnemyState_Invalid;
+			//if (enemy->m_target == nullptr) return enEnemyState_Invalid;
 
-			Vector3 currentPos = enemy->m_target->GetTransform().m_position;
+			//Vector3 currentPos = enemy->m_target->GetTransform().m_position;
 
-			// 移動距離チェック
-			float moveDistance = (currentPos - enemy->m_startPosition).Length();
+			//// 移動距離チェック
+			//float moveDistance = (currentPos - enemy->m_startPosition).Length();
 
-			const float maxDistance = 10.0f;
+			//const float maxDistance = 10.0f;
 
-			if (moveDistance > maxDistance)
-			{
-				return enEnemyState_Idle;
-			}
+			//if (moveDistance > maxDistance)
+			//{
+			//	return enEnemyState_Idle;
+			//}
 
-			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
-			Vector3 playerPos = EnemyControllerManager::GetInstance()->GetPlayer()->GetTransform().m_position;
+			//Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			//Vector3 playerPos = EnemyControllerManager::GetInstance()->GetPlayer()->GetTransform().m_position;
 
-			float distance = (playerPos - enemyPos).Length();
+			//float distance = (playerPos - enemyPos).Length();
 
-			// 発見距離
-			const float findDistance = 0.1f;
+			//// 発見距離
+			//const float findDistance = 0.1f;
 
-			if (distance < findDistance)
-			{
-				enemy->m_target->GetEnemyStateMachine()->SetIsFindPenguin(true);
-				return enEnemyState_Chase;
-			}
+			//if (distance < findDistance)
+			//{
+			//	enemy->m_target->GetEnemyStateMachine()->SetIsFindPenguin(true);
+			//	return enEnemyState_Chase;
+			//}
 
-			return enEnemyState_Invalid;
+			//return enEnemyState_Invalid;
+			enemy->m_target->GetEnemyStateMachine()->SetIsFindPenguin(true);
+			return enEnemyState_Chase;
+
 		}
 
 
@@ -383,10 +386,7 @@ namespace app
 
 		int EnemyController::CheckAttack(EnemyController* enemy)
 		{
-			if (enemy->m_target->GetModelRender()->IsPlayingAnimation() == false)
-			{
-				return enEnemyState_Idle;
-			}
+			return enEnemyState_Chase;
 			return enEnemyState_Invalid;
 		}
 	}
