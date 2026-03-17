@@ -46,6 +46,10 @@ namespace app
 		/************************************/
 
 
+		/** 前方宣言 */
+		class CharacterStateMachine;
+
+
 		/**
 		 * @brief キャラクターの基底クラス
 		 */
@@ -79,8 +83,10 @@ namespace app
 
 
 		protected:
+			/** キャラクターステートマシン */
+			CharacterStateMachine* m_characterStateMachine;
 			/** アニメーションクリップ */
-			AnimationClip* m_animationClips;
+			std::unique_ptr<AnimationClip[]> m_animationClips;
 			/** キャラクターコントローラー */
 			nsBeastEngine::nsCollision::CharacterController m_characterController;
 		};

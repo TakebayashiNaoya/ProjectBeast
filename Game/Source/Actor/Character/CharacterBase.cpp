@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "CharacterBase.h"
+#include "CharacterStateMachine.h"
 #include "CharacterStatus.h"
 
 
@@ -13,7 +14,8 @@ namespace app
 	namespace actor
 	{
 		CharacterBase::CharacterBase()
-			: m_animationClips(nullptr)
+			: m_characterStateMachine(nullptr)
+			, m_animationClips(nullptr)
 		{}
 
 
@@ -28,6 +30,10 @@ namespace app
 
 		void CharacterBase::Update()
 		{
+			m_transform.m_position = m_characterStateMachine->GetTransform().m_position;
+			m_transform.m_rotation = m_characterStateMachine->GetTransform().m_rotation;
+			m_transform.m_scale = m_characterStateMachine->GetTransform().m_scale;
+
 			// モデルレンダーを更新
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 			m_modelRender.Update();
@@ -44,7 +50,7 @@ namespace app
 		void CharacterBase::Init(const ModelData& data)
 		{
 			// アニメーションクリップを作成
-			m_animationClips = new AnimationClip[data.clipNum];
+			m_animationClips = std::make_unique<AnimationClip[]>(data.clipNum);
 
 			for (int i = 0; i < data.clipNum; ++i)
 			{
@@ -53,7 +59,7 @@ namespace app
 			}
 
 			// モデルをセットアップ
-			m_modelRender.Init(data.fileName, m_animationClips, data.clipNum, true, data.upAxis);
+			m_modelRender.Init(data.fileName, m_animationClips.get(), data.clipNum, true, data.upAxis);
 			// トランスフォームを設定
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 			// モデルレンダーを更新
