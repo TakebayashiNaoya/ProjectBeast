@@ -33,8 +33,6 @@ namespace app
 		protected:
 			/** ステートのオーナー */
 			DaddyPenguinStateMachine* m_owner;
-			/** オーナーのステータス */
-			DaddyPenguinStatus* m_ownerStatus;
 		};
 
 
@@ -126,6 +124,78 @@ namespace app
 		public:
 			DaddyPenguinJumpState(DaddyPenguinStateMachine* owner);
 			~DaddyPenguinJumpState() override = default;
+		};
+
+
+
+
+		/*****************************************/
+
+
+		/**
+		 * @brief 親ペンギンのスライド開始ステートクラス
+		 */
+		class DaddyPenguinSlideStartState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinSlideStartState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinSlideStartState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinSlideStartState() override = default;
+		};
+
+
+
+
+		/*****************************************/
+
+
+		/**
+		 * @brief 親ペンギンのスライドステートクラス
+		 */
+		class DaddyPenguinSlidingState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinSlidingState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinSlidingState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinSlidingState() override = default;
+		};
+
+
+
+
+		/*****************************************/
+
+
+		/**
+		 * @brief 親ペンギンのスライド終了ステートクラス
+		 */
+		class DaddyPenguinSlideEndState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinSlideEndState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinSlideEndState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinSlideEndState() override = default;
 		};
 	};
 }

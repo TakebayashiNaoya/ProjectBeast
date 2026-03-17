@@ -23,6 +23,9 @@ namespace app
 			AddState<DaddyPenguinSneakState>(this);
 			AddState<DaddyPenguinRunState>(this);
 			AddState<DaddyPenguinJumpState>(this);
+			AddState<DaddyPenguinSlideStartState>(this);
+			AddState<DaddyPenguinSlidingState>(this);
+			AddState<DaddyPenguinSlideEndState>(this);
 
 			// 初期ステートの設定
 			m_currentState = FindState(DaddyPenguinIdleState::ID());
@@ -37,6 +40,7 @@ namespace app
 			m_moveDirection.y = 0.0f;
 			m_isDash = g_pad[0]->IsPress(enButtonB);
 			m_isJump = g_pad[0]->IsTrigger(enButtonA);
+			m_isSlide = g_pad[0]->IsPress(enButtonX);
 		}
 
 
