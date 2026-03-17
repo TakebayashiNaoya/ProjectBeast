@@ -16,13 +16,15 @@ namespace app
 	namespace actor
 	{
 		EnemyStateMachine::EnemyStateMachine(Enemy* enemy)
-			: StateMachineBase()
+			: CharacterStateMachine(enemy)
 			, m_owner(enemy)
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
 			AddState<EnemyWanderingState>(this);
-			AddState<EnemyChaceState>(this);
+			AddState<EnemyChaseState>(this);
+			AddState<EnemyJumpState>(this);
+			AddState<EnemySwimState>(this);
 			AddState<EnemyAttackState>(this);
 
 
@@ -64,17 +66,17 @@ namespace app
 			{
 				return FindState(EnemyIdleState::ID());
 			}
+			if (CanChangeAttack())
+			{
+				return FindState(EnemyAttackState::ID());
+			}
 			if (CanChangeChace())
 			{
-				return FindState(EnemyChaceState::ID());
+				return FindState(EnemyChaseState::ID());
 			}
 			if (CanChangeWandering())
 			{
 				return FindState(EnemyWanderingState::ID());
-			}
-			if (CanChangeAttack())
-			{
-				return FindState(EnemyAttackState::ID());
 			}
 
 			return FindState(EnemyIdleState::ID());
@@ -92,7 +94,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeWandering() const
 		{
-			if (m_stickLAmount > 0.01f) {
+			if (!m_isFindPenguin && m_stickLAmount > 0.01f) {
 				return true;
 			}
 			return false;
@@ -101,7 +103,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeChace() const
 		{
-			if (m_isFindPenguin) {
+			if (m_isFindPenguin && m_stickLAmount > 0.01f) {
 				return true;
 			}
 			return false;
@@ -110,9 +112,9 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeAttack() const
 		{
-			if (!m_canAttack) {
-				return false;
-			}
+			//if (!m_canAttack)return false;
+			if (!m_isNearPenguin)return false;
+
 			if (m_actionButtonX) {
 				return true;
 			}
@@ -123,13 +125,12 @@ namespace app
 		void EnemyStateMachine::Setup(Enemy* owner)
 		{
 			m_owner = owner;
-			m_ownerStatus = owner->GetStatus<EnemyStatus>();
+
 		}
 
-
-		void EnemyStateMachine::PlayAnimation(const int animationIndex)
+		const EnemyStatus* EnemyStateMachine::GetOwnerStatus()
 		{
-			m_owner->GetModelRender()->PlayAnimation(animationIndex);
+			return m_owner->GetStatus<EnemyStatus>();
 		}
 	}
 }

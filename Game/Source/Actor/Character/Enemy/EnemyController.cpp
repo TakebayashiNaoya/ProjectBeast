@@ -4,6 +4,8 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include <time.h>
+
 #include "Enemy.h"
 #include "EnemyController.h"
 #include "EnemyControllerManager.h"
@@ -21,7 +23,12 @@ namespace app
 
 
 		EnemyController::EnemyController()
-			:m_target(nullptr)
+			:m_target(nullptr),
+			m_elapsedTime(0.0f),
+			m_prePosition(Vector3::Zero),
+			m_startPosition(Vector3::Zero),
+			m_targetPosition(Vector3::Zero),
+			isFind(false)
 		{
 			static bool ini = false;
 			if (!ini)
@@ -99,6 +106,8 @@ namespace app
 		{
 			/** 待機 */
 			RegisterState(enEnemyState_Idle, EnterIdle, UpdateIdle, ExitIdle, CheckIdle);
+			/** サーチ */
+			RegisterState(enEnemyState_Search, EnterSearch, UpdateSearch, ExitSearch, CheckSearch);
 			/** 徘徊 */
 			RegisterState(enEnemyState_Wandering, EnterWandering, UpdateWandering, ExitWandering, CheckWandering);
 			/** チェイス */
@@ -115,15 +124,17 @@ namespace app
 		/** 各ステートの処理はこの下に書いていく */
 
 
-			/** 待機 */
+		/** 待機 */
 		void EnemyController::EnterIdle(EnemyController* enemy)
 		{
-
+			enemy->m_elapsedTime = 0.0f;
 		}
 
 
 		void EnemyController::UpdateIdle(EnemyController* enemy)
-		{}
+		{
+			enemy->m_elapsedTime += g_gameTime->GetFrameDeltaTime();
+		}
 
 
 		void EnemyController::ExitIdle(EnemyController* enemy)
@@ -132,34 +143,129 @@ namespace app
 
 		int EnemyController::CheckIdle(EnemyController* enemy)
 		{
-			if (rand() % 10 >= 5) {
-				return enEnemyState_Wandering;
+			const float idleTime = static_cast<float>(rand() % 500) * 0.01f;
+			if (enemy->m_elapsedTime > idleTime) {
+				if (rand() % 10 >= 5) {
+					return enEnemyState_Wandering;
+				}
+				return enEnemyState_Search;
 			}
+			return enEnemyState_Invalid;
+		}
+
+
+		/** サーチ */
+		void EnemyController::EnterSearch(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::UpdateSearch(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::ExitSearch(EnemyController* enemy)
+		{
+
+		}
+
+
+		int EnemyController::CheckSearch(EnemyController* enemy)
+		{
 			return enEnemyState_Wandering;
 		}
 
 
-
-		/** 移動 */
+		/** 徘徊 */
 		void EnemyController::EnterWandering(EnemyController* enemy)
-		{}
+		{
+			if (enemy->m_target == nullptr)return;
+
+			enemy->m_startPosition = enemy->m_target->GetTransform().m_position;
+
+			bool x = rand() % 2 >= 1;
+			bool z = rand() % 2 >= 1;
+
+			Vector3 base = enemy->m_startPosition;
+
+			enemy->m_targetPosition = base + Vector3(rand() % 50 * (x ? 1.0f : -1.0f), 0.0f, rand() % 50 * (z ? 1.0f : -1.0f));
+		}
 
 
 		void EnemyController::UpdateWandering(EnemyController* enemy)
 		{
+			if (enemy->m_target == nullptr) return;
 
+			Vector3 dis = enemy->m_targetPosition - enemy->m_target->GetTransform().m_position;
+			auto* stateMachine = enemy->m_target->GetEnemyStateMachine();
+
+			if (dis.Length() < 0.5f)
+			{
+				// 新しい目的地
+				bool x = rand() % 2 >= 1;
+				bool z = rand() % 2 >= 1;
+
+				Vector3 base = enemy->m_target->GetTransform().m_position;
+
+				enemy->m_targetPosition = base + Vector3(
+					rand() % 50 * (x ? 1.0f : -1.0f),
+					0.0f,
+					rand() % 50 * (z ? 1.0f : -1.0f)
+				);
+
+				return;
+			}
+
+			Vector3 dir = dis;
+			dir.Normalize();
+
+			stateMachine->SetMoveDirection(dir);
+			stateMachine->SetStickLAmount(1.0f);
 		}
 
 
 		void EnemyController::ExitWandering(EnemyController* enemy)
-		{}
+		{
+			if (enemy->m_target == nullptr) return;
+
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+
+		}
 
 
 		int EnemyController::CheckWandering(EnemyController* enemy)
 		{
-			if (rand() % 10 >= 5) {
+			if (enemy->m_target == nullptr) return enEnemyState_Invalid;
+
+			Vector3 currentPos = enemy->m_target->GetTransform().m_position;
+
+			// 移動距離チェック
+			float moveDistance = (currentPos - enemy->m_startPosition).Length();
+
+			const float maxDistance = 10.0f;
+
+			if (moveDistance > maxDistance)
+			{
+				return enEnemyState_Idle;
+			}
+
+			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			Vector3 playerPos = EnemyControllerManager::GetInstance()->GetPlayer()->GetTransform().m_position;
+
+			float distance = (playerPos - enemyPos).Length();
+
+			// 発見距離
+			const float findDistance = 0.1f;
+
+			if (distance < findDistance)
+			{
+				enemy->m_target->GetEnemyStateMachine()->SetIsFindPenguin(true);
 				return enEnemyState_Chase;
 			}
+
 			return enEnemyState_Invalid;
 		}
 
@@ -181,20 +287,21 @@ namespace app
 			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
 			Vector3 playerPos = player->GetTransform().m_position;
 
-			Vector3 dir = playerPos - enemyPos;
+			Vector3 dis = playerPos - enemyPos;
+			Vector3 dir = dis;
+			dir.y = 0.0f;
 			dir.Normalize();
 
-			float speed = 3.0f;
+			auto* stateMachine = enemy->m_target->GetEnemyStateMachine();
 
-			Vector3 newPos = enemyPos + dir * speed * g_gameTime->GetFrameDeltaTime();
-
-			enemy->m_target->SetPosition(newPos);
+			stateMachine->SetMoveDirection(dir);
+			stateMachine->SetStickLAmount(1.0f);
 		}
 
 
 		void EnemyController::ExitChase(EnemyController* enemy)
 		{
-
+			enemy->m_target->GetEnemyStateMachine()->SetMoveVector(Vector3::Zero);
 		}
 
 
@@ -208,8 +315,11 @@ namespace app
 
 			float distance = (playerPos - enemyPos).Length();
 
-			if (distance < 2.0f)
+			if (distance < 9.0f)
 			{
+				enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(true);
+				enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(true);
+
 				return enEnemyState_Attack;
 			}
 
@@ -273,6 +383,10 @@ namespace app
 
 		int EnemyController::CheckAttack(EnemyController* enemy)
 		{
+			if (enemy->m_target->GetModelRender()->IsPlayingAnimation() == false)
+			{
+				return enEnemyState_Idle;
+			}
 			return enEnemyState_Invalid;
 		}
 	}

@@ -66,6 +66,7 @@ namespace app
 			enum EnEnemyStateID
 			{
 				enEnemyState_Idle,
+				enEnemyState_Search,
 				enEnemyState_Wandering,
 				enEnemyState_Chase,
 				enEnemyState_Jump,
@@ -137,6 +138,15 @@ namespace app
 
 
 			/**
+			 * サーチ
+			 */
+			static void EnterSearch(EnemyController* enemy);
+			static void UpdateSearch(EnemyController* enemy);
+			static void ExitSearch(EnemyController* enemy);
+			static int CheckSearch(EnemyController* enemy);
+
+
+			/**
 			 * 徘徊
 			 */
 			static void EnterWandering(EnemyController* enemy);
@@ -183,9 +193,13 @@ namespace app
 
 		private:
 			Enemy* m_target = nullptr;
+			float m_elapsedTime = 0.0f;
 
 			/** targetの前回の位置を保持 */
 			Vector3 m_prePosition = Vector3::Zero;
+
+			/** 徘徊開始位置 */
+			Vector3 m_startPosition = Vector3::Zero;
 
 			Vector3 m_targetPosition = Vector3::Zero;
 			bool isFind = false;

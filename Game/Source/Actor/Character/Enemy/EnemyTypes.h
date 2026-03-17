@@ -8,7 +8,7 @@
  /**
   * プレイヤーのアニメーションの種類
   */
-enum class EnemyAnimationType : uint8_t
+enum class EnEnemyAnimationType : uint8_t
 {
 	Idle,
 	Walk,

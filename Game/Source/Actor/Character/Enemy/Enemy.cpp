@@ -40,6 +40,8 @@ namespace app
 			m_stateMachine = std::make_unique<EnemyStateMachine>(this);
 			m_status = std::make_unique<EnemyStatus>();
 			m_status->Setup();
+
+			m_stateMachine->Setup(this);
 		}
 
 
@@ -54,7 +56,21 @@ namespace app
 		{
 			m_stateMachine->Update();
 
+			Vector3 move = m_stateMachine->GetMoveVector();
+			if (move.Length() > 0.001f)
+			{
+				Vector3 currentPos = GetTransform().m_position;
+				Vector3 targetPos = currentPos + move;
+
+				const Vector3& position = m_characterController.Execute(targetPos, 1.0f);
+
+				Quaternion rot = GetTransform().m_rotation;
+				rot.SetRotationYFromDirectionXZ(move);
+				SetPosition(position);
+				SetRotation(rot);
+			}
 			CharacterBase::Update();
+			m_stateMachine->SetPosition(GetTransform().m_position);
 		}
 
 

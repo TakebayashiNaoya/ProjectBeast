@@ -4,7 +4,7 @@
  * @author 立山
  */
 #pragma once
-#include "Source/Core/StateMachineBase.h"
+#include "Source/Actor/Character/CharacterStateMachine.h"
 
 
 namespace app
@@ -18,7 +18,7 @@ namespace app
 		class Player;
 
 
-		class EnemyStateMachine :public core::StateMachineBase
+		class EnemyStateMachine :public CharacterStateMachine
 		{
 		public:
 			core::IState* GetChangeState();
@@ -40,17 +40,10 @@ namespace app
 		public:
 			Enemy* GetOwner() { return m_owner; }
 
-			EnemyStatus* GetOwnerStatus() { return m_ownerStatus; }
-
-			void PlayAnimation(const int animationIndex);
+			const EnemyStatus* GetOwnerStatus();
 
 
 		public:
-			/** 方向のゲッター */
-			const Vector3& GetDirection() { return m_direction; }
-			/** 方向のセッター */
-			void SetDirection(const Vector3& direction) { m_direction = direction; }
-
 
 			/**
 			 * @brief 移動ベクトルのゲッター
@@ -90,12 +83,6 @@ namespace app
 			 * @brief 回転のセッター
 			 */
 			void SetRotation(const Quaternion& rotation) { m_rotation = rotation; }
-
-
-			/**
-			 * @brief ダッシュの設定
-			 */
-			void SetDash(const bool isDash) { m_isDash = isDash; }
 
 
 			/**
@@ -174,9 +161,6 @@ namespace app
 			core::IState* m_currentState = nullptr;
 			core::IState* m_nextState = nullptr;
 
-			/** プレイヤーの方向を取る変数(スティック入力の方向) */
-			Vector3 m_direction = Vector3::Zero;
-
 			/** 移動ベクトル */
 			Vector3 m_moveVector = Vector3::Zero;
 
@@ -195,9 +179,6 @@ namespace app
 
 			/** 左スティックの入力量 */
 			float m_stickLAmount = 0.0f;
-
-			/** ダッシュできるかどうか */
-			bool m_isDash = false;
 
 			/** Aボタンを押せるかどうか */
 			bool m_actionButtonA = false;

@@ -27,7 +27,7 @@ namespace app
 
 		void EnemyIdleState::Enter()
 		{
-
+			m_owner->PlayAnimation(EnEnemyAnimationType::Idle);
 		}
 
 
@@ -50,7 +50,9 @@ namespace app
 
 
 		void EnemyWanderingState::Enter()
-		{}
+		{
+			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+		}
 
 
 		void EnemyWanderingState::Update()
@@ -59,7 +61,7 @@ namespace app
 				return;
 			}
 
-			const Vector3& moveDirection = m_owner->GetDirection();
+			const Vector3& moveDirection = m_owner->GetMoveDirection();
 			// NOTE:Statusの設定が出来たらコメントを解除する
 			const Vector3 move = moveDirection * m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveVector(move);
@@ -82,17 +84,17 @@ namespace app
 		/************************************/
 
 
-		void EnemyChaceState::Enter()
+		void EnemyChaseState::Enter()
 		{}
 
 
-		void EnemyChaceState::Update()
+		void EnemyChaseState::Update()
 		{
 			if (m_owner->GetStickLAmount() < 0.01f) {
 				return;
 			}
 
-			const Vector3& moveDirection = m_owner->GetDirection();
+			const Vector3& moveDirection = m_owner->GetMoveDirection();
 
 			// NOTE:Statusの設定が出来たらコメントを解除する
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
@@ -105,13 +107,13 @@ namespace app
 		}
 
 
-		void EnemyChaceState::Exit()
+		void EnemyChaseState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 		}
 
 
-		EnemyChaceState::EnemyChaceState(EnemyStateMachine* owner)
+		EnemyChaseState::EnemyChaseState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
 
@@ -182,7 +184,7 @@ namespace app
 
 		void EnemyAttackState::Enter()
 		{
-			m_owner->PlayAnimation(static_cast<uint8_t>(EnemyAnimationType::Attack));
+			m_owner->PlayAnimation(EnEnemyAnimationType::Attack);
 		}
 
 

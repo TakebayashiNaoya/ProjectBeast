@@ -90,9 +90,9 @@ namespace app
 		/**
 		 * @brief エネミーの追跡ステートクラス
 		 */
-		class EnemyChaceState :public EnemyIState
+		class EnemyChaseState :public EnemyIState
 		{
-			appState(EnemyChaceState);
+			appState(EnemyChaseState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -101,8 +101,8 @@ namespace app
 
 
 		public:
-			EnemyChaceState(EnemyStateMachine* owner);
-			~EnemyChaceState() override = default;
+			EnemyChaseState(EnemyStateMachine* owner);
+			~EnemyChaseState() override = default;
 		};
 
 
