@@ -55,34 +55,7 @@ namespace app
 			void SetMoveVector(const Vector3& moveVector) { m_moveVector = moveVector; }
 
 
-			/**
-			 * @brief 座標のゲッター
-			 */
-			const Vector3& GetPosition() const { return m_position; }
-			/**
-			 * @brief 座標のセッター
-			 */
-			void SetPosition(const Vector3& position) { m_position = position; }
 
-
-			/**
-			 * @brief スケールのゲッター
-			 */
-			const Vector3& GetScale()const { return m_scale; }
-			/**
-			 * @brief スケールのセッター
-			 */
-			void SetScale(const Vector3& scale) { m_scale = scale; }
-
-
-			/**
-			 * @brief 回転のゲッター
-			 */
-			const Quaternion& GetRotation()const { return m_rotation; }
-			/**
-			 * @brief 回転のセッター
-			 */
-			void SetRotation(const Quaternion& rotation) { m_rotation = rotation; }
 
 
 			/**
@@ -163,13 +136,6 @@ namespace app
 
 			/** 移動ベクトル */
 			Vector3 m_moveVector = Vector3::Zero;
-
-			/** 座標 */
-			Vector3 m_position = Vector3::Zero;
-			/** 拡縮 */
-			Vector3 m_scale = Vector3::One * 1.0f;
-			/** 回転 */
-			Quaternion m_rotation = Quaternion::Identity;
 
 			/** プレイヤーの位置 */
 			Vector3 m_playerPosition = Vector3::Zero;
