@@ -56,14 +56,64 @@ namespace app
 			{
 				return FindState(DaddyPenguinJumpState::ID());
 			}
+
+
+			/** スライド終わりのアニメーション再生中なら維持する */
+			if (IsEqualCurrentState(DaddyPenguinSlideEndState::ID()))
+			{
+				if (!IsFinishedSlideEndState())
+				{
+					return FindState(DaddyPenguinSlideEndState::ID());
+				}
+			}
+
+
+			/** スライド中なら、スライドを維持するか判断する */
+			if (IsEqualCurrentState(DaddyPenguinSlidingState::ID()))
+			{
+				if (CanKeepSlidingState())
+				{
+					return FindState(DaddyPenguinSlidingState::ID());
+				}
+				else
+				{
+					return FindState(DaddyPenguinSlideEndState::ID());
+				}
+			}
+
+
+			/** スライド開始中ならアニメーションが終わるまで維持し、終わるとスライディングステートへ */
+			if (IsEqualCurrentState(DaddyPenguinSlideStartState::ID()))
+			{
+				if (CanChangeSlidingState())
+				{
+					return FindState(DaddyPenguinSlidingState::ID());
+				}
+			}
+
+
+			/** スライドを始められるならスライド開始状態へ */
+			if (CanChangeSlideStartState())
+			{
+				return FindState(DaddyPenguinSlideStartState::ID());
+			}
+
+
+			/** ダッシュ入力があり、移動入力があればダッシュ状態へ */
 			if (CanChangeRunState())
 			{
 				return FindState(DaddyPenguinRunState::ID());
 			}
+
+
+			/** 移動入力があればスニーク状態へ */
 			if (CanChangeWalkState())
 			{
 				return FindState(DaddyPenguinSneakState::ID());
 			}
+
+
+			/** 当てはまらなければ待機状態へ */
 			return FindState(DaddyPenguinIdleState::ID());
 		}
 	}
