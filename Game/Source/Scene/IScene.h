@@ -35,6 +35,7 @@ namespace app
 		virtual bool Start() = 0;
 		virtual void Update() = 0;
 		virtual void Render(RenderContext& rc) = 0;
+		virtual void PauseUpdate() = 0;
 
 		/**
 		 * @brief シーンを要求

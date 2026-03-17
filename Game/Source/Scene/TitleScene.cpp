@@ -35,6 +35,10 @@ namespace app
 		}
 	}
 
+	void TitleScene::PauseUpdate()
+	{
+	}
+
 
 	void TitleScene::Render(RenderContext& rc)
 	{

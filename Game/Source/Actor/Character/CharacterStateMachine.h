@@ -42,6 +42,14 @@ namespace app
 			{
 				return m_moveSpeed;
 			}
+			/**
+			 * @brief ダッシュしているかどうかを取得
+			 * @return ダッシュしているかどうか
+			 */
+			inline bool GetIsDash() const
+			{
+				return m_isDash;
+			}
 
 
 		public:
@@ -71,7 +79,7 @@ namespace app
 			}
 
 
-		protected:
+		public:
 			/**
 			 * @brief 移動処理
 			 */
@@ -85,7 +93,7 @@ namespace app
 			 */
 			inline bool CanChangeWalkState() const
 			{
-				return fabsf(m_moveSpeed) > FLT_EPSILON && fabsf(m_moveDirection.LengthSq()) > FLT_EPSILON;
+				return fabsf(m_moveDirection.LengthSq()) > FLT_EPSILON;
 			}
 			/**
 			 * @brief 走行ステートに切り替えられるかどうか
@@ -123,15 +131,13 @@ namespace app
 
 
 		public:
-			CharacterStateMachine(CharacterBase* ownerCharacter, CharacterStatus* characterStatus);
+			CharacterStateMachine(CharacterBase* ownerCharacter);
 			virtual ~CharacterStateMachine() override = default;
 
 
 		protected:
 			/** キャラクターのオーナー */
 			CharacterBase* m_ownerCharacter;
-			/** キャラクターのステータス */
-			CharacterStatus* m_characterStatus;
 
 
 			/** 移動方向 */
