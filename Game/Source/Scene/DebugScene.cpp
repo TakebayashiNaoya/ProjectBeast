@@ -4,6 +4,7 @@
  * @author 立山
  */
 #include "stdafx.h"
+#if defined(APP_DEBUG)
 #include "DebugScene.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/Daddypenguin.h"
 #include "Source/Core/ParameterManager.h"
@@ -36,6 +37,12 @@ namespace app
 	{
 		daddyPenguin->UpdateWrapper();
 		core::ParameterManager::Get()->Update();
+		
+	}
+
+
+	void DebugScene::PauseUpdate()
+	{
 	}
 
 
@@ -49,4 +56,4 @@ namespace app
 	{
 		return false;
 	}
-}
+}#endif

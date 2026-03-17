@@ -34,6 +34,10 @@ namespace app
 		}
 	}
 
+	void InGameScene::PauseUpdate()
+	{
+	}
+
 
 	void InGameScene::Render(RenderContext& rc)
 	{

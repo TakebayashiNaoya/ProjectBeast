@@ -255,13 +255,13 @@ namespace app
 				InitializeUIParts(gauge, item);
 				return gauge;
 			}
-			//if (type == "UIButton")
-			//{
-			//	canvas->CreateUI<UIButton>(key);
-			//	auto* button = canvas->FindUI<UIButton>(key);
-			//	InitializeUIParts(button, item);
-			//	return button;
-			//}
+			if (type == "UIButton")
+			{
+				canvas->CreateUI<UIButton>(key);
+				auto* button = canvas->FindUI<UIButton>(key);
+				InitializeUIParts(button, item);
+				return button;
+			}
 			if (type == "UIDigit")
 			{
 				canvas->CreateUI<UIDigit>(key);
