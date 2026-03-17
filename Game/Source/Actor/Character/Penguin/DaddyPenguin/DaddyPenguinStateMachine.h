@@ -24,10 +24,42 @@ namespace app
 		{
 			// ここに親ペンギン固有のセッター関数を追加していく
 		public:
+			/**
+			 * @brief 追従命令を出すかどうかを設定
+			 * @param isFollowCommand 追従命令を出すかどうか
+			 */
+			inline void SetIsFollowCommand(const bool isFollowCommand)
+			{
+				m_isFollowCommand = isFollowCommand;
+			}
+			/**
+			 * @brief 待機命令を出すかどうかを設定
+			 * @param isWaitCommand 待機命令を出すかどうか
+			 */
+			inline void SetIsWaitCommand(const bool isWaitCommand)
+			{
+				m_isWaitCommand = isWaitCommand;
+			}
 
 
 			// ここに親ペンギン固有のゲッター関数を追加していく
 		public:
+			/**
+			 * @brief 追従命令を出すかどうかを取得
+			 * @return 追従命令を出すかどうか
+			 */
+			inline bool GetIsFollowCommand() const
+			{
+				return m_isFollowCommand;
+			}
+			/**
+			 * @brief 待機命令を出すかどうかを取得
+			 * @return 待機命令を出すかどうか
+			 */
+			inline bool GetIsWaitCommand() const
+			{
+				return m_isWaitCommand;
+			}
 			/**
 			 * @brief 親ペンギンのステータスを取得
 			 * @return 親ペンギンのステータスポインタ
@@ -44,6 +76,17 @@ namespace app
 			~DaddyPenguinStateMachine() = default;
 
 
+		private:
+			/**
+			 * @brief 追従命令か待機命令が出ているか
+			 * @return 追従命令か待機命令が出ているか
+			 */
+			bool CanChangeCommandState() const
+			{
+				return m_isFollowCommand || m_isWaitCommand;
+			}
+
+
 		public:
 			/**
 			 * @brief プレイヤーコントローラーの入力処理
@@ -55,8 +98,10 @@ namespace app
 		private:
 			/** 親ペンギンのポインタ */
 			DaddyPenguin* m_ownerDaddyPenguin;
-			/** 親ペンギンのステータス */
-			DaddyPenguinStatus* m_daddyPenguinStatus;
+			/** 追従命令を出すかどうか */
+			bool m_isFollowCommand;
+			/** 待機命令を出すかどうか */
+			bool m_isWaitCommand;
 		};
 	}
 }
