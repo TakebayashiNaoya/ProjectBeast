@@ -37,13 +37,12 @@ namespace app
 	{
 		daddyPenguin->UpdateWrapper();
 		core::ParameterManager::Get()->Update();
-		
+
 	}
 
 
 	void DebugScene::PauseUpdate()
-	{
-	}
+	{}
 
 
 	void DebugScene::Render(RenderContext& rc)
@@ -56,4 +55,5 @@ namespace app
 	{
 		return false;
 	}
-}#endif
+}
+#endif
