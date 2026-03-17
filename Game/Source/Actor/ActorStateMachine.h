@@ -34,7 +34,7 @@ namespace app
 			 */
 			inline const core::Transform& GetTransform() const
 			{
-				return m_ownerActor->GetTransform();
+				return m_transform;
 			}
 			/**
 			 * @brief 座標の設定
@@ -42,7 +42,7 @@ namespace app
 			 */
 			inline void SetPosition(const Vector3& position)
 			{
-				m_ownerActor->SetPosition(position);
+				m_transform.m_position = position;
 			}
 			/**
 			 * @brief 回転の設定
@@ -50,7 +50,7 @@ namespace app
 			 */
 			inline void SetRotation(const Quaternion& rotation)
 			{
-				m_ownerActor->SetRotation(rotation);
+				m_transform.m_rotation = rotation;
 			}
 			/**
 			 * @brief 拡大率の設定
@@ -58,7 +58,7 @@ namespace app
 			 */
 			inline void SetScale(const Vector3& scale)
 			{
-				m_ownerActor->SetScale(scale);
+				m_transform.m_scale = scale;
 			}
 
 
@@ -78,7 +78,8 @@ namespace app
 		protected:
 			/** アクターのオーナー */
 			Actor* m_ownerActor;
-
+			/** ステートマシンが持つトランスフォーム */
+			core::Transform m_transform;
 
 		};
 

@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "CharacterBase.h"
+#include "CharacterStateMachine.h"
 #include "CharacterStatus.h"
 
 
@@ -13,7 +14,8 @@ namespace app
 	namespace actor
 	{
 		CharacterBase::CharacterBase()
-			: m_animationClips(nullptr)
+			: m_characterStateMachine(nullptr)
+			, m_animationClips(nullptr)
 		{}
 
 
@@ -28,6 +30,10 @@ namespace app
 
 		void CharacterBase::Update()
 		{
+			m_transform.m_position = m_characterStateMachine->GetTransform().m_position;
+			m_transform.m_rotation = m_characterStateMachine->GetTransform().m_rotation;
+			m_transform.m_scale = m_characterStateMachine->GetTransform().m_scale;
+
 			// モデルレンダーを更新
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 			m_modelRender.Update();

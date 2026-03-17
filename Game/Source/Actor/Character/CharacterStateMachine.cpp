@@ -14,14 +14,14 @@ namespace app
 		void CharacterStateMachine::Move()
 		{
 			// 移動方向を正規化して移動ベクトルを計算
-			m_moveDirection.Normalize();
 			const Vector3 moveVector = m_moveDirection * m_moveSpeed;
-			const Vector3 nextPosition = m_ownerCharacter->GetCharacterController()->Execute(moveVector, 1 / 60);
-			m_ownerActor->SetPosition(nextPosition);
+			Vector3 nextPosition = m_transform.m_position + moveVector;
+			Vector3 prevPosition = m_ownerCharacter->GetCharacterController()->Execute(nextPosition, 1 / 60);
+			m_transform.m_position = prevPosition;
 
-			Quaternion rotation = Quaternion::Identity;
+			Quaternion rotation = m_transform.m_rotation;
 			rotation.SetRotationYFromDirectionXZ(m_moveDirection);
-			m_ownerActor->SetRotation(rotation);
+			m_transform.m_rotation = rotation;
 		}
 
 
@@ -32,10 +32,9 @@ namespace app
 		}
 
 
-		CharacterStateMachine::CharacterStateMachine(CharacterBase* ownerCharacter, CharacterStatus* characterStatus)
+		CharacterStateMachine::CharacterStateMachine(CharacterBase* ownerCharacter)
 			: ActorStateMachine(ownerCharacter)
 			, m_ownerCharacter(ownerCharacter)
-			, m_characterStatus(characterStatus)
 			, m_moveDirection(Vector3::Zero)
 			, m_moveSpeed(0.0f)
 			, m_isDash(false)
