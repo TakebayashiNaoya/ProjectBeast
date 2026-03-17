@@ -21,6 +21,7 @@ namespace app
 
 
 		DaddyPenguinStatus::DaddyPenguinStatus()
+			: m_enableCommandRange(0.0f)
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterDaddyPenguinParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterDaddyPenguinParameter& parameter)
@@ -35,6 +36,7 @@ namespace app
 					parameter.jumpPower = j["jumpPower"].get<float>();
 					parameter.radius = j["radius"].get<float>();
 					parameter.height = j["height"].get<float>();
+					parameter.enableCommandRange = j["enableCommandRange"].get<float>();
 				});
 		}
 
@@ -60,6 +62,7 @@ namespace app
 			m_jumpPower = parameter->jumpPower;
 			m_radius = parameter->radius;
 			m_height = parameter->height;
+			m_enableCommandRange = parameter->enableCommandRange;
 		}
 
 
