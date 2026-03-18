@@ -27,6 +27,8 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			// 親ペンギン固有のパラメーターをここに追加していく
+			/** 命令が届く範囲 */
+			float enableCommandRange;
 		};
 	}
 }

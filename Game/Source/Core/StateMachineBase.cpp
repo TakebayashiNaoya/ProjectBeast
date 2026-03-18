@@ -45,6 +45,12 @@ namespace app
 		}
 
 
+		bool StateMachineBase::IsEqualCurrentState(const uint32_t stateID) const
+		{
+			return m_currentState == m_stateMap.at(stateID).get();
+		}
+
+
 		IState* StateMachineBase::FindState(const uint32_t stateID)
 		{
 			// 指定したIDを取得

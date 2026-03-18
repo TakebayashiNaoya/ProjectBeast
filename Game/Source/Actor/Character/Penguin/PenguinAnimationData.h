@@ -16,8 +16,10 @@ namespace app
 		 */
 		enum class EnPenguinAnimationID : uint8_t
 		{
+			// 命令を出す
+			CommandShout = 0,
 			// うつ伏せで死亡する
-			DeathFaceDown = 0,
+			DeathFaceDown,
 			// 仰向けで死亡する
 			DeathFaceUp,
 			// 食べ物をついばむ
@@ -72,14 +74,11 @@ namespace app
 		};
 
 
-		/** アニメーションの数 */
-		constexpr uint8_t ANIMATION_NUM = static_cast<uint8_t>(EnPenguinAnimationID::Max);
-
-
 		/** アニメーションの情報 */
-		const AnimationData ANIMATION_DATA[ANIMATION_NUM] =
+		const AnimationData ANIMATION_DATA[static_cast<uint8_t>(EnPenguinAnimationID::Max)] =
 		{
-
+			// 命令を出す
+			{ "Assets/animData/penguin/commandShout.tka", false },
 			// うつ伏せで死亡する
 			{ "Assets/animData/penguin/deathFaceDown.tka", false },
 			// 仰向けで死亡する

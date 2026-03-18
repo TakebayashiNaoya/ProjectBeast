@@ -18,6 +18,11 @@ namespace app
 		{
 		public:
 			// ここに親ペンギン固有のステータス用のゲッター関数を追加していく
+			/**
+			 * @brief 命令が届く範囲を取得
+			 * @return 命令が届く範囲
+			 */
+			inline float GetEnableCommandRange() const { return m_enableCommandRange; }
 
 
 		public:
@@ -38,6 +43,8 @@ namespace app
 
 		private:
 			// ここに親ペンギン固有のステータスを追加していく
+			/** 命令が届く範囲 */
+			float m_enableCommandRange;
 		};
 	}
 }

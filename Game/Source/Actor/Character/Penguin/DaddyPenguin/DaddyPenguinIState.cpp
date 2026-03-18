@@ -131,5 +131,105 @@ namespace app
 		DaddyPenguinJumpState::DaddyPenguinJumpState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinSlideStartState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::SlideStart);
+		}
+
+
+		void DaddyPenguinSlideStartState::Update()
+		{}
+
+
+		void DaddyPenguinSlideStartState::Exit()
+		{}
+
+
+		DaddyPenguinSlideStartState::DaddyPenguinSlideStartState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinSlidingState::Enter()
+		{
+			const float moveSpeed = m_owner->GetDaddyPenguinStatus()->GetSlideSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnPenguinAnimationID::Sliding);
+		}
+
+
+		void DaddyPenguinSlidingState::Update()
+		{
+			m_owner->Move();
+		}
+
+
+		void DaddyPenguinSlidingState::Exit()
+		{}
+
+
+		DaddyPenguinSlidingState::DaddyPenguinSlidingState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinSlideEndState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::StandUp);
+		}
+
+
+		void DaddyPenguinSlideEndState::Update()
+		{}
+
+
+		void DaddyPenguinSlideEndState::Exit()
+		{}
+
+
+		DaddyPenguinSlideEndState::DaddyPenguinSlideEndState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinCommandShoutState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
+		}
+
+
+		void DaddyPenguinCommandShoutState::Update()
+		{}
+
+
+		void DaddyPenguinCommandShoutState::Exit()
+		{}
+
+
+		DaddyPenguinCommandShoutState::DaddyPenguinCommandShoutState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
 	}
 }

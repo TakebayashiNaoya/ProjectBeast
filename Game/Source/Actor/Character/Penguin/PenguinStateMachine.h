@@ -38,11 +38,12 @@ namespace app
 				m_isJump = isJump;
 			}
 			/**
-			 * @brief 滞空時間を設定
+			 * @brief スライドするかどうかを設定
+			 * @param isSlide スライドするかどうか
 			 */
-			inline void SetAirTime(const float airTime)
+			inline void SetIsSlide(const bool isSlide)
 			{
-				m_airTime = airTime;
+				m_isSlide = isSlide;
 			}
 
 
@@ -86,6 +87,39 @@ namespace app
 			{
 				return m_isJump && IsOnGround();
 			}
+			/**
+			 * @brief スライド開始ステートに切り替えられるかどうか
+			 * @return スライド開始ステートに切り替えられるかどうか
+			 */
+			bool CanChangeSlideStartState() const
+			{
+				const float height = m_transform.m_position.y;
+				return  m_isSlide /*&& IsOnGround()*/ && height >= 0.0f;
+			}
+			/**
+			 * @brief スライドステートに切り替えられるかどうか
+			 * @return スライドステートに切り替えられるかどうか
+			 */
+			bool CanChangeSlidingState() const
+			{
+				return m_isSlide && !IsPlayingAnimation();
+			}
+			/**
+			 * @brief スライドステートを維持できるかどうか
+			 * @return スライドステートを維持できるかどうか
+			 */
+			bool CanKeepSlidingState() const
+			{
+				return m_isSlide && CanChangeWalkState();
+			}
+			/**
+			 * @brief スライド終了ステートに切り替えられるかどうか
+			 * @return スライド終了ステートに切り替えられるかどうか
+			 */
+			bool IsFinishedSlideEndState() const
+			{
+				return !m_isSlide && !IsPlayingAnimation();
+			}
 
 
 		public:
@@ -102,6 +136,8 @@ namespace app
 			float m_jumpPower;
 			/**ジャンプするかどうか */
 			bool m_isJump;
+			/** スライドするかどうか */
+			bool m_isSlide;
 		};
 	}
 }
