@@ -77,6 +77,14 @@ namespace app
 			{
 				m_isDash = isDash;
 			}
+			/**
+			 * @brief 泳ぎ中かどうかを設定
+			 * @param isSwimming 泳ぎ中かどうか
+			 */
+			inline void SetIsSwimming(const bool isSwimming)
+			{
+				m_isSwimming = isSwimming;
+			}
 
 
 		public:
@@ -102,6 +110,14 @@ namespace app
 			inline bool CanChangeRunState() const
 			{
 				return CanChangeWalkState() && m_isDash;
+			}
+			/**
+			 * @brief 泳ぎステートに切り替えられるかどうか
+			 * @return 泳ぎステートに切り替えられるかどうか
+			 */
+			inline bool CanChangeSwimState() const
+			{
+				return  m_isSwimming || IsInWater();
 			}
 			/**
 			 * @地面についているかどうか
@@ -148,6 +164,8 @@ namespace app
 
 			/** ダッシュしているかどうか */
 			bool m_isDash;
+			/** 泳ぎ中かどうか */
+			bool m_isSwimming;
 		};
 
 	}
