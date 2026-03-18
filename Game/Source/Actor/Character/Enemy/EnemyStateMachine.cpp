@@ -31,7 +31,7 @@ namespace app
 			// 初期ステートの設定
 			m_currentState = FindState(EnemyWanderingState::ID());
 
-			m_transform.m_position = Vector3(0.0f, 0.0f, 500.0f);
+			m_transform.m_position = Vector3(80.0f, 0.0f, 800.0f);
 		}
 
 

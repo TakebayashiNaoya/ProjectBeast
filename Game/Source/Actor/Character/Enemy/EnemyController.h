@@ -13,6 +13,7 @@ namespace app
 		/** 前方宣言 */
 		class Enemy;
 		class Player;
+		class ChildPenguin;
 
 		/**
 		 * @brief エネミーのコントローラークラス
@@ -37,8 +38,14 @@ namespace app
 
 
 		public:
+			void AddTargetPos(const Vector3& pos);
+
+		public:
 			static void Initialize();
 
+		private:
+			/** 子ペンギンを探す */
+			ChildPenguin* FindTarget();
 
 		private:
 			/**
@@ -117,6 +124,7 @@ namespace app
 				}
 				return nullptr;
 			}
+
 
 
 			/**
@@ -201,7 +209,13 @@ namespace app
 			/** 徘徊開始位置 */
 			Vector3 m_startPosition = Vector3::Zero;
 
-			Vector3 m_targetPosition = Vector3::Zero;
+
+			std::vector<Vector3> m_targetPosList;
+			int m_targetPosListIndex = 0;
+
+			/** 見回し */
+
+
 			bool isFind = false;
 			/** 現在の状態 */
 			EnEnemyStateID m_currentState = enEnemyState_Idle;

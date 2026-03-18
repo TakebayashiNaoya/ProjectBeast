@@ -101,7 +101,7 @@ namespace app
 
 		void EnemyChaseState::Exit()
 		{
-			//m_owner->SetMoveVector(Vector3::Zero);
+			m_owner->SetMoveVector(Vector3::Zero);
 		}
 
 
@@ -181,7 +181,9 @@ namespace app
 
 
 		void EnemyAttackState::Update()
-		{}
+		{
+
+		}
 
 
 		void EnemyAttackState::Exit()
