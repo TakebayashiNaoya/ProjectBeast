@@ -143,8 +143,6 @@ namespace app
 			bool CanChangeWalk() const;
 			/** チェイス状態に変更できるか */
 			bool CanChangeChace() const;
-			/** 泳ぎ状態に変更できるか */
-			bool CanChangeSwim() const;
 			/** 攻撃状態に変更できるか */
 			bool CanChangeAttack() const;
 

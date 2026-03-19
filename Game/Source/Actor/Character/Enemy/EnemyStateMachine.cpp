@@ -46,8 +46,9 @@ namespace app
 			// 初期ステートの設定
 			m_currentState = FindState(EnemyIdleState::ID());
 
-			m_transform.m_position = Vector3(0.0f, 0.0f, 100.0f);
-			//m_transform.m_rotation.SetRotationDegY(180.0f);
+			m_transform.m_position = Vector3(0.0f, -80.0f, 100.0f);
+			m_transform.m_position;
+
 		}
 
 
@@ -80,10 +81,6 @@ namespace app
 
 		core::IState* EnemyStateMachine::GetChangeState()
 		{
-			if (CanChangeIdle())
-			{
-				return FindState(EnemyIdleState::ID());
-			}
 			if (CanChangeAttack())
 			{
 				return FindState(EnemyAttackState::ID());
@@ -92,13 +89,13 @@ namespace app
 			{
 				return FindState(EnemyChaseState::ID());
 			}
-			//if (CanChangeSwim())
-			//{
-			//	return FindState(EnemySwimState::ID());
-			//}
 			if (CanChangeSearch())
 			{
 				return FindState(EnemySearchState::ID());
+			}
+			if (CanChangeSwimState())
+			{
+				return FindState(EnemySwimState::ID());
 			}
 			if (CanChangeWalk())
 			{
@@ -142,13 +139,6 @@ namespace app
 			if (m_actionButtonB && m_stickLAmount > 0.0001f) {
 				return true;
 			}
-			return false;
-		}
-
-
-
-		bool EnemyStateMachine::CanChangeSwim() const
-		{
 			return false;
 		}
 
