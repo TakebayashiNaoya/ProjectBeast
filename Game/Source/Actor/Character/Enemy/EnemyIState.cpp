@@ -180,19 +180,21 @@ namespace app
 
 		void EnemySwimState::Enter()
 		{
+			const float moveSpeed = m_owner->GetOwnerStatus()->GetSwimSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
 		}
 
 
 		void EnemySwimState::Update()
 		{
-
+			m_owner->Move();
 		}
 
 
 		void EnemySwimState::Exit()
 		{
-
+			m_owner->SetMoveVector(Vector3::Zero);
 		}
 
 		EnemySwimState::EnemySwimState(EnemyStateMachine* owner)

@@ -6,6 +6,7 @@
         "walkSpeed": 3.0,
         "runSpeed": 6.0,
         "radius": 2.0,
-        "height": 70.0
+        "height": 70.0,
+        "swimSpeed": 2.0
     }
 ]

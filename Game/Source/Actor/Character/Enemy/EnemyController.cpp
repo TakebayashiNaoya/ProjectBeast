@@ -416,15 +416,40 @@ namespace app
 
 
 		void EnemyController::UpdateSwim(EnemyController* enemy)
-		{}
+		{
+			// 対象座標までの距離
+			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
+			// 方向
+			Vector3 direction = distance;
+			direction.Normalize();
+
+			enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(direction);
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(1.0f);
+		}
 
 
 		void EnemyController::ExitSwim(EnemyController* enemy)
-		{}
+		{
+			if (enemy->m_target == nullptr) return;
+
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+
+			enemy->m_targetPosListIndex++;
+			if (enemy->m_targetPosListIndex >= enemy->m_targetPosList.size())
+			{
+				enemy->m_targetPosListIndex = 0;
+			}
+		}
 
 
 		int EnemyController::CheckSwim(EnemyController* enemy)
 		{
+			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
+
+			if (distance.Length() <= 20.0f)
+			{
+				return enEnemyState_Idle;
+			}
 			return enEnemyState_Invalid;
 		}
 
