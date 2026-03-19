@@ -248,6 +248,8 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStateMachine.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyTypes.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -455,5 +457,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyTypes.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h" />
   </ItemGroup>
 </Project>

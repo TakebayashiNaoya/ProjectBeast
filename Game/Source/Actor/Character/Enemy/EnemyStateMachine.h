@@ -4,7 +4,7 @@
  * @author 立山
  */
 #pragma once
-#include "Source/Core/StateMachineBase.h"
+#include "Source/Actor/Character/CharacterStateMachine.h"
 
 
 namespace app
@@ -18,7 +18,7 @@ namespace app
 		class Player;
 
 
-		class EnemyStateMachine :public core::StateMachineBase
+		class EnemyStateMachine :public CharacterStateMachine
 		{
 		public:
 			core::IState* GetChangeState();
@@ -40,17 +40,10 @@ namespace app
 		public:
 			Enemy* GetOwner() { return m_owner; }
 
-			EnemyStatus* GetOwnerStatus() { return m_ownerStatus; }
-
-			void PlayAnimation(const int animationIndex);
+			const EnemyStatus* GetOwnerStatus();
 
 
 		public:
-			/** 方向のゲッター */
-			const Vector3& GetDirection() { return m_direction; }
-			/** 方向のセッター */
-			void SetDirection(const Vector3& direction) { m_direction = direction; }
-
 
 			/**
 			 * @brief 移動ベクトルのゲッター
@@ -63,42 +56,6 @@ namespace app
 
 
 			/**
-			 * @brief 座標のゲッター
-			 */
-			const Vector3& GetPosition() const { return m_position; }
-			/**
-			 * @brief 座標のセッター
-			 */
-			void SetPosition(const Vector3& position) { m_position = position; }
-
-
-			/**
-			 * @brief スケールのゲッター
-			 */
-			const Vector3& GetScale()const { return m_scale; }
-			/**
-			 * @brief スケールのセッター
-			 */
-			void SetScale(const Vector3& scale) { m_scale = scale; }
-
-
-			/**
-			 * @brief 回転のゲッター
-			 */
-			const Quaternion& GetRotation()const { return m_rotation; }
-			/**
-			 * @brief 回転のセッター
-			 */
-			void SetRotation(const Quaternion& rotation) { m_rotation = rotation; }
-
-
-			/**
-			 * @brief ダッシュの設定
-			 */
-			void SetDash(const bool isDash) { m_isDash = isDash; }
-
-
-			/**
 			 * @brief Aボタンを押せるかの設定
 			 */
 			void SetActionButtonA(const bool isActionButtonA) { m_actionButtonA = isActionButtonA; }
@@ -106,6 +63,16 @@ namespace app
 			 * @brief Aボタンを押したか取得
 			 */
 			bool IsActionButtonA() const { return m_actionButtonA; }
+
+
+			/**
+			 * @brief Bボタンを押せるかの設定
+			 */
+			void SetActionButtonB(const bool isActionButtonB) { m_actionButtonB = isActionButtonB; }
+			/**
+			 * @brief Bボタンを押したか取得
+			 */
+			bool IsActionButtonB() const { return m_actionButtonB; }
 
 
 			/**
@@ -131,9 +98,29 @@ namespace app
 
 
 			/**
+			 * @brief ペンギンを発見
+			 */
+			void SetSeach(const bool isSeach) { m_isSeach = isSeach; }
+			/**
+			 * @brief
+			 */
+			bool IsSeach()const { return m_isSeach; }
+
+
+			/**
+			 * @brief ペンギンを発見
+			 */
+			void SetFindPenguin(const bool isFindPenguin) { m_isFindPenguin = isFindPenguin; }
+			/**
+			 * @brief
+			 */
+			bool IsFindPenguin()const { return m_isFindPenguin; }
+
+
+			/**
 			 * @brief 近くのペンギンの設定
 			 */
-			void SetNearPenguin(const bool isNearPneguin) { m_isNearPenguin = isNearPneguin; }
+			void SetIsNearPenguin(const bool isNearPneguin) { m_isNearPenguin = isNearPneguin; }
 
 
 			/**
@@ -150,60 +137,60 @@ namespace app
 		private:
 			/** 待機状態に変更できるか */
 			bool CanChangeIdle() const;
+			/** 見回し状態に変更できるか */
+			bool CanChangeSearch() const;
 			/** 徘徊状態に変更できるか */
-			bool CanChangeWandering() const;
+			bool CanChangeWalk() const;
 			/** チェイス状態に変更できるか */
 			bool CanChangeChace() const;
+			/** 泳ぎ状態に変更できるか */
+			bool CanChangeSwim() const;
 			/** 攻撃状態に変更できるか */
 			bool CanChangeAttack() const;
 
 
 		private:
 			/** エネミーのポインタ */
-			Enemy* m_owner = nullptr;
+			Enemy* m_owner;
 			/** エネミーのステータス */
-			EnemyStatus* m_ownerStatus = nullptr;
+			EnemyStatus* m_ownerStatus;
 
 			/** 今のステータス */
-			core::IState* m_currentState = nullptr;
-			core::IState* m_nextState = nullptr;
-
-			/** プレイヤーの方向を取る変数(スティック入力の方向) */
-			Vector3 m_direction = Vector3::Zero;
+			core::IState* m_currentState;
+			core::IState* m_nextState;
 
 			/** 移動ベクトル */
-			Vector3 m_moveVector = Vector3::Zero;
-
-			/** 座標 */
-			Vector3 m_position = Vector3::Zero;
-			/** 拡縮 */
-			Vector3 m_scale = Vector3::One * 1.0f;
-			/** 回転 */
-			Quaternion m_rotation = Quaternion::Identity;
+			Vector3 m_moveVector;
 
 			/** プレイヤーの位置 */
-			Vector3 m_playerPosition = Vector3::Zero;
+			Vector3 m_playerPosition;
 
 			/** プレイヤークラスのポインタ */
-			Player* m_targetPlayer = nullptr;
+			Player* m_targetPlayer;
 
 			/** 左スティックの入力量 */
-			float m_stickLAmount = 0.0f;
-
-			/** ダッシュできるかどうか */
-			bool m_isDash = false;
+			float m_stickLAmount;
 
 			/** Aボタンを押せるかどうか */
-			bool m_actionButtonA = false;
+			bool m_actionButtonA;
+
+			/** Bボタンを押せるかどうか */
+			bool m_actionButtonB;
 
 			/** Xボタンを押せるかどうか */
-			bool m_actionButtonX = false;
+			bool m_actionButtonX;
+
+			/** サーチ状態かどうか */
+			bool m_isSeach;
+
+			/** ペンギンを見つけたか */
+			bool m_isFindPenguin;
 
 			/** ペンギンが近くにいるか */
-			bool m_isNearPenguin = false;
+			bool m_isNearPenguin;
 
 			/** 攻撃できるか */
-			bool m_canAttack = false;
+			bool m_canAttack;
 		};
 	}
 }

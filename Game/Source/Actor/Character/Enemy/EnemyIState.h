@@ -64,11 +64,11 @@ namespace app
 
 
 		/**
-		 * @brief エネミーの徘徊ステートクラス
+		 * @brief エネミーの待機ステートクラス
 		 */
-		class EnemyWanderingState :public EnemyIState
+		class EnemySearchState :public EnemyIState
 		{
-			appState(EnemyWanderingState);
+			appState(EnemySearchState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -77,8 +77,32 @@ namespace app
 
 
 		public:
-			EnemyWanderingState(EnemyStateMachine* owner);
-			~EnemyWanderingState() override = default;
+			EnemySearchState(EnemyStateMachine* owner);
+			~EnemySearchState() override = default;
+		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief エネミーの徘徊ステートクラス
+		 */
+		class EnemyWalkState :public EnemyIState
+		{
+			appState(EnemyWalkState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemyWalkState(EnemyStateMachine* owner);
+			~EnemyWalkState() override = default;
 		};
 
 
@@ -90,9 +114,9 @@ namespace app
 		/**
 		 * @brief エネミーの追跡ステートクラス
 		 */
-		class EnemyChaceState :public EnemyIState
+		class EnemyChaseState :public EnemyIState
 		{
-			appState(EnemyChaceState);
+			appState(EnemyChaseState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -101,8 +125,56 @@ namespace app
 
 
 		public:
-			EnemyChaceState(EnemyStateMachine* owner);
-			~EnemyChaceState() override = default;
+			EnemyChaseState(EnemyStateMachine* owner);
+			~EnemyChaseState() override = default;
+		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief エネミーのジャンプステートクラス
+		 */
+		class EnemyJumpState :public EnemyIState
+		{
+			appState(EnemyJumpState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemyJumpState(EnemyStateMachine* owner);
+			~EnemyJumpState() override = default;
+		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief エネミーの泳ぎステートクラス
+		 */
+		class EnemySwimState :public EnemyIState
+		{
+			appState(EnemySwimState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemySwimState(EnemyStateMachine* owner);
+			~EnemySwimState() override = default;
 		};
 
 
