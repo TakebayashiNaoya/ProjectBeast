@@ -13,6 +13,8 @@ enum class EnEnemyAnimationType : uint8_t
 	Idle,
 	Walk,
 	Attack,
+	BackWalk,
+	Run,
 	Num,
 };
 

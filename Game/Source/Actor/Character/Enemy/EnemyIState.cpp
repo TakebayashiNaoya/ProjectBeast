@@ -53,7 +53,7 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+			m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
 		}
 
 

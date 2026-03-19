@@ -21,6 +21,7 @@ namespace app
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
+			AddState<EnemySearchState>(this);
 			AddState<EnemyWalkState>(this);
 			AddState<EnemyChaseState>(this);
 			AddState<EnemyJumpState>(this);
@@ -87,7 +88,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeIdle() const
 		{
-			if (m_stickLAmount < 0.01f) {
+			if (m_stickLAmount < 0.0001f) {
 				return true;
 			}
 			return false;
@@ -96,7 +97,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeWalk() const
 		{
-			if (m_stickLAmount > 0.01f) {
+			if (m_stickLAmount >= 0.0001f) {
 				return true;
 			}
 			return false;
@@ -105,7 +106,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeChace() const
 		{
-			if (m_actionButtonB && m_stickLAmount > 0.01f) {
+			if (m_actionButtonB && m_stickLAmount > 0.0001f) {
 				return true;
 			}
 			return false;

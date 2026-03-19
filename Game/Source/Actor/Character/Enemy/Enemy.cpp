@@ -20,6 +20,8 @@ namespace app
 				{ "Assets/animData/bear/idle.tka", true },
 				{ "Assets/animData/bear/walk.tka", true },
 				{ "Assets/animData/bear/attack.tka", true },
+				{ "Assets/animData/bear/backWalk.tka", true },
+				{ "Assets/animData/bear/run.tka", true },
 
 			};
 

@@ -64,6 +64,30 @@ namespace app
 
 
 		/**
+		 * @brief エネミーの待機ステートクラス
+		 */
+		class EnemySearchState :public EnemyIState
+		{
+			appState(EnemySearchState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemySearchState(EnemyStateMachine* owner);
+			~EnemySearchState() override = default;
+		};
+
+
+
+
+		/************************************/
+
+
+		/**
 		 * @brief エネミーの徘徊ステートクラス
 		 */
 		class EnemyWalkState :public EnemyIState
