@@ -4,7 +4,7 @@
         "maxHp": 10,
         "hp": 2,
         "walkSpeed": 3.0,
-        "runSpeed": 2.0,
+        "runSpeed": 6.0,
         "radius": 2.0,
         "height": 70.0
     }
