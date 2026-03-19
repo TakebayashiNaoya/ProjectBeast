@@ -44,9 +44,10 @@ namespace app
 
 
 			// 初期ステートの設定
-			m_currentState = FindState(EnemyWalkState::ID());
+			m_currentState = FindState(EnemyIdleState::ID());
 
-			m_transform.m_position = Vector3(80.0f, 0.0f, 800.0f);
+			m_transform.m_position = Vector3(0.0f, 0.0f, 100.0f);
+			//m_transform.m_rotation.SetRotationDegY(180.0f);
 		}
 
 
@@ -91,10 +92,10 @@ namespace app
 			{
 				return FindState(EnemyChaseState::ID());
 			}
-			if (CanChangeSwim())
-			{
-				return FindState(EnemySwimState::ID());
-			}
+			//if (CanChangeSwim())
+			//{
+			//	return FindState(EnemySwimState::ID());
+			//}
 			if (CanChangeSearch())
 			{
 				return FindState(EnemySearchState::ID());

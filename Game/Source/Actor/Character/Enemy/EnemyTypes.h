@@ -15,6 +15,12 @@ enum class EnEnemyAnimationType : uint8_t
 	Attack,
 	BackWalk,
 	Run,
+	Buff,
+	Damage,
+	Eat,
+	Stun,
+	Sleep,
+
 	Num,
 };
 

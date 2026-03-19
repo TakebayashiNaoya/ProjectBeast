@@ -285,6 +285,7 @@
     <ClCompile Include="Source\Scene\TitleScene.cpp" />
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
+    <ClCompile Include="Source\UI\CountDownMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\PauseScreenMenu.cpp" />
@@ -363,6 +364,7 @@
     <ClInclude Include="Source\Sound\Types.h" />
     <ClInclude Include="Source\system\system.h" />
     <ClInclude Include="Source\Types.h" />
+    <ClInclude Include="Source\UI\CountDownMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\PauseScreenMenu.h" />
