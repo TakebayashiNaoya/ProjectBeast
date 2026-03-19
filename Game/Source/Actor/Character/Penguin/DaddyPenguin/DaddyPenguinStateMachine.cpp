@@ -31,9 +31,9 @@ namespace app
 			AddState<DaddyPenguinCommandShoutState>(this);
 			AddState<DaddyPenguinDivingState>(this);
 			AddState<DaddyPenguinSwimmingState>(this);
-			AddState<DaddyPenguinClimStartState>(this);
+			AddState<DaddyPenguinClimbStartState>(this);
 			AddState<DaddyPenguinClimbingState>(this);
-			AddState<DaddyPenguinClimEndState>(this);
+			AddState<DaddyPenguinClimbEndState>(this);
 
 			// 初期ステートの設定
 			m_currentState = FindState(DaddyPenguinIdleState::ID());
@@ -72,12 +72,12 @@ namespace app
 			}
 
 
-
-			if (IsEqualCurrentState(DaddyPenguinClimEndState::ID()))
+			/** 登り終わり中だったら */
+			if (IsEqualCurrentState(DaddyPenguinClimbEndState::ID()))
 			{
 				if (IsPlayingAnimation())
 				{
-					return FindState(DaddyPenguinClimEndState::ID());
+					return FindState(DaddyPenguinClimbEndState::ID());
 				}
 				else
 				{
@@ -86,7 +86,7 @@ namespace app
 			}
 
 
-
+			/** 登り中だったら */
 			if (IsEqualCurrentState(DaddyPenguinClimbingState::ID()))
 			{
 				if (IsPlayingAnimation())
@@ -95,16 +95,17 @@ namespace app
 				}
 				else
 				{
-					return FindState(DaddyPenguinClimEndState::ID());
+					return FindState(DaddyPenguinClimbEndState::ID());
 				}
 			}
 
 
-			if (IsEqualCurrentState(DaddyPenguinClimStartState::ID()))
+			/** 登り始まり中だったら */
+			if (IsEqualCurrentState(DaddyPenguinClimbStartState::ID()))
 			{
 				if (IsPlayingAnimation())
 				{
-					return FindState(DaddyPenguinClimStartState::ID());
+					return FindState(DaddyPenguinClimbStartState::ID());
 
 				}
 				else
@@ -113,10 +114,11 @@ namespace app
 				}
 			}
 
+
 			/** 水からなられる準備ができたら */
 			if (CanChangeSeparateWaterState())
 			{
-				return FindState(DaddyPenguinClimStartState::ID());
+				return FindState(DaddyPenguinClimbStartState::ID());
 			}
 
 
