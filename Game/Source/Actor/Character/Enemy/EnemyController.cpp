@@ -165,7 +165,7 @@ namespace app
 
 			// 完全停止
 			sm->SetStickLAmount(0.0f);
-			enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(Vector3::Zero);
+			//enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(Vector3::Zero);
 		}
 
 
@@ -197,6 +197,8 @@ namespace app
 		{
 			if (enemy->m_target == nullptr) return;
 
+			enemy->m_target->GetEnemyStateMachine()->SetSeach(true);
+
 			enemy->m_elapsedTime = 0.0f;
 
 			// 左右どちらに回るかランダム
@@ -205,15 +207,22 @@ namespace app
 			// 回転速度（ラジアン）
 			enemy->m_searchSpeed = Math::PI / 2.0f; // 90度/秒くらい
 
-			// 現在の向きを基準にする
-			auto dir = enemy->m_target->GetEnemyStateMachine()->GetMoveDirection();
-			if (dir.LengthSq() < 0.001f)
+			Quaternion q = enemy->m_target->GetTransform().m_rotation;
+
+			Vector3 forward;
+			forward.x = 2.0f * (q.x * q.z + q.w * q.y);
+			forward.y = 0.0f;
+			forward.z = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
+
+			if (forward.LengthSq() < 0.001f)
 			{
-				dir = Vector3::AxisZ; // デフォルト前方向
+				forward = Vector3::AxisZ;
 			}
 
-			dir.Normalize();
-			enemy->m_searchAngle = atan2f(dir.x, dir.z);
+			forward.Normalize();
+
+			enemy->m_searchAngle = atan2f(forward.x, forward.z);
+
 
 			// 移動は止める
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
@@ -244,7 +253,7 @@ namespace app
 			sm->SetMoveDirection(dir);
 
 			// 移動はしない
-			sm->SetStickLAmount(0.02f);
+			sm->SetStickLAmount(0.01f);
 
 			enemy->m_target->GetEnemyStateMachine()->SetPosition(enemy->m_prePosition);
 		}
@@ -252,22 +261,24 @@ namespace app
 
 		void EnemyController::ExitSearch(EnemyController* enemy)
 		{
-
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+			enemy->m_target->GetEnemyStateMachine()->SetSeach(false);
 		}
 
 
 		int EnemyController::CheckSearch(EnemyController* enemy)
 		{
 			//// ターゲット見つけたらチェイス
-			if (enemy->FindTarget() != nullptr)
-			{
-				return enEnemyState_Chase;
-			}
+			//if (enemy->FindTarget() != nullptr)
+			//{
+			//	//enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(true);
+			//	return enEnemyState_Chase;
+			//}
 
 			// 一定時間で終了
 			if (enemy->m_elapsedTime > 2.0f)
 			{
-				return enEnemyState_Wandering;
+				return enEnemyState_Idle;
 			}
 
 			return enEnemyState_Invalid;
@@ -298,13 +309,13 @@ namespace app
 		{
 			if (enemy->m_target == nullptr) return;
 
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+
 			enemy->m_targetPosListIndex++;
 			if (enemy->m_targetPosListIndex >= enemy->m_targetPosList.size())
 			{
 				enemy->m_targetPosListIndex = 0;
 			}
-
-			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 		}
 
 
@@ -351,7 +362,8 @@ namespace app
 
 		void EnemyController::ExitChase(EnemyController* enemy)
 		{
-			enemy->m_target->GetEnemyStateMachine()->SetMoveVector(Vector3::Zero);
+			//enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(true);
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 		}
 
 

@@ -100,7 +100,21 @@ namespace app
 			/**
 			 * @brief ペンギンを発見
 			 */
-			void SetIsFindPenguin(const bool isFindPenguin) { m_isFindPenguin = isFindPenguin; }
+			void SetSeach(const bool isSeach) { m_isSeach = isSeach; }
+			/**
+			 * @brief
+			 */
+			bool IsSeach()const { return m_isSeach; }
+
+
+			/**
+			 * @brief ペンギンを発見
+			 */
+			void SetFindPenguin(const bool isFindPenguin) { m_isFindPenguin = isFindPenguin; }
+			/**
+			 * @brief
+			 */
+			bool IsFindPenguin()const { return m_isFindPenguin; }
 
 
 			/**
@@ -123,53 +137,60 @@ namespace app
 		private:
 			/** 待機状態に変更できるか */
 			bool CanChangeIdle() const;
+			/** 見回し状態に変更できるか */
+			bool CanChangeSearch() const;
 			/** 徘徊状態に変更できるか */
 			bool CanChangeWalk() const;
 			/** チェイス状態に変更できるか */
 			bool CanChangeChace() const;
+			/** 泳ぎ状態に変更できるか */
+			bool CanChangeSwim() const;
 			/** 攻撃状態に変更できるか */
 			bool CanChangeAttack() const;
 
 
 		private:
 			/** エネミーのポインタ */
-			Enemy* m_owner = nullptr;
+			Enemy* m_owner;
 			/** エネミーのステータス */
-			EnemyStatus* m_ownerStatus = nullptr;
+			EnemyStatus* m_ownerStatus;
 
 			/** 今のステータス */
-			core::IState* m_currentState = nullptr;
-			core::IState* m_nextState = nullptr;
+			core::IState* m_currentState;
+			core::IState* m_nextState;
 
 			/** 移動ベクトル */
-			Vector3 m_moveVector = Vector3::Zero;
+			Vector3 m_moveVector;
 
 			/** プレイヤーの位置 */
-			Vector3 m_playerPosition = Vector3::Zero;
+			Vector3 m_playerPosition;
 
 			/** プレイヤークラスのポインタ */
-			Player* m_targetPlayer = nullptr;
+			Player* m_targetPlayer;
 
 			/** 左スティックの入力量 */
-			float m_stickLAmount = 0.0f;
+			float m_stickLAmount;
 
 			/** Aボタンを押せるかどうか */
-			bool m_actionButtonA = false;
+			bool m_actionButtonA;
 
 			/** Bボタンを押せるかどうか */
-			bool m_actionButtonB = false;
+			bool m_actionButtonB;
 
 			/** Xボタンを押せるかどうか */
-			bool m_actionButtonX = false;
+			bool m_actionButtonX;
+
+			/** サーチ状態かどうか */
+			bool m_isSeach;
 
 			/** ペンギンを見つけたか */
-			bool m_isFindPenguin = false;
+			bool m_isFindPenguin;
 
 			/** ペンギンが近くにいるか */
-			bool m_isNearPenguin = false;
+			bool m_isNearPenguin;
 
 			/** 攻撃できるか */
-			bool m_canAttack = false;
+			bool m_canAttack;
 		};
 	}
 }

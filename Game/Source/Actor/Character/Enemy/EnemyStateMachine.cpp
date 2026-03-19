@@ -18,6 +18,20 @@ namespace app
 		EnemyStateMachine::EnemyStateMachine(Enemy* enemy)
 			: CharacterStateMachine(enemy)
 			, m_owner(enemy)
+			, m_ownerStatus(nullptr)
+			, m_currentState(nullptr)
+			, m_nextState(nullptr)
+			, m_moveVector(Vector3::Zero)
+			, m_playerPosition(Vector3::Zero)
+			, m_targetPlayer(nullptr)
+			, m_stickLAmount(0.0f)
+			, m_actionButtonA(false)
+			, m_actionButtonB(false)
+			, m_actionButtonX(false)
+			, m_isFindPenguin(false)
+			, m_isNearPenguin(false)
+			, m_canAttack(false)
+			, m_isSeach(false)
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
@@ -77,6 +91,14 @@ namespace app
 			{
 				return FindState(EnemyChaseState::ID());
 			}
+			if (CanChangeSwim())
+			{
+				return FindState(EnemySwimState::ID());
+			}
+			if (CanChangeSearch())
+			{
+				return FindState(EnemySearchState::ID());
+			}
 			if (CanChangeWalk())
 			{
 				return FindState(EnemyWalkState::ID());
@@ -89,6 +111,16 @@ namespace app
 		bool EnemyStateMachine::CanChangeIdle() const
 		{
 			if (m_stickLAmount < 0.0001f) {
+				return true;
+			}
+			return false;
+		}
+
+
+		bool EnemyStateMachine::CanChangeSearch() const
+		{
+			if (m_isSeach && m_stickLAmount >= 0.0001f)
+			{
 				return true;
 			}
 			return false;
@@ -109,6 +141,13 @@ namespace app
 			if (m_actionButtonB && m_stickLAmount > 0.0001f) {
 				return true;
 			}
+			return false;
+		}
+
+
+
+		bool EnemyStateMachine::CanChangeSwim() const
+		{
 			return false;
 		}
 

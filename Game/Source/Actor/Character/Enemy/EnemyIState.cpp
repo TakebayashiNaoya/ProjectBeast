@@ -49,7 +49,9 @@ namespace app
 		/************************************/
 
 
-		void EnemyWalkState::Enter()
+
+
+		void EnemySearchState::Enter()
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
@@ -57,9 +59,39 @@ namespace app
 		}
 
 
+		void EnemySearchState::Update()
+		{
+			m_owner->Move();
+		}
+
+
+		void EnemySearchState::Exit()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+		}
+
+
+		EnemySearchState::EnemySearchState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void EnemyWalkState::Enter()
+		{
+			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+		}
+
+
 		void EnemyWalkState::Update()
 		{
-			if (m_owner->GetStickLAmount() < 0.01f) {
+			if (m_owner->GetStickLAmount() < 0.0001f) {
 				return;
 			}
 			m_owner->Move();
@@ -91,7 +123,7 @@ namespace app
 
 		void EnemyChaseState::Update()
 		{
-			if (m_owner->GetStickLAmount() < 0.01f) {
+			if (m_owner->GetStickLAmount() < 0.0001f) {
 				return;
 			}
 
