@@ -4,9 +4,38 @@
  * @author 藤谷
  */
 #pragma once
-#include "Json/json.hpp"
 #include "Source/Core/AppParameterMacro.h"
-#include <fstream>
+#include "Source/Util/JsonConverter.h"
+
+
+ /**
+ * @brief ホットリロード有効化マクロ
+  * @note デバッグビルド時のみ有効化
+  */
+#ifdef APP_DEBUG
+#define APP_PARAM_HOT_RELOAD
+#endif
+
+
+  /**
+  * @brief パラメーター用マクロ定義
+  * @note ホットリロード対応版
+  */
+#ifdef APP_PARAM_HOT_RELOAD
+
+#define appParameter(name)\
+public:\
+static constexpr uint32_t ID() {return Hash32(#name);}\
+std::function<void(const nlohmann::json& j, name& p)> load;
+
+#else
+
+#define appParameter(name)\
+public:\
+static constexpr uint32_t ID() {return Hash32(#name);}
+
+#endif
+
 
 
 namespace app
@@ -26,23 +55,6 @@ namespace app
 			using ParameterVector = std::vector<IMasterParameter*>;
 
 			using ParameterMap = std::map<uint32_t, ParameterVector>;
-
-
-		public:
-#ifdef APP_PARAM_HOT_RELOAD
-			/**
-			 * @brief ファイル更新日時取得
-			 */
-			static time_t GetFileLastWriteTime(const char* path);
-
-
-			/**
-			 * @brief ファイル更新チェック
-			 */
-			static bool CheckFileModified(const IMasterParameter* param);
-
-#endif // APP_PARAM_HOT_RELOAD
-
 
 
 		private:
@@ -67,13 +79,10 @@ namespace app
 			template <typename T>
 			void LoadParameter(const char* path, const std::function<void(const nlohmann::json& json, T& p)>& func)
 			{
-				std::ifstream file(path);
-				if (!file.is_open()) {
-					return;
-				}
 
 				nlohmann::json jsonRoot;
-				file >> jsonRoot;
+
+				if (!util::JsonConverter::IsLoadJsonFile(jsonRoot, path)) return;
 
 				ParameterVector parameters;
 				for (auto& j : jsonRoot) {
@@ -81,9 +90,9 @@ namespace app
 
 #ifdef APP_PARAM_HOT_RELOAD
 					parameter->m_path = std::string(path);
-					parameter->m_lastWriteTime = GetFileLastWriteTime(path);
+					parameter->m_lastWriteTime = util::JsonConverter::GetFileLastWriteTime(path);
 					parameter->load = func;
-#endif
+#endif // APP_PARAM_HOT_RELOAD
 
 					func(j, *parameter);
 					parameters.push_back(parameter);

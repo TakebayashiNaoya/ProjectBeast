@@ -288,20 +288,20 @@ namespace app
 		/************************************/
 
 
-		void DaddyPenguinClimStartState::Enter()
+		void DaddyPenguinClimbStartState::Enter()
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchBegin);
 		}
 
-		void DaddyPenguinClimStartState::Update()
+		void DaddyPenguinClimbStartState::Update()
 		{}
 
 
-		void DaddyPenguinClimStartState::Exit()
+		void DaddyPenguinClimbStartState::Exit()
 		{}
 
 
-		DaddyPenguinClimStartState::DaddyPenguinClimStartState(DaddyPenguinStateMachine* owner)
+		DaddyPenguinClimbStartState::DaddyPenguinClimbStartState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
 		{}
 
@@ -335,21 +335,21 @@ namespace app
 		/************************************/
 
 
-		void DaddyPenguinClimEndState::Enter()
+		void DaddyPenguinClimbEndState::Enter()
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchEnd);
 		}
 
 
-		void DaddyPenguinClimEndState::Update()
+		void DaddyPenguinClimbEndState::Update()
 		{}
 
 
-		void DaddyPenguinClimEndState::Exit()
+		void DaddyPenguinClimbEndState::Exit()
 		{}
 
 
-		DaddyPenguinClimEndState::DaddyPenguinClimEndState(DaddyPenguinStateMachine* owner)
+		DaddyPenguinClimbEndState::DaddyPenguinClimbEndState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
 		{}
 	}

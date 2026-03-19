@@ -279,9 +279,9 @@ namespace app
 		/**
 		 * @brief 親ペンギンの登り開始ステートクラス
 		 */
-		class DaddyPenguinClimStartState : public DaddyPenguinIState
+		class DaddyPenguinClimbStartState : public DaddyPenguinIState
 		{
-			appState(DaddyPenguinClimStartState);
+			appState(DaddyPenguinClimbStartState);
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
 			void Update() override final;
@@ -289,8 +289,8 @@ namespace app
 
 
 		public:
-			DaddyPenguinClimStartState(DaddyPenguinStateMachine* owner);
-			~DaddyPenguinClimStartState() override = default;
+			DaddyPenguinClimbStartState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinClimbStartState() override = default;
 		};
 
 
@@ -326,9 +326,9 @@ namespace app
 		/**
 		 * @brief 親ペンギンの登り終了ステートクラス
 		 */
-		class DaddyPenguinClimEndState : public DaddyPenguinIState
+		class DaddyPenguinClimbEndState : public DaddyPenguinIState
 		{
-			appState(DaddyPenguinClimEndState);
+			appState(DaddyPenguinClimbEndState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -337,8 +337,8 @@ namespace app
 
 
 		public:
-			DaddyPenguinClimEndState(DaddyPenguinStateMachine* owner);
-			~DaddyPenguinClimEndState() override = default;
+			DaddyPenguinClimbEndState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinClimbEndState() override = default;
 		};
 	}
 }

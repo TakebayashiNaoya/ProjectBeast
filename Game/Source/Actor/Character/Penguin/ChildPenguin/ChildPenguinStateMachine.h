@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Core/StateMachineBase.h"
+#include "Source/Actor/Character/CharacterStateMachine.h"
 
 
 namespace app
@@ -18,29 +18,35 @@ namespace app
 
 
 		/**
-		 * @brief 親ペンギンのステートマシンクラス
+		 * @brief 子ペンギンのステートマシンクラス
 		 */
-		class ChildPenguinStateMachine : public core::StateMachineBase
+		class ChildPenguinStateMachine : public CharacterStateMachine
 		{
-			// ここに親ペンギン固有のセッター関数を追加していく
+			// ここに子ペンギン固有のセッター関数を追加していく
 		public:
-			void PlayAnimation(const uint8_t animationID);
 
 
-			// ここに親ペンギン固有のゲッター関数を追加していく
+			// ここに子ペンギン固有のゲッター関数を追加していく
 		public:
+			/**
+			 * @brief 子ペンギンのステータスを取得
+			 * @return 子ペンギンのステータスポインタ
+			 */
+			const ChildPenguinStatus* GetChildPenuinStatus() const;
+
+
 			/** ステートの変更先を取得する */
 			core::IState* GetChangeState();
 
 
 		public:
-			ChildPenguinStateMachine(ChildPenguin* player);
+			ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin);
 			~ChildPenguinStateMachine() = default;
 
 
 		private:
-			/** 親ペンギンのポインタ */
-			ChildPenguin* m_player;
+			/** 子ペンギンのポインタ */
+			ChildPenguin* m_ownerChildPenguin;
 		};
 	}
 }
