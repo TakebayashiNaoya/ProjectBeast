@@ -1,0 +1,96 @@
+﻿/**
+ * @file CountDownMenu.h
+ * @brief カウントダウンの動的処理クラス
+ * @author 忽那
+ */
+#pragma once
+#include "Menu.h"
+#include <unordered_map>
+
+namespace app
+{
+	namespace ui
+	{
+		/** カウントダウンのタイプ */
+		enum class EnCountDownType : uint8_t
+		{
+			GO,
+			First,
+			Second,
+			Third,
+			Max,
+			Start,
+			None,
+			Finished
+		};
+
+
+		class CountDownIcon
+		{
+		public:
+			CountDownIcon(EnCountDownType type);
+			~CountDownIcon();
+			void Update();
+			void SetUIIcon(UIIcon* icon);
+			inline void SetIsDraw(bool isDraw)
+			{
+				m_icon->m_isDraw = isDraw;
+			}
+			inline EnCountDownType GetType()const
+			{
+				return m_type;
+			}
+
+
+		private:
+			EnCountDownType m_type;
+			UIIcon* m_icon;
+
+			// 現在のカウントダウンの時間。
+			float m_currentTime;
+		};
+
+
+		class CountDownMenu : public MenuBase
+		{
+			using CountDownClass = MenuBase;
+
+
+		public:
+			CountDownMenu();
+
+			void Update()override;
+			void InitializeLogic()override;
+			void CalcCount();
+
+			EnCountDownType GetCurrentCountType();
+			/**
+			 * @brief 現在のカウントダウンのタイプを取得する
+			 * @return 現在のカウントダウンのタイプ
+			 */
+			inline bool IsCountDownStart() const
+			{
+				return m_countDownStartFlag;
+			}
+			/**
+			 * @brief カウントダウンの開始フラグを設定する
+			 * @param flag カウントダウンの開始フラグ
+			 */
+			inline void SetCountDownStartFlag(bool flag)
+			{
+				m_countDownStartFlag = flag;
+			}
+
+
+		private:
+			float m_time;
+
+			EnCountDownType m_currentCountType;
+			using Icon = std::unique_ptr<CountDownIcon>;
+			using Key = uint32_t;
+			std::unordered_map<Key, Icon>m_countDownMap;
+
+			bool m_countDownStartFlag;
+		};
+	}
+}
