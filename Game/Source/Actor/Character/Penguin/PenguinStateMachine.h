@@ -120,6 +120,14 @@ namespace app
 			{
 				return !m_isSlide && !IsPlayingAnimation();
 			}
+			/**
+			 * @brief 離水ステートに切り替えられるかどうか
+			 * @return 離水ステートに切り替えられるかどうか
+			 */
+			bool CanChangeSeparateWaterState() const
+			{
+				return m_isSeparateWater && IsInWater();
+			}
 
 
 		public:
@@ -138,6 +146,8 @@ namespace app
 			bool m_isJump;
 			/** スライドするかどうか */
 			bool m_isSlide;
+			/** 離水するかどうか */
+			bool m_isSeparateWater;
 		};
 	}
 }

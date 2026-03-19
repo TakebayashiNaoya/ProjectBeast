@@ -231,5 +231,126 @@ namespace app
 		DaddyPenguinCommandShoutState::DaddyPenguinCommandShoutState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinDivingState::Enter()
+		{}
+
+
+		void DaddyPenguinDivingState::Update()
+		{}
+
+
+		void DaddyPenguinDivingState::Exit()
+		{}
+
+
+		DaddyPenguinDivingState::DaddyPenguinDivingState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinSwimmingState::Enter()
+		{
+			const float moveSpeed = m_owner->GetDaddyPenguinStatus()->GetSwimSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
+		}
+
+
+		void DaddyPenguinSwimmingState::Update()
+		{
+			m_owner->Move();
+		}
+
+
+		void DaddyPenguinSwimmingState::Exit()
+		{}
+
+
+		DaddyPenguinSwimmingState::DaddyPenguinSwimmingState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinClimStartState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchBegin);
+		}
+
+		void DaddyPenguinClimStartState::Update()
+		{}
+
+
+		void DaddyPenguinClimStartState::Exit()
+		{}
+
+
+		DaddyPenguinClimStartState::DaddyPenguinClimStartState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinClimbingState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchFlapingWingsQuickly);
+		}
+
+
+		void DaddyPenguinClimbingState::Update()
+		{}
+
+
+		void DaddyPenguinClimbingState::Exit()
+		{}
+
+
+		DaddyPenguinClimbingState::DaddyPenguinClimbingState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinClimEndState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchEnd);
+		}
+
+
+		void DaddyPenguinClimEndState::Update()
+		{}
+
+
+		void DaddyPenguinClimEndState::Exit()
+		{}
+
+
+		DaddyPenguinClimEndState::DaddyPenguinClimEndState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
 	}
 }

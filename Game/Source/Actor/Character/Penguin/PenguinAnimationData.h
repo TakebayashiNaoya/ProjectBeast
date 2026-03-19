@@ -108,9 +108,9 @@ namespace app
 			// 水中から出て着地する
 			{ "Assets/animData/penguin/launchEnd.tka", false },
 			// 水中から出て空中にいるときに翼を速くばたつかせる
-			{ "Assets/animData/penguin/launchFlappingWingsQuickly.tka", true },
+			{ "Assets/animData/penguin/launchFlappingWingsQuickly.tka", false },
 			// 水中から出て空中にいるときに翼をゆっくりばたつかせる
-			{ "Assets/animData/penguin/launchFlappingWingsSlowly.tka", true },
+			{ "Assets/animData/penguin/launchFlappingWingsSlowly.tka", false },
 			// 走る
 			{ "Assets/animData/penguin/moveRun.tka", true },
 			// 泳ぐ

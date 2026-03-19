@@ -29,6 +29,11 @@ namespace app
 			AddState<DaddyPenguinSlidingState>(this);
 			AddState<DaddyPenguinSlideEndState>(this);
 			AddState<DaddyPenguinCommandShoutState>(this);
+			AddState<DaddyPenguinDivingState>(this);
+			AddState<DaddyPenguinSwimmingState>(this);
+			AddState<DaddyPenguinClimStartState>(this);
+			AddState<DaddyPenguinClimbingState>(this);
+			AddState<DaddyPenguinClimEndState>(this);
 
 			// 初期ステートの設定
 			m_currentState = FindState(DaddyPenguinIdleState::ID());
@@ -48,6 +53,8 @@ namespace app
 
 			m_isFollowCommand = g_pad[0]->IsTrigger(enButtonLB1);
 			m_isWaitCommand = g_pad[0]->IsTrigger(enButtonRB1);
+			m_isSwimming = g_pad[0]->IsPress(enButtonX);
+			m_isSeparateWater = g_pad[0]->IsTrigger(enButtonY);
 		}
 
 
@@ -65,14 +72,75 @@ namespace app
 			}
 
 
+
+			if (IsEqualCurrentState(DaddyPenguinClimEndState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(DaddyPenguinClimEndState::ID());
+				}
+				else
+				{
+					return FindState(DaddyPenguinIdleState::ID());
+				}
+			}
+
+
+
+			if (IsEqualCurrentState(DaddyPenguinClimbingState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(DaddyPenguinClimbingState::ID());
+				}
+				else
+				{
+					return FindState(DaddyPenguinClimEndState::ID());
+				}
+			}
+
+
+			if (IsEqualCurrentState(DaddyPenguinClimStartState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(DaddyPenguinClimStartState::ID());
+
+				}
+				else
+				{
+					return FindState(DaddyPenguinClimbingState::ID());
+				}
+			}
+
+			/** 水からなられる準備ができたら */
+			if (CanChangeSeparateWaterState())
+			{
+				return FindState(DaddyPenguinClimStartState::ID());
+			}
+
+
+
+
+			/** 泳ぐステートに変更可能なら */
+			if (CanChangeSwimState())
+			{
+				return FindState(DaddyPenguinSwimmingState::ID());
+			}
+
+
+
+
+			/** 命令中なら維持する */
 			if (IsEqualCurrentState(DaddyPenguinCommandShoutState::ID())
 				&& IsPlayingAnimation())
 			{
-				// 追従命令状態でアニメーション再生中なら維持する
+				// 命令状態でアニメーション再生中なら維持する
 				return FindState(DaddyPenguinCommandShoutState::ID());
 			}
 
 
+			/** 命令状態へなれるなら命令状態へ */
 			if (CanChangeCommandState())
 			{
 				return FindState(DaddyPenguinCommandShoutState::ID());

@@ -221,5 +221,124 @@ namespace app
 			DaddyPenguinCommandShoutState(DaddyPenguinStateMachine* owner);
 			~DaddyPenguinCommandShoutState() override = default;
 		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンの飛び込みステートクラス
+		 */
+		class DaddyPenguinDivingState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinDivingState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinDivingState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinDivingState() override = default;
+		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンの泳ぎステートクラス
+		 */
+		class DaddyPenguinSwimmingState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinSwimmingState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinSwimmingState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinSwimmingState() override = default;
+		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンの登り開始ステートクラス
+		 */
+		class DaddyPenguinClimStartState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinClimStartState);
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinClimStartState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinClimStartState() override = default;
+		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンの登りステートクラス
+		 */
+		class DaddyPenguinClimbingState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinClimbingState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinClimbingState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinClimbingState() override = default;
+		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンの登り終了ステートクラス
+		 */
+		class DaddyPenguinClimEndState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinClimEndState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinClimEndState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinClimEndState() override = default;
+		};
 	}
 }

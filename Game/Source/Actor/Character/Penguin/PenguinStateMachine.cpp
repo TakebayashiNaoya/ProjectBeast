@@ -42,6 +42,8 @@ namespace app
 			, m_airTime(0.0f)
 			, m_jumpPower(0.0f)
 			, m_isJump(false)
+			, m_isSlide(false)
+			, m_isSeparateWater(false)
 		{}
 
 
