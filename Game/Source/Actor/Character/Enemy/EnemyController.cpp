@@ -195,13 +195,58 @@ namespace app
 		/** サーチ */
 		void EnemyController::EnterSearch(EnemyController* enemy)
 		{
+			if (enemy->m_target == nullptr) return;
 
+			enemy->m_elapsedTime = 0.0f;
+
+			// 左右どちらに回るかランダム
+			enemy->m_searchDir = (rand() % 2 == 0) ? 1 : -1;
+
+			// 回転速度（ラジアン）
+			enemy->m_searchSpeed = Math::PI / 2.0f; // 90度/秒くらい
+
+			// 現在の向きを基準にする
+			auto dir = enemy->m_target->GetEnemyStateMachine()->GetMoveDirection();
+			if (dir.LengthSq() < 0.001f)
+			{
+				dir = Vector3::AxisZ; // デフォルト前方向
+			}
+
+			dir.Normalize();
+			enemy->m_searchAngle = atan2f(dir.x, dir.z);
+
+			// 移動は止める
+			auto* sm = enemy->m_target->GetEnemyStateMachine();
+			sm->SetStickLAmount(0.0f);
+			enemy->m_prePosition = enemy->m_target->GetTransform().m_position;
 		}
 
 
 		void EnemyController::UpdateSearch(EnemyController* enemy)
 		{
+			if (enemy->m_target == nullptr) return;
 
+			float delta = g_gameTime->GetFrameDeltaTime();
+			enemy->m_elapsedTime += delta;
+
+			// 角度更新
+			enemy->m_searchAngle += enemy->m_searchSpeed * enemy->m_searchDir * delta;
+
+			// 向きをベクトルに変換
+			Vector3 dir;
+			dir.x = sinf(enemy->m_searchAngle);
+			dir.z = cosf(enemy->m_searchAngle);
+			dir.y = 0.0f;
+
+			dir.Normalize();
+
+			auto* sm = enemy->m_target->GetEnemyStateMachine();
+			sm->SetMoveDirection(dir);
+
+			// 移動はしない
+			sm->SetStickLAmount(0.02f);
+
+			enemy->m_target->GetEnemyStateMachine()->SetPosition(enemy->m_prePosition);
 		}
 
 
@@ -213,7 +258,18 @@ namespace app
 
 		int EnemyController::CheckSearch(EnemyController* enemy)
 		{
-			return enEnemyState_Wandering;
+			//// ターゲット見つけたらチェイス
+			if (enemy->FindTarget() != nullptr)
+			{
+				return enEnemyState_Chase;
+			}
+
+			// 一定時間で終了
+			if (enemy->m_elapsedTime > 2.0f)
+			{
+				return enEnemyState_Wandering;
+			}
+
 			return enEnemyState_Invalid;
 		}
 
@@ -273,23 +329,23 @@ namespace app
 
 		void EnemyController::UpdateChase(EnemyController* enemy)
 		{
-			auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
+			//auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
 
-			if (player == nullptr) return;
-			if (enemy->m_target == nullptr) return;
+			//if (player == nullptr) return;
+			//if (enemy->m_target == nullptr) return;
 
-			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
-			Vector3 playerPos = player->GetTransform().m_position;
+			//Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			//Vector3 playerPos = player->GetTransform().m_position;
 
-			Vector3 dis = playerPos - enemyPos;
-			Vector3 dir = dis;
-			dir.y = 0.0f;
-			dir.Normalize();
+			//Vector3 dis = playerPos - enemyPos;
+			//Vector3 dir = dis;
+			//dir.y = 0.0f;
+			//dir.Normalize();
 
-			auto* stateMachine = enemy->m_target->GetEnemyStateMachine();
+			//auto* stateMachine = enemy->m_target->GetEnemyStateMachine();
 
-			stateMachine->SetMoveDirection(dir);
-			stateMachine->SetStickLAmount(1.0f);
+			//stateMachine->SetMoveDirection(dir);
+			//stateMachine->SetStickLAmount(1.0f);
 		}
 
 
@@ -301,22 +357,22 @@ namespace app
 
 		int EnemyController::CheckChase(EnemyController* enemy)
 		{
-			auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
-			if (player == nullptr) return enEnemyState_Invalid;
+			//auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
+			//if (player == nullptr) return enEnemyState_Invalid;
 
-			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
-			Vector3 playerPos = player->GetTransform().m_position;
+			//Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			//Vector3 playerPos = player->GetTransform().m_position;
 
-			float distance = (playerPos - enemyPos).Length();
+			//float distance = (playerPos - enemyPos).Length();
 
-			if (distance < 9.0f)
-			{
-				enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(true);
-				enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(true);
+			//if (distance < 9.0f)
+			//{
+			//	enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(true);
+			//	enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(true);
 
-				return enEnemyState_Attack;
-			}
-
+			//	return enEnemyState_Attack;
+			//}
+			return enEnemyState_Idle;
 			return enEnemyState_Invalid;
 		}
 

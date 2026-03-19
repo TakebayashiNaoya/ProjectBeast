@@ -214,7 +214,9 @@ namespace app
 			int m_targetPosListIndex = 0;
 
 			/** 見回し */
-
+			float m_searchAngle = 0.0f;
+			float m_searchSpeed = 0.0f;
+			int m_searchDir = 1;
 
 			bool isFind = false;
 			/** 現在の状態 */
