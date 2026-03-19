@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "AppParameterMacro.h"
+#include "Json/json.hpp"
 
 
 namespace app
