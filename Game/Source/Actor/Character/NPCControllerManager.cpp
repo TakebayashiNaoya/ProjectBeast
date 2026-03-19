@@ -10,59 +10,62 @@
 
 namespace app
 {
-	NPCControllerManager* NPCControllerManager::m_instance = nullptr;
-
-
-	NPCControllerManager::NPCControllerManager()
+	namespace actor
 	{
-
-	}
-
-
-	NPCControllerManager::~NPCControllerManager()
-	{
-
-	}
+		NPCControllerManager* NPCControllerManager::m_instance = nullptr;
 
 
-	void NPCControllerManager::Register(actor::NPCController* npc)
-	{
-		if (npc == nullptr) {
-			return;
-		}
-
-		m_npcControllerList.push_back(npc);
-	}
-
-
-	void NPCControllerManager::UnRegister(actor::NPCController* npc)
-	{
-		if (!npc) {
-			return;
-		}
-
-		auto it = std::find(
-			m_npcControllerList.begin(),
-			m_npcControllerList.end(),
-			npc
-		);
-
-		if (it != m_npcControllerList.end())
+		NPCControllerManager::NPCControllerManager()
 		{
-			m_npcControllerList.erase(it);
+
 		}
-	}
 
 
-	void NPCControllerManager::Update()
-	{
-		for (auto& npc : m_npcControllerList)
+		NPCControllerManager::~NPCControllerManager()
 		{
-			if (!npc)
-			{
-				continue;
+
+		}
+
+
+		void NPCControllerManager::Register(actor::NPCController* npc)
+		{
+			if (npc == nullptr) {
+				return;
 			}
-			npc->Update();
+
+			m_npcControllerList.push_back(npc);
+		}
+
+
+		void NPCControllerManager::UnRegister(actor::NPCController* npc)
+		{
+			if (!npc) {
+				return;
+			}
+
+			auto it = std::find(
+				m_npcControllerList.begin(),
+				m_npcControllerList.end(),
+				npc
+			);
+
+			if (it != m_npcControllerList.end())
+			{
+				m_npcControllerList.erase(it);
+			}
+		}
+
+
+		void NPCControllerManager::Update()
+		{
+			for (auto& npc : m_npcControllerList)
+			{
+				if (!npc)
+				{
+					continue;
+				}
+				npc->Update();
+			}
 		}
 	}
 }

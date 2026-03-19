@@ -8,6 +8,7 @@
 #include "EnemyIState.h"
 #include "EnemyStateMachine.h"
 #include "EnemyStatus.h"
+#include "EnemyTypes.h"
 
 
 namespace app
@@ -26,7 +27,7 @@ namespace app
 
 		void EnemyIdleState::Enter()
 		{
-
+			m_owner->PlayAnimation(EnEnemyAnimationType::Idle);
 		}
 
 
@@ -48,30 +49,29 @@ namespace app
 		/************************************/
 
 
-		void EnemyWanderingState::Enter()
-		{}
 
 
-		void EnemyWanderingState::Update()
+		void EnemySearchState::Enter()
 		{
-			//if (m_owner->GetStickLAmount() < 0.01f) {
-			//	return;
-			//}
-
-			//const Vector3& moveDirection = m_owner->GetDirection();
-			//// NOTE:Statusの設定が出来たらコメントを解除する
-			//const Vector3 move = moveDirection * m_owner->GetOwnerStatus()->GetWalkSpeed();
-			//m_owner->SetMoveVector(move);
+			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
 		}
 
 
-		void EnemyWanderingState::Exit()
+		void EnemySearchState::Update()
 		{
-			//m_owner->SetMoveVector(Vector3::Zero);
+			m_owner->Move();
 		}
 
 
-		EnemyWanderingState::EnemyWanderingState(EnemyStateMachine* owner)
+		void EnemySearchState::Exit()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+		}
+
+
+		EnemySearchState::EnemySearchState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
 
@@ -81,38 +81,124 @@ namespace app
 		/************************************/
 
 
-		void EnemyChaceState::Enter()
-		{}
-
-
-		void EnemyChaceState::Update()
+		void EnemyWalkState::Enter()
 		{
-			//if (m_owner->GetStickLAmount() < 0.01f) {
-			//	return;
-			//}
-
-			//const Vector3& moveDirection = m_owner->GetDirection();
-
-			//// NOTE:Statusの設定が出来たらコメントを解除する
-			//const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
-			//const float dashSpeed = m_owner->GetOwnerStatus()->GetRunSpeed();
-			//const float moveDashSpeed = moveSpeed * dashSpeed;
-
-			//const Vector3 move = moveDirection * moveDashSpeed;
-
-			//m_owner->SetMoveVector(move);
+			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
 		}
 
 
-		void EnemyChaceState::Exit()
+		void EnemyWalkState::Update()
 		{
-			//m_owner->SetMoveVector(Vector3::Zero);
+			if (m_owner->GetStickLAmount() < 0.0001f) {
+				return;
+			}
+			m_owner->Move();
 		}
 
 
-		EnemyChaceState::EnemyChaceState(EnemyStateMachine* owner)
+		void EnemyWalkState::Exit()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+		}
+
+
+		EnemyWalkState::EnemyWalkState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void EnemyChaseState::Enter()
+		{
+			const float moveSpeed = m_owner->GetOwnerStatus()->GetRunSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+		}
+
+
+		void EnemyChaseState::Update()
+		{
+			if (m_owner->GetStickLAmount() < 0.0001f) {
+				return;
+			}
+
+			m_owner->Move();
+		}
+
+
+		void EnemyChaseState::Exit()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+		}
+
+
+		EnemyChaseState::EnemyChaseState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void EnemyJumpState::Enter()
+		{
+
+		}
+
+
+		void EnemyJumpState::Update()
+		{
+
+		}
+
+
+		void EnemyJumpState::Exit()
+		{
+
+		}
+
+
+		EnemyJumpState::EnemyJumpState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{
+
+		}
+
+
+
+
+		/************************************/
+
+
+		void EnemySwimState::Enter()
+		{
+
+		}
+
+
+		void EnemySwimState::Update()
+		{
+
+		}
+
+
+		void EnemySwimState::Exit()
+		{
+
+		}
+
+		EnemySwimState::EnemySwimState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{
+
+		}
 
 
 
@@ -122,12 +208,14 @@ namespace app
 
 		void EnemyAttackState::Enter()
 		{
-
+			m_owner->PlayAnimation(EnEnemyAnimationType::Attack);
 		}
 
 
 		void EnemyAttackState::Update()
-		{}
+		{
+
+		}
 
 
 		void EnemyAttackState::Exit()

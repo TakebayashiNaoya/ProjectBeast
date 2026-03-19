@@ -29,15 +29,17 @@ namespace app
 
 		ChildPenguin::ChildPenguin()
 		{
+			Init(MODEL_DATA);
 			m_stateMachine = std::make_unique<ChildPenguinStateMachine>(this);
 			m_status = std::make_unique<ChildPenguinStatus>();
 			m_status->Setup();
+
+			m_characterStateMachine = m_stateMachine.get();
 		}
 
 
 		void ChildPenguin::Start()
 		{
-			CharacterBase::Init(MODEL_DATA);
 			PenguinBase::Start();
 		}
 

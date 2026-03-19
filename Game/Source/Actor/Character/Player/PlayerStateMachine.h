@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Core/StateMachineBase.h"
+#include "Source/Actor/Character/CharacterStateMachine.h"
 
 
 namespace app
@@ -20,7 +20,7 @@ namespace app
 		/**
 		 * @brief プレイヤーのステートマシンクラス
 		 */
-		class PlayerStateMachine : public core::StateMachineBase
+		class PlayerStateMachine : public CharacterStateMachine
 		{
 		public:
 
@@ -33,7 +33,7 @@ namespace app
 
 		public:
 			PlayerStateMachine(Player* player);
-			~PlayerStateMachine() = default;
+			~PlayerStateMachine() override = default;
 
 
 		private:

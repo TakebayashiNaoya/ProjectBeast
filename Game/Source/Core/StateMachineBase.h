@@ -88,6 +88,13 @@ namespace app
 			}
 
 
+			/**
+			 * @brief 現在のステートと指定したIDが等しいかどうか
+			 * @param stateID ステートID
+			 */
+			bool IsEqualCurrentState(const uint32_t stateID) const;
+
+
 			/*
 			 * @brief ステートの変更先を取得する
 			 * @return 変更先のステートポインタ

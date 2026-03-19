@@ -1,6 +1,6 @@
 ﻿/**
- * @file NPCControllerManager.h
- * @brief NPCのコントローラーのマネージャー
+ * @file ChildPenguinManager.h
+ * @brief 子ペンギンのマネージャー
  * @author 立山
  */
 #pragma once
@@ -10,15 +10,11 @@ namespace app
 {
 	namespace actor
 	{
-		class NPCController;
 
+		class ChildPenguin;
 
-		class NPCControllerManager
+		class ChildPenguinManager
 		{
-		public:
-			void Update();
-
-
 		public:
 			/**
 			 * @brief シングルトンインスタンスを生成
@@ -28,12 +24,12 @@ namespace app
 			{
 				if (m_instance == nullptr)
 				{
-					m_instance = new NPCControllerManager;
+					m_instance = new ChildPenguinManager;
 				}
 			}
 
 
-			static NPCControllerManager* GetInstance()
+			static ChildPenguinManager* GetInstance()
 			{
 				return m_instance;
 			}
@@ -54,24 +50,32 @@ namespace app
 
 
 		public:
-			/** Managerに登録 */
-			void Register(actor::NPCController* npc);
+			void Start();
+			void Update();
+			void Render(RenderContext& rc);
 
-			/** リストから削除 */
-			void UnRegister(actor::NPCController* npc);
-
-
-		private:
-			NPCControllerManager();
-			~NPCControllerManager();
+			void CreateChildPenguin(const int childPenguinNum);
 
 
-		private:
-			std::vector<actor::NPCController*> m_npcControllerList;
+		public:
+			const std::vector<actor::ChildPenguin*>& GetChildPenguiin()
+			{
+				return m_childPenguinList;
+			}
 
 
 		private:
-			static NPCControllerManager* m_instance;
+			ChildPenguinManager();
+			~ChildPenguinManager();
+
+
+		private:
+			std::vector<actor::ChildPenguin*>m_childPenguinList;
+
+
+		private:
+
+			static ChildPenguinManager* m_instance;
 		};
 	}
 }

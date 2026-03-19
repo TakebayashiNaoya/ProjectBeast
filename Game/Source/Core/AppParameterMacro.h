@@ -20,7 +20,7 @@ namespace app
 * @brief ホットリロード有効化マクロ
  * @note デバッグビルド時のみ有効化
  */
-#ifdef K2_DEBUG
+#ifdef APP_DEBUG
 #define APP_PARAM_HOT_RELOAD
 #endif
 

@@ -13,6 +13,7 @@ namespace app
 		/** 前方宣言 */
 		class Enemy;
 		class Player;
+		class ChildPenguin;
 
 		/**
 		 * @brief エネミーのコントローラークラス
@@ -37,8 +38,14 @@ namespace app
 
 
 		public:
+			void AddTargetPos(const Vector3& pos);
+
+		public:
 			static void Initialize();
 
+		private:
+			/** 子ペンギンを探す */
+			ChildPenguin* FindTarget();
 
 		private:
 			/**
@@ -66,6 +73,7 @@ namespace app
 			enum EnEnemyStateID
 			{
 				enEnemyState_Idle,
+				enEnemyState_Search,
 				enEnemyState_Wandering,
 				enEnemyState_Chase,
 				enEnemyState_Jump,
@@ -118,6 +126,7 @@ namespace app
 			}
 
 
+
 			/**
 			 * 何もしない関数
 			 */
@@ -134,6 +143,15 @@ namespace app
 			static void UpdateIdle(EnemyController* enemy);
 			static void ExitIdle(EnemyController* enemy);
 			static int CheckIdle(EnemyController* enemy);
+
+
+			/**
+			 * サーチ
+			 */
+			static void EnterSearch(EnemyController* enemy);
+			static void UpdateSearch(EnemyController* enemy);
+			static void ExitSearch(EnemyController* enemy);
+			static int CheckSearch(EnemyController* enemy);
 
 
 			/**
@@ -183,11 +201,23 @@ namespace app
 
 		private:
 			Enemy* m_target = nullptr;
+			float m_elapsedTime = 0.0f;
 
 			/** targetの前回の位置を保持 */
 			Vector3 m_prePosition = Vector3::Zero;
 
-			Vector3 m_targetPosition = Vector3::Zero;
+			/** 徘徊開始位置 */
+			Vector3 m_startPosition = Vector3::Zero;
+
+
+			std::vector<Vector3> m_targetPosList;
+			int m_targetPosListIndex = 0;
+
+			/** 見回し */
+			float m_searchAngle = 0.0f;
+			float m_searchSpeed = 0.0f;
+			int m_searchDir = 1;
+
 			bool isFind = false;
 			/** 現在の状態 */
 			EnEnemyStateID m_currentState = enEnemyState_Idle;

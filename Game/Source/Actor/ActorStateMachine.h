@@ -29,6 +29,14 @@ namespace app
 				m_ownerActor->GetModelRender()->PlayAnimation(static_cast<uint8_t>(animationID));
 			}
 			/**
+			 * @brief アニメーションが再生中か
+			 * @return 再生中ならtrue
+			 */
+			inline bool IsPlayingAnimation() const
+			{
+				return m_ownerActor->GetModelRender()->IsPlayingAnimation();
+			}
+			/**
 			 * @brief トランスフォームの取得
 			 * @return トランスフォームの参照
 			 */

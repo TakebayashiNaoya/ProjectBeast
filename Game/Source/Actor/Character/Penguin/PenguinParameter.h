@@ -29,6 +29,8 @@ namespace app
 			// ペンギン固有のパラメーターをここに追加していく
 			/** スニークの速さ */
 			float sneakSpeed;
+			/** スライドの速さ */
+			float slideSpeed;
 			/** ジャンプパワー */
 			float jumpPower;
 		};

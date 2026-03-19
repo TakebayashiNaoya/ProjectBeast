@@ -8,24 +8,45 @@
 #include "EnemyIState.h"
 #include "EnemyStateMachine.h"
 
+#include "EnemyStatus.h"
+
 
 namespace app
 {
 	namespace actor
 	{
 		EnemyStateMachine::EnemyStateMachine(Enemy* enemy)
-			: StateMachineBase()
+			: CharacterStateMachine(enemy)
 			, m_owner(enemy)
+			, m_ownerStatus(nullptr)
+			, m_currentState(nullptr)
+			, m_nextState(nullptr)
+			, m_moveVector(Vector3::Zero)
+			, m_playerPosition(Vector3::Zero)
+			, m_targetPlayer(nullptr)
+			, m_stickLAmount(0.0f)
+			, m_actionButtonA(false)
+			, m_actionButtonB(false)
+			, m_actionButtonX(false)
+			, m_isFindPenguin(false)
+			, m_isNearPenguin(false)
+			, m_canAttack(false)
+			, m_isSeach(false)
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
-			AddState<EnemyWanderingState>(this);
-			AddState<EnemyChaceState>(this);
+			AddState<EnemySearchState>(this);
+			AddState<EnemyWalkState>(this);
+			AddState<EnemyChaseState>(this);
+			AddState<EnemyJumpState>(this);
+			AddState<EnemySwimState>(this);
 			AddState<EnemyAttackState>(this);
 
 
 			// 初期ステートの設定
-			m_currentState = FindState(EnemyWanderingState::ID());
+			m_currentState = FindState(EnemyWalkState::ID());
+
+			m_transform.m_position = Vector3(80.0f, 0.0f, 800.0f);
 		}
 
 
@@ -62,17 +83,25 @@ namespace app
 			{
 				return FindState(EnemyIdleState::ID());
 			}
-			if (CanChangeWandering())
-			{
-				return FindState(EnemyWanderingState::ID());
-			}
-			if (CanChangeChace())
-			{
-				return FindState(EnemyChaceState::ID());
-			}
 			if (CanChangeAttack())
 			{
 				return FindState(EnemyAttackState::ID());
+			}
+			if (CanChangeChace())
+			{
+				return FindState(EnemyChaseState::ID());
+			}
+			if (CanChangeSwim())
+			{
+				return FindState(EnemySwimState::ID());
+			}
+			if (CanChangeSearch())
+			{
+				return FindState(EnemySearchState::ID());
+			}
+			if (CanChangeWalk())
+			{
+				return FindState(EnemyWalkState::ID());
 			}
 
 			return FindState(EnemyIdleState::ID());
@@ -81,16 +110,26 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeIdle() const
 		{
-			if (m_stickLAmount < 0.01f) {
+			if (m_stickLAmount < 0.0001f) {
 				return true;
 			}
 			return false;
 		}
 
 
-		bool EnemyStateMachine::CanChangeWandering() const
+		bool EnemyStateMachine::CanChangeSearch() const
 		{
-			if (m_stickLAmount > 0.01f) {
+			if (m_isSeach && m_stickLAmount >= 0.0001f)
+			{
+				return true;
+			}
+			return false;
+		}
+
+
+		bool EnemyStateMachine::CanChangeWalk() const
+		{
+			if (m_stickLAmount >= 0.0001f) {
 				return true;
 			}
 			return false;
@@ -99,18 +138,23 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeChace() const
 		{
-			if (m_isDash && m_direction.Length() > 0.01f) {
+			if (m_actionButtonB && m_stickLAmount > 0.0001f) {
 				return true;
 			}
 			return false;
 		}
 
 
+
+		bool EnemyStateMachine::CanChangeSwim() const
+		{
+			return false;
+		}
+
+
 		bool EnemyStateMachine::CanChangeAttack() const
 		{
-			if (!m_canAttack) {
-				return false;
-			}
+			if (!m_isNearPenguin)return false;
 			if (m_actionButtonX) {
 				return true;
 			}
@@ -121,13 +165,12 @@ namespace app
 		void EnemyStateMachine::Setup(Enemy* owner)
 		{
 			m_owner = owner;
-			//m_ownerStatus = static_cast<const EnemyStatus*>(owner->GetStatus());
+
 		}
 
-
-		void EnemyStateMachine::PlayAnimation(const int animationIndex)
+		const EnemyStatus* EnemyStateMachine::GetOwnerStatus()
 		{
-			m_owner->GetModelRender()->PlayAnimation(animationIndex);
+			return m_owner->GetStatus<EnemyStatus>();
 		}
 	}
 }

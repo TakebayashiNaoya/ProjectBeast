@@ -38,15 +38,18 @@ namespace app
 
 		Player::Player()
 		{
+			Init(MODEL_DATA);
+
 			m_stateMachine = std::make_unique<PlayerStateMachine>(this);
 			m_status = std::make_unique<PlayerStatus>();
 			m_status->Setup();
+
+			m_characterStateMachine = m_stateMachine.get();
 		}
 
 
 		void Player::Start()
 		{
-			Init(MODEL_DATA);
 			CharacterBase::Start();
 		}
 
