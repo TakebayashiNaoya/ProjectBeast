@@ -239,7 +239,9 @@ namespace app
 
 
 		void DaddyPenguinDivingState::Enter()
-		{}
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::IdleShake);
+		}
 
 
 		void DaddyPenguinDivingState::Update()
