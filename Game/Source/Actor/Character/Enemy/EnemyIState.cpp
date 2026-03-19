@@ -118,6 +118,7 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetRunSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
 		}
 
 
@@ -179,7 +180,7 @@ namespace app
 
 		void EnemySwimState::Enter()
 		{
-
+			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
 		}
 
 
