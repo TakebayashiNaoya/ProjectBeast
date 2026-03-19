@@ -23,6 +23,31 @@ namespace app
 			 * @return 読み込めたかどうか
 			 */
 			static bool IsLoadJsonFile(nlohmann::json& json, const std::string& filePath);
+
+			/** デバッグ用の関数群 */
+#ifdef APP_DEBUG
+			/**
+			 * @brief ファイルの最終更新日時を取得
+			 */
+			static inline time_t GetFileLastWriteTime(const char* path)
+			{
+				struct stat result;
+				// stat関数でファイル情報を取得 (0なら成功)
+				if (stat(path, &result) == 0) {
+					return result.st_mtime;
+				}
+				return 0;
+			}
+			/**
+			 * @brief ファイルが更新されたかどうか
+			 * @param filePath ファイルパス
+			 */
+			static inline bool CheckFileModified(const std::string filePath, const time_t time)
+			{
+				return util::JsonConverter::GetFileLastWriteTime(filePath.c_str()) > time;
+			}
+
+#endif // APP_DEBUG
 			/**
 			 * @brief jsonからintを読み込む
 			 * @param json 読み込むjsonファイル
