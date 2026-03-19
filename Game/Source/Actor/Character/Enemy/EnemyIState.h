@@ -66,9 +66,9 @@ namespace app
 		/**
 		 * @brief エネミーの徘徊ステートクラス
 		 */
-		class EnemyWanderingState :public EnemyIState
+		class EnemyWalkState :public EnemyIState
 		{
-			appState(EnemyWanderingState);
+			appState(EnemyWalkState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -77,8 +77,8 @@ namespace app
 
 
 		public:
-			EnemyWanderingState(EnemyStateMachine* owner);
-			~EnemyWanderingState() override = default;
+			EnemyWalkState(EnemyStateMachine* owner);
+			~EnemyWalkState() override = default;
 		};
 
 

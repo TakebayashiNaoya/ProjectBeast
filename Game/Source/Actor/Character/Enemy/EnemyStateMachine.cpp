@@ -21,7 +21,7 @@ namespace app
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
-			AddState<EnemyWanderingState>(this);
+			AddState<EnemyWalkState>(this);
 			AddState<EnemyChaseState>(this);
 			AddState<EnemyJumpState>(this);
 			AddState<EnemySwimState>(this);
@@ -29,7 +29,7 @@ namespace app
 
 
 			// 初期ステートの設定
-			m_currentState = FindState(EnemyWanderingState::ID());
+			m_currentState = FindState(EnemyWalkState::ID());
 
 			m_transform.m_position = Vector3(80.0f, 0.0f, 800.0f);
 		}
@@ -76,9 +76,9 @@ namespace app
 			{
 				return FindState(EnemyChaseState::ID());
 			}
-			if (CanChangeWandering())
+			if (CanChangeWalk())
 			{
-				return FindState(EnemyWanderingState::ID());
+				return FindState(EnemyWalkState::ID());
 			}
 
 			return FindState(EnemyIdleState::ID());
@@ -94,9 +94,9 @@ namespace app
 		}
 
 
-		bool EnemyStateMachine::CanChangeWandering() const
+		bool EnemyStateMachine::CanChangeWalk() const
 		{
-			if (!m_isFindPenguin && m_stickLAmount > 0.01f) {
+			if (m_stickLAmount > 0.01f) {
 				return true;
 			}
 			return false;
@@ -105,7 +105,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeChace() const
 		{
-			if (m_isFindPenguin && m_stickLAmount > 0.01f) {
+			if (m_actionButtonB && m_stickLAmount > 0.01f) {
 				return true;
 			}
 			return false;
@@ -114,9 +114,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeAttack() const
 		{
-			//if (!m_canAttack)return false;
 			if (!m_isNearPenguin)return false;
-
 			if (m_actionButtonX) {
 				return true;
 			}

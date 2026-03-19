@@ -49,7 +49,7 @@ namespace app
 		/************************************/
 
 
-		void EnemyWanderingState::Enter()
+		void EnemyWalkState::Enter()
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
@@ -57,7 +57,7 @@ namespace app
 		}
 
 
-		void EnemyWanderingState::Update()
+		void EnemyWalkState::Update()
 		{
 			if (m_owner->GetStickLAmount() < 0.01f) {
 				return;
@@ -66,13 +66,13 @@ namespace app
 		}
 
 
-		void EnemyWanderingState::Exit()
+		void EnemyWalkState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 		}
 
 
-		EnemyWanderingState::EnemyWanderingState(EnemyStateMachine* owner)
+		EnemyWalkState::EnemyWalkState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
 

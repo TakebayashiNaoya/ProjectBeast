@@ -55,9 +55,6 @@ namespace app
 			void SetMoveVector(const Vector3& moveVector) { m_moveVector = moveVector; }
 
 
-
-
-
 			/**
 			 * @brief Aボタンを押せるかの設定
 			 */
@@ -66,6 +63,16 @@ namespace app
 			 * @brief Aボタンを押したか取得
 			 */
 			bool IsActionButtonA() const { return m_actionButtonA; }
+
+
+			/**
+			 * @brief Bボタンを押せるかの設定
+			 */
+			void SetActionButtonB(const bool isActionButtonB) { m_actionButtonB = isActionButtonB; }
+			/**
+			 * @brief Bボタンを押したか取得
+			 */
+			bool IsActionButtonB() const { return m_actionButtonB; }
 
 
 			/**
@@ -117,7 +124,7 @@ namespace app
 			/** 待機状態に変更できるか */
 			bool CanChangeIdle() const;
 			/** 徘徊状態に変更できるか */
-			bool CanChangeWandering() const;
+			bool CanChangeWalk() const;
 			/** チェイス状態に変更できるか */
 			bool CanChangeChace() const;
 			/** 攻撃状態に変更できるか */
@@ -148,6 +155,9 @@ namespace app
 
 			/** Aボタンを押せるかどうか */
 			bool m_actionButtonA = false;
+
+			/** Bボタンを押せるかどうか */
+			bool m_actionButtonB = false;
 
 			/** Xボタンを押せるかどうか */
 			bool m_actionButtonX = false;
