@@ -41,39 +41,5 @@ namespace app
 			// 読み込み成功
 			return true;
 		}
-
-
-		int JsonConverter::ToInt(const nlohmann::json& json)
-		{
-			return json.get<int>();
-		}
-
-
-		uint32_t JsonConverter::ToUInt32(const nlohmann::json& json)
-		{
-			return json.get<uint32_t>();
-		}
-
-
-		float JsonConverter::ToFloat(const nlohmann::json& json)
-		{
-			return json.get<float>();
-		}
-
-
-		std::string JsonConverter::ToString(const nlohmann::json& json)
-		{
-			return json.get<std::string>();
-		}
-
-
-		Vector3 JsonConverter::ToVector3(const nlohmann::json& json)
-		{
-			return Vector3(
-				ToFloat(json[0]),
-				ToFloat(json[1]),
-				ToFloat(json[2])
-			);
-		}
 	}
 }
