@@ -128,6 +128,14 @@ namespace app
 			{
 				return m_isSeparateWater && IsInWater();
 			}
+			/**
+			 * @brief 飛び込みステートに切り替えられるかどうか
+			 * @return 飛び込みステートに切り替えられるかどうか
+			 */
+			bool CanChangeDivingState() const
+			{
+				return m_isDive && IsInWater();
+			}
 
 
 		public:
@@ -148,6 +156,8 @@ namespace app
 			bool m_isSlide;
 			/** 離水するかどうか */
 			bool m_isSeparateWater;
+			/** 飛び込みするかどうか */
+			bool m_isDive;
 		};
 	}
 }

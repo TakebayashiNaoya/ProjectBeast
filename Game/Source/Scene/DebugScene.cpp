@@ -6,8 +6,6 @@
 #include "stdafx.h"
 #if defined(APP_DEBUG)
 #include "DebugScene.h"
-#include "Source/Actor/Character/Penguin/DaddyPenguin/Daddypenguin.h"
-#include "Source/Core/ParameterManager.h"
 
 
 

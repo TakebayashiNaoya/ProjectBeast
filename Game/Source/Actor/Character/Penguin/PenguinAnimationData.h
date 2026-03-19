@@ -92,9 +92,9 @@ namespace app
 			// その場で翼をばたつかせる
 			{ "Assets/animData/penguin/idleFlappingWings.tka", true },
 			// その場で周りを見回す
-			{ "Assets/animData/penguin/idleLooKAround.tka", true },
+			{ "Assets/animData/penguin/idleLooKAround.tka", false },
 			// その場で体を振るう
-			{ "Assets/animData/penguin/idleShake.tka", true },
+			{ "Assets/animData/penguin/idleShake.tka", false },
 			// その場で眠る
 			{ "Assets/animData/penguin/idleSleep.tka", true },
 			// その場で何もしない

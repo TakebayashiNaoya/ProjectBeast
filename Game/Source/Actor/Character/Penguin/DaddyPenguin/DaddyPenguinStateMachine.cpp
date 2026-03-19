@@ -54,7 +54,7 @@ namespace app
 			m_isFollowCommand = g_pad[0]->IsTrigger(enButtonLB1);
 			m_isWaitCommand = g_pad[0]->IsTrigger(enButtonRB1);
 			m_isSwimming = g_pad[0]->IsPress(enButtonX);
-			m_isSeparateWater = g_pad[0]->IsTrigger(enButtonY);
+			m_isDive = m_isSeparateWater = g_pad[0]->IsTrigger(enButtonY);
 		}
 
 
@@ -130,6 +130,25 @@ namespace app
 				return FindState(DaddyPenguinSwimmingState::ID());
 			}
 
+
+
+			if (IsEqualCurrentState(DaddyPenguinDivingState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(DaddyPenguinDivingState::ID());
+				}
+				else
+				{
+					return FindState(DaddyPenguinSwimmingState::ID());
+				}
+			}
+
+
+			if (CanChangeDivingState())
+			{
+				return FindState(DaddyPenguinDivingState::ID());
+			}
 
 
 
