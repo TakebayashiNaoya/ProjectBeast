@@ -102,7 +102,6 @@
     <ClCompile Include="Source\system\system.cpp">
       <Filter>Source\system</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Scene\DebugScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
@@ -248,8 +247,18 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStateMachine.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\CountDownMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Application.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyTypes.cpp" />
+    　<Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp" />
+  　<Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+  　</ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -302,7 +311,6 @@
     <ClInclude Include="Source\system\system.h">
       <Filter>Source\system</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Scene\DebugScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
@@ -457,7 +465,17 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\CountDownMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Application.h">
+      <Filter>Source</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyTypes.h" />
+    <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h" />
+　　<Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+　　</ClInclude>
   </ItemGroup>
 </Project>

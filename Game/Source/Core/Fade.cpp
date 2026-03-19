@@ -15,6 +15,11 @@ namespace app
 
 
 		Fade::Fade()
+			: m_state(FadeState::None)
+			, m_timer(0.0f)
+			, m_duration(0.0f)
+			, m_isFadeIn(false)
+			, m_isFadeOut(false)
 		{
 			m_fadeRender.Init("Assets/sprite/Loading.DDS", 1920.0f, 1080.0f);
 		}
@@ -42,18 +47,22 @@ namespace app
 
 			if (m_state == FadeState::FadeIn)
 			{
+				m_isFadeIn = true;
 				m_timer -= delta;
 				if (m_timer <= 0.0f)
 				{
 					m_timer = 0.0f;
+					m_isFadeIn = false;
 					m_state = FadeState::None;
 				}
 			}
 			else if (m_state == FadeState::FadeOut)
 			{
+				m_isFadeOut = true;
 				m_timer += delta;
 				if (m_timer >= m_duration)
 				{
+					m_isFadeOut = false;
 					m_timer = m_duration;
 				}
 			}
