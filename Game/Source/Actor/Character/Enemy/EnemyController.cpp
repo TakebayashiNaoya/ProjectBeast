@@ -29,7 +29,8 @@ namespace app
 			m_elapsedTime(0.0f),
 			m_prePosition(Vector3::Zero),
 			m_startPosition(Vector3::Zero),
-			isFind(false)
+			isFind(false),
+			m_isStun(false)
 		{
 			static bool ini = false;
 			if (!ini)
@@ -73,6 +74,12 @@ namespace app
 			if (nextState != -1 && nextState != m_currentState) {
 				ChangeState((EnEnemyStateID)nextState);
 				currentState = FindAIState(m_currentState);
+			}
+
+			if (m_isStun)
+			{
+				m_target->GetEnemyStateMachine()->SetStun(true);
+				m_isStun = false;
 			}
 
 			/** 現在のステートのアップデート */
@@ -190,6 +197,30 @@ namespace app
 			}
 			return enEnemyState_Invalid;
 		}
+
+
+		/** スタン */
+		void EnemyController::EnterStun(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::UpdateStun(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::ExitStun(EnemyController* enemy)
+		{}
+
+
+		int EnemyController::CheckStun(EnemyController* enemy)
+		{
+			return enEnemyState_Invalid;
+		}
+
 
 
 		/** サーチ */

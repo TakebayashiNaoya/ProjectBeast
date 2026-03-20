@@ -35,6 +35,7 @@ namespace app
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
+			AddState<EnemyStunState>(this);
 			AddState<EnemySearchState>(this);
 			AddState<EnemyWalkState>(this);
 			AddState<EnemyChaseState>(this);
@@ -81,6 +82,11 @@ namespace app
 
 		core::IState* EnemyStateMachine::GetChangeState()
 		{
+			if (CanChangeStun())
+			{
+				return FindState(EnemyStunState::ID());
+			}
+
 			if (CanChangeAttack())
 			{
 				return FindState(EnemyAttackState::ID());
@@ -109,6 +115,16 @@ namespace app
 		bool EnemyStateMachine::CanChangeIdle() const
 		{
 			if (m_stickLAmount < 0.0001f) {
+				return true;
+			}
+			return false;
+		}
+
+
+		bool EnemyStateMachine::CanChangeStun() const
+		{
+			if (m_isStun)
+			{
 				return true;
 			}
 			return false;

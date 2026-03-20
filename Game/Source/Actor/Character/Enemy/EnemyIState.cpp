@@ -51,6 +51,42 @@ namespace app
 
 
 
+		void EnemyStunState::Enter()
+		{
+			m_owner->PlayAnimation(EnEnemyAnimationType::Stun);
+			m_owner->SetStickLAmount(0.0f); // 動かない
+
+			m_stunTimer = 2.0f;
+		}
+
+
+		void EnemyStunState::Update()
+		{
+			m_stunTimer -= g_gameTime->GetFrameDeltaTime();
+
+			if (!m_owner->IsPlayingAnimation() || m_stunTimer <= 0.0f)
+			{
+				m_owner->SetStun(false); // ←ここで解除！
+			}
+		}
+
+		void EnemyStunState::Exit()
+		{
+			m_owner->SetStun(false);
+		}
+
+		EnemyStunState::EnemyStunState(EnemyStateMachine* owner)
+			:EnemyIState(owner),
+			m_stunTimer(0.0f)
+		{
+
+		}
+
+
+		/************************************/
+
+
+
 		void EnemySearchState::Enter()
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();

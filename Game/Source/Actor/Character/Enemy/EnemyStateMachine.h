@@ -133,10 +133,22 @@ namespace app
 			bool CanAttack() const { return m_canAttack; }
 
 
+			/**
+			 * @brief　スタンしているかの設定
+			 */
+			void SetStun(const bool isStun) { m_isStun = isStun; }
+			/**
+			 * @brief スタンしているかの取得
+			 */
+			bool IsStun() const { return m_isStun; }
+
+
 
 		private:
 			/** 待機状態に変更できるか */
 			bool CanChangeIdle() const;
+			/** スタン状態に変更できるか */
+			bool CanChangeStun() const;
 			/** 見回し状態に変更できるか */
 			bool CanChangeSearch() const;
 			/** 徘徊状態に変更できるか */
@@ -189,6 +201,9 @@ namespace app
 
 			/** 攻撃できるか */
 			bool m_canAttack;
+
+			/** スタン状態か */
+			bool m_isStun;
 		};
 	}
 }
