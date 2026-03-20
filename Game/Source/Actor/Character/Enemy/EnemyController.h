@@ -43,6 +43,10 @@ namespace app
 		public:
 			static void Initialize();
 
+
+		public:
+			void SetStun(const bool isStun) { m_isStun = isStun; }
+
 		private:
 			/** 子ペンギンを探す */
 			ChildPenguin* FindTarget();
@@ -73,12 +77,14 @@ namespace app
 			enum EnEnemyStateID
 			{
 				enEnemyState_Idle,
+				enEnemyState_Stun,
 				enEnemyState_Search,
 				enEnemyState_Wandering,
 				enEnemyState_Chase,
 				enEnemyState_Jump,
 				enEnemyState_Swim,
 				enEnemyState_Attack,
+				//enEnemyState_Sleep,
 
 				enEnemyState_Num,
 				enEnemyState_Invalid = -1
@@ -143,6 +149,15 @@ namespace app
 			static void UpdateIdle(EnemyController* enemy);
 			static void ExitIdle(EnemyController* enemy);
 			static int CheckIdle(EnemyController* enemy);
+
+
+			/**
+			* サーチ
+			*/
+			static void EnterStun(EnemyController* enemy);
+			static void UpdateStun(EnemyController* enemy);
+			static void ExitStun(EnemyController* enemy);
+			static int CheckStun(EnemyController* enemy);
 
 
 			/**
@@ -223,6 +238,8 @@ namespace app
 			EnEnemyStateID m_currentState = enEnemyState_Idle;
 			/** 初期化処理をしたか */
 			bool m_isInitialized = false;
+
+			bool m_isStun;
 		};
 	}
 }
