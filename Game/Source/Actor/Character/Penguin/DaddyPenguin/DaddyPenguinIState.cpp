@@ -10,6 +10,7 @@
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -217,6 +218,7 @@ namespace app
 		void DaddyPenguinCommandShoutState::Enter()
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
+			EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
 		}
 
 
