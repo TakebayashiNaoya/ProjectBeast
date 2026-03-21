@@ -142,6 +142,15 @@ namespace app
 			 */
 			bool IsStun() const { return m_isStun; }
 
+			/**
+			 * @brief 帰巣するかの設定
+			 */
+			void SetReturnHome(const bool returnHome) { m_isReturnHome = returnHome; }
+			/**
+			 * @brief 帰巣するかの取得
+			 */
+			bool IsReturnHome()const { return m_isReturnHome; }
+
 
 
 		private:
@@ -157,6 +166,8 @@ namespace app
 			bool CanChangeChace() const;
 			/** 攻撃状態に変更できるか */
 			bool CanChangeAttack() const;
+			/** 帰巣状態に変更できるか */
+			bool CanChangeReturnHome()const;
 
 
 		private:
@@ -204,6 +215,9 @@ namespace app
 
 			/** スタン状態か */
 			bool m_isStun;
+
+			/** 帰巣する状態か */
+			bool m_isReturnHome;
 		};
 	}
 }

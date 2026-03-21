@@ -32,6 +32,7 @@ namespace app
 			, m_isNearPenguin(false)
 			, m_canAttack(false)
 			, m_isSeach(false)
+			, m_isReturnHome(false)
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
@@ -42,6 +43,7 @@ namespace app
 			AddState<EnemyJumpState>(this);
 			AddState<EnemySwimState>(this);
 			AddState<EnemyAttackState>(this);
+			AddState<EnemyReturnHomeState>(this);
 
 
 			// 初期ステートの設定
@@ -82,6 +84,10 @@ namespace app
 
 		core::IState* EnemyStateMachine::GetChangeState()
 		{
+			if (CanChangeReturnHome())
+			{
+				return FindState(EnemyReturnHomeState::ID());
+			}
 			if (CanChangeStun())
 			{
 				return FindState(EnemyStunState::ID());
@@ -144,6 +150,16 @@ namespace app
 		bool EnemyStateMachine::CanChangeWalk() const
 		{
 			if (m_stickLAmount >= 0.0001f) {
+				return true;
+			}
+			return false;
+		}
+
+
+		bool EnemyStateMachine::CanChangeReturnHome()const
+		{
+			if (m_isReturnHome)
+			{
 				return true;
 			}
 			return false;

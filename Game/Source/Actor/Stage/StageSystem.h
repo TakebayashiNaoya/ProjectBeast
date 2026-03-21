@@ -94,6 +94,10 @@ namespace app
 			}
 
 
+		public:
+			Vector3 GetObjectPosition(const std::string& key)const;
+
+
 		private:
 			/** シングルトンインスタンス */
 			static StageSystem* m_instance;

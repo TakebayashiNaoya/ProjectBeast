@@ -31,10 +31,7 @@ namespace app
 
 		public:
 			/** 操作対象の設定 */
-			void SetTarget(Enemy* target)
-			{
-				m_target = target;
-			}
+			void SetTarget(Enemy* target);
 
 
 		public:
@@ -84,6 +81,7 @@ namespace app
 				enEnemyState_Jump,
 				enEnemyState_Swim,
 				enEnemyState_Attack,
+				enEnemyState_ReturnHome,
 				//enEnemyState_Sleep,
 
 				enEnemyState_Num,
@@ -98,6 +96,9 @@ namespace app
 		private:
 			static std::map<EnEnemyStateID, AIState> m_stateMap;
 
+
+		private:
+			bool IsFarFromHome()const;
 
 		private:
 			/**
@@ -214,6 +215,15 @@ namespace app
 			static int CheckAttack(EnemyController* enemy);
 
 
+			/**
+			 * 帰巣
+			 */
+			static void EnterReturnHome(EnemyController* enemy);
+			static void UpdateReturnHome(EnemyController* enemy);
+			static void ExitReturnHome(EnemyController* enemy);
+			static int CheckReturnHome(EnemyController* enemy);
+
+
 		private:
 			Enemy* m_target = nullptr;
 			float m_elapsedTime = 0.0f;
@@ -223,6 +233,9 @@ namespace app
 
 			/** 徘徊開始位置 */
 			Vector3 m_startPosition = Vector3::Zero;
+
+			/** 巣の位置 */
+			Vector3 m_homePosition;
 
 
 			std::vector<Vector3> m_targetPosList;
@@ -240,6 +253,8 @@ namespace app
 			bool m_isInitialized = false;
 
 			bool m_isStun;
+
+			bool m_isHomeInitialized;
 		};
 	}
 }
