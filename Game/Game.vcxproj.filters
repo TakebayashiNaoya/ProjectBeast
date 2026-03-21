@@ -49,6 +49,9 @@
     <Filter Include="Source\Actor\Character\penguin\ChildPenguin">
       <UniqueIdentifier>{25d9ee0e-41a8-4178-bf79-b80371945ac2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Effect">
+      <UniqueIdentifier>{2bc75a8b-34a3-49dc-91cf-e98845bf3cc8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -253,12 +256,15 @@
     <ClCompile Include="Source\Application.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-	  <ClCompile Include="Source\Actor\Character\Enemy\EnemyTypes.cpp">
-		  <Filter>Source\Actor\Character\Enemy</Filter>
-	  </ClCompile>
-	  <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
-		  <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-	  </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyTypes.cpp">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Effect\EffectManager.cpp">
+      <Filter>Source\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -471,11 +477,17 @@
     <ClInclude Include="Source\Application.h">
       <Filter>Source</Filter>
     </ClInclude>
-	  <ClInclude Include="Source\Actor\Character\Enemy\EnemyTypes.h">
-		  <Filter>Source\Actor\Character\Enemy</Filter>
-	  </ClInclude>
-	  <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h">
-		  <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-	  </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyTypes.h">
+      <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect\EffectManager.h">
+      <Filter>Source\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect\Types.h">
+      <Filter>Source\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
