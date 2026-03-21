@@ -92,9 +92,9 @@ namespace app
 			static inline Vector3 ToVector3(const nlohmann::json& json)
 			{
 				return Vector3(
-					json["x"].get<float>(),
-					json["y"].get<float>(),
-					json["z"].get<float>()
+					json[0].get<float>(),
+					json[1].get<float>(),
+					json[2].get<float>()
 				);
 			}
 
