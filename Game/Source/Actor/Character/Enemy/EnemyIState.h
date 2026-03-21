@@ -227,6 +227,30 @@ namespace app
 			EnemyAttackState(EnemyStateMachine* owner);
 			~EnemyAttackState() override = default;
 		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief エネミーの帰巣ステートクラス
+		 */
+		class EnemyReturnHomeState :public EnemyIState
+		{
+			appState(EnemyReturnHomeState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemyReturnHomeState(EnemyStateMachine* owner);
+			~EnemyReturnHomeState() override = default;
+		};
 	}
 }
 

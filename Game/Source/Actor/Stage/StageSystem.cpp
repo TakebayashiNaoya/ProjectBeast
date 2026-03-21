@@ -256,6 +256,18 @@ namespace app
 		}
 
 
+		Vector3 StageSystem::GetObjectPosition(const std::string& key)const
+		{
+			auto it = m_objectMap.find(key);
+			if (it != m_objectMap.end())
+			{
+				return it->second->GetTransform().m_position;
+			}
+
+			// 見つからなかった場合
+			return Vector3::Zero;
+		}
+
 		/** インスタンスを初期化 */
 		StageSystem* StageSystem::m_instance = nullptr;
 	}

@@ -266,5 +266,38 @@ namespace app
 		EnemyAttackState::EnemyAttackState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void EnemyReturnHomeState::Enter()
+		{
+			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+		}
+
+
+		void EnemyReturnHomeState::Update()
+		{
+			if (m_owner->GetStickLAmount() < 0.0001f) {
+				return;
+			}
+			m_owner->Move();
+		}
+
+
+		void EnemyReturnHomeState::Exit()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+		}
+
+
+		EnemyReturnHomeState::EnemyReturnHomeState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{}
 	}
 }

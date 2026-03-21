@@ -14,6 +14,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Player/Player.h"
+#include "Source/Actor/Stage/StageSystem.h"
 
 
 namespace app
@@ -29,8 +30,10 @@ namespace app
 			m_elapsedTime(0.0f),
 			m_prePosition(Vector3::Zero),
 			m_startPosition(Vector3::Zero),
+			m_homePosition(Vector3::Zero),
 			isFind(false),
 			m_isStun(false)
+			, m_isHomeInitialized(false)
 		{
 			static bool ini = false;
 			if (!ini)
@@ -57,6 +60,17 @@ namespace app
 
 		void EnemyController::Update()
 		{
+			if (!m_isHomeInitialized)
+			{
+				Vector3 pos = StageSystem::GetInstance()->GetObjectPosition("bearHome");
+
+				if (pos.LengthSq() > 0.0001f)
+				{
+					m_homePosition = pos;
+					m_isHomeInitialized = true;
+				}
+			}
+
 			auto* currentState = FindAIState(m_currentState);
 			if (currentState == nullptr) {
 				K2_ASSERT(false, "対象の処理が見つかりません\n");
@@ -90,6 +104,12 @@ namespace app
 
 		void EnemyController::Render(RenderContext& renderContext)
 		{}
+
+
+		void EnemyController::SetTarget(Enemy* target)
+		{
+			m_target = target;
+		}
 
 
 		void EnemyController::AddTargetPos(const Vector3& pos)
@@ -141,6 +161,20 @@ namespace app
 		}
 
 
+		bool EnemyController::IsFarFromHome()const
+		{
+			Vector3 pos = m_target->GetTransform().m_position;
+			Vector3 toHome = m_homePosition - pos;
+
+			const float MAX_DIST = 500.0f;
+			if (toHome.LengthSq() > MAX_DIST * MAX_DIST)
+			{
+				return true;
+			}
+			return false;
+		}
+
+
 		void EnemyController::Initialize()
 		{
 			/** 待機 */
@@ -157,6 +191,8 @@ namespace app
 			RegisterState(enEnemyState_Swim, EnterSwim, UpdateSwim, ExitSwim, CheckSwim);
 			/** 攻撃 */
 			RegisterState(enEnemyState_Attack, EnterAttack, UpdateAttack, ExitAttack, CheckAttack);
+			/** 帰巣 */
+			RegisterState(enEnemyState_ReturnHome, EnterReturnHome, UpdateReturnHome, ExitReturnHome, CheckReturnHome);
 		}
 
 
@@ -188,6 +224,11 @@ namespace app
 
 		int EnemyController::CheckIdle(EnemyController* enemy)
 		{
+			if (enemy->IsFarFromHome())
+			{
+				return enEnemyState_ReturnHome;
+			}
+
 			const float idleTime = static_cast<float>(rand() % 500) * 0.01f;
 			if (enemy->m_elapsedTime > idleTime) {
 				if (rand() % 10 >= 5) {
@@ -305,6 +346,10 @@ namespace app
 			//	//enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(true);
 			//	return enEnemyState_Chase;
 			//}
+			if (enemy->IsFarFromHome())
+			{
+				return enEnemyState_ReturnHome;
+			}
 
 			// 一定時間で終了
 			if (enemy->m_elapsedTime > 2.0f)
@@ -352,6 +397,11 @@ namespace app
 
 		int EnemyController::CheckWandering(EnemyController* enemy)
 		{
+			if (enemy->IsFarFromHome())
+			{
+				return enEnemyState_ReturnHome;
+			}
+
 			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
 
 			if (distance.Length() <= 20.0f)
@@ -400,6 +450,11 @@ namespace app
 
 		int EnemyController::CheckChase(EnemyController* enemy)
 		{
+			if (enemy->IsFarFromHome())
+			{
+				return enEnemyState_ReturnHome;
+			}
+
 			//auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
 			//if (player == nullptr) return enEnemyState_Invalid;
 
@@ -475,6 +530,11 @@ namespace app
 
 		int EnemyController::CheckSwim(EnemyController* enemy)
 		{
+			if (enemy->IsFarFromHome())
+			{
+				return enEnemyState_ReturnHome;
+			}
+
 			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
 
 			if (distance.Length() <= 20.0f)
@@ -501,8 +561,62 @@ namespace app
 
 		int EnemyController::CheckAttack(EnemyController* enemy)
 		{
+			if (enemy->IsFarFromHome())
+			{
+				return enEnemyState_ReturnHome;
+			}
+
 			return enEnemyState_Chase;
 			return enEnemyState_Invalid;
 		}
+
+
+		/** 攻撃 */
+		void EnemyController::EnterReturnHome(EnemyController* enemy)
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetReturnHome(true);
+		}
+
+
+		void EnemyController::UpdateReturnHome(EnemyController* enemy)
+		{
+			Vector3 pos = enemy->m_target->GetTransform().m_position;
+			Vector3 toHome = enemy->m_homePosition - pos;
+
+			// 到着判定
+			if (toHome.LengthSq() < 10.0f)
+			{
+				enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+				return;
+			}
+
+			toHome.Normalize();
+			enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(toHome);
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(1.0f);
+		}
+
+
+		void EnemyController::ExitReturnHome(EnemyController* enemy)
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetReturnHome(false);
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+		}
+
+
+		int EnemyController::CheckReturnHome(EnemyController* enemy)
+		{
+			Vector3 pos = enemy->m_target->GetTransform().m_position;
+			Vector3 toHome = enemy->m_homePosition - pos;
+
+			// 到着したら終了
+			if (toHome.LengthSq() < 10.0f)
+			{
+				return enEnemyState_Idle;
+			}
+
+			// まだ遠い → 継続
+			return enEnemyState_ReturnHome;
+		}
+
 	}
 }
