@@ -8,6 +8,7 @@
 #include "ChildPenguinIState.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 
 
 namespace app
@@ -60,6 +61,54 @@ namespace app
 
 
 		ChildPenguinMoveState::ChildPenguinMoveState(ChildPenguinStateMachine* owner)
+			: ChildPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void ChildPenguinFollowState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::IdleFlapingWings);
+		}
+
+
+		void ChildPenguinFollowState::Update()
+		{}
+
+
+		void ChildPenguinFollowState::Exit()
+		{}
+
+
+		ChildPenguinFollowState::ChildPenguinFollowState(ChildPenguinStateMachine* owner)
+			: ChildPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void ChildPenguinWaitState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::IdleLoocAround);
+		}
+
+
+		void ChildPenguinWaitState::Update()
+		{}
+
+
+		void ChildPenguinWaitState::Exit()
+		{}
+
+
+		ChildPenguinWaitState::ChildPenguinWaitState(ChildPenguinStateMachine* owner)
 			: ChildPenguinIState(owner)
 		{}
 	}

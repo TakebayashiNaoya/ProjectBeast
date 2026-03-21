@@ -35,6 +35,16 @@ namespace app
 
 		core::IState* ChildPenguinStateMachine::GetChangeState()
 		{
+			if (m_isFollowCommanded)
+			{
+				return FindState(ChildPenguinFollowState::ID());
+			}
+
+			if (m_isWaitCommanded)
+			{
+				return FindState(ChildPenguinWaitState::ID());
+			}
+
 			return FindState(ChildPenguinIdleState::ID());
 			return nullptr;
 		}

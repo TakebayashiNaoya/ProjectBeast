@@ -132,6 +132,54 @@ namespace app
 			ChildPenguinMoveState(ChildPenguinStateMachine* owner);
 			~ChildPenguinMoveState() override = default;
 		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief 子ペンギンの追従ステートクラス
+		 */
+		class ChildPenguinFollowState : public ChildPenguinIState
+		{
+			appState(ChildPenguinFollowState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			ChildPenguinFollowState(ChildPenguinStateMachine* owner);
+			~ChildPenguinFollowState() override = default;
+		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief 子ペンギンの待機ステートクラス
+		 */
+		class ChildPenguinWaitState : public ChildPenguinIState
+		{
+			appState(ChildPenguinWaitState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			ChildPenguinWaitState(ChildPenguinStateMachine* owner);
+			~ChildPenguinWaitState() override = default;
+		};
 	}
 }
 
