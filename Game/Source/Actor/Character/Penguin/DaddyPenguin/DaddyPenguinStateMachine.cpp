@@ -34,6 +34,9 @@ namespace app
 			AddState<DaddyPenguinClimbStartState>(this);
 			AddState<DaddyPenguinClimbingState>(this);
 			AddState<DaddyPenguinClimbEndState>(this);
+			AddState<DaddyPenguinDamagedState>(this);
+			AddState<DaddyPenguinDiyingState>(this);
+			AddState<DaddyPenguinDeadState>(this);
 
 			// 初期ステートの設定
 			m_currentState = FindState(DaddyPenguinIdleState::ID());
@@ -55,10 +58,11 @@ namespace app
 			m_isWaitCommand = g_pad[0]->IsTrigger(enButtonRB1);
 			m_isSwimming = g_pad[0]->IsPress(enButtonX);
 			m_isDive = m_isSeparateWater = g_pad[0]->IsTrigger(enButtonY);
+			m_isDamaged = g_pad[0]->IsTrigger(enButtonLB3);
 		}
 
 
-		const DaddyPenguinStatus* DaddyPenguinStateMachine::GetDaddyPenguinStatus() const
+		DaddyPenguinStatus* DaddyPenguinStateMachine::GetDaddyPenguinStatus() const
 		{
 			return m_ownerActor->GetStatus<DaddyPenguinStatus>();
 		}
@@ -69,6 +73,33 @@ namespace app
 			if (CanChangeJumpState())
 			{
 				return FindState(DaddyPenguinJumpState::ID());
+			}
+
+
+			/** 死亡ステート中、アニメーション再生中であれば継続 */
+			if (IsEqualCurrentState(DaddyPenguinDiyingState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(DaddyPenguinDiyingState::ID());
+				}
+				else
+				{
+					return FindState(DaddyPenguinDeadState::ID());
+				}
+			}
+
+
+
+			if (m_ownerDaddyPenguin->GetStatus<DaddyPenguinStatus>()->IsDead())
+			{
+				return FindState(DaddyPenguinDiyingState::ID());
+			}
+
+
+			if (m_isDamaged)
+			{
+				return FindState(DaddyPenguinDamagedState::ID());
 			}
 
 

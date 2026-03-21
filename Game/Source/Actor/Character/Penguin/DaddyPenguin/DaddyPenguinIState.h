@@ -340,5 +340,74 @@ namespace app
 			DaddyPenguinClimbEndState(DaddyPenguinStateMachine* owner);
 			~DaddyPenguinClimbEndState() override = default;
 		};
+
+
+
+
+		/***************************************/
+
+
+		/**
+		 * @brief 親ペンギンの被弾ステートクラス
+		 */
+		class DaddyPenguinDamagedState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinDamagedState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinDamagedState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinDamagedState() override = default;
+		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンのダイイングステートクラス
+		 */
+		class DaddyPenguinDiyingState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinDyingState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinDiyingState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinDiyingState() override = default;
+		};
+
+
+
+
+		/****************************************/
+
+
+		class DaddyPenguinDeadState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinDeadState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			DaddyPenguinDeadState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinDeadState() override = default;
+		};
 	}
 }

@@ -354,5 +354,77 @@ namespace app
 		DaddyPenguinClimbEndState::DaddyPenguinClimbEndState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinDamagedState::Enter()
+		{
+			m_owner->GetDaddyPenguinStatus()->Damage();
+		}
+
+
+		void DaddyPenguinDamagedState::Update()
+		{}
+
+
+		void DaddyPenguinDamagedState::Exit()
+		{}
+
+
+		DaddyPenguinDamagedState::DaddyPenguinDamagedState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinDiyingState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::DeathFaceDown);
+		}
+
+
+		void DaddyPenguinDiyingState::Update()
+		{}
+
+
+		void DaddyPenguinDiyingState::Exit()
+		{}
+
+
+		DaddyPenguinDiyingState::DaddyPenguinDiyingState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinDeadState::Enter()
+		{
+			m_owner->SetActive(false);
+		}
+
+
+		void DaddyPenguinDeadState::Update()
+		{}
+
+
+		void DaddyPenguinDeadState::Exit()
+		{}
+
+
+		DaddyPenguinDeadState::DaddyPenguinDeadState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
 	}
 }

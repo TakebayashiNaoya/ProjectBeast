@@ -64,7 +64,7 @@ namespace app
 			 * @brief 親ペンギンのステータスを取得
 			 * @return 親ペンギンのステータスポインタ
 			 */
-			const DaddyPenguinStatus* GetDaddyPenguinStatus() const;
+			DaddyPenguinStatus* GetDaddyPenguinStatus() const;
 
 
 			/** ステートの変更先を取得する */
