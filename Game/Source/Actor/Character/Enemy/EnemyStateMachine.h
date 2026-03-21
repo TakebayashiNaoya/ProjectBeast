@@ -142,6 +142,7 @@ namespace app
 			 */
 			bool IsStun() const { return m_isStun; }
 
+
 			/**
 			 * @brief 帰巣するかの設定
 			 */
@@ -150,6 +151,16 @@ namespace app
 			 * @brief 帰巣するかの取得
 			 */
 			bool IsReturnHome()const { return m_isReturnHome; }
+
+
+			/**
+			 * @brief クールダウンするかの設定
+			 */
+			void SetCoolDown(const bool coolDown) { m_isCoolDown = coolDown; }
+			/**
+			 * @brief クールダウンしているかの取得
+			 */
+			bool IsCooolDown()const { return m_isCoolDown; }
 
 
 
@@ -168,6 +179,8 @@ namespace app
 			bool CanChangeAttack() const;
 			/** 帰巣状態に変更できるか */
 			bool CanChangeReturnHome()const;
+			/** クールダウン状態に変更できるか */
+			bool CanChangeCoolDown()const;
 
 
 		private:
@@ -218,6 +231,9 @@ namespace app
 
 			/** 帰巣する状態か */
 			bool m_isReturnHome;
+
+			/** クールダウン状態か */
+			bool m_isCoolDown;
 		};
 	}
 }
