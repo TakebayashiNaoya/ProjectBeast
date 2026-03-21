@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Application.h"
 #include "Source/Core/Fade.h"
+#include "Source/Effect/EffectManager.h"
 #include "Source/Scene/SceneManager.h"
 #include "Source/Sound/SoundManager.h"
 
@@ -12,6 +13,7 @@ namespace app
 		core::Fade::Create();
 		SoundManager::CreateInstance();
 		SceneManager::CreateInstance();
+		EffectManager::CreateInstance();
 	}
 
 
@@ -19,6 +21,7 @@ namespace app
 	{
 		SceneManager::DestroyInstance();
 		SoundManager::DestroyInstance();
+		EffectManager::DestroyInstance();
 		core::Fade::Delete();
 	}
 
@@ -27,6 +30,7 @@ namespace app
 	{
 		SoundManager::Get().Update();
 		SceneManager::GetInstance()->Update();
+		EffectManager::Get().Update();
 		core::Fade::Get().Update();
 	}
 

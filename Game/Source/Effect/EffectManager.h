@@ -79,7 +79,7 @@ namespace app
 		/**
 		 * @brief インスタンスを作る
 		 */
-		static void Initialize()
+		static void CreateInstance()
 		{
 			if (m_instance == nullptr)
 			{
@@ -100,7 +100,7 @@ namespace app
 		/**
 		 * @brief インスタンスを破棄
 		 */
-		static void Finalize()
+		static void DestroyInstance()
 		{
 			if (m_instance != nullptr)
 			{

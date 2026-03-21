@@ -55,14 +55,14 @@ namespace app
 			K2_ASSERT(false, "エフェクトの再生が多いです。\n");
 			return INVALID_EFFECT_HANDLE;
 		}
-		EffectEmitter* m_effect = NewGO<EffectEmitter>(0);
-		m_effect->Init(static_cast<int>(kind));
-		m_effect->SetPosition(position);
-		m_effect->SetRotation(rotation);
-		m_effect->SetScale(scale);
-		m_effect->Play();
+		auto* newEffect = new EffectEmitter();
+		newEffect->Init(static_cast<int>(kind));
+		newEffect->SetPosition(position);
+		newEffect->SetRotation(rotation);
+		newEffect->SetScale(scale);
+		newEffect->Play();
 
-		m_effectList.emplace(m_effectHandleCount++, m_effect);
+		m_effectList.emplace(m_effectHandleCount++, newEffect);
 
 		return m_effectHandleCount;
 	}
