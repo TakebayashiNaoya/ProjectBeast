@@ -28,7 +28,7 @@ namespace app
 		 * @brief イージングの種類
 		 * @brief 線形補間、イーズイン、イーズアウト、イーズインアウト
 		 */
-		enum class EasingType { Liner, EaseIn, EaseOut, EaseInOut };
+		enum class EasingType { Linear, EaseIn, EaseOut, EaseInOut };
 
 
 
@@ -178,7 +178,7 @@ namespace app
 				switch (m_easingType)
 				{
 					/** 等速 */
-				case EasingType::Liner:      return t;
+				case EasingType::Linear:      return t;
 					/** 加速 */
 				case EasingType::EaseIn:     return t * t;
 					/** 加減速 */
