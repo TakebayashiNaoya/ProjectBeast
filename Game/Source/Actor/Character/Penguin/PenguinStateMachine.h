@@ -65,6 +65,13 @@ namespace app
 			{
 				return m_isJump;
 			}
+			/**
+			 * @被弾したかどうか取得
+			 */
+			inline bool GetIsDamaged() const
+			{
+				return m_isDamaged;
+			}
 
 
 			/** ステートの変更先を取得する */
@@ -136,6 +143,14 @@ namespace app
 			{
 				return m_isDive && IsInWater();
 			}
+			/**
+			 * @brief 被弾ステートに切り替えられるかどうか
+			 * @return 被弾ステートに切り替えられるかどうか
+			 */
+			bool CanChangeDamagedState() const
+			{
+				return m_isDamaged;
+			}
 
 
 		public:
@@ -158,6 +173,8 @@ namespace app
 			bool m_isSeparateWater;
 			/** 飛び込みするかどうか */
 			bool m_isDive;
+			/** 被弾したかどうか */
+			bool m_isDamaged;
 		};
 	}
 }
