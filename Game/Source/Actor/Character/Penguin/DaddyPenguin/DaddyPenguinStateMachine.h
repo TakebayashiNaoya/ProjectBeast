@@ -61,10 +61,18 @@ namespace app
 				return m_isWaitCommand;
 			}
 			/**
+			 * @brief 追従命令か待機命令が出ているか
+			 * @return 追従命令か待機命令が出ているか
+			 */
+			inline bool IsCommandState() const
+			{
+				return CanChangeCommandState();
+			}
+			/**
 			 * @brief 親ペンギンのステータスを取得
 			 * @return 親ペンギンのステータスポインタ
 			 */
-			const DaddyPenguinStatus* GetDaddyPenguinStatus() const;
+			DaddyPenguinStatus* GetDaddyPenguinStatus() const;
 
 
 			/** ステートの変更先を取得する */

@@ -69,6 +69,11 @@ namespace app
 				m_transform.m_scale = scale;
 			}
 
+			inline void SetActive(const bool isActive)
+			{
+				m_ownerActor->SetActive(isActive);
+			}
+
 
 		public:
 			/**

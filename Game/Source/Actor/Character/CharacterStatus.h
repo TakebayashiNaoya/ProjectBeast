@@ -52,6 +52,18 @@ namespace app
 			 * @return 高さ
 			 */
 			inline float GetHeight() const { return m_height; }
+			/**
+			 * @brief ダメージ処理
+			 */
+			inline void Damage(const int dmg = 1)
+			{
+				m_hp = std::max<int>(0, m_hp - dmg);
+			}
+			/**
+			 * @brief 死んでいるか
+			 * @return 死んでいるか
+			 */
+			inline bool IsDead() const { return m_hp <= 0; }
 
 
 		public:
