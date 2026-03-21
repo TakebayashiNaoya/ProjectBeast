@@ -84,7 +84,7 @@ namespace app
 
 		private:
 			float m_time;
-
+			
 			EnCountDownType m_currentCountType;
 			using Icon = std::unique_ptr<CountDownIcon>;
 			using Key = uint32_t;
