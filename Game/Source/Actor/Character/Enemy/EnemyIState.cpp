@@ -299,5 +299,32 @@ namespace app
 		EnemyReturnHomeState::EnemyReturnHomeState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void EnemyCoolDownState::Enter()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Sleep);
+		}
+
+
+		void EnemyCoolDownState::Update()
+		{}
+
+
+		void EnemyCoolDownState::Exit()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+		}
+
+
+		EnemyCoolDownState::EnemyCoolDownState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{}
 	}
 }

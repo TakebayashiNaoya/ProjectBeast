@@ -251,6 +251,30 @@ namespace app
 			EnemyReturnHomeState(EnemyStateMachine* owner);
 			~EnemyReturnHomeState() override = default;
 		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief エネミーのクールダウンステートクラス
+		 */
+		class EnemyCoolDownState :public EnemyIState
+		{
+			appState(EnemyCoolDownState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemyCoolDownState(EnemyStateMachine* owner);
+			~EnemyCoolDownState() override = default;
+		};
 	}
 }
 

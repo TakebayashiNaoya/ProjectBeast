@@ -44,6 +44,7 @@ namespace app
 			AddState<EnemySwimState>(this);
 			AddState<EnemyAttackState>(this);
 			AddState<EnemyReturnHomeState>(this);
+			AddState<EnemyCoolDownState>(this);
 
 
 			// 初期ステートの設定
@@ -113,6 +114,10 @@ namespace app
 			{
 				return FindState(EnemyWalkState::ID());
 			}
+			if (CanChangeCoolDown())
+			{
+				return FindState(EnemyCoolDownState::ID());
+			}
 
 			return FindState(EnemyIdleState::ID());
 		}
@@ -179,6 +184,16 @@ namespace app
 		{
 			if (!m_isNearPenguin)return false;
 			if (m_actionButtonX) {
+				return true;
+			}
+			return false;
+		}
+
+
+		bool EnemyStateMachine::CanChangeCoolDown()const
+		{
+			if (m_isCoolDown)
+			{
 				return true;
 			}
 			return false;

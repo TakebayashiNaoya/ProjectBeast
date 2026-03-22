@@ -8,8 +8,6 @@
 #include "DebugScene.h"
 
 
-
-
 namespace app
 {
 	DebugScene::DebugScene()

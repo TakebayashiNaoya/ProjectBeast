@@ -82,7 +82,7 @@ namespace app
 				enEnemyState_Swim,
 				enEnemyState_Attack,
 				enEnemyState_ReturnHome,
-				//enEnemyState_Sleep,
+				enEnemyState_CoolDown,
 
 				enEnemyState_Num,
 				enEnemyState_Invalid = -1
@@ -224,9 +224,19 @@ namespace app
 			static int CheckReturnHome(EnemyController* enemy);
 
 
+			/**
+			 * クールダウン
+			 */
+			static void EnterCoolDown(EnemyController* enemy);
+			static void UpdateCoolDown(EnemyController* enemy);
+			static void ExitCoolDown(EnemyController* enemy);
+			static int CheckCoolDown(EnemyController* enemy);
+
+
 		private:
 			Enemy* m_target = nullptr;
 			float m_elapsedTime = 0.0f;
+			float m_coolDownTimer;
 
 			/** targetの前回の位置を保持 */
 			Vector3 m_prePosition = Vector3::Zero;
