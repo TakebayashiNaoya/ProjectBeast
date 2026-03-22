@@ -90,6 +90,7 @@ namespace app
 			: m_currentCountType(EnCountDownType::None)
 			, m_time(TIME_VALUE_FOUR)
 			, m_countDownStartFlag(false)
+			, m_countDownFinishedFlag(false)
 		{
 		}
 
@@ -164,6 +165,7 @@ namespace app
 			if (m_time > COUNT_TIME_UP)return EnCountDownType::GO;
 
 			m_countDownStartFlag = false;
+			m_countDownFinishedFlag = true;
 			return EnCountDownType::None;
 		}
 
