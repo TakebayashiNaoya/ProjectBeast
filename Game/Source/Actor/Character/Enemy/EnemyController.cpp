@@ -34,6 +34,7 @@ namespace app
 			isFind(false),
 			m_isStun(false)
 			, m_isHomeInitialized(false)
+			, m_coolDownTimer(0.0f)
 		{
 			static bool ini = false;
 			if (!ini)
@@ -193,6 +194,8 @@ namespace app
 			RegisterState(enEnemyState_Attack, EnterAttack, UpdateAttack, ExitAttack, CheckAttack);
 			/** 帰巣 */
 			RegisterState(enEnemyState_ReturnHome, EnterReturnHome, UpdateReturnHome, ExitReturnHome, CheckReturnHome);
+			/** クールダウン */
+			RegisterState(enEnemyState_CoolDown, EnterCoolDown, UpdateCoolDown, ExitCoolDown, CheckCoolDown);
 		}
 
 
@@ -571,7 +574,7 @@ namespace app
 		}
 
 
-		/** 攻撃 */
+		/** 帰巣 */
 		void EnemyController::EnterReturnHome(EnemyController* enemy)
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetReturnHome(true);
@@ -611,11 +614,44 @@ namespace app
 			// 到着したら終了
 			if (toHome.LengthSq() < 10.0f)
 			{
-				return enEnemyState_Idle;
+				return enEnemyState_CoolDown;
 			}
 
 			// まだ遠い → 継続
 			return enEnemyState_ReturnHome;
+		}
+
+
+		/** クールダウン */
+		void EnemyController::EnterCoolDown(EnemyController* enemy)
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetCoolDown(true);
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+		}
+
+
+		void EnemyController::UpdateCoolDown(EnemyController* enemy)
+		{}
+
+
+		void EnemyController::ExitCoolDown(EnemyController* enemy)
+		{
+			enemy->m_coolDownTimer = 0.0f;
+			enemy->m_target->GetEnemyStateMachine()->SetCoolDown(false);
+			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+		}
+
+
+		int EnemyController::CheckCoolDown(EnemyController* enemy)
+		{
+
+			enemy->m_coolDownTimer += g_gameTime->GetFrameDeltaTime();
+
+			if (enemy->m_coolDownTimer >= 5.0f)
+			{
+				return enEnemyState_Idle;
+			}
+			return enEnemyState_Invalid;
 		}
 
 	}
