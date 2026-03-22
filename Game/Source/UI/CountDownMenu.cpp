@@ -96,7 +96,6 @@ namespace app
 
 		void CountDownMenu::Update()
 		{
-            
 			if (!m_countDownStartFlag)
 			{
 				for (const auto& icon : m_countDownMap)
@@ -108,12 +107,38 @@ namespace app
 			}
 			//　時間が減る処理。
 			CalcCount();
+
+			// 更新前の状態を保存。
+			EnCountDownType previewType = m_currentCountType;
+			// ここで新しい状態に更新。
 			m_currentCountType = GetCurrentCountType();
+
 			for (const auto& icon : m_countDownMap)
 			{
 				icon.second->SetIsDraw(icon.second->GetType() == m_currentCountType);
 				// カウントダウンアイコンの更新。
 				icon.second->Update();
+			}
+			
+			// 状態が切り替わった瞬間に
+			if (previewType != m_currentCountType && m_currentCountType != EnCountDownType::None)
+			{
+				// 切り替わった今の状態に対応するキーを
+				for (const auto& info : COUNT_DOWN_ICON_KEYS)
+				{
+					// 今のタイプと同じなら
+					if (info.type == m_currentCountType)
+					{
+						auto* icon = GetUI<UIIcon>(info.key);
+						if (icon)
+						{
+							// 登録されているアニメーションを最初から再生する。
+							icon->PlayAnimation();
+						}
+						// 見つかったらループを抜ける。
+						break;
+					}
+				}
 			}
 			// Menuの更新。
 			CountDownClass::Update();
@@ -154,10 +179,81 @@ namespace app
 			{
 				// カウントダウンアイコンの生成。
 				Icon countIcon = std::make_unique<CountDownIcon>(info.type);
+				// UIからIconを取得。
+				auto* icon = GetUI<UIIcon>(info.key);
 				// UIからIconを取得して、カウントダウンアイコンに設定。
 				countIcon->SetUIIcon(GetUI<UIIcon>(info.key));
 				// マップにカウントダウンアイコンを追加。
 				m_countDownMap.emplace(info.key, std::move(countIcon));
+
+
+				if (icon)
+				{
+					if (info.type == EnCountDownType::GO)
+					{
+						// 拡縮のアニメーションを作成。
+						auto scaleAnim = std::make_unique<app::ui::UIScaleAnimation>();
+
+						// アニメーションのパラメーターを設定。
+						// 最初は大きさが変わらない。
+						Vector3 startScale(0.0f, 0.0f, 0.0f);
+						// 最終的な大きさ。
+						Vector3 endScale(1.5f, 1.5f, 1.5f);
+						// 間隔。
+						float duration = 0.2f;;
+
+						// アニメーションの設定。
+						scaleAnim->SetParameter(
+								startScale
+							,	endScale
+							,	duration
+							,	util::EasingType::Linear
+							,	util::LoopMode::Once
+						);
+
+						// GOアイコンにアニメーションを登録。
+						icon->AddAnimation(Hash32("ScaleAnim"), std::move(scaleAnim));
+
+						// フェードアウトするアニメーションを作成。
+						auto colorAnim = std::make_unique<UIColorAnimation>();
+
+						Vector4 startColor(1.0f, 1.0f, 1.0f, 1.0f);
+						Vector4 endColor(1.0f, 1.0f, 1.0f, 0.0f);
+						float durationColor = 1.0f;
+
+						// アニメーションの設定。
+						colorAnim->SetParameter(
+								startColor
+							,	endColor
+							,	durationColor
+							,	util::EasingType::Linear
+							,	util::LoopMode::Once
+						);
+
+						// GOアイコンにアニメーションを登録。
+						icon->AddAnimation(Hash32("ColorAnim"), std::move(colorAnim));
+					}
+
+					else
+					{
+						// シーンのフェードを使わないで、UIAnimationだけでフェードを行う。
+						auto colorAnim = std::make_unique<UIColorAnimation>();
+						Vector4 startColor(1.0f, 1.0f, 1.0f, 1.0f);
+						Vector4 endColor(1.0f, 1.0f, 1.0f, 0.0f);
+						float durationColor = 1.0f;
+
+						// アニメーションの設定。
+						colorAnim->SetParameter(
+								startColor
+							,	endColor
+							,	durationColor
+							,	util::EasingType::Linear
+							,	util::LoopMode::Once
+						);
+						// 3,2,1のアイコンにアニメーションを登録。
+						icon->AddAnimation(Hash32("ColorAnimation"), std::move(colorAnim));
+					}
+				}
 			}
 		}
 	}

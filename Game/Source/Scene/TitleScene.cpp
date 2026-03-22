@@ -22,7 +22,7 @@ namespace app
 
 	bool TitleScene::Start()
 	{
-		m_titleRender.Init("Assets/sprite/Title.DDS", 1920.0f, 1080.0f);
+		m_titleRender.Init("Assets/spriteData/Scene/Title.DDS", 1920.0f, 1080.0f);
 		return true;
 	}
 

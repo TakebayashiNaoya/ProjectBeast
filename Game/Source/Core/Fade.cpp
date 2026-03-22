@@ -21,7 +21,7 @@ namespace app
 			, m_isFadeIn(false)
 			, m_isFadeOut(false)
 		{
-			m_fadeRender.Init("Assets/sprite/Loading.DDS", 1920.0f, 1080.0f);
+			m_fadeRender.Init("Assets/spriteData/Scene/Loading.DDS", 1920.0f, 1080.0f);
 		}
 
 

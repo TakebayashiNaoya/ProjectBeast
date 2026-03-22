@@ -50,7 +50,7 @@ namespace app
 			/** 秒数 */
 			float m_timeSec;
 			/** 等速 */
-			app::util::EasingType m_type = app::util::EasingType::Liner;
+			app::util::EasingType m_type = app::util::EasingType::Linear;
 			/** 片道 */
 			app::util::LoopMode m_loopMode = app::util::LoopMode::Once;
 		};
@@ -107,7 +107,7 @@ namespace app
 			 * @param type イージングタイプ
 			 * @param loopMode ループモード
 			 */
-			void SetUIAnimation(float start, float end, float timeSec, app::util::EasingType type, app::util::LoopMode loopMode)
+			void SetParameter(float start, float end, float timeSec, app::util::EasingType type, app::util::LoopMode loopMode)
 			{
 				m_start = start;
 				m_end = end;
@@ -306,7 +306,7 @@ namespace app
 			float m_timeSec;
 
 			/** 等速 */
-			app::util::EasingType m_type = app::util::EasingType::Liner;
+			app::util::EasingType m_type = app::util::EasingType::Linear;
 			/** 片道 */
 			app::util::LoopMode m_loopMode = app::util::LoopMode::Once;
 
@@ -394,7 +394,7 @@ namespace app
 			float m_timeSec;
 			
 			/** 等速 */
-			app::util::EasingType m_type = app::util::EasingType::Liner;
+			app::util::EasingType m_type = app::util::EasingType::Linear;
 			/** 片道 */
 			app::util::LoopMode m_loopMode = app::util::LoopMode::Once;
 
