@@ -265,13 +265,11 @@ namespace app
 
 			for (int i = 0; i < digit; i++)
 			{
-				SpriteRender* spriteRender = new SpriteRender;
-				spriteRender->Init(assetName, widht, height);
+				UpdateNumber(i + 1, number_); // 桁なので＋１する
+				auto* spriteRender = renderList_[i];
 				spriteRender->SetPosition(position);
 				spriteRender->SetScale(scale);
 				spriteRender->SetRotation(rotation);
-				renderList_.push_back(spriteRender);
-				UpdateNumber(i + 1, number_); // 桁なので＋１する
 			}
 		}
 
@@ -286,7 +284,10 @@ namespace app
 			SpriteRender* nextRender = nullptr;
 			// 次のやつをつくる
 			if (targetRenderIndex < renderList_.size()) {
-				nextRender = renderList_[targetRenderIndex];
+				delete renderList_[targetRenderIndex];
+				renderList_[targetRenderIndex] = nullptr;
+				nextRender = new SpriteRender();
+				renderList_[targetRenderIndex] = nextRender;
 			}
 			else {
 				nextRender = new SpriteRender();

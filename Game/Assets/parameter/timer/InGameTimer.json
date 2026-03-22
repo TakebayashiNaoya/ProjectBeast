@@ -29,9 +29,9 @@
                 "asset":"Assets/spriteData/UI/TimerNumber",
                 "digit":3,
                 "number":300,
-                "width":30,
-                "height":45,
-                "position":[590,300,0],
+                "width":70,
+                "height":50,
+                "position":[630,300,0],
                 "scale":[1,1,1],
                 "rotation":0
             }
