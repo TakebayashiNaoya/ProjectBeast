@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "InGameScene.h"
 #include "TitleScene.h"
-
+#include "DebugScene.h"
 
 namespace app
 {
@@ -49,7 +49,7 @@ namespace app
 	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		if (m_nextScene) {
-			id = InGameScene::ID();
+			id = DebugScene::ID();
 			waitTime = 3.0f;
 			return true;
 		}

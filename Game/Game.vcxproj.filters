@@ -265,6 +265,9 @@
     <ClCompile Include="Source\Effect\EffectManager.cpp">
       <Filter>Source\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\InGameTimerMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -488,6 +491,9 @@
     </ClInclude>
     <ClInclude Include="Source\Effect\Types.h">
       <Filter>Source\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameTimerMenu.h">
+      <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

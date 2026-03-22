@@ -80,6 +80,22 @@ namespace app
 			{
 				m_countDownStartFlag = flag;
 			}
+			/**
+			 * @brief カウントダウンの終了フラグを取得する
+			 * @return カウントダウンの終了フラグ
+			 */
+			inline bool IsCountDownFinished()const
+			{
+				return m_countDownFinishedFlag;
+			}
+			/**
+			 * @brief カウントダウンの終了フラグを設定する
+			 * @param flag カウントダウンの終了フラグ
+			 */
+			inline void SetCountDownFinishedFlag(bool flag)
+			{
+				m_countDownFinishedFlag = flag;
+			}
 
 
 		private:
@@ -91,6 +107,7 @@ namespace app
 			std::unordered_map<Key, Icon>m_countDownMap;
 
 			bool m_countDownStartFlag;
+			bool m_countDownFinishedFlag;
 		};
 	}
 }
