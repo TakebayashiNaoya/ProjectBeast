@@ -40,6 +40,22 @@ namespace app
 			{
 				m_isWaitCommand = isWaitCommand;
 			}
+			/**
+			 * @brief 勝ったかどうかを設定
+			 * @param isWin 勝ったかどうか
+			 */
+			inline void SetIsWin(const bool isWin)
+			{
+				m_isWin = isWin;
+			}
+			/**
+			 * @brief 負けたかどうかを設定
+			 * @param isLose 負けたかどうか
+			 */
+			inline void SetIsLose(const bool isLose)
+			{
+				m_isLose = isLose;
+			}
 
 
 			// ここに親ペンギン固有のゲッター関数を追加していく
@@ -110,6 +126,10 @@ namespace app
 			bool m_isFollowCommand;
 			/** 待機命令を出すかどうか */
 			bool m_isWaitCommand;
+			/** 勝ったかどうか */
+			bool m_isWin;
+			/** 負けたかどうか */
+			bool m_isLose;
 		};
 	}
 }

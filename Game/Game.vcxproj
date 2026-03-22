@@ -274,6 +274,8 @@
     <ClCompile Include="Source\Camera\CameraController.cpp" />
     <ClCompile Include="Source\Camera\CameraManager.cpp" />
     <ClCompile Include="Source\Camera\CameraSteering.cpp" />
+    <ClCompile Include="Source\Camera\LoseCamera.cpp" />
+    <ClCompile Include="Source\Camera\WinCamera.cpp" />
     <ClCompile Include="Source\Core\AppParameterMacro.cpp" />
     <ClCompile Include="Source\Core\Fade.cpp" />
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp" />
@@ -356,6 +358,8 @@
     <ClInclude Include="Source\Camera\CameraController.h" />
     <ClInclude Include="Source\Camera\CameraManager.h" />
     <ClInclude Include="Source\Camera\CameraSteering.h" />
+    <ClInclude Include="Source\Camera\LoseCamera.h" />
+    <ClInclude Include="Source\Camera\WinCamera.h" />
     <ClInclude Include="Source\Core\AppParameterMacro.h" />
     <ClInclude Include="Source\Core\Fade.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />

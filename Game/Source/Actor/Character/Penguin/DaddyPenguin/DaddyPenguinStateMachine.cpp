@@ -37,6 +37,8 @@ namespace app
 			AddState<DaddyPenguinDamagedState>(this);
 			AddState<DaddyPenguinDiyingState>(this);
 			AddState<DaddyPenguinDeadState>(this);
+			AddState<DaddyPenguinWinState>(this);
+			AddState<DaddyPenguinLoseState>(this);
 
 			// 初期ステートの設定
 			m_currentState = FindState(DaddyPenguinIdleState::ID());
@@ -59,6 +61,9 @@ namespace app
 			m_isSwimming = g_pad[0]->IsPress(enButtonX);
 			m_isDive = m_isSeparateWater = g_pad[0]->IsTrigger(enButtonY);
 			m_isDamaged = g_pad[0]->IsTrigger(enButtonLB3);
+
+			m_isWin = g_pad[0]->IsTrigger(enButtonLB2);
+			m_isLose = g_pad[0]->IsTrigger(enButtonRB2);
 		}
 
 
@@ -70,6 +75,19 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
+
+			if (m_isWin)
+			{
+				return FindState(DaddyPenguinWinState::ID());
+			}
+
+
+			if (m_isLose)
+			{
+				return FindState(DaddyPenguinLoseState::ID());
+			}
+
+
 			if (CanChangeJumpState())
 			{
 				return FindState(DaddyPenguinJumpState::ID());

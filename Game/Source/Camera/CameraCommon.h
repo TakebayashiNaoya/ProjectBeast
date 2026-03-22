@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #pragma once
+#include"Source/Util/CRC32.h"
 
 
 #define appCameraController(name)\

@@ -3,7 +3,6 @@
  * カメラ管理
  */
 #pragma once
-#include "camera/SpringCamera.h"
 #include "CameraCommon.h"
 
 
@@ -21,7 +20,7 @@ namespace app
 			std::shared_ptr<ICameraController> m_prev;
 #endif
 
-			std::unique_ptr<SpringCamera> m_springCamera;
+			//std::unique_ptr<SpringCamera> m_springCamera;
 
 			/** ブレンド用 */
 			bool m_isBlending = false;
@@ -82,6 +81,24 @@ namespace app
 			}
 
 
+			/**
+			 * @brief 指定したIDのコントローラーを取得する
+			 * @tparam T 取得したいコントローラーの型
+			 * @param nameHash コントローラーのID（例: WinCamera::ID()）
+			 * @return コントローラーのshared_ptr。見つからない場合はnullptr
+			 */
+			template <typename T>
+			std::shared_ptr<T> GetController(const uint32_t nameHash)
+			{
+				auto it = m_controllers.find(nameHash);
+				if (it != m_controllers.end()) {
+					// ICameraController から派生クラス（VictoryCameraなど）へキャスト
+					return std::static_pointer_cast<T>(it->second);
+				}
+				return nullptr;
+			}
+
+
 
 
 			/**
@@ -92,19 +109,17 @@ namespace app
 
 
 		public:
-			static void Initialize()
+			static void CreateInstance()
 			{
 				if (m_instance == nullptr) {
 					m_instance = new CameraManager();
 				}
 			}
 			static CameraManager& Get() { return *m_instance; }
-			static void Finalize()
+			static void DestroyInstance()
 			{
-				if (m_instance != nullptr) {
-					delete m_instance;
-					m_instance = nullptr;
-				}
+				delete m_instance;
+				m_instance = nullptr;
 			}
 		};
 	}
