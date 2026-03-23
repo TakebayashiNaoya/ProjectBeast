@@ -12,12 +12,13 @@ namespace app
 {
 	Application::Application()
 	{
+		camera::CameraManager::CreateInstance();
+		core::ParameterManager::CreateInstance();
 		core::Fade::Create();
 		SoundManager::CreateInstance();
 		SceneManager::CreateInstance();
 		EffectManager::CreateInstance();
-		camera::CameraManager::CreateInstance();
-		core::ParameterManager::CreateInstance();
+
 	}
 
 
@@ -34,11 +35,11 @@ namespace app
 
 	void Application::Update()
 	{
+		camera::CameraManager::Get().Update(6);
+		core::ParameterManager::Get()->Update();
 		SoundManager::Get().Update();
 		SceneManager::GetInstance()->Update();
 		EffectManager::Get().Update();
-		camera::CameraManager::Get().Update(6);
-		core::ParameterManager::Get()->Update();
 		core::Fade::Get().Update();
 	}
 
