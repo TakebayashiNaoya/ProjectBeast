@@ -235,6 +235,8 @@ namespace app
 
 		private:
 			Enemy* m_target = nullptr;
+			ChildPenguin* m_foundPenguin;
+
 			float m_elapsedTime = 0.0f;
 			float m_coolDownTimer;
 
@@ -247,9 +249,12 @@ namespace app
 			/** 巣の位置 */
 			Vector3 m_homePosition;
 
+			/** ペンギンを最後に見た位置 */
+			Vector3 m_lastKnownPenguinPos;
 
-			std::vector<Vector3> m_targetPosList;
-			int m_targetPosListIndex = 0;
+
+			std::vector<Vector3> m_wanderingPosList;
+			int m_wanderingPosListIndex = 0;
 
 			/** 見回し */
 			float m_searchAngle = 0.0f;

@@ -50,7 +50,7 @@ namespace app
 			// 初期ステートの設定
 			m_currentState = FindState(EnemyIdleState::ID());
 
-			m_transform.m_position = Vector3(0.0f, -80.0f, 100.0f);
+			m_transform.m_position = Vector3(0.0f, 10.0f, 100.0f);
 			m_transform.m_position;
 
 		}
