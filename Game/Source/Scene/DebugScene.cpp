@@ -25,7 +25,8 @@ namespace app
 
 
 	void DebugScene::Update()
-	{}
+	{
+	}
 
 
 	void DebugScene::PauseUpdate()
@@ -33,11 +34,18 @@ namespace app
 
 
 	void DebugScene::Render(RenderContext& rc)
-	{}
+	{
+		
+	}
 
 
 	bool DebugScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
+		if (g_pad[0]->IsTrigger(enButtonA))
+		{
+			id = DebugScene::ID();
+			return true;
+		}
 		return false;
 	}
 }

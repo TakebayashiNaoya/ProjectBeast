@@ -29,7 +29,7 @@ namespace app
 		AddSceneMap<app::ResultScene>();
 
 		// 初期シーン生成
-		CreateScene(app::DebugScene::ID());
+		CreateScene(app::TitleScene::ID());
 	}
 
 

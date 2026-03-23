@@ -26,13 +26,15 @@ namespace app
 
 
 		EnemyController::EnemyController()
-			:m_target(nullptr),
-			m_elapsedTime(0.0f),
-			m_prePosition(Vector3::Zero),
-			m_startPosition(Vector3::Zero),
-			m_homePosition(Vector3::Zero),
-			isFind(false),
-			m_isStun(false)
+			:m_target(nullptr)
+			, m_foundPenguin(nullptr)
+			, m_elapsedTime(0.0f)
+			, m_prePosition(Vector3::Zero)
+			, m_startPosition(Vector3::Zero)
+			, m_homePosition(Vector3::Zero)
+			, m_lastKnownPenguinPos(Vector3::Zero)
+			, isFind(false)
+			, m_isStun(false)
 			, m_isHomeInitialized(false)
 			, m_coolDownTimer(0.0f)
 		{
@@ -99,7 +101,12 @@ namespace app
 
 			/** 現在のステートのアップデート */
 			currentState->update(this);
-			FindTarget();
+			ChildPenguin* found = FindTarget();
+			if (found != nullptr && m_currentState != enEnemyState_CoolDown)
+			{
+				m_foundPenguin = found;
+				m_lastKnownPenguinPos = found->GetTransform().m_position;
+			}
 		}
 
 
@@ -115,7 +122,7 @@ namespace app
 
 		void EnemyController::AddTargetPos(const Vector3& pos)
 		{
-			m_targetPosList.push_back(pos);
+			m_wanderingPosList.push_back(pos);
 		}
 
 
@@ -144,7 +151,7 @@ namespace app
 			{
 				Vector3 diff = penguin->GetTransform().m_position - m_target->GetTransform().m_position;
 				diff.y = 0.0f;
-				if (diff.LengthSq() > 700.0f * 700.0f)// 距離外ならIdleへ
+				if (diff.LengthSq() > 600.0f * 600.0f)// 距離外ならIdleへ
 				{
 					continue;
 				}
@@ -211,6 +218,8 @@ namespace app
 
 			// 完全停止
 			sm->SetStickLAmount(0.0f);
+
+			enemy->m_foundPenguin = nullptr;
 			//enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(Vector3::Zero);
 		}
 
@@ -343,12 +352,11 @@ namespace app
 
 		int EnemyController::CheckSearch(EnemyController* enemy)
 		{
-			//// ターゲット見つけたらチェイス
-			//if (enemy->FindTarget() != nullptr)
-			//{
-			//	//enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(true);
-			//	return enEnemyState_Chase;
-			//}
+			// ターゲット見つけたらチェイス
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				return enEnemyState_Chase;
+			}
 			if (enemy->IsFarFromHome())
 			{
 				return enEnemyState_ReturnHome;
@@ -374,7 +382,7 @@ namespace app
 		void EnemyController::UpdateWandering(EnemyController* enemy)
 		{
 			// 対象座標までの距離
-			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
+			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
 			// 方向
 			Vector3 direction = distance;
 			direction.Normalize();
@@ -390,22 +398,26 @@ namespace app
 
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 
-			enemy->m_targetPosListIndex++;
-			if (enemy->m_targetPosListIndex >= enemy->m_targetPosList.size())
+			enemy->m_wanderingPosListIndex++;
+			if (enemy->m_wanderingPosListIndex >= enemy->m_wanderingPosList.size())
 			{
-				enemy->m_targetPosListIndex = 0;
+				enemy->m_wanderingPosListIndex = 0;
 			}
 		}
 
 
 		int EnemyController::CheckWandering(EnemyController* enemy)
 		{
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				return enEnemyState_Chase;
+			}
 			if (enemy->IsFarFromHome())
 			{
 				return enEnemyState_ReturnHome;
 			}
 
-			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
+			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
 
 			if (distance.Length() <= 20.0f)
 			{
@@ -418,62 +430,101 @@ namespace app
 		/** チェイス */
 		void EnemyController::EnterChase(EnemyController* enemy)
 		{
-
+			enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(true);
 		}
 
 
 		void EnemyController::UpdateChase(EnemyController* enemy)
 		{
-			//auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
+			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
 
-			//if (player == nullptr) return;
-			//if (enemy->m_target == nullptr) return;
+			Vector3 targetPos;
 
-			//Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
-			//Vector3 playerPos = player->GetTransform().m_position;
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				targetPos = enemy->m_foundPenguin->GetTransform().m_position;
+			}
+			else
+			{
+				targetPos = enemy->m_lastKnownPenguinPos;
+			}
 
-			//Vector3 dis = playerPos - enemyPos;
-			//Vector3 dir = dis;
-			//dir.y = 0.0f;
-			//dir.Normalize();
+			Vector3 dir = targetPos - enemyPos;
+			dir.y = 0.0f;
 
-			//auto* stateMachine = enemy->m_target->GetEnemyStateMachine();
+			if (dir.LengthSq() > 0.001f)
+			{
+				dir.Normalize();
+			}
 
-			//stateMachine->SetMoveDirection(dir);
-			//stateMachine->SetStickLAmount(1.0f);
+			auto* sm = enemy->m_target->GetEnemyStateMachine();
+			sm->SetMoveDirection(dir);
+			sm->SetStickLAmount(1.0f);
 		}
 
 
 		void EnemyController::ExitChase(EnemyController* enemy)
 		{
-			//enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(true);
+			enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(false);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 		}
 
 
 		int EnemyController::CheckChase(EnemyController* enemy)
 		{
-			if (enemy->IsFarFromHome())
+			//if (enemy->IsFarFromHome())
+			//{
+			//	return enEnemyState_ReturnHome;
+			//}
+
+			if (enemy->m_foundPenguin != nullptr)
 			{
-				return enEnemyState_ReturnHome;
+				Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+				Vector3 penguinPos = enemy->m_foundPenguin->GetTransform().m_position;
+
+				Vector3 diff = penguinPos - enemyPos;
+				diff.y = 0.0f;
+
+				const float LOST_DIST = 800.0f;
+
+				if (diff.LengthSq() > LOST_DIST * LOST_DIST)
+				{
+					enemy->m_foundPenguin = nullptr;
+				}
 			}
 
-			//auto* player = EnemyControllerManager::GetInstance()->GetPlayer();
-			//if (player == nullptr) return enEnemyState_Invalid;
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+				Vector3 penguinPos = enemy->m_foundPenguin->GetTransform().m_position;
 
-			//Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
-			//Vector3 playerPos = player->GetTransform().m_position;
+				Vector3 diff = penguinPos - enemyPos;
+				diff.y = 0.0f;
 
-			//float distance = (playerPos - enemyPos).Length();
+				float distSq = diff.LengthSq();
 
-			//if (distance < 9.0f)
-			//{
-			//	enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(true);
-			//	enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(true);
+				// 一定距離で攻撃
+				const float ATTACK_DIST = 80.0f;
+				if (distSq <= ATTACK_DIST * ATTACK_DIST)
+				{
+					return enEnemyState_Attack;
+				}
 
-			//	return enEnemyState_Attack;
-			//}
-			return enEnemyState_Idle;
+				return enEnemyState_Invalid;
+			}
+			if (enemy->m_foundPenguin == nullptr)
+			{
+				Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+				Vector3 diff = enemy->m_lastKnownPenguinPos - enemyPos;
+				diff.y = 0.0f;
+
+				// 最後の位置に到達したらIdle
+				const float ARRIVE_DIST = 20.0f;
+				if (diff.LengthSq() <= ARRIVE_DIST * ARRIVE_DIST)
+				{
+					return enEnemyState_Idle;
+				}
+			}
 			return enEnemyState_Invalid;
 		}
 
@@ -507,7 +558,7 @@ namespace app
 		void EnemyController::UpdateSwim(EnemyController* enemy)
 		{
 			// 対象座標までの距離
-			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
+			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
 			// 方向
 			Vector3 direction = distance;
 			direction.Normalize();
@@ -523,22 +574,26 @@ namespace app
 
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 
-			enemy->m_targetPosListIndex++;
-			if (enemy->m_targetPosListIndex >= enemy->m_targetPosList.size())
+			enemy->m_wanderingPosListIndex++;
+			if (enemy->m_wanderingPosListIndex >= enemy->m_wanderingPosList.size())
 			{
-				enemy->m_targetPosListIndex = 0;
+				enemy->m_wanderingPosListIndex = 0;
 			}
 		}
 
 
 		int EnemyController::CheckSwim(EnemyController* enemy)
 		{
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				return enEnemyState_Chase;
+			}
 			if (enemy->IsFarFromHome())
 			{
 				return enEnemyState_ReturnHome;
 			}
 
-			Vector3 distance = enemy->m_targetPosList[enemy->m_targetPosListIndex] - enemy->m_target->GetTransform().m_position;
+			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
 
 			if (distance.Length() <= 20.0f)
 			{
@@ -551,7 +606,10 @@ namespace app
 
 		/** 攻撃 */
 		void EnemyController::EnterAttack(EnemyController* enemy)
-		{}
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(true);
+			enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(true);
+		}
 
 
 		void EnemyController::UpdateAttack(EnemyController* enemy)
@@ -559,7 +617,10 @@ namespace app
 
 
 		void EnemyController::ExitAttack(EnemyController* enemy)
-		{}
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(false);
+			enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(false);
+		}
 
 
 		int EnemyController::CheckAttack(EnemyController* enemy)
@@ -569,8 +630,7 @@ namespace app
 				return enEnemyState_ReturnHome;
 			}
 
-			return enEnemyState_Chase;
-			return enEnemyState_Invalid;
+			return enEnemyState_ReturnHome;
 		}
 
 
@@ -612,7 +672,7 @@ namespace app
 			Vector3 toHome = enemy->m_homePosition - pos;
 
 			// 到着したら終了
-			if (toHome.LengthSq() < 10.0f)
+			if (toHome.LengthSq() < 50.0f * 50.0f)
 			{
 				return enEnemyState_CoolDown;
 			}

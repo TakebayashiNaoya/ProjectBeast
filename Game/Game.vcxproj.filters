@@ -268,6 +268,9 @@
     <ClCompile Include="Source\Effect\EffectManager.cpp">
       <Filter>Source\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\InGameTimerMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Camera\CameraCommon.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
@@ -509,6 +512,9 @@
     </ClInclude>
     <ClInclude Include="Source\Effect\Types.h">
       <Filter>Source\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameTimerMenu.h">
+      <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Camera\CameraCommon.h">
       <Filter>Source\Camera</Filter>
