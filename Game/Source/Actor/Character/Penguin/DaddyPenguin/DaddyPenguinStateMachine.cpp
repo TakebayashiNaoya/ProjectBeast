@@ -75,10 +75,22 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
+			if (IsEqualCurrentState(DaddyPenguinWinState::ID()))
+			{
+				return FindState(DaddyPenguinWinState::ID());
+			}
+
+
 
 			if (m_isWin)
 			{
 				return FindState(DaddyPenguinWinState::ID());
+			}
+
+
+			if (IsEqualCurrentState(DaddyPenguinLoseState::ID()))
+			{
+				return FindState(DaddyPenguinLoseState::ID());
 			}
 
 

@@ -440,8 +440,16 @@ namespace app
 
 		void DaddyPenguinWinState::Enter()
 		{
+			float ry = m_owner->GetTransform().m_rotation.y;
+
+			Vector3 front;
+			front.x = sinf(ry);
+			front.y = 0.0f;
+			front.z = cosf(ry);
+
+
 			// ターゲットを親ペンギンの座標に設定
-			camera::CameraManager::Get().GetController<camera::WinCamera>(camera::WinCamera::ID())->SetTarget(m_owner->GetTransform().m_position);
+			camera::CameraManager::Get().GetController<camera::WinCamera>(camera::WinCamera::ID())->SetTarget(m_owner->GetTransform().m_position, -front);
 			// 勝利カメラに切り替え
 			camera::CameraManager::Get().SwitchCamera(camera::WinCamera::ID(), 1.0f);
 		}
@@ -476,7 +484,18 @@ namespace app
 
 
 		void DaddyPenguinLoseState::Update()
-		{}
+		{
+			m_timer += g_gameTime->GetFrameDeltaTime();
+
+			if (m_timer >= 2.5f)
+			{
+				// ターゲットを親ペンギンの座標に設定
+				camera::CameraManager::Get().GetController<camera::DefeatCamera>(camera::DefeatCamera::ID())->SetTarget(m_owner->GetTransform().m_position);
+				// 負けカメラに切り替え
+				camera::CameraManager::Get().SwitchCamera(camera::DefeatCamera::ID(), 1.0f);
+				m_timer = 0.0f;
+			}
+		}
 
 
 		void DaddyPenguinLoseState::Exit()

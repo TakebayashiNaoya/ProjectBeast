@@ -451,6 +451,11 @@ namespace app
 		public:
 			DaddyPenguinLoseState(DaddyPenguinStateMachine* owner);
 			~DaddyPenguinLoseState() override = default;
+
+
+		private:
+			/** 演出用タイマー */
+			float m_timer = 0.0f;
 		};
 	}
 }

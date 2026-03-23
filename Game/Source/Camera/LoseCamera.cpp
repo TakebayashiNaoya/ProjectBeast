@@ -31,5 +31,38 @@ namespace app
 			// 演出：少しずつ視野角(FOV)を広げて、孤独感を出す
 			m_data.fov = Math::DegToRad(60.0f + (m_timer * 5.0f));
 		}
+
+
+
+
+		/******************************************************/
+
+
+		void DefeatCamera::SetTarget(const Vector3& playerPos)
+		{
+			// --- 演出設定 ---
+			float viewHeight = 300.0f;     // どれくらいの高さから見下ろすか
+			float horizontalOffset = 50.0f; // 真上だとキャラが分かりにくい場合、少し手前に引く
+
+			// 1. カメラの位置を計算 (プレイヤーの上空後方)
+			m_data.position = playerPos + Vector3(0.0f, viewHeight, -horizontalOffset);
+
+			// 2. 注視点はプレイヤーの足元（地面）
+			m_data.target = playerPos;
+
+			// 3. 上方向ベクトルは通常 (真下を見下ろす場合、ここを調整することもあるが、まずはデフォルト)
+			m_data.up = Vector3::Up;
+
+			// 4. 画角は標準
+			m_data.fov = Math::DegToRad(60.0f);
+		}
+
+
+		void DefeatCamera::OnEnter()
+		{}
+
+
+		void DefeatCamera::Update()
+		{}
 	}
 }

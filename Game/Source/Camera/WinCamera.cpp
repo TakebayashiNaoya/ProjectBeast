@@ -16,19 +16,42 @@ namespace app
 {
 	namespace camera
 	{
+		void WinCamera::SetTarget(const Vector3& playerPos, const Vector3& playerFront)
+		{
+			m_targetPos = playerPos;
+			m_targetFront = playerFront;
+			m_timer = 0.0f;
+			m_angle = 0.0f;
+			m_angularSpeed = 0.0f; // 停止状態から開始
+		}
+
+
 		void WinCamera::Update()
 		{
-			m_timer += 0.016f; // 本来はdeltaTimeを使用
+			float deltaTime = 0.016f; // 本来はマネージャー等から取得
+			m_timer += deltaTime;
 
-			// 例：キャラの周りを円運動しながら、少しずつ上昇する演出
-			float radius = 200.0f;
-			float speed = 10.0f;
+			if (m_timer < DURATION) {
+				// 1. 加速的に回転速度を上げる
+				m_angularSpeed += ACCEL * deltaTime;
+				m_angle += m_angularSpeed * deltaTime;
+			}
+			else {
+				// 2. 終了時間は正面で固定
+				// プレイヤーの正面(m_targetFront)の逆方向にカメラを置くと「正面から映す」ことになる
+				m_angle = atan2f(-m_targetFront.x, -m_targetFront.z);
+			}
 
-			m_data.position.x = m_targetPos.x + cos(m_timer * speed) * radius;
-			m_data.position.z = m_targetPos.z + sin(m_timer * speed) * radius;
-			m_data.position.y = m_targetPos.y + 50.0f + (m_timer * 10.0f); // 徐々に上がる
+			// 3. カメラ座標の計算（円運動）
+			float radius = 150.0f; // プレイヤーとの距離
+			float height = 50.0f;  // カメラの高さ
 
-			m_data.target = m_targetPos + Vector3(0, 40.0f, 0); // 顔あたりを注視
+			m_data.position.x = m_targetPos.x + sinf(m_angle) * radius;
+			m_data.position.z = m_targetPos.z + cosf(m_angle) * radius;
+			m_data.position.y = m_targetPos.y + height;
+
+			// 4. 注視点はプレイヤーの顔あたり
+			m_data.target = m_targetPos + Vector3(0, 40.0f, 0);
 		}
 	}
 }
