@@ -7,6 +7,7 @@
 #include "InGameScene.h"
 #include "ResultScene.h"
 #include "Source/Actor/Character/Player/Player.h"
+#include "Source/Core/ParameterManager.h"
 
 
 namespace app
@@ -25,6 +26,7 @@ namespace app
 
 	bool InGameScene::Start()
 	{
+		app::core::ParameterManager::CreateInstance();
 		m_player = new actor::Player();
 		m_player->SetPosition(Vector3::Zero);
 		m_player->StartWrapper();
