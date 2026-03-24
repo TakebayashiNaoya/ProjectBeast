@@ -244,9 +244,12 @@ namespace app
 
 		void UIDigit::Render(RenderContext& rc)
 		{
-			for (SpriteRender* spriteRender : renderList_)
+			if (m_isDraw)
 			{
-				spriteRender->Draw(rc);
+				for (SpriteRender* spriteRender : renderList_)
+				{
+					spriteRender->Draw(rc);
+				}
 			}
 		}
 

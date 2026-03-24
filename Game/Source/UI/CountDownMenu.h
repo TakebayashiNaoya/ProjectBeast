@@ -62,6 +62,7 @@ namespace app
 			void Update()override;
 			void InitializeLogic()override;
 			void CalcCount();
+			void ResetCountDown();
 
 			EnCountDownType GetCurrentCountType();
 			/**
