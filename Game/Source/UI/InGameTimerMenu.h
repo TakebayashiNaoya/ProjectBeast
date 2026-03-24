@@ -61,6 +61,7 @@ namespace app
 			InGameTimerMenu();
 			void Update()override;
 			void InitializeLogic()override;
+			void ResetTimer();
 
 			/**
 			 * @brief アイコンの初期化用

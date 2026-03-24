@@ -271,6 +271,9 @@
     <ClCompile Include="Source\UI\InGameTimerMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\PBWakingUpTimerMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Camera\CameraCommon.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
@@ -514,6 +517,9 @@
       <Filter>Source\Effect</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\InGameTimerMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\PBWakingUpTimerMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Camera\CameraCommon.h">

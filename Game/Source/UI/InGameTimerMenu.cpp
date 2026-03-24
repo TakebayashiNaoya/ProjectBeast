@@ -112,7 +112,11 @@ namespace app
 				{
 					m_currentTime -= deltaTime;
 					// 0秒以下にならないように制限。
-					if (m_currentTime <= 0.0f)m_currentTime = 0.0f;
+					if (m_currentTime <= 0.0f)
+					{
+						m_currentTime = 0.0f;
+						m_isTimerActive = true;
+					}
 				}
 			}
 			
@@ -144,6 +148,13 @@ namespace app
 		{
 			InitializeIcon();
 			InitializeDigit();
+		}
+
+
+		void InGameTimerMenu::ResetTimer()
+		{
+			m_currentTime = 300.0f;
+			m_isTimerActive = false;
 		}
 
 

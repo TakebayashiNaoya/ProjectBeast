@@ -160,9 +160,17 @@ namespace app
 			/**
 			 * @brief クールダウンしているかの取得
 			 */
-			bool IsCooolDown()const { return m_isCoolDown; }
+			bool IsCoolDown()const { return m_isCoolDown; }
 
 
+			/**
+			 * @brief 攻撃中かの設定
+			 */
+			void SetIsAttack(const bool coolDown) { m_isAttackPlaying = coolDown; }
+			/**
+			 * @brief 攻撃中かの取得
+			 */
+			bool IsAttack()const { return m_isAttackPlaying; }
 
 		private:
 			/** 待機状態に変更できるか */
@@ -234,6 +242,9 @@ namespace app
 
 			/** クールダウン状態か */
 			bool m_isCoolDown;
+
+			/** 攻撃中かどうか */
+			bool m_isAttackPlaying;
 		};
 	}
 }

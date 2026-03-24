@@ -6,7 +6,6 @@
 #include "stdafx.h"
 #include "CountDownMenu.h"
 #include "Source/Util/CRC32.h"
-#include "Source/Core/Fade.h"
 
 
 namespace app
@@ -154,6 +153,15 @@ namespace app
 			m_time -= deltaTime;
 			// 時間の制限の設定。
 			m_time = util::clamp(m_time, COUNT_TIME_UP, TIME_VALUE_FOUR);
+		}
+
+
+		void CountDownMenu::ResetCountDown()
+		{
+			m_time = TIME_VALUE_FOUR;
+			m_countDownStartFlag = false;
+			m_countDownFinishedFlag = false;
+			m_currentCountType = EnCountDownType::None;
 		}
 
 
