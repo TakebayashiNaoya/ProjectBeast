@@ -166,11 +166,11 @@ namespace app
 			/**
 			 * @brief 攻撃中かの設定
 			 */
-			void SetAttackPlaying(const bool coolDown) { m_isAttackPlaying = coolDown; }
+			void SetIsAttack(const bool coolDown) { m_isAttackPlaying = coolDown; }
 			/**
 			 * @brief 攻撃中かの取得
 			 */
-			bool IsAttackPlaying()const { return m_isAttackPlaying; }
+			bool IsAttack()const { return m_isAttackPlaying; }
 
 		private:
 			/** 待機状態に変更できるか */

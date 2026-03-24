@@ -627,8 +627,8 @@ namespace app
 			sm->SetActionButtonX(true);
 			sm->SetIsNearPenguin(true);
 
-			enemy->m_attackTimer = 0.0f;
-			enemy->m_isAttacking = true;
+			//enemy->m_attackTimer = 0.0f;
+			//enemy->m_isAttacking = true;
 
 			// 満腹処理
 			enemy->m_eatCount++;
@@ -641,7 +641,7 @@ namespace app
 
 		void EnemyController::UpdateAttack(EnemyController* enemy)
 		{
-			enemy->m_attackTimer += g_gameTime->GetFrameDeltaTime();
+
 		}
 
 
@@ -651,14 +651,12 @@ namespace app
 
 			sm->SetActionButtonX(false);
 			sm->SetIsNearPenguin(false);
-
-			enemy->m_isAttacking = false;
 		}
 
 
 		int EnemyController::CheckAttack(EnemyController* enemy)
 		{
-			if (enemy->m_attackTimer < enemy->m_attackDuration)
+			if (enemy->m_target->GetEnemyStateMachine()->IsPlayingAnimation())
 			{
 				return enEnemyState_Invalid;
 			}
