@@ -25,6 +25,7 @@ namespace app
 					parameter.radius = j["radius"].get<float>();
 					parameter.height = j["height"].get<float>();
 					parameter.swimSpeed = j["swimSpeed"].get<float>();
+					parameter.maxEat = j["maxEat"].get<int>();
 				});
 		}
 
@@ -47,6 +48,7 @@ namespace app
 			m_radius = parameter->radius;
 			m_height = parameter->height;
 			m_swimSpeed = parameter->swimSpeed;
+			m_maxEat = parameter->maxEat;
 		}
 
 

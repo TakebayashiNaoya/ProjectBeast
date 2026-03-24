@@ -258,9 +258,7 @@ namespace app
 
 
 		void EnemyAttackState::Exit()
-		{
-
-		}
+		{}
 
 
 		EnemyAttackState::EnemyAttackState(EnemyStateMachine* owner)

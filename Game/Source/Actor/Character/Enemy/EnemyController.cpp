@@ -11,6 +11,7 @@
 #include "EnemyControllerManager.h"
 
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Enemy/EnemyStatus.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Player/Player.h"
@@ -37,6 +38,13 @@ namespace app
 			, m_isStun(false)
 			, m_isHomeInitialized(false)
 			, m_coolDownTimer(0.0f)
+			, m_maxEatCount(3)
+			, m_eatCount(0)
+			, m_isFull(false)
+			, m_isParamInitialized(false)
+			, m_attackDuration(1.5f)
+			, m_attackTimer(0.0f)
+			, m_isAttacking(false)
 		{
 			static bool ini = false;
 			if (!ini)
@@ -72,6 +80,13 @@ namespace app
 					m_homePosition = pos;
 					m_isHomeInitialized = true;
 				}
+			}
+
+			if (!m_isParamInitialized)
+			{
+				m_maxEatCount = m_target->GetEnemyStateMachine()->GetOwnerStatus()->GetMaxEat();
+
+				m_isParamInitialized = true;
 			}
 
 			auto* currentState = FindAIState(m_currentState);
@@ -607,30 +622,58 @@ namespace app
 		/** 攻撃 */
 		void EnemyController::EnterAttack(EnemyController* enemy)
 		{
-			enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(true);
-			enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(true);
+			auto* sm = enemy->m_target->GetEnemyStateMachine();
+
+			sm->SetActionButtonX(true);
+			sm->SetIsNearPenguin(true);
+
+			//enemy->m_attackTimer = 0.0f;
+			//enemy->m_isAttacking = true;
+
+			// 満腹処理
+			enemy->m_eatCount++;
+			if (enemy->m_eatCount >= enemy->m_maxEatCount)
+			{
+				enemy->m_isFull = true;
+			}
 		}
 
 
 		void EnemyController::UpdateAttack(EnemyController* enemy)
-		{}
+		{
+
+		}
 
 
 		void EnemyController::ExitAttack(EnemyController* enemy)
 		{
-			enemy->m_target->GetEnemyStateMachine()->SetActionButtonX(false);
-			enemy->m_target->GetEnemyStateMachine()->SetIsNearPenguin(false);
+			auto* sm = enemy->m_target->GetEnemyStateMachine();
+
+			sm->SetActionButtonX(false);
+			sm->SetIsNearPenguin(false);
 		}
 
 
 		int EnemyController::CheckAttack(EnemyController* enemy)
 		{
-			if (enemy->IsFarFromHome())
+			if (enemy->m_target->GetEnemyStateMachine()->IsPlayingAnimation())
+			{
+				return enEnemyState_Invalid;
+			}
+
+			// 満腹なら帰る
+			if (enemy->m_isFull)
 			{
 				return enEnemyState_ReturnHome;
 			}
 
-			return enEnemyState_ReturnHome;
+			// まだターゲットいるなら追跡
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				return enEnemyState_Chase;
+			}
+
+			return enEnemyState_Idle;
 		}
 
 
@@ -697,6 +740,10 @@ namespace app
 		void EnemyController::ExitCoolDown(EnemyController* enemy)
 		{
 			enemy->m_coolDownTimer = 0.0f;
+
+			enemy->m_eatCount = 0;
+			enemy->m_isFull = false;
+
 			enemy->m_target->GetEnemyStateMachine()->SetCoolDown(false);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 		}
