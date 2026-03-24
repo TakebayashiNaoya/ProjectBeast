@@ -1,18 +1,10 @@
 ﻿#include "BeastEnginePreCompile.h"
 #include "AnimationClipResource.h"
 
+// TkaLoader::LoadImpl と TkaResource::Finalize はヘッダーにインライン実装済み。
+// TkaClipSetLoader のメソッドもヘッダーにインライン実装済み。
+// このファイルには実装すべきものはない。
+
 namespace nsBeastEngine
 {
-	bool AnimationLoader::LoadImpl(AnimationResource& resource, const std::string& key)
-	{
-		resource.m_animation = new Animation;
-		resource.m_animation->Init(*resource.m_skeleton, resource.m_animationClips, resource.m_numAnimationClips);
-
-		if (resource.m_animation->IsInited()) {
-			return true;
-		}
-		else {
-			return true;
-		}
-	}
 }

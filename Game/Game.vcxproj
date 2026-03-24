@@ -345,6 +345,9 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Test.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

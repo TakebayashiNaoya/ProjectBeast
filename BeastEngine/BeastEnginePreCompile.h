@@ -15,6 +15,7 @@ using namespace nsK2EngineLow;
 #include "Resource/ResourceManager.h"
 #include "Resource/ModelResource.h"
 #include "Resource/AnimationClipResource.h"
+#include "Resource/SkeletonResource.h"
 
 #include "Graphics/ModelRender.h"
 #include "Graphics/SpriteRender.h"

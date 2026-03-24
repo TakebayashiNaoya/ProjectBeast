@@ -91,6 +91,7 @@
     <ClInclude Include="Resource\AnimationClipResource.h" />
     <ClInclude Include="Resource\ModelResource.h" />
     <ClInclude Include="Resource\ResourceManager.h" />
+    <ClInclude Include="Resource\SkeletonResource.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

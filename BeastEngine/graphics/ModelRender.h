@@ -69,7 +69,7 @@ namespace nsBeastEngine
 		  * @brief アニメーションが再生中か
 		  * @return 再生中ならtrue
 		  */
-		inline bool IsPlayingAnimation() const { return m_animationResource->GetAnimation()->IsPlaying(); }
+		inline bool IsPlayingAnimation() const { return m_animation.IsPlaying(); }
 
 
 	public:
@@ -116,7 +116,7 @@ namespace nsBeastEngine
 		 */
 		void PlayAnimation(int animNo, float interpolateTime = 0.0f)
 		{
-			m_animationResource->GetAnimation()->Play(animNo, interpolateTime);
+			m_animation.Play(animNo, interpolateTime);
 		}
 
 		/**
@@ -131,13 +131,21 @@ namespace nsBeastEngine
 		 */
 		void AddAnimationEvent(AnimationEventListener eventListener)
 		{
-			m_animationResource->GetAnimation()->AddAnimationEventListener(eventListener);
+			m_animation.AddAnimationEventListener(eventListener);
 		}
 
 		/**
 		 * @brief 更新
 		 */
 		void Update();
+
+		/**
+		 * @brief ロードが完了しているか
+		 */
+		bool IsCompleted() const
+		{
+			return m_modelResource && m_modelResource->IsCompleted();
+		}
 
 
 	private:
@@ -194,14 +202,12 @@ namespace nsBeastEngine
 		Vector3			m_scale;
 		/** 回転 */
 		Quaternion		m_rotation;
-		/** モデル */
-		//Model			m_model;
 		/** シャドウマップ用モデル */
 		Model			m_shadowModels;
 		/** ボーン */
 		Skeleton		m_skeleton;
 		/** アニメーション */
-		//Animation		m_animation;
+		Animation		m_animation;
 		/** アニメーションクリップ */
 		AnimationClip* m_animationClips;
 		/** シャドウマップ用のカメラパラメータを格納する定数バッファ */
@@ -226,10 +232,7 @@ namespace nsBeastEngine
 		/** ZPrepassで描画されるモデル */
 		Model m_zprepassModel;
 
-
 		/** モデルリソース */
 		std::shared_ptr<ModelResource> m_modelResource;
-		/** アニメーションクリップリソース */
-		std::shared_ptr<AnimationResource> m_animationResource;
 	};
 }

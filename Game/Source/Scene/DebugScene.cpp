@@ -7,7 +7,8 @@
 #include "DebugScene.h"
 #include "../../../BeastEngine/Resource/ResourceManager.h"
 #include "../../../BeastEngine/Resource/ModelResource.h"
-#include <time.h>
+#include "Source/Actor/Character/Player/Player.h"
+#include "Source/Core/ParameterManager.h"
 
 
 namespace app
@@ -18,45 +19,50 @@ namespace app
 
 	DebugScene::~DebugScene()
 	{
+		for (auto& player : m_players) {
+			delete player;
+			player = nullptr;
+		}
 		ResourceManager::GetInstance().Shutdown();
 	}
 
 
 	bool DebugScene::Start()
 	{
-		srand((unsigned int)time(NULL));
-		ResourceManager::GetInstance().Start();
-		ResourceManager::GetInstance().Register<ModelResource>(std::make_shared<ModelLoader>());
-		ResourceManager::GetInstance().Register<AnimationResource>(std::make_shared<AnimationLoader>());
-
-		for (int i = 0; i < 100; i++) {
-			m_animationClip[i] = new AnimationClip;
-			m_animationClip[i]->Load("Assets/animData/penguin/moveRun.tka");
-			m_animationClip[i]->SetLoopFlag(true);
-			m_modelRender[i].Init("Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm", m_animationClip[i], 1);
-			m_modelRender[i].SetPosition(rand() % 100, rand() % 100, rand() % 100);
-			m_modelRender[i].Update();
-		}
-
+		app::core::ParameterManager::CreateInstance();
+		m_spawnedCount = 0;
 		return true;
 	}
 
 
 	void DebugScene::Update()
 	{
-		for (int i = 0; i < 100; i++)
-		{
-			m_modelRender[i].PlayAnimation(0);
-			m_modelRender[i].Update();
+		for (auto* p : m_players) {
+			if (p) {
+				p->UpdateWrapper();
+			}
 		}
+
+		if (m_spawnedCount >= 20) {
+			// すでに最大数生成している場合はここで終了
+			return;
+		}
+		// 1体目を生成して非同期ロード開始。
+		m_players[m_spawnedCount] = new app::actor::Player;
+		m_position.z += 50.0f; /** 少しずつ右にずらして配置 */
+		m_position.x += 50.0f;
+		m_players[m_spawnedCount]->SetPosition(m_position);
+		m_players[m_spawnedCount]->StartWrapper();
+		++m_spawnedCount;
 	}
 
 
 	void DebugScene::Render(RenderContext& rc)
 	{
-		for (int i = 0; i < 100; i++)
-		{
-			m_modelRender[i].Draw(rc);
+		for (auto* p : m_players) {
+			if (p) {
+				p->RenderWrapper(rc);
+			}
 		}
 	}
 

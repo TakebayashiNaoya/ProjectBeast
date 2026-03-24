@@ -38,23 +38,12 @@ namespace nsBeastEngine
 			modelInitData.m_skeleton = &m_skeleton;
 		}
 
-		/** シャドウマップテクスチャ */
-		//modelInitData.m_expandShaderResoruceView[0] = &g_renderingEngine->GetShadowMap();
-
 		/** シーンライト */
 		modelInitData.m_expandConstantBuffer = g_sceneLight->GetLight();
 		modelInitData.m_expandConstantBufferSize = sizeof(Light);
 
 		m_modelResource = ResourceManager::GetInstance().Load<ModelResource>(filePath);
 		m_modelResource->SetInitData(modelInitData);
-
-		/** シャドウマップテクスチャ */
-		//modelInitData.m_expandShaderResoruceView[0] = nullptr;
-
-		//modelInitData.m_fxFilePath = "Assets/shader/DrawShadowMap.fx";
-		//modelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
-		//modelInitData.m_expandConstantBuffer = &g_sceneLight->GetLVP();
-		//m_shadowModels.Init(modelInitData);
 	}
 
 
@@ -66,8 +55,6 @@ namespace nsBeastEngine
 		initData.m_colorBufferFormat[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		m_frowardRenderModel.Init(initData);
 		m_frowardRenderModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
-		//InitModelOnZprepass(tkmFilePath, enModelUpAxisZ);
-		//InitInstancingDraw(1);
 	}
 
 
@@ -78,13 +65,10 @@ namespace nsBeastEngine
 		modelInitData.m_fxFilePath = "Assets/shader/ZPrepass.fx";
 		modelInitData.m_modelUpAxis = modelUpAxis;
 
-		//ノンスキンメッシュ用の頂点シェーダーのエントリーポイントを指定する。
 		modelInitData.m_vsEntryPointFunc = "VSMain";
 
-		//アニメーションがあるならVSSkinMainを指定。
 		if (m_animationClips != nullptr)
 		{
-			//スケルトンを指定する。
 			modelInitData.m_skeleton = &m_skeleton;
 
 			if (m_isEnableInstancingDraw) {
@@ -93,7 +77,6 @@ namespace nsBeastEngine
 			else {
 				modelInitData.m_vsSkinEntryPointFunc = "VSSkinMain";
 			}
-
 		}
 		else
 		{
@@ -111,7 +94,6 @@ namespace nsBeastEngine
 
 		modelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		if (m_isEnableInstancingDraw) {
-			// インスタンシング描画を行う場合は、拡張SRVにインスタンシング描画用のデータを設定する。
 			modelInitData.m_expandShaderResoruceView[0] = &m_worldMatrixArraySB;
 		}
 
@@ -127,26 +109,19 @@ namespace nsBeastEngine
 
 	void ModelRender::InitSkeleton(const char* filePath)
 	{
-		/** 一旦tkmのファイルパスを受け取る */
 		std::string skeletonFilePath = filePath;
-		/** パスの中に.tkmが何文字目にあるか探す */
 		int pos = (int)skeletonFilePath.find(".tkm");
-		/** .tkmを.tksに置き換える */
 		skeletonFilePath.replace(pos, 4, ".tks");
-		/** char型に変換してInit */
 		m_skeleton.Init(skeletonFilePath.c_str());
 	}
 
 
-	void ModelRender::InitAnimation(AnimationClip* animtionClips, int numAnimationClips, EnModelUpAxis enModelUpAxis)
+	void ModelRender::InitAnimation(AnimationClip* animationClips, int numAnimationClips, EnModelUpAxis enModelUpAxis)
 	{
-		m_animationClips = animtionClips;
+		m_animationClips = animationClips;
 		m_numAnimationClips = numAnimationClips;
 		if (m_animationClips != nullptr) {
-			m_animationResource = ResourceManager::GetInstance().Load<AnimationResource>("animationResource");
-			m_animationResource->SetSkeleton(&m_skeleton);
-			m_animationResource->SetAnimationClips(m_animationClips, m_numAnimationClips);
-			//m_animationResource->GetAnimation()->Init(m_skeleton, m_animationClips, numAnimationClips);
+			m_animation.Init(m_skeleton, m_animationClips, m_numAnimationClips);
 		}
 	}
 
@@ -155,7 +130,6 @@ namespace nsBeastEngine
 	{
 		modelInitData.m_vsEntryPointFunc = "VSMain";
 		modelInitData.m_vsSkinEntryPointFunc = "VSMain";
-		/** アニメーションがある場合 */
 		if (m_animationClips != nullptr) {
 			modelInitData.m_vsSkinEntryPointFunc = "VSSkinMain";
 		}
@@ -171,28 +145,22 @@ namespace nsBeastEngine
 
 	void ModelRender::Update()
 	{
-		/** モデルの読み込みが完了していたらアニメーションを進める */
 		if (m_modelResource->IsCompleted() == false) return;
 
-		/** モデルのワールド行列を更新する */
 		UpdateWorldMatrixInModes();
 
-
-		if (m_animationResource->IsCompleted() == false) return;
-
-		/** スケルトンのボーン行列を更新する */
 		if (m_skeleton.IsInited()) {
 			m_skeleton.Update(m_modelResource->GetModel()->GetWorldMatrix());
 		}
 
-		/** アニメーションを進める */
-		m_animationResource->GetAnimation()->Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);
+		if (m_animation.IsInited()) {
+			m_animation.Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);
+		}
 	}
 
 
 	void ModelRender::Draw(RenderContext& rc)
 	{
-		/** モデルの読み込みが完了していたらアニメーションを進める */
 		if (m_modelResource->IsCompleted() == false) return;
 
 		if (m_isFowardRender) {

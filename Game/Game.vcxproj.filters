@@ -375,4 +375,7 @@
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
+  </ItemGroup>
 </Project>
