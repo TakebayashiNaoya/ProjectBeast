@@ -18,7 +18,7 @@ namespace app
 		{
 		public:
 			// ここにエネミー固有のステータス用のゲッター関数を追加していく
-
+			inline int GetMaxEat()const { return m_maxEat; }
 
 		public:
 			/**
@@ -38,6 +38,8 @@ namespace app
 
 		private:
 			// ここにエネミー固有のステータスを追加していく
+			/** 最大食事数 */
+			int m_maxEat;
 		};
 	}
 }

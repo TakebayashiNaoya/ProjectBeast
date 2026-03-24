@@ -27,6 +27,7 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			// エネミー固有のパラメーターをここに追加していく
+			int maxEat;
 		};
 	}
 }

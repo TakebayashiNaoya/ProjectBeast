@@ -261,6 +261,14 @@ namespace app
 			float m_searchSpeed = 0.0f;
 			int m_searchDir = 1;
 
+			int m_maxEatCount;
+			int m_eatCount;
+			bool m_isFull;
+
+			float m_attackTimer;
+			float m_attackDuration;
+			bool m_isAttacking;
+
 			bool isFind = false;
 			/** 現在の状態 */
 			EnEnemyStateID m_currentState = enEnemyState_Idle;
@@ -270,6 +278,8 @@ namespace app
 			bool m_isStun;
 
 			bool m_isHomeInitialized;
+
+			bool m_isParamInitialized;
 		};
 	}
 }
