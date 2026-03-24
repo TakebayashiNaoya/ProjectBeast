@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "IScene.h"
+#include <array>
 #include "Source/Actor/Character/Player/Player.h"
 
 
@@ -24,6 +25,7 @@ namespace app
 		void Render(RenderContext& rc) override;
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
+
 
 	private:
 		static constexpr int kPlayerCount = 20;

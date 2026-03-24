@@ -101,6 +101,20 @@ namespace nsBeastEngine
 		);
 
 		/**
+		 * @brief 事前ロード済みのデータから初期化する
+		 * @param initData     完成済みのModelInitData（tkmパスやシェーダ設定などを含む）
+		 * @param skeleton     外部でロード済みのスケルトン（不要ならnullptr）
+		 * @param animationeClips 外部でロード済みのアニメーションクリップ配列（不要ならnullptr）
+		 * @param numAnimationClips クリップ数
+		 */
+		void InitFromLoaded(
+			const ModelInitData& initData,
+			Skeleton* skeleton = nullptr,
+			AnimationClip* animationeClips = nullptr,
+			int numAnimationClips = 0
+		);
+
+		/**
 		 * @brief 海の初期化用関数
 		 * @param initData		モデルの初期化データ
 		 * @param tkmFilePath	tkmファイルのファイルパス
@@ -138,14 +152,6 @@ namespace nsBeastEngine
 		 * @brief 更新
 		 */
 		void Update();
-
-		/**
-		 * @brief ロードが完了しているか
-		 */
-		bool IsCompleted() const
-		{
-			return m_modelResource && m_modelResource->IsCompleted();
-		}
 
 
 	private:
@@ -202,10 +208,14 @@ namespace nsBeastEngine
 		Vector3			m_scale;
 		/** 回転 */
 		Quaternion		m_rotation;
+		/** モデル */
+		Model			m_model;
 		/** シャドウマップ用モデル */
 		Model			m_shadowModels;
-		/** ボーン */
+		/** ボーン（自前保有） */
 		Skeleton		m_skeleton;
+		/** ボーン参照（外部注入または自前） */
+		Skeleton* m_skeletonRef = nullptr;
 		/** アニメーション */
 		Animation		m_animation;
 		/** アニメーションクリップ */
@@ -231,8 +241,5 @@ namespace nsBeastEngine
 		StructuredBuffer m_worldMatrixArraySB;
 		/** ZPrepassで描画されるモデル */
 		Model m_zprepassModel;
-
-		/** モデルリソース */
-		std::shared_ptr<ModelResource> m_modelResource;
 	};
 }

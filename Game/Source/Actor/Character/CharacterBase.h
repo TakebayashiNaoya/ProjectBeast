@@ -6,6 +6,7 @@
 #pragma once
 #include "Source/Actor/Actor.h"
 #include "Physics/CharacterController.h"	// あとで確認
+#include "Resource/ModelResource.h"
 
 
 namespace app
@@ -83,6 +84,17 @@ namespace app
 			std::unique_ptr<AnimationClip[]> m_animationClips;
 			/** キャラクターコントローラー */
 			nsBeastEngine::nsCollision::CharacterController m_characterController;
+
+			/** スケルトン */
+			Skeleton m_skeleton;
+			/** リソースまとめローダー */
+			ModelAssetsLoader m_assetsLoader;
+			/** モデル読み込み完了フラグ */
+			bool m_modelReady = false;
+			/** クリップ数 */
+			int m_clipNum = 0;
+			/** モデルの上方向 */
+			EnModelUpAxis m_upAxis = enModelUpAxisZ;
 		};
 	}
 }

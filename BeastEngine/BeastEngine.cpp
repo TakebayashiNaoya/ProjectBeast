@@ -43,10 +43,10 @@ namespace nsBeastEngine
 		m_renderingEngine.Init();
 
 		/** モデルリソースを登録 */
-		ResourceManager::GetInstance().Register<ModelResource>(std::make_shared<ModelLoader>());
+		ResourceManager::GetInstance().Register<TkmResource>(std::make_shared<TkmLoader>());
 		/** アニメーションリソースを登録 */
 		ResourceManager::GetInstance().Register<TkaResource>(std::make_shared<TkaLoader>());
-        /** スケルトンリソースを登録 */
+		/** スケルトンリソースを登録 */
 		ResourceManager::GetInstance().Register<TksResource>(std::make_shared<TksLoader>());
 		/** リソースマネージャーを起動 */
 		ResourceManager::GetInstance().Start();

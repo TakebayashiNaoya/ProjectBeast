@@ -23,7 +23,6 @@ namespace app
 			delete player;
 			player = nullptr;
 		}
-		ResourceManager::GetInstance().Shutdown();
 	}
 
 
