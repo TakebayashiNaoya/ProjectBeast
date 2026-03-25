@@ -40,8 +40,6 @@ namespace app
 
 	void SceneManager::Update()
 	{
-		float delta = g_gameTime->GetFrameDeltaTime();
-
 		if (m_currentScene) {
 
 			if (g_pad[0]->IsTrigger(enButtonSelect))
@@ -61,9 +59,7 @@ namespace app
 			case TransitionState::Idle:
 				if (m_currentScene)
 				{
-					if (!m_isPause) {
-						m_currentScene->Update();
-					}
+					// 二重呼び出しを避けるため、ここでは遷移要求のみ判定
 					if (m_currentScene->RequesutScene(m_nextSceneId, m_fadeDuration))
 					{
 						core::Fade::Get().FadeOut(m_fadeDuration);
