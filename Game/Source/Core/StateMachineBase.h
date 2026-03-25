@@ -16,7 +16,7 @@ public:\
 
 namespace app
 {
-	namespace actor
+	namespace core
 	{
 
 		/** 前方宣言 */
@@ -86,6 +86,13 @@ namespace app
 				// ステートを追加
 				m_stateMap[TState::ID()] = std::make_unique<TState>(std::forward<TStateMachine>(stateMachine));
 			}
+
+
+			/**
+			 * @brief 現在のステートと指定したIDが等しいかどうか
+			 * @param stateID ステートID
+			 */
+			bool IsEqualCurrentState(const uint32_t stateID) const;
 
 
 			/*

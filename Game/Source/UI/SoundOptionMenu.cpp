@@ -246,12 +246,16 @@ namespace app
 
 		SoundOptionMenu::SoundOptionMenu()
 			: m_currentSoundType(SoundType::Master)
+			, m_isBack(false)
 		{
 		}
 
 
 		void SoundOptionMenu::Update()
 		{
+			// 戻るフラグがfalseなら、trueにする。
+			if (m_isBack) m_isBack = !m_isBack;
+
 			// 現在のタイプを保存。
 			const uint8_t currentType = static_cast<uint8_t>(m_currentSoundType);
 
@@ -270,7 +274,7 @@ namespace app
 				m_currentSoundType = static_cast<SoundType>((currentType + add) % SOUND_SIZE);
 			}
 
-
+			
 			const uint8_t type = static_cast<uint8_t>(m_currentSoundType);
 			const Key key = SOUND_ICON_KEYS[type].key;
 
@@ -306,17 +310,14 @@ namespace app
 			// サウンドマップの最大サイズを設定
 			m_soundIconMap.reserve(SOUND_SIZE);
 
-			for (int i = 0; i < SOUND_SIZE; i++)
+			for (const auto& info : SOUND_ICON_KEYS)
 			{
-				const Key key = SOUND_ICON_KEYS[i].key;
-				const SoundType type = SOUND_ICON_KEYS[i].type;
-
 				// 新しいバーを作成
-				Icon newIcon = std::make_unique<SoundIcon>(type);
+				Icon newIcon = std::make_unique<SoundIcon>(info.type);
 				// UIパーツの設定
-				newIcon->SetUIIcon(GetUI<UIIcon>(key));
+				newIcon->SetUIIcon(GetUI<UIIcon>(info.key));
 				// マップにアイコンを追加
-				m_soundIconMap.emplace(key, std::move(newIcon));
+				m_soundIconMap.emplace(info.key, std::move(newIcon));
 			}
 		}
 
@@ -328,21 +329,18 @@ namespace app
 			// マップの最大サイズ数を設定
 			m_soundDigitMap.reserve(SOUND_SIZE);
 
-			for (int i = 0; i < SOUND_SIZE; i++)
+			for (const auto& info : SOUND_DIGIT_KEYS)
 			{
-				const Key key = SOUND_DIGIT_KEYS[i].key;
-				const SoundType type = SOUND_DIGIT_KEYS[i].type;
-				
 				// 新しいディジットを作成
-				Digit newDigit = std::make_unique<SoundDigit>(type);
+				Digit newDigit = std::make_unique<SoundDigit>(info.type);
 				// UIパーツの設定
-				newDigit->SetUIDigit(GetUI<UIDigit>(key));
-
-				const Key iconKey = SOUND_ICON_KEYS[i].key;
+				newDigit->SetUIDigit(GetUI<UIDigit>(info.key));
+				int iconType = static_cast<int>(info.type);
+				const Key iconKey = SOUND_ICON_KEYS[iconType].key;
 				newDigit->SetSoundIcon(m_soundIconMap[iconKey].get());
 
 				// マップにディジットを追加
-				m_soundDigitMap.emplace(key, std::move(newDigit));
+				m_soundDigitMap.emplace(info.key, std::move(newDigit));
 
 			}
 		}

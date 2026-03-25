@@ -20,6 +20,7 @@ namespace app
 
 		bool Start() override;
 		void Update() override;
+		void PauseUpdate()override;
 		void Render(RenderContext& rc) override;
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;

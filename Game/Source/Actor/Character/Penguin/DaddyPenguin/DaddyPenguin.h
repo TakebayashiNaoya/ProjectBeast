@@ -26,6 +26,14 @@ namespace app
 			 * @return ステートマシンのポインタ
 			 */
 			inline DaddyPenguinStateMachine* GetStateMachine() { return m_stateMachine.get(); }
+			/**
+			 * @brief Activeフラグの設定
+			 * @param isActive Activeフラグ
+			 */
+			inline void SetActive(const bool isActive)
+			{
+				m_isActive = isActive;
+			}
 
 
 		public:

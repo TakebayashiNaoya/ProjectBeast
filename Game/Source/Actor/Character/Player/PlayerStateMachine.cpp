@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "Player.h"
 #include "PlayerIState.h"
 #include "PlayerStateMachine.h"
 
@@ -13,7 +14,7 @@ namespace app
 	namespace actor
 	{
 		PlayerStateMachine::PlayerStateMachine(Player* player)
-			: StateMachineBase()
+			: CharacterStateMachine(player)
 			, m_player(player)
 		{
 			// ステートの追加
@@ -25,7 +26,7 @@ namespace app
 		}
 
 
-		IState* PlayerStateMachine::GetChangeState()
+		core::IState* PlayerStateMachine::GetChangeState()
 		{
 			return FindState(PlayerIdleState::ID());
 			return nullptr;

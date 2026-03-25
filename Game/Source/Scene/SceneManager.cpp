@@ -30,7 +30,7 @@ namespace app
 		AddSceneMap<app::ResultScene>();
 
 		// 初期シーン生成
-		CreateScene(app::DebugScene::ID());
+		CreateScene(app::TitleScene::ID());
 	}
 
 
@@ -40,10 +40,21 @@ namespace app
 
 	void SceneManager::Update()
 	{
-		if (g_pad[0]->IsTrigger(enButtonSelect))
-		{
-			m_isPause = !m_isPause;
-		}
+		float delta = g_gameTime->GetFrameDeltaTime();
+
+		if (m_currentScene) {
+
+			if (g_pad[0]->IsTrigger(enButtonSelect))
+			{
+				m_isPause = !m_isPause;
+			}
+			if (!m_isPause) {
+				m_currentScene->Update();
+			}
+			else
+			{
+				m_currentScene->PauseUpdate();
+			}
 
 		switch (m_transitionState)
 		{

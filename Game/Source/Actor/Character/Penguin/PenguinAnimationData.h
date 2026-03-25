@@ -16,8 +16,10 @@ namespace app
 		 */
 		enum class EnPenguinAnimationID : uint8_t
 		{
+			// 命令を出す
+			CommandShout = 0,
 			// うつ伏せで死亡する
-			DeathFaceDown = 0,
+			DeathFaceDown,
 			// 仰向けで死亡する
 			DeathFaceUp,
 			// 食べ物をついばむ
@@ -72,14 +74,11 @@ namespace app
 		};
 
 
-		/** アニメーションの数 */
-		constexpr uint8_t ANIMATION_NUM = static_cast<uint8_t>(EnPenguinAnimationID::Max);
-
-
 		/** アニメーションの情報 */
-		const AnimationData ANIMATION_DATA[ANIMATION_NUM] =
+		const AnimationData ANIMATION_DATA[static_cast<uint8_t>(EnPenguinAnimationID::Max)] =
 		{
-
+			// 命令を出す
+			{ "Assets/animData/penguin/commandShout.tka", false },
 			// うつ伏せで死亡する
 			{ "Assets/animData/penguin/deathFaceDown.tka", false },
 			// 仰向けで死亡する
@@ -93,9 +92,9 @@ namespace app
 			// その場で翼をばたつかせる
 			{ "Assets/animData/penguin/idleFlappingWings.tka", true },
 			// その場で周りを見回す
-			{ "Assets/animData/penguin/idleLooKAround.tka", true },
+			{ "Assets/animData/penguin/idleLooKAround.tka", false },
 			// その場で体を振るう
-			{ "Assets/animData/penguin/idleShake.tka", true },
+			{ "Assets/animData/penguin/idleShake.tka", false },
 			// その場で眠る
 			{ "Assets/animData/penguin/idleSleep.tka", true },
 			// その場で何もしない
@@ -109,9 +108,9 @@ namespace app
 			// 水中から出て着地する
 			{ "Assets/animData/penguin/launchEnd.tka", false },
 			// 水中から出て空中にいるときに翼を速くばたつかせる
-			{ "Assets/animData/penguin/launchFlappingWingsQuickly.tka", true },
+			{ "Assets/animData/penguin/launchFlappingWingsQuickly.tka", false },
 			// 水中から出て空中にいるときに翼をゆっくりばたつかせる
-			{ "Assets/animData/penguin/launchFlappingWingsSlowly.tka", true },
+			{ "Assets/animData/penguin/launchFlappingWingsSlowly.tka", false },
 			// 走る
 			{ "Assets/animData/penguin/moveRun.tka", true },
 			// 泳ぐ

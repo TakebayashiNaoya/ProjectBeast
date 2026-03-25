@@ -103,6 +103,9 @@ namespace app
 
 		void UIButton::Update()
 		{
+			UpdateAnimation();
+
+			m_spriteRender.SetMulColor(m_color);
 			m_transform.UpdateTransform();
 
 			m_spriteRender.SetPosition(m_transform.m_localTransform.m_position);
@@ -119,6 +122,7 @@ namespace app
 				m_spriteRender.Draw(rc);
 			}
 		}
+
 
 		void UIButton::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector4& color)
 		{
@@ -140,7 +144,7 @@ namespace app
 
 
 
-		/****************************************/
+		/***************************************/
 
 
 		UIGauge::UIGauge()
@@ -193,134 +197,144 @@ namespace app
 
 
 
-		/******************************************/
+		/********************************/
 
 
 		UIDigit::UIDigit()
-			: m_number(0)
-			, m_requestNumber(0)
-			, m_digit(0)
-			,m_wide(0.0f)
-			,m_height(0.0f)
-		{
-		}
+		{}
 
 
 		UIDigit::~UIDigit()
-		{
-			for (const auto* render : m_renderList)
-			{
-				delete render;
-				render = nullptr;
-			}
-		}
+		{}
 
 
 		void UIDigit::Update()
 		{
-			/** 桁更新 */
-			if (m_number != m_requestNumber)
-			{
-				m_number = m_requestNumber;
-				for (int i = 0; i < m_digit; i++)
-				{
-					UpdateNumber(i + 1, m_number);
+			//ComputeFinalColor();
+			if (number_ != requestNumber_) {
+				number_ = requestNumber_;
+				digit_ = ComputeDigit();
+
+				//不要な桁を削除
+				while (renderList_.size() > digit_) {
+					delete renderList_.back();
+					renderList_.pop_back();
+				}
+
+				for (int i = 0; i < digit_; ++i) {
+					UpdateNumber(i + 1, number_);
 				}
 			}
 
 			UpdateAnimation();
 
-			for (int i = 0; i < m_renderList.size(); i++)
+			m_transform.UpdateTransform();
+			for (int i = 0; i < renderList_.size(); ++i)
 			{
-				auto* spriteRender = m_renderList[i];
+				auto* spriteRender = renderList_[i];
 				UpdatePosition(i);
-
+				spriteRender->SetScale(m_transform.m_localTransform.m_scale);
+				spriteRender->SetRotation(m_transform.m_localTransform.m_rotation);
+				spriteRender->SetMulColor(m_color);
 				spriteRender->Update();
 			}
+
 		}
 
 
 		void UIDigit::Render(RenderContext& rc)
 		{
-			for (SpriteRender* spriteRender : m_renderList)
+			if (m_isDraw)
 			{
-				spriteRender->Draw(rc);
+				for (SpriteRender* spriteRender : renderList_)
+				{
+					spriteRender->Draw(rc);
+				}
 			}
 		}
 
 
-		void UIDigit::Initialize(const char* assetName, const int digit, const int number, const float wide, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation)
+		void UIDigit::Initialize(const char* assetName, const int digit, const int number, const float widht, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation)
 		{
-			m_assetsPath = assetName;
-			m_digit = digit;
-			m_number = number;
-			m_wide = wide;
-			m_height = height;
+			assetPath_ = assetName;
+			digit_ = digit;
+			number_ = number;
+			w_ = widht;
+			h_ = height;
 
 			m_transform.m_localTransform.m_position = position;
 			m_transform.m_localTransform.m_scale = scale;
 			m_transform.m_localTransform.m_rotation = rotation;
 
-
-			for (int i = 0; i < m_digit; i++)
+			for (int i = 0; i < digit; i++)
 			{
-				SpriteRender* spriteRender = new SpriteRender;
-				spriteRender->Init(assetName,wide,height);
-				spriteRender->SetPosition(m_transform.m_localTransform.m_position);
-				spriteRender->SetScale(m_transform.m_localTransform.m_scale);
-				spriteRender->SetRotation(m_transform.m_localTransform.m_rotation);
-				m_renderList.push_back(spriteRender);
-				/** 桁なので +1する */
-				UpdateNumber(i + 1, m_number);
+				UpdateNumber(i + 1, number_); // 桁なので＋１する
+				auto* spriteRender = renderList_[i];
+				spriteRender->SetPosition(position);
+				spriteRender->SetScale(scale);
+				spriteRender->SetRotation(rotation);
 			}
 		}
 
 
 		void UIDigit::UpdateNumber(const int targetDigit, const int number)
 		{
-			/** 1以上なら警告 */
-			K2_ASSERT(targetDigit >= 1, "桁指定間違ってるよ!\n");
+			// NOTE: targetDigitは1以上の値になっている
+			K2_ASSERT(targetDigit >= 1, "桁指定が間違えています。\n");
 
+			// いらない
 			const int targetRenderIndex = targetDigit - 1;
 			SpriteRender* nextRender = nullptr;
-
-			/** 次のものを作る */
-			if (targetRenderIndex < m_renderList.size())
-			{
-				nextRender = m_renderList[targetRenderIndex];
-			}
-			else
-			{
+			// 次のやつをつくる
+			if (targetRenderIndex < renderList_.size()) {
+				delete renderList_[targetRenderIndex];
+				renderList_[targetRenderIndex] = nullptr;
 				nextRender = new SpriteRender();
-				m_renderList.push_back(nextRender);
+				renderList_[targetRenderIndex] = nextRender;
+			}
+			else {
+				nextRender = new SpriteRender();
+				renderList_.push_back(nextRender);
 			}
 
-			/** 対象の桁の数字 */
+			// 対象の桁の数字
 			const int targetDigitNumber = GetDigit(targetDigit);
-			std::string assetName = m_assetsPath + "/0.dds";
-			assetName[assetName.size() - 5] = '0' + targetDigitNumber;
-			nextRender->Init(assetName.c_str(), m_wide, m_height);
+			std::string assetNname = assetPath_ + "/0.dds";
+			assetNname[assetNname.size() - 5] = '0' + targetDigitNumber;
+			nextRender->Init(assetNname.c_str(), w_, h_);
 		}
 
 
 		void UIDigit::UpdatePosition(const int index)
 		{
-			SpriteRender* render = m_renderList[index];
+			SpriteRender* render = renderList_[index];
 			Vector3 position = m_transform.m_localTransform.m_position;
-			position.x -= m_wide * index;
+			position.x -= w_ * index;
 			render->SetPosition(position);
+		}
+
+		int UIDigit::ComputeDigit()
+		{
+			int n = number_;
+			if (n == 0) return 1;
+			int count = 0;
+			n = std::abs(n);
+			while (n > 0) {
+				n /= 10;
+				count++;
+			}
+			return count;
 		}
 
 
 		int UIDigit::GetDigit(int digit)
 		{
-			/** 1以上なら警告 */
-			K2_ASSERT(digit >= 1, "桁指定を間違えています\n");
+			// NOTE: targetDigitは1以上の値になっている
+			K2_ASSERT(digit >= 1, "桁指定が間違えています。\n");
 			digit -= 1;
-			int diver = static_cast<int>(pow(10, digit));
-			return (m_number / diver) % 10;
+			int divisor = static_cast<int>(pow(10, digit));
+			return (number_ / divisor) % 10;
 		}
-
 
 
 

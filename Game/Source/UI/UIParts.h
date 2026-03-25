@@ -322,115 +322,70 @@ namespace app
 			);
 		};
 
-
-
-		/**
-		 * @brief 数字のスプライトのみを扱うUIBaseの派生クラス
-		 */
+		
+		// ============================================
+// UI桁表示(スコア表示などで使用)
+// ============================================
 		class UIDigit : public UIBase
 		{
+		private:
+			/** 画像表示機能の可変長配列 */
+			std::vector<SpriteRender*> renderList_;
+			/** 表示される数字 */
+			int number_ = 0;
+			int requestNumber_ = 0;
+			int digit_ = 0;
+			/** 数字表示に必要な画像が入った */
+			std::string assetPath_;
+
+			int w_ = 0;
+			int h_ = 0;
+
+
+
 		public:
 			UIDigit();
 			~UIDigit();
 
 
 		public:
-			/** 更新処理 */
-			virtual void Update()override;
-			/** 描画処理 */
-			virtual void Render(RenderContext& rc)override;
+			virtual void Update() override;
+			virtual void Render(RenderContext& rc) override;
 
 
+		public:
 			/**
-			 * @brief 数字のスプライトの初期化
-			 * @param assetName アセット名
-			 * @param digit 何桁かの情報(数)
-			 * @param number 表示する数
-			 * @param wide 横幅
-			 * @param height 縦幅
-			 * @param position 位置
-			 * @param scale 大きさ
-			 * @param rotation 回転
+			 * ・アセットの名前
+			 * ・何桁かの情報（数）
+			 * ・表示する数
+			 * ・横
+			 * ・高さ
+			 * ・位置
+			 * ・大きさ
+			 * ・回転
 			 */
-			void Initialize(
-				const char* assetName,
-				const int digit,
-				const int number,
-				const float wide,
-				const float height,
-				const Vector3& position,
-				const Vector3& scale,
-				const Quaternion& rotation
-			);
+			void Initialize(const char* assetPath, const int digit, const int number, const float widht, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation);
 
+			/** 数字を設定 */
+			void SetNumber(const int number) { requestNumber_ = number; }
 
-			/**
-			 * @brief 数字の設定
-			 * @param number 数
-			 */
-			void SetNumber(const int number) { m_requestNumber = number; }
+			std::vector<SpriteRender*>& GetSpriteRenderList() { return renderList_; }
 
-
-			/**
-			 * @brief スプライトレンダー配列の取得
-			 * @return スプライトレンダー配列の参照
-			 */
-			std::vector<SpriteRender*>& GetSpriteRenderList() { return m_renderList; }
-			
-			
-			/**
-			 * @brief スプライトの配列のラムダ式
-			 * @param func 全てのスプライトレンダーに対して何を行うか
-			 */
 			void ForEach(const std::function<void(SpriteRender*)>& func)
 			{
-				for (auto* render : m_renderList)
-				{
+				for (auto* render : renderList_) {
 					func(render);
 				}
 			}
 
 
 		private:
-			/** 画像表示用の配列 */
-			std::vector<SpriteRender*> m_renderList;
-
-
-			/** 表示用の数字 */
-			int m_number;
-			int m_requestNumber;
-			int m_digit;
-
-
-			/** 数字用に必要な画像の名前 */
-			std::string m_assetsPath;
-
-
-			/** 横幅 */
-			float m_wide;
-			/** 縦幅 */
-			float m_height;
-
-
-			/**
-			 * @brief 桁数の更新処理
-			 * @param targetDigit 対象の桁
-			 * @param number 数
-			 */
 			void UpdateNumber(const int targetDigit, const int number);
-
-
-			/**
-			 * @brief 桁の更新処理
-			 * @param index 要素数
-			 */
 			void UpdatePosition(const int index);
 
+			int ComputeDigit();
 
-			/**
-			 * @brief 対象の桁
-			 * @param digit 桁
-			 */
+			/** 対象の桁 */
 			int GetDigit(int digit);
 		};
 
@@ -445,7 +400,6 @@ namespace app
 			friend class UIImage;
 			friend class UIGauge;
 			friend class UIIcon;
-			friend class UIText;
 			friend class UIButton;
 
 

@@ -4,9 +4,9 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Actor.h"
 #include "Physics/CharacterController.h"	// あとで確認
 #include "Resource/ModelResource.h"
+#include "Source/Actor/Actor.h"
 
 
 namespace app
@@ -47,6 +47,10 @@ namespace app
 		/************************************/
 
 
+		/** 前方宣言 */
+		class CharacterStateMachine;
+
+
 		/**
 		 * @brief キャラクターの基底クラス
 		 */
@@ -80,6 +84,8 @@ namespace app
 
 
 		protected:
+			/** キャラクターステートマシン */
+			CharacterStateMachine* m_characterStateMachine;
 			/** アニメーションクリップ */
 			std::unique_ptr<AnimationClip[]> m_animationClips;
 			/** キャラクターコントローラー */

@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "CharacterBase.h"
+#include "CharacterStateMachine.h"
 #include "CharacterStatus.h"
 
 
@@ -17,6 +18,8 @@ namespace app
 			, m_clipNum(0)
 			, m_upAxis(EnModelUpAxis::enModelUpAxisY)
 			, m_modelReady(false)
+			: m_characterStateMachine(nullptr)
+			, m_animationClips(nullptr)
 		{}
 
 
@@ -47,6 +50,9 @@ namespace app
 				m_modelRender.Update();
 				m_modelReady = true;
 			}
+			m_transform.m_position = m_characterStateMachine->GetTransform().m_position;
+			m_transform.m_rotation = m_characterStateMachine->GetTransform().m_rotation;
+			m_transform.m_scale = m_characterStateMachine->GetTransform().m_scale;
 
 			// モデルレンダーを更新
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);

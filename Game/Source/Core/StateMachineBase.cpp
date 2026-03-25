@@ -9,7 +9,7 @@
 
 namespace app
 {
-	namespace actor
+	namespace core
 	{
 		StateMachineBase::StateMachineBase()
 			: m_currentState(nullptr)
@@ -42,6 +42,12 @@ namespace app
 				m_currentState->Enter();
 				m_nextState = nullptr;
 			}
+		}
+
+
+		bool StateMachineBase::IsEqualCurrentState(const uint32_t stateID) const
+		{
+			return m_currentState == m_stateMap.at(stateID).get();
 		}
 
 

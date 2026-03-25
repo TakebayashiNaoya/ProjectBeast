@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "InGameScene.h"
 #include "TitleScene.h"
-
+#include "DebugScene.h"
 
 namespace app
 {
@@ -22,7 +22,7 @@ namespace app
 
 	bool TitleScene::Start()
 	{
-		m_titleRender.Init("Assets/sprite/Title.DDS", 1920.0f, 1080.0f);
+		m_titleRender.Init("Assets/spriteData/Scene/Title.DDS", 1920.0f, 1080.0f);
 		return true;
 	}
 
@@ -35,6 +35,10 @@ namespace app
 		}
 	}
 
+	void TitleScene::PauseUpdate()
+	{
+	}
+
 
 	void TitleScene::Render(RenderContext& rc)
 	{
@@ -45,7 +49,7 @@ namespace app
 	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		if (m_nextScene) {
-			id = InGameScene::ID();
+			id = DebugScene::ID();
 			waitTime = 3.0f;
 			return true;
 		}

@@ -64,6 +64,17 @@ namespace app
 				}
 			}
 
+			/**
+			 * @brief フェードイン中かどうか
+			 * @return フェードイン中ならtrue、そうでなければfalse
+			 */
+			inline bool IsFadeIn()const { return m_isFadeIn; }
+			/**
+			 * @brief フェードアウト中かどうか
+			 * @return フェードアウト中ならtrue、そうでなければfalse
+			 */
+			inline bool IsFadeOut()const { return m_isFadeOut; }
+
 
 		private:
 			Fade();
@@ -81,7 +92,6 @@ namespace app
 
 		private:
 			SpriteRender m_fadeRender;
-
 
 		private:
 			/**
@@ -104,10 +114,15 @@ namespace app
 
 
 			/** フェードの経過時間 */
-			float m_timer = 0.0f;
+			float m_timer;
 
 			/** フェードが完了するまでの時間 */
-			float m_duration = 0.0f;
+			float m_duration;
+
+			/** フェードイン中かどうか */
+			bool m_isFadeIn;
+			/** フェードアウト中かどうか */
+			bool m_isFadeOut;
 		};
 	}
 }

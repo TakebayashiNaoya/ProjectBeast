@@ -7,15 +7,16 @@
 #include "ChildPenguin.h"
 #include "ChildPenguinIState.h"
 #include "ChildPenguinStateMachine.h"
+#include "ChildPenguinStatus.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-		ChildPenguinStateMachine::ChildPenguinStateMachine(ChildPenguin* player)
-			: StateMachineBase()
-			, m_player(player)
+		ChildPenguinStateMachine::ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin)
+			: CharacterStateMachine(ownerChildPenguin)
+			, m_ownerChildPenguin(ownerChildPenguin)
 		{
 			// ステートの追加
 			AddState<ChildPenguinIdleState>(this);
@@ -26,14 +27,24 @@ namespace app
 		}
 
 
-		void ChildPenguinStateMachine::PlayAnimation(const uint8_t animationID)
+		const ChildPenguinStatus* ChildPenguinStateMachine::GetChildPenuinStatus() const
 		{
-			m_player->GetModelRender()->PlayAnimation(animationID);
+			return m_ownerChildPenguin->GetStatus<ChildPenguinStatus>();
 		}
 
 
-		IState* ChildPenguinStateMachine::GetChangeState()
+		core::IState* ChildPenguinStateMachine::GetChangeState()
 		{
+			if (m_isFollowCommanded)
+			{
+				return FindState(ChildPenguinFollowState::ID());
+			}
+
+			if (m_isWaitCommanded)
+			{
+				return FindState(ChildPenguinWaitState::ID());
+			}
+
 			return FindState(ChildPenguinIdleState::ID());
 			return nullptr;
 		}
