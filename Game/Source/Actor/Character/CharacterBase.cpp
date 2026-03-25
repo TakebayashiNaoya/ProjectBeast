@@ -18,8 +18,7 @@ namespace app
 			, m_clipNum(0)
 			, m_upAxis(EnModelUpAxis::enModelUpAxisY)
 			, m_modelReady(false)
-			: m_characterStateMachine(nullptr)
-			, m_animationClips(nullptr)
+			, m_characterStateMachine(nullptr)
 		{}
 
 
