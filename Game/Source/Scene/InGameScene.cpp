@@ -9,6 +9,7 @@
 #include "Source/Core/ParameterManager.h"
 
 #include "Source/Actor/Stage/IStage.h"
+#include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 
@@ -33,52 +34,59 @@ namespace app
 	bool InGameScene::Start()
 	{
 		app::core::ParameterManager::CreateInstance();
-
-		// ① ステージ生成
-		m_stage = new actor::IStageObject();
-		m_stage->Init("Assets/modelData/stage/floor.tkm"); // 実際のパスに合わせる
-		m_stage->StartWrapper();
-
-		// ② 親ペンギン生成
-		m_daddyPenguin = new actor::DaddyPenguin();
-		m_daddyPenguin->SetPosition(Vector3::Zero);
-		m_daddyPenguin->StartWrapper();
-
-		// ③ 子ペンギン100体生成
-		Vector3 pos = Vector3(5.0f, 0.0f, 0.0f);
-		for (int i = 0; i < CHILD_PENGUIN_NUM; i++) {
-			m_childPenguins[i] = new actor::ChildPenguin();
-			m_childPenguins[i]->SetPosition(pos);
-			m_childPenguins[i]->StartWrapper();
-			// 少しずつずらして配置
-			pos.x += 3.0f;
-			if ((i + 1) % 10 == 0) {
-				pos.x = 5.0f;
-				pos.z += 3.0f;
-			}
-		}
-
+		m_phase = LoadPhase::Stage;
+		m_childIndex = 0;
 		return true;
 	}
 
-
 	void InGameScene::Update()
 	{
-		if (m_stage)        m_stage->UpdateWrapper();
-		if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-		for (auto* p : m_childPenguins) {
-			if (p) p->UpdateWrapper();
-		}
-
-		if (g_pad[0]->IsTrigger(enButtonA))
+		switch (m_phase)
 		{
-			m_nextScene = true;
+		case LoadPhase::Stage:
+			m_stage = new actor::IStageObject();
+			m_stage->Init("Assets/modelData/stage/floor.tkm");
+			m_stage->StartWrapper();
+			m_phase = LoadPhase::Daddy;
+			break;
+
+		case LoadPhase::Daddy:
+			m_daddyPenguin = new actor::DaddyPenguin();
+			m_daddyPenguin->SetPosition(Vector3::Zero);
+			m_daddyPenguin->StartWrapper();
+			m_phase = LoadPhase::Children;
+			break;
+
+		case LoadPhase::Children:
+			if (m_childIndex < CHILD_PENGUIN_NUM)
+			{
+				Vector3 pos = Vector3(5.0f + (m_childIndex % 10) * 3.0f,
+					0.0f,
+					(m_childIndex / 10) * 3.0f);
+				m_childPenguins[m_childIndex] = new actor::ChildPenguin();
+				m_childPenguins[m_childIndex]->SetPosition(pos);
+				m_childPenguins[m_childIndex]->StartWrapper();
+				++m_childIndex;
+			}
+			else {
+				m_phase = LoadPhase::Done;
+			}
+			break;
+
+		case LoadPhase::Done:
+			// 通常更新
+			if (m_stage)        m_stage->UpdateWrapper();
+			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
+			for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+			if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
+			break;
+
+		default: break;
 		}
 	}
 
 	void InGameScene::PauseUpdate()
-	{
-	}
+	{}
 
 
 	void InGameScene::Render(RenderContext& rc)
@@ -95,7 +103,7 @@ namespace app
 	{
 		if (m_nextScene) {
 			id = ResultScene::ID();
-			waitTime = 3.0f;
+			waitTime = 0.5f;
 			return true;
 		}
 		return false;

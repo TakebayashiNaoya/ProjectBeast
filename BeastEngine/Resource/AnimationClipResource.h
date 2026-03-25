@@ -94,7 +94,7 @@ namespace nsBeastEngine
 			if (m_handles.empty()) return false;
 			for (const auto& h : m_handles)
 			{
-				if (!h || !h->IsCompleted()) return false;
+				if (!h || !(h->IsCompleted() || h->IsError())) return false;
 			}
 			return true;
 		}
@@ -105,7 +105,8 @@ namespace nsBeastEngine
 		{
 			for (int i = 0; i < static_cast<int>(m_handles.size()); i++)
 			{
-				if (m_handles[i])
+				// エラー状態のリソースはスキップ
+				if (m_handles[i] && m_handles[i]->IsCompleted())
 				{
 					m_handles[i]->Finalize(outClips[i]);
 				}

@@ -40,65 +40,67 @@ namespace app
 
 	void SceneManager::Update()
 	{
-		if (m_currentScene) {
+		//if (!m_currentScene) return;
 
-			if (g_pad[0]->IsTrigger(enButtonSelect))
-			{
-				m_isPause = !m_isPause;
-			}
+		// ポーズ切り替え
+		if (g_pad[0]->IsTrigger(enButtonSelect))
+		{
+			m_isPause = !m_isPause;
+		}
+
+		switch (m_transitionState)
+		{
+		case TransitionState::Idle:
+			// 通常のゲームプレイ：シーンを更新
 			if (!m_isPause) {
 				m_currentScene->Update();
 			}
-			else
-			{
+			else {
 				m_currentScene->PauseUpdate();
 			}
-
-			switch (m_transitionState)
+			// シーン遷移要求を判定
+			if (m_currentScene->RequesutScene(m_nextSceneId, m_fadeDuration))
 			{
-			case TransitionState::Idle:
-				if (m_currentScene)
-				{
-					// 二重呼び出しを避けるため、ここでは遷移要求のみ判定
-					if (m_currentScene->RequesutScene(m_nextSceneId, m_fadeDuration))
-					{
-						core::Fade::Get().FadeOut(m_fadeDuration);
-						m_transitionState = TransitionState::FadingOut;
-					}
-				}
-				break;
-
-			case TransitionState::FadingOut:
-				// FadeOut 完了待ち（画面が完全に暗くなるまで）
-				if (core::Fade::Get().IsFadeOutComplete())
-				{
-					delete m_currentScene;
-					m_currentScene = nullptr;
-					CreateScene(m_nextSceneId); // Start() → アクター生成 → 非同期ロード開始
-					m_nextSceneId = INVALID_SCENE_ID;
-					m_transitionState = TransitionState::LoadingScene;
-				}
-				break;
-
-			case TransitionState::LoadingScene:
-				// 全リソースのロード完了待ち
-				if (nsBeastEngine::ResourceManager::GetInstance().IsIdle())
-				{
-					K2_LOG("LoadComplete");
-					core::Fade::Get().FadeIn(m_fadeDuration);
-					m_transitionState = TransitionState::FadingIn;
-				}
-				break;
-
-			case TransitionState::FadingIn:
-				// FadeIn 完了待ち（Update は呼ばない → キャラ・タイマーは動かない）
-				if (!core::Fade::Get().IsFading())
-				{
-					m_fadeDuration = 0.0f;
-					m_transitionState = TransitionState::Idle;
-				}
-				break;
+				core::Fade::Get().FadeOut(m_fadeDuration);
+				m_transitionState = TransitionState::FadingOut;
 			}
+			break;
+
+		case TransitionState::FadingOut:
+			if (core::Fade::Get().IsFadeOutComplete()) {
+				delete m_currentScene;
+				m_currentScene = nullptr;
+				core::Fade::Get().ShowLoadingCircle();
+				m_transitionState = TransitionState::LoadingScene; // ここではCreateしない
+			}
+			break;
+
+		case TransitionState::LoadingScene:
+			if (!m_currentScene && m_nextSceneId != INVALID_SCENE_ID) {
+				CreateScene(m_nextSceneId);
+				m_nextSceneId = INVALID_SCENE_ID;
+			}
+			if (m_currentScene) m_currentScene->Update();
+
+			// リソース完了かつシーンの段階ロード完了を待つ
+			if (nsBeastEngine::ResourceManager::GetInstance().IsIdle())
+			{
+				//core::Fade::Get().HideLoadingCircle();
+				core::Fade::Get().FadeIn(m_fadeDuration);
+				m_transitionState = TransitionState::FadingIn;
+			}
+
+		case TransitionState::FadingIn:
+			// FadeIn 完了待ち
+			// シーン更新を行い、初期化済みモデルを表示できるようにする
+			m_currentScene->Update();
+			if (!core::Fade::Get().IsFading())
+			{
+				core::Fade::Get().HideLoadingCircle();
+				m_fadeDuration = 0.0f;
+				m_transitionState = TransitionState::Idle;
+			}
+			break;
 		}
 	}
 

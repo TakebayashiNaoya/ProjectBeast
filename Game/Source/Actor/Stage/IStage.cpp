@@ -22,11 +22,12 @@ namespace app
 		{
 			if (!m_isModelLoaded)
 			{
-				if (!m_pendingModelPath.empty() && m_tksLoader.IsReady())
+				if (!m_pendingModelPath.empty() && m_tkmLoader.IsReady())
 				{
-					// tks をバンクに登録
-					m_tksLoader.Finalize();
-					// モデル初期化（スケルトンはバンクヒットでIOスキップ）
+					// TKM非同期ロード完了 → バンク登録＋モデル初期化
+					nsK2EngineLow::ModelInitData initData;
+					m_tkmLoader.Finalize(initData);
+					// ステージはスケルトン・アニメーション不要なのでnullptr
 					m_modelRender.Init(m_pendingModelPath.c_str());
 					m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 					m_modelRender.Update();
@@ -50,18 +51,10 @@ namespace app
 		{
 			m_isModelLoaded = false;
 			m_pendingModelPath = fileName;
-			m_tksLoader.Reset();
+			m_tkmLoader.Reset();
 
-			// tksパスを作成して非同期ロード（.tkm -> .tks）
-			std::string tksPath = fileName;
-			auto extPos = tksPath.rfind(".tkm");
-			if (extPos != std::string::npos) {
-				tksPath.replace(extPos, 4, ".tks");
-			}
-			else {
-				tksPath += ".tks";
-			}
-			m_tksLoader.RequestLoad(ResourceManager::GetInstance(), tksPath.c_str());
+			// TKMファイルを非同期ロードリクエスト
+			m_tkmLoader.RequestLoad(nsBeastEngine::ResourceManager::GetInstance(), fileName);
 		}
 	}
 }

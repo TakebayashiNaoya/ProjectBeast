@@ -97,12 +97,12 @@ namespace nsBeastEngine
 
 		bool IsReady() const
 		{
-			return m_handle && m_handle->IsCompleted();
+			return m_handle && (m_handle->IsCompleted() || m_handle->IsError());
 		}
 
 		void Finalize(ModelInitData& initData)
 		{
-			if (m_handle)
+			if (m_handle && m_handle->IsCompleted())
 			{
 				m_handle->Finalize(initData);
 			}
@@ -154,7 +154,13 @@ namespace nsBeastEngine
 		void Finalize(ModelInitData& initData, Skeleton* skeleton = nullptr, AnimationClip* clips = nullptr)
 		{
 			if (m_hasTkm) { m_tkm.Finalize(initData); }
-			if (m_hasTks && skeleton) { skeleton->Init(m_tksPath.c_str()); }
+			if (m_hasTks)
+			{
+				// 非同期ロード済みの TksFile をバンクに登録
+				m_tks.Finalize();
+				// バンクヒットにより二重ロードを防止
+				if (skeleton) { skeleton->Init(m_tksPath.c_str()); }
+			}
 			if (m_hasTka && clips) { m_tka.Finalize(clips); }
 		}
 

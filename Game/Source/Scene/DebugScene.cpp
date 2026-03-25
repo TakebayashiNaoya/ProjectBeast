@@ -4,7 +4,6 @@
  * @author 立山
  */
 #include "stdafx.h"
-#if defined(APP_DEBUG)
 #include "DebugScene.h"
 #include "../../../BeastEngine/Resource/ResourceManager.h"
 #include "../../../BeastEngine/Resource/ModelResource.h"
@@ -50,4 +49,3 @@ namespace app
 		return false;
 	}
 }
-#endif

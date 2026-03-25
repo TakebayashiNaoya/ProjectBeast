@@ -31,6 +31,7 @@ namespace app
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
+		bool IsLoaded() const { return m_phase == LoadPhase::Done; }
 
 	private:
 		bool m_nextScene = false;
@@ -40,5 +41,9 @@ namespace app
 		actor::IStageObject* m_stage = nullptr;
 		actor::DaddyPenguin* m_daddyPenguin = nullptr;
 		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
+
+		enum class LoadPhase { None, Stage, Daddy, Children, Done };
+		LoadPhase m_phase = LoadPhase::None;
+		int m_childIndex = 0;
 	};
 }
