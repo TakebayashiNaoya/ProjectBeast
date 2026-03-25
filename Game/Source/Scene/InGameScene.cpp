@@ -12,6 +12,8 @@
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Util/JsonConverter.h"
+#include "Source/Camera/CameraManager.h"
+#include "Source/Camera/CameraController.h"
 
 
 namespace app
@@ -28,6 +30,7 @@ namespace app
 			delete p;
 			p = nullptr;
 		}
+		DeleteGO(m_ocean);
 	}
 
 
@@ -45,15 +48,17 @@ namespace app
 		switch (m_phase)
 		{
 		case LoadPhase::Stage:
+		{
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
 			m_phase = LoadPhase::Daddy;
 			break;
+		}
 
 		case LoadPhase::Daddy:
 			m_daddyPenguin = new actor::DaddyPenguin();
-			m_daddyPenguin->SetPosition(Vector3(0.0f, 100.0f, 0.0f));
+			m_daddyPenguin->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
 			m_daddyPenguin->StartWrapper();
 			m_phase = LoadPhase::Children;
 			break;
@@ -70,19 +75,46 @@ namespace app
 				++m_childIndex;
 			}
 			else {
-				m_phase = LoadPhase::Done;
+				m_phase = LoadPhase::Camera;
 			}
 			break;
 
 		case LoadPhase::Camera:
+		{
+			// CameraSteeringの初期化
+			camera::CameraSteering::Config config;
+			m_cameraSteering.SetConfig(config);
+			m_cameraSteering.SetTargetCharacter(m_daddyPenguin);
+
+			// GameCameraを登録してアクティブにする
+			auto gameCamera = std::make_shared<camera::GameCamera>();
+			camera::CameraManager::Get().Register(camera::GameCamera::ID(), gameCamera);
+			camera::CameraManager::Get().SwitchCamera(camera::GameCamera::ID());
+			m_phase = LoadPhase::Ocean;
+			break;
+		}
+
+		case LoadPhase::Ocean:
+			m_ocean = NewGO<Ocean>(0);
 
 		case LoadPhase::Done:
+		{
 			// 通常更新
 			actor::StageSystem::GetInstance()->Update();
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
 			for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+
+			// CameraSteeringの結果をGameCameraに反映
+			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
+			if (gameCamera) {
+				camera::CameraData data = gameCamera->GetCameraData();
+				m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
+				gameCamera->SetState(data);
+			}
+
 			if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
 			break;
+		}
 
 		default: break;
 		}

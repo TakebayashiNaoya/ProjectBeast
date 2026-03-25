@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "IScene.h"
+#include "Source/Camera/CameraSteering.h"
 
 
 namespace app
@@ -40,8 +41,12 @@ namespace app
 		actor::DaddyPenguin* m_daddyPenguin = nullptr;
 		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
 
-		enum class LoadPhase { None, Stage, Daddy, Children, Camera, Done };
+		camera::CameraSteering m_cameraSteering;
+
+		enum class LoadPhase { None, Stage, Daddy, Children, Camera, Ocean, Done };
 		LoadPhase m_phase = LoadPhase::None;
 		int m_childIndex = 0;
+
+		Ocean* m_ocean = nullptr;
 	};
 }
