@@ -5,7 +5,7 @@
  */
 #pragma once
 #include "Source/Actor/Actor.h"
-#include "Resource/SkeletonResource.h"
+#include "Resource/ModelResource.h"
 
 
 namespace app
@@ -49,9 +49,12 @@ namespace app
 			//PhysicsStaticObject m_physicsStaticObject;
 
 		private:
+			/** モデルロード完了フラグ */
 			bool m_isModelLoaded = false;
+			/** モデルファイルパス（非同期ロード完了後にModelRender::Initで使用） */
 			std::string m_pendingModelPath;
-			nsBeastEngine::TksSkeletonLoader m_tksLoader;
+			/** TKM非同期ローダー */
+			nsBeastEngine::TkmModelLoader m_tkmLoader;
 		};
 	}
 }

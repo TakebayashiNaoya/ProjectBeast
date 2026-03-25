@@ -57,12 +57,17 @@ namespace nsBeastEngine
 
 		bool IsReady() const
 		{
-			return m_handle && m_handle->IsCompleted();
+			return m_handle && (m_handle->IsCompleted() || m_handle->IsError());
+		}
+
+		bool IsError() const
+		{
+			return m_handle && m_handle->IsError();
 		}
 
 		void Finalize()
 		{
-			if (m_handle)
+			if (m_handle && m_handle->IsCompleted())
 			{
 				m_handle->Finalize();
 			}

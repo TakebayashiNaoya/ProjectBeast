@@ -8,9 +8,12 @@
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
 
-#include "Source/Actor/Stage/IStage.h"
+#include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
+#include "Source/Util/JsonConverter.h"
+#include "Source/Camera/CameraManager.h"
+#include "Source/Camera/CameraController.h"
 
 
 namespace app
@@ -21,69 +24,109 @@ namespace app
 
 	InGameScene::~InGameScene()
 	{
-		delete m_stage;
+		actor::StageSystem::DestroyInstance();
 		delete m_daddyPenguin;
 		for (auto*& p : m_childPenguins) {
 			delete p;
 			p = nullptr;
 		}
+		DeleteGO(m_ocean);
 	}
 
 
 	bool InGameScene::Start()
 	{
 		app::core::ParameterManager::CreateInstance();
-
-		// ① ステージ生成
-		m_stage = new actor::IStageObject();
-		m_stage->Init("Assets/modelData/stage/floor.tkm"); // 実際のパスに合わせる
-		m_stage->StartWrapper();
-
-		// ② 親ペンギン生成
-		m_daddyPenguin = new actor::DaddyPenguin();
-		m_daddyPenguin->SetPosition(Vector3::Zero);
-		m_daddyPenguin->StartWrapper();
-
-		// ③ 子ペンギン100体生成
-		Vector3 pos = Vector3(5.0f, 0.0f, 0.0f);
-		for (int i = 0; i < CHILD_PENGUIN_NUM; i++) {
-			m_childPenguins[i] = new actor::ChildPenguin();
-			m_childPenguins[i]->SetPosition(pos);
-			m_childPenguins[i]->StartWrapper();
-			// 少しずつずらして配置
-			pos.x += 3.0f;
-			if ((i + 1) % 10 == 0) {
-				pos.x = 5.0f;
-				pos.z += 3.0f;
-			}
-		}
-
+		actor::StageSystem::CreateInstance();
+		m_phase = LoadPhase::Stage;
+		m_childIndex = 0;
 		return true;
 	}
 
-
 	void InGameScene::Update()
 	{
-		if (m_stage)        m_stage->UpdateWrapper();
-		if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-		for (auto* p : m_childPenguins) {
-			if (p) p->UpdateWrapper();
+		switch (m_phase)
+		{
+		case LoadPhase::Stage:
+		{
+			nlohmann::json json;
+			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
+			actor::StageSystem::GetInstance()->CreateStageObject(json);
+			m_phase = LoadPhase::Daddy;
+			break;
 		}
 
-		if (g_pad[0]->IsTrigger(enButtonA))
+		case LoadPhase::Daddy:
+			m_daddyPenguin = new actor::DaddyPenguin();
+			m_daddyPenguin->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
+			m_daddyPenguin->StartWrapper();
+			m_phase = LoadPhase::Children;
+			break;
+
+		case LoadPhase::Children:
+			if (m_childIndex < CHILD_PENGUIN_NUM)
+			{
+				Vector3 pos = Vector3(10.0f + (m_childIndex % 10) * 3.0f,
+					100.0f,
+					(m_childIndex / 10) * 3.0f);
+				m_childPenguins[m_childIndex] = new actor::ChildPenguin();
+				m_childPenguins[m_childIndex]->SetPosition(pos);
+				m_childPenguins[m_childIndex]->StartWrapper();
+				++m_childIndex;
+			}
+			else {
+				m_phase = LoadPhase::Camera;
+			}
+			break;
+
+		case LoadPhase::Camera:
 		{
-			m_nextScene = true;
+			// CameraSteeringの初期化
+			camera::CameraSteering::Config config;
+			m_cameraSteering.SetConfig(config);
+			m_cameraSteering.SetTargetCharacter(m_daddyPenguin);
+
+			// GameCameraを登録してアクティブにする
+			auto gameCamera = std::make_shared<camera::GameCamera>();
+			camera::CameraManager::Get().Register(camera::GameCamera::ID(), gameCamera);
+			camera::CameraManager::Get().SwitchCamera(camera::GameCamera::ID());
+			m_phase = LoadPhase::Ocean;
+			break;
+		}
+
+		case LoadPhase::Ocean:
+			m_ocean = NewGO<Ocean>(0);
+
+		case LoadPhase::Done:
+		{
+			// 通常更新
+			actor::StageSystem::GetInstance()->Update();
+			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
+			for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+
+			// CameraSteeringの結果をGameCameraに反映
+			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
+			if (gameCamera) {
+				camera::CameraData data = gameCamera->GetCameraData();
+				m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
+				gameCamera->SetState(data);
+			}
+
+			if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
+			break;
+		}
+
+		default: break;
 		}
 	}
 
 	void InGameScene::PauseUpdate()
-	{
-	}
+	{}
 
 
 	void InGameScene::Render(RenderContext& rc)
 	{
-		if (m_stage)        m_stage->RenderWrapper(rc);
+		actor::StageSystem::GetInstance()->Render(rc);
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
 		for (auto* p : m_childPenguins) {
 			if (p) p->RenderWrapper(rc);
@@ -95,7 +138,7 @@ namespace app
 	{
 		if (m_nextScene) {
 			id = ResultScene::ID();
-			waitTime = 3.0f;
+			waitTime = 0.5f;
 			return true;
 		}
 		return false;
