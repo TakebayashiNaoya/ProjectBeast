@@ -9,11 +9,11 @@
 
 namespace app
 {
-	namespace actor
-	{
-		class Player;
+	namespace actor {
+		class DaddyPenguin;
+		class ChildPenguin;
+		class IStageObject;
 	}
-
 
 	class InGameScene : public IScene
 	{
@@ -34,6 +34,10 @@ namespace app
 	private:
 		bool m_nextScene = false;
 
-		actor::Player* m_player = nullptr;
+
+		static constexpr int CHILD_PENGUIN_NUM = 100;
+		actor::IStageObject* m_stage = nullptr;
+		actor::DaddyPenguin* m_daddyPenguin = nullptr;
+		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
 	};
 }

@@ -35,8 +35,7 @@ namespace app
 
 
 	SceneManager::~SceneManager()
-	{
-	}
+	{}
 
 
 	void SceneManager::Update()
@@ -78,6 +77,7 @@ namespace app
 			// 全リソースのロード完了待ち
 			if (nsBeastEngine::ResourceManager::GetInstance().IsIdle())
 			{
+				K2_LOG("LoadComplete");
 				core::Fade::Get().FadeIn(m_fadeDuration);
 				m_transitionState = TransitionState::FadingIn;
 			}
