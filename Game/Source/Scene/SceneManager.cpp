@@ -40,8 +40,6 @@ namespace app
 
 	void SceneManager::Update()
 	{
-		float delta = g_gameTime->GetFrameDeltaTime();
-
 		if (m_currentScene) {
 
 			if (g_pad[0]->IsTrigger(enButtonSelect))
@@ -56,52 +54,51 @@ namespace app
 				m_currentScene->PauseUpdate();
 			}
 
-		switch (m_transitionState)
-		{
-		case TransitionState::Idle:
-			if (m_currentScene)
+			switch (m_transitionState)
 			{
-				if (!m_isPause) {
-					m_currentScene->Update();
-				}
-				if (m_currentScene->RequesutScene(m_nextSceneId, m_fadeDuration))
+			case TransitionState::Idle:
+				if (m_currentScene)
 				{
-					core::Fade::Get().FadeOut(m_fadeDuration);
-					m_transitionState = TransitionState::FadingOut;
+					// 二重呼び出しを避けるため、ここでは遷移要求のみ判定
+					if (m_currentScene->RequesutScene(m_nextSceneId, m_fadeDuration))
+					{
+						core::Fade::Get().FadeOut(m_fadeDuration);
+						m_transitionState = TransitionState::FadingOut;
+					}
 				}
-			}
-			break;
+				break;
 
-		case TransitionState::FadingOut:
-			// FadeOut 完了待ち（画面が完全に暗くなるまで）
-			if (core::Fade::Get().IsFadeOutComplete())
-			{
-				delete m_currentScene;
-				m_currentScene = nullptr;
-				CreateScene(m_nextSceneId); // Start() → アクター生成 → 非同期ロード開始
-				m_nextSceneId = INVALID_SCENE_ID;
-				m_transitionState = TransitionState::LoadingScene;
-			}
-			break;
+			case TransitionState::FadingOut:
+				// FadeOut 完了待ち（画面が完全に暗くなるまで）
+				if (core::Fade::Get().IsFadeOutComplete())
+				{
+					delete m_currentScene;
+					m_currentScene = nullptr;
+					CreateScene(m_nextSceneId); // Start() → アクター生成 → 非同期ロード開始
+					m_nextSceneId = INVALID_SCENE_ID;
+					m_transitionState = TransitionState::LoadingScene;
+				}
+				break;
 
-		case TransitionState::LoadingScene:
-			// 全リソースのロード完了待ち
-			if (nsBeastEngine::ResourceManager::GetInstance().IsIdle())
-			{
-				K2_LOG("LoadComplete");
-				core::Fade::Get().FadeIn(m_fadeDuration);
-				m_transitionState = TransitionState::FadingIn;
-			}
-			break;
+			case TransitionState::LoadingScene:
+				// 全リソースのロード完了待ち
+				if (nsBeastEngine::ResourceManager::GetInstance().IsIdle())
+				{
+					K2_LOG("LoadComplete");
+					core::Fade::Get().FadeIn(m_fadeDuration);
+					m_transitionState = TransitionState::FadingIn;
+				}
+				break;
 
-		case TransitionState::FadingIn:
-			// FadeIn 完了待ち（Update は呼ばない → キャラ・タイマーは動かない）
-			if (!core::Fade::Get().IsFading())
-			{
-				m_fadeDuration = 0.0f;
-				m_transitionState = TransitionState::Idle;
+			case TransitionState::FadingIn:
+				// FadeIn 完了待ち（Update は呼ばない → キャラ・タイマーは動かない）
+				if (!core::Fade::Get().IsFading())
+				{
+					m_fadeDuration = 0.0f;
+					m_transitionState = TransitionState::Idle;
+				}
+				break;
 			}
-			break;
 		}
 	}
 
