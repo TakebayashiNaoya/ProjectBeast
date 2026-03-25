@@ -8,10 +8,10 @@
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
 
-#include "Source/Actor/Stage/IStage.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
+#include "Source/Util/JsonConverter.h"
 
 
 namespace app
@@ -22,7 +22,7 @@ namespace app
 
 	InGameScene::~InGameScene()
 	{
-		delete m_stage;
+		actor::StageSystem::DestroyInstance();
 		delete m_daddyPenguin;
 		for (auto*& p : m_childPenguins) {
 			delete p;
@@ -34,6 +34,7 @@ namespace app
 	bool InGameScene::Start()
 	{
 		app::core::ParameterManager::CreateInstance();
+		actor::StageSystem::CreateInstance();
 		m_phase = LoadPhase::Stage;
 		m_childIndex = 0;
 		return true;
@@ -44,15 +45,15 @@ namespace app
 		switch (m_phase)
 		{
 		case LoadPhase::Stage:
-			m_stage = new actor::IStageObject();
-			m_stage->Init("Assets/modelData/stage/floor.tkm");
-			m_stage->StartWrapper();
+			nlohmann::json json;
+			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
+			actor::StageSystem::GetInstance()->CreateStageObject(json);
 			m_phase = LoadPhase::Daddy;
 			break;
 
 		case LoadPhase::Daddy:
 			m_daddyPenguin = new actor::DaddyPenguin();
-			m_daddyPenguin->SetPosition(Vector3::Zero);
+			m_daddyPenguin->SetPosition(Vector3(0.0f, 100.0f, 0.0f));
 			m_daddyPenguin->StartWrapper();
 			m_phase = LoadPhase::Children;
 			break;
@@ -60,8 +61,8 @@ namespace app
 		case LoadPhase::Children:
 			if (m_childIndex < CHILD_PENGUIN_NUM)
 			{
-				Vector3 pos = Vector3(5.0f + (m_childIndex % 10) * 3.0f,
-					0.0f,
+				Vector3 pos = Vector3(10.0f + (m_childIndex % 10) * 3.0f,
+					100.0f,
 					(m_childIndex / 10) * 3.0f);
 				m_childPenguins[m_childIndex] = new actor::ChildPenguin();
 				m_childPenguins[m_childIndex]->SetPosition(pos);
@@ -73,9 +74,11 @@ namespace app
 			}
 			break;
 
+		case LoadPhase::Camera:
+
 		case LoadPhase::Done:
 			// 通常更新
-			if (m_stage)        m_stage->UpdateWrapper();
+			actor::StageSystem::GetInstance()->Update();
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
 			for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
 			if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
@@ -91,7 +94,7 @@ namespace app
 
 	void InGameScene::Render(RenderContext& rc)
 	{
-		if (m_stage)        m_stage->RenderWrapper(rc);
+		actor::StageSystem::GetInstance()->Render(rc);
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
 		for (auto* p : m_childPenguins) {
 			if (p) p->RenderWrapper(rc);
