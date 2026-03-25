@@ -202,7 +202,6 @@ namespace app
 
 
 		StageSystem::StageSystem()
-			: m_lastUpdateTime(0)
 		{
 			/** マップのメモリを確保 */
 			m_objectMap.reserve(MAX_OBJECT_NUM);

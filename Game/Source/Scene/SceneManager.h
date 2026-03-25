@@ -78,11 +78,21 @@ namespace app
 
 
 	private:
+		/** シーン遷移の状態 */
+		enum class TransitionState
+		{
+			Idle,           // 通常のゲームプレイ
+			FadingOut,      // FadeOut 進行中（画面が暗くなっている）
+			LoadingScene,   // 画面が暗い状態でリソースロード中
+			FadingIn,       // FadeIn 進行中（ロード画面が消えている）
+		};
+
 		/** 次のシーンID */
 		uint32_t m_nextSceneId = INVALID_SCENE_ID;
-
-		float m_elapsedTime = 0.0f;
-		float m_waitTime = 0.0f;
+		/** 遷移状態 */
+		TransitionState m_transitionState = TransitionState::Idle;
+		/** フェードの持続時間 */
+		float m_fadeDuration = 0.0f;
 
 
 	private:

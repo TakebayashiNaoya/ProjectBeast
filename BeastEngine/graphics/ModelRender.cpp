@@ -11,48 +11,80 @@ namespace nsBeastEngine
 {
 	void ModelRender::Init(
 		const char* filePath,
-		AnimationClip* animationeClips,
+		AnimationClip* animationClips,
 		int numAnimationClips,
 		bool islighting,
 		EnModelUpAxis enModelUpAxiz)
 	{
-		/** スケルトンの初期化 */
+		// スケルトン初期化
 		InitSkeleton(filePath);
-		/** アニメーションの初期化 */
-		InitAnimation(animationeClips, numAnimationClips, enModelUpAxiz);
+		m_skeletonRef = &m_skeleton;
+		// アニメーション初期化
+		InitAnimation(animationClips, numAnimationClips, enModelUpAxiz);
 
 		ModelInitData modelInitData;
-		/** tkmファイルのファイルパスの指定 */
 		modelInitData.m_tkmFilePath = filePath;
-		/** シェーダーのファイルパスの指定 */
+		modelInitData.m_modelUpAxis = enModelUpAxiz;
+
+		// シェーダー設定
 		if (islighting) {
 			modelInitData.m_fxFilePath = "Assets/shader/model.fx";
 		}
 		else {
 			modelInitData.m_fxFilePath = "Assets/shader/lightOffModel.fx";
 		}
-		/** シェーダーのエントリーポイントの設定 */
-		SetupShaderEntryPointFunc(modelInitData);
-		/** アニメーションがある場合はスケルトンを渡す */
-		if (animationeClips != nullptr) {
+
+		// アニメーションがある場合はスケルトンを指定
+		if (animationClips != nullptr) {
 			modelInitData.m_skeleton = &m_skeleton;
 		}
 
-		/** シャドウマップテクスチャ */
-		//modelInitData.m_expandShaderResoruceView[0] = &g_renderingEngine->GetShadowMap();
+		// シェーダーのエントリーポイント設定
+		SetupShaderEntryPointFunc(modelInitData);
 
-		/** シーンライト */
+		// シーンライト
 		modelInitData.m_expandConstantBuffer = g_sceneLight->GetLight();
 		modelInitData.m_expandConstantBufferSize = sizeof(Light);
+
+		// モデル初期化
+		m_model.Init(modelInitData);
+	}
+
+
+	void ModelRender::InitFromLoaded(
+		const ModelInitData& initData,
+		Skeleton* skeleton,
+		AnimationClip* animationeClips,
+		int numAnimationClips)
+	{
+		// 外部ロード済みデータをローカルに反映
+		m_animationClips = animationeClips;
+		m_numAnimationClips = numAnimationClips;
+
+		ModelInitData modelInitData = initData; // コピーしてローカル調整
+
+		// シェーダーのエントリーポイント設定（アニメ有無でスキン用を切替）
+		SetupShaderEntryPointFunc(modelInitData);
+
+		// スケルトンが渡された場合は参照する（コピーしない）
+		m_skeletonRef = skeleton;
+		if (m_skeletonRef != nullptr) {
+			modelInitData.m_skeleton = m_skeletonRef;
+		}
+
+		// シーンライトが未設定ならデフォルトを補完
+		if (modelInitData.m_expandConstantBuffer == nullptr) {
+			modelInitData.m_expandConstantBuffer = g_sceneLight->GetLight();
+			modelInitData.m_expandConstantBufferSize = sizeof(Light);
+		}
+
+		// モデル初期化
 		m_model.Init(modelInitData);
 
-		/** シャドウマップテクスチャ */
-		//modelInitData.m_expandShaderResoruceView[0] = nullptr;
-
-		//modelInitData.m_fxFilePath = "Assets/shader/DrawShadowMap.fx";
-		//modelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
-		//modelInitData.m_expandConstantBuffer = &g_sceneLight->GetLVP();
-		//m_shadowModels.Init(modelInitData);
+		// アニメーション初期化
+		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr) {
+			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
+		}
 	}
 
 
@@ -140,8 +172,8 @@ namespace nsBeastEngine
 	{
 		m_animationClips = animtionClips;
 		m_numAnimationClips = numAnimationClips;
-		if (m_animationClips != nullptr) {
-			m_animation.Init(m_skeleton, m_animationClips, numAnimationClips);
+		if (m_animationClips != nullptr && m_skeletonRef != nullptr) {
+			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
 		}
 	}
 
@@ -170,8 +202,8 @@ namespace nsBeastEngine
 		UpdateWorldMatrixInModes();
 
 		/** スケルトンのボーン行列を更新する */
-		if (m_skeleton.IsInited()) {
-			m_skeleton.Update(m_model.GetWorldMatrix());
+		if (m_skeletonRef != nullptr && m_skeletonRef->IsInited()) {
+			m_skeletonRef->Update(m_model.GetWorldMatrix());
 		}
 
 		/** アニメーションを進める */

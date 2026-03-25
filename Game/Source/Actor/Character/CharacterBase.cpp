@@ -14,6 +14,10 @@ namespace app
 	namespace actor
 	{
 		CharacterBase::CharacterBase()
+			: m_animationClips(nullptr)
+			, m_clipNum(0)
+			, m_upAxis(EnModelUpAxis::enModelUpAxisY)
+			, m_modelReady(false)
 			: m_characterStateMachine(nullptr)
 			, m_animationClips(nullptr)
 		{}
@@ -30,6 +34,22 @@ namespace app
 
 		void CharacterBase::Update()
 		{
+			// 非同期ロード完了待ち
+			if (!m_modelReady)
+			{
+				if (!m_assetsLoader.IsReady())
+				{
+					return; // まだロード中
+				}
+
+				// ロード完了 → Finalize して ModelRender 初期化
+				nsK2EngineLow::ModelInitData initData;
+				m_assetsLoader.Finalize(initData, &m_skeleton, m_animationClips.get());
+				m_modelRender.Init(initData.m_tkmFilePath, m_animationClips.get(), m_clipNum, true, m_upAxis);
+				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
+				m_modelRender.Update();
+				m_modelReady = true;
+			}
 			m_transform.m_position = m_characterStateMachine->GetTransform().m_position;
 			m_transform.m_rotation = m_characterStateMachine->GetTransform().m_rotation;
 			m_transform.m_scale = m_characterStateMachine->GetTransform().m_scale;
@@ -42,28 +62,41 @@ namespace app
 
 		void CharacterBase::Render(RenderContext& rc)
 		{
-			// モデルレンダーを描画
-			m_modelRender.Draw(rc);
+			// モデルレンダーを描画（準備完了時）
+			if (m_modelReady)
+			{
+				m_modelRender.Draw(rc);
+			}
 		}
 
 
 		void CharacterBase::Init(const ModelData& data)
 		{
-			// アニメーションクリップを作成
+			// クリップ数とUpAxisを保存
+			m_clipNum = data.clipNum;
+			m_upAxis = data.upAxis;
+
+			// アニメーションクリップ配列を確保
 			m_animationClips = std::make_unique<AnimationClip[]>(data.clipNum);
 
+			// tkaパス配列を準備
+			std::vector<const char*> tkaPaths;
+			tkaPaths.reserve(data.clipNum);
 			for (int i = 0; i < data.clipNum; ++i)
 			{
-				m_animationClips[i].Load(data.animationData[i].fileName);
-				m_animationClips[i].SetLoopFlag(data.animationData[i].isLoop);
+				m_animationClips[i].SetLoopFlag(data.animationData[i].isLoop); // ループフラグだけ事前設定
+				tkaPaths.push_back(data.animationData[i].fileName);
 			}
 
-			// モデルをセットアップ
-			m_modelRender.Init(data.fileName, m_animationClips.get(), data.clipNum, true, data.upAxis);
-			// トランスフォームを設定
-			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
-			// モデルレンダーを更新
-			m_modelRender.Update();
+			// tksパス生成
+			std::string tksPath = data.fileName;
+			size_t pos = tksPath.find(".tkm");
+			if (pos != std::string::npos) {
+				tksPath.replace(pos, 4, ".tks");
+			}
+
+			// 非同期リクエスト
+			m_assetsLoader.Request(ResourceManager::GetInstance(), data.fileName, tksPath.c_str(), tkaPaths.data(), data.clipNum);
 		}
 	}
 }

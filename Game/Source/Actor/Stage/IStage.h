@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Actor/Actor.h"
+#include "Resource/SkeletonResource.h"
 
 
 namespace app
@@ -46,6 +47,11 @@ namespace app
 		private:
 			/** 物理静的オブジェクト */
 			//PhysicsStaticObject m_physicsStaticObject;
+
+		private:
+			bool m_isModelLoaded = false;
+			std::string m_pendingModelPath;
+			nsBeastEngine::TksSkeletonLoader m_tksLoader;
 		};
 	}
 }

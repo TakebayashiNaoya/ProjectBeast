@@ -36,6 +36,11 @@ namespace app
 			{
 				return m_state != FadeState::None;
 			}
+			/** フェードアウトが完了したか（画面が完全に暗い状態） */
+			bool IsFadeOutComplete() const
+			{
+				return m_state == FadeState::FadeOut && m_timer >= m_duration;
+			}
 
 
 		public:

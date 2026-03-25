@@ -63,12 +63,12 @@ namespace nsBeastEngine
 		 * @brief モデルの取得
 		 * @return モデル
 		 */
-		inline Model& GetModel() { return m_model; }
+		 //inline Model& GetModel() { return m_model; }
 
-		/**
-		 * @brief アニメーションが再生中か
-		 * @return 再生中ならtrue
-		 */
+		 /**
+		  * @brief アニメーションが再生中か
+		  * @return 再生中ならtrue
+		  */
 		inline bool IsPlayingAnimation() const { return m_animation.IsPlaying(); }
 
 
@@ -81,8 +81,7 @@ namespace nsBeastEngine
 			, m_maxInstance(1)
 			, m_numAnimationClips(0)
 			, m_animationSpeed(1.0f)
-		{
-		};
+		{};
 		~ModelRender() = default;
 
 		/**
@@ -99,6 +98,20 @@ namespace nsBeastEngine
 			int numAnimationClips = 0,
 			bool islighting = true,
 			EnModelUpAxis enModelUpAxiz = enModelUpAxisZ
+		);
+
+		/**
+		 * @brief 事前ロード済みのデータから初期化する
+		 * @param initData     完成済みのModelInitData（tkmパスやシェーダ設定などを含む）
+		 * @param skeleton     外部でロード済みのスケルトン（不要ならnullptr）
+		 * @param animationeClips 外部でロード済みのアニメーションクリップ配列（不要ならnullptr）
+		 * @param numAnimationClips クリップ数
+		 */
+		void InitFromLoaded(
+			const ModelInitData& initData,
+			Skeleton* skeleton = nullptr,
+			AnimationClip* animationeClips = nullptr,
+			int numAnimationClips = 0
 		);
 
 		/**
@@ -199,8 +212,10 @@ namespace nsBeastEngine
 		Model			m_model;
 		/** シャドウマップ用モデル */
 		Model			m_shadowModels;
-		/** ボーン */
+		/** ボーン（自前保有） */
 		Skeleton		m_skeleton;
+		/** ボーン参照（外部注入または自前） */
+		Skeleton* m_skeletonRef = nullptr;
 		/** アニメーション */
 		Animation		m_animation;
 		/** アニメーションクリップ */

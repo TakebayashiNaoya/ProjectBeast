@@ -12,6 +12,7 @@
 #include "TitleScene.h"
 
 #include "Source/Core/Fade.h"
+#include "Resource/ResourceManager.h"
 
 
 namespace app
@@ -34,8 +35,7 @@ namespace app
 
 
 	SceneManager::~SceneManager()
-	{
-	}
+	{}
 
 
 	void SceneManager::Update()
@@ -56,29 +56,52 @@ namespace app
 				m_currentScene->PauseUpdate();
 			}
 
-			if (m_nextSceneId == INVALID_SCENE_ID)
+		switch (m_transitionState)
+		{
+		case TransitionState::Idle:
+			if (m_currentScene)
 			{
-				if (m_currentScene->RequesutScene(m_nextSceneId, m_waitTime)) {
-					m_elapsedTime = 0.0f;
-					core::Fade::Get().FadeOut(m_waitTime);
+				if (!m_isPause) {
+					m_currentScene->Update();
+				}
+				if (m_currentScene->RequesutScene(m_nextSceneId, m_fadeDuration))
+				{
+					core::Fade::Get().FadeOut(m_fadeDuration);
+					m_transitionState = TransitionState::FadingOut;
 				}
 			}
-		}
+			break;
 
-		if (m_nextSceneId != INVALID_SCENE_ID) {
-			m_elapsedTime += delta;
-
-			if (m_elapsedTime >= m_waitTime) {
+		case TransitionState::FadingOut:
+			// FadeOut 完了待ち（画面が完全に暗くなるまで）
+			if (core::Fade::Get().IsFadeOutComplete())
+			{
 				delete m_currentScene;
 				m_currentScene = nullptr;
-
-				core::Fade::Get().FadeIn(m_waitTime);
-				CreateScene(m_nextSceneId);
-
+				CreateScene(m_nextSceneId); // Start() → アクター生成 → 非同期ロード開始
 				m_nextSceneId = INVALID_SCENE_ID;
-				m_waitTime = 0.0f;
-				m_elapsedTime = 0.0f;
+				m_transitionState = TransitionState::LoadingScene;
 			}
+			break;
+
+		case TransitionState::LoadingScene:
+			// 全リソースのロード完了待ち
+			if (nsBeastEngine::ResourceManager::GetInstance().IsIdle())
+			{
+				K2_LOG("LoadComplete");
+				core::Fade::Get().FadeIn(m_fadeDuration);
+				m_transitionState = TransitionState::FadingIn;
+			}
+			break;
+
+		case TransitionState::FadingIn:
+			// FadeIn 完了待ち（Update は呼ばない → キャラ・タイマーは動かない）
+			if (!core::Fade::Get().IsFading())
+			{
+				m_fadeDuration = 0.0f;
+				m_transitionState = TransitionState::Idle;
+			}
+			break;
 		}
 	}
 
