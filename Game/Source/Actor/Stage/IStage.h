@@ -4,8 +4,9 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Actor.h"
+#include "../../../BeastEngine/Physics/PhysicalBody.h"
 #include "Resource/ModelResource.h"
+#include "Source/Actor/Actor.h"
 
 
 namespace app
@@ -47,6 +48,8 @@ namespace app
 		private:
 			/** 物理静的オブジェクト */
 			//PhysicsStaticObject m_physicsStaticObject;
+			nsBeastEngine::nsCollision::PhysicalBody m_physicalObj;
+
 
 		private:
 			/** モデルロード完了フラグ */
