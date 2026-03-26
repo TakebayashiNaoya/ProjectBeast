@@ -1,6 +1,6 @@
 ﻿/**
- * @file DaddyPenguinStatus.cpp
- * @brief 親ペンギンのステータスクラス
+ * @file ChildPenguinStatus.cpp
+ * @brief 子ペンギンのステータスクラス
  * @author 藤谷
  */
 #include "stdafx.h"
@@ -15,7 +15,7 @@ namespace app
 	{
 		namespace
 		{
-			/** 親ペンギンのパラメーターのファイルパス */
+			/** 子ペンギンのパラメーターのファイルパス */
 			const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinParameter.json";
 		}
 
@@ -30,6 +30,9 @@ namespace app
 					parameter.walkSpeed = j["walkSpeed"].get<float>();
 					parameter.runSpeed = j["runSpeed"].get<float>();
 					parameter.swimSpeed = j["swimSpeed"].get<float>();
+					parameter.sneakSpeed = j["sneakSpeed"].get<float>();
+					parameter.slideSpeed = j["slideSpeed"].get<float>();
+					parameter.jumpPower = j["jumpPower"].get<float>();
 					parameter.radius = j["radius"].get<float>();
 					parameter.height = j["height"].get<float>();
 				});
@@ -52,6 +55,9 @@ namespace app
 			m_walkSpeed = parameter->walkSpeed;
 			m_runSpeed = parameter->runSpeed;
 			m_swimSpeed = parameter->swimSpeed;
+			m_sneakSpeed = parameter->sneakSpeed;
+			m_slideSpeed = parameter->slideSpeed;
+			m_jumpPower = parameter->jumpPower;
 			m_radius = parameter->radius;
 			m_height = parameter->height;
 		}

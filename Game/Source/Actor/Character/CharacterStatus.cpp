@@ -18,17 +18,14 @@ namespace app
 			, m_runSpeed(0.0f)
 			, m_radius(0.0f)
 			, m_height(1.0f)
-		{
-		}
+		{}
 
 
 		void CharacterStatus::Setup()
-		{
-		}
+		{}
 
 
 		void CharacterStatus::Update()
-		{
-		}
+		{}
 	}
 }

@@ -27,6 +27,9 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			// 子ペンギン固有のパラメーターをここに追加していく
+			float sneakSpeed;
+			float slideSpeed;
+			float jumpPower;
 		};
 	}
 }

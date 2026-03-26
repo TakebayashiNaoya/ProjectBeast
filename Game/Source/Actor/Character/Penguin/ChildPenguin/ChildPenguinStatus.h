@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/CharacterStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinStatus.h"
 
 
 namespace app
@@ -14,10 +14,10 @@ namespace app
 		/**
 		 * @brief 子ペンギンのステータスクラス
 		 */
-		class ChildPenguinStatus : public CharacterStatus
+		class ChildPenguinStatus : public PenguinStatus
 		{
 		public:
-			// ここに親ペンギン固有のステータス用のゲッター関数を追加していく
+			// ここに子ペンギン固有のステータス用のゲッター関数を追加していく
 
 
 		public:

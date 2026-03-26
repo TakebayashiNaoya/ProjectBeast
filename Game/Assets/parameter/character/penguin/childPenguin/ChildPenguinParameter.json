@@ -6,6 +6,9 @@
     "walkSpeed": 10.0,
     "runSpeed": 10.0,
     "swimSpeed" : 10.0,
+    "sneakSpeed" : 1.0,
+    "slideSpeed" : 3.0,
+    "jumpPower" : 2.0,
     "radius": 10.0,
     "height": 70.0
   }

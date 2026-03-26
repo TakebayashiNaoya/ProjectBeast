@@ -63,12 +63,12 @@ namespace nsBeastEngine
 		 * @brief モデルの取得
 		 * @return モデル
 		 */
-		 //inline Model& GetModel() { return m_model; }
+		inline Model& GetModel() { return m_model; }
 
-		 /**
-		  * @brief アニメーションが再生中か
-		  * @return 再生中ならtrue
-		  */
+		/**
+		 * @brief アニメーションが再生中か
+		 * @return 再生中ならtrue
+		 */
 		inline bool IsPlayingAnimation() const { return m_animation.IsPlaying(); }
 
 

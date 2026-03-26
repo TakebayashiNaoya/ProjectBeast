@@ -4,7 +4,8 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/CharacterStateMachine.h"
+#include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
+#include "ChildPenguinTypes.h"
 
 
 namespace app
@@ -20,53 +21,82 @@ namespace app
 		/**
 		 * @brief 子ペンギンのステートマシンクラス
 		 */
-		class ChildPenguinStateMachine : public CharacterStateMachine
+		class ChildPenguinStateMachine : public PenguinStateMachine
 		{
-			// ここに子ペンギン固有のセッター関数を追加していく
 		public:
+			/**
+			 * @brief 追従命令を受けたかどうかを取得
+			 * @return 追従命令を受けたかどうか
+			 */
+			inline bool IsFollow() const { return m_isFollow; }
 			/**
 			 * @brief 追従命令を受けたかどうかを設定
-			 * @param isFollowCommanded 追従命令を受けたかどうか
+			 * @param isFollow 追従命令を受けたかどうか
 			 */
-			inline void SetIsFollowCommanded(const bool isFollowCommanded)
-			{
-				m_isFollowCommanded = isFollowCommanded;
-			}
+			inline void SetIsFollow(const bool isFollow) { m_isFollow = isFollow; }
+
+			/**
+			 * @brief 待機命令を受けたかどうかを取得
+			 * @return 待機命令を受けたかどうか
+			 */
+			inline bool IsWait() const { return m_isWait; }
 			/**
 			 * @brief 待機命令を受けたかどうかを設定
-			 * @param isWaitCommanded 待機命令を受けたかどうか
+			 * @param isWait 待機命令を受けたかどうか
 			 */
-			inline void SetIsWaitCommanded(const bool isWaitCommanded)
-			{
-				m_isWaitCommanded = isWaitCommanded;
-			}
+			inline void SetIsWait(const bool isWait) { m_isWait = isWait; }
 
-
-			// ここに子ペンギン固有のゲッター関数を追加していく
-		public:
 			/**
 			 * @brief 子ペンギンのステータスを取得
 			 * @return 子ペンギンのステータスポインタ
 			 */
-			const ChildPenguinStatus* GetChildPenuinStatus() const;
+			const ChildPenguinStatus* GetChildPenguinStatus() const;
 
+			/**
+			 * @brief ペンギンのステータスを取得（基底クラスのオーバーライド）
+			 * @return ペンギンのステータスポインタ
+			 */
+			virtual const PenguinStatus* GetPenguinStatus() const override;
 
 			/** ステートの変更先を取得する */
-			core::IState* GetChangeState();
+			core::IState* GetChangeState() override;
 
 
 		public:
-			ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin);
+			/**
+			 * @brief AIコントローラーの入力処理
+			 * @note 子ペンギンのAIコントローラーから呼び出される
+			 */
+			void AIControllerInput(const Vector3& moveDirection, bool isDash, bool isJump, bool isSlide, bool isDive, bool isSeparateWater);
+			/**
+			 * @brief ダメージ処理
+			 */
+			void Damage() override;
+
+
+		public:
+			ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin, EnChildPenguinType type);
 			~ChildPenguinStateMachine() = default;
+
+
+		protected:
+			/**
+			 * @brief タイプ固有のステート遷移
+			 * @note 固有ステートへの遷移が必要な派生クラスでオーバーライドする
+			 * @return 遷移先ステート。遷移不要ならnullptr
+			 */
+			virtual core::IState* GetTypeSpecificChangeState() { return nullptr; }
 
 
 		private:
 			/** 子ペンギンのポインタ */
 			ChildPenguin* m_ownerChildPenguin;
 			/** 追従命令を受けたかどうか */
-			bool m_isFollowCommanded;
+			bool m_isFollow;
 			/** 待機命令を受けたかどうか */
-			bool m_isWaitCommanded;
+			bool m_isWait;
+			/** タイプを保持 */
+			EnChildPenguinType m_type;
 		};
 	}
 }
