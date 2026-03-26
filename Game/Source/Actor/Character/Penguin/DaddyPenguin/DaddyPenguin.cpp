@@ -21,7 +21,7 @@ namespace app
 			{
 				"Assets/modelData/penguin/daddyPenguin/DaddyPenguin.tkm",
 				ANIMATION_DATA,
-				EnModelUpAxis::enModelUpAxisY,
+				EnModelUpAxis::enModelUpAxisZ,
 				std::size(ANIMATION_DATA)
 			};
 		}
