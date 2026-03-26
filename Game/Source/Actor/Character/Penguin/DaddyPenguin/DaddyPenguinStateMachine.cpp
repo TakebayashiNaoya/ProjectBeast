@@ -9,6 +9,7 @@
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 
 
 namespace app
@@ -92,6 +93,21 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
+			/** 命令中なら命令ステートへ */
+			if (CanChangeCommandState())
+			{
+				if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow)
+				{
+					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Wait);
+				}
+				else if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow)
+				{
+					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Follow);
+				}
+				return FindState(DaddyPenguinCommandShoutState::ID());
+			}
+
+
 			if (IsEqualCurrentState(DaddyPenguinWinState::ID()))
 			{
 				return FindState(DaddyPenguinWinState::ID());

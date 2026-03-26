@@ -25,28 +25,6 @@ namespace app
 		{
 		public:
 			/**
-			 * @brief 追従命令を受けたかどうかを取得
-			 * @return 追従命令を受けたかどうか
-			 */
-			inline bool IsFollow() const { return m_isFollow; }
-			/**
-			 * @brief 追従命令を受けたかどうかを設定
-			 * @param isFollow 追従命令を受けたかどうか
-			 */
-			inline void SetIsFollow(const bool isFollow) { m_isFollow = isFollow; }
-
-			/**
-			 * @brief 待機命令を受けたかどうかを取得
-			 * @return 待機命令を受けたかどうか
-			 */
-			inline bool IsWait() const { return m_isWait; }
-			/**
-			 * @brief 待機命令を受けたかどうかを設定
-			 * @param isWait 待機命令を受けたかどうか
-			 */
-			inline void SetIsWait(const bool isWait) { m_isWait = isWait; }
-
-			/**
 			 * @brief 子ペンギンのステータスを取得
 			 * @return 子ペンギンのステータスポインタ
 			 */
@@ -91,10 +69,6 @@ namespace app
 		private:
 			/** 子ペンギンのポインタ */
 			ChildPenguin* m_ownerChildPenguin;
-			/** 追従命令を受けたかどうか */
-			bool m_isFollow;
-			/** 待機命令を受けたかどうか */
-			bool m_isWait;
 			/** タイプを保持 */
 			EnChildPenguinType m_type;
 		};

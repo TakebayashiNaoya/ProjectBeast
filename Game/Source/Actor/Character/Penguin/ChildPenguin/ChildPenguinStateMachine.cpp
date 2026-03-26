@@ -17,8 +17,6 @@ namespace app
 		ChildPenguinStateMachine::ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin, EnChildPenguinType type)
 			: PenguinStateMachine(ownerChildPenguin)
 			, m_ownerChildPenguin(ownerChildPenguin)
-			, m_isFollow(false)
-			, m_isWait(false)
 			, m_type(type)
 		{
 			/** 共通ステートの追加 */
