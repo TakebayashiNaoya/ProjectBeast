@@ -21,6 +21,10 @@ namespace app
 			void Update();
 			void SetUIDigit(UIDigit* digit);
 			void SetValue(float value);
+			inline void SetIsDraw(bool isDraw)
+			{
+				if (m_digit)m_digit->m_isDraw = isDraw;
+			}
 
 
 		private:
@@ -75,6 +79,8 @@ namespace app
 			 * @param enemy しろくま
 			 */
 			void SetEnemy(actor::Enemy* enemy) { m_enemy = enemy; }
+
+			void SetIsDraw(bool isDraw);
 
 
 		private:

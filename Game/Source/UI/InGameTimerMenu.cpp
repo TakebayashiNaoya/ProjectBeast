@@ -179,5 +179,18 @@ namespace app
 			//timerDigit->SetUIDigit(GetUI<UIDigit>(Hash32("InGameTimerDigit")));
 			//m_timerDigitMap.emplace(Hash32("InGameTimerDigit"), std::move(timerDigit));
 		}
+
+
+		void InGameTimerMenu::SetIsDraw(bool isDraw)
+		{
+			for (const auto& icon : m_timerIconMap)
+			{
+				icon.second->SetIsDraw(isDraw);
+			}
+			for (const auto& digit : m_timerDigitMap)
+			{
+				digit.second->SetIsDraw(isDraw);
+			}
+		}
 	}
 }
