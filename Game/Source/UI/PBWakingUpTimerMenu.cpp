@@ -119,7 +119,16 @@ namespace app
 			m_currentPBTime = MAX_TIME;
 			m_isPBTimerActive = false;
 			auto* digit = GetUI<UIDigit>(Hash32("PBWakingUpTimerDigit"));
-			digit->m_isDraw = !digit->m_isDraw;
+			digit->m_isDraw = false;
+		}
+
+
+		void PBWakingUpTimerMenu::SetIsDraw(bool isDraw)
+		{
+			for (const auto& digit : m_wakingUpTimeMap)
+			{
+				digit.second->SetIsDraw(isDraw);
+			}
 		}
 		
 
