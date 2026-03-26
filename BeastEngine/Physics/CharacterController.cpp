@@ -126,8 +126,7 @@ namespace nsBeastEngine
 			, m_isJump(false)
 			, m_isOnGround(true)
 			, m_isRequestTeleport(false)
-		{
-		}
+		{}
 
 
 		CharacterController::~CharacterController()
@@ -224,7 +223,7 @@ namespace nsBeastEngine
 						callback.me = m_rigidBody.GetBody();
 						callback.startPos = posTmp;
 
-						//PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+						PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
 
 						if (callback.isHit) {
 							// 壁衝突：押し戻し計算
@@ -271,7 +270,7 @@ namespace nsBeastEngine
 					callback.startPos.y = checkY;
 
 					if ((start - end).LengthSq() >= 0.01f) {
-						//PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+						PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
 					}
 					if (callback.isHit) {
 						m_verticalVelocity = 0.0f;
@@ -298,7 +297,7 @@ namespace nsBeastEngine
 					callback.me = m_rigidBody.GetBody();
 					callback.startPos = Vector3(m_position.x, checkY, m_position.z);
 
-					//PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+					PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
 
 					if (callback.isHit) {
 						m_isOnGround = true;
@@ -326,7 +325,7 @@ namespace nsBeastEngine
 
 		void CharacterController::RemoveRigidBoby()
 		{
-			//PhysicsWorld::Get().RemoveRigidBody(m_rigidBody);
+			PhysicsWorld::Get().RemoveRigidBody(m_rigidBody);
 		}
 
 
