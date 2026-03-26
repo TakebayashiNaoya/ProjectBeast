@@ -14,6 +14,7 @@
 #include "Source/Util/JsonConverter.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/CameraController.h"
+#include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 
 
 namespace app
@@ -26,10 +27,11 @@ namespace app
 	{
 		actor::StageSystem::DestroyInstance();
 		delete m_daddyPenguin;
-		for (auto*& p : m_childPenguins) {
-			delete p;
-			p = nullptr;
-		}
+		//for (auto*& p : m_childPenguins) {
+		//	delete p;
+		//	p = nullptr;
+		//}
+		actor::ChildPenguinManager::DestroyInstance();
 		DeleteGO(m_ocean);
 	}
 
@@ -38,6 +40,7 @@ namespace app
 	{
 		app::core::ParameterManager::CreateInstance();
 		actor::StageSystem::CreateInstance();
+		actor::ChildPenguinManager::CreateInstance();
 		m_phase = LoadPhase::Stage;
 		m_childIndex = 0;
 		return true;
@@ -66,12 +69,21 @@ namespace app
 		case LoadPhase::Children:
 			if (m_childIndex < CHILD_PENGUIN_NUM)
 			{
-				Vector3 pos = Vector3(10.0f + (m_childIndex % 10) * 3.0f,
-					100.0f,
-					(m_childIndex / 10) * 3.0f);
-				m_childPenguins[m_childIndex] = new actor::ChildPenguin();
-				m_childPenguins[m_childIndex]->SetPosition(pos);
-				m_childPenguins[m_childIndex]->StartWrapper();
+				// 10列×10行のグリッド状に配置
+				const float spacing = 100.0f;
+				Vector3 pos = Vector3(
+					(m_childIndex % 10) * spacing,   // X: 0～9列
+					0.0f,
+					(m_childIndex / 10) * spacing);   // Z: 0～9行
+
+				actor::ChildPenguinManager::GetInstance()->CreateChildPenguin(1);
+
+				const auto& children = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
+				auto* child = children.back();
+				child->SetDaddyPenguin(m_daddyPenguin);
+				child->SetPosition(pos);
+				child->StartWrapper();
+
 				++m_childIndex;
 			}
 			else {
@@ -102,7 +114,10 @@ namespace app
 			// 通常更新
 			actor::StageSystem::GetInstance()->Update();
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-			for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+			//for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+
+
+			actor::ChildPenguinManager::GetInstance()->Update();
 
 			// CameraSteeringの結果をGameCameraに反映
 			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
@@ -118,6 +133,7 @@ namespace app
 
 		default: break;
 		}
+
 	}
 
 	void InGameScene::PauseUpdate()
@@ -128,9 +144,10 @@ namespace app
 	{
 		actor::StageSystem::GetInstance()->Render(rc);
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
-		for (auto* p : m_childPenguins) {
-			if (p) p->RenderWrapper(rc);
-		}
+		//for (auto* p : m_childPenguins) {
+		//	if (p) p->RenderWrapper(rc);
+		//}
+		actor::ChildPenguinManager::GetInstance()->Render(rc);
 	}
 
 
