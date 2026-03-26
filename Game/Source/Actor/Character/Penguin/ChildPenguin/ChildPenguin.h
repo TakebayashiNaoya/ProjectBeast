@@ -35,10 +35,25 @@ namespace app
 			 */
 			void SetDaddyPenguin(DaddyPenguin* daddyPenguin);
 			/**
+			 * @brief 子ペンギンのタイプを取得
+			 * @return 子ペンギンのタイプ
+			 */
+			inline EnChildPenguinType GetChildPenguinType() const { return m_type; }
+			/**
 			 * @brief 子ペンギンのタイプを設定
 			 * @param type 子ペンギンのタイプ
 			 */
 			void SetChildPenguinType(EnChildPenguinType type);
+			/**
+			 * @brief 目標座標を取得する（AIコントローラーが移動処理に使う）
+			 * @return 目標座標
+			 */
+			inline const Vector3& GetFormationTargetPosition() const { return m_formationTarget; }
+			/**
+			 * @brief 陣形における自身の目標座標を設定する
+			 * @param targetPos 目標座標
+			 */
+			inline void SetFormationTargetPosition(const Vector3& targetPos) { m_formationTarget = targetPos; }
 
 
 		public:
@@ -61,6 +76,8 @@ namespace app
 			DaddyPenguin* m_daddyPenguin = nullptr;
 			/** 子ペンギンのタイプ */
 			EnChildPenguinType m_type = EnChildPenguinType::Serious;
+			/** 陣形における自身の目標座標 */
+			Vector3 m_formationTarget;
 		};
 	}
 }

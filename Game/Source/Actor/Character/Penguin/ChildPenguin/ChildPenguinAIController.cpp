@@ -44,6 +44,25 @@ namespace app
 		}
 
 
+		Vector3 ChildPenguinAIController::CalculateDirectionToTarget(const Vector3& targetPos) const
+		{
+			const Vector3& childPos = m_owner->GetTransform().m_position;
+			Vector3 direction = targetPos - childPos;
+			direction.y = 0.0f;
+			direction.Normalize();
+			return direction;
+		}
+
+
+		float ChildPenguinAIController::GetDistanceToTarget(const Vector3& targetPos) const
+		{
+			const Vector3& childPos = m_owner->GetTransform().m_position;
+			Vector3 diff = targetPos - childPos;
+			diff.y = 0.0f;
+			return diff.Length();
+		}
+
+
 
 
 		/************************************/
@@ -57,18 +76,53 @@ namespace app
 		void SeriousChildPenguinAI::Update()
 		{
 			auto* manager = ChildPenguinManager::GetInstance();
-			const float distance = GetDistanceToDaddy();
+			bool isFollowCommand = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
+			const float distanceToDaddy = GetDistanceToDaddy();
 
-			bool isFollowCommand = ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
-
-			if (isFollowCommand && distance > FOLLOW_DISTANCE)
+			if (isFollowCommand)
 			{
-				const Vector3 moveDirection = CalculateDirectionToDaddy();
-				const bool isDash = distance > DASH_DISTANCE;
-				m_stateMachine->AIControllerInput(moveDirection, isDash, false, false, false, false);
+				// 親の命令範囲に入ったら、隊列に参加する
+				if (!m_isFollowing && distanceToDaddy <= JOIN_DISTANCE)
+				{
+					manager->AddFollower(m_owner);
+					m_isFollowing = true;
+				}
+
+				if (m_isFollowing)
+				{
+					// 陣形の自分の担当ポジション座標を取得
+					Vector3 targetPos = m_owner->GetFormationTargetPosition();
+					float distanceToTarget = GetDistanceToTarget(targetPos);
+
+					// 担当ポジションに十分近づいていなければ移動する
+					if (distanceToTarget > STOP_DISTANCE)
+					{
+						const Vector3 moveDirection = CalculateDirectionToTarget(targetPos);
+						const bool isDash = distanceToTarget > DASH_DISTANCE;
+						m_stateMachine->AIControllerInput(moveDirection, isDash, false, false, false, false);
+					}
+					else
+					{
+						// ポジションに到着したら停止
+						m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+					}
+				}
+				else
+				{
+					// まだ命令範囲外で隊列に入っていない場合は、親の方へ向かう
+					const Vector3 moveDirection = CalculateDirectionToDaddy();
+					const bool isDash = distanceToDaddy > DASH_DISTANCE;
+					m_stateMachine->AIControllerInput(moveDirection, isDash, false, false, false, false);
+				}
 			}
 			else
 			{
+				// 待機命令などが出た場合、隊列から離脱して停止する
+				if (m_isFollowing)
+				{
+					manager->RemoveFollower(m_owner);
+					m_isFollowing = false;
+				}
 				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
 			}
 		}
@@ -87,19 +141,49 @@ namespace app
 		void ClingyChildPenguinAI::Update()
 		{
 			auto* manager = ChildPenguinManager::GetInstance();
-			const float distance = GetDistanceToDaddy();
+			bool isFollowCommand = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
+			const float distanceToDaddy = GetDistanceToDaddy();
 
-			bool isFollowCommand = ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
-
-			// 追従命令中、または待機命令中でも離れすぎた場合は追従（甘えん坊固有）
-			if (isFollowCommand && distance > FOLLOW_DISTANCE)
+			// 追従命令中、または待機命令でも親から離れすぎた場合は強制追従
+			if (isFollowCommand || (!isFollowCommand && distanceToDaddy > BREAK_AWAY_DISTANCE))
 			{
-				const Vector3 moveDirection = CalculateDirectionToDaddy();
-				const bool isDash = distance > DASH_DISTANCE;
-				m_stateMachine->AIControllerInput(moveDirection, isDash, false, false, false, false);
+				if (!m_isFollowing && distanceToDaddy <= JOIN_DISTANCE)
+				{
+					manager->AddFollower(m_owner);
+					m_isFollowing = true;
+				}
+
+				if (m_isFollowing)
+				{
+					Vector3 targetPos = m_owner->GetFormationTargetPosition();
+					float distanceToTarget = GetDistanceToTarget(targetPos);
+
+					if (distanceToTarget > STOP_DISTANCE)
+					{
+						const Vector3 moveDirection = CalculateDirectionToTarget(targetPos);
+						const bool isDash = distanceToTarget > DASH_DISTANCE;
+						m_stateMachine->AIControllerInput(moveDirection, isDash, false, false, false, false);
+					}
+					else
+					{
+						m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+					}
+				}
+				else
+				{
+					const Vector3 moveDirection = CalculateDirectionToDaddy();
+					const bool isDash = distanceToDaddy > DASH_DISTANCE;
+					m_stateMachine->AIControllerInput(moveDirection, isDash, false, false, false, false);
+				}
 			}
 			else
 			{
+				// 待機命令中で、かつ親との距離がBREAK_AWAY_DISTANCE以内の場合はおとなしく待機
+				if (m_isFollowing)
+				{
+					manager->RemoveFollower(m_owner);
+					m_isFollowing = false;
+				}
 				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
 			}
 		}

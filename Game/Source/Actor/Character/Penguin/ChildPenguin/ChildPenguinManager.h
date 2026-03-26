@@ -12,6 +12,7 @@ namespace app
 	{
 		/** 前方宣言 */
 		class ChildPenguin;
+		class DaddyPenguin;
 
 
 		/**
@@ -52,6 +53,61 @@ namespace app
 		private:
 			/** 子ペンギンのリスト */
 			std::vector<actor::ChildPenguin*>m_childPenguinList;
+
+
+
+
+			//============================================//
+			// 陣形・追従管理
+			//============================================//
+
+		public:
+			/**
+			 * @brief 親ペンギンを設定（GameSceneなどで呼び出す）
+			 * @param daddy 親ペンギンのポインタ
+			 */
+			void SetDaddyPenguin(DaddyPenguin* daddy) { m_daddyPenguin = daddy; }
+
+			/**
+			 * @brief 隊列（フォロー状態）に参加する
+			 * @param penguin 参加する子ペンギンのポインタ
+			 */
+			void AddFollower(ChildPenguin* penguin);
+
+			/**
+			 * @brief 隊列から離脱する（はぐれた時など）
+			 * @param penguin 離脱する子ペンギンのポインタ
+			 */
+			void RemoveFollower(ChildPenguin* penguin);
+
+
+		private:
+			/**
+			 * @brief 陣形の座標を計算する
+			 */
+			void CalculateFormationPositions();
+
+			/**
+			 * @brief 隊列をソートし、各自に目標座標を割り当てる
+			 */
+			void SortAndAssignFollowers();
+
+
+		private:
+			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
+			DaddyPenguin* m_daddyPenguin = nullptr;
+
+			/** 現在、親に追従している子ペンギンのリスト（隊列） */
+			std::vector<ChildPenguin*> m_followers;
+
+			/** 計算された陣形の目標座標（最大100個） */
+			std::vector<Vector3> m_formationPositions;
+
+			/** 陣形調整用のパラメータ */
+			const int MAX_FORMATION_COUNT = 100;		/** 隊列の最大数 */
+			const float FORMATION_BASE_RADIUS = 30.0f;  /** 一番内側の円の半径 */
+			const float FORMATION_RADIUS_STEP = 20.0f;  /** 円が外側になるごとの増加量 */
+			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
 
 
 

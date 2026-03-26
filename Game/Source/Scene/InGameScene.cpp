@@ -87,6 +87,8 @@ namespace app
 				++m_childIndex;
 			}
 			else {
+				auto* manager = app::actor::ChildPenguinManager::GetInstance();
+				manager->SetDaddyPenguin(m_daddyPenguin);
 				m_phase = LoadPhase::Camera;
 			}
 			break;
@@ -108,6 +110,8 @@ namespace app
 
 		case LoadPhase::Ocean:
 			m_ocean = NewGO<Ocean>(0);
+			m_phase = LoadPhase::Done;
+			break;
 
 		case LoadPhase::Done:
 		{
