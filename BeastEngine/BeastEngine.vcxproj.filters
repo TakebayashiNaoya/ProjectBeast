@@ -84,6 +84,12 @@
     <ClCompile Include="Resource\ResourceManager.cpp">
       <Filter>Resource</Filter>
     </ClCompile>
+    <ClCompile Include="Resource\ModelResource.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource\AnimationClipResource.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -187,6 +193,13 @@
     <ClInclude Include="Resource\ResourceManager.h">
       <Filter>Resource</Filter>
     </ClInclude>
+    <ClInclude Include="Resource\ModelResource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\AnimationClipResource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\SkeletonResource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

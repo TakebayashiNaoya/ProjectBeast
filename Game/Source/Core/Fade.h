@@ -36,6 +36,15 @@ namespace app
 			{
 				return m_state != FadeState::None;
 			}
+			/** フェードアウトが完了したか（画面が完全に暗い状態） */
+			bool IsFadeOutComplete() const
+			{
+				return m_state == FadeState::FadeOut && m_timer >= m_duration;
+			}
+			/** ローディングサークルを表示する */
+			void ShowLoadingCircle();
+			/** ローディングサークルを非表示にする */
+			void HideLoadingCircle();
 
 
 		public:
@@ -86,7 +95,16 @@ namespace app
 
 
 		private:
+			/** 背景スプライト */
 			SpriteRender m_fadeRender;
+			/** ローディングサークル（遅延初期化） */
+			std::unique_ptr<SpriteRender> m_circleRender;
+			/** サークル初期化済みフラグ */
+			bool m_circleInited = false;
+			/** サークル表示フラグ */
+			bool m_showCircle = false;
+			/** サークルの回転角度（ラジアン） */
+			float m_circleAngle = 0.0f;
 
 		private:
 			/**

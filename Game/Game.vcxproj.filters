@@ -295,6 +295,24 @@
     <ClCompile Include="Source\UI\PBWakingUpTimerMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Camera\CameraCommon.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera\CameraController.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera\CameraManager.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera\CameraSteering.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera\WinCamera.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera\LoseCamera.cpp">
+      <Filter>Source\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -546,5 +564,26 @@
     <ClInclude Include="Source\UI\PBWakingUpTimerMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Camera\CameraCommon.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera\CameraController.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera\CameraManager.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera\CameraSteering.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera\WinCamera.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera\LoseCamera.h">
+      <Filter>Source\Camera</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
   </ItemGroup>
 </Project>

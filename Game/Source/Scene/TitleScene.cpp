@@ -49,7 +49,7 @@ namespace app
 	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		if (m_nextScene) {
-			id = DebugScene::ID();
+			id = InGameScene::ID();
 			waitTime = 3.0f;
 			return true;
 		}

@@ -7,6 +7,8 @@ namespace app
 {
 	namespace camera
 	{
+
+#if defined(APP_DEBUG)
 		void DebugCamera::OnEnter()
 		{
 			m_cameraData = CameraManager::Get().GetCurrentCameraData();
@@ -14,14 +16,16 @@ namespace app
 
 
 		void DebugCamera::Update()
-        {
+
 			// fov調整
 			if (g_pad[0]->IsPress(enButtonRB1)) {
 				float value = g_pad[0]->GetLStickYF();
 				m_cameraData.fov += value * 0.05f;
 				return;
 			}
-            // 左スティックで移動
+
+      // 左スティックで移動
+			// 左スティックで移動
 			{
 				Vector3 inputDirection;
 				inputDirection.x = g_pad[0]->GetLStickXF();
@@ -64,6 +68,7 @@ namespace app
 				xzRotation.Apply(toVector);
 				m_cameraData.position = m_cameraData.target + toVector;
 			}
-        }
+		}
+#endif
 	}
 }

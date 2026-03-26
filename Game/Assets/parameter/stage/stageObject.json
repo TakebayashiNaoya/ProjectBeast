@@ -2,13 +2,6 @@
   "StageObject": {
     "object": [      
       {
-        "objectName" : "ocean",
-        "fileName" : "Assets/modelData/Ocean/ocean.tkm",
-        "position" : [0, 0, 0],
-        "rotationDeg" : [0, 0, 0],
-        "scale" : [1, 1, 1]
-      },
-      {
         "objectName" : "bearHome",
         "fileName" : "Assets/modelData/stage/BearHome/bearHome.tkm",
         "position" : [560, 10, 80],

@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BeastEngine.cpp" />
+    <ClCompile Include="BeastEngine.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="BeastEnginePreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -49,6 +51,8 @@
     <ClCompile Include="Physics\Physics.cpp" />
     <ClCompile Include="Physics\RigidBody.cpp" />
     <ClCompile Include="Physics\SphereCollider.cpp" />
+    <ClCompile Include="Resource\AnimationClipResource.cpp" />
+    <ClCompile Include="Resource\ModelResource.cpp" />
     <ClCompile Include="Resource\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -86,7 +90,10 @@
     <ClInclude Include="Physics\RigidBody.h" />
     <ClInclude Include="Physics\SphereCollider.h" />
     <ClInclude Include="Physics\Types.h" />
+    <ClInclude Include="Resource\AnimationClipResource.h" />
+    <ClInclude Include="Resource\ModelResource.h" />
     <ClInclude Include="Resource\ResourceManager.h" />
+    <ClInclude Include="Resource\SkeletonResource.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
@@ -146,7 +153,7 @@
     <LibraryPath>$(ProjectDir)\..\exlib\$(Platform)\$(Configuration)\;$(ProjectDir)..\k2EngineLow\$(Platform)\$(Configuration)\;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/EffeseerRendererDX12;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)../;$(ProjectDir)../k2EngineLow/;$(ProjectDir)../BeastEngine/;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDIr);$(ProjectDir)../k2EngineLow/;$(ProjectDir)../k2EngineLow/MiniEngine/;$(ProjectDir)../k2EngineLow/ExEngine/;$(ProjectDir)../k2EngineLow/ExEngine/bulletPhysics/src;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/Effekseer;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(IncludePath)</IncludePath>
     <OutDir>..\exlib\$(Platform)\$(Configuration)\</OutDir>
     <LibraryPath>$(ProjectDir)\..\exlib\$(Platform)\$(Configuration)\;$(ProjectDir)..\k2EngineLow\$(Platform)\$(Configuration)\;$(ProjectDir)../k2EngineLow/ExEngine/effekseer/install_msvc2019/include/EffeseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon</LibraryPath>
   </PropertyGroup>
@@ -195,6 +202,7 @@
       <PrecompiledHeaderFile>BeastEnginePreCompile.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -218,6 +226,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>BeastEnginePreCompile.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>

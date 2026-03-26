@@ -35,7 +35,7 @@ namespace app
 			{
 				"Assets/modelData/whiteBear/WhiteBear.tkm",
 				ANIMATION_DATA,
-				EnModelUpAxis::enModelUpAxisY,
+				EnModelUpAxis::enModelUpAxisZ,
 				std::size(ANIMATION_DATA)
 			};
 

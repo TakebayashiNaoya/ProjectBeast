@@ -7,13 +7,11 @@ namespace nsBeastEngine
 	namespace nsCollision
 	{
 		PhysicalBody::PhysicalBody()
-		{
-		}
+		{}
 
 
 		PhysicalBody::~PhysicalBody()
-		{
-		}
+		{}
 
 
 		void PhysicalBody::CreateFromModel(Model& model, const Matrix& worldMatrix, const uint32_t collisionAttribute, const btCollisionObject::CollisionFlags collisionFlags, const float restitution)
@@ -76,6 +74,8 @@ namespace nsBeastEngine
 
 			rigidBody_.GetBody()->setUserIndex(collisionAttribute);
 			rigidBody_.GetBody()->setCollisionFlags(collisionFlags);
+
+			PhysicsWorld::Get().AddRigidBody(rigidBody_);
 		}
 
 

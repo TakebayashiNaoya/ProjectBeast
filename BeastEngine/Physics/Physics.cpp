@@ -19,8 +19,7 @@ namespace nsBeastEngine
 
 				ExtendedRayResultCallback(const btVector3& rayFromWorld, const btVector3& rayToWorld)
 					: btCollisionWorld::ClosestRayResultCallback(rayFromWorld, rayToWorld)
-				{
-				}
+				{}
 
 				/**
 				 * Bulletが「衝突候補」を見つけた時に呼ぶ関数。ここでフィルタリングを行う。
@@ -40,6 +39,11 @@ namespace nsBeastEngine
 					}
 					return true;
 				}
+				btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace) override
+				{
+					m_collisionObject = rayResult.m_collisionObject;
+					return ClosestRayResultCallback::addSingleResult(rayResult, normalInWorldSpace);
+				}
 			};
 
 
@@ -53,8 +57,7 @@ namespace nsBeastEngine
 
 				ExtendedConvexResultCallback(const btVector3& convexFromWorld, const btVector3& convexToWorld)
 					: btCollisionWorld::ClosestConvexResultCallback(convexFromWorld, convexToWorld)
-				{
-				}
+				{}
 
 				virtual bool needsCollision(btBroadphaseProxy* proxy0) const override
 				{

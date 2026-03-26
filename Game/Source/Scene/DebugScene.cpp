@@ -4,8 +4,11 @@
  * @author 立山
  */
 #include "stdafx.h"
-#if defined(APP_DEBUG)
 #include "DebugScene.h"
+#include "../../../BeastEngine/Resource/ResourceManager.h"
+#include "../../../BeastEngine/Resource/ModelResource.h"
+#include "Source/Actor/Character/Player/Player.h"
+#include "Source/Core/ParameterManager.h"
 
 
 namespace app
@@ -25,8 +28,7 @@ namespace app
 
 
 	void DebugScene::Update()
-	{
-	}
+	{}
 
 
 	void DebugScene::PauseUpdate()
@@ -34,9 +36,7 @@ namespace app
 
 
 	void DebugScene::Render(RenderContext& rc)
-	{
-		
-	}
+	{}
 
 
 	bool DebugScene::RequesutScene(uint32_t& id, float& waitTime)
@@ -49,4 +49,3 @@ namespace app
 		return false;
 	}
 }
-#endif

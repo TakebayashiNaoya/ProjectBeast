@@ -57,7 +57,7 @@ namespace nsBeastEngine
 		initData.m_expandShaderResoruceView[0] = &m_texture[m_type];
 		initData.m_expandConstantBuffer = &m_luminance;
 		initData.m_expandConstantBufferSize = sizeof(m_luminance);
-		m_modelRender.GetModel().Init(initData);
+		//m_modelRender.GetModel().Init(initData);
 		m_modelRender.SetTRS(m_position, g_quatIdentity, m_scale);
 		m_modelRender.Update();
 

@@ -4,6 +4,8 @@
  * @author 藤谷
  */
 #pragma once
+#include "../../../BeastEngine/Physics/PhysicalBody.h"
+#include "Resource/ModelResource.h"
 #include "Source/Actor/Actor.h"
 
 
@@ -46,6 +48,16 @@ namespace app
 		private:
 			/** 物理静的オブジェクト */
 			//PhysicsStaticObject m_physicsStaticObject;
+			nsBeastEngine::nsCollision::PhysicalBody m_physicalObj;
+
+
+		private:
+			/** モデルロード完了フラグ */
+			bool m_isModelLoaded = false;
+			/** モデルファイルパス（非同期ロード完了後にModelRender::Initで使用） */
+			std::string m_pendingModelPath;
+			/** TKM非同期ローダー */
+			nsBeastEngine::TkmModelLoader m_tkmLoader;
 		};
 	}
 }
