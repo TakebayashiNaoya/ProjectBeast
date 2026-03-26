@@ -31,6 +31,13 @@ namespace app
 					m_modelRender.Init(m_pendingModelPath.c_str());
 					m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 					m_modelRender.Update();
+
+					m_physicalObj.CreateFromModel(
+						m_modelRender.GetModel(),
+						m_modelRender.GetModel().GetWorldMatrix(),
+						nsBeastEngine::nsCollision::CollisionAttribute::Ground
+					);
+
 					m_isModelLoaded = true;
 				}
 				return;
