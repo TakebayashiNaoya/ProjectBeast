@@ -18,6 +18,8 @@ namespace app
 		{
 			/** 海面の高さ */
 			constexpr float SEA_LEVEL = 0.0f;
+			/** 海面付近のしきい値（ゆらゆら中にSwimmingStateを維持するための余裕） */
+			constexpr float SEA_SURFACE_THRESHOLD = 10.0f;
 		}
 
 		/**
@@ -134,7 +136,7 @@ namespace app
 			inline bool IsInWater() const
 			{
 				const float height = m_ownerActor->GetTransform().m_position.y;
-				return height < SEA_LEVEL;
+				return height < SEA_LEVEL + SEA_SURFACE_THRESHOLD;
 			}
 
 
@@ -166,6 +168,8 @@ namespace app
 			bool m_isDash;
 			/** 泳ぎ中かどうか */
 			bool m_isSwimming;
+			/** 前フレームのY座標（水面を抜けた瞬間の判定に使用） */
+			float m_prevPositionY;
 		};
 
 	}

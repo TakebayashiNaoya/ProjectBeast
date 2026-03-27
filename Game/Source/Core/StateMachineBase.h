@@ -72,6 +72,12 @@ namespace app
 			 */
 			bool IsEqualCurrentState(const uint32_t stateID) const;
 
+			/**
+			 * @brief 現在のステートの Enter() を再度呼び出す
+			 * @note モデルロード完了後にアニメーションを再適用するために使用する
+			 */
+			void ReEnterCurrentState();
+
 
 		protected:
 			/**
@@ -126,4 +132,3 @@ namespace app
 		};
 	}
 }
-

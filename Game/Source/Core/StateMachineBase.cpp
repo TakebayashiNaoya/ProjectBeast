@@ -45,6 +45,16 @@ namespace app
 		}
 
 
+		void StateMachineBase::ReEnterCurrentState()
+		{
+			// 現在のステートの Enter() を再度呼び出してアニメーションを再適用する
+			if (m_currentState)
+			{
+				m_currentState->Enter();
+			}
+		}
+
+
 		bool StateMachineBase::IsEqualCurrentState(const uint32_t stateID) const
 		{
 			return m_currentState == m_stateMap.at(stateID).get();
