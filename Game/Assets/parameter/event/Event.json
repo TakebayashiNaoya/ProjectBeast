@@ -1,0 +1,28 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"VictoryIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Event/Victory.dds",
+                "width":320,
+                "height":240,
+                "position":[0,200,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"DefeatIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Event/Defeat.dds",
+                "width":320,
+                "height":240,
+                "position":[0,-100,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[20,20,255,255]
+            }
+        ]
+    }
+}

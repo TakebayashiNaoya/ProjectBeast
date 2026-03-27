@@ -27,6 +27,11 @@ namespace app
 			void Update();
 			void SetUIIcon(UIIcon* icon);
 
+			inline void SetIsDraw(bool isDraw)
+			{
+				if (m_icon)m_icon->m_isDraw = isDraw;
+			}
+
 
 		private:
 			EnInGameTimerType m_type;
@@ -41,6 +46,10 @@ namespace app
 			~TimerDigit();
 			void Update();
 			void SetUIDigit(UIDigit* digit);
+			inline void SetIsDraw(bool isDraw)
+			{
+				if (m_digit)m_digit->m_isDraw = isDraw;
+			}
 
 
 		public:
@@ -78,10 +87,17 @@ namespace app
 			 */
 			inline bool IsTimerActive()const { return m_isTimerActive; }
 
+			/**
+			 * @brief タイマーの時間が0以下かどうかを返す
+			 * @return タイマーの時間が0以下かどうか
+			 */
+			inline bool IsTimeUp()const { return m_currentTime <= 0.0f; }
 
 			// タイマーの開始と停止。
 			void StartTimer() { m_isTimerActive = true; }
 			void StopTimer() { m_isTimerActive = false; }
+
+			void SetIsDraw(bool isDraw);
 
 
 		private:

@@ -164,7 +164,8 @@ namespace app
 			auto penguinList = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
 			for (auto* penguin : penguinList)
 			{
-				Vector3 diff = penguin->GetTransform().m_position - m_target->GetTransform().m_position;
+				Vector3 targetPos = m_target->GetTransform().m_position;
+				Vector3 diff = penguin->GetTransform().m_position - targetPos;
 				diff.y = 0.0f;
 				if (diff.LengthSq() > 600.0f * 600.0f)// 距離外ならIdleへ
 				{
@@ -175,10 +176,31 @@ namespace app
 				auto moveDirection = m_target->GetEnemyStateMachine()->GetMoveDirection();
 				float cosv = moveDirection.Dot(diff);
 				float cosAngle = cosf(Math::PI / 180.0f * 70.0f);
-				if (cosv >= cosAngle)
+				if (cosv <= cosAngle)
 				{
-					return penguin;
+					continue;
 				}
+
+				nsBeastEngine::nsCollision::RaycastHit hit;
+
+				if (nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(
+					targetPos,
+					penguin->GetTransform().m_position,
+					hit,
+					nsBeastEngine::nsCollision::ALL_COLLISION_ATTRIBUTE_MASK))
+				{
+					if (hit.colObject)
+					{
+						int attr = hit.colObject->getUserIndex();
+
+						if (attr & nsBeastEngine::nsCollision::CollisionAttribute::Ground)
+						{
+							continue;
+						}
+					}
+				}
+				return penguin;
+
 			}
 			return nullptr;
 		}
