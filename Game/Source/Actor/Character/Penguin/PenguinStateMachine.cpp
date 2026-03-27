@@ -36,6 +36,12 @@ namespace app
 		}
 
 
+		void PenguinStateMachine::Damage()
+		{
+			// デフォルト実装：各派生クラスでオーバーライド可能
+		}
+
+
 		PenguinStateMachine::PenguinStateMachine(PenguinBase* ownerPenguinBase)
 			: CharacterStateMachine(ownerPenguinBase)
 			, m_ownerPenguinBase(ownerPenguinBase)

@@ -5,6 +5,8 @@
  */
 #pragma once
 #include "Source/Actor/Character/CharacterStateMachine.h"
+#include "Source/Actor/Character/penguin/PenguinStatus.h"
+
 
 
 namespace app
@@ -19,7 +21,6 @@ namespace app
 		 */
 		class PenguinStateMachine : public CharacterStateMachine
 		{
-			// ここにペンギン共通のセッター関数を追加していく
 		public:
 			/**
 			 * @brief ジャンプパワーを設定
@@ -49,6 +50,11 @@ namespace app
 
 			// ここに親ペンギン共通のゲッター関数を追加していく
 		public:
+			/**
+			 * @brief ペンギンのステータスを取得
+			 * @return ペンギンのステータスポインタ
+			 */
+			virtual const PenguinStatus* GetPenguinStatus() const = 0;
 			/**
 			 * @brief ジャンプパワーを取得
 			 * @return ジャンプパワー
@@ -83,6 +89,10 @@ namespace app
 			 * @brief ジャンプ処理
 			 */
 			void Jump();
+			/**
+			 * @brief ダメージ処理
+			 */
+			virtual void Damage();
 
 
 		protected:

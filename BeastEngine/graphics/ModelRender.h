@@ -66,6 +66,15 @@ namespace nsBeastEngine
 		inline Model& GetModel() { return m_model; }
 
 		/**
+		 * @brief モデルの全マテリアルに乗算カラーを設定する
+		 * @param mulColor 乗算カラー (RGBA, 1.0f=変更なし)
+		 */
+		inline void SetMulColor(const Vector4& mulColor)
+		{
+			m_model.SetMulColor(mulColor);
+		}
+
+		/**
 		 * @brief アニメーションが再生中か
 		 * @return 再生中ならtrue
 		 */

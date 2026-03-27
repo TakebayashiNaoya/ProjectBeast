@@ -161,7 +161,7 @@ namespace app
 
 		ChildPenguin* EnemyController::FindTarget()
 		{
-			auto penguinList = actor::ChildPenguinManager::GetInstance()->GetChildPenguiin();
+			auto penguinList = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
 			for (auto* penguin : penguinList)
 			{
 				Vector3 targetPos = m_target->GetTransform().m_position;

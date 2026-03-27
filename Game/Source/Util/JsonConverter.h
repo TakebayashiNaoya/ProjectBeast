@@ -12,6 +12,15 @@ namespace app
 	namespace util
 	{
 		/**
+		 * @brief 範囲を保持するための構造体
+		 */
+		struct FloatRange {
+			float min;
+			float max;
+		};
+
+
+		/**
 		 * @brief jsonファイルの読み込みに使用する関数群
 		 */
 		class JsonConverter
@@ -96,6 +105,15 @@ namespace app
 					json[1].get<float>(),
 					json[2].get<float>()
 				);
+			}
+			/**
+			 * @brief jsonからFloatRange(Min, Max)を読み込む
+			 * @param json 読み込むjsonファイル(配列を想定)
+			 * @return 読み込んだFloatRange
+			 */
+			static inline FloatRange ToFloatRange(const nlohmann::json& json)
+			{
+				return { json[0].get<float>(), json[1].get<float>() };
 			}
 
 

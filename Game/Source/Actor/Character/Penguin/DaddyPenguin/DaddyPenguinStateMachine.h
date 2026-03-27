@@ -89,6 +89,11 @@ namespace app
 			 * @return 親ペンギンのステータスポインタ
 			 */
 			DaddyPenguinStatus* GetDaddyPenguinStatus() const;
+			/**
+			 * @brief ペンギンのステータスを取得（基底クラスのオーバーライド）
+			 * @return ペンギンのステータスポインタ
+			 */
+			virtual const PenguinStatus* GetPenguinStatus() const override;
 
 
 			/** ステートの変更先を取得する */
@@ -117,6 +122,10 @@ namespace app
 			 * @note 後にプレイヤーコントローラーに処理を移す
 			 */
 			void PlayerControllerInput();
+			/**
+			 * @brief ダメージ処理
+			 */
+			void Damage() override;
 
 
 		private:

@@ -14,6 +14,10 @@
 #include "Source/Util/JsonConverter.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/CameraController.h"
+#include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
+
+#include <random>
 
 
 namespace app
@@ -26,10 +30,11 @@ namespace app
 	{
 		actor::StageSystem::DestroyInstance();
 		delete m_daddyPenguin;
-		for (auto*& p : m_childPenguins) {
-			delete p;
-			p = nullptr;
-		}
+		//for (auto*& p : m_childPenguins) {
+		//	delete p;
+		//	p = nullptr;
+		//}
+		actor::ChildPenguinManager::DestroyInstance();
 		DeleteGO(m_ocean);
 	}
 
@@ -38,6 +43,7 @@ namespace app
 	{
 		app::core::ParameterManager::CreateInstance();
 		actor::StageSystem::CreateInstance();
+		actor::ChildPenguinManager::CreateInstance();
 		m_phase = LoadPhase::Stage;
 		m_childIndex = 0;
 		return true;
@@ -64,17 +70,47 @@ namespace app
 			break;
 
 		case LoadPhase::Children:
+			// CHILD_PENGUIN_NUM が 100 以上に設定されていることを前提とします
 			if (m_childIndex < CHILD_PENGUIN_NUM)
 			{
-				Vector3 pos = Vector3(10.0f + (m_childIndex % 10) * 3.0f,
-					100.0f,
-					(m_childIndex / 10) * 3.0f);
-				m_childPenguins[m_childIndex] = new actor::ChildPenguin();
-				m_childPenguins[m_childIndex]->SetPosition(pos);
-				m_childPenguins[m_childIndex]->StartWrapper();
+				// 乱数生成器の初期化（staticにすることで毎フレーム初期化されるのを防ぎます）
+				static std::random_device rd;
+				static std::mt19937 gen(rd());
+				// -2000.0f から 2000.0f の範囲の乱数を生成
+				static std::uniform_real_distribution<float> dis(-2000.0f, 2000.0f);
+
+				// X, Y, Zをランダムに設定
+				Vector3 pos = Vector3(dis(gen), 0.0f, dis(gen));
+
+				actor::ChildPenguinManager::GetInstance()->CreateChildPenguin(1);
+
+				const auto& children = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
+				auto* child = children.back();
+
+				// ----------------------------------------------------
+				// ① 先にタイプを設定する（ここでステートマシンが生成される）
+				// ----------------------------------------------------
+				if (m_childIndex < 50)
+				{
+					child->SetChildPenguinType(app::actor::EnChildPenguinType::Serious);
+				}
+				else if (m_childIndex < 100)
+				{
+					child->SetChildPenguinType(app::actor::EnChildPenguinType::Clingy);
+				}
+
+				// ----------------------------------------------------
+				// ② その後に座標をセットする（生成されたステートマシンに座標が渡る）
+				// ----------------------------------------------------
+				child->SetPosition(pos);
+				child->GetStateMachine()->SetPosition(pos);
+				child->StartWrapper();
+
 				++m_childIndex;
 			}
 			else {
+				auto* manager = app::actor::ChildPenguinManager::GetInstance();
+				manager->SetDaddyPenguin(m_daddyPenguin);
 				m_phase = LoadPhase::Camera;
 			}
 			break;
@@ -96,13 +132,18 @@ namespace app
 
 		case LoadPhase::Ocean:
 			m_ocean = NewGO<Ocean>(0);
+			m_phase = LoadPhase::Done;
+			break;
 
 		case LoadPhase::Done:
 		{
 			// 通常更新
 			actor::StageSystem::GetInstance()->Update();
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-			for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+			//for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+
+
+			actor::ChildPenguinManager::GetInstance()->Update();
 
 			// CameraSteeringの結果をGameCameraに反映
 			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
@@ -118,6 +159,7 @@ namespace app
 
 		default: break;
 		}
+
 	}
 
 	void InGameScene::PauseUpdate()
@@ -128,9 +170,10 @@ namespace app
 	{
 		actor::StageSystem::GetInstance()->Render(rc);
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
-		for (auto* p : m_childPenguins) {
-			if (p) p->RenderWrapper(rc);
-		}
+		//for (auto* p : m_childPenguins) {
+		//	if (p) p->RenderWrapper(rc);
+		//}
+		actor::ChildPenguinManager::GetInstance()->Render(rc);
 	}
 
 

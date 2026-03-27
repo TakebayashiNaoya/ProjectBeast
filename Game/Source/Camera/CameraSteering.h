@@ -24,11 +24,6 @@ namespace app
 		public:
 			struct Config
 			{
-				//float distance = 50.0f;
-				//float height = 10.0f;
-				//float rotationSpeedX = 1.0f;
-				//float rotationSpeedY = 1.0f;
-        
 				float distance = 200.0f;
 				float height = 100.0f;
 				float rotationSpeedX = 0.1f;

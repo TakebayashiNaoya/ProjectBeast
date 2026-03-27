@@ -17,7 +17,6 @@ namespace app
 		class PenguinStatus : public CharacterStatus
 		{
 		public:
-			// ここにペンギン共通のステータス用のゲッター関数を追加していく
 			/**
 			 * @brief 移動速度(スニーク)を取得
 			 * @return 移動速度(スニーク)

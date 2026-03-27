@@ -38,7 +38,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//////////////////////////////////////
 	// 初期化を行うコードを書くのはここまで！！！
 	//////////////////////////////////////
-
+	nsBeastEngine::nsCollision::PhysicsWorld::Initialize();
+	nsBeastEngine::nsCollision::PhysicsWorld::Get().EnableDrawDebugWireFrame();
 	// ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
@@ -56,12 +57,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		g_engine->ExecuteRender();
 		auto& renderContext = g_graphicsEngine->GetRenderContext();
+		nsBeastEngine::nsCollision::PhysicsWorld::Get().DebubDrawWorld(renderContext);
+
 		application->Render(renderContext);
 		//レンダリングエンジンを実行。		
 		g_renderingEngine->Execute(renderContext);
 
 		//当たり判定描画。
 		g_engine->DebubDrawWorld();
+
+
 
 		g_engine->EndFrame();
 	}
