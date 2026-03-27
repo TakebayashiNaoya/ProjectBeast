@@ -171,8 +171,6 @@ namespace app
 		protected:
 			/** 親ペンギンのポインタ */
 			PenguinBase* m_ownerPenguinBase;
-			/** 滞空時間 */
-			float m_airTime;
 			/** ジャンプパワー */
 			float m_jumpPower;
 			/**ジャンプするかどうか */
@@ -188,4 +186,3 @@ namespace app
 		};
 	}
 }
-

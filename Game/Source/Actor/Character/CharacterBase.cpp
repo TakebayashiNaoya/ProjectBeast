@@ -13,6 +13,12 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			constexpr float GRAVITY = -9.8f * 150; // 重力の値
+		}
+
+
 		CharacterBase::CharacterBase()
 			: m_animationClips(nullptr)
 			, m_clipNum(0)
@@ -28,6 +34,8 @@ namespace app
 			const auto* status = GetStatus<CharacterStatus>();
 			// キャラクターコントローラーを初期化
 			m_characterController.Init(status->GetRadius(), status->GetHeight(), m_transform.m_position);
+			// 重力を設定
+			m_characterController.SetGravity(GRAVITY);
 		}
 
 

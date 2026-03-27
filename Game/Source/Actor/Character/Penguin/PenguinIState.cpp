@@ -33,7 +33,9 @@ namespace app
 
 
 		void PenguinIdleState::Update()
-		{}
+		{
+			m_owner->Move();
+		}
 
 
 		void PenguinIdleState::Exit()
@@ -110,15 +112,15 @@ namespace app
 		{
 			const float jumpPower = m_owner->GetPenguinStatus()->GetJumpPower();
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
-			m_owner->SetJumpPower(jumpPower);
 			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->Jump();
 			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);
 		}
 
 
 		void PenguinJumpState::Update()
 		{
-			m_owner->Jump();
+			m_owner->Move();
 		}
 
 
