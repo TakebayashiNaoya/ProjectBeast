@@ -100,7 +100,7 @@ namespace app
 				{
 					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Wait);
 				}
-				else if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow)
+				else if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Wait)
 				{
 					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Follow);
 				}
@@ -265,6 +265,16 @@ namespace app
 
 
 
+
+			/** スライド開始中ならアニメーションが終わるまで維持し、終わるとスライディングステートへ */
+			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
+			{
+				if (CanChangeSlidingState())
+				{
+					return FindState(PenguinSlidingState::ID());
+				}
+			}
+
 			/** スライド終わりのアニメーション再生中なら維持する */
 			if (IsEqualCurrentState(PenguinSlideEndState::ID()))
 			{
@@ -285,16 +295,6 @@ namespace app
 				else
 				{
 					return FindState(PenguinSlideEndState::ID());
-				}
-			}
-
-
-			/** スライド開始中ならアニメーションが終わるまで維持し、終わるとスライディングステートへ */
-			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
-			{
-				if (CanChangeSlidingState())
-				{
-					return FindState(PenguinSlidingState::ID());
 				}
 			}
 

@@ -80,7 +80,6 @@ namespace app
 
 				const auto& children = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
 				auto* child = children.back();
-				child->SetDaddyPenguin(m_daddyPenguin);
 				child->SetPosition(pos);
 				child->StartWrapper();
 

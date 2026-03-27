@@ -13,7 +13,6 @@ namespace app
 		/** 前方宣言 */
 		class ChildPenguin;
 		class ChildPenguinStateMachine;
-		class DaddyPenguin;
 
 
 		/**
@@ -29,7 +28,7 @@ namespace app
 
 
 		public:
-			ChildPenguinAIController(ChildPenguin* owner, DaddyPenguin* daddyPenguin);
+			ChildPenguinAIController(ChildPenguin* owner);
 			virtual ~ChildPenguinAIController() = default;
 
 
@@ -47,77 +46,137 @@ namespace app
 			/**
 			 * @brief 任意の目標座標への正規化された方向ベクトルを計算
 			 * @param targetPos 目標座標
+			 * @return 正規化された方向ベクトル
 			 */
 			Vector3 CalculateDirectionToTarget(const Vector3& targetPos) const;
 			/**
 			 * @brief 任意の目標座標までの距離を取得
 			 * @param targetPos 目標座標
+			 * @return 距離
 			 */
 			float GetDistanceToTarget(const Vector3& targetPos) const;
+
+			/**
+			 * @brief 陣形ポジションまでの距離に応じてAIControllerInputを組み立てる
+			 *
+			 * @details
+			 * 【移動手段の切り替え（3段階）】
+			 *   距離が大きいほど速い移動手段を使う。親の移動状態には依存しない。
+			 *   distance <= stopDistance : 停止
+			 *   distance <= walkDistance : 歩き
+			 *   distance <= runDistance  : 走り
+			 *   distance >  runDistance  : 滑り
+			 *
+			 * 【ヒステリシスによるチラつき防止】
+			 *   フェーズを「上げる閾値」と「下げる閾値」を分けている。
+			 *   下げる閾値 = 上げる閾値 - HYSTERESIS
+			 *   これにより、閾値付近での高速な状態切り替えを防ぐ。
+			 *   ※ STOP_DISTANCE > HYSTERESIS となる値を設定すること。
+			 *
+			 * 【目標手前での減速（アプローチ減速）】
+			 *   stopDistance の2倍以内に入ると moveDirection をスケールダウンする。
+			 *   目標に近づくほど入力が弱まり行き過ぎを抑制する。
+			 *
+			 * @param stopDistance  停止とみなす距離
+			 * @param walkDistance  歩きの上限距離
+			 * @param runDistance   走りの上限距離（これを超えると滑り）
+			 */
+			void BuildInput(float stopDistance, float walkDistance, float runDistance);
 
 
 		protected:
 			/** 子ペンギンのポインタ */
 			ChildPenguin* m_owner;
-			/** 親ペンギンのポインタ */
-			DaddyPenguin* m_daddyPenguin;
 			/** ステートマシンへの参照 */
 			ChildPenguinStateMachine* m_stateMachine;
 			/** 隊列（陣形）に参加しているかどうか */
 			bool m_isFollowing = false;
+
+
+		private:
+			/**
+			 * @brief 移動手段の内部フェーズ
+			 * @details ヒステリシス制御のために保持する
+			 */
+			enum class MovePhase
+			{
+				Stop,    ///< 停止
+				Walk,    ///< 歩き（Sneak）
+				Run,     ///< 走り
+				Slide,   ///< 滑り
+			};
+
+			/** 現在の移動フェーズ */
+			MovePhase m_movePhase = MovePhase::Stop;
+
+			/**
+			 * @brief ヒステリシス幅
+			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
+			 *          STOP_DISTANCE より小さい値にすること。
+			 */
+			static constexpr float HYSTERESIS = 5.0f;
 		};
 
 
 		/**
 		 * @brief まじめタイプの子ペンギンAI
-		 * 追従命令→ついてくる、待機命令→その場待機
+		 * @details 追従命令→ついてくる、待機命令→その場待機
 		 */
 		class SeriousChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			/**
-			 * @brief 更新処理
-			 */
 			void Update() override;
 
-
 		public:
-			SeriousChildPenguinAI(ChildPenguin* owner, DaddyPenguin* daddyPenguin);
+			SeriousChildPenguinAI(ChildPenguin* owner);
 			~SeriousChildPenguinAI() override = default;
 
-
 		private:
-			/** 陣形の自身のポジションに到着したとみなす距離（停止距離） */
-			static constexpr float STOP_DISTANCE = 5.0f;
-			/** 陣形のポジションから離れた際のダッシュ開始距離 */
-			static constexpr float DASH_DISTANCE = 50.0f;
-			/** 親ペンギンに近づいて、隊列に加わる（命令が届く）距離 */
+			/** 停止とみなす距離（HYSTERESIS より十分大きい値にすること） */
+			static constexpr float STOP_DISTANCE = 15.0f;
+			/** 歩きの上限距離 */
+			static constexpr float WALK_DISTANCE = 30.0f;
+			/** 走りの上限距離（これを超えると滑りで追う） */
+			static constexpr float RUN_DISTANCE = 80.0f;
+			/** 隊列に加わる距離（未参加→参加） */
 			static constexpr float JOIN_DISTANCE = 400.0f;
+			/**
+			 * @brief 追跡をあきらめてその場で待機する距離（参加中→離脱）
+			 * @details JOIN_DISTANCE より大きい値にすること。
+			 *          JOIN_DISTANCE と差を設けることで、離脱後に少し戻るだけで
+			 *          すぐ追従を再開するような挙動を防ぐ。
+			 */
+			static constexpr float GIVE_UP_DISTANCE = 600.0f;
 		};
 
 
 		/**
 		 * @brief 甘えん坊タイプの子ペンギンAI
-		 * 待機命令を無視して常にDaddyに追従
+		 * @details 待機命令を無視して常にDaddyに追従する
 		 */
 		class ClingyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			/**
-			 * @brief 更新処理
-			 */
 			void Update() override;
 
-
 		public:
-			ClingyChildPenguinAI(ChildPenguin* owner, DaddyPenguin* daddyPenguin);
+			ClingyChildPenguinAI(ChildPenguin* owner);
 			~ClingyChildPenguinAI() override = default;
 
-
 		private:
-			static constexpr float STOP_DISTANCE = 5.0f;
-			static constexpr float DASH_DISTANCE = 40.0f;
+			/** 停止とみなす距離（HYSTERESIS より十分大きい値にすること） */
+			static constexpr float STOP_DISTANCE = 15.0f;
+			/** 歩きの上限距離 */
+			static constexpr float WALK_DISTANCE = 25.0f;
+			/** 走りの上限距離（これを超えると滑りで追う） */
+			static constexpr float RUN_DISTANCE = 60.0f;
+			/** 隊列に加わる距離（未参加→参加） */
 			static constexpr float JOIN_DISTANCE = 400.0f;
+			/**
+			 * @brief 追跡をあきらめてその場で待機する距離（参加中→離脱）
+			 * @details JOIN_DISTANCE より大きい値にすること。
+			 */
+			static constexpr float GIVE_UP_DISTANCE = 600.0f;
 			/** 待機命令中に強制追従が始まる親との距離 */
 			static constexpr float BREAK_AWAY_DISTANCE = 300.0f;
 		};

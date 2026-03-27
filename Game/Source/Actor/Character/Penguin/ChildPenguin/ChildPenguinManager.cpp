@@ -7,6 +7,9 @@
 #include "ChildPenguin.h"
 #include "ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/PenguinIState.h"
+
 
 namespace app
 {
@@ -37,6 +40,24 @@ namespace app
 
 		void ChildPenguinManager::Update()
 		{
+			/** 子ペンギンが親と同じ移動方法で移動するため、親のステートを確認する */
+			if (m_daddyPenguin)
+			{
+				auto* daddyState = m_daddyPenguin->GetStateMachine();
+
+				/** 走っているかどうか */
+				m_isDaddyRunning = daddyState->IsEqualCurrentState(PenguinRunState::ID());
+				/** スライドしているかどうか */
+				m_isDaddySliding = daddyState->IsEqualCurrentState(PenguinSlidingState::ID()) ||
+					daddyState->IsEqualCurrentState(PenguinSlideStartState::ID());
+				/** 飛び込んでいるかどうか */
+				m_isDaddyDiving = daddyState->IsEqualCurrentState(PenguinDivingState::ID());
+			}
+			else
+			{
+				m_isDaddyRunning = m_isDaddySliding = m_isDaddyDiving = false;
+			}
+
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
@@ -62,6 +83,16 @@ namespace app
 				if (!cp) continue;
 				cp->RenderWrapper(rc);
 			}
+		}
+
+
+		Vector3 ChildPenguinManager::GetDaddyPosition() const
+		{
+			if (m_daddyPenguin != nullptr)
+			{
+				return m_daddyPenguin->GetTransform().m_position;
+			}
+			return Vector3::Zero;
 		}
 
 

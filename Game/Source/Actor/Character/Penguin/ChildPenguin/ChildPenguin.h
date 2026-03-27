@@ -30,20 +30,10 @@ namespace app
 			 */
 			inline ChildPenguinStateMachine* GetStateMachine() { return m_stateMachine.get(); }
 			/**
-			 * @brief 親ペンギンを設定
-			 * @param daddyPenguin 親ペンギンのポインタ
-			 */
-			void SetDaddyPenguin(DaddyPenguin* daddyPenguin);
-			/**
 			 * @brief 子ペンギンのタイプを取得
 			 * @return 子ペンギンのタイプ
 			 */
 			inline EnChildPenguinType GetChildPenguinType() const { return m_type; }
-			/**
-			 * @brief 子ペンギンのタイプを設定
-			 * @param type 子ペンギンのタイプ
-			 */
-			void SetChildPenguinType(EnChildPenguinType type);
 			/**
 			 * @brief 目標座標を取得する（AIコントローラーが移動処理に使う）
 			 * @return 目標座標
@@ -54,6 +44,16 @@ namespace app
 			 * @param targetPos 目標座標
 			 */
 			inline void SetFormationTargetPosition(const Vector3& targetPos) { m_formationTarget = targetPos; }
+			/**
+			 * @brief 子ペンギンのタイプを設定
+			 * @param type 子ペンギンのタイプ
+			 */
+			void SetChildPenguinType(EnChildPenguinType type);
+			/**
+			 * @brief AIコントローラーの作成
+			 * @note 親ペンギンが設定された後に呼び出す必要がある
+			 */
+			void CreateAIController();
 
 
 		public:
@@ -72,8 +72,6 @@ namespace app
 			std::unique_ptr<ChildPenguinStateMachine> m_stateMachine;
 			/** AIコントローラー */
 			std::unique_ptr<ChildPenguinAIController> m_aiController;
-			/** 親ペンギンのポインタ */
-			DaddyPenguin* m_daddyPenguin = nullptr;
 			/** 子ペンギンのタイプ */
 			EnChildPenguinType m_type = EnChildPenguinType::Serious;
 			/** 陣形における自身の目標座標 */

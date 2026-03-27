@@ -229,9 +229,6 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinAnimationData.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.cpp">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\PauseScreenMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
@@ -258,9 +255,6 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyTypes.cpp">
       <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
     <ClCompile Include="Source\Effect\EffectManager.cpp">
       <Filter>Source\Effect</Filter>
@@ -289,11 +283,17 @@
     <ClCompile Include="Source\Camera\LoseCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinAIController.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp">
-      <Filter>Source\Actor\Character\penguin</Filter>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -477,9 +477,6 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinAnimationData.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\PauseScreenMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
@@ -506,9 +503,6 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyTypes.h">
       <Filter>Source\Actor\Character\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
     <ClInclude Include="Source\Effect\EffectManager.h">
       <Filter>Source\Effect</Filter>
@@ -540,14 +534,20 @@
     <ClInclude Include="Source\Camera\LoseCamera.h">
       <Filter>Source\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinAIController.h">
-      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinIState.h">
       <Filter>Source\Actor\Character\penguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinAIController.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

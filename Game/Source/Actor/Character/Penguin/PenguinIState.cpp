@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file PenguinIState.cpp
  * @brief ペンギン共通のステートインターフェース
  * @author 藤谷

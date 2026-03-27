@@ -64,6 +64,14 @@ namespace app
 			/** ステートを変更させる */
 			void ChangeState();
 
+			/**
+			 * @brief 現在のステートと指定したIDが等しいかどうか
+			 * @param stateID ステートID
+			 * @return 等しいかどうか
+			 * @NOTE ChildPenguinManager経由で子ペンギンが親ペンギンのステートを毎フレームチェックするために必要
+			 */
+			bool IsEqualCurrentState(const uint32_t stateID) const;
+
 
 		protected:
 			/**
@@ -86,13 +94,6 @@ namespace app
 				// ステートを追加
 				m_stateMap[TState::ID()] = std::make_unique<TState>(std::forward<TStateMachine>(stateMachine));
 			}
-
-
-			/**
-			 * @brief 現在のステートと指定したIDが等しいかどうか
-			 * @param stateID ステートID
-			 */
-			bool IsEqualCurrentState(const uint32_t stateID) const;
 
 
 			/*

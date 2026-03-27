@@ -28,6 +28,37 @@ namespace app
 		}
 
 
+		void ChildPenguin::SetChildPenguinType(EnChildPenguinType type)
+		{
+			m_type = type;
+
+			// タイプ変更に伴いステートマシンを作成
+			m_stateMachine = std::make_unique<ChildPenguinStateMachine>(this, m_type);
+			m_characterStateMachine = m_stateMachine.get();
+
+			CreateAIController();
+		}
+
+
+		void ChildPenguin::CreateAIController()
+		{
+			// 親ペンギンが設定されたら、タイプに応じたAIコントローラーを作成
+			switch (m_type)
+			{
+			case EnChildPenguinType::Serious:
+				m_aiController = std::make_unique<SeriousChildPenguinAI>(this);
+				break;
+			case EnChildPenguinType::Clingy:
+				m_aiController = std::make_unique<ClingyChildPenguinAI>(this);
+				break;
+			default:
+				// まだ実装されていないタイプはSeriousとして動作
+				m_aiController = std::make_unique<SeriousChildPenguinAI>(this);
+				break;
+			}
+		}
+
+
 		ChildPenguin::ChildPenguin()
 		{
 			Init(MODEL_DATA);
@@ -38,43 +69,7 @@ namespace app
 			m_status = std::make_unique<ChildPenguinStatus>();
 			m_status->Setup();
 
-		}
-
-
-		void ChildPenguin::SetDaddyPenguin(DaddyPenguin* daddyPenguin)
-		{
-			m_daddyPenguin = daddyPenguin;
-
-			// 親ペンギンが設定されたら、タイプに応じたAIコントローラーを作成
-			switch (m_type)
-			{
-			case EnChildPenguinType::Serious:
-				m_aiController = std::make_unique<SeriousChildPenguinAI>(this, daddyPenguin);
-				break;
-			case EnChildPenguinType::Clingy:
-				m_aiController = std::make_unique<ClingyChildPenguinAI>(this, daddyPenguin);
-				break;
-			default:
-				// まだ実装されていないタイプはSeriousとして動作
-				m_aiController = std::make_unique<SeriousChildPenguinAI>(this, daddyPenguin);
-				break;
-			}
-		}
-
-
-		void ChildPenguin::SetChildPenguinType(EnChildPenguinType type)
-		{
-			m_type = type;
-
-			// タイプ変更に伴いステートマシンを作成
-			m_stateMachine = std::make_unique<ChildPenguinStateMachine>(this, m_type);
-			m_characterStateMachine = m_stateMachine.get();
-
-			// 既に親ペンギンが設定されている場合はAIコントローラーを再作成
-			if (m_daddyPenguin != nullptr)
-			{
-				SetDaddyPenguin(m_daddyPenguin);
-			}
+			CreateAIController();
 		}
 
 

@@ -170,40 +170,35 @@ namespace app
 				return FindState(PenguinDivingState::ID());
 			}
 
-			// スライド終了状態
-			if (IsEqualCurrentState(PenguinSlideEndState::ID()))
+			// スライド開始状態
+			// ※ SlideStart アニメーション中に停止してしまうため、
+			//   SlideStart はスキップして即 Sliding へ遷移する。
+			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
 			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinSlideEndState::ID());
-				}
-				// アニメーション終了後は次の判定へ
+				return FindState(PenguinSlidingState::ID());
 			}
 
+			// スライド終了状態
+			// ※ SlideEnd アニメーション中に停止してしまうため、
+			//   SlideEnd はスキップして次の判定（Run / Sneak / Idle）へ直接落とす。
+			// （維持ブロックを除去することでスキップを実現する）
+
 			// スライド中状態
+			// ※ スライドを終了するとき SlideEnd を経由せず次の判定へ直接遷移する。
 			if (IsEqualCurrentState(PenguinSlidingState::ID()))
 			{
 				if (CanKeepSlidingState())
 				{
 					return FindState(PenguinSlidingState::ID());
 				}
-				return FindState(PenguinSlideEndState::ID());
-			}
-
-			// スライド開始状態
-			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
-			{
-				if (CanChangeSlidingState())
-				{
-					return FindState(PenguinSlidingState::ID());
-				}
-				return FindState(PenguinSlideStartState::ID());
+				// SlideEnd をスキップ → 次の判定（Run / Sneak / Idle）へ落とす
 			}
 
 			// スライド開始判定
+			// ※ SlideStart を経由せず直接 Sliding へ遷移する。
 			if (CanChangeSlideStartState())
 			{
-				return FindState(PenguinSlideStartState::ID());
+				return FindState(PenguinSlidingState::ID());
 			}
 
 			// ダッシュ判定
