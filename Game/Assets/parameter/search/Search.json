@@ -1,0 +1,28 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"canSearchIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/PBSearch/SearchIconExclamationmark.dds",
+                "width":150,
+                "height":150,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"canNotSearchIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/PBSearch/SearchIconQuestionmark.dds",
+                "width":150,
+                "height":150,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            }
+        ]
+    }
+}
