@@ -37,6 +37,7 @@ namespace app
 
 	void Application::Update()
 	{
+		camera::CameraManager::CreateInstance();
 		camera::CameraManager::Get().Update(6);
 		core::ParameterManager::Get()->Update();
 		SoundManager::Get().Update();

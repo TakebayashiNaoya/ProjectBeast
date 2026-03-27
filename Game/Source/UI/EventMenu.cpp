@@ -185,7 +185,7 @@ namespace app
 					{
 						// 移動アニメーション。
 						auto translateAnim = std::make_unique<UITranslateAnimation>();
-						Vector3 startPos(0.0f, 500.0f, 0.0f);
+						Vector3 startPos(0.0f, 900.0f, 0.0f);
 						Vector3 endPos(0.0f, 0.0f, 0.0f);
 						float duration = 0.82f;
 						// アニメーションのパラメーターを設定。

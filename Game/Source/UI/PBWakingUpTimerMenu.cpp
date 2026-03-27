@@ -20,6 +20,8 @@ namespace app
 			constexpr float MIN_TIME = 0.0f;
 			// 誤差。
 			constexpr float LIMITE_TIME = 31.0f;
+			// 描画距離の値。
+			constexpr float LENGTH_DRAW_ACTIVE = 80.0f;
 		}
 
 
@@ -66,7 +68,9 @@ namespace app
 			, m_isPBTimerActive(false)
 			, m_eneCon(nullptr)
 			, m_enemy(nullptr)
-		{}
+			, m_daddyPenguin(nullptr)
+		{
+		}
 		
 		
 		PBWakingUpTimerMenu::~PBWakingUpTimerMenu()
@@ -78,17 +82,19 @@ namespace app
 			// DigitのUIを取得。
 			auto* digit = GetUI<UIDigit>(Hash32("PBWakingUpTimerDigit"));
 
-			
-			// アクティブの時は、表示。
+			// 非アクティブの時は早期リターン。
+			if (!m_isPBTimerActive)return;
+
+			// アクティブの時に
 			if (m_isPBTimerActive)
-			{
+			{	
 				// World座標をスクリーン座標に変換して、DigitのUIの位置をシロクマの上に表示。
 				Vector2 screenPos = Vector2::Zero;
 				Vector3 targetPos = m_enemy->GetTransform().m_position;
 
 				g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, targetPos);
 				digit->m_transform.m_localTransform.m_position = Vector3(screenPos.x, screenPos.y + 250.0f, 0.0f);
-				
+
 				float deltaTime = g_gameTime->GetFrameDeltaTime();
 				if (m_currentPBTime > m_minTime)
 				{
@@ -99,6 +105,10 @@ namespace app
 						digit->m_isDraw = false;
 					}
 				}
+			}
+			else
+			{
+				m_isLengthDraw = false;
 			}
 
 			// float型kからint型にキャスト処理を行う。

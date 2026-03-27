@@ -17,7 +17,6 @@ namespace app
 
 		void DebugCamera::Update()
 		{
-
 			// fov調整
 			if (g_pad[0]->IsPress(enButtonRB1)) {
 				float value = g_pad[0]->GetLStickYF();
