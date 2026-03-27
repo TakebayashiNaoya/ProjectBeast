@@ -16,6 +16,7 @@ namespace app
 
 
 		void DebugCamera::Update()
+		{
 
 			// fov調整
 			if (g_pad[0]->IsPress(enButtonRB1)) {
@@ -24,7 +25,6 @@ namespace app
 				return;
 			}
 
-      // 左スティックで移動
 			// 左スティックで移動
 			{
 				Vector3 inputDirection;
