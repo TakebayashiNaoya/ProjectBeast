@@ -7,31 +7,31 @@
 namespace nsK2EngineLow {
 	class IShaderResource;
 
-	//ƒ‚ƒfƒ‹‚Ìã•ûŒü
+	//ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½
 	enum EnModelUpAxis {
-		enModelUpAxisY,		//ƒ‚ƒfƒ‹‚Ìã•ûŒü‚ªYŽ²B
-		enModelUpAxisZ,		//ƒ‚ƒfƒ‹‚Ìã•ûŒü‚ªZŽ²B
+		enModelUpAxisY,		//ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½B
+		enModelUpAxisZ,		//ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½B
 	};
 
 	/// <summary>
-	/// ƒ‚ƒfƒ‹‚Ì‰Šú‰»ƒf[ƒ^
+	/// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^
 	/// </summary>
 	struct ModelInitData {
-		const char* m_tkmFilePath = nullptr;							// tkmƒtƒ@ƒCƒ‹ƒpƒXB
-		const char* m_vsEntryPointFunc = "VSMain";						// ’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒgB
-		const char* m_vsSkinEntryPointFunc = "VSMain";					// ƒXƒLƒ“‚ ‚èƒ}ƒeƒŠƒAƒ‹—p‚Ì’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒgB
-		const char* m_psEntryPointFunc = "PSMain";						// ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒgB
-		const char* m_fxFilePath = nullptr;								// .fxƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒXB
-		void* m_expandConstantBuffer = nullptr;							// ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@B
-		int m_expandConstantBufferSize = 0;								// ƒ†[ƒU[Šg’£‚Ì’è”ƒoƒbƒtƒ@‚ÌƒTƒCƒYB
-		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };	// ƒ†[ƒU[Šg’£‚ÌƒVƒF[ƒ_[ƒŠƒ\[ƒXB
-																										// t10ƒŒƒWƒXƒ^‚©‚ç‡”Ô‚ÉŠ„‚è“–‚Ä‚ç‚ê‚Ü‚·B
-		Skeleton* m_skeleton = nullptr;									// ƒXƒPƒ‹ƒgƒ“B
-		EnModelUpAxis m_modelUpAxis = enModelUpAxisZ;					// ƒ‚ƒfƒ‹‚Ìã•ûŒüB
-		AlphaBlendMode m_alphaBlendMode = AlphaBlendMode_None;			// ƒAƒ‹ƒtƒ@ƒuƒŒƒ“ƒfƒBƒ“ƒOƒ‚[ƒhB
-		bool m_isDepthWrite = true;										// [“xƒoƒbƒtƒ@‚É‘‚«ž‚ÞH
-		bool m_isDepthTest = true;										// [“xƒeƒXƒg‚ðs‚¤H
-		D3D12_CULL_MODE m_cullMode = D3D12_CULL_MODE_BACK;				// ƒJƒŠƒ“ƒOƒ‚[ƒhB
+		const char* m_tkmFilePath = nullptr;							// tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½B
+		const char* m_vsEntryPointFunc = "VSMain";						// ï¿½ï¿½ï¿½_ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½gï¿½B
+		const char* m_vsSkinEntryPointFunc = "VSMain";					// ï¿½Xï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½pï¿½Ì’ï¿½ï¿½_ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½gï¿½B
+		const char* m_psEntryPointFunc = "PSMain";						// ï¿½sï¿½Nï¿½Zï¿½ï¿½ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½gï¿½B
+		const char* m_fxFilePath = nullptr;								// .fxï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½B
+		void* m_expandConstantBuffer = nullptr;							// ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½gï¿½ï¿½ï¿½Ì’è”ï¿½oï¿½bï¿½tï¿½@ï¿½B
+		int m_expandConstantBufferSize = 0;								// ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½gï¿½ï¿½ï¿½Ì’è”ï¿½oï¿½bï¿½tï¿½@ï¿½ÌƒTï¿½Cï¿½Yï¿½B
+		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };	// ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½gï¿½ï¿½ï¿½ÌƒVï¿½Fï¿½[ï¿½_ï¿½[ï¿½ï¿½ï¿½\ï¿½[ï¿½Xï¿½B
+																										// t10ï¿½ï¿½ï¿½Wï¿½Xï¿½^ï¿½ï¿½ï¿½ç‡ï¿½Ô‚ÉŠï¿½ï¿½è“–ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B
+		Skeleton* m_skeleton = nullptr;									// ï¿½Xï¿½Pï¿½ï¿½ï¿½gï¿½ï¿½ï¿½B
+		EnModelUpAxis m_modelUpAxis = enModelUpAxisZ;					// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½B
+		AlphaBlendMode m_alphaBlendMode = AlphaBlendMode_None;			// ï¿½Aï¿½ï¿½ï¿½tï¿½@ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½fï¿½Bï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½[ï¿½hï¿½B
+		bool m_isDepthWrite = true;										// ï¿½[ï¿½xï¿½oï¿½bï¿½tï¿½@ï¿½Éï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÞH
+		bool m_isDepthTest = true;										// ï¿½[ï¿½xï¿½eï¿½Xï¿½gï¿½ï¿½ï¿½sï¿½ï¿½ï¿½H
+		D3D12_CULL_MODE m_cullMode = D3D12_CULL_MODE_BACK;				// ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½[ï¿½hï¿½B
 		std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> m_colorBufferFormat = {
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			DXGI_FORMAT_UNKNOWN,
@@ -41,80 +41,80 @@ namespace nsK2EngineLow {
 			DXGI_FORMAT_UNKNOWN,
 			DXGI_FORMAT_UNKNOWN,
 			DXGI_FORMAT_UNKNOWN,
-		};	//ƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚éƒJƒ‰[ƒoƒbƒtƒ@‚ÌƒtƒH[ƒ}ƒbƒgB
+		};	//ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½[ï¿½oï¿½bï¿½tï¿½@ï¿½Ìƒtï¿½Hï¿½[ï¿½}ï¿½bï¿½gï¿½B
 	};
 	/// <summary>
-	/// ƒ}ƒeƒŠƒAƒ‹‚ðÄ‰Šú‰»‚·‚é‚½‚ß‚Ìƒf[ƒ^B
+	/// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é‚½ï¿½ß‚Ìƒfï¿½[ï¿½^ï¿½B
 	/// </summary>
 	struct MaterialReInitData {
 		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };
 	};
 	/// <summary>
-	/// ƒ‚ƒfƒ‹ƒNƒ‰ƒXB
+	/// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½B
 	/// </summary>
 	class Model : public Noncopyable {
 
 	public:
 
 		/// <summary>
-		/// tkmƒtƒ@ƒCƒ‹‚©‚ç‰Šú‰»B
+		/// tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ç‰ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
-		/// <param name="initData">‰Šú‰»ƒf[ƒ^</param>
+		/// <param name="initData">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^</param>
 		void Init(const ModelInitData& initData);
 		/// <summary>
-		/// ƒ[ƒ‹ƒhs—ñ‚ÌXVB
+		/// ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ï¿½ÌXï¿½Vï¿½B
 		/// </summary>
-		/// <param name="pos">À•W</param>
-		/// <param name="rot">‰ñ“]</param>
-		/// <param name="scale">Šg‘å—¦</param>
+		/// <param name="pos">ï¿½ï¿½ï¿½W</param>
+		/// <param name="rot">ï¿½ï¿½]</param>
+		/// <param name="scale">ï¿½gï¿½å—¦</param>
 		void UpdateWorldMatrix(Vector3 pos, Quaternion rot, Vector3 scale)
 		{
 			m_worldMatrix = CalcWorldMatrix(pos, rot, scale);
 		}
 
 		/// <summary>
-		/// ƒ[ƒ‹ƒhs—ñ‚ðŒvŽZ
+		/// ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ï¿½ï¿½ï¿½vï¿½Z
 		/// </summary>
 		/// <remark>
-		/// ModelƒNƒ‰ƒX‚ÌÝ’è‚ÉŠî‚Ã‚¢‚½ƒ[ƒ‹ƒhs—ñ‚ÌŒvŽZ‚ªs‚í‚ê‚Ü‚·B
-		/// ŒvŽZ‚³‚ê‚½ƒ[ƒ‹ƒhs—ñ‚ª–ß‚è’l‚Æ‚µ‚Ä•Ô‚³‚ê‚Ü‚·B
-		/// –{ŠÖ”‚ÍUpdateWorldMatrix‚©‚çŒÄ‚Î‚ê‚Ä‚¢‚Ü‚·B
-		/// –{ŠÖ”‚Íƒ[ƒ‹ƒhs—ñ‚ðŒvŽZ‚µ‚ÄA–ß‚·‚¾‚¯‚Å‚·B
-		/// Model::m_worldMatrix‚ªXV‚³‚ê‚é‚í‚¯‚Å‚Í‚È‚¢‚Ì‚ÅA’ˆÓ‚µ‚Ä‚­‚¾‚³‚¢B
-		/// –{ƒNƒ‰ƒX‚ÌÝ’è‚ÉŠî‚Ã‚¢‚ÄŒvŽZ‚³‚ê‚½ƒ[ƒ‹ƒhs—ñ‚ª•K—v‚Èê‡‚ÉŽg—p‚µ‚Ä‚­‚¾‚³‚¢
+		/// Modelï¿½Nï¿½ï¿½ï¿½Xï¿½ÌÝ’ï¿½ÉŠï¿½Ã‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ï¿½ÌŒvï¿½Zï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
+		/// ï¿½vï¿½Zï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ñ‚ª–ß‚ï¿½lï¿½Æ‚ï¿½ï¿½Ä•Ô‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
+		/// ï¿½{ï¿½Öï¿½ï¿½ï¿½UpdateWorldMatrixï¿½ï¿½ï¿½ï¿½Ä‚Î‚ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B
+		/// ï¿½{ï¿½Öï¿½ï¿½Íƒï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ÄAï¿½ß‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½B
+		/// Model::m_worldMatrixï¿½ï¿½ï¿½Xï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½í‚¯ï¿½Å‚Í‚È‚ï¿½ï¿½Ì‚ÅAï¿½ï¿½ï¿½Ó‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+		/// ï¿½{ï¿½Nï¿½ï¿½ï¿½Xï¿½ÌÝ’ï¿½ÉŠï¿½Ã‚ï¿½ï¿½ÄŒvï¿½Zï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ñ‚ª•Kï¿½vï¿½Èê‡ï¿½ÉŽgï¿½pï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		/// </remark>
-		/// <param name="pos">À•W</param>
-		/// <param name="rot">‰ñ“]</param>
-		/// <param name="scale">Šg‘å—¦</param>
-		/// <returns>ƒ[ƒ‹ƒhs—ñ</returns>
+		/// <param name="pos">ï¿½ï¿½ï¿½W</param>
+		/// <param name="rot">ï¿½ï¿½]</param>
+		/// <param name="scale">ï¿½gï¿½å—¦</param>
+		/// <returns>ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ï¿½</returns>
 		Matrix CalcWorldMatrix(Vector3 pos, Quaternion rot, Vector3 scale);
 		/// <summary>
-		/// •`‰æ
+		/// ï¿½`ï¿½ï¿½
 		/// </summary>
-		/// <param name="renderContext">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
-		/// <param name="numInstance">ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì”</param>
+		/// <param name="renderContext">ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½g</param>
+		/// <param name="numInstance">ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½Ìï¿½</param>
 		void Draw(
 			RenderContext& renderContext,
 			int numInstance = 1
 		);
 		/// <summary>
-		/// •`‰æ(ƒJƒƒ‰Žw’è”Å)
+		/// ï¿½`ï¿½ï¿½(ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½ï¿½)
 		/// </summary>
-		/// <param name="renderContext">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
-		/// <param name="camera">ƒJƒƒ‰</param>
-		/// <param name="numInstance">ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì”</param>
+		/// <param name="renderContext">ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½g</param>
+		/// <param name="camera">ï¿½Jï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name="numInstance">ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½Ìï¿½</param>
 		void Draw(
 			RenderContext& renderContext,
 			Camera& camera,
 			int numInstance = 1
 		);
 		/// <summary>
-		/// •`‰æ(ƒJƒƒ‰s—ñŽw’è”Å)
+		/// ï¿½`ï¿½ï¿½(ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½wï¿½ï¿½ï¿½)
 		/// </summary>
-		/// <param name="renderContext">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
-		/// <param name="viewMatrix">ƒrƒ…[s—ñ</param>
-		/// <param name="projMatrix">ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ</param>
-		/// <param name="numInstance">ƒCƒ“ƒXƒ^ƒ“ƒX‚Ì”</param>
+		/// <param name="renderContext">ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½g</param>
+		/// <param name="viewMatrix">ï¿½rï¿½ï¿½ï¿½[ï¿½sï¿½ï¿½</param>
+		/// <param name="projMatrix">ï¿½vï¿½ï¿½ï¿½Wï¿½Fï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½</param>
+		/// <param name="numInstance">ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½Ìï¿½</param>
 		void Draw(
 			RenderContext& renderContext,
 			const Matrix& viewMatrix,
@@ -122,7 +122,7 @@ namespace nsK2EngineLow {
 			int numInstance = 1
 		);
 		/// <summary>
-		/// ƒ[ƒ‹ƒhs—ñ‚ðŽæ“¾B
+		/// ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		const Matrix& GetWorldMatrix() const
@@ -130,9 +130,9 @@ namespace nsK2EngineLow {
 			return m_worldMatrix;
 		}
 		/// <summary>
-		/// ƒƒbƒVƒ…‚É‘Î‚µ‚Ä–â‚¢‡‚í‚¹‚ðs‚¤B
+		/// ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½É‘Î‚ï¿½ï¿½Ä–â‚¢ï¿½ï¿½ï¿½í‚¹ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B
 		/// </summary>
-		/// <param name="queryFunc">–â‚¢‡‚í‚¹ŠÖ”</param>
+		/// <param name="queryFunc">ï¿½â‚¢ï¿½ï¿½ï¿½í‚¹ï¿½Öï¿½</param>
 		void QueryMeshs(std::function<void(const SMesh& mesh)> queryFunc)
 		{
 			m_meshParts.QueryMeshs(queryFunc);
@@ -142,17 +142,25 @@ namespace nsK2EngineLow {
 			m_meshParts.QueryMeshAndDescriptorHeap(queryFunc);
 		}
 		/// <summary>
-		/// ƒAƒ‹ƒxƒhƒ}ƒbƒv‚ð•ÏXB
+		/// ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½}ï¿½bï¿½vï¿½ï¿½ÏXï¿½B
 		/// </summary>
 		/// <remarks>
-		/// ‚±‚ÌŠÖ”‚ðŒÄ‚Ño‚·‚ÆƒfƒBƒXƒNƒŠƒvƒ^ƒq[ƒv‚ÌÄ\’z‚ªs‚í‚ê‚é‚½‚ßAˆ—•‰‰×‚ª‚©‚©‚è‚Ü‚·B
-		/// –ˆƒtƒŒ[ƒ€ŒÄ‚Ño‚·•K—v‚ª‚È‚¢ê‡‚ÍŒÄ‚Ño‚³‚È‚¢‚æ‚¤‚É‚µ‚Ä‚­‚¾‚³‚¢B
+		/// ï¿½ï¿½ï¿½ÌŠÖï¿½ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½Æƒfï¿½Bï¿½Xï¿½Nï¿½ï¿½ï¿½vï¿½^ï¿½qï¿½[ï¿½vï¿½ÌÄ\ï¿½zï¿½ï¿½ï¿½sï¿½ï¿½ï¿½é‚½ï¿½ßAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
+		/// ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½ÍŒÄ‚Ñoï¿½ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </remarks>
-		/// <param name="materialName">•ÏX‚µ‚¢‚½ƒ}ƒeƒŠƒAƒ‹‚Ì–¼‘O</param>
-		/// <param name="albedoMap">ƒAƒ‹ƒxƒhƒ}ƒbƒv</param>
+		/// <param name="materialName">ï¿½ÏXï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Ì–ï¿½ï¿½O</param>
+		/// <param name="albedoMap">ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½}ï¿½bï¿½v</param>
 		void ChangeAlbedoMap(const char* materialName, Texture& albedoMap);
 		/// <summary>
-		/// TKMƒtƒ@ƒCƒ‹‚ðŽæ“¾B
+		/// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ì‘Sï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Éï¿½Zï¿½Jï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Ý’è‚·ï¿½ï¿½B
+		/// </summary>
+		/// <param name="mulColor">ï¿½ï¿½Zï¿½Jï¿½ï¿½ï¿½[</param>
+		void SetMulColor(const Vector4& mulColor)
+		{
+			m_meshParts.SetMulColor(mulColor);
+		}
+		/// <summary>
+		/// TKMï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		const TkmFile& GetTkmFile() const
@@ -160,7 +168,7 @@ namespace nsK2EngineLow {
 			return *m_tkmFile;
 		}
 		/// <summary>
-		/// ‰Šú‰»‚³‚ê‚Ä‚¢‚é‚©”»’èB
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		bool IsInited() const
@@ -168,19 +176,19 @@ namespace nsK2EngineLow {
 			return m_isInited;
 		}
 		/// <summary>
-		/// ƒ}ƒeƒŠƒAƒ‹‚ðÄ‰Šú‰»B
+		/// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
 		/// <remark>
-		/// ƒ‚ƒfƒ‹‚É“\‚è•t‚¯‚éƒeƒNƒXƒ`ƒƒ‚ð•ÏX‚µ‚½‚¢ê‡‚È‚Ç‚É—˜—p‚µ‚Ä‚­‚¾‚³‚¢B
+		/// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½É“\ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½ÏXï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‡ï¿½È‚Ç‚É—ï¿½ï¿½pï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </remark>
-		/// <param name="reInitData">Ä‰Šú‰»ƒf[ƒ^B</param>
+		/// <param name="reInitData">ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½B</param>
 		void ReInitMaterials(MaterialReInitData& reInitData);
 	private:
-		bool m_isInited = false;						//‰Šú‰»‚³‚ê‚Ä‚¢‚éH
-		Matrix m_worldMatrix;							//ƒ[ƒ‹ƒhs—ñB
-		TkmFile* m_tkmFile;								//tkmƒtƒ@ƒCƒ‹B
-		Skeleton m_skeleton;							//ƒXƒPƒ‹ƒgƒ“B
-		MeshParts m_meshParts;							//ƒƒbƒVƒ…ƒp[ƒcB
-		EnModelUpAxis m_modelUpAxis = enModelUpAxisY;	//ƒ‚ƒfƒ‹‚Ìã•ûŒüB
+		bool m_isInited = false;						//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½H
+		Matrix m_worldMatrix;							//ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½sï¿½ï¿½B
+		TkmFile* m_tkmFile;								//tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½B
+		Skeleton m_skeleton;							//ï¿½Xï¿½Pï¿½ï¿½ï¿½gï¿½ï¿½ï¿½B
+		MeshParts m_meshParts;							//ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½pï¿½[ï¿½cï¿½B
+		EnModelUpAxis m_modelUpAxis = enModelUpAxisY;	//ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½B
 	};
 }

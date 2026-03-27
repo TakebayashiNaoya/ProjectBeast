@@ -4,14 +4,14 @@
 
 namespace nsK2EngineLow {
 	/// <summary>
-	/// ƒ}ƒeƒŠƒAƒ‹B
+	/// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½B
 	/// </summary>
 	class Material : public Noncopyable {
 	public:
 		/// <summary>
-		/// tkmƒtƒ@ƒCƒ‹‚Ìƒ}ƒeƒŠƒAƒ‹î•ñ‚©‚ç‰Šú‰»‚·‚éB
+		/// tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒ}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ñ‚©‚ç‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
-		/// <param name="tkmMat">tkmƒ}ƒeƒŠƒAƒ‹</param>
+		/// <param name="tkmMat">tkmï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½</param>
 		void InitFromTkmMaterila(
 			const TkmFile::SMaterial& tkmMat,
 			const char* fxFilePath,
@@ -29,14 +29,14 @@ namespace nsK2EngineLow {
 			D3D12_CULL_MODE cullMode
 		);
 		/// <summary>
-		/// ƒŒƒ“ƒ_ƒŠƒ“ƒO‚ğŠJn‚·‚é‚Æ‚«‚ÉŒÄ‚Ño‚·ŠÖ”B
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½Jï¿½nï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ÉŒÄ‚Ñoï¿½ï¿½ï¿½Öï¿½ï¿½B
 		/// </summary>
-		/// <param name="rc">ƒŒƒ“ƒ_ƒŠƒ“ƒOƒRƒ“ƒeƒLƒXƒg</param>
-		/// <param name="hasSkin">ƒXƒLƒ“‚ª‚ ‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO</param>
+		/// <param name="rc">ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Rï¿½ï¿½ï¿½eï¿½Lï¿½Xï¿½g</param>
+		/// <param name="hasSkin">ï¿½Xï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½Ìƒtï¿½ï¿½ï¿½O</param>
 		void BeginRender(RenderContext& rc, int hasSkin);
 
 		/// <summary>
-		/// ƒAƒ‹ƒxƒhƒ}ƒbƒv‚ğæ“¾B
+		/// ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½}ï¿½bï¿½vï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		Texture& GetAlbedoMap()
@@ -44,7 +44,7 @@ namespace nsK2EngineLow {
 			return *m_albedoMap;
 		}
 		/// <summary>
-		/// –@üƒ}ƒbƒv‚ğæ“¾B
+		/// ï¿½@ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		Texture& GetNormalMap()
@@ -52,7 +52,7 @@ namespace nsK2EngineLow {
 			return *m_normalMap;
 		}
 		/// <summary>
-		/// ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚ğæ“¾B
+		/// ï¿½Xï¿½yï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		Texture& GetSpecularMap()
@@ -60,7 +60,7 @@ namespace nsK2EngineLow {
 			return *m_specularMap;
 		}
 		/// <summary>
-		/// ”½Ëƒ}ƒbƒv‚ğæ“¾B
+		/// ï¿½ï¿½ï¿½Ëƒ}ï¿½bï¿½vï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		Texture& GetReflectionMap()
@@ -68,7 +68,7 @@ namespace nsK2EngineLow {
 			return *m_reflectionMap;
 		}
 		/// <summary>
-		/// ‹üÜƒ}ƒbƒv‚ğæ“¾B
+		/// ï¿½ï¿½ï¿½Üƒ}ï¿½bï¿½vï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		Texture& GetRefractionMap()
@@ -76,7 +76,7 @@ namespace nsK2EngineLow {
 			return *m_refractionMap;
 		}
 		/// <summary>
-		/// ’è”ƒoƒbƒtƒ@‚ğæ“¾B
+		/// ï¿½è”ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		ConstantBuffer& GetConstantBuffer()
@@ -86,7 +86,7 @@ namespace nsK2EngineLow {
 		
 	private:
 		/// <summary>
-		/// ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ì‰Šú‰»B
+		/// ï¿½pï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
 		void InitPipelineState(
 			const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
@@ -96,45 +96,60 @@ namespace nsK2EngineLow {
 			D3D12_CULL_MODE cullMode
 		);
 		/// <summary>
-		/// ƒVƒF[ƒ_[‚Ì‰Šú‰»B
+		/// ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
-		/// <param name="fxFilePath">fxƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX</param>
-		/// <param name="vsEntryPointFunc">’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚ÌŠÖ”–¼</param>
-		/// <param name="vsEntryPointFunc">ƒXƒLƒ“‚ ‚èƒ}ƒeƒŠƒAƒ‹—p‚Ì’¸“_ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚ÌŠÖ”–¼</param>
-		/// <param name="psEntryPointFunc">ƒsƒNƒZƒ‹ƒVƒF[ƒ_[‚ÌƒGƒ“ƒgƒŠ[ƒ|ƒCƒ“ƒg‚ÌŠÖ”–¼</param>
+		/// <param name="fxFilePath">fxï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½X</param>
+		/// <param name="vsEntryPointFunc">ï¿½ï¿½ï¿½_ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½gï¿½ÌŠÖï¿½ï¿½ï¿½</param>
+		/// <param name="vsEntryPointFunc">ï¿½Xï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½pï¿½Ì’ï¿½ï¿½_ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½gï¿½ÌŠÖï¿½ï¿½ï¿½</param>
+		/// <param name="psEntryPointFunc">ï¿½sï¿½Nï¿½Zï¿½ï¿½ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½|ï¿½Cï¿½ï¿½ï¿½gï¿½ÌŠÖï¿½ï¿½ï¿½</param>
 		void InitShaders(
 			const char* fxFilePath,
 			const char* vsEntryPointFunc,
 			const char* vsSkinEntriyPointFunc,
 			const char* psEntryPointFunc);
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ‚ğ‰Šú‰»B
+		/// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
 		/// <param name="tkmMat"></param>
 		void InitTexture(const TkmFile::SMaterial& tkmMat);
+	public:
+		/// <summary>
+		/// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Ìï¿½Zï¿½Jï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½İ’è‚·ï¿½ï¿½B
+		/// </summary>
+		/// <param name="mulColor">ï¿½Zï¿½Jï¿½ï¿½ï¿½[(RGBA, 1.0f=ï¿½ÏXï¿½È‚ï¿½)</param>
+		void SetMulColor(const Vector4& mulColor)
+		{
+			m_materialParam.mulColor = mulColor;
+			m_constantBuffer.CopyToVRAM(m_materialParam);
+		}
+
 	private:
 		/// <summary>
-		/// ƒ}ƒeƒŠƒAƒ‹ƒpƒ‰ƒ[ƒ^B
+		/// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½B
 		/// </summary>
 		struct SMaterialParam {
-			int hasNormalMap;	//–@üƒ}ƒbƒv‚ğ•Û‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOB
-			int hasSpecMap;		//ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚ğ•Û‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒOB
+			int hasNormalMap;	//ï¿½@ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½Ìƒtï¿½ï¿½ï¿½Oï¿½B
+			int hasSpecMap;		//ï¿½Xï¿½yï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½ï¿½Ûï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‚©ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½Ìƒtï¿½ï¿½ï¿½Oï¿½B
+			int pad0;			// ï¿½Aï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½pï¿½B
+			int pad1;			// ï¿½Aï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½pï¿½B
+			Vector4 mulColor;	// ï¿½ï¿½Zï¿½Jï¿½ï¿½ï¿½[(RGBA)ï¿½B
 		};
-		Texture* m_albedoMap;						//ƒAƒ‹ƒxƒhƒ}ƒbƒvB
-		Texture* m_normalMap;						//–@üƒ}ƒbƒvB
-		Texture* m_specularMap;						//ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒvB
-		Texture* m_reflectionMap;					//ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒvB
-		Texture* m_refractionMap;					//‹üÜƒ}ƒbƒvB
+		SMaterialParam m_materialParam;					//ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½iCopyToVRAMï¿½pï¿½É•Û‘ï¿½jï¿½B
+		Texture* m_albedoMap;						//ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½}ï¿½bï¿½vï¿½B
+		Texture* m_normalMap;						//ï¿½@ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½B
+		Texture* m_specularMap;						//ï¿½Xï¿½yï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½B
+		Texture* m_reflectionMap;					//ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½B
+		Texture* m_refractionMap;					//ï¿½ï¿½ï¿½Üƒ}ï¿½bï¿½vï¿½B
 
-		ConstantBuffer m_constantBuffer;				//’è”ƒoƒbƒtƒ@B
-		RootSignature m_rootSignature;					//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒB
-		PipelineState m_nonSkinModelPipelineState;		//ƒXƒLƒ“‚È‚µƒ‚ƒfƒ‹—p‚ÌƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒgB
-		PipelineState m_skinModelPipelineState;			//ƒXƒLƒ“‚ ‚èƒ‚ƒfƒ‹—p‚ÌƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒgB
-		PipelineState m_transSkinModelPipelineState;	//ƒXƒLƒ“‚ ‚èƒ‚ƒfƒ‹—p‚ÌƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg(”¼“§–¾ƒ}ƒeƒŠƒAƒ‹)B
-		PipelineState m_transNonSkinModelPipelineState;	//ƒXƒLƒ“‚È‚µƒ‚ƒfƒ‹—p‚ÌƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg(”¼“§–¾ƒ}ƒeƒŠƒAƒ‹)B
-		Shader* m_vsNonSkinModel = nullptr;				//ƒXƒLƒ“‚È‚µƒ‚ƒfƒ‹—p‚Ì’¸“_ƒVƒF[ƒ_[B
-		Shader* m_vsSkinModel = nullptr;				//ƒXƒLƒ“‚ ‚èƒ‚ƒfƒ‹—p‚Ì’¸“_ƒVƒF[ƒ_[B
-		Shader* m_psModel = nullptr;					//ƒ‚ƒfƒ‹—p‚ÌƒsƒNƒZƒ‹ƒVƒF[ƒ_[B
+		ConstantBuffer m_constantBuffer;				//ï¿½è”ï¿½oï¿½bï¿½tï¿½@ï¿½B
+		RootSignature m_rootSignature;					//ï¿½ï¿½ï¿½[ï¿½gï¿½Vï¿½Oï¿½lï¿½`ï¿½ï¿½ï¿½B
+		PipelineState m_nonSkinModelPipelineState;		//ï¿½Xï¿½Lï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½pï¿½Ìƒpï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½B
+		PipelineState m_skinModelPipelineState;			//ï¿½Xï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½èƒ‚ï¿½fï¿½ï¿½ï¿½pï¿½Ìƒpï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½B
+		PipelineState m_transSkinModelPipelineState;	//ï¿½Xï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½èƒ‚ï¿½fï¿½ï¿½ï¿½pï¿½Ìƒpï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½g(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½)ï¿½B
+		PipelineState m_transNonSkinModelPipelineState;	//ï¿½Xï¿½Lï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½pï¿½Ìƒpï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½g(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½)ï¿½B
+		Shader* m_vsNonSkinModel = nullptr;				//ï¿½Xï¿½Lï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½pï¿½Ì’ï¿½ï¿½_ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½B
+		Shader* m_vsSkinModel = nullptr;				//ï¿½Xï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½èƒ‚ï¿½fï¿½ï¿½ï¿½pï¿½Ì’ï¿½ï¿½_ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½B
+		Shader* m_psModel = nullptr;					//ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½pï¿½Ìƒsï¿½Nï¿½Zï¿½ï¿½ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½B
 	};
 }
 

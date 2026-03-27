@@ -11,6 +11,7 @@ cbuffer ModelCb : register(b0){
 	float4x4 mWorld;
 	float4x4 mView;
 	float4x4 mProj;
+	float4 mulColor;	// 乗算カラー (RGBA, 1.0f=変更なし)
 };
 
 ////////////////////////////////////////////////
@@ -104,5 +105,5 @@ SPSIn VSSkinMain( SVSIn vsIn )
 float4 PSMain( SPSIn psIn ) : SV_Target0
 {
 	float4 albedoColor = g_albedo.Sample(g_sampler, psIn.uv);
-	return albedoColor;
+	return float4(albedoColor.rgb * mulColor.rgb, albedoColor.a);
 }

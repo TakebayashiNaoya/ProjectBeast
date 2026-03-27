@@ -441,6 +441,7 @@ namespace nsK2EngineLow {
 		static const Vector4 Black;
 		static const Vector4 Yellow;
 		static const Vector4 Gray;
+		static const Vector4 One;
 	public:
 		/// <summary>
 		/// XMVECTORへの暗黙の型変換。
@@ -712,8 +713,7 @@ namespace nsK2EngineLow {
 		/// </summary>
 		Quaternion(float x, float y, float z, float w) :
 			Vector4(x, y, z, w)
-		{
-		}
+		{}
 
 		bool IsEqual(const Quaternion& q, const float value = 0.001f) const
 		{

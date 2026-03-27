@@ -1,8 +1,8 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "Material.h"
 
 namespace nsK2EngineLow {
-	//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ÆƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒgŽü‚è‚ÍƒJƒŠƒJƒŠƒJƒŠ
+	//ï¿½ï¿½ï¿½[ï¿½gï¿½Vï¿½Oï¿½lï¿½`ï¿½ï¿½ï¿½Æƒpï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ÍƒJï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½Jï¿½ï¿½
 	enum {
 		enDescriptorHeap_CB,
 		enDescriptorHeap_SRV,
@@ -18,7 +18,7 @@ namespace nsK2EngineLow {
 		char* map = nullptr;
 		unsigned int mapSize;
 
-		//ƒAƒ‹ƒxƒhƒ}ƒbƒvB
+		//ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½}ï¿½bï¿½vï¿½B
 		{
 			if (tkmMat.albedoMap != nullptr)
 			{
@@ -44,7 +44,7 @@ namespace nsK2EngineLow {
 		}
 
 
-		//–@üƒ}ƒbƒvB
+		//ï¿½@ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½B
 		{
 			if (tkmMat.normalMap != nullptr)
 			{
@@ -71,7 +71,7 @@ namespace nsK2EngineLow {
 
 
 
-		//ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒvB
+		//ï¿½Xï¿½yï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½B
 		{
 			if (tkmMat.specularMap != nullptr)
 			{
@@ -96,7 +96,7 @@ namespace nsK2EngineLow {
 			m_specularMap = specularMap;
 		}
 
-		//”½ŽËƒ}ƒbƒvB
+		//ï¿½ï¿½ï¿½Ëƒ}ï¿½bï¿½vï¿½B
 		{
 			if (tkmMat.reflectionMap != nullptr)
 			{
@@ -121,7 +121,7 @@ namespace nsK2EngineLow {
 			m_reflectionMap = reflectionMap;
 		}
 
-		//‹üÜƒ}ƒbƒvB
+		//ï¿½ï¿½ï¿½Üƒ}ï¿½bï¿½vï¿½B
 		{
 			if (tkmMat.refractionMap != nullptr)
 			{
@@ -165,18 +165,20 @@ namespace nsK2EngineLow {
 		D3D12_CULL_MODE cullMode
 	)
 	{
-		//ƒeƒNƒXƒ`ƒƒ‚ðƒ[ƒhB
+		//ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½B
 		InitTexture(tkmMat);
 
-		//’è”ƒoƒbƒtƒ@‚ðì¬B
-		SMaterialParam matParam;
-		matParam.hasNormalMap = m_normalMap->IsValid() ? 1 : 0;
-		matParam.hasSpecMap = m_specularMap->IsValid() ? 1 : 0;
-		m_constantBuffer.Init(sizeof(SMaterialParam), &matParam);
+		//ï¿½è”ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½ì¬ï¿½B
+		m_materialParam.hasNormalMap = m_normalMap->IsValid() ? 1 : 0;
+		m_materialParam.hasSpecMap = m_specularMap->IsValid() ? 1 : 0;
+		m_materialParam.pad0 = 0;
+		m_materialParam.pad1 = 0;
+		m_materialParam.mulColor = Vector4::One;
+		m_constantBuffer.Init(sizeof(SMaterialParam), &m_materialParam);
 
-		//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚ð‰Šú‰»B
+		//ï¿½ï¿½ï¿½[ï¿½gï¿½Vï¿½Oï¿½lï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		D3D12_STATIC_SAMPLER_DESC samplerDescArray[2];
-		//ƒfƒtƒHƒ‹ƒg‚ÌƒTƒ“ƒvƒ‰
+		//ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ÌƒTï¿½ï¿½ï¿½vï¿½ï¿½
 		samplerDescArray[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 		samplerDescArray[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 		samplerDescArray[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -190,9 +192,9 @@ namespace nsK2EngineLow {
 		samplerDescArray[0].ShaderRegister = 0;
 		samplerDescArray[0].RegisterSpace = 0;
 		samplerDescArray[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
-		//ƒVƒƒƒhƒEƒ}ƒbƒv—p‚ÌƒTƒ“ƒvƒ‰B
+		//ï¿½Vï¿½ï¿½ï¿½hï¿½Eï¿½}ï¿½bï¿½vï¿½pï¿½ÌƒTï¿½ï¿½ï¿½vï¿½ï¿½ï¿½B
 		samplerDescArray[1] = samplerDescArray[0];
-		//”äŠr‘ÎÛ‚Ì’l‚ª¬‚³‚¯‚ê‚Î‚OA‘å‚«‚¯‚ê‚Î‚P‚ð•Ô‚·”äŠrŠÖ”‚ðÝ’è‚·‚éB
+		//ï¿½ï¿½rï¿½ÎÛ‚Ì’lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚Oï¿½Aï¿½å‚«ï¿½ï¿½ï¿½ï¿½Î‚Pï¿½ï¿½Ô‚ï¿½ï¿½ï¿½rï¿½Öï¿½ï¿½ï¿½Ý’è‚·ï¿½ï¿½B
 		samplerDescArray[1].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 		samplerDescArray[1].ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER;
 		samplerDescArray[1].MaxAnisotropy = 1;
@@ -209,13 +211,13 @@ namespace nsK2EngineLow {
 		);
 
 		if (fxFilePath != nullptr && strlen(fxFilePath) > 0) {
-			//ƒVƒF[ƒ_[‚ð‰Šú‰»B
+			//ï¿½Vï¿½Fï¿½[ï¿½_ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 			InitShaders(fxFilePath, vsEntryPointFunc, vsSkinEntryPointFunc, psEntryPointFunc);
-			//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ð‰Šú‰»B
+			//ï¿½pï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 			InitPipelineState(
-				colorBufferFormat, 
-				alphaBlendMode, 
-				isDepthWrite, 
+				colorBufferFormat,
+				alphaBlendMode,
+				isDepthWrite,
 				isDepthTest,
 				cullMode
 			);
@@ -228,7 +230,7 @@ namespace nsK2EngineLow {
 		bool isDepthTest,
 		D3D12_CULL_MODE cullMode
 	) {
-		// ’¸“_ƒŒƒCƒAƒEƒg‚ð’è‹`‚·‚éB
+		// ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Cï¿½Aï¿½Eï¿½gï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½B
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -240,7 +242,7 @@ namespace nsK2EngineLow {
 			{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		};
 
-		//ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚ðì¬B
+		//ï¿½pï¿½Cï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½ì¬ï¿½B
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
 		psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
 		psoDesc.pRootSignature = m_rootSignature.Get();
@@ -251,28 +253,28 @@ namespace nsK2EngineLow {
 		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
 		if (alphaBlendMode == AlphaBlendMode_Trans) {
-			//”¼“§–¾‡¬‚ÌƒuƒŒƒ“ƒhƒXƒe[ƒg‚ðì¬‚·‚éB
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒuï¿½ï¿½ï¿½ï¿½ï¿½hï¿½Xï¿½eï¿½[ï¿½gï¿½ï¿½ï¿½ì¬ï¿½ï¿½ï¿½ï¿½B
 			psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
 			psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 			psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 			psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		}
 		else if (alphaBlendMode == AlphaBlendMode_Add) {
-			//‰ÁŽZ‡¬B
+			//ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½ï¿½B
 			psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
 			psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
 			psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 			psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		}
 		else if (alphaBlendMode == AlphaBlendMode_Multiply) {
-			//æŽZ‡¬B
+			//ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½ï¿½B
 			psoDesc.BlendState.RenderTarget[0].BlendEnable = true;
 			psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
 			psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
 			psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
 		}
 		else if (alphaBlendMode == AlphaBlendMode_None) {
-			//ƒ¿ƒuƒŒƒ“ƒfƒBƒ“ƒO‚È‚µB
+			//ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½fï¿½Bï¿½ï¿½ï¿½Oï¿½È‚ï¿½ï¿½B
 			psoDesc.BlendState.RenderTarget[0].BlendEnable = false;
 		}
 
@@ -285,21 +287,21 @@ namespace nsK2EngineLow {
 		int numRenderTarget = 0;
 		for (auto& format : colorBufferFormat) {
 			if (format == DXGI_FORMAT_UNKNOWN) {
-				//ƒtƒH[ƒ}ƒbƒg‚ªŽw’è‚³‚ê‚Ä‚¢‚È‚¢êŠ‚ª—ˆ‚½‚çI‚í‚èB
+				//ï¿½tï¿½Hï¿½[ï¿½}ï¿½bï¿½gï¿½ï¿½ï¿½wï¿½è‚³ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½êŠï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½B
 				break;
 			}
 			psoDesc.RTVFormats[numRenderTarget] = colorBufferFormat[numRenderTarget];
 			numRenderTarget++;
 		}
 		psoDesc.NumRenderTargets = numRenderTarget;
-#if 0 //ŒÃ‚¢ŽÀ‘•B
-		psoDesc.RTVFormats[0] = colorBufferFormat;		//ƒAƒ‹ƒxƒhƒJƒ‰[o—Í—pB
+#if 0 //ï¿½Ã‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+		psoDesc.RTVFormats[0] = colorBufferFormat;		//ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½Jï¿½ï¿½ï¿½[ï¿½oï¿½Í—pï¿½B
 #ifdef SAMPE_16_02
-		psoDesc.RTVFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;	//–@üo—Í—pB	
-		psoDesc.RTVFormats[2] = DXGI_FORMAT_R32_FLOAT;						//Z’lB
+		psoDesc.RTVFormats[1] = DXGI_FORMAT_R16G16B16A16_FLOAT;	//ï¿½@ï¿½ï¿½ï¿½oï¿½Í—pï¿½B	
+		psoDesc.RTVFormats[2] = DXGI_FORMAT_R32_FLOAT;						//Zï¿½lï¿½B
 #else
-		psoDesc.RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM;			//–@üo—Í—pB	
-		psoDesc.RTVFormats[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	//Z’lB
+		psoDesc.RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM;			//ï¿½@ï¿½ï¿½ï¿½oï¿½Í—pï¿½B	
+		psoDesc.RTVFormats[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	//Zï¿½lï¿½B
 #endif
 #endif
 		psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
@@ -307,11 +309,11 @@ namespace nsK2EngineLow {
 
 		m_skinModelPipelineState.Init(psoDesc);
 
-		//‘±‚¢‚ÄƒXƒLƒ“‚È‚µƒ‚ƒfƒ‹—p‚ðì¬B
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ÄƒXï¿½Lï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½pï¿½ï¿½ï¿½ì¬ï¿½B
 		psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vsNonSkinModel->GetCompiledBlob());
 		m_nonSkinModelPipelineState.Init(psoDesc);
 
-		//‘±‚¢‚Ä”¼“§–¾ƒ}ƒeƒŠƒAƒ‹—pB
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ä”ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½pï¿½B
 		psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vsSkinModel->GetCompiledBlob());
 		psoDesc.BlendState.IndependentBlendEnable = TRUE;
 		psoDesc.BlendState.RenderTarget[0].BlendEnable = TRUE;
@@ -333,14 +335,14 @@ namespace nsK2EngineLow {
 		const char* psEntryPointFunc
 	)
 	{
-		//ƒXƒLƒ“‚È‚µƒ‚ƒfƒ‹—p‚ÌƒVƒF[ƒ_[‚ðƒ[ƒh‚·‚éB
+		//ï¿½Xï¿½Lï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½pï¿½ÌƒVï¿½Fï¿½[ï¿½_ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½B
 		m_vsNonSkinModel = g_engine->GetShaderFromBank(fxFilePath, vsEntryPointFunc);
 		if (m_vsNonSkinModel == nullptr) {
 			m_vsNonSkinModel = new Shader;
 			m_vsNonSkinModel->LoadVS(fxFilePath, vsEntryPointFunc);
 			g_engine->RegistShaderToBank(fxFilePath, vsEntryPointFunc, m_vsNonSkinModel);
 		}
-		//ƒXƒLƒ“‚ ‚èƒ‚ƒfƒ‹—p‚ÌƒVƒF[ƒ_[‚ðƒ[ƒh‚·‚éB
+		//ï¿½Xï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½èƒ‚ï¿½fï¿½ï¿½ï¿½pï¿½ÌƒVï¿½Fï¿½[ï¿½_ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½B
 		m_vsSkinModel = g_engine->GetShaderFromBank(fxFilePath, vsSkinEntriyPointFunc);
 		if (m_vsSkinModel == nullptr) {
 			m_vsSkinModel = new Shader;
