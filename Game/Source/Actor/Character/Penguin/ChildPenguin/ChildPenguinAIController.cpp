@@ -345,7 +345,7 @@ namespace app
 		//--------------------------------------------------------------
 
 		NaughtyChildPenguinAI::NaughtyChildPenguinAI(ChildPenguin* owner)
-			: ChildPenguinAIController(owner, EnChildPenguinType::naughty)
+			: ChildPenguinAIController(owner, EnChildPenguinType::Naughty)
 		{}
 
 

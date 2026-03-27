@@ -60,7 +60,7 @@ namespace app
 			case EnChildPenguinType::Clingy:
 				m_aiController = std::make_unique<ClingyChildPenguinAI>(this);
 				break;
-			case EnChildPenguinType::naughty:
+			case EnChildPenguinType::Naughty:
 				m_aiController = std::make_unique<NaughtyChildPenguinAI>(this);
 				break;
 			case EnChildPenguinType::Clumsy:

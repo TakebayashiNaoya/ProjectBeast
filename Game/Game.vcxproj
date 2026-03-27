@@ -314,6 +314,7 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hlsl ModelVSCommon.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="Source\Achivement\AchievementBase.h" />
     <ClInclude Include="Source\Achivement\AchievementManager.h" />

@@ -17,7 +17,7 @@ namespace app
 		{
 			Serious = 0,	// まじめ
 			Clingy,			// 甘えん坊
-			naughty,		// やんちゃ
+			Naughty,		// やんちゃ
 			Clumsy,			// おっちょこちょい
 			Caring,			// 世話焼き
 			Num

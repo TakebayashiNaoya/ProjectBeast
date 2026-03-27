@@ -12,7 +12,7 @@ namespace app
 	namespace util
 	{
 		/**
-		 * @brief 範囲を保持するための構造体s
+		 * @brief 範囲を保持するための構造体
 		 */
 		struct FloatRange {
 			float min;

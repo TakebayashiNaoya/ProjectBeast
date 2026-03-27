@@ -39,7 +39,7 @@ namespace app
 			/** タイプ固有のステートの追加 */
 			switch (m_type)
 			{
-			case EnChildPenguinType::naughty:
+			case EnChildPenguinType::Naughty:
 				// AddState<NaughtyRampageState>(this); // 実装時に追加
 				break;
 			default:
