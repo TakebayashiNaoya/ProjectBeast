@@ -449,7 +449,7 @@ namespace app
 
 
 			// ターゲットを親ペンギンの座標に設定
-			camera::CameraManager::Get().GetController<camera::WinCamera>(camera::WinCamera::ID())->SetTarget(m_owner->GetTransform().m_position, -front);
+			camera::CameraManager::Get().GetController<camera::WinCamera>(camera::WinCamera::ID())->SetTarget(m_owner->GetTransform().m_position, front);
 
 			// 勝利カメラに切り替え
 			camera::CameraManager::Get().SwitchCamera(camera::WinCamera::ID(), 1.0f);

@@ -16,6 +16,11 @@ namespace app
 {
 	namespace camera
 	{
+		namespace
+		{
+			constexpr float LIMITE_HEIGHT = 220.0f;
+		}
+
 		void LoseCamera::Update()
 		{
 			m_timer += 0.016f; // 本来はdeltaTimeを使用
@@ -24,6 +29,12 @@ namespace app
 			// 徐々に高く、遠くへ
 			float height = 50.0f + (m_timer * 40.0f);
 			float distance = 100.0f + (m_timer * 20.0f);
+			// 高さの上限を設定。
+			if (height > LIMITE_HEIGHT)
+			{
+				height = LIMITE_HEIGHT;
+				return;
+			}
 
 			m_data.position = m_targetPos + Vector3(0, height, -distance);
 			m_data.target = m_targetPos; // 倒れたキャラを注視し続ける
