@@ -15,6 +15,9 @@
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/CameraController.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
+
+#include <random>
 
 
 namespace app
@@ -67,20 +70,40 @@ namespace app
 			break;
 
 		case LoadPhase::Children:
+			// CHILD_PENGUIN_NUM が 100 以上に設定されていることを前提とします
 			if (m_childIndex < CHILD_PENGUIN_NUM)
 			{
-				// 10列×10行のグリッド状に配置
-				const float spacing = 100.0f;
-				Vector3 pos = Vector3(
-					(m_childIndex % 10) * spacing,   // X: 0～9列
-					0.0f,
-					(m_childIndex / 10) * spacing);   // Z: 0～9行
+				// 乱数生成器の初期化（staticにすることで毎フレーム初期化されるのを防ぎます）
+				static std::random_device rd;
+				static std::mt19937 gen(rd());
+				// -2000.0f から 2000.0f の範囲の乱数を生成
+				static std::uniform_real_distribution<float> dis(-2000.0f, 2000.0f);
+
+				// X, Y, Zをランダムに設定
+				Vector3 pos = Vector3(dis(gen), 0.0f, dis(gen));
 
 				actor::ChildPenguinManager::GetInstance()->CreateChildPenguin(1);
 
 				const auto& children = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
 				auto* child = children.back();
+
+				// ----------------------------------------------------
+				// ① 先にタイプを設定する（ここでステートマシンが生成される）
+				// ----------------------------------------------------
+				if (m_childIndex < 50)
+				{
+					child->SetChildPenguinType(app::actor::EnChildPenguinType::Serious);
+				}
+				else if (m_childIndex < 100)
+				{
+					child->SetChildPenguinType(app::actor::EnChildPenguinType::Clingy);
+				}
+
+				// ----------------------------------------------------
+				// ② その後に座標をセットする（生成されたステートマシンに座標が渡る）
+				// ----------------------------------------------------
 				child->SetPosition(pos);
+				child->GetStateMachine()->SetPosition(pos);
 				child->StartWrapper();
 
 				++m_childIndex;

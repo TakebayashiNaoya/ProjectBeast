@@ -76,6 +76,10 @@ namespace app
 			EnChildPenguinType m_type = EnChildPenguinType::Serious;
 			/** 陣形における自身の目標座標 */
 			Vector3 m_formationTarget;
+			/** タイプ別乗算カラー */
+			Vector4 m_typeColor = Vector4::One;
+			/** カラー適用済みフラグ（モデルロード完了後に一度だけ適用） */
+			bool m_colorApplied = false;
 		};
 	}
 }

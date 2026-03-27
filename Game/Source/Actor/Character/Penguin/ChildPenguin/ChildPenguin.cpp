@@ -31,6 +31,27 @@ namespace app
 		void ChildPenguin::SetChildPenguinType(EnChildPenguinType type)
 		{
 			m_type = type;
+			m_colorApplied = false;
+
+			// タイプ別乗算カラーを設定
+			switch (type)
+			{
+			case EnChildPenguinType::Serious:
+				m_typeColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);	// デフォルト（白）
+				break;
+			case EnChildPenguinType::Clingy:
+				m_typeColor = Vector4(1.0f, 0.85f, 0.85f, 1.0f);	// ピンク系（甘えん坊）
+				break;
+			case EnChildPenguinType::naughty:
+				m_typeColor = Vector4(1.0f, 0.90f, 0.70f, 1.0f);	// オレンジ系（やんちゃ）
+				break;
+			case EnChildPenguinType::Clumsy:
+				m_typeColor = Vector4(0.85f, 0.90f, 1.0f, 1.0f);	// 青系（おっちょこちょい）
+				break;
+			case EnChildPenguinType::Caring:
+				m_typeColor = Vector4(0.85f, 1.0f, 0.88f, 1.0f);	// 緑系（世話焼き）
+				break;
+			}
 
 			// タイプ変更に伴いステートマシンを作成
 			m_stateMachine = std::make_unique<ChildPenguinStateMachine>(this, m_type);
@@ -81,6 +102,14 @@ namespace app
 
 		void ChildPenguin::Update()
 		{
+			// モデルロード完了後、一度だけカラーを適用
+			if (m_modelReady && !m_colorApplied)
+			{
+				m_modelRender.SetMulColor(m_typeColor);
+				m_modelRender.Update();
+				m_colorApplied = true;
+			}
+
 			// AIコントローラーがあれば更新
 			if (m_aiController)
 			{
