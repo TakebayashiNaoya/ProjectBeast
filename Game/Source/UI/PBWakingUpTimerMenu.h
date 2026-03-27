@@ -7,6 +7,7 @@
 #include "Menu.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 
 
 namespace app
@@ -80,6 +81,12 @@ namespace app
 			 */
 			void SetEnemy(actor::Enemy* enemy) { m_enemy = enemy; }
 
+			/**
+			 * @brief DaddyPenguinの設定
+			 * @param daddyPenguin 親ペンギン
+			 */
+			void SetDaddyPenguin(actor::DaddyPenguin* daddyPenguin) { m_daddyPenguin = daddyPenguin; }
+
 			void SetIsDraw(bool isDraw);
 
 
@@ -90,6 +97,7 @@ namespace app
 			bool m_isLengthDraw;
 			bool m_isPBTimerActive;
 
+			actor::DaddyPenguin* m_daddyPenguin;
 			actor::EnemyController* m_eneCon;
 			actor::Enemy* m_enemy;
 
