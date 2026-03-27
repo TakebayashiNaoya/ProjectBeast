@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #pragma once
+#include "ChildPenguinTypes.h"
 
 
 namespace app
@@ -28,7 +29,7 @@ namespace app
 
 
 		public:
-			ChildPenguinAIController(ChildPenguin* owner);
+			ChildPenguinAIController(ChildPenguin* owner, EnChildPenguinType type);
 			virtual ~ChildPenguinAIController() = default;
 
 
@@ -71,17 +72,13 @@ namespace app
 			 *   フェーズを「上げる閾値」と「下げる閾値」を分けている。
 			 *   下げる閾値 = 上げる閾値 - HYSTERESIS
 			 *   これにより、閾値付近での高速な状態切り替えを防ぐ。
-			 *   ※ STOP_DISTANCE > HYSTERESIS となる値を設定すること。
+			 *   ※ m_stopDistance > HYSTERESIS となる値を設定すること。
 			 *
 			 * 【目標手前での減速（アプローチ減速）】
 			 *   stopDistance の2倍以内に入ると moveDirection をスケールダウンする。
 			 *   目標に近づくほど入力が弱まり行き過ぎを抑制する。
-			 *
-			 * @param stopDistance  停止とみなす距離
-			 * @param walkDistance  歩きの上限距離
-			 * @param runDistance   走りの上限距離（これを超えると滑り）
 			 */
-			void BuildInput(float stopDistance, float walkDistance, float runDistance);
+			void BuildInput();
 
 
 		protected:
@@ -91,6 +88,21 @@ namespace app
 			ChildPenguinStateMachine* m_stateMachine;
 			/** 隊列（陣形）に参加しているかどうか */
 			bool m_isFollowing = false;
+			/** 停止とみなす距離（HYSTERESIS より十分大きい値にすること） */
+			float m_stopDistance;
+			/** 歩きの上限距離 */
+			float m_walkDistance;
+			/** 走りの上限距離（これを超えると滑りで追う） */
+			float m_runDistance;
+			/** 隊列に加わる距離（未参加→参加） */
+			float m_joinDistance;
+			/**
+			 * @brief 追跡をあきらめてその場で待機する距離（参加中→離脱）
+			 * @details m_joinDistance より大きい値にすること。
+			 *          m_joinDistance と差を設けることで、離脱後に少し戻るだけで
+			 *          すぐ追従を再開するような挙動を防ぐ。
+			 */
+			float m_giveUpDistance;
 
 
 		private:
@@ -112,7 +124,7 @@ namespace app
 			/**
 			 * @brief ヒステリシス幅
 			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
-			 *          STOP_DISTANCE より小さい値にすること。
+			 *          m_stopDistance より小さい値にすること。
 			 */
 			static constexpr float HYSTERESIS = 5.0f;
 		};
@@ -130,23 +142,6 @@ namespace app
 		public:
 			SeriousChildPenguinAI(ChildPenguin* owner);
 			~SeriousChildPenguinAI() override = default;
-
-		private:
-			/** 停止とみなす距離（HYSTERESIS より十分大きい値にすること） */
-			static constexpr float STOP_DISTANCE = 15.0f;
-			/** 歩きの上限距離 */
-			static constexpr float WALK_DISTANCE = 30.0f;
-			/** 走りの上限距離（これを超えると滑りで追う） */
-			static constexpr float RUN_DISTANCE = 80.0f;
-			/** 隊列に加わる距離（未参加→参加） */
-			static constexpr float JOIN_DISTANCE = 400.0f;
-			/**
-			 * @brief 追跡をあきらめてその場で待機する距離（参加中→離脱）
-			 * @details JOIN_DISTANCE より大きい値にすること。
-			 *          JOIN_DISTANCE と差を設けることで、離脱後に少し戻るだけで
-			 *          すぐ追従を再開するような挙動を防ぐ。
-			 */
-			static constexpr float GIVE_UP_DISTANCE = 600.0f;
 		};
 
 
@@ -164,21 +159,53 @@ namespace app
 			~ClingyChildPenguinAI() override = default;
 
 		private:
-			/** 停止とみなす距離（HYSTERESIS より十分大きい値にすること） */
-			static constexpr float STOP_DISTANCE = 15.0f;
-			/** 歩きの上限距離 */
-			static constexpr float WALK_DISTANCE = 25.0f;
-			/** 走りの上限距離（これを超えると滑りで追う） */
-			static constexpr float RUN_DISTANCE = 60.0f;
-			/** 隊列に加わる距離（未参加→参加） */
-			static constexpr float JOIN_DISTANCE = 400.0f;
-			/**
-			 * @brief 追跡をあきらめてその場で待機する距離（参加中→離脱）
-			 * @details JOIN_DISTANCE より大きい値にすること。
-			 */
-			static constexpr float GIVE_UP_DISTANCE = 600.0f;
 			/** 待機命令中に強制追従が始まる親との距離 */
-			static constexpr float BREAK_AWAY_DISTANCE = 300.0f;
+			float m_breakAwayDistance;
+		};
+
+
+		/**
+		 * @brief やんちゃタイプの子ペンギンAI
+		 * @details 追従命令→ついてくる、待機命令→その場待機
+		 */
+		class NaughtyChildPenguinAI : public ChildPenguinAIController
+		{
+		public:
+			void Update() override;
+
+		public:
+			NaughtyChildPenguinAI(ChildPenguin* owner);
+			~NaughtyChildPenguinAI() override = default;
+		};
+
+
+		/**
+		 * @brief おっちょこちょいタイプの子ペンギンAI
+		 * @details 追従命令→ついてくる、待機命令→その場待機
+		 */
+		class ClumsyChildPenguinAI : public ChildPenguinAIController
+		{
+		public:
+			void Update() override;
+
+		public:
+			ClumsyChildPenguinAI(ChildPenguin* owner);
+			~ClumsyChildPenguinAI() override = default;
+		};
+
+
+		/**
+		 * @brief 世話焼きタイプの子ペンギンAI
+		 * @details 追従命令→ついてくる、待機命令→その場待機
+		 */
+		class CaringChildPenguinAI : public ChildPenguinAIController
+		{
+		public:
+			void Update() override;
+
+		public:
+			CaringChildPenguinAI(ChildPenguin* owner);
+			~CaringChildPenguinAI() override = default;
 		};
 	}
 }

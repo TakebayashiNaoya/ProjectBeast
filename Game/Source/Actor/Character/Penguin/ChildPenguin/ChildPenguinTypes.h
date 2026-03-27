@@ -19,7 +19,8 @@ namespace app
 			Clingy,			// 甘えん坊
 			naughty,		// やんちゃ
 			Clumsy,			// おっちょこちょい
-			Caring			// 世話焼き
+			Caring,			// 世話焼き
+			Num
 		};
 	}
 }

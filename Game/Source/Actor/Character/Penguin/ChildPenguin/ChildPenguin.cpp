@@ -6,9 +6,11 @@
 #include "stdafx.h"
 #include "ChildPenguin.h"
 #include "ChildPenguinAIController.h"
+#include "ChildPenguinParameter.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Core/ParameterManager.h"
 
 
 namespace app
@@ -33,25 +35,11 @@ namespace app
 			m_type = type;
 			m_colorApplied = false;
 
-			// タイプ別乗算カラーを設定
-			switch (type)
-			{
-			case EnChildPenguinType::Serious:
-				m_typeColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);	// デフォルト（白）
-				break;
-			case EnChildPenguinType::Clingy:
-				m_typeColor = Vector4(1.0f, 0.85f, 0.85f, 1.0f);	// ピンク系（甘えん坊）
-				break;
-			case EnChildPenguinType::naughty:
-				m_typeColor = Vector4(1.0f, 0.90f, 0.70f, 1.0f);	// オレンジ系（やんちゃ）
-				break;
-			case EnChildPenguinType::Clumsy:
-				m_typeColor = Vector4(0.85f, 0.90f, 1.0f, 1.0f);	// 青系（おっちょこちょい）
-				break;
-			case EnChildPenguinType::Caring:
-				m_typeColor = Vector4(0.85f, 1.0f, 0.88f, 1.0f);	// 緑系（世話焼き）
-				break;
-			}
+			// タイプ別乗算カラーをJSONパラメーターから設定
+			const int typeIndex = static_cast<int>(type);
+			const auto* param = core::ParameterManager::Get()->GetParameter<MasterChildPenguinParameter>(typeIndex);
+			const auto& td = param->typeData[typeIndex];
+			m_typeColor = Vector4(td.colorR, td.colorG, td.colorB, td.colorA);
 
 			// タイプ変更に伴いステートマシンを作成
 			m_stateMachine = std::make_unique<ChildPenguinStateMachine>(this, m_type);
@@ -72,9 +60,14 @@ namespace app
 			case EnChildPenguinType::Clingy:
 				m_aiController = std::make_unique<ClingyChildPenguinAI>(this);
 				break;
-			default:
-				// まだ実装されていないタイプはSeriousとして動作
-				m_aiController = std::make_unique<SeriousChildPenguinAI>(this);
+			case EnChildPenguinType::naughty:
+				m_aiController = std::make_unique<NaughtyChildPenguinAI>(this);
+				break;
+			case EnChildPenguinType::Clumsy:
+				m_aiController = std::make_unique<ClumsyChildPenguinAI>(this);
+				break;
+			case EnChildPenguinType::Caring:
+				m_aiController = std::make_unique<CaringChildPenguinAI>(this);
 				break;
 			}
 		}
