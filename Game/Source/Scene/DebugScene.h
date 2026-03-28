@@ -6,7 +6,7 @@
 #pragma once
 #include "IScene.h"
 #include <array>
-#include "Source/Actor/Character/Player/Player.h"
+
 
 namespace app
 {
@@ -31,6 +31,5 @@ namespace app
 		static constexpr int kPlayerCount = 20;
 		Vector3 m_position = Vector3::Zero;
 		int m_spawnedCount = 0;
-		app::actor::Player* m_players[kPlayerCount] = {};
 	};
 }

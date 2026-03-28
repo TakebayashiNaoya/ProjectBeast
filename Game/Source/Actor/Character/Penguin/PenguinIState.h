@@ -204,54 +204,6 @@ namespace app
 
 
 
-		/*****************************************/
-
-
-		/**
-		 * @brief ペンギンの命令ステートクラス
-		 */
-		class PenguinCommandShoutState : public PenguinIState
-		{
-			appState(PenguinCommandShoutState);
-		public:
-			// IStateの仮想関数のオーバーライド
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-
-		public:
-			PenguinCommandShoutState(PenguinStateMachine* owner);
-			~PenguinCommandShoutState() override = default;
-		};
-
-
-
-
-		/****************************************/
-
-
-		/**
-		 * @brief ペンギンの飛び込みステートクラス
-		 */
-		class PenguinDivingState : public PenguinIState
-		{
-			appState(PenguinDivingState);
-		public:
-			// IStateの仮想関数のオーバーライド
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-
-		public:
-			PenguinDivingState(PenguinStateMachine* owner);
-			~PenguinDivingState() override = default;
-		};
-
-
-
-
 		/****************************************/
 
 
@@ -276,78 +228,7 @@ namespace app
 
 
 
-		/****************************************/
-
-
-		/**
-		 * @brief ペンギンの登り開始ステートクラス
-		 */
-		class PenguinClimbStartState : public PenguinIState
-		{
-			appState(PenguinClimbStartState);
-			// IStateの仮想関数のオーバーライド
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-
-		public:
-			PenguinClimbStartState(PenguinStateMachine* owner);
-			~PenguinClimbStartState() override = default;
-		};
-
-
-
-
-		/****************************************/
-
-
-		/**
-		 * @brief ペンギンの登りステートクラス
-		 */
-		class PenguinClimbingState : public PenguinIState
-		{
-			appState(PenguinClimbingState);
-		public:
-			// IStateの仮想関数のオーバーライド
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-
-		public:
-			PenguinClimbingState(PenguinStateMachine* owner);
-			~PenguinClimbingState() override = default;
-		};
-
-
-
-
-		/****************************************/
-
-
-		/**
-		 * @brief ペンギンの登り終了ステートクラス
-		 */
-		class PenguinClimbEndState : public PenguinIState
-		{
-			appState(PenguinClimbEndState);
-		public:
-			// IStateの仮想関数のオーバーライド
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-
-		public:
-			PenguinClimbEndState(PenguinStateMachine* owner);
-			~PenguinClimbEndState() override = default;
-		};
-
-
-
-
-		/***************************************/
+		/************************************/
 
 
 		/**

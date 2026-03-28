@@ -36,7 +36,6 @@ namespace app
 			 * @details タイプ確定後に一度だけ呼び出す。
 			 *          ロック後は Update() 内の Setup() 再呼び出しをスキップし、
 			 *          ホットリロードによる上書きを防ぐ。
-			 * @param walkSpeed  歩き速度の個体値
 			 * @param runSpeed   走り速度の個体値
 			 * @param swimSpeed  泳ぎ速度の個体値
 			 * @param sneakSpeed スニーク速度の個体値
@@ -44,7 +43,6 @@ namespace app
 			 * @param jumpPower  ジャンプパワーの個体値
 			 */
 			void SetIndividualValues(
-				float walkSpeed,
 				float runSpeed,
 				float swimSpeed,
 				float sneakSpeed,

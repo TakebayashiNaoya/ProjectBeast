@@ -75,14 +75,13 @@ namespace app
 			const auto& td = GetTypeData(type);
 
 			/** 速度系個体値を決定してStatusに反映する */
-			const float walkSpeed = RollRange(td.walkSpeed);
 			const float runSpeed = RollRange(td.runSpeed);
 			const float swimSpeed = RollRange(td.swimSpeed);
 			const float sneakSpeed = RollRange(td.sneakSpeed);
 			const float slideSpeed = RollRange(td.slideSpeed);
 			const float jumpPower = RollRange(td.jumpPower);
 			owner->GetStatus<ChildPenguinStatus>()->SetIndividualValues(
-				walkSpeed, runSpeed, swimSpeed, sneakSpeed, slideSpeed, jumpPower);
+				runSpeed, swimSpeed, sneakSpeed, slideSpeed, jumpPower);
 
 			/** 距離系個体値を決定する */
 			m_stopDistance = RollRange(td.stopDistance);
@@ -272,42 +271,21 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// ClingyChildPenguinAI
+		// ClingyChildPenguinAI（甘えん坊ペンギン）
 		//--------------------------------------------------------------
 
 		ClingyChildPenguinAI::ClingyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Clingy)
-		{
-			/** 甘えん坊専用：強制追従が始まる距離を追加で設定する */
-			const auto& td = GetTypeData(EnChildPenguinType::Clingy);
-			m_breakAwayDistance = RollRange(td.breakAwayDistance);
-		}
+		{}
 
 
 		void ClingyChildPenguinAI::Update()
 		{
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
-			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
 			/** 親との距離を取得 */
 			const float distDaddy = GetDistanceToDaddy();
-
-			/** 待機命令中でも親から離れすぎたら強制追従 */
-			const bool forceFollow = !isFollowCmd && distDaddy > m_breakAwayDistance;
-
-			if (!isFollowCmd && !forceFollow)
-			{
-				/** 待機命令中かつ親との距離が許容範囲内：隊列から離脱 */
-				if (m_isFollowing)
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
-				}
-				/** その場で待機 */
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
-				return;
-			}
 
 			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
 			if (!m_isFollowing && distDaddy <= m_joinDistance)
@@ -341,7 +319,7 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// NaughtyChildPenguinAI
+		// NaughtyChildPenguinAI（やんちゃペンギン）
 		//--------------------------------------------------------------
 
 		NaughtyChildPenguinAI::NaughtyChildPenguinAI(ChildPenguin* owner)
@@ -404,7 +382,7 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// ClumsyChildPenguinAI
+		// ClumsyChildPenguinAI（おっちょこちょいペンギン）
 		//--------------------------------------------------------------
 
 		ClumsyChildPenguinAI::ClumsyChildPenguinAI(ChildPenguin* owner)
@@ -467,7 +445,7 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// CaringChildPenguinAI
+		// CaringChildPenguinAI（世話焼きペンギン）
 		//--------------------------------------------------------------
 
 		CaringChildPenguinAI::CaringChildPenguinAI(ChildPenguin* owner)

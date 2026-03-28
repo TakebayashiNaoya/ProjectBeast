@@ -8,7 +8,6 @@
     "radius": 10.0,
     "height": 70.0,
     "randomRanges": {
-      "walkSpeed":         [9.0,   11.0],
       "runSpeed":          [1.2,   1.8],
       "swimSpeed":         [9.0,   11.0],
       "sneakSpeed":        [0.8,   1.2],
@@ -18,8 +17,7 @@
       "walkDistance":      [28.0,  35.0],
       "runDistance":       [75.0,  90.0],
       "joinDistance":      [380.0, 420.0],
-      "giveUpDistance":    [570.0, 630.0],
-      "breakAwayDistance": [280.0, 320.0]
+      "giveUpDistance":    [570.0, 630.0]
     }
   },
   {
@@ -31,7 +29,6 @@
     "radius": 10.0,
     "height": 70.0,
     "randomRanges": {
-      "walkSpeed":         [8.5,   10.5],
       "runSpeed":          [1.0,   1.5],
       "swimSpeed":         [8.0,   10.0],
       "sneakSpeed":        [0.7,   1.0],
@@ -41,8 +38,7 @@
       "walkDistance":      [22.0,  28.0],
       "runDistance":       [55.0,  65.0],
       "joinDistance":      [380.0, 420.0],
-      "giveUpDistance":    [570.0, 630.0],
-      "breakAwayDistance": [250.0, 350.0]
+      "giveUpDistance":    [570.0, 630.0]
     }
   },
   {
@@ -54,7 +50,6 @@
     "radius": 10.0,
     "height": 70.0,
     "randomRanges": {
-      "walkSpeed":         [10.0,  12.0],
       "runSpeed":          [1.5,   2.0],
       "swimSpeed":         [10.0,  12.0],
       "sneakSpeed":        [1.0,   1.5],
@@ -64,8 +59,7 @@
       "walkDistance":      [32.0,  42.0],
       "runDistance":       [80.0,  100.0],
       "joinDistance":      [380.0, 420.0],
-      "giveUpDistance":    [570.0, 630.0],
-      "breakAwayDistance": [280.0, 320.0]
+      "giveUpDistance":    [570.0, 630.0]
     }
   },
   {
@@ -77,7 +71,6 @@
     "radius": 10.0,
     "height": 70.0,
     "randomRanges": {
-      "walkSpeed":         [8.0,   12.0],
       "runSpeed":          [1.0,   2.0],
       "swimSpeed":         [8.0,   12.0],
       "sneakSpeed":        [0.5,   1.5],
@@ -87,8 +80,7 @@
       "walkDistance":      [24.0,  42.0],
       "runDistance":       [65.0,  100.0],
       "joinDistance":      [350.0, 450.0],
-      "giveUpDistance":    [540.0, 660.0],
-      "breakAwayDistance": [280.0, 320.0]
+      "giveUpDistance":    [540.0, 660.0]
     }
   },
   {
@@ -100,7 +92,6 @@
     "radius": 10.0,
     "height": 70.0,
     "randomRanges": {
-      "walkSpeed":         [9.5,   10.5],
       "runSpeed":          [1.4,   1.6],
       "swimSpeed":         [9.5,   10.5],
       "sneakSpeed":        [0.9,   1.1],
@@ -110,8 +101,7 @@
       "walkDistance":      [28.0,  35.0],
       "runDistance":       [75.0,  90.0],
       "joinDistance":      [380.0, 420.0],
-      "giveUpDistance":    [570.0, 630.0],
-      "breakAwayDistance": [280.0, 320.0]
+      "giveUpDistance":    [570.0, 630.0]
     }
   }
 ]

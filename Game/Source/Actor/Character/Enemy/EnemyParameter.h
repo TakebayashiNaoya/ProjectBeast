@@ -27,8 +27,10 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			// エネミー固有のパラメーターをここに追加していく
+			/** 歩行速度 */
+			float walkSpeed;
+			/** 最大食事数 */
 			int maxEat;
 		};
 	}
 }
-

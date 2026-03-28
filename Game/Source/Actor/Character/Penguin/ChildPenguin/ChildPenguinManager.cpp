@@ -40,23 +40,21 @@ namespace app
 
 		void ChildPenguinManager::Update()
 		{
-			/** 子ペンギンが親と同じ移動方法で移動するため、親のステートを確認する */
-			if (m_daddyPenguin)
-			{
-				auto* daddyState = m_daddyPenguin->GetStateMachine();
+			///** 子ペンギンが親と同じ移動方法で移動するため、親のステートを確認する */
+			//if (m_daddyPenguin)
+			//{
+			//	auto* daddyState = m_daddyPenguin->GetStateMachine();
 
-				/** 走っているかどうか */
-				m_isDaddyRunning = daddyState->IsEqualCurrentState(PenguinRunState::ID());
-				/** スライドしているかどうか */
-				m_isDaddySliding = daddyState->IsEqualCurrentState(PenguinSlidingState::ID()) ||
-					daddyState->IsEqualCurrentState(PenguinSlideStartState::ID());
-				/** 飛び込んでいるかどうか */
-				m_isDaddyDiving = daddyState->IsEqualCurrentState(PenguinDivingState::ID());
-			}
-			else
-			{
-				m_isDaddyRunning = m_isDaddySliding = m_isDaddyDiving = false;
-			}
+			//	/** 走っているかどうか */
+			//	m_isDaddyRunning = daddyState->IsEqualCurrentState(PenguinRunState::ID());
+			//	/** スライドしているかどうか */
+			//	m_isDaddySliding = daddyState->IsEqualCurrentState(PenguinSlidingState::ID()) ||
+			//		daddyState->IsEqualCurrentState(PenguinSlideStartState::ID());
+			//}
+			//else
+			//{
+			//	m_isDaddyRunning = m_isDaddySliding = false;
+			//}
 
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {

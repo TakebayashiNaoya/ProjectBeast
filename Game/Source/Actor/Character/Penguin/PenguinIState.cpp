@@ -211,30 +211,6 @@ namespace app
 
 
 
-		/************************************/
-
-
-		void PenguinDivingState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::IdleShake);
-		}
-
-
-		void PenguinDivingState::Update()
-		{}
-
-
-		void PenguinDivingState::Exit()
-		{}
-
-
-		PenguinDivingState::PenguinDivingState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
 		/****************************************/
 
 
@@ -257,78 +233,6 @@ namespace app
 
 
 		PenguinSwimmingState::PenguinSwimmingState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
-		/****************************************/
-
-
-		void PenguinClimbStartState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchBegin);
-		}
-
-
-		void PenguinClimbStartState::Update()
-		{}
-
-
-		void PenguinClimbStartState::Exit()
-		{}
-
-
-		PenguinClimbStartState::PenguinClimbStartState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
-		/****************************************/
-
-
-		void PenguinClimbingState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchFlapingWingsQuickly);
-		}
-
-
-		void PenguinClimbingState::Update()
-		{}
-
-
-		void PenguinClimbingState::Exit()
-		{}
-
-
-		PenguinClimbingState::PenguinClimbingState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
-		/****************************************/
-
-
-		void PenguinClimbEndState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchEnd);
-		}
-
-
-		void PenguinClimbEndState::Update()
-		{}
-
-
-		void PenguinClimbEndState::Exit()
-		{}
-
-
-		PenguinClimbEndState::PenguinClimbEndState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
 		{}
 

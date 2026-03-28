@@ -127,7 +127,7 @@ namespace app
 			 */
 			bool CanKeepSlidingState() const
 			{
-				return m_isSlide && CanChangeWalkState();
+				return m_isSlide && CanChangeMoveState();
 			}
 			/**
 			 * @brief スライド終了ステートに切り替えられるかどうか
@@ -136,22 +136,6 @@ namespace app
 			bool IsFinishedSlideEndState() const
 			{
 				return !m_isSlide && !IsPlayingAnimation();
-			}
-			/**
-			 * @brief 離水ステートに切り替えられるかどうか
-			 * @return 離水ステートに切り替えられるかどうか
-			 */
-			bool CanChangeSeparateWaterState() const
-			{
-				return m_isSeparateWater && IsInWater();
-			}
-			/**
-			 * @brief 飛び込みステートに切り替えられるかどうか
-			 * @return 飛び込みステートに切り替えられるかどうか
-			 */
-			bool CanChangeDivingState() const
-			{
-				return m_isDive && IsInWater();
 			}
 			/**
 			 * @brief 被弾ステートに切り替えられるかどうか
@@ -177,10 +161,6 @@ namespace app
 			bool m_isJump;
 			/** スライドするかどうか */
 			bool m_isSlide;
-			/** 離水するかどうか */
-			bool m_isSeparateWater;
-			/** 飛び込みするかどうか */
-			bool m_isDive;
 			/** 被弾したかどうか */
 			bool m_isDamaged;
 		};

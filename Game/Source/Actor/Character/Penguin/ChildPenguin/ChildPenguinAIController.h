@@ -147,7 +147,7 @@ namespace app
 
 		/**
 		 * @brief 甘えん坊タイプの子ペンギンAI
-		 * @details 待機命令を無視して常にDaddyに追従する
+		 * @details 命令に関わらず常にDaddyに追従する
 		 */
 		class ClingyChildPenguinAI : public ChildPenguinAIController
 		{
@@ -157,10 +157,6 @@ namespace app
 		public:
 			ClingyChildPenguinAI(ChildPenguin* owner);
 			~ClingyChildPenguinAI() override = default;
-
-		private:
-			/** 待機命令中に強制追従が始まる親との距離 */
-			float m_breakAwayDistance;
 		};
 
 

@@ -27,11 +27,7 @@ namespace app
 			AddState<PenguinSlideStartState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlidingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlideEndState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinDivingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSwimmingState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinClimbStartState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinClimbingState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinClimbEndState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDamagedState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDiyingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDeadState>(static_cast<PenguinStateMachine*>(this));
@@ -58,8 +54,6 @@ namespace app
 			m_isDash = isDash;
 			m_isJump = isJump;
 			m_isSlide = isSlide;
-			m_isDive = isDive;
-			m_isSeparateWater = isSeparateWater;
 			m_isSwimming = IsInWater();
 		}
 
@@ -112,76 +106,18 @@ namespace app
 				return FindState(PenguinDamagedState::ID());
 			}
 
-			// 登り終了状態
-			if (IsEqualCurrentState(PenguinClimbEndState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinClimbEndState::ID());
-				}
-				// アニメーション終了後はIdleへ
-			}
-
-			// 登り中状態
-			if (IsEqualCurrentState(PenguinClimbingState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinClimbingState::ID());
-				}
-				return FindState(PenguinClimbEndState::ID());
-			}
-
-			// 登り開始状態
-			if (IsEqualCurrentState(PenguinClimbStartState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinClimbStartState::ID());
-				}
-				return FindState(PenguinClimbingState::ID());
-			}
-
-			// 離水判定
-			if (CanChangeSeparateWaterState())
-			{
-				return FindState(PenguinClimbStartState::ID());
-			}
-
 			// 泳ぎ判定
 			if (CanChangeSwimState())
 			{
 				return FindState(PenguinSwimmingState::ID());
 			}
 
-			// 飛び込み状態の維持
-			if (IsEqualCurrentState(PenguinDivingState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinDivingState::ID());
-				}
-				return FindState(PenguinSwimmingState::ID());
-			}
-
-			// 飛び込み判定
-			if (CanChangeDivingState())
-			{
-				return FindState(PenguinDivingState::ID());
-			}
-
 			// スライド開始状態
-			// ※ SlideStart アニメーション中に停止してしまうため、
-			//   SlideStart はスキップして即 Sliding へ遷移する。
+			// ※ SlideStart を経由せず直接 Sliding へ遷移する。
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
 			{
 				return FindState(PenguinSlidingState::ID());
 			}
-
-			// スライド終了状態
-			// ※ SlideEnd アニメーション中に停止してしまうため、
-			//   SlideEnd はスキップして次の判定（Run / Sneak / Idle）へ直接落とす。
-			// （維持ブロックを除去することでスキップを実現する）
 
 			// スライド中状態
 			// ※ スライドを終了するとき SlideEnd を経由せず次の判定へ直接遷移する。
@@ -208,7 +144,7 @@ namespace app
 			}
 
 			// 歩行判定
-			if (CanChangeWalkState())
+			if (CanChangeMoveState())
 			{
 				return FindState(PenguinSneakState::ID());
 			}

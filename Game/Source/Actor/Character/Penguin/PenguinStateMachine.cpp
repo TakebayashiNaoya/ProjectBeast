@@ -31,7 +31,7 @@ namespace app
 			, m_jumpPower(0.0f)
 			, m_isJump(false)
 			, m_isSlide(false)
-			, m_isSeparateWater(false)
+			, m_isDamaged(false)
 		{}
 
 

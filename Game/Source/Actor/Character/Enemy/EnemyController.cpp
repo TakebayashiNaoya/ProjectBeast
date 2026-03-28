@@ -14,7 +14,6 @@
 #include "Source/Actor/Character/Enemy/EnemyStatus.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Actor/Character/Player/Player.h"
 #include "Source/Actor/Stage/StageSystem.h"
 
 

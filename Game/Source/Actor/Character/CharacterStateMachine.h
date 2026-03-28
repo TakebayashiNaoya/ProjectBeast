@@ -98,10 +98,10 @@ namespace app
 
 		protected:
 			/**
-			 * @brief 歩行ステートに切り替えられるかどうか
-			 * @return 歩行ステートに切り替えられるかどうか
+			 * @brief 移動入力があるかどうか（スニーク/ダッシュ/スライドへの遷移判定に使用）
+			 * @return 移動入力があるかどうか
 			 */
-			inline bool CanChangeWalkState() const
+			inline bool CanChangeMoveState() const
 			{
 				return fabsf(m_moveDirection.LengthSq()) > FLT_EPSILON;
 			}
@@ -111,7 +111,7 @@ namespace app
 			 */
 			inline bool CanChangeRunState() const
 			{
-				return CanChangeWalkState() && m_isDash;
+				return CanChangeMoveState() && m_isDash;
 			}
 			/**
 			 * @brief 泳ぎステートに切り替えられるかどうか

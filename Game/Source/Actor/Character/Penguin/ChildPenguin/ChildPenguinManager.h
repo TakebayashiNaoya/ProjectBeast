@@ -63,6 +63,10 @@ namespace app
 
 		public:
 			/**
+			 * @brief 親ペンギンの現在座標を取得する
+			 */
+			Vector3 GetDaddyPosition() const;
+			/**
 			 * @brief 親ペンギンを設定（GameSceneなどで呼び出す）
 			 * @param daddy 親ペンギンのポインタ
 			 */
@@ -149,30 +153,6 @@ namespace app
 		private:
 			/** 子ペンギンへの命令 */
 			EnPenguinCommand m_command = EnPenguinCommand::Follow;
-
-
-
-
-			//============================================//
-			// 親ペンギンと同じ移動をするためのフラグ管理
-			//============================================//
-
-		public:
-			/**
-			 * @brief 親ペンギンの現在座標を取得する
-			 */
-			Vector3 GetDaddyPosition() const;
-
-			/** 親ペンギンの現在アクション状態を取得 */
-			bool IsDaddyRunning() const { return m_isDaddyRunning; }
-			bool IsDaddySliding() const { return m_isDaddySliding; }
-			bool IsDaddyDiving() const { return m_isDaddyDiving; }
-
-
-		private:
-			bool m_isDaddyRunning = false;
-			bool m_isDaddySliding = false;
-			bool m_isDaddyDiving = false;
 
 
 
