@@ -24,7 +24,7 @@ namespace app
 			, m_hp(0)
 			, m_sneakSpeed(0.0f)
 			, m_slideSpeed(0.0f)
-			, m_jumpPower(1.0f)
+			, m_jumpPower(0.0f)
 		{}
 
 

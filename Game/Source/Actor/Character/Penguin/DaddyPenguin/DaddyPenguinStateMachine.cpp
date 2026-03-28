@@ -131,37 +131,25 @@ namespace app
 				return FindState(DaddyPenguinCommandShoutState::ID());
 			}
 
-
 			if (IsEqualCurrentState(DaddyPenguinWinState::ID()))
 			{
 				return FindState(DaddyPenguinWinState::ID());
 			}
-
-
 
 			if (m_isWin)
 			{
 				return FindState(DaddyPenguinWinState::ID());
 			}
 
-
 			if (IsEqualCurrentState(DaddyPenguinLoseState::ID()))
 			{
 				return FindState(DaddyPenguinLoseState::ID());
 			}
 
-
 			if (m_isLose)
 			{
 				return FindState(DaddyPenguinLoseState::ID());
 			}
-
-
-			if (CanChangeJumpState())
-			{
-				return FindState(PenguinJumpState::ID());
-			}
-
 
 			/** 死亡ステート中、アニメーション再生中であれば継続 */
 			if (IsEqualCurrentState(PenguinDiyingState::ID()))
@@ -176,23 +164,19 @@ namespace app
 				}
 			}
 
-
 			if (m_ownerDaddyPenguin->GetStatus<DaddyPenguinStatus>()->IsDead())
 			{
 				return FindState(PenguinDiyingState::ID());
 			}
-
 
 			if (m_isDamaged)
 			{
 				return FindState(PenguinDamagedState::ID());
 			}
 
-
 			/** 泳ぐステートの維持・変更 */
 			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
-				// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
 				if (!IsOnGround())
 				{
 					return FindState(PenguinSwimmingState::ID());
@@ -200,26 +184,22 @@ namespace app
 			}
 			else if (CanChangeSwimState())
 			{
-				// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
 				return FindState(PenguinSwimmingState::ID());
 			}
 
+			/** ジャンプ開始、または滞空（落下中）状態の維持 */
+			// ※水泳条件に当てはまらず、空中にいる場合は常にジャンプステートにする
+			if (CanChangeJumpState() || !IsOnGround())
+			{
+				return FindState(PenguinJumpState::ID());
+			}
 
 			/** 命令中なら維持する */
 			if (IsEqualCurrentState(DaddyPenguinCommandShoutState::ID())
 				&& IsPlayingAnimation())
 			{
-				// 命令状態でアニメーション再生中なら維持する
 				return FindState(DaddyPenguinCommandShoutState::ID());
 			}
-
-
-			/** 命令状態へなれるなら命令状態へ */
-			if (CanChangeCommandState())
-			{
-				return FindState(DaddyPenguinCommandShoutState::ID());
-			}
-
 
 			/** スライド開始中ならアニメーションが終わるまで維持し、終わるとスライディングステートへ */
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
@@ -239,7 +219,6 @@ namespace app
 				}
 			}
 
-
 			/** スライド中なら、スライドを維持するか判断する */
 			if (IsEqualCurrentState(PenguinSlidingState::ID()))
 			{
@@ -253,13 +232,11 @@ namespace app
 				}
 			}
 
-
 			/** スライドを始められるならスライド開始状態へ */
 			if (CanChangeSlideStartState())
 			{
 				return FindState(PenguinSlideStartState::ID());
 			}
-
 
 			/** ダッシュ入力があり、移動入力があればダッシュ状態へ */
 			if (CanChangeRunState())
@@ -267,13 +244,11 @@ namespace app
 				return FindState(PenguinRunState::ID());
 			}
 
-
 			/** 移動入力があればスニーク状態へ */
 			if (CanChangeMoveState())
 			{
 				return FindState(PenguinSneakState::ID());
 			}
-
 
 			/** 当てはまらなければ待機状態へ */
 			return FindState(PenguinIdleState::ID());

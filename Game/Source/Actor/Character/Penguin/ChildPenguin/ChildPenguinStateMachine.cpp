@@ -78,12 +78,6 @@ namespace app
 
 		core::IState* ChildPenguinStateMachine::GetChangeState()
 		{
-			// ジャンプ判定
-			if (CanChangeJumpState())
-			{
-				return FindState(PenguinJumpState::ID());
-			}
-
 			// 死亡中状態の維持
 			if (IsEqualCurrentState(PenguinDiyingState::ID()))
 			{
@@ -109,7 +103,6 @@ namespace app
 			// 泳ぎ判定（チャタリング防止ロジック）
 			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
-				// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
 				if (!IsOnGround())
 				{
 					return FindState(PenguinSwimmingState::ID());
@@ -117,30 +110,31 @@ namespace app
 			}
 			else if (CanChangeSwimState())
 			{
-				// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
 				return FindState(PenguinSwimmingState::ID());
 			}
 
+			// ジャンプ開始、または滞空（落下中）状態の維持
+			if (CanChangeJumpState() || !IsOnGround())
+			{
+				return FindState(PenguinJumpState::ID());
+			}
+
 			// スライド開始状態
-			// ※ SlideStart を経由せず直接 Sliding へ遷移する。
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
 			{
 				return FindState(PenguinSlidingState::ID());
 			}
 
 			// スライド中状態
-			// ※ スライドを終了するとき SlideEnd を経由せず次の判定へ直接遷移する。
 			if (IsEqualCurrentState(PenguinSlidingState::ID()))
 			{
 				if (CanKeepSlidingState())
 				{
 					return FindState(PenguinSlidingState::ID());
 				}
-				// SlideEnd をスキップ → 次の判定（Run / Sneak / Idle）へ落とす
 			}
 
 			// スライド開始判定
-			// ※ SlideStart を経由せず直接 Sliding へ遷移する。
 			if (CanChangeSlideStartState())
 			{
 				return FindState(PenguinSlidingState::ID());
