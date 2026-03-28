@@ -40,22 +40,6 @@ namespace app
 			{
 				m_isSneak = isSneak;
 			}
-			/**
-			 * @brief 勝ったかどうかを設定
-			 * @param isWin 勝ったかどうか
-			 */
-			inline void SetIsWin(const bool isWin)
-			{
-				m_isWin = isWin;
-			}
-			/**
-			 * @brief 負けたかどうかを設定
-			 * @param isLose 負けたかどうか
-			 */
-			inline void SetIsLose(const bool isLose)
-			{
-				m_isLose = isLose;
-			}
 
 
 			// ここに親ペンギン固有のゲッター関数を追加していく
@@ -115,10 +99,6 @@ namespace app
 				return m_isCommandToggle;
 			}
 
-			void UpdateMovementInput();
-			void UpdateActionInput();
-			void UpdateSystemInput();
-
 			core::IState* CheckSystemState();
 			core::IState* CheckCommandState();
 			core::IState* CheckActionState();
@@ -126,10 +106,10 @@ namespace app
 
 		public:
 			/**
-			 * @brief プレイヤーコントローラーの入力処理
-			 * @note 後にプレイヤーコントローラーに処理を移す
+			 * @brief コントローラーからの入力処理
+			 * @note コントローラークラスから呼び出される
 			 */
-			void PlayerControllerInput();
+			void PlayerControllerInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide, bool isCommandToggle);
 			/**
 			 * @brief ダメージ処理
 			 */
@@ -143,10 +123,6 @@ namespace app
 			bool m_isCommandToggle;
 			/** スニーク状態かどうか */
 			bool m_isSneak;
-			/** 勝ったかどうか */
-			bool m_isWin;
-			/** 負けたかどうか */
-			bool m_isLose;
 		};
 	}
 }

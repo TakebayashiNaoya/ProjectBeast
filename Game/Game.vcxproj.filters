@@ -295,6 +295,9 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.cpp">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -553,6 +556,9 @@
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
     <ClInclude Include="hlsl ModelVSCommon.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />

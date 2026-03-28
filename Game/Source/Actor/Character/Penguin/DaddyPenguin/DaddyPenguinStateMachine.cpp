@@ -10,8 +10,6 @@
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Camera/CameraManager.h"
-#include <algorithm> // std::min用
 
 
 namespace app
@@ -23,8 +21,6 @@ namespace app
 			, m_ownerDaddyPenguin(ownerDaddyPenguin)
 			, m_isCommandToggle(false)
 			, m_isSneak(false)
-			, m_isWin(false)
-			, m_isLose(false)
 		{
 			// 共通ステートの追加
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
@@ -51,104 +47,17 @@ namespace app
 
 
 		// =========================================================
-		// 入力処理群（分割してスッキリ！）
+		// 入力処理群
 		// =========================================================
 
-		void DaddyPenguinStateMachine::PlayerControllerInput()
+		void DaddyPenguinStateMachine::PlayerControllerInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide, bool isCommandToggle)
 		{
-			UpdateMovementInput();
-			UpdateActionInput();
-			UpdateSystemInput();
-		}
-
-		void DaddyPenguinStateMachine::UpdateMovementInput()
-		{
-			/**
-			 * コントローラーの倒し具合で挙動を変えるため、
-			 * 正規化前のスティック入力の生データを取ってくる
-			 * NOTE: sThumbLXとsThumbLYは-32768～32767の範囲で値が入るため、
-			 *		 32767で割って-1.0f～1.0fの範囲に正規化する
-			 */
-			const XINPUT_STATE& state = g_pad[0]->GetXInputState();
-			float rawX = static_cast<float>(state.Gamepad.sThumbLX) / 32767.0f;
-			float rawY = static_cast<float>(state.Gamepad.sThumbLY) / 32767.0f;
-			float rawLength = sqrtf(rawX * rawX + rawY * rawY);
-
-
-			/**
-			 * コントローラーorエンジンの入力を取る
-			 */
-			float inputX = 0.0f;			/** X方向の入力 */
-			float inputY = 0.0f;			/** Y方向の入力 */
-			float stickLength = 0.0f;		/** スティックの倒し具合（0.0f～1.0f） */
-			const float DEAD_ZONE = 0.1f;	/** コントローラーの遊び */
-			/** ① コントローラーが倒されている場合は生データを採用 */
-			if (rawLength > DEAD_ZONE)
-			{
-				inputX = rawX;
-				inputY = rawY;
-				stickLength = min(rawLength, 1.0f);
-			}
-			/** ② コントローラーが触られていない場合はエンジンのデータを採用 */
-			else
-			{
-				inputX = g_pad[0]->GetLStickXF();
-				inputY = g_pad[0]->GetLStickYF();
-				stickLength = sqrtf(inputX * inputX + inputY * inputY);
-				stickLength = min(stickLength, 1.0f);
-			}
-
-
-			/** Bボタンが押されているか（スニークのトグル用） */
-			bool isPressB = g_pad[0]->IsPress(enButtonB);
-
-
-			/** スティックがある程度倒されている場合は移動入力として採用 */
-			if (stickLength > 0.1f)
-			{
-				/** カメラの向きと入力から移動方向を決める */
-				const auto& camData = camera::CameraManager::Get().GetCurrentCameraData();
-				Vector3 camForward = camData.target - camData.position;
-				camForward.y = 0.0f;
-				camForward.Normalize();
-				Vector3 camRight = { camForward.z, 0.0f, -camForward.x };
-				Vector3 inputDir = camRight * inputX + camForward * inputY;
-				if (inputDir.LengthSq() > FLT_EPSILON) {
-					inputDir.Normalize();
-				}
-				m_moveDirection = inputDir;
-
-				/** スティックの倒し具合とBボタンの状態でスニークかダッシュかを決める */
-				const float SNEAK_THRESHOLD = 0.9f;
-				if (stickLength <= SNEAK_THRESHOLD || isPressB) {
-					m_isSneak = true;
-					SetIsDash(false);
-				}
-				else {
-					m_isSneak = false;
-					SetIsDash(true);
-				}
-			}
-			else
-			{
-				m_moveDirection.Set(Vector3::Zero);
-				m_isSneak = false;
-				SetIsDash(false);
-			}
-		}
-
-		void DaddyPenguinStateMachine::UpdateActionInput()
-		{
-			m_isJump = g_pad[0]->IsTrigger(enButtonA);
-			m_isCommandToggle = g_pad[0]->IsTrigger(enButtonY);
-			m_isSlide = g_pad[0]->IsPress(enButtonX);
-		}
-
-		void DaddyPenguinStateMachine::UpdateSystemInput()
-		{
-			m_isDamaged = g_pad[0]->IsTrigger(enButtonLB3);
-			m_isWin = g_pad[0]->IsTrigger(enButtonLB2);
-			m_isLose = g_pad[0]->IsTrigger(enButtonRB2);
+			m_moveDirection = moveDirection;
+			m_isSneak = isSneak;
+			SetIsDash(isDash);
+			m_isJump = isJump;
+			m_isSlide = isSlide;
+			m_isCommandToggle = isCommandToggle;
 		}
 
 
@@ -196,11 +105,6 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::CheckSystemState()
 		{
-			if (IsEqualCurrentState(DaddyPenguinWinState::ID())) return FindState(DaddyPenguinWinState::ID());
-			if (m_isWin) return FindState(DaddyPenguinWinState::ID());
-			if (IsEqualCurrentState(DaddyPenguinLoseState::ID())) return FindState(DaddyPenguinLoseState::ID());
-			if (m_isLose) return FindState(DaddyPenguinLoseState::ID());
-
 			/** 1. 死ぬアニメーションが流れていたら死亡中ステートを返し、
 					アニメーションが終わったら死亡ステートを返す */
 			if (IsEqualCurrentState(PenguinDiyingState::ID())) {

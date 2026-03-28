@@ -253,6 +253,7 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStateMachine.cpp" />
@@ -337,6 +338,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinParameter.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinStateMachine.h" />
