@@ -49,7 +49,6 @@ namespace app
 
 	void Application::Render(RenderContext& rc)
 	{
-		SoundManager::Get().Update();
 		SceneManager::GetInstance()->Render(rc);
 		core::Fade::Get().Render(rc);
 	}

@@ -283,6 +283,9 @@
     <ClCompile Include="Source\Camera\LoseCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\SearchMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
@@ -539,6 +542,9 @@
     </ClInclude>
     <ClInclude Include="Source\Camera\LoseCamera.h">
       <Filter>Source\Camera</Filter>
+    </ClInclude>
+<ClInclude Include="Source\UI\SearchMenu.h">
+      <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
