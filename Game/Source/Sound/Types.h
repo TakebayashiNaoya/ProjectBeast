@@ -15,6 +15,10 @@ namespace app
 
 		/** 下にSEの設定 */
 		enSoundKind_Damage = enSoundKind_SE,
+		enSoundKind_EnemyStep,
+		enSoundKind_EnemyRoar,
+		enSoundKind_EnemyGrowl,
+		enSoundKind_EnemyAttack,
 
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
@@ -50,6 +54,10 @@ namespace app
 	{
 		//SE
 		SoundInformation("Assets/sound/SE/damage.wav"),
+		SoundInformation("Assets/sound/SE/step.wav"),
+		SoundInformation("Assets/sound/SE/roar.wav"),
+		SoundInformation("Assets/sound/SE/growl.wav"),
+		SoundInformation("Assets/sound/SE/attack.wav"),
 		//BGM
 		SoundInformation("Assets/sound/BGM/InGame.wav"),
 		//Voice

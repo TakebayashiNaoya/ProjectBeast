@@ -34,7 +34,6 @@ namespace app
 			, m_startPosition(Vector3::Zero)
 			, m_homePosition(Vector3::Zero)
 			, m_lastKnownPenguinPos(Vector3::Zero)
-			, isFind(false)
 			, m_isStun(false)
 			, m_isHomeInitialized(false)
 			, m_coolDownTimer(0.0f)
