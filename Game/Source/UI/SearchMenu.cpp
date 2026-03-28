@@ -101,7 +101,7 @@ namespace app
 
 				if (info.type == EnSearchType::CanFind)
 				{
-					// アクティブかつ、Chaise状態の時は
+					// アクティブかつ、Chase状態の時は
 					if (m_isActive && isChasing)
 					{
 						icon->m_isDraw = true;

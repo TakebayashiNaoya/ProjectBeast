@@ -63,8 +63,8 @@ namespace app
 			 */
 			inline void SetIsActive(bool isActive) { m_isActive = isActive; }
 			/**
-			 * @brief 敵の情報の取得
-			 * @return m_enemy 敵の情報の取得
+			 * @brief 敵の情報の設定
+			 * @param enemy 敵の情報の設定
 			 */
 			void SetEnemy(actor::Enemy* enemy) { m_enemy = enemy; }
 			/**
