@@ -10,6 +10,7 @@
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/LoseCamera.h"
 #include "Source/Camera/WinCamera.h"
@@ -35,6 +36,9 @@ namespace app
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
 			EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
+
+			// マネージャーを介して子ペンギンへの命令を切り替える
+			ChildPenguinManager::GetInstance()->ToggleCommand();
 		}
 
 

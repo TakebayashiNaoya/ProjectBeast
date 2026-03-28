@@ -54,6 +54,16 @@ namespace app
 			 * @return ジャンプパワー
 			 */
 			inline float GetJumpPower() const { return m_jumpPower; }
+			/**
+			 * @brief ノイズレベルを取得 (0.0f ～ 1.0f)
+			 * @return ノイズレベル
+			 */
+			inline float GetNoiseLevel() const { return m_noiseLevel; }
+			/**
+			 * @brief ノイズレベルを設定
+			 * @param noise ノイズレベル (0.0f ～ 1.0f)
+			 */
+			inline void SetNoiseLevel(const float noise) { m_noiseLevel = noise; }
 
 
 		public:
@@ -84,6 +94,8 @@ namespace app
 			float m_slideSpeed;
 			/** ジャンプパワー */
 			float m_jumpPower;
+			/** ノイズレベル(音の大きさや見つかりやすさの指標) */
+			float m_noiseLevel = 0.0f;
 		};
 	}
 }

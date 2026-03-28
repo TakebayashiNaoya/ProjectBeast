@@ -145,6 +145,14 @@ namespace app
 			{
 				return m_isDamaged;
 			}
+			/**
+			 * @brief 泳ぐステートに切り替えられるかどうか
+			 * @return 泳ぐステートに切り替えられるかどうか
+			 */
+			bool CanChangeSwimState() const
+			{
+				return !IsOnGround() && m_transform.m_position.y < 0.0f;
+			}
 
 
 		public:

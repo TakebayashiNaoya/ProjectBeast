@@ -149,6 +149,21 @@ namespace app
 				m_command = command;
 			}
 
+			/**
+			 * @brief 追従命令と待機命令を切り替える（トグル）
+			 */
+			void ToggleCommand()
+			{
+				if (m_command == EnPenguinCommand::Follow)
+				{
+					m_command = EnPenguinCommand::Wait;
+				}
+				else
+				{
+					m_command = EnPenguinCommand::Follow;
+				}
+			}
+
 
 		private:
 			/** 子ペンギンへの命令 */

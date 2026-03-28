@@ -106,9 +106,18 @@ namespace app
 				return FindState(PenguinDamagedState::ID());
 			}
 
-			// 泳ぎ判定
-			if (CanChangeSwimState())
+			// 泳ぎ判定（チャタリング防止ロジック）
+			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
+				// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
+				if (!IsOnGround())
+				{
+					return FindState(PenguinSwimmingState::ID());
+				}
+			}
+			else if (CanChangeSwimState())
+			{
+				// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
 				return FindState(PenguinSwimmingState::ID());
 			}
 

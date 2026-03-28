@@ -113,6 +113,9 @@ namespace app
 			const float jumpPower = m_owner->GetPenguinStatus()->GetJumpPower();
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
+
+			// ジャンプパワーをステートマシン側に渡す
+			m_owner->SetJumpPower(jumpPower);
 			m_owner->Jump();
 			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);
 		}

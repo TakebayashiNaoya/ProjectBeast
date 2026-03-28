@@ -10,6 +10,7 @@
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Camera/CameraManager.h"
 
 
 namespace app
@@ -19,8 +20,8 @@ namespace app
 		DaddyPenguinStateMachine::DaddyPenguinStateMachine(DaddyPenguin* ownerDaddyPenguin)
 			: PenguinStateMachine(ownerDaddyPenguin)
 			, m_ownerDaddyPenguin(ownerDaddyPenguin)
-			, m_isFollowCommand(false)
-			, m_isWaitCommand(false)
+			, m_isCommandToggle(false)
+			, m_isSneak(false)
 			, m_isWin(false)
 			, m_isLose(false)
 		{
@@ -50,17 +51,53 @@ namespace app
 
 		void DaddyPenguinStateMachine::PlayerControllerInput()
 		{
-			m_moveDirection.x = g_pad[0]->GetLStickXF();
-			m_moveDirection.z = g_pad[0]->GetLStickYF();
-			m_moveDirection.y = 0.0f;
+			float stickX = g_pad[0]->GetLStickXF();
+			float stickY = g_pad[0]->GetLStickYF(); // Yは奥方向の入力
 
-			m_isDash = g_pad[0]->IsPress(enButtonB);
+			// カメラの向きを考慮した移動ベクトルの計算
+			const auto& camData = camera::CameraManager::Get().GetCurrentCameraData();
+
+			// カメラの前方向ベクトルと右方向ベクトルを計算
+			Vector3 camForward = camData.target - camData.position;
+			camForward.y = 0.0f;      // 水平方向のみにする（空や地面に向かって移動しないように）
+			camForward.Normalize();   // 長さを1にする
+
+			Vector3 camRight = { camForward.z, 0.0f, -camForward.x }; // Y軸回りに90度回転させて右ベクトルを作成
+
+			// カメラの向きを基準に移動ベクトルを算出
+			m_moveDirection = camRight * stickX + camForward * stickY;
+
+			// スティックの入力強度（ベクトル長）を計算
+			float stickLength = sqrtf(stickX * stickX + stickY * stickY);
+			bool isPressB = g_pad[0]->IsPress(enButtonB);
+
+			// 遊び(デッドゾーン)を考慮
+			if (stickLength > 0.1f)
+			{
+				// スティック50%以下、またはBボタンが押されている場合はスニーク
+				if (stickLength <= 0.5f || isPressB)
+				{
+					m_isSneak = true;
+					m_isDash = false;
+				}
+				// それ以外（スティック50%より大きく、Bボタンなし）はダッシュ
+				else
+				{
+					m_isSneak = false;
+					m_isDash = true;
+				}
+			}
+			else
+			{
+				m_isSneak = false;
+				m_isDash = false;
+			}
+
 			m_isJump = g_pad[0]->IsTrigger(enButtonA);
-			m_isSlide = g_pad[0]->IsPress(enButtonRB3);
+			m_isSlide = g_pad[0]->IsPress(enButtonX);
 
-			m_isFollowCommand = g_pad[0]->IsTrigger(enButtonLB1);
-			m_isWaitCommand = g_pad[0]->IsTrigger(enButtonRB1);
-			m_isSwimming = g_pad[0]->IsPress(enButtonX);
+			m_isCommandToggle = g_pad[0]->IsTrigger(enButtonY);
+
 			m_isDamaged = g_pad[0]->IsTrigger(enButtonLB3);
 
 			m_isWin = g_pad[0]->IsTrigger(enButtonLB2);
@@ -91,14 +128,6 @@ namespace app
 			/** 命令中なら命令ステートへ */
 			if (CanChangeCommandState())
 			{
-				if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow)
-				{
-					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Wait);
-				}
-				else if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Wait)
-				{
-					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Follow);
-				}
 				return FindState(DaddyPenguinCommandShoutState::ID());
 			}
 
@@ -160,9 +189,18 @@ namespace app
 			}
 
 
-			/** 泳ぐステートに変更可能なら */
-			if (CanChangeSwimState())
+			/** 泳ぐステートの維持・変更 */
+			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
+				// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
+				if (!IsOnGround())
+				{
+					return FindState(PenguinSwimmingState::ID());
+				}
+			}
+			else if (CanChangeSwimState())
+			{
+				// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
 				return FindState(PenguinSwimmingState::ID());
 			}
 
