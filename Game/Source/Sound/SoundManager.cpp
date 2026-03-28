@@ -41,13 +41,13 @@ namespace app
 			auto* se = it.second;
 			/** 再生が終わっているなら削除 */
 			if (!se->IsPlaying()) {
-				delete se;
 				eraseSEList.push_back(key);
 			}
 		}
 		for (const auto& key : eraseSEList) {
 			m_seList.erase(key);
 		}
+
 
 
 		/** Voiceリストから再生していないものがあれば削除する */
@@ -57,7 +57,6 @@ namespace app
 			auto* voice = it.second;
 			/** 再生が終わっているなら削除 */
 			if (!voice->IsPlaying()) {
-				delete voice;
 				eraseVoiceList.push_back(key);
 			}
 		}
@@ -70,7 +69,7 @@ namespace app
 	void SoundManager::PlayBGM(const int kind)
 	{
 		if (m_bgm == nullptr) {
-			m_bgm = new SoundSource;
+			m_bgm = NewGO<SoundSource>(0, "se");
 		}
 		else {
 			m_bgm->Stop();
@@ -99,7 +98,7 @@ namespace app
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
 			return INVALID_SE_HANDLE;
 		}
-		auto* se = new SoundSource;
+		auto* se = NewGO<SoundSource>(0, "se");
 		se->Init(kind, is3D);
 		se->SetVolume(m_masterVolume * m_seVolume);
 		se->Play(isLoop);
@@ -129,7 +128,7 @@ namespace app
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
 			return INVALID_VOICE_HANDLE;
 		}
-		auto* voice = new SoundSource;
+		auto* voice = NewGO<SoundSource>(0, "se");
 		voice->Init(kind, is3D);
 		voice->SetVolume(m_masterVolume * m_voiceVolume);
 		voice->Play(isLoop);
