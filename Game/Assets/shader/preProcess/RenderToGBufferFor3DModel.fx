@@ -26,6 +26,13 @@ struct SPSOut
 
 #include "../ModelVSCommon.h"
 
+///////////////////////////////////////
+// 乗算カラー定数バッファ (b1)
+///////////////////////////////////////
+cbuffer MulColorCb : register(b1)
+{
+    float4 mulColor;    // 乗算カラー (RGBA, 1.0f=変更なし)
+};
 
 ///////////////////////////////////////
 // シェーダーリソース
@@ -84,8 +91,9 @@ SPSOut PSMainCore( SPSIn psIn, int isShadowReciever)
 {
     // G-Bufferに出力
     SPSOut psOut;
-    // アルベドカラーと深度値を出力
-    psOut.albedo = g_albedo.Sample(g_sampler, psIn.uv);
+    // アルベドカラーと深度値を出力（乗算カラーを適用）
+    float4 albedoSample = g_albedo.Sample(g_sampler, psIn.uv);
+    psOut.albedo = float4(albedoSample.rgb * mulColor.rgb, albedoSample.a);
     
     clip(psOut.albedo.a - 0.2f);    // ピクセルキル
 

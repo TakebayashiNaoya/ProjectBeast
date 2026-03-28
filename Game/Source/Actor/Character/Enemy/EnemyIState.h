@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"
+#include "Source/Sound/SoundManager.h"
 
 
 namespace app
@@ -106,6 +107,9 @@ namespace app
 		public:
 			EnemySearchState(EnemyStateMachine* owner);
 			~EnemySearchState() override = default;
+
+		private:
+			app::SEHandle m_stepSE = -1;
 		};
 
 
@@ -130,6 +134,11 @@ namespace app
 		public:
 			EnemyWalkState(EnemyStateMachine* owner);
 			~EnemyWalkState() override = default;
+
+
+		private:
+			app::SEHandle m_stepSE = -1;
+			float m_stepTimer = 0.0f;
 		};
 
 
@@ -154,6 +163,10 @@ namespace app
 		public:
 			EnemyChaseState(EnemyStateMachine* owner);
 			~EnemyChaseState() override = default;
+
+
+		private:
+			app::SEHandle m_stepSE = -1;
 		};
 
 
@@ -250,6 +263,10 @@ namespace app
 		public:
 			EnemyReturnHomeState(EnemyStateMachine* owner);
 			~EnemyReturnHomeState() override = default;
+
+
+		private:
+			app::SEHandle m_stepSE = -1;
 		};
 
 

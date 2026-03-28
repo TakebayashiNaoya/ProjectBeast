@@ -11,8 +11,6 @@ namespace app
 {
 	namespace actor
 	{
-
-
 		/**
 		 * @brief ペンギンの基底クラス
 		 */

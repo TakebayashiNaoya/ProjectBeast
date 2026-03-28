@@ -24,7 +24,6 @@ namespace app
 				return;
 			}
 
-      // 左スティックで移動
 			// 左スティックで移動
 			{
 				Vector3 inputDirection;

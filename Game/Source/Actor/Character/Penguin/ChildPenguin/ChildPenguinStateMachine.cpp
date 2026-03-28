@@ -5,48 +5,223 @@
  */
 #include "stdafx.h"
 #include "ChildPenguin.h"
-#include "ChildPenguinIState.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinIState.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-		ChildPenguinStateMachine::ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin)
-			: CharacterStateMachine(ownerChildPenguin)
+		ChildPenguinStateMachine::ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin, EnChildPenguinType type)
+			: PenguinStateMachine(ownerChildPenguin)
 			, m_ownerChildPenguin(ownerChildPenguin)
+			, m_type(type)
 		{
-			// ステートの追加
-			AddState<ChildPenguinIdleState>(this);
-			AddState<ChildPenguinMoveState>(this);
+			/** 共通ステートの追加 */
+			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinSneakState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinRunState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinJumpState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinSlideStartState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinSlidingState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinSlideEndState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinDivingState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinSwimmingState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinClimbStartState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinClimbingState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinClimbEndState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinDamagedState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinDiyingState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinDeadState>(static_cast<PenguinStateMachine*>(this));
 
-			// 初期ステートの設定
-			m_currentState = FindState(ChildPenguinIdleState::ID());
+			/** タイプ固有のステートの追加 */
+			switch (m_type)
+			{
+			case EnChildPenguinType::Naughty:
+				// AddState<NaughtyRampageState>(this); // 実装時に追加
+				break;
+			default:
+				break;
+			}
+
+			/** 初期ステートの設定 */
+			m_currentState = FindState(PenguinIdleState::ID());
+			m_currentState->Enter();
 		}
 
 
-		const ChildPenguinStatus* ChildPenguinStateMachine::GetChildPenuinStatus() const
+		void ChildPenguinStateMachine::AIControllerInput(const Vector3& moveDirection, bool isDash, bool isJump, bool isSlide, bool isDive, bool isSeparateWater)
 		{
-			return m_ownerChildPenguin->GetStatus<ChildPenguinStatus>();
+			m_moveDirection = moveDirection;
+			m_isDash = isDash;
+			m_isJump = isJump;
+			m_isSlide = isSlide;
+			m_isDive = isDive;
+			m_isSeparateWater = isSeparateWater;
+			m_isSwimming = IsInWater();
+		}
+
+
+		const ChildPenguinStatus* ChildPenguinStateMachine::GetChildPenguinStatus() const
+		{
+			return m_ownerActor->GetStatus<ChildPenguinStatus>();
+		}
+
+
+		const PenguinStatus* ChildPenguinStateMachine::GetPenguinStatus() const
+		{
+			return GetChildPenguinStatus();
+		}
+
+
+		void ChildPenguinStateMachine::Damage()
+		{
+			const_cast<ChildPenguinStatus*>(GetChildPenguinStatus())->Damage();
 		}
 
 
 		core::IState* ChildPenguinStateMachine::GetChangeState()
 		{
-			if (m_isFollowCommanded)
+			// ジャンプ判定
+			if (CanChangeJumpState())
 			{
-				return FindState(ChildPenguinFollowState::ID());
+				return FindState(PenguinJumpState::ID());
 			}
 
-			if (m_isWaitCommanded)
+			// 死亡中状態の維持
+			if (IsEqualCurrentState(PenguinDiyingState::ID()))
 			{
-				return FindState(ChildPenguinWaitState::ID());
+				if (IsPlayingAnimation())
+				{
+					return FindState(PenguinDiyingState::ID());
+				}
+				return FindState(PenguinDeadState::ID());
 			}
 
-			return FindState(ChildPenguinIdleState::ID());
-			return nullptr;
+			// 死亡判定
+			if (GetChildPenguinStatus()->IsDead())
+			{
+				return FindState(PenguinDiyingState::ID());
+			}
+
+			// 被弾判定
+			if (CanChangeDamagedState())
+			{
+				return FindState(PenguinDamagedState::ID());
+			}
+
+			// 登り終了状態
+			if (IsEqualCurrentState(PenguinClimbEndState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(PenguinClimbEndState::ID());
+				}
+				// アニメーション終了後はIdleへ
+			}
+
+			// 登り中状態
+			if (IsEqualCurrentState(PenguinClimbingState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(PenguinClimbingState::ID());
+				}
+				return FindState(PenguinClimbEndState::ID());
+			}
+
+			// 登り開始状態
+			if (IsEqualCurrentState(PenguinClimbStartState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(PenguinClimbStartState::ID());
+				}
+				return FindState(PenguinClimbingState::ID());
+			}
+
+			// 離水判定
+			if (CanChangeSeparateWaterState())
+			{
+				return FindState(PenguinClimbStartState::ID());
+			}
+
+			// 泳ぎ判定
+			if (CanChangeSwimState())
+			{
+				return FindState(PenguinSwimmingState::ID());
+			}
+
+			// 飛び込み状態の維持
+			if (IsEqualCurrentState(PenguinDivingState::ID()))
+			{
+				if (IsPlayingAnimation())
+				{
+					return FindState(PenguinDivingState::ID());
+				}
+				return FindState(PenguinSwimmingState::ID());
+			}
+
+			// 飛び込み判定
+			if (CanChangeDivingState())
+			{
+				return FindState(PenguinDivingState::ID());
+			}
+
+			// スライド開始状態
+			// ※ SlideStart アニメーション中に停止してしまうため、
+			//   SlideStart はスキップして即 Sliding へ遷移する。
+			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
+			{
+				return FindState(PenguinSlidingState::ID());
+			}
+
+			// スライド終了状態
+			// ※ SlideEnd アニメーション中に停止してしまうため、
+			//   SlideEnd はスキップして次の判定（Run / Sneak / Idle）へ直接落とす。
+			// （維持ブロックを除去することでスキップを実現する）
+
+			// スライド中状態
+			// ※ スライドを終了するとき SlideEnd を経由せず次の判定へ直接遷移する。
+			if (IsEqualCurrentState(PenguinSlidingState::ID()))
+			{
+				if (CanKeepSlidingState())
+				{
+					return FindState(PenguinSlidingState::ID());
+				}
+				// SlideEnd をスキップ → 次の判定（Run / Sneak / Idle）へ落とす
+			}
+
+			// スライド開始判定
+			// ※ SlideStart を経由せず直接 Sliding へ遷移する。
+			if (CanChangeSlideStartState())
+			{
+				return FindState(PenguinSlidingState::ID());
+			}
+
+			// ダッシュ判定
+			if (CanChangeRunState())
+			{
+				return FindState(PenguinRunState::ID());
+			}
+
+			// 歩行判定
+			if (CanChangeWalkState())
+			{
+				return FindState(PenguinSneakState::ID());
+			}
+
+			// タイプ固有のステート遷移
+			core::IState* typeSpecificState = GetTypeSpecificChangeState();
+			if (typeSpecificState != nullptr)
+			{
+				return typeSpecificState;
+			}
+
+			// デフォルトは待機
+			return FindState(PenguinIdleState::ID());
 		}
 	}
 }

@@ -269,7 +269,7 @@ namespace app
 			float m_attackDuration;
 			bool m_isAttacking;
 
-			bool isFind = false;
+			//bool isFind = false;
 			/** 現在の状態 */
 			EnEnemyStateID m_currentState = enEnemyState_Idle;
 			/** 初期化処理をしたか */

@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/PenguinBase.h"
+#include "ChildPenguinTypes.h"
 
 
 namespace app
@@ -13,36 +14,46 @@ namespace app
 	{
 		/** 前方宣言 */
 		class ChildPenguinStateMachine;
+		class ChildPenguinAIController;
+		class DaddyPenguin;
 
 
 		/**
-		 * @brief 親ペンギンクラス
+		 * @brief 子ペンギンクラス
 		 */
 		class ChildPenguin : public PenguinBase
 		{
-		public:
-			/**
-			 * @brief 子ペンギンのタイプ
-			 */
-			enum class EnChildPenguinType : uint8_t
-			{
-				// 世話焼き
-				Caring = 0,
-				// おっちょこちょい
-				Clumsy,
-				// 甘えん坊
-				Spoiled,
-				// しっかり者
-				Serious,
-			};
-
-
 		public:
 			/**
 			 * @brief ステートマシンを取得
 			 * @return ステートマシンのポインタ
 			 */
 			inline ChildPenguinStateMachine* GetStateMachine() { return m_stateMachine.get(); }
+			/**
+			 * @brief 子ペンギンのタイプを取得
+			 * @return 子ペンギンのタイプ
+			 */
+			inline EnChildPenguinType GetChildPenguinType() const { return m_type; }
+			/**
+			 * @brief 目標座標を取得する（AIコントローラーが移動処理に使う）
+			 * @return 目標座標
+			 */
+			inline const Vector3& GetFormationTargetPosition() const { return m_formationTarget; }
+			/**
+			 * @brief 陣形における自身の目標座標を設定する
+			 * @param targetPos 目標座標
+			 */
+			inline void SetFormationTargetPosition(const Vector3& targetPos) { m_formationTarget = targetPos; }
+			/**
+			 * @brief 子ペンギンのタイプを設定
+			 * @param type 子ペンギンのタイプ
+			 */
+			void SetChildPenguinType(EnChildPenguinType type);
+			/**
+			 * @brief AIコントローラーの作成
+			 * @note 親ペンギンが設定された後に呼び出す必要がある
+			 */
+			void CreateAIController();
 
 
 		public:
@@ -59,6 +70,16 @@ namespace app
 		private:
 			/** ステートマシン */
 			std::unique_ptr<ChildPenguinStateMachine> m_stateMachine;
+			/** AIコントローラー */
+			std::unique_ptr<ChildPenguinAIController> m_aiController;
+			/** 子ペンギンのタイプ */
+			EnChildPenguinType m_type = EnChildPenguinType::Serious;
+			/** 陣形における自身の目標座標 */
+			Vector3 m_formationTarget;
+			/** タイプ別乗算カラー */
+			Vector4 m_typeColor = Vector4::One;
+			/** カラー適用済みフラグ（モデルロード完了後に一度だけ適用） */
+			bool m_colorApplied = false;
 		};
 	}
 }
