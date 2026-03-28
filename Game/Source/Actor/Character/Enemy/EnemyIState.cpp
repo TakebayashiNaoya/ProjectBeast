@@ -9,6 +9,7 @@
 #include "EnemyStateMachine.h"
 #include "EnemyStatus.h"
 #include "EnemyTypes.h"
+#include "Source/Sound/SoundManager.h"
 
 
 namespace app
@@ -28,6 +29,10 @@ namespace app
 		void EnemyIdleState::Enter()
 		{
 			m_owner->PlayAnimation(EnEnemyAnimationType::Idle);
+
+
+			SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
+
 		}
 
 
@@ -92,6 +97,12 @@ namespace app
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
+			if (rand() % 100 < 30)
+			{
+				SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
+			}
+			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
+
 		}
 
 
@@ -104,6 +115,12 @@ namespace app
 		void EnemySearchState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
+
+			if (m_stepSE != -1)
+			{
+				app::SoundManager::Get().StopSE(m_stepSE);
+				m_stepSE = -1;
+			}
 		}
 
 
@@ -122,6 +139,11 @@ namespace app
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+
+			if (m_stepSE == -1)
+			{
+				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true, false);
+			}
 		}
 
 
@@ -131,12 +153,23 @@ namespace app
 				return;
 			}
 			m_owner->Move();
+
+			if (m_stepSE == -1)
+			{
+				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
+			}
 		}
 
 
 		void EnemyWalkState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
+
+			if (m_stepSE != -1)
+			{
+				app::SoundManager::Get().StopSE(m_stepSE);
+				m_stepSE = -1;
+			}
 		}
 
 
@@ -155,6 +188,12 @@ namespace app
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetRunSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
+
+
+			SoundManager::Get().PlaySE(enSoundKind_EnemyRoar);
+
+			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
+
 		}
 
 
@@ -171,6 +210,11 @@ namespace app
 		void EnemyChaseState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
+			if (m_stepSE != -1)
+			{
+				app::SoundManager::Get().StopSE(m_stepSE);
+				m_stepSE = -1;
+			}
 		}
 
 
@@ -276,6 +320,9 @@ namespace app
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+
+			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
+
 		}
 
 
@@ -291,6 +338,12 @@ namespace app
 		void EnemyReturnHomeState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
+
+			if (m_stepSE != -1)
+			{
+				app::SoundManager::Get().StopSE(m_stepSE);
+				m_stepSE = -1;
+			}
 		}
 
 

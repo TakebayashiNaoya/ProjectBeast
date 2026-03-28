@@ -29,8 +29,7 @@ namespace app
 
 
 	SoundManager::~SoundManager()
-	{
-	}
+	{}
 
 
 	void SoundManager::Update()
@@ -63,7 +62,7 @@ namespace app
 			}
 		}
 		for (const auto& key : eraseVoiceList) {
-			m_seList.erase(key);
+			m_voiceList.erase(key);
 		}
 	}
 
@@ -105,9 +104,11 @@ namespace app
 		se->SetVolume(m_masterVolume * m_seVolume);
 		se->Play(isLoop);
 
-		m_seList.emplace(m_soundHandleCount++, se);
+		SEHandle handle = m_soundHandleCount++;
 
-		return m_soundHandleCount;
+		m_seList.emplace(handle, se);
+
+		return handle;
 	}
 
 
