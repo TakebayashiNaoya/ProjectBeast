@@ -33,12 +33,20 @@ namespace app
 				m_isCommandToggle = isCommandToggle;
 			}
 			/**
-			 * @brief スニーク状態かどうかを設定
-			 * @param isSneak スニーク状態かどうか
+			 * @brief 勝ったかどうかを設定
+			 * @param isWin 勝ったかどうか
 			 */
-			inline void SetIsSneak(const bool isSneak)
+			inline void SetIsWin(const bool isWin)
 			{
-				m_isSneak = isSneak;
+				m_isWin = isWin;
+			}
+			/**
+			 * @brief 負けたかどうかを設定
+			 * @param isLose 負けたかどうか
+			 */
+			inline void SetIsLose(const bool isLose)
+			{
+				m_isLose = isLose;
 			}
 
 
@@ -51,14 +59,6 @@ namespace app
 			inline bool GetIsCommandToggle() const
 			{
 				return m_isCommandToggle;
-			}
-			/**
-			 * @brief スニーク状態かどうかを取得
-			 * @return スニーク状態かどうか
-			 */
-			inline bool GetIsSneak() const
-			{
-				return m_isSneak;
 			}
 			/**
 			 * @brief 命令が出ているか
@@ -106,11 +106,6 @@ namespace app
 
 		public:
 			/**
-			 * @brief コントローラーからの入力処理
-			 * @note コントローラークラスから呼び出される
-			 */
-			void PlayerControllerInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide, bool isCommandToggle);
-			/**
 			 * @brief ダメージ処理
 			 */
 			virtual void Damage() override;
@@ -121,8 +116,10 @@ namespace app
 			DaddyPenguin* m_ownerDaddyPenguin;
 			/** 命令を出すかどうか(トグル) */
 			bool m_isCommandToggle;
-			/** スニーク状態かどうか */
-			bool m_isSneak;
+			/** 勝ったかどうか */
+			bool m_isWin;
+			/** 負けたかどうか */
+			bool m_isLose;
 		};
 	}
 }

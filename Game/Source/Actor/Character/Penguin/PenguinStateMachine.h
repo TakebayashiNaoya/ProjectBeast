@@ -94,6 +94,16 @@ namespace app
 			 */
 			virtual void Damage();
 
+			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide)
+			{
+				m_moveDirection = moveDirection;
+				m_isSneak = isSneak;
+				m_isDash = isDash; // または SetIsDash(isDash);
+				m_isJump = isJump;
+				m_isSlide = isSlide;
+				m_isSwimming = IsInWater();
+			}
+
 
 		protected:
 			/**
@@ -168,6 +178,8 @@ namespace app
 			float m_jumpPower;
 			/**ジャンプするかどうか */
 			bool m_isJump;
+			/** スニークするかどうか */
+			bool m_isSneak;
 			/** スライドするかどうか */
 			bool m_isSlide;
 			/** 被弾したかどうか */

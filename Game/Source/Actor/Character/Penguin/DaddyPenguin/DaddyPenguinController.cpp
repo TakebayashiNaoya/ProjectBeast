@@ -1,14 +1,14 @@
 ﻿/**
  * @file DaddyPenguinController.cpp
  * @brief 親ペンギンのプレイヤーコントローラー
- * @author 竹林
+ * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "DaddyPenguinController.h"
 #include "DaddyPenguin.h"
 #include "DaddyPenguinStateMachine.h"
 #include "Source/Camera/CameraManager.h"
-#include <algorithm> 
+#include <algorithm> // std::min用
 
 
 namespace app
@@ -111,7 +111,11 @@ namespace app
 			// =========================================================
 			// ステートマシンへ一括入力
 			// =========================================================
-			m_stateMachine->PlayerControllerInput(moveDirection, isSneak, isDash, isJump, isSlide, isCommandToggle);
+			// 共通のアクション入力
+			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, isJump, isSlide);
+
+			// 親ペンギン固有の入力
+			m_stateMachine->SetIsCommandToggle(isCommandToggle);
 		}
 	}
 }

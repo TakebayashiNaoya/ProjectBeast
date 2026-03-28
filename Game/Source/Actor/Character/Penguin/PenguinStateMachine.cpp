@@ -30,6 +30,7 @@ namespace app
 			, m_ownerPenguinBase(ownerPenguinBase)
 			, m_jumpPower(0.0f)
 			, m_isJump(false)
+			, m_isSneak(false)
 			, m_isSlide(false)
 			, m_isDamaged(false)
 		{}

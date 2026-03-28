@@ -48,16 +48,6 @@ namespace app
 		}
 
 
-		void ChildPenguinStateMachine::AIControllerInput(const Vector3& moveDirection, bool isDash, bool isJump, bool isSlide, bool isDive, bool isSeparateWater)
-		{
-			m_moveDirection = moveDirection;
-			m_isDash = isDash;
-			m_isJump = isJump;
-			m_isSlide = isSlide;
-			m_isSwimming = IsInWater();
-		}
-
-
 		const ChildPenguinStatus* ChildPenguinStateMachine::GetChildPenguinStatus() const
 		{
 			return m_ownerActor->GetStatus<ChildPenguinStatus>();
@@ -113,10 +103,6 @@ namespace app
 				return FindState(PenguinSwimmingState::ID());
 			}
 
-			// ========================================================
-			// ★修正：スライドの判定を落下（Jump）よりも優先して上に移動
-			// ========================================================
-
 			// スライド開始状態
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
 			{
@@ -137,11 +123,8 @@ namespace app
 			{
 				return FindState(PenguinSlidingState::ID());
 			}
-			// ========================================================
-
 
 			// ジャンプ開始、または滞空（落下中）状態の維持
-			// ※スライド中以外で空中にいる場合は落下ステートにする
 			if (CanChangeJumpState() || !IsOnGround())
 			{
 				return FindState(PenguinJumpState::ID());

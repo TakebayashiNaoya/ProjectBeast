@@ -20,7 +20,8 @@ namespace app
 			: PenguinStateMachine(ownerDaddyPenguin)
 			, m_ownerDaddyPenguin(ownerDaddyPenguin)
 			, m_isCommandToggle(false)
-			, m_isSneak(false)
+			, m_isWin(false)
+			, m_isLose(false)
 		{
 			// 共通ステートの追加
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
@@ -43,21 +44,6 @@ namespace app
 			// 初期ステートの設定
 			m_currentState = FindState(PenguinIdleState::ID());
 			m_currentState->Enter();
-		}
-
-
-		// =========================================================
-		// 入力処理群
-		// =========================================================
-
-		void DaddyPenguinStateMachine::PlayerControllerInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide, bool isCommandToggle)
-		{
-			m_moveDirection = moveDirection;
-			m_isSneak = isSneak;
-			SetIsDash(isDash);
-			m_isJump = isJump;
-			m_isSlide = isSlide;
-			m_isCommandToggle = isCommandToggle;
 		}
 
 
@@ -105,6 +91,11 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::CheckSystemState()
 		{
+			if (IsEqualCurrentState(DaddyPenguinWinState::ID())) return FindState(DaddyPenguinWinState::ID());
+			if (m_isWin) return FindState(DaddyPenguinWinState::ID());
+			if (IsEqualCurrentState(DaddyPenguinLoseState::ID())) return FindState(DaddyPenguinLoseState::ID());
+			if (m_isLose) return FindState(DaddyPenguinLoseState::ID());
+
 			/** 1. 死ぬアニメーションが流れていたら死亡中ステートを返し、
 					アニメーションが終わったら死亡ステートを返す */
 			if (IsEqualCurrentState(PenguinDiyingState::ID())) {
