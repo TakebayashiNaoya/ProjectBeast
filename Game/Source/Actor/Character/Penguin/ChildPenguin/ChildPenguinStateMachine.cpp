@@ -113,11 +113,9 @@ namespace app
 				return FindState(PenguinSwimmingState::ID());
 			}
 
-			// ジャンプ開始、または滞空（落下中）状態の維持
-			if (CanChangeJumpState() || !IsOnGround())
-			{
-				return FindState(PenguinJumpState::ID());
-			}
+			// ========================================================
+			// ★修正：スライドの判定を落下（Jump）よりも優先して上に移動
+			// ========================================================
 
 			// スライド開始状態
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
@@ -138,6 +136,15 @@ namespace app
 			if (CanChangeSlideStartState())
 			{
 				return FindState(PenguinSlidingState::ID());
+			}
+			// ========================================================
+
+
+			// ジャンプ開始、または滞空（落下中）状態の維持
+			// ※スライド中以外で空中にいる場合は落下ステートにする
+			if (CanChangeJumpState() || !IsOnGround())
+			{
+				return FindState(PenguinJumpState::ID());
 			}
 
 			// ダッシュ判定

@@ -114,7 +114,7 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 
-			// ★ボタン入力による正規のジャンプ遷移の場合のみJump()を呼ぶ（崖からの落下時は呼ばない）
+			// ボタン入力による正規のジャンプ遷移の場合のみJump()を呼ぶ（崖からの落下時は呼ばない）
 			if (m_owner->GetIsJump())
 			{
 				m_owner->SetJumpPower(jumpPower);
@@ -147,12 +147,18 @@ namespace app
 
 		void PenguinSlideStartState::Enter()
 		{
+			// 滑るステートと同じ速度を設定
+			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::SlideStart);
 		}
 
 
 		void PenguinSlideStartState::Update()
-		{}
+		{
+			// 移動を可能にする
+			m_owner->Move();
+		}
 
 
 		void PenguinSlideStartState::Exit()
@@ -199,12 +205,18 @@ namespace app
 
 		void PenguinSlideEndState::Enter()
 		{
+			// 滑るステートと同じ速度を設定
+			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::StandUp);
 		}
 
 
 		void PenguinSlideEndState::Update()
-		{}
+		{
+			// 移動を可能にする
+			m_owner->Move();
+		}
 
 
 		void PenguinSlideEndState::Exit()

@@ -97,7 +97,7 @@ namespace app
 
 
 			/** ステートの変更先を取得する */
-			core::IState* GetChangeState();
+			virtual core::IState* GetChangeState() override;
 
 
 		public:
@@ -115,6 +115,14 @@ namespace app
 				return m_isCommandToggle;
 			}
 
+			void UpdateMovementInput();
+			void UpdateActionInput();
+			void UpdateSystemInput();
+
+			core::IState* CheckSystemState();
+			core::IState* CheckCommandState();
+			core::IState* CheckActionState();
+
 
 		public:
 			/**
@@ -125,7 +133,7 @@ namespace app
 			/**
 			 * @brief ダメージ処理
 			 */
-			void Damage() override;
+			virtual void Damage() override;
 
 
 		private:

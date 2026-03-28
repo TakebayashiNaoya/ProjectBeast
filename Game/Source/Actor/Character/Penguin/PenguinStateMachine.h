@@ -111,7 +111,7 @@ namespace app
 			bool CanChangeSlideStartState() const
 			{
 				const float height = m_transform.m_position.y;
-				return  m_isSlide /*&& IsOnGround()*/ && height >= 0.0f;
+				return  m_isSlide && height >= 0.0f;
 			}
 			/**
 			 * @brief スライドステートに切り替えられるかどうか
@@ -127,7 +127,8 @@ namespace app
 			 */
 			bool CanKeepSlidingState() const
 			{
-				return m_isSlide && CanChangeMoveState();
+				// ★ここを修正：ボタンが押されていれば空中に浮いても維持する
+				return m_isSlide;
 			}
 			/**
 			 * @brief スライド終了ステートに切り替えられるかどうか
