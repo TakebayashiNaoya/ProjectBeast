@@ -10,6 +10,8 @@
 #include "EnemyStatus.h"
 #include "EnemyTypes.h"
 #include "Source/Sound/SoundManager.h"
+#include "Source/Noise/NoiseManager.h"
+#include <algorithm>
 
 
 namespace app
@@ -37,7 +39,18 @@ namespace app
 
 
 		void EnemyIdleState::Update()
-		{}
+		{
+			// 音の検知処理
+			Vector3 loudestPos;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
+			const float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
+
+			if (totalNoise >= SEARCH_THRESHOLD)
+			{
+				m_owner->SetSeach(true);
+				m_owner->SetSearchTargetPos(loudestPos);
+			}
+		}
 
 
 		void EnemyIdleState::Exit()
@@ -157,6 +170,17 @@ namespace app
 			if (m_stepSE == -1)
 			{
 				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
+			}
+
+			// 音の検知処理
+			Vector3 loudestPos;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
+			const float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
+
+			if (totalNoise >= SEARCH_THRESHOLD)
+			{
+				m_owner->SetSeach(true);
+				m_owner->SetSearchTargetPos(loudestPos);
 			}
 		}
 
@@ -365,7 +389,35 @@ namespace app
 
 
 		void EnemyCoolDownState::Update()
-		{}
+		{
+			// 音の検知処理
+			Vector3 loudestPos;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
+
+			float currentGauge = m_owner->GetWakeUpGauge();
+			const float MAX_WAKE_UP_GAUGE = 100.0f; // 起床する閾値
+
+			if (totalNoise > 0.0f)
+			{
+				currentGauge += totalNoise * g_gameTime->GetFrameDeltaTime();
+
+				if (currentGauge >= MAX_WAKE_UP_GAUGE)
+				{
+					currentGauge = 0.0f; // リセット
+
+					m_owner->SetCoolDown(false);
+					m_owner->SetSeach(true);
+					m_owner->SetSearchTargetPos(loudestPos);
+				}
+			}
+			else
+			{
+				currentGauge -= 10.0f * g_gameTime->GetFrameDeltaTime();
+				currentGauge = max(0.0f, currentGauge);
+			}
+
+			m_owner->SetWakeUpGauge(currentGauge);
+		}
 
 
 		void EnemyCoolDownState::Exit()

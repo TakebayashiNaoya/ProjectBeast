@@ -11,11 +11,13 @@
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Util/JsonConverter.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/CameraController.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
+#include "Source/Noise/NoiseManager.h"
 
 #include <random>
 
@@ -111,9 +113,19 @@ namespace app
 			else {
 				auto* manager = app::actor::ChildPenguinManager::GetInstance();
 				manager->SetDaddyPenguin(m_daddyPenguin);
-				m_phase = LoadPhase::Camera;
+				m_phase = LoadPhase::Enemy;
 			}
 			break;
+
+		case LoadPhase::Enemy:
+		{
+			// クマの生成と初期化
+			m_enemy = new actor::Enemy();
+			m_enemy->SetPosition(Vector3(100.0f, 30.0f, 100.0f));
+			m_enemy->StartWrapper();
+			m_phase = LoadPhase::Camera;
+			break;
+		}
 
 		case LoadPhase::Camera:
 		{
@@ -140,10 +152,10 @@ namespace app
 			// 通常更新
 			actor::StageSystem::GetInstance()->Update();
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-			//for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
-
 
 			actor::ChildPenguinManager::GetInstance()->Update();
+
+			if (m_enemy)m_enemy->UpdateWrapper();
 
 			// CameraSteeringの結果をGameCameraに反映
 			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
@@ -152,6 +164,9 @@ namespace app
 				m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
 				gameCamera->SetState(data);
 			}
+
+			// ノイズのリストをクリア
+			NoiseManager::GetInstance().ClearNoises();
 
 			//if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
 			break;
@@ -174,6 +189,8 @@ namespace app
 		//	if (p) p->RenderWrapper(rc);
 		//}
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
+
+		if (m_enemy)m_enemy->RenderWrapper(rc);
 	}
 
 

@@ -8,6 +8,7 @@
 #include "PenguinStateMachine.h"
 #include "PenguinStatus.h"
 #include "PenguinAnimationData.h"
+#include "Source/Noise/NoiseManager.h"
 
 
 namespace app
@@ -63,6 +64,12 @@ namespace app
 		void PenguinSneakState::Update()
 		{
 			m_owner->Move();
+
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Sneak
+			);
 		}
 
 
@@ -91,6 +98,12 @@ namespace app
 		void PenguinRunState::Update()
 		{
 			m_owner->Move();
+
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Dash
+			);
 		}
 
 
@@ -132,7 +145,13 @@ namespace app
 
 
 		void PenguinJumpState::Exit()
-		{}
+		{
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Fall
+			);
+		}
 
 
 		PenguinJumpState::PenguinJumpState(PenguinStateMachine* owner)
@@ -186,6 +205,12 @@ namespace app
 		void PenguinSlidingState::Update()
 		{
 			m_owner->Move();
+
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Slide
+			);
 		}
 
 

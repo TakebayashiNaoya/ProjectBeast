@@ -6,6 +6,7 @@
 #include "Source/Effect/EffectManager.h"
 #include "Source/Scene/SceneManager.h"
 #include "Source/Sound/SoundManager.h"
+#include "Source/Noise/NoiseManager.h"
 
 
 namespace app
@@ -17,6 +18,7 @@ namespace app
 		core::ParameterManager::CreateInstance();
 		core::Fade::Create();
 		SoundManager::CreateInstance();
+		NoiseManager::CreateInstance();
 		SceneManager::CreateInstance();
 		EffectManager::CreateInstance();
 
@@ -26,6 +28,7 @@ namespace app
 	Application::~Application()
 	{
 		SceneManager::DestroyInstance();
+		NoiseManager::DestroyInstance();
 		SoundManager::DestroyInstance();
 		EffectManager::DestroyInstance();
 		camera::CameraManager::DestroyInstance();
@@ -37,7 +40,6 @@ namespace app
 
 	void Application::Update()
 	{
-		camera::CameraManager::CreateInstance();
 		camera::CameraManager::Get().Update(6);
 		core::ParameterManager::Get()->Update();
 		SoundManager::Get().Update();
