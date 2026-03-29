@@ -52,6 +52,9 @@
     <Filter Include="Source\Camera">
       <UniqueIdentifier>{a3c290f5-e5f2-4b49-a3a3-3f204628b05d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Noise">
+      <UniqueIdentifier>{3fc13238-774b-4440-af8e-22dd85b59997}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -301,6 +304,9 @@
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.cpp">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Noise\NoiseManager.cpp">
+      <Filter>Source\Noise</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -543,7 +549,7 @@
     <ClInclude Include="Source\Camera\LoseCamera.h">
       <Filter>Source\Camera</Filter>
     </ClInclude>
-<ClInclude Include="Source\UI\SearchMenu.h">
+    <ClInclude Include="Source\UI\SearchMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h">
@@ -564,6 +570,9 @@
     <ClInclude Include="hlsl ModelVSCommon.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Noise\NoiseManager.h">
+      <Filter>Source\Noise</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

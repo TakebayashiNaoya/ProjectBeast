@@ -281,6 +281,7 @@
     <ClCompile Include="Source\Core\StateMachineBase.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
+    <ClCompile Include="Source\Noise\NoiseManager.cpp" />
     <ClCompile Include="Source\Scene\DebugScene.cpp" />
     <ClCompile Include="Source\Scene\InGameScene.cpp" />
     <ClCompile Include="Source\Scene\IScene.cpp" />
@@ -368,6 +369,7 @@
     <ClInclude Include="Source\Core\Transform.h" />
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
+    <ClInclude Include="Source\Noise\NoiseManager.h" />
     <ClInclude Include="Source\Scene\DebugScene.h" />
     <ClInclude Include="Source\Scene\InGameScene.h" />
     <ClInclude Include="Source\Scene\IScene.h" />
