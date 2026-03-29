@@ -19,9 +19,6 @@
     <Filter Include="Source\Actor\Character">
       <UniqueIdentifier>{cd3ea93b-69ad-46c4-83e2-cd7a71456c33}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Actor\Character\Player">
-      <UniqueIdentifier>{4be53c84-5520-4489-93ed-2bfc4d00b1fe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\system">
       <UniqueIdentifier>{706b7812-7f1c-4488-854b-c24a37b2f3c3}</UniqueIdentifier>
     </Filter>
@@ -72,21 +69,6 @@
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp">
       <Filter>Source\Actor\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\Player.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerController.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerIState.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerStateMachine.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerStatus.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -116,9 +98,6 @@
     </ClCompile>
     <ClCompile Include="Source\Core\IMasterParameter.cpp">
       <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Player\PlayerParameter.cpp">
-      <Filter>Source\Actor\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\CharacterParameter.cpp">
       <Filter>Source\Actor\Character</Filter>
@@ -304,7 +283,7 @@
     <ClCompile Include="Source\Camera\LoseCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
-<ClCompile Include="Source\UI\SearchMenu.cpp">
+    <ClCompile Include="Source\UI\SearchMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp">
@@ -319,6 +298,8 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.cpp">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -335,21 +316,6 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h">
       <Filter>Source\Actor\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\Player.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerController.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerIState.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerStateMachine.h">
-      <Filter>Source\Actor\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerStatus.h">
-      <Filter>Source\Actor\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\HierarchicalTransform.h">
       <Filter>Source\Core</Filter>
@@ -380,9 +346,6 @@
     </ClInclude>
     <ClInclude Include="Source\Core\IMasterParameter.h">
       <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Player\PlayerParameter.h">
-      <Filter>Source\Actor\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\CharacterParameter.h">
       <Filter>Source\Actor\Character</Filter>
@@ -599,6 +562,9 @@
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
     <ClInclude Include="hlsl ModelVSCommon.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
+      <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />

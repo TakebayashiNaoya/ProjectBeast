@@ -19,8 +19,7 @@ namespace app
 		DaddyPenguinStateMachine::DaddyPenguinStateMachine(DaddyPenguin* ownerDaddyPenguin)
 			: PenguinStateMachine(ownerDaddyPenguin)
 			, m_ownerDaddyPenguin(ownerDaddyPenguin)
-			, m_isFollowCommand(false)
-			, m_isWaitCommand(false)
+			, m_isCommandToggle(false)
 			, m_isWin(false)
 			, m_isLose(false)
 		{
@@ -32,11 +31,7 @@ namespace app
 			AddState<PenguinSlideStartState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlidingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlideEndState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinDivingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSwimmingState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinClimbStartState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinClimbingState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinClimbEndState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDamagedState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDiyingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDeadState>(static_cast<PenguinStateMachine*>(this));
@@ -52,38 +47,19 @@ namespace app
 		}
 
 
-		void DaddyPenguinStateMachine::PlayerControllerInput()
-		{
-			m_moveDirection.x = g_pad[0]->GetLStickXF();
-			m_moveDirection.z = g_pad[0]->GetLStickYF();
-			m_moveDirection.y = 0.0f;
-
-			m_isDash = g_pad[0]->IsPress(enButtonB);
-			m_isJump = g_pad[0]->IsTrigger(enButtonA);
-			m_isSlide = g_pad[0]->IsPress(enButtonRB3);
-
-			m_isFollowCommand = g_pad[0]->IsTrigger(enButtonLB1);
-			m_isWaitCommand = g_pad[0]->IsTrigger(enButtonRB1);
-			m_isSwimming = g_pad[0]->IsPress(enButtonX);
-			m_isDive = m_isSeparateWater = g_pad[0]->IsTrigger(enButtonY);
-			m_isDamaged = g_pad[0]->IsTrigger(enButtonLB3);
-
-			m_isWin = g_pad[0]->IsTrigger(enButtonLB2);
-			m_isLose = g_pad[0]->IsTrigger(enButtonRB2);
-		}
-
+		// =========================================================
+		// ステータス関連
+		// =========================================================
 
 		DaddyPenguinStatus* DaddyPenguinStateMachine::GetDaddyPenguinStatus() const
 		{
 			return m_ownerActor->GetStatus<DaddyPenguinStatus>();
 		}
 
-
 		const PenguinStatus* DaddyPenguinStateMachine::GetPenguinStatus() const
 		{
 			return GetDaddyPenguinStatus();
 		}
-
 
 		void DaddyPenguinStateMachine::Damage()
 		{
@@ -91,237 +67,122 @@ namespace app
 		}
 
 
+		// =========================================================
+		// ステート遷移判定群
+		// =========================================================
+
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
-			/** 命令中なら命令ステートへ */
-			if (CanChangeCommandState())
-			{
-				if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow)
-				{
-					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Wait);
-				}
-				else if (ChildPenguinManager::GetInstance()->GetCommand() == ChildPenguinManager::EnPenguinCommand::Wait)
-				{
-					ChildPenguinManager::GetInstance()->SetCommand(ChildPenguinManager::EnPenguinCommand::Follow);
-				}
-				return FindState(DaddyPenguinCommandShoutState::ID());
+			core::IState* nextState = nullptr;
+
+			// 1. システム・環境系の判定（ダメージ、死亡、水泳など）
+			if ((nextState = CheckSystemState()) != nullptr) return nextState;
+
+			// 2. 追従命令・待機命令の判定
+			if ((nextState = CheckCommandState()) != nullptr) return nextState;
+
+			// 3. アクション系の判定（ウォーク、ダッシュ、スライド、ジャンプ）
+			if ((nextState = CheckActionState()) != nullptr) return nextState;
+
+			// どれにも当てはまらなければ待機状態へ
+			return FindState(PenguinIdleState::ID());
+		}
+
+
+		core::IState* DaddyPenguinStateMachine::CheckSystemState()
+		{
+			if (IsEqualCurrentState(DaddyPenguinWinState::ID())) return FindState(DaddyPenguinWinState::ID());
+			if (m_isWin) return FindState(DaddyPenguinWinState::ID());
+			if (IsEqualCurrentState(DaddyPenguinLoseState::ID())) return FindState(DaddyPenguinLoseState::ID());
+			if (m_isLose) return FindState(DaddyPenguinLoseState::ID());
+
+			/** 1. 死ぬアニメーションが流れていたら死亡中ステートを返し、
+					アニメーションが終わったら死亡ステートを返す */
+			if (IsEqualCurrentState(PenguinDiyingState::ID())) {
+				if (IsPlayingAnimation()) return FindState(PenguinDiyingState::ID());
+				else return FindState(PenguinDeadState::ID());
 			}
 
-
-			if (IsEqualCurrentState(DaddyPenguinWinState::ID()))
-			{
-				return FindState(DaddyPenguinWinState::ID());
-			}
-
-
-
-			if (m_isWin)
-			{
-				return FindState(DaddyPenguinWinState::ID());
-			}
-
-
-			if (IsEqualCurrentState(DaddyPenguinLoseState::ID()))
-			{
-				return FindState(DaddyPenguinLoseState::ID());
-			}
-
-
-			if (m_isLose)
-			{
-				return FindState(DaddyPenguinLoseState::ID());
-			}
-
-
-			if (CanChangeJumpState())
-			{
-				return FindState(PenguinJumpState::ID());
-			}
-
-
-			/** 死亡ステート中、アニメーション再生中であれば継続 */
-			if (IsEqualCurrentState(PenguinDiyingState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinDiyingState::ID());
-				}
-				else
-				{
-					return FindState(PenguinDeadState::ID());
-				}
-			}
-
-
-
-			if (m_ownerDaddyPenguin->GetStatus<DaddyPenguinStatus>()->IsDead())
-			{
+			/** 2. 死亡フラグが立っていたら、死亡させる。 */
+			if (m_ownerDaddyPenguin->GetStatus<DaddyPenguinStatus>()->IsDead()) {
 				return FindState(PenguinDiyingState::ID());
 			}
 
-
-			if (m_isDamaged)
-			{
+			/** 3. 被弾フラグが立っていたら被弾ステートへ */
+			if (m_isDamaged) {
 				return FindState(PenguinDamagedState::ID());
 			}
 
-
-			/** 登り終わり中だったら */
-			if (IsEqualCurrentState(PenguinClimbEndState::ID()))
+			/** 4. 泳いでいる最中に足が地面についていなかったら泳ぎステートを返し、
+					現在は泳いでおらず、泳げる状態なら泳ぎステートを返す */
+			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinClimbEndState::ID());
-				}
-				else
-				{
-					return FindState(PenguinIdleState::ID());
-				}
+				if (!IsOnGround()) return FindState(PenguinSwimmingState::ID());
 			}
-
-
-			/** 登り中だったら */
-			if (IsEqualCurrentState(PenguinClimbingState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinClimbingState::ID());
-				}
-				else
-				{
-					return FindState(PenguinClimbEndState::ID());
-				}
-			}
-
-
-			/** 登り始まり中だったら */
-			if (IsEqualCurrentState(PenguinClimbStartState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinClimbStartState::ID());
-
-				}
-				else
-				{
-					return FindState(PenguinClimbingState::ID());
-				}
-			}
-
-
-			/** 水からなられる準備ができたら */
-			if (CanChangeSeparateWaterState())
-			{
-				return FindState(PenguinClimbStartState::ID());
-			}
-
-
-
-
-			/** 泳ぐステートに変更可能なら */
-			if (CanChangeSwimState())
+			else if (CanChangeSwimState())
 			{
 				return FindState(PenguinSwimmingState::ID());
 			}
 
+			return nullptr;
+		}
 
 
-			if (IsEqualCurrentState(PenguinDivingState::ID()))
-			{
-				if (IsPlayingAnimation())
-				{
-					return FindState(PenguinDivingState::ID());
-				}
-				else
-				{
-					return FindState(PenguinSwimmingState::ID());
-				}
-			}
-
-
-			if (CanChangeDivingState())
-			{
-				return FindState(PenguinDivingState::ID());
-			}
-
-
-
-			/** 命令中なら維持する */
-			if (IsEqualCurrentState(DaddyPenguinCommandShoutState::ID())
-				&& IsPlayingAnimation())
-			{
-				// 命令状態でアニメーション再生中なら維持する
-				return FindState(DaddyPenguinCommandShoutState::ID());
-			}
-
-
-			/** 命令状態へなれるなら命令状態へ */
+		core::IState* DaddyPenguinStateMachine::CheckCommandState()
+		{
 			if (CanChangeCommandState())
 			{
 				return FindState(DaddyPenguinCommandShoutState::ID());
 			}
 
-
-
-
-
-
-			/** スライド開始中ならアニメーションが終わるまで維持し、終わるとスライディングステートへ */
-			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
+			if (IsEqualCurrentState(DaddyPenguinCommandShoutState::ID()) && IsPlayingAnimation())
 			{
-				if (CanChangeSlidingState())
-				{
-					return FindState(PenguinSlidingState::ID());
-				}
+				return FindState(DaddyPenguinCommandShoutState::ID());
 			}
 
-			/** スライド終わりのアニメーション再生中なら維持する */
-			if (IsEqualCurrentState(PenguinSlideEndState::ID()))
-			{
-				if (!IsFinishedSlideEndState())
-				{
-					return FindState(PenguinSlideEndState::ID());
-				}
+			return nullptr;
+		}
+
+
+		core::IState* DaddyPenguinStateMachine::CheckActionState()
+		{
+			/** 1. スライド開始ステートのアニメーションが終わっていて、かつスライド状態が続いているならスライドステートへ */
+			if (IsEqualCurrentState(PenguinSlideStartState::ID())) {
+				if (CanChangeSlidingState()) return FindState(PenguinSlidingState::ID());
 			}
 
-
-			/** スライド中なら、スライドを維持するか判断する */
-			if (IsEqualCurrentState(PenguinSlidingState::ID()))
-			{
-				if (CanKeepSlidingState())
-				{
-					return FindState(PenguinSlidingState::ID());
-				}
-				else
-				{
-					return FindState(PenguinSlideEndState::ID());
-				}
+			/** 2. スライド終了ステートのアニメーションが終わっていなければスライド終了ステートを続行する */
+			if (IsEqualCurrentState(PenguinSlideEndState::ID())) {
+				if (!IsFinishedSlideEndState()) return FindState(PenguinSlideEndState::ID());
 			}
 
+			/** 3. スライド中で、スライドをキープできるならスライドを維持し、そうでなければスライドを終わらせる */
+			if (IsEqualCurrentState(PenguinSlidingState::ID())) {
+				if (CanKeepSlidingState()) return FindState(PenguinSlidingState::ID());
+				else return FindState(PenguinSlideEndState::ID());
+			}
 
-			/** スライドを始められるならスライド開始状態へ */
-			if (CanChangeSlideStartState())
-			{
+			/** 4. スライドステートに切り替えられるならスライドステートへ */
+			if (CanChangeSlideStartState()) {
 				return FindState(PenguinSlideStartState::ID());
 			}
 
+			/** 5. ジャンプステートに切り替えられるor足が付いていなければジャンプステートへ */
+			if (CanChangeJumpState() || !IsOnGround()) {
+				return FindState(PenguinJumpState::ID());
+			}
 
-			/** ダッシュ入力があり、移動入力があればダッシュ状態へ */
-			if (CanChangeRunState())
-			{
+			/** 6. 走行ステートに切り替えられるなら走行ステートへ */
+			if (CanChangeRunState()) {
 				return FindState(PenguinRunState::ID());
 			}
 
-
-			/** 移動入力があればスニーク状態へ */
-			if (CanChangeWalkState())
-			{
+			/** 7. 移動入力があるならスニークステートへ */
+			if (CanChangeMoveState()) {
 				return FindState(PenguinSneakState::ID());
 			}
 
-
-			/** 当てはまらなければ待機状態へ */
-			return FindState(PenguinIdleState::ID());
+			return nullptr;
 		}
 	}
 }

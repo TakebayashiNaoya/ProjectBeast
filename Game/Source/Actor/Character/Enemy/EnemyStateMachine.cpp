@@ -105,10 +105,22 @@ namespace app
 			{
 				return FindState(EnemySearchState::ID());
 			}
-			if (CanChangeSwimState())
+
+			// 泳ぎ判定（チャタリング防止ロジック）
+			if (m_currentState == FindState(EnemySwimState::ID()))
 			{
+				// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
+				if (!IsOnGround())
+				{
+					return FindState(EnemySwimState::ID());
+				}
+			}
+			else if (CanChangeSwimState())
+			{
+				// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
 				return FindState(EnemySwimState::ID());
 			}
+
 			if (CanChangeWalk())
 			{
 				return FindState(EnemyWalkState::ID());

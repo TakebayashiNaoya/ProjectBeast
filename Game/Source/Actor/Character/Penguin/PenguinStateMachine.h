@@ -94,6 +94,16 @@ namespace app
 			 */
 			virtual void Damage();
 
+			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide)
+			{
+				m_moveDirection = moveDirection;
+				m_isSneak = isSneak;
+				m_isDash = isDash; // または SetIsDash(isDash);
+				m_isJump = isJump;
+				m_isSlide = isSlide;
+				m_isSwimming = IsInWater();
+			}
+
 
 		protected:
 			/**
@@ -111,7 +121,7 @@ namespace app
 			bool CanChangeSlideStartState() const
 			{
 				const float height = m_transform.m_position.y;
-				return  m_isSlide /*&& IsOnGround()*/ && height >= 0.0f;
+				return  m_isSlide && height >= 0.0f;
 			}
 			/**
 			 * @brief スライドステートに切り替えられるかどうか
@@ -127,7 +137,8 @@ namespace app
 			 */
 			bool CanKeepSlidingState() const
 			{
-				return m_isSlide && CanChangeWalkState();
+				// ★ここを修正：ボタンが押されていれば空中に浮いても維持する
+				return m_isSlide;
 			}
 			/**
 			 * @brief スライド終了ステートに切り替えられるかどうか
@@ -138,28 +149,20 @@ namespace app
 				return !m_isSlide && !IsPlayingAnimation();
 			}
 			/**
-			 * @brief 離水ステートに切り替えられるかどうか
-			 * @return 離水ステートに切り替えられるかどうか
-			 */
-			bool CanChangeSeparateWaterState() const
-			{
-				return m_isSeparateWater && IsInWater();
-			}
-			/**
-			 * @brief 飛び込みステートに切り替えられるかどうか
-			 * @return 飛び込みステートに切り替えられるかどうか
-			 */
-			bool CanChangeDivingState() const
-			{
-				return m_isDive && IsInWater();
-			}
-			/**
 			 * @brief 被弾ステートに切り替えられるかどうか
 			 * @return 被弾ステートに切り替えられるかどうか
 			 */
 			bool CanChangeDamagedState() const
 			{
 				return m_isDamaged;
+			}
+			/**
+			 * @brief 泳ぐステートに切り替えられるかどうか
+			 * @return 泳ぐステートに切り替えられるかどうか
+			 */
+			bool CanChangeSwimState() const
+			{
+				return !IsOnGround() && m_transform.m_position.y < 0.0f;
 			}
 
 
@@ -171,21 +174,16 @@ namespace app
 		protected:
 			/** 親ペンギンのポインタ */
 			PenguinBase* m_ownerPenguinBase;
-			/** 滞空時間 */
-			float m_airTime;
 			/** ジャンプパワー */
 			float m_jumpPower;
 			/**ジャンプするかどうか */
 			bool m_isJump;
+			/** スニークするかどうか */
+			bool m_isSneak;
 			/** スライドするかどうか */
 			bool m_isSlide;
-			/** 離水するかどうか */
-			bool m_isSeparateWater;
-			/** 飛び込みするかどうか */
-			bool m_isDive;
 			/** 被弾したかどうか */
 			bool m_isDamaged;
 		};
 	}
 }
-

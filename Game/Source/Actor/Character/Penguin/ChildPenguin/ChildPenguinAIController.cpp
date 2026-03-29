@@ -75,14 +75,13 @@ namespace app
 			const auto& td = GetTypeData(type);
 
 			/** 速度系個体値を決定してStatusに反映する */
-			const float walkSpeed = RollRange(td.walkSpeed);
 			const float runSpeed = RollRange(td.runSpeed);
 			const float swimSpeed = RollRange(td.swimSpeed);
 			const float sneakSpeed = RollRange(td.sneakSpeed);
 			const float slideSpeed = RollRange(td.slideSpeed);
 			const float jumpPower = RollRange(td.jumpPower);
 			owner->GetStatus<ChildPenguinStatus>()->SetIndividualValues(
-				walkSpeed, runSpeed, swimSpeed, sneakSpeed, slideSpeed, jumpPower);
+				runSpeed, swimSpeed, sneakSpeed, slideSpeed, jumpPower);
 
 			/** 距離系個体値を決定する */
 			m_stopDistance = RollRange(td.stopDistance);
@@ -145,11 +144,10 @@ namespace app
 			const float   distToTarget = GetDistanceToTarget(targetPos);
 
 			/**
-			 * ヒステリシスを考慮したフェーズ遷移
-			 *
-			 * フェーズを「上げる閾値」と「下げる閾値」を非対称にする。
-			 * 上げる : distance > threshold               （外に出たらすぐ上げる）
-			 * 下げる : distance <= threshold - HYSTERESIS （十分内側に入ったら下げる）
+			 * ヒステリシスと「目標到達までステートを維持する」処理を考慮したフェーズ遷移
+			 * * 上げる : 設定された距離（m_walkDistance, m_runDistance）を超えたらすぐに上げる
+			 * 下げる : 一度 Run や Slide になったら、途中の距離では減速せず、
+			 * 所定の陣形位置（m_stopDistance付近）に到達して初めて Walk に一気に戻す
 			 */
 			switch (m_movePhase)
 			{
@@ -166,12 +164,15 @@ namespace app
 				break;
 
 			case MovePhase::Run:
+				// さらに離されたら Slide へ上げる
 				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
-				else if (distToTarget <= m_walkDistance - HYSTERESIS) { m_movePhase = MovePhase::Walk; }
+				// 途中の m_walkDistance では減速せず、所定の位置（m_stopDistance）まで来たら Walk に一気に戻す
+				else if (distToTarget <= m_stopDistance) { m_movePhase = MovePhase::Walk; }
 				break;
 
 			case MovePhase::Slide:
-				if (distToTarget <= m_runDistance - HYSTERESIS) { m_movePhase = MovePhase::Run; }
+				// 所定の位置（m_stopDistance）まで Slide を維持し、到着したら Walk に一気に戻す
+				if (distToTarget <= m_stopDistance) { m_movePhase = MovePhase::Walk; }
 				break;
 			}
 
@@ -188,22 +189,22 @@ namespace app
 			switch (m_movePhase)
 			{
 			case MovePhase::Stop:
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				break;
 
 			case MovePhase::Walk:
-				/** 歩き：isDash=false, isSlide=false */
-				m_stateMachine->AIControllerInput(moveDirection, false, false, false, false, false);
+				/** 歩き：isSneak=true, isDash=false, isSlide=false */
+				m_stateMachine->SetActionInput(moveDirection, true, false, false, false);
 				break;
 
 			case MovePhase::Run:
-				/** 走り：isDash=true, isSlide=false */
-				m_stateMachine->AIControllerInput(moveDirection, true, false, false, false, false);
+				/** 走り：isSneak=false, isDash=true, isSlide=false */
+				m_stateMachine->SetActionInput(moveDirection, false, true, false, false);
 				break;
 
 			case MovePhase::Slide:
-				/** 滑り：isDash=true, isSlide=true */
-				m_stateMachine->AIControllerInput(moveDirection, true, false, true, false, false);
+				/** 滑り：isSneak=false, isDash=true, isSlide=true */
+				m_stateMachine->SetActionInput(moveDirection, false, true, false, true);
 				break;
 			}
 		}
@@ -241,7 +242,7 @@ namespace app
 					m_isFollowing = false;
 				}
 				/** その場で待機 */
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -259,7 +260,7 @@ namespace app
 
 			/** 隊列に参加していない状態ならその場で待機する */
 			if (!m_isFollowing) {
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -272,42 +273,21 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// ClingyChildPenguinAI
+		// ClingyChildPenguinAI（甘えん坊ペンギン）
 		//--------------------------------------------------------------
 
 		ClingyChildPenguinAI::ClingyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Clingy)
-		{
-			/** 甘えん坊専用：強制追従が始まる距離を追加で設定する */
-			const auto& td = GetTypeData(EnChildPenguinType::Clingy);
-			m_breakAwayDistance = RollRange(td.breakAwayDistance);
-		}
+		{}
 
 
 		void ClingyChildPenguinAI::Update()
 		{
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
-			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
 			/** 親との距離を取得 */
 			const float distDaddy = GetDistanceToDaddy();
-
-			/** 待機命令中でも親から離れすぎたら強制追従 */
-			const bool forceFollow = !isFollowCmd && distDaddy > m_breakAwayDistance;
-
-			if (!isFollowCmd && !forceFollow)
-			{
-				/** 待機命令中かつ親との距離が許容範囲内：隊列から離脱 */
-				if (m_isFollowing)
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
-				}
-				/** その場で待機 */
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
-				return;
-			}
 
 			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
 			if (!m_isFollowing && distDaddy <= m_joinDistance)
@@ -326,7 +306,7 @@ namespace app
 			/** 隊列に参加していない状態ならその場で待機する */
 			if (!m_isFollowing)
 			{
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -341,7 +321,7 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// NaughtyChildPenguinAI
+		// NaughtyChildPenguinAI（やんちゃペンギン）
 		//--------------------------------------------------------------
 
 		NaughtyChildPenguinAI::NaughtyChildPenguinAI(ChildPenguin* owner)
@@ -368,7 +348,7 @@ namespace app
 					m_isFollowing = false;
 				}
 				/** その場で待機 */
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -389,7 +369,7 @@ namespace app
 			/** 隊列に参加していない状態ならその場で待機する */
 			if (!m_isFollowing)
 			{
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -404,7 +384,7 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// ClumsyChildPenguinAI
+		// ClumsyChildPenguinAI（おっちょこちょいペンギン）
 		//--------------------------------------------------------------
 
 		ClumsyChildPenguinAI::ClumsyChildPenguinAI(ChildPenguin* owner)
@@ -431,7 +411,7 @@ namespace app
 					m_isFollowing = false;
 				}
 				/** その場で待機 */
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -452,7 +432,7 @@ namespace app
 			/** 隊列に参加していない状態ならその場で待機する */
 			if (!m_isFollowing)
 			{
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -467,7 +447,7 @@ namespace app
 
 
 		//--------------------------------------------------------------
-		// CaringChildPenguinAI
+		// CaringChildPenguinAI（世話焼きペンギン）
 		//--------------------------------------------------------------
 
 		CaringChildPenguinAI::CaringChildPenguinAI(ChildPenguin* owner)
@@ -494,7 +474,7 @@ namespace app
 					m_isFollowing = false;
 				}
 				/** その場で待機 */
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
@@ -515,7 +495,7 @@ namespace app
 			/** 隊列に参加していない状態ならその場で待機する */
 			if (!m_isFollowing)
 			{
-				m_stateMachine->AIControllerInput(Vector3::Zero, false, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 

@@ -38,8 +38,6 @@ namespace app
 					td.colorG = j["color"][1].get<float>();
 					td.colorB = j["color"][2].get<float>();
 					td.colorA = j["color"][3].get<float>();
-					td.walkSpeed.min = jRange["walkSpeed"][0].get<float>();
-					td.walkSpeed.max = jRange["walkSpeed"][1].get<float>();
 					td.runSpeed.min = jRange["runSpeed"][0].get<float>();
 					td.runSpeed.max = jRange["runSpeed"][1].get<float>();
 					td.swimSpeed.min = jRange["swimSpeed"][0].get<float>();
@@ -60,8 +58,6 @@ namespace app
 					td.joinDistance.max = jRange["joinDistance"][1].get<float>();
 					td.giveUpDistance.min = jRange["giveUpDistance"][0].get<float>();
 					td.giveUpDistance.max = jRange["giveUpDistance"][1].get<float>();
-					td.breakAwayDistance.min = jRange["breakAwayDistance"][0].get<float>();
-					td.breakAwayDistance.max = jRange["breakAwayDistance"][1].get<float>();
 				});
 		}
 
@@ -95,14 +91,12 @@ namespace app
 
 
 		void ChildPenguinStatus::SetIndividualValues(
-			float walkSpeed,
 			float runSpeed,
 			float swimSpeed,
 			float sneakSpeed,
 			float slideSpeed,
 			float jumpPower)
 		{
-			m_walkSpeed = walkSpeed;
 			m_runSpeed = runSpeed;
 			m_swimSpeed = swimSpeed;
 			m_sneakSpeed = sneakSpeed;

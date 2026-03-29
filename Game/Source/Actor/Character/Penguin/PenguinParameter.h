@@ -27,6 +27,10 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			// ペンギン固有のパラメーターをここに追加していく
+			/** 最大体力 */
+			int maxHp;
+			/** 初期体力 */
+			int hp;
 			/** スニークの速さ */
 			float sneakSpeed;
 			/** スライドの速さ */
@@ -36,4 +40,3 @@ namespace app
 		};
 	}
 }
-

@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/CharacterParameter.h"
+#include "Source/Actor/Character/Penguin/PenguinParameter.h"
 #include "ChildPenguinTypes.h"
 
 
@@ -16,7 +16,7 @@ namespace app
 		 * @brief 子ペンギンパラメーター
 		 * @details 子ペンギン固有のパラメーターを保持する
 		 */
-		struct MasterChildPenguinParameter : public MasterCharacterParameter
+		struct MasterChildPenguinParameter : public MasterPenguinParameter
 		{
 			appParameter(MasterChildPenguinParameter);
 
@@ -28,9 +28,6 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			// 子ペンギン固有のパラメーターをここに追加していく
-			float sneakSpeed;
-			float slideSpeed;
-			float jumpPower;
 
 			/**
 			 * @brief min/max の範囲を表す構造体
@@ -53,7 +50,6 @@ namespace app
 				float colorB;
 				float colorA;
 				// 速度系の個体差範囲
-				Range walkSpeed;
 				Range runSpeed;
 				Range swimSpeed;
 				Range sneakSpeed;
@@ -65,7 +61,6 @@ namespace app
 				Range runDistance;
 				Range joinDistance;
 				Range giveUpDistance;
-				Range breakAwayDistance;
 			};
 
 			/** タイプ別パラメーター（インデックス = EnChildPenguinType の値） */

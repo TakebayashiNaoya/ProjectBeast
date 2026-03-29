@@ -18,21 +18,6 @@ namespace app
 		{
 		public:
 			/**
-			 * @brief 最大体力を取得
-			 * @return 最大体力
-			 */
-			inline int GetMaxHp() const { return m_maxHp; }
-			/**
-			 * @brief 体力を取得
-			 * @return 体力
-			 */
-			inline int GetHp() const { return m_hp; }
-			/**
-			 * @brief 歩き速度を取得
-			 * @return 歩き速度
-			 */
-			inline float GetWalkSpeed() const { return m_walkSpeed; }
-			/**
 			 * @brief 走り速度を取得
 			 * @return 走り速度
 			 */
@@ -52,18 +37,6 @@ namespace app
 			 * @return 高さ
 			 */
 			inline float GetHeight() const { return m_height; }
-			/**
-			 * @brief ダメージ処理
-			 */
-			inline void Damage(const int dmg = 1)
-			{
-				m_hp = std::max<int>(0, m_hp - dmg);
-			}
-			/**
-			 * @brief 死んでいるか
-			 * @return 死んでいるか
-			 */
-			inline bool IsDead() const { return m_hp <= 0; }
 
 
 		public:
@@ -83,12 +56,6 @@ namespace app
 
 
 		protected:
-			/** 最大体力 */
-			int m_maxHp;
-			/** 体力 */
-			int m_hp;
-			/** 移動速度(歩き) */
-			float m_walkSpeed;
 			/** 移動速度(走り) */
 			float m_runSpeed;
 			/** 移動速度(泳ぎ) */
@@ -100,4 +67,3 @@ namespace app
 		};
 	}
 }
-

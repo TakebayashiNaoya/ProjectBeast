@@ -6,7 +6,6 @@
 #include "stdafx.h"
 #include "NPCController.h"
 #include "NPCControllerManager.h"
-#include "Source/Actor/Character/Player/Player.h"
 
 
 namespace app
@@ -120,13 +119,11 @@ namespace app
 
 
 		void NPCController::UpdateIdle(NPCController* npc)
-		{
-		}
+		{}
 
 
 		void NPCController::ExitIdle(NPCController* npc)
-		{
-		}
+		{}
 
 
 		int NPCController::CheckIdle(NPCController* npc)
@@ -151,8 +148,7 @@ namespace app
 
 
 		void NPCController::ExitMove(NPCController* npc)
-		{
-		}
+		{}
 
 
 		int NPCController::CheckMove(NPCController* npc)
@@ -165,18 +161,15 @@ namespace app
 
 		/** ジャンプ */
 		void NPCController::EnterJump(NPCController* npc)
-		{
-		}
+		{}
 
 
 		void NPCController::UpdateJump(NPCController* npc)
-		{
-		}
+		{}
 
 
 		void NPCController::ExitJump(NPCController* npc)
-		{
-		}
+		{}
 
 
 		int NPCController::CheckJump(NPCController* npc)
@@ -188,18 +181,15 @@ namespace app
 
 		/** 泳ぐ */
 		void NPCController::EnterSwim(NPCController* npc)
-		{
-		}
+		{}
 
 
 		void NPCController::UpdateSwim(NPCController* npc)
-		{
-		}
+		{}
 
 
 		void NPCController::ExitSwim(NPCController* npc)
-		{
-		}
+		{}
 
 
 		int NPCController::CheckSwim(NPCController* npc)

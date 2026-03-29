@@ -10,6 +10,7 @@
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/LoseCamera.h"
 #include "Source/Camera/WinCamera.h"
@@ -33,8 +34,27 @@ namespace app
 
 		void DaddyPenguinCommandShoutState::Enter()
 		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
-			EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
+			// 1. マネージャーを介して子ペンギンへの命令を切り替える（トグル）
+			auto* manager = ChildPenguinManager::GetInstance();
+			manager->ToggleCommand();
+
+			// 2. 切り替わった後の命令を取得
+			auto currentCommand = manager->GetCommand();
+
+			// 3. 命令に応じて演出（アニメーションやエフェクト）を分岐
+			if (currentCommand == ChildPenguinManager::EnPenguinCommand::Follow)
+			{
+				// === 「おいで！（追従）」の演出 ===
+				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
+				EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
+			}
+			else if (currentCommand == ChildPenguinManager::EnPenguinCommand::Wait)
+			{
+				// === 「待て！（待機）」の演出 ===
+				// NOTE: 現状は同じ設定を入れていますが、待機用のアニメーションやエフェクト（例: EnPenguinAnimationID::CommandWait など）があればここを変更してください。
+				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
+				EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
+			}
 		}
 
 

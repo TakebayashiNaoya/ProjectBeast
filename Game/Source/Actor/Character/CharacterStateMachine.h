@@ -18,6 +18,8 @@ namespace app
 		{
 			/** 海面の高さ */
 			constexpr float SEA_LEVEL = 0.0f;
+			/** 海面付近のしきい値（ゆらゆら中にSwimmingStateを維持するための余裕） */
+			constexpr float SEA_SURFACE_THRESHOLD = 10.0f;
 		}
 
 		/**
@@ -96,10 +98,10 @@ namespace app
 
 		protected:
 			/**
-			 * @brief 歩行ステートに切り替えられるかどうか
-			 * @return 歩行ステートに切り替えられるかどうか
+			 * @brief 移動入力があるかどうか（スニーク/ダッシュ/スライドへの遷移判定に使用）
+			 * @return 移動入力があるかどうか
 			 */
-			inline bool CanChangeWalkState() const
+			inline bool CanChangeMoveState() const
 			{
 				return fabsf(m_moveDirection.LengthSq()) > FLT_EPSILON;
 			}
@@ -109,7 +111,7 @@ namespace app
 			 */
 			inline bool CanChangeRunState() const
 			{
-				return CanChangeWalkState() && m_isDash;
+				return CanChangeMoveState() && m_isDash;
 			}
 			/**
 			 * @brief 泳ぎステートに切り替えられるかどうか
@@ -134,7 +136,7 @@ namespace app
 			inline bool IsInWater() const
 			{
 				const float height = m_ownerActor->GetTransform().m_position.y;
-				return height < SEA_LEVEL;
+				return height < SEA_LEVEL + SEA_SURFACE_THRESHOLD;
 			}
 
 
@@ -166,6 +168,8 @@ namespace app
 			bool m_isDash;
 			/** 泳ぎ中かどうか */
 			bool m_isSwimming;
+			/** 前フレームのY座標（水面を抜けた瞬間の判定に使用） */
+			float m_prevPositionY;
 		};
 
 	}

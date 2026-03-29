@@ -11,6 +11,7 @@ namespace nsBeastEngine
 	namespace nsCollision
 	{
 		/** 地面判定 */
+/** 地面判定 */
 		struct SweepResultGround : public btCollisionWorld::ConvexResultCallback {
 			bool isHit = false;
 			Vector3 hitPos;
@@ -18,6 +19,7 @@ namespace nsBeastEngine
 			Vector3 hitNormal;
 			btCollisionObject* me = nullptr;
 			float dist = FLT_MAX;
+			float closestFraction = 1.0f; // ★この変数を追加します
 
 			virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace) {
 				if (convexResult.m_hitCollisionObject == me || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
@@ -28,18 +30,21 @@ namespace nsBeastEngine
 				float angle = acosf(hitNormalTmp.y); // 上(0,1,0)との角度
 
 				// 地面判定 (法線が上を向いている)
-				if (fabsf(angle) < Math::PI * 0.3f) {
-					isHit = true;
-					Vector3 hitPosTmp = *(Vector3*)&convexResult.m_hitPointLocal;
-					Vector3 vDist = hitPosTmp - startPos;
-					float distTmp = vDist.Length();
-					if (dist > distTmp) {
-						hitPos = hitPosTmp;
+				// 急斜面対応のため、許容角を 0.35f (約63度) に広げています
+				if (fabsf(angle) < Math::PI * 0.35f) {
+					// 一番手前のヒット情報を記録する
+					if (convexResult.m_hitFraction < closestFraction) {
+						isHit = true;
+						closestFraction = convexResult.m_hitFraction; // ★割合を記録
+
+						// 座標や法線も一番近いもので更新しておく
+						hitPos = *(Vector3*)&convexResult.m_hitPointLocal;
 						hitNormal = hitNormalTmp;
-						dist = distTmp;
 					}
 				}
-				return 0.0f;
+
+				// 手前の段差などに邪魔されず、奥までしっかり判定するために必ず1.0fを返します
+				return 1.0f;
 			}
 		};
 
@@ -287,15 +292,29 @@ namespace nsBeastEngine
 				{
 					// 落下中（床判定）
 					float downAmount = fabsf(m_verticalVelocity * deltaTime);
-					float checkDist = (m_isOnGround) ? 0.5f : downAmount + 0.1f;
-					float checkY = m_position.y + m_height * 0.5f + m_radius;
 
-					Vector3 start(m_position.x, checkY, m_position.z);
-					Vector3 end(m_position.x, checkY - checkDist, m_position.z);
+					// ★ユーザーのご推測通り、下り坂での「一瞬の浮き」を防ぐための吸着距離（Snap Distance）
+					// 接地中（m_isOnGround == true）は、斜面を下る際に宙に浮かないよう、
+					// 下方向へのチェック距離を通常よりかなり長めに取ります。
+					// ※急斜面でまだカクつく場合は、この 1.5f を 2.0f などに増やしてください。
+					float stickDist = 1.5f;
+					float checkDist = (m_isOnGround) ? stickDist : downAmount + 0.1f;
+
+					// 横移動による地形へのめり込み防止（上空から判定を開始する）
+					Vector3 xzMove(m_position.x - m_prevPosition.x, 0.0f, m_position.z - m_prevPosition.z);
+					float moveDist = xzMove.Length();
+					float maxSlopeRise = moveDist * 2.5f;
+					float stepOffset = maxSlopeRise + m_radius * 2.0f;
+
+					float totalSweepDist = stepOffset + checkDist;
+
+					float checkY = m_position.y + m_height * 0.5f + m_radius;
+					Vector3 start(m_position.x, checkY + stepOffset, m_position.z);
+					// 終了位置は start から totalSweepDist 分下げる
+					Vector3 end(m_position.x, start.y - totalSweepDist, m_position.z);
 
 					SweepResultGround callback;
 					callback.me = m_rigidBody.GetBody();
-					callback.startPos = Vector3(m_position.x, checkY, m_position.z);
 
 					PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
 
@@ -303,9 +322,13 @@ namespace nsBeastEngine
 						m_isOnGround = true;
 						m_isJump = false;
 						m_verticalVelocity = 0.0f;
-						m_position.y = callback.hitPos.y;
+
+						// 地面が見つかったら、足元を斜面にピタッと吸着させる
+						float hitCenterY = start.y - totalSweepDist * callback.closestFraction;
+						m_position.y = hitCenterY - (m_height * 0.5f + m_radius);
 					}
 					else {
+						// 吸着距離（stickDist）を越えて地面がない場合のみ、崖から落ちたと判定して落下させる
 						m_isOnGround = false;
 						m_position.y -= downAmount;
 					}

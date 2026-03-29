@@ -18,8 +18,6 @@ namespace app
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterEnemyParameter>("Assets/parameter/character/enemy/EnemyParameter.json", [](const nlohmann::json& j, MasterEnemyParameter& parameter)
 				{
-					parameter.maxHp = j["maxHp"].get<int>();
-					parameter.hp = j["hp"].get<int>();
 					parameter.walkSpeed = j["walkSpeed"].get<float>();
 					parameter.runSpeed = j["runSpeed"].get<float>();
 					parameter.radius = j["radius"].get<float>();
@@ -41,8 +39,6 @@ namespace app
 		{
 			// 読み込んだパラメーター取得
 			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterEnemyParameter>();
-			m_maxHp = parameter->maxHp;
-			m_hp = parameter->hp;
 			m_walkSpeed = parameter->walkSpeed;
 			m_runSpeed = parameter->runSpeed;
 			m_radius = parameter->radius;

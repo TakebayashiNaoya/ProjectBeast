@@ -153,7 +153,7 @@ namespace app
 				gameCamera->SetState(data);
 			}
 
-			if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
+			//if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
 			break;
 		}
 
