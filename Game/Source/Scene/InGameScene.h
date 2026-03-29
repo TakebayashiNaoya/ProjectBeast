@@ -14,6 +14,7 @@ namespace app
 		class DaddyPenguin;
 		class ChildPenguin;
 		class Enemy;
+		class EnemyController;
 	}
 
 	class InGameScene : public IScene
@@ -42,6 +43,7 @@ namespace app
 		actor::DaddyPenguin* m_daddyPenguin = nullptr;
 		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
 		actor::Enemy* m_enemy = nullptr;
+		actor::EnemyController* m_enemyController = nullptr;
 
 		camera::CameraSteering m_cameraSteering;
 
