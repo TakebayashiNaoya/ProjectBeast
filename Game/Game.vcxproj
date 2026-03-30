@@ -301,6 +301,7 @@
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\PBWakingUpTimerMenu.cpp" />
+    <ClCompile Include="Source\UI\RemainingChildMenu.cpp" />
     <ClCompile Include="Source\UI\SearchMenu.cpp" />
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp" />
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
@@ -394,6 +395,7 @@
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\PauseScreenMenu.h" />
     <ClInclude Include="Source\UI\PBWakingUpTimerMenu.h" />
+    <ClInclude Include="Source\UI\RemainingChildMenu.h" />
     <ClInclude Include="Source\UI\SearchMenu.h" />
     <ClInclude Include="Source\UI\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />

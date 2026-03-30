@@ -55,6 +55,16 @@ namespace app
 				return m_childPenguinList;
 			}
 
+			/**
+			 * @brief 子ペンギンの数を取得
+			 * @return 子ペンギンの数
+			 */
+			int GetChildPenguinNum() const
+			{
+				return m_childPenguinList.size();
+			}
+
+
 
 		private:
 			/** 子ペンギンのリスト */
@@ -89,6 +99,15 @@ namespace app
 			 * @param penguin 離脱する子ペンギンのポインタ
 			 */
 			void RemoveFollower(ChildPenguin* penguin);
+
+			/**
+			 * @brief 整列済み子ペンギンの数を取得
+			 * @return 整列済み子ペンギンの数
+			 */
+			int GetFollowersNum() const
+			{
+				return m_followers.size();
+			}
 
 
 		private:
