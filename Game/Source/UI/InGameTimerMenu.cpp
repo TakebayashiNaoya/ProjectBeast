@@ -93,7 +93,15 @@ namespace app
 
 		InGameTimerMenu::InGameTimerMenu()
 			: m_currentTime(0.0f)
-		{}
+		{
+			BattleManager::GetInstance().Register(this);
+		}
+
+
+		InGameTimerMenu::~InGameTimerMenu()
+		{
+			BattleManager::GetInstance().Unregister(this);
+		}
 
 
 		void InGameTimerMenu::Update()

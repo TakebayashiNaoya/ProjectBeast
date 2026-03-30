@@ -297,7 +297,7 @@ namespace nsBeastEngine
 					// 接地中（m_isOnGround == true）は、斜面を下る際に宙に浮かないよう、
 					// 下方向へのチェック距離を通常よりかなり長めに取ります。
 					// ※急斜面でまだカクつく場合は、この 1.5f を 2.0f などに増やしてください。
-					float stickDist = 1.5f;
+					float stickDist = 5.0f;
 					float checkDist = (m_isOnGround) ? stickDist : downAmount + 0.1f;
 
 					// 横移動による地形へのめり込み防止（上空から判定を開始する）

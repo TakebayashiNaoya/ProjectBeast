@@ -24,6 +24,8 @@ namespace app
 		class CountDownMenu;
 		class InGameTimerMenu;
 		class FinishMenu;
+		class PauseScreenMenu;
+		class SoundOptionMenu;
 	}
 
 
@@ -94,10 +96,23 @@ namespace app
 		ui::Layout* m_timerLayout = nullptr;
 		ui::Layout* m_finishLayout = nullptr;
 		ui::Layout* m_remainingChildLayout = nullptr;
+		ui::Layout* m_pauseLayout = nullptr;
 
 		ui::CountDownMenu* m_countDownMenu = nullptr;
 		ui::InGameTimerMenu* m_timerMenu = nullptr;
 		ui::FinishMenu* m_finishMenu = nullptr;
+		ui::PauseScreenMenu* m_pauseMenu = nullptr;
+
+		// サウンドオプション（ポーズ中から開く用）
+		ui::Layout* m_soundOptionLayout = nullptr;
+		ui::SoundOptionMenu* m_soundOptionMenu = nullptr;
+
+		// タイトルへ戻るフラグ
+		bool m_goTitle = false;
+
+		// ポーズ中のサブ状態
+		enum class PauseState { Pause, SoundOption };
+		PauseState m_pauseState = PauseState::Pause;
 
 		//------------------------------------------------------------
 		// シーン遷移

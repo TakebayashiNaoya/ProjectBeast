@@ -8,6 +8,12 @@
 
 namespace app
 {
+	namespace ui
+	{
+		class InGameTimerMenu;
+	}
+
+
 	/**
 	 * @brief バトルの情報受け渡しクラス
 	 * @detail ゲームのフェーズ管理は行わない。
@@ -109,6 +115,13 @@ namespace app
 		//============================================//
 		// 登録用関数
 		//============================================//
+
+		/** インゲームタイマーUI */
+	public:
+		inline void Register(ui::InGameTimerMenu* timerMenu) { m_timerMenu = timerMenu; }
+		inline void Unregister(ui::InGameTimerMenu* timerMenu) { m_timerMenu = nullptr; }
+	private:
+		ui::InGameTimerMenu* m_timerMenu = nullptr;
 
 
 

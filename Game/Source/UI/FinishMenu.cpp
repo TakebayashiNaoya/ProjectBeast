@@ -135,7 +135,7 @@ namespace app
 					scaleAnim->SetParameter(
 						scaleStart,
 						scaleEnd,
-						0.4f,
+						0.1f,
 						util::EasingType::EaseInOut,
 						util::LoopMode::Once
 					);
@@ -148,7 +148,7 @@ namespace app
 					colorAnim->SetParameter(
 						colorStart,
 						colorEnd,
-						1.0f,
+						2.9f,
 						util::EasingType::Linear,
 						util::LoopMode::Once
 					);

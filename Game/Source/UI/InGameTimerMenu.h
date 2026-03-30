@@ -67,6 +67,7 @@ namespace app
 
 		public:
 			InGameTimerMenu();
+			~InGameTimerMenu();
 
 			void Update()override;
 

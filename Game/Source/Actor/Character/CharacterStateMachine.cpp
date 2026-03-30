@@ -23,7 +23,8 @@ namespace app
 		void CharacterStateMachine::Move()
 		{
 			// 移動方向を正規化して移動ベクトルを計算
-			const Vector3 moveVector = m_moveDirection * m_moveSpeed;
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();  // 追加
+			const Vector3 moveVector = m_moveDirection * m_moveSpeed * deltaTime;  // deltaTime を追加
 			Vector3 nextPosition = m_transform.m_position + moveVector;
 
 			const float currentY = m_transform.m_position.y;

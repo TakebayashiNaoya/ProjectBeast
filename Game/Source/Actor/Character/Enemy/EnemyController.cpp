@@ -694,7 +694,7 @@ namespace app
 			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
 			// 到着判定
-			if (toHome.LengthSq() < 10.0f)
+			if (toHome.LengthSq() < 200.0f)
 			{
 				enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 				return;

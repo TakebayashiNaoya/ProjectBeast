@@ -4,7 +4,7 @@
     "maxHp": 3,
     "hp": 3,
     "walkSpeed": 10.0,
-    "runSpeed": 1.5,
+    "runSpeed": 150.0,
     "swimSpeed" : 5.0,
     "sneakSpeed" : 1.0,
     "slideSpeed" : 3.0,

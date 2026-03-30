@@ -6,6 +6,9 @@
 #include "stdafx.h"
 #include "BattleManager.h"
 
+ // UI
+#include "Source/UI/InGameTimerMenu.h"
+
 
 namespace app
 {
@@ -26,9 +29,13 @@ namespace app
 		/** ゲームクリアorゲームオーバーなら更新処理をブロック */
 		if (m_battleState != EnBattleState::Playing) return;
 
+
 		//--------------------------------------------//
 		// タイムの更新
 		//--------------------------------------------//
+		if (m_timerMenu) {
+			m_timerMenu->SetTime(m_currentTime);
+		}
 	}
 
 
