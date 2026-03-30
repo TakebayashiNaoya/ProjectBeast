@@ -46,6 +46,7 @@ namespace app
 		delete m_countDownLayout;
 		delete m_timerLayout;
 		delete m_finishLayout;
+		delete m_remainingChildLayout;
 
 		// アクター
 		actor::StageSystem::DestroyInstance();
