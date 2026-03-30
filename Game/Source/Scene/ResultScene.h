@@ -31,6 +31,10 @@ namespace app
 
 
 	private:
+		float m_clearTime;
+		int m_collectedPenguin;
+
+	private:
 		SpriteRender m_resultRender;
 	};
 }
