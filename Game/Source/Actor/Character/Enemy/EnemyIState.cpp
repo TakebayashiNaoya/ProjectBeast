@@ -9,8 +9,8 @@
 #include "EnemyStateMachine.h"
 #include "EnemyStatus.h"
 #include "EnemyTypes.h"
-#include "Source/Sound/SoundManager.h"
 #include "Source/Noise/NoiseManager.h"
+#include "Source/Sound/SoundManager.h"
 #include <algorithm>
 
 
@@ -214,8 +214,6 @@ namespace app
 			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
 
 
-			SoundManager::Get().PlaySE(enSoundKind_EnemyRoar);
-
 			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 
 		}
@@ -385,6 +383,7 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Sleep);
+			SoundManager::Get().PlaySE(enSoundKind_EnemyRoar);
 		}
 
 
@@ -429,5 +428,37 @@ namespace app
 		EnemyCoolDownState::EnemyCoolDownState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void EnemyRoarState::Enter()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Buff);
+
+		}
+
+
+		void EnemyRoarState::Update()
+		{
+
+		}
+
+
+		void EnemyRoarState::Exit()
+		{
+			if (m_owner->IsPlayingAnimation())return;
+		}
+
+
+		EnemyRoarState::EnemyRoarState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{
+
+		}
 	}
 }

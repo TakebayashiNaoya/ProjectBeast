@@ -79,6 +79,7 @@ namespace app
 				enEnemyState_Attack,
 				enEnemyState_ReturnHome,
 				enEnemyState_CoolDown,
+				enEnemyState_Roar,
 
 				enEnemyState_Num,
 				enEnemyState_Invalid = -1
@@ -191,6 +192,13 @@ namespace app
 			static void UpdateCoolDown(EnemyController* enemy);
 			static void ExitCoolDown(EnemyController* enemy);
 			static int CheckCoolDown(EnemyController* enemy);
+
+			/** クールダウン */
+			static void EnterRoar(EnemyController* enemy);
+			static void UpdateRoar(EnemyController* enemy);
+			static void ExitRoar(EnemyController* enemy);
+			static int CheckRoar(EnemyController* enemy);
+
 
 		private:
 			Enemy* m_target = nullptr;

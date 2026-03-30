@@ -224,6 +224,8 @@ namespace app
 			RegisterState(enEnemyState_ReturnHome, EnterReturnHome, UpdateReturnHome, ExitReturnHome, CheckReturnHome);
 			/** クールダウン */
 			RegisterState(enEnemyState_CoolDown, EnterCoolDown, UpdateCoolDown, ExitCoolDown, CheckCoolDown);
+			/** 咆哮 */
+			RegisterState(enEnemyState_Roar, EnterRoar, UpdateRoar, ExitRoar, CheckRoar);
 		}
 
 
@@ -376,7 +378,7 @@ namespace app
 			// ターゲット見つけたらチェイス
 			if (enemy->m_foundPenguin != nullptr)
 			{
-				return enEnemyState_Chase;
+				return enEnemyState_Roar;
 			}
 			if (enemy->IsFarFromHome())
 			{
@@ -430,7 +432,7 @@ namespace app
 		{
 			if (enemy->m_foundPenguin != nullptr)
 			{
-				return enEnemyState_Chase;
+				return enEnemyState_Roar;
 			}
 			if (enemy->IsFarFromHome())
 			{
@@ -771,6 +773,36 @@ namespace app
 			if (enemy->m_coolDownTimer >= 5.0f)
 			{
 				return enEnemyState_Idle;
+			}
+			return enEnemyState_Invalid;
+		}
+
+
+
+		/** 咆哮 */
+		void EnemyController::EnterRoar(EnemyController* enemy)
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetIsRoar(true);
+		}
+
+
+		void EnemyController::UpdateRoar(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::ExitRoar(EnemyController* enemy)
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetIsRoar(false);
+		}
+
+
+		int EnemyController::CheckRoar(EnemyController* enemy)
+		{
+			if (!enemy->m_target->GetEnemyStateMachine()->IsPlayingAnimation())
+			{
+				return enEnemyState_Chase;
 			}
 			return enEnemyState_Invalid;
 		}
