@@ -2,47 +2,96 @@
   "StageObject": {
     "object": [      
       {
-        "objectName" : "bearHome",
-        "fileName" : "Assets/modelData/stage/BearHome/bearHome.tkm",
-        "position" : [560, 10, 80],
+        "objectName" : "bearHome_1",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "position" : [560, 50, 80],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
       },
       {
-        "objectName" : "SnowyGround",
+        "objectName" : "bearHome_2",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "position" : [0, 50, 300],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "iceWall",
+        "fileName" : "Assets/modelData/stage/Wall/iceWall.tkm",
+        "position" : [0, -1800, 0],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [0.3, 0.3, 0.3]
+      },
+      {
+        "objectName" : "Ground01",
         "fileName" : "Assets/modelData/stage/SnowyGround/SnowyGround.tkm",
-        "position" : [-200, 10, 600],
-        "rotationDeg" : [0, 165, 0],
-        "scale" : [1, 1, 1]
+        "position" : [-100, 0, 1900],
+        "rotationDeg" : [0, 160, 0],
+        "scale" : [2, 2, 2]
       },
       {
-        "objectName" : "SnowEmbankment",
+        "objectName" : "Ground02",
+        "fileName" : "Assets/modelData/stage/SnowyGround/SnowyGround.tkm",
+        "position" : [-100, 0, 1900],
+        "rotationDeg" : [0, 160, 0],
+        "scale" : [2, 2, 2]
+      },
+      {
+        "objectName" : "Ground03",
         "fileName" : "Assets/modelData/Stage/SnowEmbankment/SnowEmbankment.tkm",
-        "position" : [0, 0, 0],
-        "rotationDeg" : [0, 0, 0],
-        "scale" : [1, 1, 1]
+        "position" : [0, 0, -0],
+        "rotationDeg" : [0, -10, 0],
+        "scale" : [2, 2, 2]
       },
       {
-        "objectName" : "RockySnowPile_1",
+        "objectName" : "Ground04",
         "fileName" : "Assets/modelData/Stage/RockySnowPile_1/RockySnowPile_1.tkm",
-        "position" : [600, 0, 100],
-        "rotationDeg" : [0, 60, 0],
-        "scale" : [1, 1, 1]
+        "position" : [2000, 0, 0],
+        "rotationDeg" : [0, 100, 0],
+        "scale" : [2, 2, 2]
       },
       {
-        "objectName" : "RockySnowPile_2",
+        "objectName" : "Ground05",
         "fileName" : "Assets/modelData/stage/RockySnowPile_2/RockySnowPile_2.tkm",
-        "position" : [0, 0, -500],
+        "position" : [500, 0, -1500],
         "rotationDeg" : [0, 0, 0],
+        "scale" : [2, 2, 2]
+      },
+      {
+        "objectName" : "Ground06",
+        "fileName" : "Assets/modelData/stage/RockySnowPile_2/RockySnowPile_2.tkm",
+        "position" : [1400, 0, -1300],
+         "rotationDeg" : [0, 70, 0],
+        "scale" : [2, 2, 2]
+      },
+      {
+        "objectName" : "Ground07",
+        "fileName" : "Assets/modelData/stage/SnowPile/SnowPile.tkm",
+        "position" : [-1400, 20, -1300],
+        "rotationDeg" : [0, 40,  0],
+        "scale" : [2, 2, 2]
+      },
+      {
+        "objectName" : "Ground08",
+        "fileName" : "Assets/modelData/stage/SnowPile/SnowPile.tkm",
+        "position" : [2000, 0, 1500],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [2, 2, 2]
+      },
+      {
+        "objectName" : "Ground09",
+        "fileName" : "Assets/modelData/stage/SnowHill/SnowHill.tkm",
+        "position" : [-2510, 0, 10],
+        "rotationDeg" : [0, -30, 0],
         "scale" : [1, 1, 1]
       },
       {
-        "objectName" : "SnowPile",
-        "fileName" : "Assets/modelData/stage/SnowPile/SnowPile.tkm",
-        "position" : [-700, 0, -300],
-        "rotationDeg" : [0, 0, 0],
+        "objectName" : "Ground10",
+        "fileName" : "Assets/modelData/stage/HugeSnowHill/HugeSnowHill.tkm",
+        "position" : [-400, 0, -2300],
+        "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
       }
-    ]    
+    ]
   }
 }

@@ -12,6 +12,10 @@
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyControllerManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Util/JsonConverter.h"
+#include "Source/Camera/CameraManager.h"
+#include "Source/Camera/CameraController.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
@@ -40,6 +44,12 @@ namespace app
 		delete m_daddyPenguin;
 
 		actor::EnemyControllerManager::DestroyInstance();
+		actor::StageSystem::DestroyInstance();
+		actor::EnemyManager::DestroyInstance();
+		//for (auto*& p : m_childPenguins) {
+		//	delete p;
+		//	p = nullptr;
+		//}
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
 
@@ -58,7 +68,7 @@ namespace app
 		app::core::ParameterManager::CreateInstance();
 		actor::StageSystem::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
-		actor::EnemyControllerManager::CreateInstance();
+		actor::EnemyManager::CreateInstance();
 		m_phase = LoadPhase::Stage;
 		m_childIndex = 0;
 		return true;
@@ -132,19 +142,10 @@ namespace app
 
 		case LoadPhase::Enemy:
 		{
-			m_enemy = new actor::Enemy();
-			m_enemy->SetPosition(Vector3(100.0f, 30.0f, 100.0f));
-			m_enemy->StartWrapper();
-
-			// EnemyControllerを生成してターゲットを設定
-			m_enemyController = new actor::EnemyController();
-			m_enemyController->SetTarget(m_enemy);
-
-			// 徘徊先の座標を登録（巣の周囲など）
-			m_enemyController->AddTargetPos(Vector3(100.0f, 0.0f, 100.0f));
-			m_enemyController->AddTargetPos(Vector3(-100.0f, 0.0f, 100.0f));
-			m_enemyController->AddTargetPos(Vector3(-100.0f, 0.0f, -100.0f));
-			m_enemyController->AddTargetPos(Vector3(100.0f, 0.0f, -100.0f));
+			// JSONを読み込んでマネージャーに渡すだけで完了
+			nlohmann::json enemyJson;
+			util::JsonConverter::IsLoadJsonFile(enemyJson, "Assets/parameter/character/enemy/EnemyLayout.json");
+			actor::EnemyManager::GetInstance()->LoadEnemies(enemyJson);
 
 			m_phase = LoadPhase::Camera;
 			break;
@@ -178,8 +179,7 @@ namespace app
 
 			actor::ChildPenguinManager::GetInstance()->Update();
 
-			if (m_enemy)m_enemy->UpdateWrapper();
-			actor::EnemyControllerManager::GetInstance()->Update();
+			actor::EnemyManager::GetInstance()->Update();
 
 			// CameraSteeringの結果をGameCameraに反映
 			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
@@ -223,7 +223,7 @@ namespace app
 		//}
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
 
-		if (m_enemy)m_enemy->RenderWrapper(rc);
+		actor::EnemyManager::GetInstance()->Render(rc);
 	}
 
 
