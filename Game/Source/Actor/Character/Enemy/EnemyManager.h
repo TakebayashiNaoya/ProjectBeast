@@ -46,6 +46,9 @@ namespace app
 			}
 
 
+			/** 全エネミーの座標取得 */
+			std::vector<Vector3> GetPositionList() const;
+
 
 		private:
 			EnemyManager();

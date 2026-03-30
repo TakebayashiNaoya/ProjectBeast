@@ -294,7 +294,9 @@
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\CountDownMenu.cpp" />
+    <ClCompile Include="Source\UI\EnemySleepingMenu.cpp" />
     <ClCompile Include="Source\UI\EventMenu.cpp" />
+    <ClCompile Include="Source\UI\HPBarMenu.cpp" />
     <ClCompile Include="Source\UI\FinishMenu.cpp" />
     <ClCompile Include="Source\UI\InGameTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
@@ -388,7 +390,9 @@
     <ClInclude Include="Source\system\system.h" />
     <ClInclude Include="Source\Types.h" />
     <ClInclude Include="Source\UI\CountDownMenu.h" />
+    <ClInclude Include="Source\UI\EnemySleepingMenu.h" />
     <ClInclude Include="Source\UI\EventMenu.h" />
+    <ClInclude Include="Source\UI\HPBarMenu.h" />
     <ClInclude Include="Source\UI\FinishMenu.h" />
     <ClInclude Include="Source\UI\InGameTimerMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />

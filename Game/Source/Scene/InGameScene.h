@@ -99,6 +99,7 @@ namespace app
 		ui::Layout* m_remainingChildLayout = nullptr;
 		ui::Layout* m_pauseLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
+		ui::Layout* m_enemySleepingLayout = nullptr;
 
 		ui::CountDownMenu* m_countDownMenu = nullptr;
 		ui::InGameTimerMenu* m_timerMenu = nullptr;

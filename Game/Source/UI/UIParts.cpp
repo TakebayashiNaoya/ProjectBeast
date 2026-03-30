@@ -172,7 +172,9 @@ namespace app
 
 		void UIGauge::Render(RenderContext& rc)
 		{
-			m_spriteRender.Draw(rc);
+			if (m_isDraw) {
+				m_spriteRender.Draw(rc);
+			}
 		}
 
 

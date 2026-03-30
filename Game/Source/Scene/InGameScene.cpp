@@ -37,6 +37,7 @@
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
 
+#include "Source/UI/EnemySleepingMenu.h"
 
 #include <random>
 
@@ -61,6 +62,7 @@ namespace app
 			delete layout;
 		}
 		m_searchLayouts.clear();
+		delete m_enemySleepingLayout;
 
 		// アクター
 		actor::StageSystem::DestroyInstance();
@@ -125,6 +127,11 @@ namespace app
 		m_soundOptionLayout = new ui::Layout;
 		m_soundOptionLayout->Initialize<ui::SoundOptionMenu>("Assets/parameter/sound/SoundOption.json");
 		m_soundOptionMenu = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
+
+		m_enemySleepingLayout = new ui::Layout();
+		m_enemySleepingLayout->Initialize<ui::EnemySleepingMenu>(
+			"Assets/parameter/UI/enemySleepGauge/sleepGauge.json"
+		);
 
 		// ロードフェーズ開始
 		m_loadPhase = LoadPhase::Stage;
@@ -333,6 +340,51 @@ namespace app
 				m_remainingChildLayout->Update();
 			}
 
+			// クマの起床ゲージ UI 更新
+			if (m_enemySleepingLayout) {
+
+				constexpr float MAX_RANGE = 200.0f;
+				constexpr float MAX_RANGE_SQ = MAX_RANGE * MAX_RANGE;
+
+				// 一番近い敵の座標を取得する
+				auto nearTargetPosition = [this](Vector3& outPosition)
+					{
+						bool isFind = false;
+						const Vector3 playerPosition = m_daddyPenguin->GetTransform().m_position;
+						Vector3 targetPosition;
+						Vector3 distance = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+
+						auto positionList = actor::EnemyManager::GetInstance()->GetPositionList();
+						for (const auto& pos : positionList) {
+							Vector3 d = playerPosition - pos;
+							const float dSq = d.LengthSq();
+							// 指定距離以上なら処理しない
+							if (MAX_RANGE_SQ < dSq) {
+								continue;
+							}
+							if (d.LengthSq() < distance.LengthSq()) {
+								targetPosition = pos;
+								distance = d;
+								isFind = true;
+							}
+						}
+
+						outPosition = targetPosition;
+						return isFind;
+					};
+
+				auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>();
+				if (menu) {
+					Vector3 targetPosition;
+					const bool isFind = nearTargetPosition(targetPosition);
+					// menu->SetSleepingRate(); // NOTE: ここに起床パーセントを入れて
+					menu->SetTargetPosition(targetPosition);
+					menu->SetDraw(isFind);
+				}
+
+				m_enemySleepingLayout->Update();
+			}
+
 			BattleManager::GetInstance().Update();
 			TimeManager::GetInstance().Update();
 
@@ -463,6 +515,7 @@ namespace app
 				{
 					if (layout) layout->Render(rc);
 				}
+				if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
 				break;
 			case GamePhase::Finishing:
 				if (m_timerLayout)  m_timerLayout->Render(rc);
