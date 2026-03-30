@@ -65,45 +65,21 @@ namespace app
 		{
 			using InGameTimerClass = MenuBase;
 
-
 		public:
 			InGameTimerMenu();
+
 			void Update()override;
-			void InitializeLogic()override;
-			void ResetTimer();
 
-			/**
-			 * @brief アイコンの初期化用
-			 */
-			void InitializeIcon();
-			/**
-			 * @brief ディジットの初期化用
-			 */
-			void InitializeDigit();
-
-			/**
-			 * @brief 今のタイマーが動いているかどうかを返す
-			 * @return タイマーが動いているかどうか
-			 */
-			inline bool IsTimerActive()const { return m_isTimerActive; }
-
-			/**
-			 * @brief タイマーの時間が0以下かどうかを返す
-			 * @return タイマーの時間が0以下かどうか
-			 */
-			inline bool IsTimeUp()const { return m_currentTime <= 0.0f; }
-
-			// タイマーの開始と停止。
-			void StartTimer() { m_isTimerActive = true; }
-			void StopTimer() { m_isTimerActive = false; }
-
+			/** 描画するかどうか */
 			void SetIsDraw(bool isDraw);
+
+			/** タイマーの時間を設定 */
+			inline void SetTime(float time) { m_currentTime = time; }
 
 
 		private:
+			/** 今の時間 */
 			float m_currentTime;
-			bool m_isTimerActive;
-
 
 			using Icon = std::unique_ptr<TimerIcon>;
 			using Digit = std::unique_ptr<TimerDigit>;
