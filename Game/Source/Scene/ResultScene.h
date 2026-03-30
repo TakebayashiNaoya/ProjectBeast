@@ -52,6 +52,10 @@ namespace app
 
 	private:
 		SpriteRender m_resultRender;
+		SpriteRender m_rescueRender;
+		SpriteRender m_clearTimeRender;
+		SpriteRender m_frame;
+		SpriteRender m_titleBackRender;
 
 
 	private:

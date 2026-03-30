@@ -31,6 +31,15 @@ namespace app
 	bool ResultScene::Start()
 	{
 		m_resultRender.Init("Assets/spriteData/Scene/NorthPole.DDS", 1920.0f, 1080.0f);
+		m_clearTimeRender.Init("Assets/spriteData/UI/TextSprite/Result/ClearTime.DDS", 480.0f, 270.0f);
+		m_rescueRender.Init("Assets/spriteData/UI/TextSprite/Result/Rescue.DDS", 480.0f, 270.0f);
+		m_titleBackRender.Init("Assets/spriteData/UI/TextSprite/Result/TitleBack.DDS", 480.0f, 270.0f);
+		m_frame.Init("Assets/spriteData/UI/Frame/ResultFrame.DDS", 1920.0f, 1080.0f);
+
+		m_clearTimeRender.SetPosition(Vector2(-300.0f, 200.0f));
+		m_rescueRender.SetPosition(Vector2(300.0f, 200.0f));
+		m_titleBackRender.SetPosition(Vector2(-400.0f, -350.0f));
+
 
 		m_clearTime = s_clearTime;
 		m_collectedPenguin = s_collectedPenguin;
@@ -61,6 +70,10 @@ namespace app
 	void ResultScene::Update()
 	{
 		m_layout.Update();   // UIの毎フレーム更新
+		m_clearTimeRender.Update();
+		m_rescueRender.Update();
+		m_titleBackRender.Update();
+		m_frame.Update();
 
 		auto* timeDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultTimeDigit"));
 		auto* scoreDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultScoreDigit"));
@@ -82,6 +95,10 @@ namespace app
 	void ResultScene::Render(RenderContext& rc)
 	{
 		m_resultRender.Draw(rc);
+		m_frame.Draw(rc);
+		m_rescueRender.Draw(rc);
+		m_clearTimeRender.Draw(rc);
+		m_titleBackRender.Draw(rc);
 		m_layout.Render(rc); // UIの描画
 	}
 
