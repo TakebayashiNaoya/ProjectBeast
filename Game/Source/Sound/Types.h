@@ -15,6 +15,23 @@ namespace app
 
 		/** 下にSEの設定 */
 		enSoundKind_Damage = enSoundKind_SE,
+
+		/** 親ペンギンのSE */
+		enSoundKind_DaddyPenguinShoutFollow,
+		enSoundKind_DaddyPenguinShoutWait,
+		enSoundKind_DaddyPenguinSystemFollow,
+		enSoundKind_DaddyPenguinSystemWait,
+
+		/** ペンギン共通のSE */
+		enSoundKind_PenguinDash,
+		enSoundKind_PenguinJump,
+		enSoundKind_PenguinLanding,
+		enSoundKind_PenguinSlide,
+		enSoundKind_PenguinSneak,
+		enSoundKind_PenguinSwimming,
+		enSoundKind_PenguinWaterIn,
+		enSoundKind_PenguinWaterOut,
+
 		enSoundKind_EnemyStep,
 		enSoundKind_EnemyRoar,
 		enSoundKind_EnemyGrowl,
@@ -57,6 +74,18 @@ namespace app
 	{
 		//SE
 		SoundInformation("Assets/sound/SE/damage.wav"),
+		SoundInformation("Assets/sound/SE/penguin/daddyPenguin/shoutFollow.wav"),
+		SoundInformation("Assets/sound/SE/penguin/daddyPenguin/shoutWait.wav"),
+		SoundInformation("Assets/sound/SE/penguin/daddyPenguin/systemFollow.wav"),
+		SoundInformation("Assets/sound/SE/penguin/daddyPenguin/systemWait.wav"),
+		SoundInformation("Assets/sound/SE/penguin/dash.wav"),
+		SoundInformation("Assets/sound/SE/penguin/jump.wav"),
+		SoundInformation("Assets/sound/SE/penguin/landing.wav"),
+		SoundInformation("Assets/sound/SE/penguin/slide.wav"),
+		SoundInformation("Assets/sound/SE/penguin/sneak.wav"),
+		SoundInformation("Assets/sound/SE/penguin/swimming.wav"),
+		SoundInformation("Assets/sound/SE/penguin/waterIn.wav"),
+		SoundInformation("Assets/sound/SE/penguin/waterOut.wav"),
 		SoundInformation("Assets/sound/SE/step.wav"),
 		SoundInformation("Assets/sound/SE/roar.wav"),
 		SoundInformation("Assets/sound/SE/growl.wav"),
