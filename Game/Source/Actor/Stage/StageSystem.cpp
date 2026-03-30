@@ -201,6 +201,16 @@ namespace app
 		}
 
 
+		void StageSystem::LoadEnemyNests(const nlohmann::json& json)
+		{
+			if (!json.contains("enemies")) return;
+
+			for (const auto& enemyJson : json["enemies"]) {
+				Vector3 nestPos = util::JsonConverter::ToVector3(enemyJson["nestPosition"]);
+			}
+		}
+
+
 		StageSystem::StageSystem()
 		{
 			/** マップのメモリを確保 */
