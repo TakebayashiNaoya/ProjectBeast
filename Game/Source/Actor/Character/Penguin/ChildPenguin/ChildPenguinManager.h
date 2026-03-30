@@ -27,6 +27,12 @@ namespace app
 			void Render(RenderContext& rc);
 
 
+			/**
+			 * @brief モデルの行列更新のみ行う（AI・ステートマシンは動かさない）
+			 */
+			void UpdateModelOnly();
+
+
 
 
 			//============================================//

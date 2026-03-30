@@ -18,6 +18,7 @@ namespace app
 		{
 		public:
 			void Update();
+			void UpdateModelOnly();
 			void Render(RenderContext& rc);
 
 			/**
