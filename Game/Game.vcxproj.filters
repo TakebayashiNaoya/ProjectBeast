@@ -55,6 +55,9 @@
     <Filter Include="Source\Noise">
       <UniqueIdentifier>{3fc13238-774b-4440-af8e-22dd85b59997}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Manager">
+      <UniqueIdentifier>{f2113126-0993-4392-b78c-f9c9c06c8671}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -307,9 +310,15 @@
     <ClCompile Include="Source\Noise\NoiseManager.cpp">
       <Filter>Source\Noise</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Manager\BattleManager.cpp" />
-    <ClCompile Include="Source\Manager\ScoreManager.cpp" />
-    <ClCompile Include="Source\Manager\TimeManager.cpp" />
+    <ClCompile Include="Source\Manager\BattleManager.cpp">
+      <Filter>Source\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Manager\ScoreManager.cpp">
+      <Filter>Source\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Manager\TimeManager.cpp">
+      <Filter>Source\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -480,9 +489,6 @@
     <ClInclude Include="Source\Actor\ActorStateMachine.h">
       <Filter>Source\Actor</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\CharacterStateMachine.h">
-      <Filter>Source\Actor\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinParameter.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
@@ -577,9 +583,18 @@
     <ClInclude Include="Source\Noise\NoiseManager.h">
       <Filter>Source\Noise</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Manager\BattleManager.h" />
-    <ClInclude Include="Source\Manager\ScoreManager.h" />
-    <ClInclude Include="Source\Manager\TimeManager.h" />
+    <ClInclude Include="Source\Actor\Character\CharacterStateMachine.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Manager\BattleManager.h">
+      <Filter>Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Manager\ScoreManager.h">
+      <Filter>Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Manager\TimeManager.h">
+      <Filter>Source\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
