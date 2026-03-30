@@ -27,8 +27,6 @@ namespace app
 
 	bool ResultScene::Start()
 	{
-		ScoreManager::CreateInstance();
-		TimeManager::CreateInstance();
 		m_resultRender.Init("Assets/sprite/Result.DDS", 1920.0f, 1080.0f);
 
 		m_clearTime = app::TimeManager::GetInstance().GetCurTime();

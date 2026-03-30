@@ -19,6 +19,16 @@ namespace app
 		}
 
 
+		void CharacterBase::UpdateModelOnly()
+		{
+			if (!m_modelReady) return;
+
+			// ステートマシンの座標はそのまま使い、行列だけ更新する
+			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
+			m_modelRender.Update();
+		}
+
+
 		CharacterBase::CharacterBase()
 			: m_animationClips(nullptr)
 			, m_clipNum(0)

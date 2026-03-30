@@ -5,22 +5,17 @@
  */
 #include "stdafx.h"
 #include "BattleManager.h"
-#include <algorithm>
 
 
 namespace app
 {
-
 	BattleManager* BattleManager::m_instance = nullptr;
 
 	BattleManager::BattleManager()
-	{
-
-	}
-
+		: m_isGameActive(false)
+		, m_isClear(false)
+	{}
 
 	BattleManager::~BattleManager()
-	{
-
-	}
+	{}
 }

@@ -9,3 +9,5 @@ using namespace nsBeastEngine;
 #include "Source/Types.h"
 // K2EngineLowのグローバルアクセスポイント
 extern K2EngineLow* g_k2EngineLow;
+
+#include "Source/Manager/ScoreManager.h"

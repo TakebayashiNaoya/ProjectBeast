@@ -84,6 +84,15 @@ namespace app
 		}
 
 
+		void ChildPenguinManager::UpdateModelOnly()
+		{
+			for (auto& cp : m_childPenguinList) {
+				if (!cp) continue;
+				cp->UpdateModelOnly();
+			}
+		}
+
+
 		Vector3 ChildPenguinManager::GetDaddyPosition() const
 		{
 			if (m_daddyPenguin != nullptr)
@@ -109,6 +118,7 @@ namespace app
 			auto it = std::find(m_followers.begin(), m_followers.end(), penguin);
 			if (it == m_followers.end()) {
 				m_followers.push_back(penguin);
+				ScoreManager::GetInstance().AddCollectedCount();
 			}
 			/** メンバーが増えたので次フレームで再ソート・再割り当てが走る */
 		}
@@ -120,6 +130,7 @@ namespace app
 			auto it = std::find(m_followers.begin(), m_followers.end(), penguin);
 			if (it != m_followers.end()) {
 				m_followers.erase(it);
+				ScoreManager::GetInstance().SubCollectedCount();
 			}
 			/** メンバーが減ったので外側の子が内側に詰める処理が次フレームで自然に行われる */
 		}
