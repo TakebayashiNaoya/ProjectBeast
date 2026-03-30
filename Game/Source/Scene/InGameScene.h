@@ -26,6 +26,7 @@ namespace app
 		class FinishMenu;
 		class PauseScreenMenu;
 		class SoundOptionMenu;
+		class SearchMenu;
 	}
 
 
@@ -97,11 +98,13 @@ namespace app
 		ui::Layout* m_finishLayout = nullptr;
 		ui::Layout* m_remainingChildLayout = nullptr;
 		ui::Layout* m_pauseLayout = nullptr;
+		std::vector<ui::Layout*> m_searchLayouts;
 
 		ui::CountDownMenu* m_countDownMenu = nullptr;
 		ui::InGameTimerMenu* m_timerMenu = nullptr;
 		ui::FinishMenu* m_finishMenu = nullptr;
 		ui::PauseScreenMenu* m_pauseMenu = nullptr;
+		std::vector<ui::SearchMenu*> m_searchMenus;
 
 		// サウンドオプション（ポーズ中から開く用）
 		ui::Layout* m_soundOptionLayout = nullptr;

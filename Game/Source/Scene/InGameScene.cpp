@@ -32,6 +32,7 @@
 #include "Source/UI/RemainingChildMenu.h"
 #include "Source/UI/PauseScreenMenu.h"
 #include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/SearchMenu.h"
 
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
@@ -55,6 +56,11 @@ namespace app
 		delete m_remainingChildLayout;
 		delete m_pauseLayout;
 		delete m_soundOptionLayout;
+		for (auto* layout : m_searchLayouts)
+		{
+			delete layout;
+		}
+		m_searchLayouts.clear();
 
 		// アクター
 		actor::StageSystem::DestroyInstance();
@@ -199,6 +205,20 @@ namespace app
 			// マネージャーにJSONを渡して一括生成させる
 			actor::EnemyManager::GetInstance()->LoadEnemies(json);
 
+			// ↓ ここから追加
+			for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())
+			{
+				auto* layout = new ui::Layout();
+				layout->Initialize<ui::SearchMenu>("Assets/parameter/search/Search.json");
+
+				auto* menu = layout->GetMenu<ui::SearchMenu>();
+				menu->SetEnemy(enemy);
+				menu->SetIsActive(true);
+
+				m_searchLayouts.push_back(layout);
+				m_searchMenus.push_back(menu);
+			}
+
 			m_loadPhase = LoadPhase::Camera;
 			break;
 		}
@@ -296,6 +316,11 @@ namespace app
 
 			// タイマー UI 更新
 			if (m_timerLayout) m_timerLayout->Update();
+			// 探索 UI 更新
+			for (auto* layout : m_searchLayouts)
+			{
+				if (layout) layout->Update();
+			}
 
 			// 残り子ペンギン数 UI 更新
 			if (m_remainingChildLayout) {
@@ -434,6 +459,10 @@ namespace app
 			case GamePhase::Playing:
 				if (m_timerLayout) m_timerLayout->Render(rc);
 				if (m_remainingChildLayout) m_remainingChildLayout->Render(rc);
+				for (auto* layout : m_searchLayouts)
+				{
+					if (layout) layout->Render(rc);
+				}
 				break;
 			case GamePhase::Finishing:
 				if (m_timerLayout)  m_timerLayout->Render(rc);

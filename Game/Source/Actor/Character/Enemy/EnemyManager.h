@@ -32,6 +32,19 @@ namespace app
 			 */
 			void ClearEnemies();
 
+			/**
+			 * @brief エネミーのポインタリストを取得
+			 */
+			std::vector<Enemy*> GetEnemies() const
+			{
+				std::vector<Enemy*> list;
+				for (const auto& data : m_enemyList)
+				{
+					list.push_back(data.enemy);
+				}
+				return list;
+			}
+
 
 
 		private:
