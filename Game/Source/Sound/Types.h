@@ -20,12 +20,15 @@ namespace app
 		enSoundKind_EnemyGrowl,
 		enSoundKind_EnemyAttack,
 
+		enSoundKind_ButtonPush,
+
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
 
 		enSoundKind_BGM = enSoundKind_SE_Max,
 		/** 下にBGMの設定 */
 		enSoundKind_Game = enSoundKind_BGM,
+		enSoundKind_Title,
 
 		/** BGMの設定はここまで */
 
@@ -58,8 +61,12 @@ namespace app
 		SoundInformation("Assets/sound/SE/roar.wav"),
 		SoundInformation("Assets/sound/SE/growl.wav"),
 		SoundInformation("Assets/sound/SE/attack.wav"),
+		SoundInformation("Assets/sound/SE/AS_139690_キャンセルや決定ボタンの選択音（ピコン）.wav"),
+
 		//BGM
-		SoundInformation("Assets/sound/BGM/InGame.wav"),
+		SoundInformation("Assets/sound/BGM/AS_1419280_氷の世界＿雪＿かわいいフィールドBGM.wav"),
+		SoundInformation("Assets/sound/BGM/AS_1157435_輝く銀世界彩るR_Bポップ＿+.wav"),
+
 		//Voice
 		SoundInformation("Assets/sound/Voice/bootA.wav")
 	};
