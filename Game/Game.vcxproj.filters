@@ -175,7 +175,7 @@
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp">
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyManager.cpp">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp">
@@ -307,6 +307,9 @@
     <ClCompile Include="Source\Noise\NoiseManager.cpp">
       <Filter>Source\Noise</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Manager\BattleManager.cpp" />
+    <ClCompile Include="Source\Manager\ScoreManager.cpp" />
+    <ClCompile Include="Source\Manager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -435,7 +438,7 @@
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h">
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyManager.h">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\SoundOptionMenu.h">
@@ -574,6 +577,9 @@
     <ClInclude Include="Source\Noise\NoiseManager.h">
       <Filter>Source\Noise</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Manager\BattleManager.h" />
+    <ClInclude Include="Source\Manager\ScoreManager.h" />
+    <ClInclude Include="Source\Manager\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />

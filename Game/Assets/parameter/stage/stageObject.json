@@ -2,9 +2,16 @@
   "StageObject": {
     "object": [      
       {
-        "objectName" : "bearHome",
-        "fileName" : "Assets/modelData/stage/BearHome/bearHome.tkm",
-        "position" : [560, 10, 80],
+        "objectName" : "bearHome_1",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "position" : [560, 50, 80],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_2",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "position" : [0, 50, 300],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
       },

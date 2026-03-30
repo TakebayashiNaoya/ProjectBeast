@@ -206,7 +206,7 @@ namespace app
 			Vector3 m_startPosition = Vector3::Zero;
 
 			/** 巣の位置 */
-			Vector3 m_homePosition;
+			//Vector3 m_homePosition;
 
 			/** ペンギンを最後に見た位置 */
 			Vector3 m_lastKnownPenguinPos;

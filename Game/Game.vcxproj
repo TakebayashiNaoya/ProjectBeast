@@ -238,7 +238,7 @@
     <ClCompile Include="Source\Actor\Character\CharacterStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\Enemy.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyController.cpp" />
-    <ClCompile Include="Source\Actor\Character\Enemy\EnemyControllerManager.cpp" />
+    <ClCompile Include="Source\Actor\Character\Enemy\EnemyManager.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyIState.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyStateMachine.cpp" />
@@ -281,6 +281,9 @@
     <ClCompile Include="Source\Core\StateMachineBase.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
+    <ClCompile Include="Source\Manager\BattleManager.cpp" />
+    <ClCompile Include="Source\Manager\ScoreManager.cpp" />
+    <ClCompile Include="Source\Manager\TimeManager.cpp" />
     <ClCompile Include="Source\Noise\NoiseManager.cpp" />
     <ClCompile Include="Source\Scene\DebugScene.cpp" />
     <ClCompile Include="Source\Scene\InGameScene.cpp" />
@@ -324,7 +327,7 @@
     <ClInclude Include="Source\Actor\Character\CharacterStatus.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\Enemy.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyController.h" />
-    <ClInclude Include="Source\Actor\Character\Enemy\EnemyControllerManager.h" />
+    <ClInclude Include="Source\Actor\Character\Enemy\EnemyManager.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyIState.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h" />
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyStateMachine.h" />
@@ -369,6 +372,9 @@
     <ClInclude Include="Source\Core\Transform.h" />
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
+    <ClInclude Include="Source\Manager\BattleManager.h" />
+    <ClInclude Include="Source\Manager\ScoreManager.h" />
+    <ClInclude Include="Source\Manager\TimeManager.h" />
     <ClInclude Include="Source\Noise\NoiseManager.h" />
     <ClInclude Include="Source\Scene\DebugScene.h" />
     <ClInclude Include="Source\Scene\InGameScene.h" />
