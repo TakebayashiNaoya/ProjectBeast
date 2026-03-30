@@ -30,7 +30,7 @@ namespace app
 
 	bool ResultScene::Start()
 	{
-		m_resultRender.Init("Assets/sprite/Result.DDS", 1920.0f, 1080.0f);
+		m_resultRender.Init("Assets/spriteData/Scene/NorthPole.DDS", 1920.0f, 1080.0f);
 
 		m_clearTime = s_clearTime;
 		m_collectedPenguin = s_collectedPenguin;
