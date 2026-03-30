@@ -1,7 +1,7 @@
 ﻿/**
  * @file BattleManager.cpp
  * @brief バトルの管理をするクラス
- * @author 立山
+ * @author 竹林
  */
 #include "stdafx.h"
 #include "BattleManager.h"
@@ -18,18 +18,20 @@ namespace app
 	}
 
 
-	BattleManager::BattleManager()
-	{}
-
-
-	BattleManager::~BattleManager()
-	{}
-
-
 	void BattleManager::Update()
 	{
+		/** バトルの状態を確認 */
+		m_battleState = CheckBattleState();
 
+		/** ゲームクリアorゲームオーバーなら更新処理をブロック */
+		if (m_battleState != EnBattleState::Playing) return;
+
+		//--------------------------------------------//
+		// タイムの更新
+		//--------------------------------------------//
 	}
+
+
 
 
 	//============================================//

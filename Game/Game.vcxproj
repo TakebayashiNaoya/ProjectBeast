@@ -315,7 +315,6 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="hlsl ModelVSCommon.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="Source\Achivement\AchievementBase.h" />
     <ClInclude Include="Source\Achivement\AchievementManager.h" />
@@ -404,9 +403,6 @@
     <ClInclude Include="Source\Util\JsonConverter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Test.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
