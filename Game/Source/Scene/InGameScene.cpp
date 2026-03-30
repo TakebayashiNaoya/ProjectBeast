@@ -10,9 +10,8 @@
 
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
-#include "Source/Actor/Character/Enemy/EnemyControllerManager.h"
-#include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Util/JsonConverter.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/CameraController.h"
@@ -20,8 +19,6 @@
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Stage/StageSystem.h"
-#include "Source/Camera/CameraController.h"
-#include "Source/Camera/CameraManager.h"
 #include "Source/Noise/NoiseManager.h"
 
 #include "Source/Manager/BattleManager.h"
@@ -32,10 +29,6 @@
 #include "Source/UI/CountDownMenu.h"
 #include "Source/UI/InGameTimerMenu.h"
 #include "Source/UI/FinishMenu.h"
-#include "Source/Util/JsonConverter.h"
-
-#include "Source/Manager/ScoreManager.h"
-#include "Source/Manager/TimeManager.h"
 
 #include <random>
 
