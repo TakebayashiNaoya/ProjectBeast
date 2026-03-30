@@ -45,18 +45,15 @@ namespace app
 
 
 		void AchievementManager::Update()
-		{
-		}
+		{}
 
 
 		void AchievementManager::Render(RenderContext& rc)
-		{
-		}
+		{}
 
 
 		AchievementManager::AchievementManager()
-		{
-		}
+		{}
 
 
 		AchievementManager::~AchievementManager()
@@ -98,6 +95,23 @@ namespace app
 				// マップに追加
 				m_achievementMap.emplace(key, std::move(newAchieve));
 			}
+		}
+
+
+		std::vector<AchievementBase*> AchievementManager::GetAllAchievements() const
+		{
+			std::vector<AchievementBase*> allList;
+
+			for (const auto& pair : m_achievementMap)
+			{
+				if (pair.second)
+				{
+					// 達成状況に関わらず、全て返す
+					allList.push_back(pair.second.get());
+				}
+			}
+
+			return allList;
 		}
 
 

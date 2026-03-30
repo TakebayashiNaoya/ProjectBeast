@@ -8,13 +8,14 @@
 #include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/LoseCamera.h"
 #include "Source/Camera/WinCamera.h"
 #include "Source/Effect/EffectManager.h"
+#include "Source/Sound/SoundManager.h"
 
 
 namespace app
@@ -24,6 +25,7 @@ namespace app
 
 		DaddyPenguinIState::DaddyPenguinIState(DaddyPenguinStateMachine* owner)
 			: m_owner(owner)
+			, m_seHandle(-1)
 		{}
 
 
@@ -47,6 +49,8 @@ namespace app
 				// === 「おいで！（追従）」の演出 ===
 				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
 				EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutFollow, false);
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemFollow, false);
 			}
 			else if (currentCommand == ChildPenguinManager::EnPenguinCommand::Wait)
 			{
@@ -54,6 +58,8 @@ namespace app
 				// NOTE: 現状は同じ設定を入れていますが、待機用のアニメーションやエフェクト（例: EnPenguinAnimationID::CommandWait など）があればここを変更してください。
 				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
 				EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutWait, false);
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemWait, false);
 			}
 		}
 

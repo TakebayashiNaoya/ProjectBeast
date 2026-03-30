@@ -29,7 +29,7 @@ namespace app
 
 	bool TitleScene::Start()
 	{
-		m_titleRender.Init("Assets/spriteData/Scene/Title.DDS", 1920.0f, 1080.0f);
+		m_titleRender.Init("Assets/spriteData/Scene/NorthPole.DDS", 1920.0f, 1080.0f);
 		m_PenTakt.Init("Assets/spriteData/Scene/PenTakt.DDS", 480.0f, 270.0f);
 		m_AButton.Init("Assets/spriteData/UI/Button/TitleScreen/Abutton.DDS", 480.0f, 270.0f);
 		m_XButton.Init("Assets/spriteData/UI/Button/TitleScreen/Xbutton.DDS", 480.0f, 270.0f);
