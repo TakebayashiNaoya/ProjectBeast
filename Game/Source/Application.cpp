@@ -4,9 +4,9 @@
 #include "Source/Core/Fade.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Effect/EffectManager.h"
+#include "Source/Noise/NoiseManager.h"
 #include "Source/Scene/SceneManager.h"
 #include "Source/Sound/SoundManager.h"
-#include "Source/Noise/NoiseManager.h"
 
 
 namespace app
@@ -42,8 +42,8 @@ namespace app
 	{
 		camera::CameraManager::Get().Update(6);
 		core::ParameterManager::Get()->Update();
-		SoundManager::Get().Update();
 		SceneManager::GetInstance()->Update();
+		SoundManager::Get().Update();
 		EffectManager::Get().Update();
 		core::Fade::Get().Update();
 	}

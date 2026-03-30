@@ -4,11 +4,12 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "PenguinAnimationData.h"
 #include "PenguinIState.h"
 #include "PenguinStateMachine.h"
 #include "PenguinStatus.h"
-#include "PenguinAnimationData.h"
 #include "Source/Noise/NoiseManager.h"
+#include "Source/Sound/SoundManager.h"
 
 
 namespace app
@@ -18,6 +19,7 @@ namespace app
 
 		PenguinIState::PenguinIState(PenguinStateMachine* owner)
 			: m_owner(owner)
+			, m_seHandle(-1)
 		{}
 
 
@@ -58,6 +60,7 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveWalk);
+			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
 		}
 
 
@@ -92,6 +95,7 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetRunSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveRun);
+			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
 		}
 
 
@@ -135,6 +139,7 @@ namespace app
 			}
 
 			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);
+			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinJump, false);
 		}
 
 
@@ -199,6 +204,7 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Sliding);
+			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
 		}
 
 
@@ -263,17 +269,35 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSwimSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
+			if (m_seHandle == -1)
+			{
+				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
+			}
 		}
 
 
 		void PenguinSwimmingState::Update()
 		{
+			SoundManager* sound = &SoundManager::Get();
+			if (m_seHandle != -1 && sound->FindSE(m_seHandle)->IsPlaying())
+			{
+				sound->StopSE(m_seHandle);
+				m_seHandle = sound->PlaySE(enSoundKind::enSoundKind_PenguinSwimming, true);
+			}
 			m_owner->Move();
 		}
 
 
 		void PenguinSwimmingState::Exit()
-		{}
+		{
+			SoundManager* sound = &SoundManager::Get();
+			if (m_seHandle != -1 && sound->FindSE(m_seHandle)->IsPlaying())
+			{
+				sound->StopSE(m_seHandle);
+				m_seHandle = -1;
+				sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
+			}
+		}
 
 
 		PenguinSwimmingState::PenguinSwimmingState(PenguinStateMachine* owner)
