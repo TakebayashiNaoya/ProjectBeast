@@ -8,7 +8,7 @@
 
 #include "Enemy.h"
 #include "EnemyController.h"
-#include "EnemyControllerManager.h"
+#include "EnemyManager.h"
 
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Enemy/EnemyStatus.h"
@@ -32,7 +32,6 @@ namespace app
 			, m_elapsedTime(0.0f)
 			, m_prePosition(Vector3::Zero)
 			, m_startPosition(Vector3::Zero)
-			, m_homePosition(Vector3::Zero)
 			, m_lastKnownPenguinPos(Vector3::Zero)
 			, m_isStun(false)
 			, m_isHomeInitialized(false)
@@ -52,15 +51,11 @@ namespace app
 				Initialize();
 				ini = true;
 			}
-
-			EnemyControllerManager::GetInstance()->Register(this);
 		}
 
 
 		EnemyController::~EnemyController()
-		{
-			EnemyControllerManager::GetInstance()->UnRegister(this);
-		}
+		{}
 
 
 		bool EnemyController::Start()
@@ -71,17 +66,6 @@ namespace app
 
 		void EnemyController::Update()
 		{
-			if (!m_isHomeInitialized)
-			{
-				Vector3 pos = StageSystem::GetInstance()->GetObjectPosition("bearHome");
-
-				if (pos.LengthSq() > 0.0001f)
-				{
-					m_homePosition = pos;
-					m_isHomeInitialized = true;
-				}
-			}
-
 			if (!m_isParamInitialized)
 			{
 				m_maxEatCount = m_target->GetEnemyStateMachine()->GetOwnerStatus()->GetMaxEat();
@@ -209,7 +193,7 @@ namespace app
 		bool EnemyController::IsFarFromHome()const
 		{
 			Vector3 pos = m_target->GetTransform().m_position;
-			Vector3 toHome = m_homePosition - pos;
+			Vector3 toHome = m_target->GetHomePosition() - pos;
 
 			const float MAX_DIST = 500.0f;
 			if (toHome.LengthSq() > MAX_DIST * MAX_DIST)
@@ -705,7 +689,7 @@ namespace app
 		void EnemyController::UpdateReturnHome(EnemyController* enemy)
 		{
 			Vector3 pos = enemy->m_target->GetTransform().m_position;
-			Vector3 toHome = enemy->m_homePosition - pos;
+			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
 			// 到着判定
 			if (toHome.LengthSq() < 10.0f)
@@ -730,7 +714,7 @@ namespace app
 		int EnemyController::CheckReturnHome(EnemyController* enemy)
 		{
 			Vector3 pos = enemy->m_target->GetTransform().m_position;
-			Vector3 toHome = enemy->m_homePosition - pos;
+			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
 			// 到着したら終了
 			if (toHome.LengthSq() < 50.0f * 50.0f)
