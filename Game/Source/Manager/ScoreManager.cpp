@@ -13,7 +13,7 @@ namespace app
 	ScoreManager* ScoreManager::m_instance = nullptr;
 
 	ScoreManager::ScoreManager()
-		:m_collectedCount(30)
+		:m_collectedCount(3)
 	{
 
 	}

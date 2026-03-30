@@ -35,7 +35,10 @@ namespace app
 			 */
 			void Render(RenderContext& rc);
 
-
+			/**
+			 * @brief 達成済みのアチーブメントの配列を取得する
+			 */
+			std::vector<AchievementBase*> GetAllAchievements() const;
 		public:
 			AchievementManager();
 			~AchievementManager();

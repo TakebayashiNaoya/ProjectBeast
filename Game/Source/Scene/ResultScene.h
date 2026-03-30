@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "IScene.h"
+#include "Source/Achivement/AchievementManager.h"
 #include "Source/UI/Layout.h"
 
 
@@ -37,12 +38,21 @@ namespace app
 
 
 	private:
+		// ★追加：スコア計算とアチーブメントUI構築
+		void CalcTotalScore();
+		void SetupAchievementUI();
+
+
+	private:
 		bool m_nextScene = false;
 
 
 	private:
 		float m_clearTime;
 		int m_collectedPenguin;
+		float m_totalScore;
+
+		std::vector<app::achievement::AchievementBase*> m_allAchievementList;
 
 
 	private:
