@@ -49,7 +49,6 @@ namespace app
 		// アクター
 		actor::StageSystem::DestroyInstance();
 		delete m_daddyPenguin;
-		delete m_enemyController;
 		actor::EnemyManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
 		DeleteGO(m_ocean);
@@ -165,17 +164,12 @@ namespace app
 
 		case LoadPhase::Enemy:
 		{
-			m_enemy = new actor::Enemy();
-			m_enemy->SetPosition(Vector3(100.0f, 30.0f, 100.0f));
-			m_enemy->StartWrapper();
+			nlohmann::json json;
+			// プロジェクト内の実際のパスに合わせてください
+			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/character/enemy/EnemyLayout.json");
 
-			m_enemyController = new actor::EnemyController();
-			m_enemyController->SetTarget(m_enemy);
-
-			m_enemyController->AddTargetPos(Vector3(100.0f, 0.0f, 100.0f));
-			m_enemyController->AddTargetPos(Vector3(-100.0f, 0.0f, 100.0f));
-			m_enemyController->AddTargetPos(Vector3(-100.0f, 0.0f, -100.0f));
-			m_enemyController->AddTargetPos(Vector3(100.0f, 0.0f, -100.0f));
+			// マネージャーにJSONを渡して一括生成させる
+			actor::EnemyManager::GetInstance()->LoadEnemies(json);
 
 			m_loadPhase = LoadPhase::Camera;
 			break;
@@ -243,7 +237,7 @@ namespace app
 			// AI・入力は動かさないが、描画用の行列更新だけ行う
 			if (m_daddyPenguin) m_daddyPenguin->UpdateModelOnly();
 			actor::ChildPenguinManager::GetInstance()->UpdateModelOnly();
-			if (m_enemy) m_enemy->UpdateModelOnly();
+			actor::EnemyManager::GetInstance()->UpdateModelOnly();
 
 			// カウントダウン UI 更新
 			if (m_countDownLayout) m_countDownLayout->Update();
@@ -271,7 +265,6 @@ namespace app
 			// プレイヤー・子ペンギン・シロクマ の更新
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
 			actor::ChildPenguinManager::GetInstance()->Update();
-			if (m_enemy) m_enemy->UpdateWrapper();
 			actor::EnemyManager::GetInstance()->Update();
 
 			// タイマー UI 更新
@@ -362,7 +355,7 @@ namespace app
 
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
-		if (m_enemy) m_enemy->RenderWrapper(rc);
+		actor::EnemyManager::GetInstance()->Render(rc);
 
 		// UI 描画
 		if (m_loadPhase == LoadPhase::Done)

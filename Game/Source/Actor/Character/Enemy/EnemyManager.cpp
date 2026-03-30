@@ -88,6 +88,18 @@ namespace app
 			}
 		}
 
+		void EnemyManager::UpdateModelOnly()
+		{
+			for (auto& data : m_enemyList)
+			{
+				if (data.enemy)
+				{
+					// AIなどは動かさず、モデルのアニメーションと姿勢だけ更新する
+					data.enemy->UpdateModelOnly();
+				}
+			}
+		}
+
 
 		void EnemyManager::Render(RenderContext& rc)
 		{
