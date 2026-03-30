@@ -294,6 +294,7 @@
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\CountDownMenu.cpp" />
+    <ClCompile Include="Source\UI\EnemySleepingMenu.cpp" />
     <ClCompile Include="Source\UI\EventMenu.cpp" />
     <ClCompile Include="Source\UI\FinishMenu.cpp" />
     <ClCompile Include="Source\UI\InGameTimerMenu.cpp" />
@@ -316,7 +317,6 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="hlsl ModelVSCommon.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="Source\Achivement\AchievementBase.h" />
     <ClInclude Include="Source\Achivement\AchievementManager.h" />
@@ -389,6 +389,7 @@
     <ClInclude Include="Source\system\system.h" />
     <ClInclude Include="Source\Types.h" />
     <ClInclude Include="Source\UI\CountDownMenu.h" />
+    <ClInclude Include="Source\UI\EnemySleepingMenu.h" />
     <ClInclude Include="Source\UI\EventMenu.h" />
     <ClInclude Include="Source\UI\FinishMenu.h" />
     <ClInclude Include="Source\UI\InGameTimerMenu.h" />
@@ -406,9 +407,6 @@
     <ClInclude Include="Source\Util\JsonConverter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Test.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

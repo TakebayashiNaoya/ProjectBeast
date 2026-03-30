@@ -108,5 +108,16 @@ namespace app
 				if (data.enemy) data.enemy->RenderWrapper(rc);
 			}
 		}
+
+
+		std::vector<Vector3> EnemyManager::GetPositionList() const
+		{
+			std::vector<Vector3> positionList;
+			for (auto& data : m_enemyList)
+			{
+				positionList.push_back(data.enemy->GetTransform().m_position);
+			}
+			return positionList;
+		}
 	}
 }
