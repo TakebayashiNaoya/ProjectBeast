@@ -325,6 +325,9 @@
     <ClCompile Include="Source\UI\RemainingChildMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\EnemySleepingMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -582,7 +585,6 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
-    <ClInclude Include="hlsl ModelVSCommon.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
     </ClInclude>
@@ -607,8 +609,8 @@
     <ClInclude Include="Source\UI\RemainingChildMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
+    <ClInclude Include="Source\UI\EnemySleepingMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

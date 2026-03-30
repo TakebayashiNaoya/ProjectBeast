@@ -3,32 +3,10 @@
         "elements":[
             {
                 "type":"UIIcon",
-                "name":"ThirdCountDownTypeIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/CountDown/ThreeCountDown.dds",
-                "width":400,
-                "height":350,
-                "position":[0,0,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
-            },
-            {
-                "type":"UIIcon",
-                "name":"SecondCountDownTypeIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/CountDown/TwoCountDown.dds",
-                "width":420,
-                "height":370,
-                "position":[0,0,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
-            },
-            {
-                "type":"UIIcon",
-                "name":"FirstCountDownTypeIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/CountDown/OneCountDown.dds",
-                "width":380,
-                "height":440,
+                "name":"SleepIconA",
+                "asset":"Assets/spriteData/UI/Icon/SleepIcon.dds",
+                "width":50,
+                "height":50,
                 "position":[-50,0,0],
                 "scale":[1,1,1],
                 "rotation":0,
@@ -36,14 +14,37 @@
             },
             {
                 "type":"UIIcon",
-                "name":"GoCountDownTypeIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/CountDown/GoCountDown.dds",
-                "width":600,
-                "height":350,
-                "position":[50,0,0],
-                "scale":[1,1,1],
+                "name":"SleepIconB",
+                "asset":"Assets/spriteData/UI/Icon/SleepIcon.dds",
+                "width":50,
+                "height":50,
+                "position":[-30,10,0],
+                "scale":[0.8,0.8,1],
                 "rotation":0,
                 "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SleepIconC",
+                "asset":"Assets/spriteData/UI/Icon/SleepIcon.dds",
+                "width":50,
+                "height":50,
+                "position":[-15,20,0],
+                "scale":[0.6,0.6,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIGauge",
+                "name":"GaugeA",
+                "asset":"Assets/spriteData/UI/white.dds",
+                "width":420,
+                "height":30,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[90,150,220,255],
+                "pivot":[0.0, 0.5]
             }
         ]
     }

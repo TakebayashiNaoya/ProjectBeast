@@ -94,6 +94,7 @@ namespace app
 		ui::Layout* m_timerLayout = nullptr;
 		ui::Layout* m_finishLayout = nullptr;
 		ui::Layout* m_remainingChildLayout = nullptr;
+		ui::Layout* m_enemySleepingLayout = nullptr;
 
 		ui::CountDownMenu* m_countDownMenu = nullptr;
 		ui::InGameTimerMenu* m_timerMenu = nullptr;
