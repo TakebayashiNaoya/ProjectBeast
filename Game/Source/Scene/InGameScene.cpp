@@ -1,5 +1,5 @@
 ﻿/**
- * @file InGameScene.h
+ * @file InGameScene.cpp
  * @brief インゲームシーン
  * @author 立山
  */
@@ -8,14 +8,29 @@
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
 
-#include "Source/Actor/Stage/StageSystem.h"
-#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyController.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Util/JsonConverter.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/CameraController.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
+#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Noise/NoiseManager.h"
+
+#include "Source/Manager/BattleManager.h"
+#include "Source/Manager/ScoreManager.h"
+#include "Source/Manager/TimeManager.h"
+
+#include "Source/UI/Layout.h"
+#include "Source/UI/CountDownMenu.h"
+#include "Source/UI/InGameTimerMenu.h"
+#include "Source/UI/FinishMenu.h"
+#include "Source/UI/RemainingChildMenu.h"
+#include "Source/UI/EnemySleepingMenu.h"
 
 #include <random>
 
@@ -28,37 +43,97 @@ namespace app
 
 	InGameScene::~InGameScene()
 	{
+		// UI
+		delete m_countDownLayout;
+		delete m_timerLayout;
+		delete m_finishLayout;
+		delete m_remainingChildLayout;
+		delete m_enemySleepingLayout;
+
+		// アクター
 		actor::StageSystem::DestroyInstance();
-		delete m_daddyPenguin;
-		//for (auto*& p : m_childPenguins) {
-		//	delete p;
-		//	p = nullptr;
-		//}
+		actor::EnemyManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
+		actor::StageSystem::DestroyInstance();
+
+		app::TimeManager::DestroyInstance();
+		app::ScoreManager::DestroyInstance();
+
 		DeleteGO(m_ocean);
+
+		// マネージャー
+		BattleManager::DestroyInstance();
+		ScoreManager::DestroyInstance();
+		TimeManager::DestroyInstance();
 	}
 
 
 	bool InGameScene::Start()
 	{
+		ScoreManager::CreateInstance();
+		TimeManager::CreateInstance();
+
+		// マネージャー生成
 		app::core::ParameterManager::CreateInstance();
+		BattleManager::CreateInstance();
+		ScoreManager::CreateInstance();
+		TimeManager::CreateInstance();
+
+		// アクター系シングルトン生成
 		actor::StageSystem::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
-		m_phase = LoadPhase::Stage;
+		actor::EnemyManager::CreateInstance();
+
+		// UI レイアウト生成
+		m_countDownLayout = new ui::Layout();
+		m_countDownLayout->Initialize<ui::CountDownMenu>(
+			"Assets/parameter/countDown/CountDown.json"
+		);
+		m_countDownMenu = m_countDownLayout->GetMenu<ui::CountDownMenu>();
+
+		m_timerLayout = new ui::Layout();
+		m_timerLayout->Initialize<ui::InGameTimerMenu>(
+			"Assets/parameter/timer/InGameTimer.json"
+		);
+		m_timerMenu = m_timerLayout->GetMenu<ui::InGameTimerMenu>();
+
+		m_finishLayout = new ui::Layout();
+		m_finishLayout->Initialize<ui::FinishMenu>(
+			"Assets/parameter/UI/FinishMenu.json"
+		);
+		m_finishMenu = m_finishLayout->GetMenu<ui::FinishMenu>();
+
+		m_remainingChildLayout = new ui::Layout();
+		m_remainingChildLayout->Initialize<ui::RemainingChildMenu>(
+			"Assets/parameter/UI/remainingChild/remainingChild.json"
+		);
+
+		m_enemySleepingLayout = new ui::Layout();
+		m_enemySleepingLayout->Initialize<ui::EnemySleepingMenu>(
+			"Assets/parameter/UI/enemySleepGauge/sleepGauge.json"
+		);
+
+		// ロードフェーズ開始
+		m_loadPhase = LoadPhase::Stage;
 		m_childIndex = 0;
+
 		return true;
 	}
 
+
 	void InGameScene::Update()
 	{
-		switch (m_phase)
+		//------------------------------------------------------------
+		// ロードフェーズ（既存ロジックそのまま）
+		//------------------------------------------------------------
+		switch (m_loadPhase)
 		{
 		case LoadPhase::Stage:
 		{
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
-			m_phase = LoadPhase::Daddy;
+			m_loadPhase = LoadPhase::Daddy;
 			break;
 		}
 
@@ -66,30 +141,22 @@ namespace app
 			m_daddyPenguin = new actor::DaddyPenguin();
 			m_daddyPenguin->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
 			m_daddyPenguin->StartWrapper();
-			m_phase = LoadPhase::Children;
+			m_loadPhase = LoadPhase::Children;
 			break;
 
 		case LoadPhase::Children:
-			// CHILD_PENGUIN_NUM が 100 以上に設定されていることを前提とします
 			if (m_childIndex < CHILD_PENGUIN_NUM)
 			{
-				// 乱数生成器の初期化（staticにすることで毎フレーム初期化されるのを防ぎます）
 				static std::random_device rd;
 				static std::mt19937 gen(rd());
-				// -2000.0f から 2000.0f の範囲の乱数を生成
 				static std::uniform_real_distribution<float> dis(-2000.0f, 2000.0f);
 
-				// X, Y, Zをランダムに設定
 				Vector3 pos = Vector3(dis(gen), 0.0f, dis(gen));
-
 				actor::ChildPenguinManager::GetInstance()->CreateChildPenguin(1);
 
 				const auto& children = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
 				auto* child = children.back();
 
-				// ----------------------------------------------------
-				// ① 先にタイプを設定する（ここでステートマシンが生成される）
-				// ----------------------------------------------------
 				if (m_childIndex < 50)
 				{
 					child->SetChildPenguinType(app::actor::EnChildPenguinType::Serious);
@@ -99,68 +166,215 @@ namespace app
 					child->SetChildPenguinType(app::actor::EnChildPenguinType::Clingy);
 				}
 
-				// ----------------------------------------------------
-				// ② その後に座標をセットする（生成されたステートマシンに座標が渡る）
-				// ----------------------------------------------------
 				child->SetPosition(pos);
 				child->GetStateMachine()->SetPosition(pos);
 				child->StartWrapper();
-
 				++m_childIndex;
 			}
-			else {
+			else
+			{
 				auto* manager = app::actor::ChildPenguinManager::GetInstance();
 				manager->SetDaddyPenguin(m_daddyPenguin);
-				m_phase = LoadPhase::Camera;
+
+				// ステージ上の総ペンギン数をセット
+				ScoreManager::GetInstance().SetTotalCount(CHILD_PENGUIN_NUM);
+
+				m_loadPhase = LoadPhase::Enemy;
 			}
 			break;
 
+		case LoadPhase::Enemy:
+		{
+			nlohmann::json json;
+			// プロジェクト内の実際のパスに合わせてください
+			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/character/enemy/EnemyLayout.json");
+
+			// マネージャーにJSONを渡して一括生成させる
+			actor::EnemyManager::GetInstance()->LoadEnemies(json);
+
+			m_loadPhase = LoadPhase::Camera;
+			break;
+		}
+
 		case LoadPhase::Camera:
 		{
-			// CameraSteeringの初期化
 			camera::CameraSteering::Config config;
 			m_cameraSteering.SetConfig(config);
 			m_cameraSteering.SetTargetCharacter(m_daddyPenguin);
 
-			// GameCameraを登録してアクティブにする
 			auto gameCamera = std::make_shared<camera::GameCamera>();
 			camera::CameraManager::Get().Register(camera::GameCamera::ID(), gameCamera);
 			camera::CameraManager::Get().SwitchCamera(camera::GameCamera::ID());
-			m_phase = LoadPhase::Ocean;
+			m_loadPhase = LoadPhase::Ocean;
 			break;
 		}
 
 		case LoadPhase::Ocean:
 			m_ocean = NewGO<Ocean>(0);
-			m_phase = LoadPhase::Done;
+			m_loadPhase = LoadPhase::Done;
+
+			// ロード完了 → カウントダウン開始
+			if (m_countDownMenu)
+			{
+				m_countDownMenu->SetCountDownStartFlag(true);
+			}
 			break;
 
 		case LoadPhase::Done:
+			// ゲームフェーズへ移譲
+			UpdateGamePhase();
+			break;
+
+		default:
+			break;
+		}
+	}
+
+
+	void InGameScene::UpdateGamePhase()
+	{
+		// カメラは常に更新
+		auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
+		if (gameCamera)
 		{
-			// 通常更新
-			actor::StageSystem::GetInstance()->Update();
-			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-			//for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
+			camera::CameraData data = gameCamera->GetCameraData();
+			m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
+			gameCamera->SetState(data);
+		}
 
+		// ステージは常に更新
+		actor::StageSystem::GetInstance()->Update();
 
-			actor::ChildPenguinManager::GetInstance()->Update();
+		switch (m_gamePhase)
+		{
+			//------------------------------------------------------------
+			// カウントダウン
+			//------------------------------------------------------------
+		case GamePhase::CountDown:
+		{
+			// BattleManager にゲーム非アクティブを伝える
+			BattleManager::GetInstance().SetIsActive(false);
 
-			// CameraSteeringの結果をGameCameraに反映
-			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
-			if (gameCamera) {
-				camera::CameraData data = gameCamera->GetCameraData();
-				m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
-				gameCamera->SetState(data);
+			// AI・入力は動かさないが、描画用の行列更新だけ行う
+			if (m_daddyPenguin) m_daddyPenguin->UpdateModelOnly();
+			actor::ChildPenguinManager::GetInstance()->UpdateModelOnly();
+			actor::EnemyManager::GetInstance()->UpdateModelOnly();
+
+			// カウントダウン UI 更新
+			if (m_countDownLayout) m_countDownLayout->Update();
+
+			// カウントダウン完了 → Playing へ
+			if (m_countDownMenu && m_countDownMenu->IsCountDownFinished())
+			{
+				m_gamePhase = GamePhase::Playing;
+				BattleManager::GetInstance().SetIsActive(true);
 			}
-
-			if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
 			break;
 		}
 
-		default: break;
+		//------------------------------------------------------------
+		// プレイ中
+		//------------------------------------------------------------
+		case GamePhase::Playing:
+		{
+			// プレイヤー・子ペンギン・シロクマ の更新
+			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
+			actor::ChildPenguinManager::GetInstance()->Update();
+			actor::EnemyManager::GetInstance()->Update();
+
+			// タイマー UI 更新
+			if (m_timerLayout) m_timerLayout->Update();
+
+			// 残り子ペンギン数 UI 更新
+			if (m_remainingChildLayout) {
+				auto* menu = m_remainingChildLayout->GetMenu<ui::RemainingChildMenu>();
+				if (menu) {
+					const int childNum = actor::ChildPenguinManager::GetInstance()->GetFollowersNum();
+					menu->SetChildNum(childNum);
+				}
+
+				m_remainingChildLayout->Update();
+			}
+
+			// クマの起床ゲージ UI 更新
+			if (m_enemySleepingLayout) {
+
+				constexpr float MAX_RANGE = 200.0f;
+				constexpr float MAX_RANGE_SQ = MAX_RANGE * MAX_RANGE;
+
+				// 一番近い敵の座標を取得する
+				auto nearTargetPosition = [this](Vector3& outPosition)
+					{
+						bool isFind = false;
+						const Vector3 playerPosition = m_daddyPenguin->GetTransform().m_position;
+						Vector3 targetPosition;
+						Vector3 distance = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+
+						auto positionList = actor::EnemyManager::GetInstance()->GetPositionList();
+						for (const auto& pos : positionList) {
+							Vector3 d = playerPosition - pos;
+							const float dSq = d.LengthSq();
+							// 指定距離以上なら処理しない
+							if (MAX_RANGE_SQ < dSq) {
+								continue;
+							}
+							if (d.LengthSq() < distance.LengthSq()) {
+								targetPosition = pos;
+								distance = d;
+								isFind = true;
+							}
+						}
+
+						outPosition = targetPosition;
+						return isFind;
+					};
+
+				auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>();
+				if (menu) {
+					Vector3 targetPosition;
+					const bool isFind = nearTargetPosition(targetPosition);
+					// menu->SetSleepingRate(); // NOTE: ここに起床パーセントを入れて
+					menu->SetTargetPosition(targetPosition);
+					menu->SetDraw(isFind);
+				}
+
+				m_enemySleepingLayout->Update();
+			}
+
+			// ノイズリストをクリア
+			NoiseManager::GetInstance().ClearNoises();
+
+			// 終了判定
+			if (BattleManager::GetInstance().GetBattleState() != BattleManager::EnBattleState::Playing)
+			{
+				// FINISH 演出開始
+				if (m_finishMenu) m_finishMenu->StartFinish();
+
+				m_gamePhase = GamePhase::Finishing;
+			}
+			break;
+
+			BattleManager::GetInstance().Update();
 		}
 
+		//------------------------------------------------------------
+		// FINISH 演出
+		//------------------------------------------------------------
+		case GamePhase::Finishing:
+		{
+			// FINISH UI 更新
+			if (m_finishLayout) m_finishLayout->Update();
+
+			// 演出終了 → リザルトへ
+			if (m_finishMenu && m_finishMenu->IsFinished())
+			{
+				m_nextScene = true;
+			}
+			break;
+		}
+		}
 	}
+
 
 	void InGameScene::PauseUpdate()
 	{}
@@ -169,17 +383,37 @@ namespace app
 	void InGameScene::Render(RenderContext& rc)
 	{
 		actor::StageSystem::GetInstance()->Render(rc);
+
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
-		//for (auto* p : m_childPenguins) {
-		//	if (p) p->RenderWrapper(rc);
-		//}
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
+		actor::EnemyManager::GetInstance()->Render(rc);
+
+		// UI 描画
+		if (m_loadPhase == LoadPhase::Done)
+		{
+			switch (m_gamePhase)
+			{
+			case GamePhase::CountDown:
+				if (m_countDownLayout) m_countDownLayout->Render(rc);
+				break;
+			case GamePhase::Playing:
+				if (m_timerLayout) m_timerLayout->Render(rc);
+				if (m_remainingChildLayout) m_remainingChildLayout->Render(rc);
+				if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
+				break;
+			case GamePhase::Finishing:
+				if (m_timerLayout)  m_timerLayout->Render(rc);
+				if (m_finishLayout) m_finishLayout->Render(rc);
+				break;
+			}
+		}
 	}
 
 
 	bool InGameScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
-		if (m_nextScene) {
+		if (m_nextScene)
+		{
 			id = ResultScene::ID();
 			waitTime = 0.5f;
 			return true;

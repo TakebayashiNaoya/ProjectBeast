@@ -4,10 +4,12 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "PenguinAnimationData.h"
 #include "PenguinIState.h"
 #include "PenguinStateMachine.h"
 #include "PenguinStatus.h"
-#include "PenguinAnimationData.h"
+#include "Source/Noise/NoiseManager.h"
+#include "Source/Sound/SoundManager.h"
 
 
 namespace app
@@ -17,6 +19,7 @@ namespace app
 
 		PenguinIState::PenguinIState(PenguinStateMachine* owner)
 			: m_owner(owner)
+			, m_seHandle(-1)
 		{}
 
 
@@ -33,7 +36,9 @@ namespace app
 
 
 		void PenguinIdleState::Update()
-		{}
+		{
+			m_owner->Move();
+		}
 
 
 		void PenguinIdleState::Exit()
@@ -55,17 +60,26 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveWalk);
+			soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
 		}
 
 
 		void PenguinSneakState::Update()
 		{
 			m_owner->Move();
+
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Sneak
+			);
 		}
 
 
 		void PenguinSneakState::Exit()
-		{}
+		{
+			SoundManager::Get().StopSE(soundHandle);
+		}
 
 
 		PenguinSneakState::PenguinSneakState(PenguinStateMachine* owner)
@@ -83,17 +97,26 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetRunSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveRun);
+			soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
 		}
 
 
 		void PenguinRunState::Update()
 		{
 			m_owner->Move();
+
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Dash
+			);
 		}
 
 
 		void PenguinRunState::Exit()
-		{}
+		{
+			SoundManager::Get().StopSE(soundHandle);
+		}
 
 
 		PenguinRunState::PenguinRunState(PenguinStateMachine* owner)
@@ -110,20 +133,34 @@ namespace app
 		{
 			const float jumpPower = m_owner->GetPenguinStatus()->GetJumpPower();
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
-			m_owner->SetJumpPower(jumpPower);
 			m_owner->SetMoveSpeed(moveSpeed);
+
+			// ボタン入力による正規のジャンプ遷移の場合のみJump()を呼ぶ（崖からの落下時は呼ばない）
+			if (m_owner->GetIsJump())
+			{
+				m_owner->SetJumpPower(jumpPower);
+				m_owner->Jump();
+			}
+
 			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);
+			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinJump, false);
 		}
 
 
 		void PenguinJumpState::Update()
 		{
-			m_owner->Jump();
+			m_owner->Move();
 		}
 
 
 		void PenguinJumpState::Exit()
-		{}
+		{
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Fall
+			);
+		}
 
 
 		PenguinJumpState::PenguinJumpState(PenguinStateMachine* owner)
@@ -138,12 +175,18 @@ namespace app
 
 		void PenguinSlideStartState::Enter()
 		{
+			// 滑るステートと同じ速度を設定
+			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::SlideStart);
 		}
 
 
 		void PenguinSlideStartState::Update()
-		{}
+		{
+			// 移動を可能にする
+			m_owner->Move();
+		}
 
 
 		void PenguinSlideStartState::Exit()
@@ -165,17 +208,26 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Sliding);
+			soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
 		}
 
 
 		void PenguinSlidingState::Update()
 		{
 			m_owner->Move();
+
+			/** 足音を出す */
+			app::NoiseManager::GetInstance().AddNoise(
+				m_owner->GetTransform().m_position,
+				app::EnNoiseType::Slide
+			);
 		}
 
 
 		void PenguinSlidingState::Exit()
-		{}
+		{
+			SoundManager::Get().StopSE(soundHandle);
+		}
 
 
 		PenguinSlidingState::PenguinSlidingState(PenguinStateMachine* owner)
@@ -190,12 +242,18 @@ namespace app
 
 		void PenguinSlideEndState::Enter()
 		{
+			// 滑るステートと同じ速度を設定
+			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
+			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::StandUp);
 		}
 
 
 		void PenguinSlideEndState::Update()
-		{}
+		{
+			// 移動を可能にする
+			m_owner->Move();
+		}
 
 
 		void PenguinSlideEndState::Exit()
@@ -203,30 +261,6 @@ namespace app
 
 
 		PenguinSlideEndState::PenguinSlideEndState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
-		/************************************/
-
-
-		void PenguinDivingState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::IdleShake);
-		}
-
-
-		void PenguinDivingState::Update()
-		{}
-
-
-		void PenguinDivingState::Exit()
-		{}
-
-
-		PenguinDivingState::PenguinDivingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
 		{}
 
@@ -241,92 +275,44 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSwimSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
+			if (m_seHandle == -1)
+			{
+				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
+			}
 		}
 
 
 		void PenguinSwimmingState::Update()
 		{
+			SoundManager* sound = &SoundManager::Get();
+			if (m_seHandle != -1)
+			{
+				auto* se = sound->FindSE(m_seHandle);
+				if (se && se->IsPlaying()) {
+					sound->StopSE(m_seHandle);
+					m_seHandle = sound->PlaySE(enSoundKind::enSoundKind_PenguinSwimming, true);
+				}
+			}
 			m_owner->Move();
 		}
 
 
 		void PenguinSwimmingState::Exit()
-		{}
+		{
+			SoundManager* sound = &SoundManager::Get();
+			if (m_seHandle != -1)
+			{
+				auto* se = sound->FindSE(m_seHandle);
+				if (se && se->IsPlaying()) {
+					sound->StopSE(m_seHandle);
+					m_seHandle = -1;
+					sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
+				}
+			}
+		}
 
 
 		PenguinSwimmingState::PenguinSwimmingState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
-		/****************************************/
-
-
-		void PenguinClimbStartState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchBegin);
-		}
-
-
-		void PenguinClimbStartState::Update()
-		{}
-
-
-		void PenguinClimbStartState::Exit()
-		{}
-
-
-		PenguinClimbStartState::PenguinClimbStartState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
-		/****************************************/
-
-
-		void PenguinClimbingState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchFlapingWingsQuickly);
-		}
-
-
-		void PenguinClimbingState::Update()
-		{}
-
-
-		void PenguinClimbingState::Exit()
-		{}
-
-
-		PenguinClimbingState::PenguinClimbingState(PenguinStateMachine* owner)
-			: PenguinIState(owner)
-		{}
-
-
-
-
-		/****************************************/
-
-
-		void PenguinClimbEndState::Enter()
-		{
-			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchEnd);
-		}
-
-
-		void PenguinClimbEndState::Update()
-		{}
-
-
-		void PenguinClimbEndState::Exit()
-		{}
-
-
-		PenguinClimbEndState::PenguinClimbEndState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
 		{}
 

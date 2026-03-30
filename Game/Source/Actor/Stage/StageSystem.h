@@ -28,17 +28,20 @@ namespace app
 			 */
 			void CreateStageObject(const nlohmann::json& json);
 
-
 			/**
 			 * @brief ステージオブジェクトを削除
 			 */
 			void DeleteStageObject(const nlohmann::json& json);
 
-
 			/**
 			 * @briefトランスフォームの情報を読み込み直す
 			 */
 			void ReloadTransform(const nlohmann::json& j);
+
+			/**
+			 * @brief エネミーの巣の情報を読み込む
+			 */
+			void LoadEnemyNests(const nlohmann::json& json);
 
 
 		public:

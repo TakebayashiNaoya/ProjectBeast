@@ -27,12 +27,6 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 
-			/** 最大体力 */
-			int maxHp;
-			/** 初期体力 */
-			int hp;
-			/** 歩行速度 */
-			float walkSpeed;
 			/** 走行速度 */
 			float runSpeed;
 			/** 泳ぐ速度 */
@@ -44,4 +38,3 @@ namespace app
 		};
 	}
 }
-

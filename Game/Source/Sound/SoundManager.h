@@ -20,11 +20,44 @@ namespace app
 	static constexpr VoiceHandle INVALID_VOICE_HANDLE = 0xffffffff;
 
 
+	/** サウンド再生の優先度 */
+	enum EnSoundPriority
+	{
+		enSoundPriority_Hight,
+		enSoundPriority_Normal,
+		enSoundPriority_Low,
+		enSoundPriority_Max,
+	};
+
+
+
 	/**
 	 * サウンドを管理するクラス
 	 */
 	class SoundManager
 	{
+	private:
+		/**
+		 * SE再生用の情報
+		 * NOTE: リクエスト方式にするため一時的に情報を確保
+		 */
+		struct SEInformation
+		{
+			int m_kind = 0;
+			bool m_isLoop = false;
+			bool m_is3D = false;
+			VoiceHandle m_handle = INVALID_VOICE_HANDLE;
+			//
+			SEInformation(const int kind, const bool isLoop, const bool is3D, const VoiceHandle handle)
+				: m_kind(kind)
+				, m_isLoop(isLoop)
+				, m_is3D(is3D)
+				, m_handle(handle)
+			{
+			}
+		};
+
+
 	public:
 		/**
 		 * 更新処理
@@ -41,8 +74,12 @@ namespace app
 		void StopBGM();
 
 
-		/** SEの再生 */
-		SEHandle PlaySE(const int kind, const bool isLoop = false, const bool is3D = false);
+		/**
+		 * SEの再生のリクエスト
+		 * NOTE: フレームの最後でまとめて再生される
+		 *		 再生されない可能性があるのでHandleから取得する際はnullptrチェックをすること
+		 */
+		SEHandle PlaySE(const int kind, const bool isLoop = false, const bool is3D = false, const EnSoundPriority priority = enSoundPriority_Normal);
 		/** SEの停止 */
 		void StopSE(const SEHandle handle);
 
@@ -59,7 +96,7 @@ namespace app
 			if (it != m_seList.end()) {
 				return it->second;
 			}
-			K2_ASSERT(false, "削除済みか追加されていないSEにアクセスしようとしています。\n");
+			//K2_ASSERT(false, "削除済みか追加されていないSEにアクセスしようとしています。\n");
 			return nullptr;
 		}
 
@@ -155,6 +192,9 @@ namespace app
 		 * マップで参照するようにハンドル数を保持
 		 */
 		SEHandle m_soundHandleCount = 0;
+
+		/** SE再生のリクエスト用情報 */
+		std::vector<SEInformation> m_seInfomationList[enSoundPriority_Max];
 
 
 	private:

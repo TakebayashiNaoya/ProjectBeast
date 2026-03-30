@@ -42,11 +42,6 @@ namespace app
 
 		public:
 			/**
-			 * @brief AIコントローラーの入力処理
-			 * @note 子ペンギンのAIコントローラーから呼び出される
-			 */
-			void AIControllerInput(const Vector3& moveDirection, bool isDash, bool isJump, bool isSlide, bool isDive, bool isSeparateWater);
-			/**
 			 * @brief ダメージ処理
 			 */
 			void Damage() override;
@@ -74,4 +69,3 @@ namespace app
 		};
 	}
 }
-

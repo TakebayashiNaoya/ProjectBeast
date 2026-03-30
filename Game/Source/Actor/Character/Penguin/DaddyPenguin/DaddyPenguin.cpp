@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"
+#include "DaddyPenguinController.h"
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
@@ -35,6 +36,9 @@ namespace app
 			m_status->Setup();
 			m_stateMachine = std::make_unique<DaddyPenguinStateMachine>(this);
 			m_characterStateMachine = m_stateMachine.get();
+
+			// コントローラーの作成
+			m_controller = std::make_unique<DaddyPenguinController>(this);
 		}
 
 
@@ -47,7 +51,11 @@ namespace app
 
 		void DaddyPenguin::Update()
 		{
-			m_stateMachine->PlayerControllerInput();
+			if (m_controller)
+			{
+				m_controller->Update();
+			}
+
 			m_stateMachine->Update();
 
 			PenguinBase::Update();

@@ -27,6 +27,12 @@ namespace app
 			void Render(RenderContext& rc);
 
 
+			/**
+			 * @brief モデルの行列更新のみ行う（AI・ステートマシンは動かさない）
+			 */
+			void UpdateModelOnly();
+
+
 
 
 			//============================================//
@@ -49,6 +55,16 @@ namespace app
 				return m_childPenguinList;
 			}
 
+			/**
+			 * @brief 子ペンギンの数を取得
+			 * @return 子ペンギンの数
+			 */
+			int GetChildPenguinNum() const
+			{
+				return m_childPenguinList.size();
+			}
+
+
 
 		private:
 			/** 子ペンギンのリスト */
@@ -62,6 +78,10 @@ namespace app
 			//============================================//
 
 		public:
+			/**
+			 * @brief 親ペンギンの現在座標を取得する
+			 */
+			Vector3 GetDaddyPosition() const;
 			/**
 			 * @brief 親ペンギンを設定（GameSceneなどで呼び出す）
 			 * @param daddy 親ペンギンのポインタ
@@ -79,6 +99,15 @@ namespace app
 			 * @param penguin 離脱する子ペンギンのポインタ
 			 */
 			void RemoveFollower(ChildPenguin* penguin);
+
+			/**
+			 * @brief 整列済み子ペンギンの数を取得
+			 * @return 整列済み子ペンギンの数
+			 */
+			int GetFollowersNum() const
+			{
+				return m_followers.size();
+			}
 
 
 		private:
@@ -145,34 +174,25 @@ namespace app
 				m_command = command;
 			}
 
+			/**
+			 * @brief 追従命令と待機命令を切り替える（トグル）
+			 */
+			void ToggleCommand()
+			{
+				if (m_command == EnPenguinCommand::Follow)
+				{
+					m_command = EnPenguinCommand::Wait;
+				}
+				else
+				{
+					m_command = EnPenguinCommand::Follow;
+				}
+			}
+
 
 		private:
 			/** 子ペンギンへの命令 */
 			EnPenguinCommand m_command = EnPenguinCommand::Follow;
-
-
-
-
-			//============================================//
-			// 親ペンギンと同じ移動をするためのフラグ管理
-			//============================================//
-
-		public:
-			/**
-			 * @brief 親ペンギンの現在座標を取得する
-			 */
-			Vector3 GetDaddyPosition() const;
-
-			/** 親ペンギンの現在アクション状態を取得 */
-			bool IsDaddyRunning() const { return m_isDaddyRunning; }
-			bool IsDaddySliding() const { return m_isDaddySliding; }
-			bool IsDaddyDiving() const { return m_isDaddyDiving; }
-
-
-		private:
-			bool m_isDaddyRunning = false;
-			bool m_isDaddySliding = false;
-			bool m_isDaddyDiving = false;
 
 
 

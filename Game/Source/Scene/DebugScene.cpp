@@ -7,7 +7,6 @@
 #include "DebugScene.h"
 #include "../../../BeastEngine/Resource/ResourceManager.h"
 #include "../../../BeastEngine/Resource/ModelResource.h"
-#include "Source/Actor/Character/Player/Player.h"
 #include "Source/Core/ParameterManager.h"
 
 

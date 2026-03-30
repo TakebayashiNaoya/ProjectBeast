@@ -22,7 +22,7 @@ namespace app
 				{ "Assets/animData/bear/attack.tka", false },
 				{ "Assets/animData/bear/backWalk.tka", true },
 				{ "Assets/animData/bear/run.tka", true },
-				{ "Assets/animData/bear/buff.tka", true },
+				{ "Assets/animData/bear/buff.tka", false },
 				{ "Assets/animData/bear/damage.tka", true },
 				{ "Assets/animData/bear/eat.tka", true },
 				{ "Assets/animData/bear/stun.tka", true },

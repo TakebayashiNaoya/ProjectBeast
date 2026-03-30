@@ -33,6 +33,7 @@ namespace app
 			, m_canAttack(false)
 			, m_isSeach(false)
 			, m_isReturnHome(false)
+			, m_isRoar(false)
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
@@ -45,6 +46,7 @@ namespace app
 			AddState<EnemyAttackState>(this);
 			AddState<EnemyReturnHomeState>(this);
 			AddState<EnemyCoolDownState>(this);
+			AddState<EnemyRoarState>(this);
 
 
 			// 初期ステートの設定
@@ -97,6 +99,11 @@ namespace app
 			{
 				return FindState(EnemyAttackState::ID());
 			}
+			if (CanChangeRoar())
+			{
+				return FindState(EnemyRoarState::ID());
+			}
+
 			if (CanChangeChace())
 			{
 				return FindState(EnemyChaseState::ID());
@@ -105,10 +112,22 @@ namespace app
 			{
 				return FindState(EnemySearchState::ID());
 			}
-			if (CanChangeSwimState())
+
+			// 泳ぎ判定（チャタリング防止ロジック）
+			if (m_currentState == FindState(EnemySwimState::ID()))
 			{
+				// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
+				if (!IsOnGround())
+				{
+					return FindState(EnemySwimState::ID());
+				}
+			}
+			else if (CanChangeSwimState())
+			{
+				// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
 				return FindState(EnemySwimState::ID());
 			}
+
 			if (CanChangeWalk())
 			{
 				return FindState(EnemyWalkState::ID());
@@ -192,6 +211,16 @@ namespace app
 		bool EnemyStateMachine::CanChangeCoolDown()const
 		{
 			if (m_isCoolDown)
+			{
+				return true;
+			}
+			return false;
+		}
+
+
+		bool EnemyStateMachine::CanChangeRoar()const
+		{
+			if (m_isRoar)
 			{
 				return true;
 			}

@@ -28,7 +28,6 @@ namespace app
 				{
 					parameter.maxHp = j["maxHp"].get<int>();
 					parameter.hp = j["hp"].get<int>();
-					parameter.walkSpeed = j["walkSpeed"].get<float>();
 					parameter.runSpeed = j["runSpeed"].get<float>();
 					parameter.swimSpeed = j["swimSpeed"].get<float>();
 					parameter.sneakSpeed = j["sneakSpeed"].get<float>();
@@ -54,7 +53,6 @@ namespace app
 			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterDaddyPenguinParameter>();
 			m_maxHp = parameter->maxHp;
 			m_hp = parameter->hp;
-			m_walkSpeed = parameter->walkSpeed;
 			m_runSpeed = parameter->runSpeed;
 			m_swimSpeed = parameter->swimSpeed;
 			m_sneakSpeed = parameter->sneakSpeed;

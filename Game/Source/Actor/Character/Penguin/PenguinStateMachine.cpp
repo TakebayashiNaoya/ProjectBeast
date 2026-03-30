@@ -12,27 +12,10 @@ namespace app
 {
 	namespace actor
 	{
-
-		namespace
-		{
-			/** 重力 */
-			constexpr float GRAVITY = -9.8f * 5;
-			/** 地面(仮) */
-			constexpr float GROUND = 0.0f;
-		}
-
-
 		void PenguinStateMachine::Jump()
 		{
-			// 先に移動処理を行う
-			Move();
-
-			// 滞空時間を加算
-			m_airTime += g_gameTime->GetFrameDeltaTime();
-			// ジャンプパワーと重力から現在のジャンプパワーを計算
-			const float jumpPower = m_jumpPower + GRAVITY * m_airTime;
-
-			m_ownerCharacter->GetCharacterController()->Jump(jumpPower);
+			m_ownerCharacter->GetCharacterController()->Jump(m_jumpPower);
+			m_isJump = false; // ジャンプフラグをリセット
 		}
 
 
@@ -45,11 +28,11 @@ namespace app
 		PenguinStateMachine::PenguinStateMachine(PenguinBase* ownerPenguinBase)
 			: CharacterStateMachine(ownerPenguinBase)
 			, m_ownerPenguinBase(ownerPenguinBase)
-			, m_airTime(0.0f)
 			, m_jumpPower(0.0f)
 			, m_isJump(false)
+			, m_isSneak(false)
 			, m_isSlide(false)
-			, m_isSeparateWater(false)
+			, m_isDamaged(false)
 		{}
 
 
@@ -57,7 +40,5 @@ namespace app
 		{
 			return nullptr;
 		}
-
-
 	}
 }

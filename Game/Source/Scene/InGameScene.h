@@ -1,7 +1,7 @@
 ﻿/**
  * @file InGameScene.h
  * @brief インゲームシーン
- * @author 立山
+ * @author 立山、竹林
  */
 #pragma once
 #include "IScene.h"
@@ -10,15 +10,29 @@
 
 namespace app
 {
-	namespace actor {
+	/** 前方宣言 */
+	namespace actor
+	{
 		class DaddyPenguin;
 		class ChildPenguin;
+		class Enemy;
+		class EnemyController;
+	}
+	namespace ui
+	{
+		class Layout;
+		class CountDownMenu;
+		class InGameTimerMenu;
+		class FinishMenu;
 	}
 
+
+	/**
+	 * @brief インゲームシーン
+	 */
 	class InGameScene : public IScene
 	{
 		appScene(InGameScene);
-
 
 	public:
 		InGameScene();
@@ -26,27 +40,72 @@ namespace app
 
 		bool Start() override;
 		void Update() override;
-		void PauseUpdate()override;
+		void PauseUpdate() override;
 		void Render(RenderContext& rc) override;
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
-		bool IsLoaded() const { return m_phase == LoadPhase::Done; }
+		bool IsLoaded() const { return m_loadPhase == LoadPhase::Done; }
+
 
 	private:
-		bool m_nextScene = false;
+		//------------------------------------------------------------
+		// ロードフェーズ（既存）
+		//------------------------------------------------------------
+		enum class LoadPhase
+		{
+			None, Stage, Daddy, Children, Enemy, Camera, Ocean, Done
+		};
+		LoadPhase m_loadPhase = LoadPhase::None;
+		int m_childIndex = 0;
 
+		//------------------------------------------------------------
+		// ゲームフェーズ（新規）
+		//------------------------------------------------------------
+		enum class GamePhase
+		{
+			CountDown,  // カウントダウン中（プレイヤー・AI・シロクマ停止）
+			Playing,    // プレイ中
+			Finishing,  // FINISH演出中
+		};
+		GamePhase m_gamePhase = GamePhase::CountDown;
 
+		//------------------------------------------------------------
+		// 終了判定
+		//------------------------------------------------------------
+
+		/** ロード完了後のゲームフェーズ更新をまとめた関数 */
+		void UpdateGamePhase();
+
+		//------------------------------------------------------------
+		// アクター
+		//------------------------------------------------------------
 		static constexpr int CHILD_PENGUIN_NUM = 100;
 		actor::DaddyPenguin* m_daddyPenguin = nullptr;
 		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
 
 		camera::CameraSteering m_cameraSteering;
-
-		enum class LoadPhase { None, Stage, Daddy, Children, Camera, Ocean, Done };
-		LoadPhase m_phase = LoadPhase::None;
-		int m_childIndex = 0;
-
 		Ocean* m_ocean = nullptr;
+
+		//------------------------------------------------------------
+		// UI レイアウト
+		//------------------------------------------------------------
+		ui::Layout* m_countDownLayout = nullptr;
+		ui::Layout* m_timerLayout = nullptr;
+		ui::Layout* m_finishLayout = nullptr;
+		ui::Layout* m_remainingChildLayout = nullptr;
+		ui::Layout* m_enemySleepingLayout = nullptr;
+
+		ui::CountDownMenu* m_countDownMenu = nullptr;
+		ui::InGameTimerMenu* m_timerMenu = nullptr;
+		ui::FinishMenu* m_finishMenu = nullptr;
+
+		//------------------------------------------------------------
+		// シーン遷移
+		//------------------------------------------------------------
+		bool m_nextScene = false;
+
+		/** クリア判定用定数 */
+		static constexpr int CLEAR_COUNT = 50;
 	};
 }

@@ -9,7 +9,9 @@
 #include "EnemyStateMachine.h"
 #include "EnemyStatus.h"
 #include "EnemyTypes.h"
+#include "Source/Noise/NoiseManager.h"
 #include "Source/Sound/SoundManager.h"
+#include <algorithm>
 
 
 namespace app
@@ -37,7 +39,18 @@ namespace app
 
 
 		void EnemyIdleState::Update()
-		{}
+		{
+			// 音の検知処理
+			Vector3 loudestPos;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
+			const float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
+
+			if (totalNoise >= SEARCH_THRESHOLD)
+			{
+				m_owner->SetSeach(true);
+				m_owner->SetSearchTargetPos(loudestPos);
+			}
+		}
 
 
 		void EnemyIdleState::Exit()
@@ -158,6 +171,17 @@ namespace app
 			{
 				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 			}
+
+			// 音の検知処理
+			Vector3 loudestPos;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
+			const float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
+
+			if (totalNoise >= SEARCH_THRESHOLD)
+			{
+				m_owner->SetSeach(true);
+				m_owner->SetSearchTargetPos(loudestPos);
+			}
 		}
 
 
@@ -189,8 +213,6 @@ namespace app
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
 
-
-			SoundManager::Get().PlaySE(enSoundKind_EnemyRoar);
 
 			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 
@@ -361,11 +383,40 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Sleep);
+			SoundManager::Get().PlaySE(enSoundKind_EnemyRoar);
 		}
 
 
 		void EnemyCoolDownState::Update()
-		{}
+		{
+			// 音の検知処理
+			Vector3 loudestPos;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
+
+			float currentGauge = m_owner->GetWakeUpGauge();
+			const float MAX_WAKE_UP_GAUGE = 100.0f; // 起床する閾値
+
+			if (totalNoise > 0.0f)
+			{
+				currentGauge += totalNoise * g_gameTime->GetFrameDeltaTime();
+
+				if (currentGauge >= MAX_WAKE_UP_GAUGE)
+				{
+					currentGauge = 0.0f; // リセット
+
+					m_owner->SetCoolDown(false);
+					m_owner->SetSeach(true);
+					m_owner->SetSearchTargetPos(loudestPos);
+				}
+			}
+			else
+			{
+				currentGauge -= 10.0f * g_gameTime->GetFrameDeltaTime();
+				currentGauge = max(0.0f, currentGauge);
+			}
+
+			m_owner->SetWakeUpGauge(currentGauge);
+		}
 
 
 		void EnemyCoolDownState::Exit()
@@ -377,5 +428,37 @@ namespace app
 		EnemyCoolDownState::EnemyCoolDownState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 		{}
+
+
+
+
+		/************************************/
+
+
+		void EnemyRoarState::Enter()
+		{
+			m_owner->SetMoveVector(Vector3::Zero);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Buff);
+
+		}
+
+
+		void EnemyRoarState::Update()
+		{
+
+		}
+
+
+		void EnemyRoarState::Exit()
+		{
+			if (m_owner->IsPlayingAnimation())return;
+		}
+
+
+		EnemyRoarState::EnemyRoarState(EnemyStateMachine* owner)
+			: EnemyIState(owner)
+		{
+
+		}
 	}
 }

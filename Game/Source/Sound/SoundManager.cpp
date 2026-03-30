@@ -8,6 +8,13 @@
 #include <algorithm>
 
 
+namespace
+{
+	// SE再生上限数
+	constexpr uint8_t MAX_SE_PLAY_NUM = 7;
+}
+
+
 namespace app
 {
 	SoundManager* SoundManager::m_instance = nullptr;
@@ -63,6 +70,35 @@ namespace app
 		for (const auto& key : eraseVoiceList) {
 			m_voiceList.erase(key);
 		}
+
+
+		// リクエストされたSEを再生する
+		int playNum = 0;
+		// 優先度別のList
+		for (const auto& infoList : m_seInfomationList) {
+			// 優先度の中のリスト
+			for (const auto& info : infoList) {
+				auto* se = NewGO<SoundSource>(0, "se");
+				se->Init(info.m_kind, info.m_is3D);
+				se->SetVolume(m_masterVolume * m_seVolume);
+				se->Play(info.m_isLoop);
+				m_seList.emplace(info.m_handle, se);
+				// 再生数加算
+				++playNum;
+				// 再生数を超えたかチェック
+				if (playNum >= MAX_SE_PLAY_NUM) {
+					break;
+				}
+			}
+			// 既に再生数を超えているなら処理する必要がない
+			if (playNum >= MAX_SE_PLAY_NUM) {
+				break;
+			}
+		}
+		// 再生完了なのでクリア
+		for (auto& infoList : m_seInfomationList) {
+			infoList.clear();
+		}
 	}
 
 
@@ -91,22 +127,20 @@ namespace app
 	}
 
 
-	SEHandle SoundManager::PlaySE(const int kind, const bool isLoop, const bool is3D)
+	SEHandle SoundManager::PlaySE(const int kind, const bool isLoop, const bool is3D, const EnSoundPriority priority)
 	{
 		/** ハンドルが最大数になったら使えない */
 		if (m_soundHandleCount == INVALID_SE_HANDLE) {
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
 			return INVALID_SE_HANDLE;
 		}
-		auto* se = NewGO<SoundSource>(0, "se");
-		se->Init(kind, is3D);
-		se->SetVolume(m_masterVolume * m_seVolume);
-		se->Play(isLoop);
-
+		// ハンドルは常に加算していく
+		// そのため再生されない可能性があるので、Handle取得時はnullptrチェック必須
 		SEHandle handle = m_soundHandleCount++;
 
-		m_seList.emplace(handle, se);
-
+		// 優先度別の再生リクエスト情報を追加
+		m_seInfomationList[priority].push_back(SEInformation(kind, isLoop, is3D, handle));
+		
 		return handle;
 	}
 

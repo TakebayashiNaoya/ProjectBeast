@@ -8,14 +8,14 @@
 
 #include "Enemy.h"
 #include "EnemyController.h"
-#include "EnemyControllerManager.h"
+#include "EnemyManager.h"
 
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Enemy/EnemyStatus.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Actor/Character/Player/Player.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Noise/NoiseManager.h"
 
 
 namespace app
@@ -32,7 +32,6 @@ namespace app
 			, m_elapsedTime(0.0f)
 			, m_prePosition(Vector3::Zero)
 			, m_startPosition(Vector3::Zero)
-			, m_homePosition(Vector3::Zero)
 			, m_lastKnownPenguinPos(Vector3::Zero)
 			, m_isStun(false)
 			, m_isHomeInitialized(false)
@@ -44,6 +43,7 @@ namespace app
 			, m_attackDuration(1.5f)
 			, m_attackTimer(0.0f)
 			, m_isAttacking(false)
+			, m_searchTimer(0.0f) // 初期化追加
 		{
 			static bool ini = false;
 			if (!ini)
@@ -51,15 +51,11 @@ namespace app
 				Initialize();
 				ini = true;
 			}
-
-			EnemyControllerManager::GetInstance()->Register(this);
 		}
 
 
 		EnemyController::~EnemyController()
-		{
-			EnemyControllerManager::GetInstance()->UnRegister(this);
-		}
+		{}
 
 
 		bool EnemyController::Start()
@@ -70,17 +66,6 @@ namespace app
 
 		void EnemyController::Update()
 		{
-			if (!m_isHomeInitialized)
-			{
-				Vector3 pos = StageSystem::GetInstance()->GetObjectPosition("bearHome");
-
-				if (pos.LengthSq() > 0.0001f)
-				{
-					m_homePosition = pos;
-					m_isHomeInitialized = true;
-				}
-			}
-
 			if (!m_isParamInitialized)
 			{
 				m_maxEatCount = m_target->GetEnemyStateMachine()->GetOwnerStatus()->GetMaxEat();
@@ -208,7 +193,7 @@ namespace app
 		bool EnemyController::IsFarFromHome()const
 		{
 			Vector3 pos = m_target->GetTransform().m_position;
-			Vector3 toHome = m_homePosition - pos;
+			Vector3 toHome = m_target->GetHomePosition() - pos;
 
 			const float MAX_DIST = 500.0f;
 			if (toHome.LengthSq() > MAX_DIST * MAX_DIST)
@@ -239,6 +224,8 @@ namespace app
 			RegisterState(enEnemyState_ReturnHome, EnterReturnHome, UpdateReturnHome, ExitReturnHome, CheckReturnHome);
 			/** クールダウン */
 			RegisterState(enEnemyState_CoolDown, EnterCoolDown, UpdateCoolDown, ExitCoolDown, CheckCoolDown);
+			/** 咆哮 */
+			RegisterState(enEnemyState_Roar, EnterRoar, UpdateRoar, ExitRoar, CheckRoar);
 		}
 
 
@@ -256,7 +243,6 @@ namespace app
 			sm->SetStickLAmount(0.0f);
 
 			enemy->m_foundPenguin = nullptr;
-			//enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(Vector3::Zero);
 		}
 
 
@@ -277,12 +263,16 @@ namespace app
 				return enEnemyState_ReturnHome;
 			}
 
+			// 音で索敵フラグが立ったらSearchへ
+			if (enemy->m_target->GetEnemyStateMachine()->IsSeach())
+			{
+				return enEnemyState_Search;
+			}
+
 			const float idleTime = static_cast<float>(rand() % 500) * 0.01f;
 			if (enemy->m_elapsedTime > idleTime) {
-				if (rand() % 10 >= 5) {
-					return enEnemyState_Wandering;
-				}
-				return enEnemyState_Search;
+				// 時間経過によるランダム遷移は、(0,0,0)へ行かないようWanderingに統一
+				return enEnemyState_Wandering;
 			}
 			return enEnemyState_Invalid;
 		}
@@ -312,42 +302,13 @@ namespace app
 
 
 
-		/** サーチ */
+		/** サーチ（音のした場所へ向かう） */
 		void EnemyController::EnterSearch(EnemyController* enemy)
 		{
 			if (enemy->m_target == nullptr) return;
 
 			enemy->m_target->GetEnemyStateMachine()->SetSeach(true);
-
-			enemy->m_elapsedTime = 0.0f;
-
-			// 左右どちらに回るかランダム
-			enemy->m_searchDir = (rand() % 2 == 0) ? 1 : -1;
-
-			// 回転速度（ラジアン）
-			enemy->m_searchSpeed = Math::PI / 2.0f; // 90度/秒くらい
-
-			Quaternion q = enemy->m_target->GetTransform().m_rotation;
-
-			Vector3 forward;
-			forward.x = 2.0f * (q.x * q.z + q.w * q.y);
-			forward.y = 0.0f;
-			forward.z = 1.0f - 2.0f * (q.x * q.x + q.y * q.y);
-
-			if (forward.LengthSq() < 0.001f)
-			{
-				forward = Vector3::AxisZ;
-			}
-
-			forward.Normalize();
-
-			enemy->m_searchAngle = atan2f(forward.x, forward.z);
-
-
-			// 移動は止める
-			auto* sm = enemy->m_target->GetEnemyStateMachine();
-			sm->SetStickLAmount(0.0f);
-			enemy->m_prePosition = enemy->m_target->GetTransform().m_position;
+			enemy->m_searchTimer = 0.0f; // タイマーリセット
 		}
 
 
@@ -355,27 +316,52 @@ namespace app
 		{
 			if (enemy->m_target == nullptr) return;
 
-			float delta = g_gameTime->GetFrameDeltaTime();
-			enemy->m_elapsedTime += delta;
+			// 1. 視界によるペンギン発見処理
+			enemy->m_foundPenguin = enemy->FindTarget();
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				enemy->m_target->GetEnemyStateMachine()->SetFindPenguin(true);
+				return;
+			}
 
-			// 角度更新
-			enemy->m_searchAngle += enemy->m_searchSpeed * enemy->m_searchDir * delta;
-
-			// 向きをベクトルに変換
-			Vector3 dir;
-			dir.x = sinf(enemy->m_searchAngle);
-			dir.z = cosf(enemy->m_searchAngle);
-			dir.y = 0.0f;
-
-			dir.Normalize();
+			// 2. 索敵中も耳を澄ませて、新しい音がしたら目標地点を更新する
+			Vector3 loudestPos;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(enemy->m_target->GetTransform().m_position, loudestPos);
+			const float SEARCH_THRESHOLD = 15.0f; // 閾値
 
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
-			sm->SetMoveDirection(dir);
 
-			// 移動はしない
-			sm->SetStickLAmount(0.01f);
+			if (totalNoise >= SEARCH_THRESHOLD)
+			{
+				sm->SetSearchTargetPos(loudestPos);
+				enemy->m_searchTimer = 0.0f; // 新しい音がしたので諦めタイマーをリセット
+			}
 
-			enemy->m_target->GetEnemyStateMachine()->SetPosition(enemy->m_prePosition);
+			// 3. 音がした目標地点へ歩く
+			Vector3 targetPos = sm->GetSearchTargetPos();
+			Vector3 currentPos = enemy->m_target->GetTransform().m_position;
+			Vector3 toTarget = targetPos - currentPos;
+			toTarget.y = 0.0f; // 高さは無視して平面の距離だけを見る
+
+			float distanceSq = toTarget.LengthSq();
+			if (distanceSq > 5.0f * 5.0f) // 目標までまだ遠い場合（距離5.0f以内で到着とする）
+			{
+				toTarget.Normalize();
+				sm->SetMoveDirection(toTarget);
+				sm->SetStickLAmount(1.0f); // スティックを倒して歩かせる
+			}
+			else
+			{
+				// 目標地点に到着した
+				sm->SetStickLAmount(0.0f); // 立ち止まる
+
+				// 到着してしばらく（例：3秒）音が鳴らなければ諦める
+				enemy->m_searchTimer += g_gameTime->GetFrameDeltaTime();
+				if (enemy->m_searchTimer > 3.0f)
+				{
+					sm->SetSeach(false); // 諦めフラグを落とす
+				}
+			}
 		}
 
 
@@ -383,6 +369,7 @@ namespace app
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 			enemy->m_target->GetEnemyStateMachine()->SetSeach(false);
+			enemy->m_searchTimer = 0.0f;
 		}
 
 
@@ -391,17 +378,16 @@ namespace app
 			// ターゲット見つけたらチェイス
 			if (enemy->m_foundPenguin != nullptr)
 			{
-				return enEnemyState_Chase;
+				return enEnemyState_Roar;
 			}
 			if (enemy->IsFarFromHome())
 			{
 				return enEnemyState_ReturnHome;
 			}
 
-			// 一定時間で終了
-			if (enemy->m_elapsedTime > 2.0f)
-			{
-				return enEnemyState_Idle;
+			// 諦めフラグが立っていたら徘徊に戻る
+			if (!enemy->m_target->GetEnemyStateMachine()->IsSeach()) {
+				return enEnemyState_Wandering;
 			}
 
 			return enEnemyState_Invalid;
@@ -446,11 +432,16 @@ namespace app
 		{
 			if (enemy->m_foundPenguin != nullptr)
 			{
-				return enEnemyState_Chase;
+				return enEnemyState_Roar;
 			}
 			if (enemy->IsFarFromHome())
 			{
 				return enEnemyState_ReturnHome;
+			}
+
+			// 耳で音を検知してフラグが立ったら、索敵ステートへ移行
+			if (enemy->m_target->GetEnemyStateMachine()->IsSeach()) {
+				return enEnemyState_Search;
 			}
 
 			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
@@ -508,11 +499,6 @@ namespace app
 
 		int EnemyController::CheckChase(EnemyController* enemy)
 		{
-			//if (enemy->IsFarFromHome())
-			//{
-			//	return enEnemyState_ReturnHome;
-			//}
-
 			if (enemy->m_foundPenguin != nullptr)
 			{
 				Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
@@ -648,9 +634,6 @@ namespace app
 			sm->SetActionButtonX(true);
 			sm->SetIsNearPenguin(true);
 
-			//enemy->m_attackTimer = 0.0f;
-			//enemy->m_isAttacking = true;
-
 			// 満腹処理
 			enemy->m_eatCount++;
 			if (enemy->m_eatCount >= enemy->m_maxEatCount)
@@ -708,10 +691,10 @@ namespace app
 		void EnemyController::UpdateReturnHome(EnemyController* enemy)
 		{
 			Vector3 pos = enemy->m_target->GetTransform().m_position;
-			Vector3 toHome = enemy->m_homePosition - pos;
+			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
 			// 到着判定
-			if (toHome.LengthSq() < 10.0f)
+			if (toHome.LengthSq() < 100.0f)
 			{
 				enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 				return;
@@ -733,7 +716,7 @@ namespace app
 		int EnemyController::CheckReturnHome(EnemyController* enemy)
 		{
 			Vector3 pos = enemy->m_target->GetTransform().m_position;
-			Vector3 toHome = enemy->m_homePosition - pos;
+			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
 			// 到着したら終了
 			if (toHome.LengthSq() < 50.0f * 50.0f)
@@ -772,12 +755,54 @@ namespace app
 
 		int EnemyController::CheckCoolDown(EnemyController* enemy)
 		{
+			auto* sm = enemy->m_target->GetEnemyStateMachine();
 
+			// 耳で音を聞いてステートマシン内部で起き上がった場合（フラグが折られる）
+			if (!sm->IsCoolDown())
+			{
+				// 起きた理由が音による索敵ならSearchへ、そうでなければIdleへ
+				if (sm->IsSeach()) {
+					return enEnemyState_Search;
+				}
+				return enEnemyState_Idle;
+			}
+
+			// 一応、時間経過でも起きるように残しておく
 			enemy->m_coolDownTimer += g_gameTime->GetFrameDeltaTime();
 
 			if (enemy->m_coolDownTimer >= 5.0f)
 			{
 				return enEnemyState_Idle;
+			}
+			return enEnemyState_Invalid;
+		}
+
+
+
+		/** 咆哮 */
+		void EnemyController::EnterRoar(EnemyController* enemy)
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetIsRoar(true);
+		}
+
+
+		void EnemyController::UpdateRoar(EnemyController* enemy)
+		{
+
+		}
+
+
+		void EnemyController::ExitRoar(EnemyController* enemy)
+		{
+			enemy->m_target->GetEnemyStateMachine()->SetIsRoar(false);
+		}
+
+
+		int EnemyController::CheckRoar(EnemyController* enemy)
+		{
+			if (!enemy->m_target->GetEnemyStateMachine()->IsPlayingAnimation())
+			{
+				return enEnemyState_Chase;
 			}
 			return enEnemyState_Invalid;
 		}

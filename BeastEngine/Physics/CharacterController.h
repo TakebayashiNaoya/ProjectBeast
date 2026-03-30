@@ -54,6 +54,12 @@ namespace nsBeastEngine
 			inline float GetVerticalVelocity() const { return m_verticalVelocity; }
 
 			/**
+			 * @brief 垂直方向の速度を設定
+			 * @param velocity 垂直方向の速度
+			 */
+			inline void SetVerticalVelocity(const float velocity) { m_verticalVelocity = velocity; }
+
+			/**
 			 * @brief ジャンプ中フラグを取得
 			 * @return ジャンプ中フラグ
 			 */

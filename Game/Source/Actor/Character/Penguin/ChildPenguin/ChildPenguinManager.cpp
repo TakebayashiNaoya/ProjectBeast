@@ -40,23 +40,21 @@ namespace app
 
 		void ChildPenguinManager::Update()
 		{
-			/** 子ペンギンが親と同じ移動方法で移動するため、親のステートを確認する */
-			if (m_daddyPenguin)
-			{
-				auto* daddyState = m_daddyPenguin->GetStateMachine();
+			///** 子ペンギンが親と同じ移動方法で移動するため、親のステートを確認する */
+			//if (m_daddyPenguin)
+			//{
+			//	auto* daddyState = m_daddyPenguin->GetStateMachine();
 
-				/** 走っているかどうか */
-				m_isDaddyRunning = daddyState->IsEqualCurrentState(PenguinRunState::ID());
-				/** スライドしているかどうか */
-				m_isDaddySliding = daddyState->IsEqualCurrentState(PenguinSlidingState::ID()) ||
-					daddyState->IsEqualCurrentState(PenguinSlideStartState::ID());
-				/** 飛び込んでいるかどうか */
-				m_isDaddyDiving = daddyState->IsEqualCurrentState(PenguinDivingState::ID());
-			}
-			else
-			{
-				m_isDaddyRunning = m_isDaddySliding = m_isDaddyDiving = false;
-			}
+			//	/** 走っているかどうか */
+			//	m_isDaddyRunning = daddyState->IsEqualCurrentState(PenguinRunState::ID());
+			//	/** スライドしているかどうか */
+			//	m_isDaddySliding = daddyState->IsEqualCurrentState(PenguinSlidingState::ID()) ||
+			//		daddyState->IsEqualCurrentState(PenguinSlideStartState::ID());
+			//}
+			//else
+			//{
+			//	m_isDaddyRunning = m_isDaddySliding = false;
+			//}
 
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {
@@ -86,6 +84,15 @@ namespace app
 		}
 
 
+		void ChildPenguinManager::UpdateModelOnly()
+		{
+			for (auto& cp : m_childPenguinList) {
+				if (!cp) continue;
+				cp->UpdateModelOnly();
+			}
+		}
+
+
 		Vector3 ChildPenguinManager::GetDaddyPosition() const
 		{
 			if (m_daddyPenguin != nullptr)
@@ -111,6 +118,7 @@ namespace app
 			auto it = std::find(m_followers.begin(), m_followers.end(), penguin);
 			if (it == m_followers.end()) {
 				m_followers.push_back(penguin);
+				ScoreManager::GetInstance().AddCollectedCount();
 			}
 			/** メンバーが増えたので次フレームで再ソート・再割り当てが走る */
 		}
@@ -122,6 +130,7 @@ namespace app
 			auto it = std::find(m_followers.begin(), m_followers.end(), penguin);
 			if (it != m_followers.end()) {
 				m_followers.erase(it);
+				ScoreManager::GetInstance().SubCollectedCount();
 			}
 			/** メンバーが減ったので外側の子が内側に詰める処理が次フレームで自然に行われる */
 		}

@@ -25,20 +25,12 @@ namespace app
 			// ここに親ペンギン固有のセッター関数を追加していく
 		public:
 			/**
-			 * @brief 追従命令を出すかどうかを設定
-			 * @param isFollowCommand 追従命令を出すかどうか
+			 * @brief 命令（トグル）を出すかどうかを設定
+			 * @param isCommandToggle 命令を出すかどうか
 			 */
-			inline void SetIsFollowCommand(const bool isFollowCommand)
+			inline void SetIsCommandToggle(const bool isCommandToggle)
 			{
-				m_isFollowCommand = isFollowCommand;
-			}
-			/**
-			 * @brief 待機命令を出すかどうかを設定
-			 * @param isWaitCommand 待機命令を出すかどうか
-			 */
-			inline void SetIsWaitCommand(const bool isWaitCommand)
-			{
-				m_isWaitCommand = isWaitCommand;
+				m_isCommandToggle = isCommandToggle;
 			}
 			/**
 			 * @brief 勝ったかどうかを設定
@@ -61,24 +53,16 @@ namespace app
 			// ここに親ペンギン固有のゲッター関数を追加していく
 		public:
 			/**
-			 * @brief 追従命令を出すかどうかを取得
-			 * @return 追従命令を出すかどうか
+			 * @brief 命令（トグル）を出すかどうかを取得
+			 * @return 命令を出すかどうか
 			 */
-			inline bool GetIsFollowCommand() const
+			inline bool GetIsCommandToggle() const
 			{
-				return m_isFollowCommand;
+				return m_isCommandToggle;
 			}
 			/**
-			 * @brief 待機命令を出すかどうかを取得
-			 * @return 待機命令を出すかどうか
-			 */
-			inline bool GetIsWaitCommand() const
-			{
-				return m_isWaitCommand;
-			}
-			/**
-			 * @brief 追従命令か待機命令が出ているか
-			 * @return 追従命令か待機命令が出ているか
+			 * @brief 命令が出ているか
+			 * @return 命令が出ているか
 			 */
 			inline bool IsCommandState() const
 			{
@@ -97,7 +81,7 @@ namespace app
 
 
 			/** ステートの変更先を取得する */
-			core::IState* GetChangeState();
+			virtual core::IState* GetChangeState() override;
 
 
 		public:
@@ -107,34 +91,31 @@ namespace app
 
 		private:
 			/**
-			 * @brief 追従命令か待機命令が出ているか
-			 * @return 追従命令か待機命令が出ているか
+			 * @brief 命令が出ているか
+			 * @return 命令が出ているか
 			 */
 			bool CanChangeCommandState() const
 			{
-				return m_isFollowCommand || m_isWaitCommand;
+				return m_isCommandToggle;
 			}
+
+			core::IState* CheckSystemState();
+			core::IState* CheckCommandState();
+			core::IState* CheckActionState();
 
 
 		public:
 			/**
-			 * @brief プレイヤーコントローラーの入力処理
-			 * @note 後にプレイヤーコントローラーに処理を移す
-			 */
-			void PlayerControllerInput();
-			/**
 			 * @brief ダメージ処理
 			 */
-			void Damage() override;
+			virtual void Damage() override;
 
 
 		private:
 			/** 親ペンギンのポインタ */
 			DaddyPenguin* m_ownerDaddyPenguin;
-			/** 追従命令を出すかどうか */
-			bool m_isFollowCommand;
-			/** 待機命令を出すかどうか */
-			bool m_isWaitCommand;
+			/** 命令を出すかどうか(トグル) */
+			bool m_isCommandToggle;
 			/** 勝ったかどうか */
 			bool m_isWin;
 			/** 負けたかどうか */
@@ -142,4 +123,3 @@ namespace app
 		};
 	}
 }
-

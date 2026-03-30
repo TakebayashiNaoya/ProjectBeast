@@ -1,0 +1,17 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"FinishIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Event/Finish.DDS",
+                "width":700,
+                "height":300,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            }
+        ]
+    }
+}

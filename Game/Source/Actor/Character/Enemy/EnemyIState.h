@@ -292,6 +292,30 @@ namespace app
 			EnemyCoolDownState(EnemyStateMachine* owner);
 			~EnemyCoolDownState() override = default;
 		};
+
+
+
+
+		/************************************/
+
+
+		/**
+		 * @brief エネミーの咆哮ステートクラス
+		 */
+		class EnemyRoarState :public EnemyIState
+		{
+			appState(EnemyRoarState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			EnemyRoarState(EnemyStateMachine* owner);
+			~EnemyRoarState() override = default;
+		};
 	}
 }
 
