@@ -13,7 +13,8 @@ namespace app
 
 	TimeManager::TimeManager()
 		:m_maxTime(0.0f)
-		, m_currentTime(300.0f)
+		, m_currentTime(100.0f)
+		, m_timeStop(false)
 	{
 
 	}

@@ -5,6 +5,8 @@
  */
 #pragma once
 #include "IScene.h"
+#include "Source/Achivement/AchievementManager.h"
+#include "Source/UI/Layout.h"
 
 
 namespace app
@@ -26,6 +28,21 @@ namespace app
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
 
+	public:
+		// InGameScene から遷移前に呼ぶ
+		static void SetResult(float clearTime, int collectedPenguin)
+		{
+			s_clearTime = clearTime;
+			s_collectedPenguin = collectedPenguin;
+		}
+
+
+	private:
+		// ★追加：スコア計算とアチーブメントUI構築
+		void CalcTotalScore();
+		void SetupAchievementUI();
+
+
 	private:
 		bool m_nextScene = false;
 
@@ -33,8 +50,25 @@ namespace app
 	private:
 		float m_clearTime;
 		int m_collectedPenguin;
+		float m_totalScore;
+
+		std::vector<app::achievement::AchievementBase*> m_allAchievementList;
+
+
+	private:
+		static float s_clearTime;
+		static int   s_collectedPenguin;
+
 
 	private:
 		SpriteRender m_resultRender;
+		SpriteRender m_rescueRender;
+		SpriteRender m_clearTimeRender;
+		SpriteRender m_frame;
+		SpriteRender m_titleBackRender;
+
+
+	private:
+		app::ui::Layout m_layout;
 	};
 }

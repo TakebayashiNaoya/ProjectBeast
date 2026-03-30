@@ -29,6 +29,7 @@ namespace app
 		/** 下にBGMの設定 */
 		enSoundKind_Game = enSoundKind_BGM,
 		enSoundKind_Title,
+		enSoundKind_Result,
 
 		/** BGMの設定はここまで */
 
@@ -66,6 +67,7 @@ namespace app
 		//BGM
 		SoundInformation("Assets/sound/BGM/AS_1419280_氷の世界＿雪＿かわいいフィールドBGM.wav"),
 		SoundInformation("Assets/sound/BGM/AS_1157435_輝く銀世界彩るR_Bポップ＿+.wav"),
+		SoundInformation("Assets/sound/BGM/AS_1408083_かわいい軽やかクリスマスBGM。CM広告.wav"),
 
 		//Voice
 		SoundInformation("Assets/sound/Voice/bootA.wav")
