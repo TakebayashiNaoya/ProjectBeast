@@ -322,6 +322,9 @@
     <ClCompile Include="Source\UI\FinishMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\RemainingChildMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -599,6 +602,9 @@
       <Filter>Source\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\FinishMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\RemainingChildMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>

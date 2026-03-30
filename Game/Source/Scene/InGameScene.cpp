@@ -29,6 +29,7 @@
 #include "Source/UI/CountDownMenu.h"
 #include "Source/UI/InGameTimerMenu.h"
 #include "Source/UI/FinishMenu.h"
+#include "Source/UI/RemainingChildMenu.h"
 
 #include <random>
 
@@ -45,6 +46,7 @@ namespace app
 		delete m_countDownLayout;
 		delete m_timerLayout;
 		delete m_finishLayout;
+		delete m_remainingChildLayout;
 
 		// アクター
 		actor::StageSystem::DestroyInstance();
@@ -98,6 +100,11 @@ namespace app
 			"Assets/parameter/UI/FinishMenu.json"
 		);
 		m_finishMenu = m_finishLayout->GetMenu<ui::FinishMenu>();
+
+		m_remainingChildLayout = new ui::Layout();
+		m_remainingChildLayout->Initialize<ui::RemainingChildMenu>(
+			"Assets/parameter/UI/remainingChild/remainingChild.json"
+		);
 
 		// ロードフェーズ開始
 		m_loadPhase = LoadPhase::Stage;
@@ -271,6 +278,17 @@ namespace app
 			// タイマー UI 更新
 			if (m_timerLayout) m_timerLayout->Update();
 
+			// 残り子ペンギン数 UI 更新
+			if (m_remainingChildLayout) {
+				auto* menu = m_remainingChildLayout->GetMenu<ui::RemainingChildMenu>();
+				if (menu) {
+					const int childNum = actor::ChildPenguinManager::GetInstance()->GetFollowersNum();
+					menu->SetChildNum(childNum);
+				}
+
+				m_remainingChildLayout->Update();
+			}
+
 			// ノイズリストをクリア
 			NoiseManager::GetInstance().ClearNoises();
 
@@ -328,6 +346,7 @@ namespace app
 				break;
 			case GamePhase::Playing:
 				if (m_timerLayout) m_timerLayout->Render(rc);
+				if (m_remainingChildLayout) m_remainingChildLayout->Render(rc);
 				break;
 			case GamePhase::Finishing:
 				if (m_timerLayout)  m_timerLayout->Render(rc);
