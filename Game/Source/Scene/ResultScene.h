@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "IScene.h"
+#include "Source/UI/Layout.h"
 
 
 namespace app
@@ -26,6 +27,15 @@ namespace app
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
 
+	public:
+		// InGameScene から遷移前に呼ぶ
+		static void SetResult(float clearTime, int collectedPenguin)
+		{
+			s_clearTime = clearTime;
+			s_collectedPenguin = collectedPenguin;
+		}
+
+
 	private:
 		bool m_nextScene = false;
 
@@ -34,7 +44,17 @@ namespace app
 		float m_clearTime;
 		int m_collectedPenguin;
 
+
+	private:
+		static float s_clearTime;
+		static int   s_collectedPenguin;
+
+
 	private:
 		SpriteRender m_resultRender;
+
+
+	private:
+		app::ui::Layout m_layout;
 	};
 }

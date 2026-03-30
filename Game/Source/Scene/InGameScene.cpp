@@ -8,18 +8,21 @@
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
 
-#include "Source/Actor/Stage/StageSystem.h"
-#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
-#include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyControllerManager.h"
-#include "Source/Util/JsonConverter.h"
-#include "Source/Camera/CameraManager.h"
-#include "Source/Camera/CameraController.h"
+#include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
+#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Camera/CameraController.h"
+#include "Source/Camera/CameraManager.h"
 #include "Source/Noise/NoiseManager.h"
+#include "Source/Util/JsonConverter.h"
+
+#include "Source/Manager/ScoreManager.h"
+#include "Source/Manager/TimeManager.h"
 
 #include <random>
 
@@ -32,21 +35,26 @@ namespace app
 
 	InGameScene::~InGameScene()
 	{
-		actor::StageSystem::DestroyInstance();
-		delete m_daddyPenguin;
 		delete m_enemyController;
+		delete m_enemy;
+		delete m_daddyPenguin;
+
 		actor::EnemyControllerManager::DestroyInstance();
-		//for (auto*& p : m_childPenguins) {
-		//	delete p;
-		//	p = nullptr;
-		//}
 		actor::ChildPenguinManager::DestroyInstance();
+		actor::StageSystem::DestroyInstance();
+
+		app::TimeManager::DestroyInstance();
+		app::ScoreManager::DestroyInstance();
+
 		DeleteGO(m_ocean);
 	}
 
 
 	bool InGameScene::Start()
 	{
+		ScoreManager::CreateInstance();
+		TimeManager::CreateInstance();
+
 		app::core::ParameterManager::CreateInstance();
 		actor::StageSystem::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
@@ -184,7 +192,16 @@ namespace app
 			// ノイズのリストをクリア
 			NoiseManager::GetInstance().ClearNoises();
 
-			//if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
+			//if (g_pad[0]->IsTrigger(enButtonA))
+			//{
+			//	nsBeastEngine::nsCollision::PhysicsWorld::Get().DisableDrawDebugWireFrame();
+			// 
+			//	ResultScene::SetResult(
+			//		TimeManager::GetInstance().GetCurTime(),
+			//		ScoreManager::GetInstance().GetCollectedCount()
+			//	);
+			//	m_nextScene = true;
+			//}
 			break;
 		}
 
