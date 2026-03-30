@@ -16,6 +16,8 @@ namespace app
 		class PenguinStateMachine;
 		class PenguinStatus;
 
+		using SEHandle = uint32_t;
+
 
 		/**
 		 * @brief ペンギン共通のステートインターフェース
@@ -36,6 +38,7 @@ namespace app
 		protected:
 			/** ステートのオーナー */
 			PenguinStateMachine* m_owner;
+			SEHandle m_seHandle;
 		};
 
 

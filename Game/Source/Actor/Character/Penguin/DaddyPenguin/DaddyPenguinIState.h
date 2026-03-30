@@ -15,6 +15,8 @@ namespace app
 		class DaddyPenguinStateMachine;
 		class DaddyPenguinStatus;
 
+		using SEHandle = uint32_t;
+
 
 		/**
 		 * @brief 親ペンギンのステートインターフェース
@@ -36,6 +38,7 @@ namespace app
 		protected:
 			/** ステートのオーナー */
 			DaddyPenguinStateMachine* m_owner;
+			SEHandle m_seHandle;
 		};
 
 
