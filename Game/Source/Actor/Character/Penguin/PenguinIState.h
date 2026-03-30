@@ -82,6 +82,10 @@ namespace app
 		public:
 			PenguinSneakState(PenguinStateMachine* owner);
 			~PenguinSneakState() override = default;
+
+
+		private:
+			uint32_t soundHandle = -1;
 		};
 
 
@@ -106,6 +110,10 @@ namespace app
 		public:
 			PenguinRunState(PenguinStateMachine* owner);
 			~PenguinRunState() override = default;
+
+
+		private:
+			uint32_t soundHandle = -1;
 		};
 
 
@@ -178,6 +186,10 @@ namespace app
 		public:
 			PenguinSlidingState(PenguinStateMachine* owner);
 			~PenguinSlidingState() override = default;
+
+
+		private:
+			uint32_t soundHandle = -1;
 		};
 
 
