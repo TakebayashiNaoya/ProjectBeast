@@ -89,7 +89,7 @@ namespace app
 
 		m_timerLayout = new ui::Layout();
 		m_timerLayout->Initialize<ui::InGameTimerMenu>(
-			"Assets/parameter/inGameTimer/InGameTimer.json"
+			"Assets/parameter/timer/InGameTimer.json"
 		);
 		m_timerMenu = m_timerLayout->GetMenu<ui::InGameTimerMenu>();
 
@@ -239,7 +239,7 @@ namespace app
 		case GamePhase::CountDown:
 		{
 			// BattleManager にゲーム非アクティブを伝える
-			BattleManager::GetInstance().SetGameActive(false);
+			BattleManager::GetInstance().SetIsActive(false);
 
 			// AI・入力は動かさないが、描画用の行列更新だけ行う
 			if (m_daddyPenguin) m_daddyPenguin->UpdateModelOnly();
@@ -253,13 +253,7 @@ namespace app
 			if (m_countDownMenu && m_countDownMenu->IsCountDownFinished())
 			{
 				m_gamePhase = GamePhase::Playing;
-				BattleManager::GetInstance().SetGameActive(true);
-
-				// タイマー開始
-				if (m_timerMenu)
-				{
-					m_timerMenu->StartTimer();
-				}
+				BattleManager::GetInstance().SetIsActive(true);
 			}
 			break;
 		}
@@ -281,18 +275,16 @@ namespace app
 			NoiseManager::GetInstance().ClearNoises();
 
 			// 終了判定
-			if (CheckGameEnd())
+			if (BattleManager::GetInstance().GetBattleState() != BattleManager::EnBattleState::Playing)
 			{
-				// ゲームアクティブを落とす
-				BattleManager::GetInstance().SetGameActive(false);
-				// タイマー停止
-				if (m_timerMenu) m_timerMenu->StopTimer();
 				// FINISH 演出開始
 				if (m_finishMenu) m_finishMenu->StartFinish();
 
 				m_gamePhase = GamePhase::Finishing;
 			}
 			break;
+
+			BattleManager::GetInstance().Update();
 		}
 
 		//------------------------------------------------------------
@@ -311,44 +303,6 @@ namespace app
 			break;
 		}
 		}
-	}
-
-
-	bool InGameScene::CheckGameEnd()
-	{
-		auto& score = ScoreManager::GetInstance();
-		const int collected = score.GetCollectedCount();
-		const int total = score.GetTotalCount();
-
-		//--- クリア条件 ---
-		// ① 50匹以上収集
-		if (collected >= CLEAR_COUNT)
-		{
-			BattleManager::GetInstance().SetClear(true);
-			return true;
-		}
-		// ② ステージ上の全ペンギンを収集
-		if (total > 0 && collected == total)
-		{
-			BattleManager::GetInstance().SetClear(true);
-			return true;
-		}
-
-		//--- ゲームオーバー条件 ---
-		// ③ 時間切れ かつ 50匹未満
-		if (m_timerMenu && m_timerMenu->IsTimeUp() && collected < CLEAR_COUNT)
-		{
-			BattleManager::GetInstance().SetClear(false);
-			return true;
-		}
-		// ④ ステージ上の総数が50匹未満（シロクマに食べられた）
-		if (total < CLEAR_COUNT)
-		{
-			BattleManager::GetInstance().SetClear(false);
-			return true;
-		}
-
-		return false;
 	}
 
 
