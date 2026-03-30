@@ -33,7 +33,7 @@ namespace app
 		/**
 		 * @brief タイムアップしているかどうか
 		 */
-		bool IsTimeUp() const { return m_currentTime <= m_maxTime; }
+		inline bool IsTimeUp() const { return m_isTimeUp; }
 
 
 	public:
