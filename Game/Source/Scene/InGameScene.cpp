@@ -11,11 +11,15 @@
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyController.h"
+#include "Source/Actor/Character/Enemy/EnemyControllerManager.h"
 #include "Source/Util/JsonConverter.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/CameraController.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
+#include "Source/Noise/NoiseManager.h"
 
 #include <random>
 
@@ -30,6 +34,8 @@ namespace app
 	{
 		actor::StageSystem::DestroyInstance();
 		delete m_daddyPenguin;
+		delete m_enemyController;
+		actor::EnemyControllerManager::DestroyInstance();
 		//for (auto*& p : m_childPenguins) {
 		//	delete p;
 		//	p = nullptr;
@@ -44,6 +50,7 @@ namespace app
 		app::core::ParameterManager::CreateInstance();
 		actor::StageSystem::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
+		actor::EnemyControllerManager::CreateInstance();
 		m_phase = LoadPhase::Stage;
 		m_childIndex = 0;
 		return true;
@@ -111,9 +118,29 @@ namespace app
 			else {
 				auto* manager = app::actor::ChildPenguinManager::GetInstance();
 				manager->SetDaddyPenguin(m_daddyPenguin);
-				m_phase = LoadPhase::Camera;
+				m_phase = LoadPhase::Enemy;
 			}
 			break;
+
+		case LoadPhase::Enemy:
+		{
+			m_enemy = new actor::Enemy();
+			m_enemy->SetPosition(Vector3(100.0f, 30.0f, 100.0f));
+			m_enemy->StartWrapper();
+
+			// EnemyControllerを生成してターゲットを設定
+			m_enemyController = new actor::EnemyController();
+			m_enemyController->SetTarget(m_enemy);
+
+			// 徘徊先の座標を登録（巣の周囲など）
+			m_enemyController->AddTargetPos(Vector3(100.0f, 0.0f, 100.0f));
+			m_enemyController->AddTargetPos(Vector3(-100.0f, 0.0f, 100.0f));
+			m_enemyController->AddTargetPos(Vector3(-100.0f, 0.0f, -100.0f));
+			m_enemyController->AddTargetPos(Vector3(100.0f, 0.0f, -100.0f));
+
+			m_phase = LoadPhase::Camera;
+			break;
+		}
 
 		case LoadPhase::Camera:
 		{
@@ -140,10 +167,11 @@ namespace app
 			// 通常更新
 			actor::StageSystem::GetInstance()->Update();
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-			//for (auto* p : m_childPenguins) if (p) p->UpdateWrapper();
-
 
 			actor::ChildPenguinManager::GetInstance()->Update();
+
+			if (m_enemy)m_enemy->UpdateWrapper();
+			actor::EnemyControllerManager::GetInstance()->Update();
 
 			// CameraSteeringの結果をGameCameraに反映
 			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
@@ -152,6 +180,9 @@ namespace app
 				m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
 				gameCamera->SetState(data);
 			}
+
+			// ノイズのリストをクリア
+			NoiseManager::GetInstance().ClearNoises();
 
 			//if (g_pad[0]->IsTrigger(enButtonA)) m_nextScene = true;
 			break;
@@ -174,6 +205,8 @@ namespace app
 		//	if (p) p->RenderWrapper(rc);
 		//}
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
+
+		if (m_enemy)m_enemy->RenderWrapper(rc);
 	}
 
 

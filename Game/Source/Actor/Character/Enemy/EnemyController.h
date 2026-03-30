@@ -5,7 +5,6 @@
  */
 #pragma once
 
-
 namespace app
 {
 	namespace actor
@@ -28,18 +27,15 @@ namespace app
 			void Update();
 			void Render(RenderContext& renderContext);
 
-
 		public:
 			/** 操作対象の設定 */
 			void SetTarget(Enemy* target);
-
 
 		public:
 			void AddTargetPos(const Vector3& pos);
 
 		public:
 			static void Initialize();
-
 
 		public:
 			void SetStun(const bool isStun) { m_isStun = isStun; }
@@ -88,14 +84,11 @@ namespace app
 				enEnemyState_Invalid = -1
 			};
 
-
 		private:
 			void ChangeState(EnEnemyStateID nextState);
 
-
 		private:
 			static std::map<EnEnemyStateID, AIState> m_stateMap;
-
 
 		private:
 			bool IsFarFromHome()const;
@@ -121,7 +114,6 @@ namespace app
 				m_stateMap.emplace(id, state);
 			}
 
-
 			/** AIStateを探す */
 			AIState* FindAIState(const EnEnemyStateID id)
 			{
@@ -132,8 +124,6 @@ namespace app
 				return nullptr;
 			}
 
-
-
 			/**
 			 * 何もしない関数
 			 */
@@ -141,97 +131,66 @@ namespace app
 			/** 遷移なし */
 			static int CheckNothing(EnemyController*) { return -1; }
 
-
 		private:
-			/**
-			 * 待機
-			 */
+			/** 待機 */
 			static void EnterIdle(EnemyController* enemy);
 			static void UpdateIdle(EnemyController* enemy);
 			static void ExitIdle(EnemyController* enemy);
 			static int CheckIdle(EnemyController* enemy);
 
-
-			/**
-			* サーチ
-			*/
+			/** スタン */
 			static void EnterStun(EnemyController* enemy);
 			static void UpdateStun(EnemyController* enemy);
 			static void ExitStun(EnemyController* enemy);
 			static int CheckStun(EnemyController* enemy);
 
-
-			/**
-			 * サーチ
-			 */
+			/** サーチ */
 			static void EnterSearch(EnemyController* enemy);
 			static void UpdateSearch(EnemyController* enemy);
 			static void ExitSearch(EnemyController* enemy);
 			static int CheckSearch(EnemyController* enemy);
 
-
-			/**
-			 * 徘徊
-			 */
+			/** 徘徊 */
 			static void EnterWandering(EnemyController* enemy);
 			static void UpdateWandering(EnemyController* enemy);
 			static void ExitWandering(EnemyController* enemy);
 			static int CheckWandering(EnemyController* enemy);
 
-
-			/**
-			 * チェイス
-			 */
+			/** チェイス */
 			static void EnterChase(EnemyController* enemy);
 			static void UpdateChase(EnemyController* enemy);
 			static void ExitChase(EnemyController* enemy);
 			static int CheckChase(EnemyController* enemy);
 
-
-			/**
-			 * ジャンプ
-			 */
+			/** ジャンプ */
 			static void EnterJump(EnemyController* enemy);
 			static void UpdateJump(EnemyController* enemy);
 			static void ExitJump(EnemyController* enemy);
 			static int CheckJump(EnemyController* enemy);
 
-
-			/**
-			 * 泳ぐ
-			 */
+			/** 泳ぐ */
 			static void EnterSwim(EnemyController* enemy);
 			static void UpdateSwim(EnemyController* enemy);
 			static void ExitSwim(EnemyController* enemy);
 			static int CheckSwim(EnemyController* enemy);
 
-
-			/**
-			 * 攻撃
-			 */
+			/** 攻撃 */
 			static void EnterAttack(EnemyController* enemy);
 			static void UpdateAttack(EnemyController* enemy);
 			static void ExitAttack(EnemyController* enemy);
 			static int CheckAttack(EnemyController* enemy);
 
-
-			/**
-			 * 帰巣
-			 */
+			/** 帰巣 */
 			static void EnterReturnHome(EnemyController* enemy);
 			static void UpdateReturnHome(EnemyController* enemy);
 			static void ExitReturnHome(EnemyController* enemy);
 			static int CheckReturnHome(EnemyController* enemy);
 
-
-			/**
-			 * クールダウン
-			 */
+			/** クールダウン */
 			static void EnterCoolDown(EnemyController* enemy);
 			static void UpdateCoolDown(EnemyController* enemy);
 			static void ExitCoolDown(EnemyController* enemy);
 			static int CheckCoolDown(EnemyController* enemy);
-
 
 		private:
 			Enemy* m_target = nullptr;
@@ -252,14 +211,16 @@ namespace app
 			/** ペンギンを最後に見た位置 */
 			Vector3 m_lastKnownPenguinPos;
 
-
 			std::vector<Vector3> m_wanderingPosList;
 			int m_wanderingPosListIndex = 0;
 
-			/** 見回し */
+			/** 見回し（※互換性のために残しています） */
 			float m_searchAngle = 0.0f;
 			float m_searchSpeed = 0.0f;
 			int m_searchDir = 1;
+
+			/** 索敵時の諦めタイマー */
+			float m_searchTimer = 0.0f;
 
 			int m_maxEatCount;
 			int m_eatCount;
@@ -269,18 +230,14 @@ namespace app
 			float m_attackDuration;
 			bool m_isAttacking;
 
-			//bool isFind = false;
 			/** 現在の状態 */
 			EnEnemyStateID m_currentState = enEnemyState_Idle;
 			/** 初期化処理をしたか */
 			bool m_isInitialized = false;
 
 			bool m_isStun;
-
 			bool m_isHomeInitialized;
-
 			bool m_isParamInitialized;
 		};
 	}
 }
-

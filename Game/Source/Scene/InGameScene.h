@@ -13,6 +13,8 @@ namespace app
 	namespace actor {
 		class DaddyPenguin;
 		class ChildPenguin;
+		class Enemy;
+		class EnemyController;
 	}
 
 	class InGameScene : public IScene
@@ -40,10 +42,12 @@ namespace app
 		static constexpr int CHILD_PENGUIN_NUM = 100;
 		actor::DaddyPenguin* m_daddyPenguin = nullptr;
 		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
+		actor::Enemy* m_enemy = nullptr;
+		actor::EnemyController* m_enemyController = nullptr;
 
 		camera::CameraSteering m_cameraSteering;
 
-		enum class LoadPhase { None, Stage, Daddy, Children, Camera, Ocean, Done };
+		enum class LoadPhase { None, Stage, Daddy, Children, Enemy, Camera, Ocean, Done };
 		LoadPhase m_phase = LoadPhase::None;
 		int m_childIndex = 0;
 

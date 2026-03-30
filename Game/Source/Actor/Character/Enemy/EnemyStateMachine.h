@@ -56,6 +56,12 @@ namespace app
 
 
 			/**
+			 * @brief 座標の取得
+			 */
+			const Vector3& GetPosition() const { return m_transform.m_position; }
+
+
+			/**
 			 * @brief Aボタンを押せるかの設定
 			 */
 			void SetActionButtonA(const bool isActionButtonA) { m_actionButtonA = isActionButtonA; }
@@ -172,6 +178,26 @@ namespace app
 			 */
 			bool IsAttack()const { return m_isAttackPlaying; }
 
+
+			/**
+			 * @brief 起床ゲージのゲッター
+			 */
+			float GetWakeUpGauge() const { return m_wakeUpGauge; }
+			/**
+			 * @brief 起床ゲージのセッター
+			 */
+			void SetWakeUpGauge(float gauge) { m_wakeUpGauge = gauge; }
+
+
+			/**
+			 * @brief 索敵目標座標のゲッター
+			 */
+			const Vector3& GetSearchTargetPos() const { return m_searchTargetPos; }
+			/**
+			 * @brief 索敵目標座標のセッター
+			 */
+			void SetSearchTargetPos(const Vector3& pos) { m_searchTargetPos = pos; }
+
 		private:
 			/** 待機状態に変更できるか */
 			bool CanChangeIdle() const;
@@ -245,7 +271,12 @@ namespace app
 
 			/** 攻撃中かどうか */
 			bool m_isAttackPlaying;
+
+			/** 起床ゲージ (0.0f ～ Max) */
+			float m_wakeUpGauge = 0.0f;
+
+			/** 索敵時の目標座標 */
+			Vector3 m_searchTargetPos = Vector3::Zero;
 		};
 	}
 }
-
