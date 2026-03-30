@@ -21,9 +21,23 @@ namespace app
 
 		void CharacterBase::UpdateModelOnly()
 		{
-			if (!m_modelReady) return;
+			// ロード完了待ち（Update()と同じ処理）
+			if (!m_modelReady)
+			{
+				if (!m_assetsLoader.IsReady()) return;
 
-			// ステートマシンの座標はそのまま使い、行列だけ更新する
+				nsK2EngineLow::ModelInitData initData;
+				m_assetsLoader.Finalize(initData, &m_skeleton, m_animationClips.get());
+				m_modelRender.Init(initData.m_tkmFilePath, m_animationClips.get(), m_clipNum, true, m_upAxis);
+				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
+				m_modelRender.Update();
+				m_modelReady = true;
+
+				m_characterStateMachine->ReEnterCurrentState();
+				return;
+			}
+
+			// ロード完了済み → 行列のみ更新（AIやステートマシンは動かさない）
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 			m_modelRender.Update();
 		}
