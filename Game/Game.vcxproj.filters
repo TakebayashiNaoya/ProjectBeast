@@ -304,7 +304,7 @@
     <ClCompile Include="Source\Camera\LoseCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
-<ClCompile Include="Source\UI\SearchMenu.cpp">
+    <ClCompile Include="Source\UI\SearchMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp">
@@ -319,6 +319,8 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\HPBarMenu.cpp">
+      <Filter>Source\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -580,7 +582,7 @@
     <ClInclude Include="Source\Camera\LoseCamera.h">
       <Filter>Source\Camera</Filter>
     </ClInclude>
-<ClInclude Include="Source\UI\SearchMenu.h">
+    <ClInclude Include="Source\UI\SearchMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h">
@@ -599,6 +601,9 @@
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
     <ClInclude Include="hlsl ModelVSCommon.h" />
+    <ClInclude Include="Source\UI\HPBarMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />

@@ -296,6 +296,7 @@
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\CountDownMenu.cpp" />
     <ClCompile Include="Source\UI\EventMenu.cpp" />
+    <ClCompile Include="Source\UI\HPBarMenu.cpp" />
     <ClCompile Include="Source\UI\InGameTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
@@ -390,6 +391,7 @@
     <ClInclude Include="Source\Types.h" />
     <ClInclude Include="Source\UI\CountDownMenu.h" />
     <ClInclude Include="Source\UI\EventMenu.h" />
+    <ClInclude Include="Source\UI\HPBarMenu.h" />
     <ClInclude Include="Source\UI\InGameTimerMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
