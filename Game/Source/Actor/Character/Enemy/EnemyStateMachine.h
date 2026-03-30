@@ -180,6 +180,16 @@ namespace app
 
 
 			/**
+			 * @brief 咆哮中かの設定
+			 */
+			void SetIsRoar(const bool roar) { m_isRoar = roar; }
+			/**
+			 * @brief 咆哮中かの取得
+			 */
+			bool IsRoar()const { return m_isRoar; }
+
+
+			/**
 			 * @brief 起床ゲージのゲッター
 			 */
 			float GetWakeUpGauge() const { return m_wakeUpGauge; }
@@ -215,6 +225,8 @@ namespace app
 			bool CanChangeReturnHome()const;
 			/** クールダウン状態に変更できるか */
 			bool CanChangeCoolDown()const;
+			/** 咆哮状態に変更できるか */
+			bool CanChangeRoar()const;
 
 
 		private:
@@ -271,6 +283,9 @@ namespace app
 
 			/** 攻撃中かどうか */
 			bool m_isAttackPlaying;
+
+			/** 咆哮できるかどうか */
+			bool m_isRoar;
 
 			/** 起床ゲージ (0.0f ～ Max) */
 			float m_wakeUpGauge = 0.0f;
