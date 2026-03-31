@@ -4,10 +4,10 @@
         "maxHp": 10,
         "hp": 10,
         "walkSpeed": 150.0,
-        "runSpeed": 200.0,
+        "runSpeed": 450.0,
         "radius": 100.0,
         "height": 100.0,
-        "swimSpeed": 20.0,
+        "swimSpeed": 26.0,
         "maxEat":3
     }
 ]
