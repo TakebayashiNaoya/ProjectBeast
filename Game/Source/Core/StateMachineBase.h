@@ -126,7 +126,7 @@ namespace app
 			/** ステートマップ */
 			std::unordered_map<uint32_t, std::unique_ptr<IState>> m_stateMap;
 			/** 現在のステート */
-			IState* m_currentState;
+			IState* m_currentState = nullptr;
 			/** 次のステート */
 			IState* m_nextState;
 		};

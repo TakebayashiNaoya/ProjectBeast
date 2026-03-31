@@ -37,7 +37,10 @@ namespace app
 			// ステートが変更されている場合
 			if (m_nextState && m_currentState != m_nextState)
 			{
-				m_currentState->Exit();
+				if (m_currentState)
+				{
+					m_currentState->Exit();
+				}
 				m_currentState = m_nextState;
 				m_currentState->Enter();
 				m_nextState = nullptr;
