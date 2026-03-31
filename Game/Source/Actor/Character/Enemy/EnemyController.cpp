@@ -23,6 +23,20 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** 徘徊の到達判定距離（シロクマのradiusに合わせて拡大） */
+			constexpr float ARRIVE_DIST_WANDERING = 120.0f;
+			/** 帰巣の到達判定距離（この距離に入ったら巣の上にワープして睡眠へ移行） */
+			constexpr float ARRIVE_DIST_RETURN_HOME = 120.0f;
+
+			/** スタック検出：この距離以下しか動いていなければ停滞とみなす */
+			constexpr float STUCK_MOVE_THRESHOLD = 5.0f;
+			/** スタック検出：この時間（秒）停滞し続けたら強制スキップ */
+			constexpr float STUCK_TIME_LIMIT = 3.0f;
+		}
+
+
 		// static変数の初期化
 		std::map<EnemyController::EnEnemyStateID, EnemyController::AIState> EnemyController::m_stateMap;
 
@@ -44,7 +58,9 @@ namespace app
 			, m_attackDuration(1.5f)
 			, m_attackTimer(0.0f)
 			, m_isAttacking(false)
-			, m_searchTimer(0.0f) // 初期化追加
+			, m_searchTimer(0.0f)
+			, m_lastCheckPosition(Vector3::Zero)
+			, m_stuckTimer(0.0f)
 		{
 			static bool ini = false;
 			if (!ini)
@@ -403,7 +419,9 @@ namespace app
 		/** 徘徊 */
 		void EnemyController::EnterWandering(EnemyController* enemy)
 		{
-
+			// スタック検出タイマーをリセット
+			enemy->m_stuckTimer = 0.0f;
+			enemy->m_lastCheckPosition = enemy->m_target->GetTransform().m_position;
 		}
 
 
@@ -417,6 +435,23 @@ namespace app
 
 			enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(direction);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(1.0f);
+
+			// スタック検出：前回チェック位置からほとんど動いていない場合はタイマーを進める
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+			Vector3 currentPos = enemy->m_target->GetTransform().m_position;
+			Vector3 moved = currentPos - enemy->m_lastCheckPosition;
+			moved.y = 0.0f;
+
+			if (moved.LengthSq() < STUCK_MOVE_THRESHOLD * STUCK_MOVE_THRESHOLD)
+			{
+				enemy->m_stuckTimer += deltaTime;
+			}
+			else
+			{
+				// 動いていればタイマーをリセット
+				enemy->m_stuckTimer = 0.0f;
+				enemy->m_lastCheckPosition = currentPos;
+			}
 		}
 
 
@@ -452,10 +487,18 @@ namespace app
 
 			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
 
-			if (distance.Length() <= 20.0f)
+			// 到達判定（閾値拡大）
+			if (distance.Length() <= ARRIVE_DIST_WANDERING)
 			{
 				return enEnemyState_Idle;
 			}
+
+			// スタック検出：一定時間動けていない場合は次のポイントへ強制スキップ
+			if (enemy->m_stuckTimer >= STUCK_TIME_LIMIT)
+			{
+				return enEnemyState_Idle;
+			}
+
 			return enEnemyState_Invalid;
 		}
 
@@ -699,6 +742,10 @@ namespace app
 		void EnemyController::EnterReturnHome(EnemyController* enemy)
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetReturnHome(true);
+
+			// スタック検出タイマーをリセット
+			enemy->m_stuckTimer = 0.0f;
+			enemy->m_lastCheckPosition = enemy->m_target->GetTransform().m_position;
 		}
 
 
@@ -717,6 +764,22 @@ namespace app
 			toHome.Normalize();
 			enemy->m_target->GetEnemyStateMachine()->SetMoveDirection(toHome);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(1.0f);
+
+			// スタック検出：前回チェック位置からほとんど動いていない場合はタイマーを進める
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+			Vector3 moved = pos - enemy->m_lastCheckPosition;
+			moved.y = 0.0f;
+
+			if (moved.LengthSq() < STUCK_MOVE_THRESHOLD * STUCK_MOVE_THRESHOLD)
+			{
+				enemy->m_stuckTimer += deltaTime;
+			}
+			else
+			{
+				// 動いていればタイマーをリセット
+				enemy->m_stuckTimer = 0.0f;
+				enemy->m_lastCheckPosition = pos;
+			}
 		}
 
 
@@ -732,10 +795,22 @@ namespace app
 			Vector3 pos = enemy->m_target->GetTransform().m_position;
 			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
-			// 到着したら終了
-			if (toHome.LengthSq() < 50.0f * 50.0f)
+			// 巣にある程度近づいたら巣の上にワープして睡眠へ遷移する
+			if (toHome.LengthSq() < ARRIVE_DIST_RETURN_HOME * ARRIVE_DIST_RETURN_HOME)
 			{
+				// 巣の座標に強制移動してその場で寝かせる
+				enemy->m_target->GetEnemyStateMachine()->SetPosition(enemy->m_target->GetHomePosition());
 				return enEnemyState_CoolDown;
+			}
+
+			// スタック検出：一定時間動けていない場合は方向をリセットしてリトライ
+			if (enemy->m_stuckTimer >= STUCK_TIME_LIMIT)
+			{
+				enemy->m_stuckTimer = 0.0f;
+				enemy->m_lastCheckPosition = pos;
+
+				// 移動入力をいったんリセットして再入力を促す
+				enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 			}
 
 			// まだ遠い → 継続
