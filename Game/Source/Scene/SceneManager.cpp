@@ -11,8 +11,8 @@
 #include "SceneManager.h"
 #include "TitleScene.h"
 
-#include "Source/Core/Fade.h"
 #include "Resource/ResourceManager.h"
+#include "Source/Core/Fade.h"
 
 
 namespace app
@@ -83,12 +83,14 @@ namespace app
 			if (m_currentScene) m_currentScene->Update();
 
 			// リソース完了かつシーンの段階ロード完了を待つ
-			if (nsBeastEngine::ResourceManager::GetInstance().IsIdle())
+			if (nsBeastEngine::ResourceManager::GetInstance().IsIdle() &&
+				m_currentScene->IsLoaded())
 			{
 				//core::Fade::Get().HideLoadingCircle();
 				core::Fade::Get().FadeIn(m_fadeDuration);
 				m_transitionState = TransitionState::FadingIn;
 			}
+			break;
 
 		case TransitionState::FadingIn:
 			// FadeIn 完了待ち
@@ -108,6 +110,10 @@ namespace app
 	void SceneManager::Render(RenderContext& rc)
 	{
 		if (m_currentScene) {
+			if (m_transitionState == TransitionState::LoadingScene)
+			{
+				return;
+			}
 			m_currentScene->Render(rc);
 		}
 	}
