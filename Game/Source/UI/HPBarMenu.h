@@ -72,6 +72,11 @@ namespace app
 			 */
 			EnHPType GetType()const { return m_currentHPType; }
 			/**
+			 * @brief 最大HPの設定
+			 * @param maxHp 外部から設定する最大HP
+			 */
+			void SetMaxHP(int maxHp) { m_maxHP = maxHp; }
+			/**
 			 * @brief HPの設定
 			 * @param targetHP 外部から設定する用
 			 */
@@ -81,7 +86,7 @@ namespace app
 			 * @param damage ダメージ量
 			 */
 			void Damage(float damage);
-			
+
 
 			/**
 			 * @brief バーが動いているかどうかの取得

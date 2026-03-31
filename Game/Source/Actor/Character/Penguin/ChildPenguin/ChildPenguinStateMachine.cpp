@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "ChildPenguin.h"
+#include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -66,8 +67,16 @@ namespace app
 		}
 
 
+		void ChildPenguinStateMachine::OnDead()
+		{
+			// ChildPenguinManagerからの削除とdeleteを行う。
+			ChildPenguinManager::GetInstance()->RemoveAndDestroy(m_ownerChildPenguin);
+		}
+
+
 		core::IState* ChildPenguinStateMachine::GetChangeState()
 		{
+         // 1. システム・環境系の判定（ダメージ、死亡、水泳など）
 			// 死亡中状態の維持
 			if (IsEqualCurrentState(PenguinDiyingState::ID()))
 			{
@@ -90,41 +99,43 @@ namespace app
 				return FindState(PenguinDamagedState::ID());
 			}
 
-			// 泳ぎ判定（チャタリング防止ロジック）
+			// 泳ぎ判定
 			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
-				if (!IsOnGround())
-				{
-					return FindState(PenguinSwimmingState::ID());
-				}
+				if (!IsOnGround()) return FindState(PenguinSwimmingState::ID());
 			}
 			else if (CanChangeSwimState())
 			{
 				return FindState(PenguinSwimmingState::ID());
 			}
 
-			// スライド開始状態
+			// 2. アクション系の判定（スライド、ジャンプ、移動など）
+			// スライド開始アニメ中→スライド
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
 			{
-				return FindState(PenguinSlidingState::ID());
+				if (CanChangeSlidingState()) return FindState(PenguinSlidingState::ID());
 			}
 
-			// スライド中状態
+			// スライド終了アニメ継続中
+			if (IsEqualCurrentState(PenguinSlideEndState::ID()))
+			{
+				if (!IsFinishedSlideEndState()) return FindState(PenguinSlideEndState::ID());
+			}
+
+			// スライド中の維持/終了
 			if (IsEqualCurrentState(PenguinSlidingState::ID()))
 			{
-				if (CanKeepSlidingState())
-				{
-					return FindState(PenguinSlidingState::ID());
-				}
+				if (CanKeepSlidingState()) return FindState(PenguinSlidingState::ID());
+				else return FindState(PenguinSlideEndState::ID());
 			}
 
 			// スライド開始判定
 			if (CanChangeSlideStartState())
 			{
-				return FindState(PenguinSlidingState::ID());
+				return FindState(PenguinSlideStartState::ID());
 			}
 
-			// ジャンプ開始、または滞空（落下中）状態の維持
+			// ジャンプ判定（または空中にいる場合）
 			if (CanChangeJumpState() || !IsOnGround())
 			{
 				return FindState(PenguinJumpState::ID());
@@ -136,20 +147,19 @@ namespace app
 				return FindState(PenguinRunState::ID());
 			}
 
-			// 歩行判定
+			// 通常移動判定
 			if (CanChangeMoveState())
 			{
 				return FindState(PenguinSneakState::ID());
 			}
 
-			// タイプ固有のステート遷移
-			core::IState* typeSpecificState = GetTypeSpecificChangeState();
-			if (typeSpecificState != nullptr)
+			// その他（固有ステートなど）
+			if (auto* typeState = GetTypeSpecificChangeState())
 			{
-				return typeSpecificState;
+				return typeState;
 			}
 
-			// デフォルトは待機
+			// どれにも当てはまらなければ待機
 			return FindState(PenguinIdleState::ID());
 		}
 	}

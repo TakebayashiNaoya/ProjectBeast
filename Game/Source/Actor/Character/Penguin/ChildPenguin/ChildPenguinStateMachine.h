@@ -45,6 +45,12 @@ namespace app
 			 * @brief ダメージ処理
 			 */
 			void Damage() override;
+			/**
+			 * @brief 死亡時の処理
+			 * @note PenguinDeadState::Enter()から呼ばれる
+			 * @note ChildPenguinManagerからの削除とdeleteを行う
+			 */
+			void OnDead() override;
 
 
 		public:

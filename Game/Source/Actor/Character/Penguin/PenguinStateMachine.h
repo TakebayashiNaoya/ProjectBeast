@@ -93,6 +93,11 @@ namespace app
 			 * @brief ダメージ処理
 			 */
 			virtual void Damage();
+			/**
+			 * @brief 死亡時の処理
+			 * @note PenguinDeadState::Enter()から呼ばれる。派生クラスでオーバーライドして使用する
+			 */
+			virtual void OnDead() {}
 
 			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide)
 			{
@@ -129,24 +134,23 @@ namespace app
 			 */
 			bool CanChangeSlidingState() const
 			{
-				return m_isSlide && !IsPlayingAnimation();
-			}
-			/**
-			 * @brief スライドステートを維持できるかどうか
-			 * @return スライドステートを維持できるかどうか
-			 */
-			bool CanKeepSlidingState() const
-			{
-				// ★ここを修正：ボタンが押されていれば空中に浮いても維持する
 				return m_isSlide;
 			}
 			/**
-			 * @brief スライド終了ステートに切り替えられるかどうか
-			 * @return スライド終了ステートに切り替えられるかどうか
+			 * @brief スライドをキープできるかどうか
+			 * @return スライドをキープできるかどうか
+			 */
+			bool CanKeepSlidingState() const
+			{
+				return m_isSlide;
+			}
+			/**
+			 * @brief スライド終了ステートが終わったかどうか
+			 * @return スライド終了ステートが終わったかどうか
 			 */
 			bool IsFinishedSlideEndState() const
 			{
-				return !m_isSlide && !IsPlayingAnimation();
+				return !IsPlayingAnimation();
 			}
 			/**
 			 * @brief 被弾ステートに切り替えられるかどうか
@@ -157,18 +161,18 @@ namespace app
 				return m_isDamaged;
 			}
 			/**
-			 * @brief 泳ぐステートに切り替えられるかどうか
-			 * @return 泳ぐステートに切り替えられるかどうか
+			 * @brief 泳ぎステートに切り替えられるかどうか
+			 * @return 泳ぎステートに切り替えられるかどうか
 			 */
 			bool CanChangeSwimState() const
 			{
-				return !IsOnGround() && m_transform.m_position.y < 0.0f;
+				return IsInWater();
 			}
 
 
 		public:
 			PenguinStateMachine(PenguinBase* ownerPenguinBase);
-			~PenguinStateMachine() = default;
+			virtual ~PenguinStateMachine() override = default;
 
 
 		protected:
@@ -176,7 +180,7 @@ namespace app
 			PenguinBase* m_ownerPenguinBase;
 			/** ジャンプパワー */
 			float m_jumpPower;
-			/**ジャンプするかどうか */
+			/** ジャンプするかどうか */
 			bool m_isJump;
 			/** スニークするかどうか */
 			bool m_isSneak;

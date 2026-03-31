@@ -153,7 +153,6 @@ namespace app
 			auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
 			if (menu) {
 				menu->SetDraw(false);
-				menu->SetCurrentPBTime(0.0f);
 			}
 		}
 
@@ -236,7 +235,6 @@ namespace app
 			// マネージャーにJSONを渡して一括生成させる
 			actor::EnemyManager::GetInstance()->LoadEnemies(json);
 
-			// ↓ ここから追加
 			for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())
 			{
 				auto* layout = new ui::Layout();

@@ -52,6 +52,10 @@ namespace app
 		{}
 
 
+		CharacterBase::~CharacterBase()
+		{}
+
+
 		void CharacterBase::Start()
 		{
 			// ステータスを取得

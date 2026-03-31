@@ -36,7 +36,7 @@ namespace app
 
 
 			//============================================//
-			// 子ペンギンの生成と管理
+			// 子ペンギンの生成・削除と管理
 			//============================================//
 
 		public:
@@ -64,11 +64,19 @@ namespace app
 				return m_childPenguinList.size();
 			}
 
+			/**
+			 * @brief 子ペンギンを隊列・リストから取り除いてdeleteする
+			 * @param penguin 削除する子ペンギンのポインタ
+			 * @note PenguinDeadState::Enter()経由でChildPenguinStateMachine::OnDead()から呼ばれる
+			 */
+			void RemoveAndDestroy(ChildPenguin* penguin);
 
 
 		private:
 			/** 子ペンギンのリスト */
 			std::vector<actor::ChildPenguin*>m_childPenguinList;
+			/** 削除待ちのペンギンを入れるリスト */
+			std::vector<ChildPenguin*> m_destroyList;
 
 
 
