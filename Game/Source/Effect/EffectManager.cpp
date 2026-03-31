@@ -29,22 +29,7 @@ namespace app
 
 
 	void EffectManager::Update()
-	{
-		/** エフェクトリストから再生していないものがあれば削除する */
-		std::vector<EffectHandle> eraseSEList;
-		for (auto& it : m_effectList) {
-			const auto key = it.first;
-			auto* se = it.second;
-			/** 再生が終わっているなら削除 */
-			if (!se->IsPlay()) {
-				delete se;
-				eraseSEList.push_back(key);
-			}
-		}
-		for (const auto& key : eraseSEList) {
-			m_effectList.erase(key);
-		}
-	}
+	{}
 
 
 	EffectHandle EffectManager::PlayEffect(const EnEffectKind kind, const Vector3& position, const Quaternion& rotation, const Vector3& scale)
@@ -55,16 +40,16 @@ namespace app
 			K2_ASSERT(false, "エフェクトの再生が多いです。\n");
 			return INVALID_EFFECT_HANDLE;
 		}
-		auto* newEffect = new EffectEmitter();
+		auto* newEffect = NewGO<EffectEmitter>(0);
 		newEffect->Init(static_cast<int>(kind));
 		newEffect->SetPosition(position);
 		newEffect->SetRotation(rotation);
 		newEffect->SetScale(scale);
 		newEffect->Play();
 
-		m_effectList.emplace(m_effectHandleCount++, newEffect);
+		m_effectList.emplace(m_effectHandleCount, newEffect);
 
-		return m_effectHandleCount;
+		return m_effectHandleCount++;
 	}
 
 
