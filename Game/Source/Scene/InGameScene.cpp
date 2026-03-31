@@ -8,6 +8,8 @@
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
 
+#include "Source/Sound/SoundManager.h"
+
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
@@ -46,6 +48,20 @@
 
 namespace app
 {
+	namespace
+	{
+		/** 子ペンギンのスポーン半径 */
+		constexpr float CHILD_SPAWN_RADIUS = 3000.0f;
+
+		/** タイプ別の生成数 */
+		constexpr int SERIOUS_NUM = 50;
+		constexpr int CLINGY_NUM = 50;
+		constexpr int NAUGHTY_NUM = 0;
+		constexpr int CLUMSY_NUM = 0;
+		constexpr int CARING_NUM = 0;
+	}
+
+
 	InGameScene::InGameScene()
 	{}
 
@@ -181,7 +197,18 @@ namespace app
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
-			m_loadPhase = LoadPhase::Daddy;
+			m_loadPhase = LoadPhase::StageWait;  // ←Daddyではなくwaitへ
+			break;
+		}
+
+		case LoadPhase::StageWait:
+		{
+			/** ステージの非同期モデルロードと物理コリジョン登録が完了するまで待つ */
+			actor::StageSystem::GetInstance()->Update();
+			if (actor::StageSystem::GetInstance()->IsAllLoaded())
+			{
+				m_loadPhase = LoadPhase::Daddy;
+			}
 			break;
 		}
 
@@ -193,43 +220,27 @@ namespace app
 			break;
 
 		case LoadPhase::Children:
-			if (m_childIndex < CHILD_PENGUIN_NUM)
-			{
-				static std::random_device rd;
-				static std::mt19937 gen(rd());
-				static std::uniform_real_distribution<float> dis(-2000.0f, 2000.0f);
+		{
+			/** タイプ別数とスポーン半径を指定して一括生成 */
+			actor::ChildPenguinManager::GetInstance()->CreateChildPenguins(
+				SERIOUS_NUM,
+				CLINGY_NUM,
+				NAUGHTY_NUM,
+				CLUMSY_NUM,
+				CARING_NUM,
+				CHILD_SPAWN_RADIUS
+			);
 
-				Vector3 pos = Vector3(dis(gen), 0.0f, dis(gen));
-				actor::ChildPenguinManager::GetInstance()->CreateChildPenguin(1);
+			auto* manager = actor::ChildPenguinManager::GetInstance();
+			manager->SetDaddyPenguin(m_daddyPenguin);
 
-				const auto& children = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
-				auto* child = children.back();
+			/** ステージ上の総ペンギン数をセット */
+			const int totalNum = SERIOUS_NUM + CLINGY_NUM + NAUGHTY_NUM + CLUMSY_NUM + CARING_NUM;
+			ScoreManager::GetInstance().SetTotalCount(totalNum);
 
-				if (m_childIndex < 50)
-				{
-					child->SetChildPenguinType(app::actor::EnChildPenguinType::Serious);
-				}
-				else if (m_childIndex < 100)
-				{
-					child->SetChildPenguinType(app::actor::EnChildPenguinType::Clingy);
-				}
-
-				child->SetPosition(pos);
-				child->GetStateMachine()->SetPosition(pos);
-				child->StartWrapper();
-				++m_childIndex;
-			}
-			else
-			{
-				auto* manager = app::actor::ChildPenguinManager::GetInstance();
-				manager->SetDaddyPenguin(m_daddyPenguin);
-
-				// ステージ上の総ペンギン数をセット
-				ScoreManager::GetInstance().SetTotalCount(CHILD_PENGUIN_NUM);
-
-				m_loadPhase = LoadPhase::Enemy;
-			}
+			m_loadPhase = LoadPhase::Enemy;
 			break;
+		}
 
 		case LoadPhase::Enemy:
 		{
@@ -278,6 +289,7 @@ namespace app
 			if (m_countDownMenu)
 			{
 				m_countDownMenu->SetCountDownStartFlag(true);
+				SoundManager::Get().PlayBGM(enSoundKind_InGame);
 			}
 			break;
 
@@ -325,20 +337,56 @@ namespace app
 			if (m_countDownLayout) m_countDownLayout->Update();
 
 			// カウントダウン完了 → Playing へ
+			//if (m_countDownMenu && m_countDownMenu->IsCountDownFinished())
+			//{
+			//	m_gamePhase = GamePhase::Playing;
+			//	BattleManager::GetInstance().SetIsActive(true);
+
+			//	// Playing に切り替わった直後のフレームで一瞬表示されないよう明示的に非表示にする
+			//	if (auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>())
+			//	{
+			//		menu->SetDraw(false);
+			//	}
+			//	if (auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>())
+			//	{
+			//		menu->SetDraw(false);
+			//	}
+			//}
+			if (m_countDownMenu)
+			{
+				// 現在のタイプを取得 (Third, Second, First, GO など)
+				ui::EnCountDownType currentType = m_countDownMenu->GetCurrentCountType();
+
+				// 前のフレームからタイプが変わった瞬間だけ音を鳴らす
+				if (currentType != m_lastCountType)
+				{
+					switch (currentType)
+					{
+					case ui::EnCountDownType::Third:  // 「3」が表示された瞬間
+					case ui::EnCountDownType::Second: // 「2」が表示された瞬間
+					case ui::EnCountDownType::First:  // 「1」が表示された瞬間
+						SoundManager::Get().PlaySE(enSoundKind_CountDown); // ピッ
+						break;
+
+					case ui::EnCountDownType::GO:     // 「GO!」が表示された瞬間
+						SoundManager::Get().PlaySE(enSoundKind_GameStart); // パーン！
+						break;
+
+					default:
+						break;
+					}
+
+					// 状態を更新
+					m_lastCountType = currentType;
+				}
+			}
+
+			// カウントダウン終了判定
 			if (m_countDownMenu && m_countDownMenu->IsCountDownFinished())
 			{
 				m_gamePhase = GamePhase::Playing;
 				BattleManager::GetInstance().SetIsActive(true);
-
-				// Playing に切り替わった直後のフレームで一瞬表示されないよう明示的に非表示にする
-				if (auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>())
-				{
-					menu->SetDraw(false);
-				}
-				if (auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>())
-				{
-					menu->SetDraw(false);
-				}
+				// ...
 			}
 			break;
 		}
@@ -370,8 +418,9 @@ namespace app
 			if (m_remainingChildLayout) {
 				auto* menu = m_remainingChildLayout->GetMenu<ui::RemainingChildMenu>();
 				if (menu) {
-					const int childNum = actor::ChildPenguinManager::GetInstance()->GetFollowersNum();
+					const int childNum = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
 					menu->SetChildNum(childNum);
+					menu->SetTotalNum(ScoreManager::GetInstance().GetTotalCount());
 				}
 
 				m_remainingChildLayout->Update();
@@ -469,10 +518,14 @@ namespace app
 			// FINISH UI 更新
 			if (m_finishLayout) m_finishLayout->Update();
 
+			SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
 			// 演出終了 → リザルトへ
 			if (m_finishMenu && m_finishMenu->IsFinished())
 			{
+				SoundManager::Get().StopBGM();
 				m_nextScene = true;
+				ResultScene::SetResult(TimeManager::GetInstance().GetCurTime(),
+					actor::ChildPenguinManager::GetInstance()->GetRescuedNum());
 			}
 			break;
 		}
@@ -548,6 +601,7 @@ namespace app
 		// ポーズ中の描画（既存のif文の後に追加）
 		if (SceneManager::GetInstance()->IsPause())
 		{
+			SoundManager::Get().StopAllSE();
 			switch (m_pauseState)
 			{
 			case PauseState::Pause:
@@ -591,6 +645,7 @@ namespace app
 		// タイトルへ戻る
 		if (m_goTitle)
 		{
+			SoundManager::Get().StopAllSE();
 			id = TitleScene::ID();
 			waitTime = 0.5f;
 			return true;
@@ -598,6 +653,7 @@ namespace app
 		// リザルトへ（既存）
 		if (m_nextScene)
 		{
+			SoundManager::Get().StopAllSE();
 			id = ResultScene::ID();
 			waitTime = 0.5f;
 			return true;

@@ -20,7 +20,30 @@
                 "number": 100,
                 "width":70,
                 "height":70,
-                "position":[-495,290,0],
+                "position":[-480,290,0],
+                "scale":[1,1,1],
+                "rotation":0
+            },
+            {
+                "type":"UIIcon",
+                "name":"SlashIcon",
+                "asset":"Assets/spriteData/UI/Icon/SlashIcon.dds",
+                "width":50,
+                "height":70,
+                "position":[-400,300,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIDigit",
+                "name":"TotalNum",
+                "asset":"Assets/spriteData/UI/TimerNumber",
+                "digit": 3,
+                "number": 100,
+                "width":70,
+                "height":70,
+                "position":[-200,290,0],
                 "scale":[1,1,1],
                 "rotation":0
             }

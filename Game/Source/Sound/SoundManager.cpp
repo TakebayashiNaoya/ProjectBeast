@@ -140,7 +140,7 @@ namespace app
 
 		// 優先度別の再生リクエスト情報を追加
 		m_seInfomationList[priority].push_back(SEInformation(kind, isLoop, is3D, handle));
-		
+
 		return handle;
 	}
 
@@ -152,6 +152,33 @@ namespace app
 			return;
 		}
 		se->Stop();
+	}
+
+
+	void SoundManager::StopAllSE()
+	{
+		for (auto& it : m_seList) {
+			if (it.second != nullptr) {
+				it.second->Stop();    // 再生を止める
+				DeleteGO(it.second);  // ゲームオブジェクトとして破棄
+			}
+		}
+		m_seList.clear(); // リストを空にする
+
+		//// Voice（鳴き声など）も同様に処理
+		//for (auto& it : m_voiceList) {
+		//	if (it.second != nullptr) {
+		//		it.second->Stop();
+		//		DeleteGO(it.second);
+		//	}
+		//}
+		//m_voiceList.clear();
+
+		//m_seList.clear();
+
+		for (auto& infolist : m_seInfomationList) {
+			infolist.clear();
+		}
 	}
 
 

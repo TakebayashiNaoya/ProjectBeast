@@ -13,8 +13,6 @@ namespace app
 {
 	namespace actor
 	{
-
-
 		/**
 		 * @brief ステージの基底クラス
 		 */
@@ -43,6 +41,12 @@ namespace app
 			 @param scale 拡大率
 			 */
 			void Init(const char* fileName);
+
+			/**
+			 * @brief モデルと物理コリジョンのロードが完了しているか
+			 * @return 完了していればtrue
+			 */
+			bool IsLoaded() const { return m_isModelLoaded; }
 
 
 		private:

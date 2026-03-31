@@ -53,8 +53,7 @@ namespace app
 				, m_isLoop(isLoop)
 				, m_is3D(is3D)
 				, m_handle(handle)
-			{
-			}
+			{}
 		};
 
 
@@ -82,6 +81,8 @@ namespace app
 		SEHandle PlaySE(const int kind, const bool isLoop = false, const bool is3D = false, const EnSoundPriority priority = enSoundPriority_Normal);
 		/** SEの停止 */
 		void StopSE(const SEHandle handle);
+		/** 全てのSEを停止 */
+		void StopAllSE();
 
 
 		/** Voiceの再生 */

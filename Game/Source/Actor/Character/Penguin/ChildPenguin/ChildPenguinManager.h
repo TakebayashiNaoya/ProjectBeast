@@ -4,6 +4,7 @@
  * @author 立山、竹林
  */
 #pragma once
+#include "ChildPenguinTypes.h"
 
 
 namespace app
@@ -41,10 +42,22 @@ namespace app
 
 		public:
 			/**
-			 * @brief 子ペンギンを生成
-			 * @param childPenguinNum 生成する子ペンギンの数
+			 * @brief タイプ別に子ペンギンを一括生成する
+			 * @param seriousNum  まじめタイプの生成数
+			 * @param clingyNum   甘えん坊タイプの生成数
+			 * @param naughtyNum  やんちゃタイプの生成数
+			 * @param clumsyNum   おっちょこちょいタイプの生成数
+			 * @param caringNum   世話焼きタイプの生成数
+			 * @param spawnRadius スポーン範囲の半径
 			 */
-			void CreateChildPenguin(const int childPenguinNum);
+			void CreateChildPenguins(
+				int seriousNum,
+				int clingyNum,
+				int naughtyNum,
+				int clumsyNum,
+				int caringNum,
+				float spawnRadius
+			);
 
 			/**
 			 * @brief 子ペンギンのリストを取得
@@ -70,6 +83,36 @@ namespace app
 			 * @note PenguinDeadState::Enter()経由でChildPenguinStateMachine::OnDead()から呼ばれる
 			 */
 			void RemoveAndDestroy(ChildPenguin* penguin);
+
+
+		private:
+			/**
+			 * @brief 1体生成してタイプと座標をセットする
+			 * @param type        生成するタイプ
+			 * @param spawnRadius スポーン範囲の半径
+			 */
+			void SpawnOne(EnChildPenguinType type, float spawnRadius);
+
+			/**
+			 * @brief 円内のランダムなXZ座標を生成する（拒絶サンプリング）
+			 * @param radius 円の半径
+			 * @return 生成された座標（y=0）
+			 */
+			Vector3 GenerateRandomSpawnPosition(float radius);
+
+			/**
+			 * @brief 指定XZ座標から真上にレイを飛ばして地面のyを返す
+			 * @param x X座標
+			 * @param z Z座標
+			 * @return ヒットした地面のy座標。ヒットしなければ0.0f（海面扱い）
+			 */
+			float GetGroundY(float x, float z);
+
+			/**
+			 * @brief 子ペンギンを生成してリストに追加する
+			 * @note SpawnOne()の内部から呼び出す
+			 */
+			void CreateChildPenguin();
 
 
 		private:
@@ -117,6 +160,13 @@ namespace app
 				return m_followers.size();
 			}
 
+			/**
+			 * @brief 救出済み子ペンギンの数を取得
+			 * @details コマンドに関係なく、各子ペンギンの joinDistance 以内にいる数を返す
+			 * @return 救出済み子ペンギンの数
+			 */
+			int GetRescuedNum() const;
+
 
 		private:
 			/**
@@ -155,7 +205,7 @@ namespace app
 
 		public:
 			/**
-			 * @brief 追従命令と待機命令の列挙型
+			 * @brief 命令と待機命令の列挙型
 			 */
 			enum class EnPenguinCommand : uint8_t
 			{

@@ -9,6 +9,8 @@
  // UI
 #include "Source/UI/InGameTimerMenu.h"
 
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+
 
 namespace app
 {
@@ -49,7 +51,7 @@ namespace app
 	{
 		/** スコアマネージャーから、今のスコアと最大スコアを取得 */
 		auto& score = ScoreManager::GetInstance();
-		const int collected = score.GetCollectedCount();
+		const int collected = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
 		const int total = score.GetTotalCount();
 		/** タイムマネージャーから、タイムアップしているかどうかを取得 */
 		const bool isTimeUp = TimeManager::GetInstance().IsTimeUp();

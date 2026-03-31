@@ -45,6 +45,11 @@ namespace app
 			 */
 			inline void SetFormationTargetPosition(const Vector3& targetPos) { m_formationTarget = targetPos; }
 			/**
+			 * @brief 隊列に加わる距離を取得する（救出判定に使用）
+			 * @return 隊列に加わる距離
+			 */
+			float GetJoinDistance() const;
+			/**
 			 * @brief 子ペンギンのタイプを設定
 			 * @param type 子ペンギンのタイプ
 			 */
@@ -83,4 +88,3 @@ namespace app
 		};
 	}
 }
-
