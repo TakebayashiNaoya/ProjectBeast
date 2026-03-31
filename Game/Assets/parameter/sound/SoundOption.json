@@ -3,6 +3,89 @@
         "elements":[
             {
                 "type":"UIIcon",
+                "name":"SoundTextAllBackGroundIcon",
+                "asset":"Assets/spriteData/UI/Icon/SoundOptionAllBackGround.dds",
+                "width":2070,
+                "height":1080,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"UpDownIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/UporDownButton.dds",
+                "width":60,
+                "height":60,
+                "position":[ 170, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"LeftRightIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/LeftorRightButton.dds",
+                "width":60,
+                "height":60,
+                "position":[ 360, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"BbuttonIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/Bbutton.dds",
+                "width":60,
+                "height":60,
+                "position":[ 550, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"SelectTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/SelectText.dds",
+                "width":90,
+                "height":50,
+                "position":[ 260, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"MoveTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/MovingText.dds",
+                "width":90,
+                "height":50,
+                "position":[ 450, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"CloseIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/CloseText.dds",
+                "width":95,
+                "height":50,
+                "position":[ 640, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+
+
+
+            {
+                "type":"UIIcon",
                 "name":"MasterVolumeTextIcon",
                 "asset":"Assets/spriteData/UI/TextSprite/TextMasterVolume.dds",
                 "width":160,

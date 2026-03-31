@@ -13,6 +13,78 @@
                 "color":[255,255,255,120]
             },
             {
+                "type":"UIIcon",
+                "name":"UpDownIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/UporDownButton.dds",
+                "width":60,
+                "height":60,
+                "position":[ 280, -400, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"PauseButtonMirrorIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/PauseButtonMirror.dds",
+                "width":60,
+                "height":60,
+                "position":[ 80, -400, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"AbuttonIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/Abutton.dds",
+                "width":60,
+                "height":60,
+                "position":[ 460, -400, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"EnaterIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/EnterText.dds",
+                "width":90,
+                "height":60,
+                "position":[ 530, -400, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"CloseIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/CloseText.dds",
+                "width":95,
+                "height":50,
+                "position":[ 160, -400, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+             {
+                "type":"UIIcon",
+                "name":"SelectTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/SelectText.dds",
+                "width":90,
+                "height":50,
+                "position":[ 360, -400, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+
+
+            {
                 "type":"UIButton",
                 "name":"PauseOnePartsButton",
                 "asset":"Assets/spriteData/UI/Button/PauseScreen/PauseButton.dds",
