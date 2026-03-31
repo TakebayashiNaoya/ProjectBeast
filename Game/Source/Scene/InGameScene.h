@@ -58,7 +58,7 @@ namespace app
 		//------------------------------------------------------------
 		enum class LoadPhase
 		{
-			None, Stage, Daddy, Children, Enemy, Camera, Ocean, Done
+			None, Stage, StageWait, Daddy, Children, Enemy, Camera, Ocean, Done
 		};
 		LoadPhase m_loadPhase = LoadPhase::None;
 		int m_childIndex = 0;

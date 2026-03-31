@@ -43,6 +43,11 @@ namespace app
 			 */
 			void LoadEnemyNests(const nlohmann::json& json);
 
+			/**
+			 * @brief 全ステージオブジェクトのロードが完了しているか
+			 */
+			bool IsAllLoaded() const;
+
 
 		public:
 			StageSystem();

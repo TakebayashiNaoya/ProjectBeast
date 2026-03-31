@@ -211,6 +211,16 @@ namespace app
 		}
 
 
+		bool StageSystem::IsAllLoaded() const
+		{
+			for (const auto& obj : m_objectMap)
+			{
+				if (!obj.second->IsLoaded()) return false;
+			}
+			return !m_objectMap.empty();
+		}
+
+
 		StageSystem::StageSystem()
 		{
 			/** マップのメモリを確保 */
