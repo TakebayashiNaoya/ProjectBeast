@@ -4,8 +4,11 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include <random>
 #include "ChildPenguin.h"
 #include "ChildPenguinManager.h"
+#include "ChildPenguinStateMachine.h"
+#include "ChildPenguinTypes.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -15,6 +18,15 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** スポーン座標を求めるレイの発射高度 */
+			constexpr float SPAWN_RAY_START_Y = 1000.0f;
+			/** 拒絶サンプリングの最大試行回数（無限ループ防止） */
+			constexpr int SPAWN_MAX_RETRY = 100;
+		}
+
+
 		ChildPenguinManager* ChildPenguinManager::m_instance = nullptr;
 
 		ChildPenguinManager::ChildPenguinManager()
@@ -59,14 +71,14 @@ namespace app
 			/** 削除待ちのペンギンを安全に破棄する (遅延削除) */
 			for (auto* deadPenguin : m_destroyList)
 			{
-				// 管理リストから安全に取り除く
+				/** 管理リストから安全に取り除く */
 				auto it = std::find(m_childPenguinList.begin(), m_childPenguinList.end(), deadPenguin);
 				if (it != m_childPenguinList.end())
 				{
 					m_childPenguinList.erase(it);
 				}
 
-				// 全ての Update 処理が終わったここで、初めてメモリを解放する
+				/** 全ての Update 処理が終わったここで、初めてメモリを解放する */
 				delete deadPenguin;
 			}
 			m_destroyList.clear();
@@ -102,22 +114,106 @@ namespace app
 		}
 
 
-		void ChildPenguinManager::CreateChildPenguin(const int childPenguinNum)
+		void ChildPenguinManager::CreateChildPenguins(
+			int seriousNum,
+			int clingyNum,
+			int naughtyNum,
+			int clumsyNum,
+			int caringNum,
+			float spawnRadius
+		)
 		{
-			/** 既に子ペンギンがいる場合は追加で生成 */
-			for (int i = 0; i < childPenguinNum; i++) {
-				m_childPenguinList.push_back(new ChildPenguin);
+			/** タイプと生成数のペアをまとめて処理する */
+			const std::pair<EnChildPenguinType, int> spawnList[] =
+			{
+				{ EnChildPenguinType::Serious, seriousNum },
+				{ EnChildPenguinType::Clingy,  clingyNum  },
+				{ EnChildPenguinType::Naughty, naughtyNum },
+				{ EnChildPenguinType::Clumsy,  clumsyNum  },
+				{ EnChildPenguinType::Caring,  caringNum  },
+			};
+
+			for (const auto& [type, num] : spawnList)
+			{
+				for (int i = 0; i < num; i++)
+				{
+					SpawnOne(type, spawnRadius);
+				}
 			}
+		}
+
+
+		void ChildPenguinManager::SpawnOne(EnChildPenguinType type, float spawnRadius)
+		{
+			/** 円内のランダムな座標を生成 */
+			const Vector3 xzPos = GenerateRandomSpawnPosition(spawnRadius);
+
+			/** レイキャストで地面のyを取得 */
+			const float groundY = GetGroundY(xzPos.x, xzPos.z);
+			const Vector3 spawnPos = Vector3(xzPos.x, groundY, xzPos.z);
+
+			/** 子ペンギンを生成してタイプと座標をセット */
+			CreateChildPenguin();
+			auto* child = m_childPenguinList.back();
+			child->SetChildPenguinType(type);
+			child->SetPosition(spawnPos);
+			child->GetStateMachine()->SetPosition(spawnPos);
+			child->StartWrapper();
+		}
+
+
+		Vector3 ChildPenguinManager::GenerateRandomSpawnPosition(float radius)
+		{
+			static std::mt19937 engine(std::random_device{}());
+			std::uniform_real_distribution<float> dist(-radius, radius);
+
+			/** 拒絶サンプリング：円の外側に落ちた点を棄却して再抽選する */
+			for (int i = 0; i < SPAWN_MAX_RETRY; i++)
+			{
+				const float x = dist(engine);
+				const float z = dist(engine);
+
+				if ((x * x + z * z) <= (radius * radius))
+				{
+					return Vector3(x, 0.0f, z);
+				}
+			}
+
+			/** 最大試行回数を超えた場合は原点付近に置く */
+			return Vector3::Zero;
+		}
+
+
+		float ChildPenguinManager::GetGroundY(float x, float z)
+		{
+			const Vector3 rayStart = Vector3(x, SPAWN_RAY_START_Y, z);
+			const Vector3 rayEnd = Vector3(x, 0.0f, z);
+
+			nsBeastEngine::nsCollision::RaycastHit hit;
+			const bool isHit = nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(
+				rayStart,
+				rayEnd,
+				hit
+			);
+
+			/** ヒットした場合は衝突点のyを返す。ヒットしなければ海面（y=0.0f）を返す */
+			return isHit ? hit.point.y : 0.0f;
+		}
+
+
+		void ChildPenguinManager::CreateChildPenguin()
+		{
+			m_childPenguinList.push_back(new ChildPenguin);
 		}
 
 
 		void ChildPenguinManager::RemoveAndDestroy(ChildPenguin* penguin)
 		{
-			// 隊列から取り除く (陣形には影響させないため即座に外す)
+			/** 隊列から取り除く (陣形には影響させないため即座に外す) */
 			RemoveFollower(penguin);
 
-			// 即座に m_childPenguinList から erase したり delete したりせず、
-			// 削除予定リストに登録するだけに留める
+			/** 即座に m_childPenguinList から erase したり delete したりせず、 */
+			/** 削除予定リストに登録するだけに留める */
 			auto it = std::find(m_destroyList.begin(), m_destroyList.end(), penguin);
 			if (it == m_destroyList.end())
 			{
@@ -204,15 +300,15 @@ namespace app
 				/** この階層に配置する数だけループ */
 				for (int i = 0; i < maxInThisLayer && currentCount < MAX_FORMATION_COUNT; ++i)
 				{
-					/* 角度を計算して、円周上の座標を求める */
+					/** 角度を計算して、円周上の座標を求める */
 					float angleDeg = i * angleStep;
-					float angleRad = angleDeg * (Math::PI / 180.0f); // ラジアン変換
+					float angleRad = angleDeg * (Math::PI / 180.0f); /** ラジアン変換 */
 
 					Vector3 targetPos = centerPos;
-					// Z軸とX軸で円を描く（ワールド座標系固定）
+					/** Z軸とX軸で円を描く（ワールド座標系固定） */
 					targetPos.x += r * cosf(angleRad);
 					targetPos.z += r * sinf(angleRad);
-					// ※Y軸（高さ）は地形に沿わせる処理が別途必要になる場合があります
+					/** ※Y軸（高さ）は地形に沿わせる処理が別途必要になる場合があります */
 
 					m_formationPositions.push_back(targetPos);
 					currentCount++;

@@ -46,6 +46,20 @@
 
 namespace app
 {
+	namespace
+	{
+		/** 子ペンギンのスポーン半径 */
+		constexpr float CHILD_SPAWN_RADIUS = 3000.0f;
+
+		/** タイプ別の生成数 */
+		constexpr int SERIOUS_NUM = 50;
+		constexpr int CLINGY_NUM = 50;
+		constexpr int NAUGHTY_NUM = 0;
+		constexpr int CLUMSY_NUM = 0;
+		constexpr int CARING_NUM = 0;
+	}
+
+
 	InGameScene::InGameScene()
 	{}
 
@@ -181,7 +195,18 @@ namespace app
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
-			m_loadPhase = LoadPhase::Daddy;
+			m_loadPhase = LoadPhase::StageWait;  // ←Daddyではなくwaitへ
+			break;
+		}
+
+		case LoadPhase::StageWait:
+		{
+			/** ステージの非同期モデルロードと物理コリジョン登録が完了するまで待つ */
+			actor::StageSystem::GetInstance()->Update();
+			if (actor::StageSystem::GetInstance()->IsAllLoaded())
+			{
+				m_loadPhase = LoadPhase::Daddy;
+			}
 			break;
 		}
 
@@ -193,43 +218,27 @@ namespace app
 			break;
 
 		case LoadPhase::Children:
-			if (m_childIndex < CHILD_PENGUIN_NUM)
-			{
-				static std::random_device rd;
-				static std::mt19937 gen(rd());
-				static std::uniform_real_distribution<float> dis(-2000.0f, 2000.0f);
+		{
+			/** タイプ別数とスポーン半径を指定して一括生成 */
+			actor::ChildPenguinManager::GetInstance()->CreateChildPenguins(
+				SERIOUS_NUM,
+				CLINGY_NUM,
+				NAUGHTY_NUM,
+				CLUMSY_NUM,
+				CARING_NUM,
+				CHILD_SPAWN_RADIUS
+			);
 
-				Vector3 pos = Vector3(dis(gen), 0.0f, dis(gen));
-				actor::ChildPenguinManager::GetInstance()->CreateChildPenguin(1);
+			auto* manager = actor::ChildPenguinManager::GetInstance();
+			manager->SetDaddyPenguin(m_daddyPenguin);
 
-				const auto& children = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
-				auto* child = children.back();
+			/** ステージ上の総ペンギン数をセット */
+			const int totalNum = SERIOUS_NUM + CLINGY_NUM + NAUGHTY_NUM + CLUMSY_NUM + CARING_NUM;
+			ScoreManager::GetInstance().SetTotalCount(totalNum);
 
-				if (m_childIndex < 50)
-				{
-					child->SetChildPenguinType(app::actor::EnChildPenguinType::Serious);
-				}
-				else if (m_childIndex < 100)
-				{
-					child->SetChildPenguinType(app::actor::EnChildPenguinType::Clingy);
-				}
-
-				child->SetPosition(pos);
-				child->GetStateMachine()->SetPosition(pos);
-				child->StartWrapper();
-				++m_childIndex;
-			}
-			else
-			{
-				auto* manager = app::actor::ChildPenguinManager::GetInstance();
-				manager->SetDaddyPenguin(m_daddyPenguin);
-
-				// ステージ上の総ペンギン数をセット
-				ScoreManager::GetInstance().SetTotalCount(CHILD_PENGUIN_NUM);
-
-				m_loadPhase = LoadPhase::Enemy;
-			}
+			m_loadPhase = LoadPhase::Enemy;
 			break;
+		}
 
 		case LoadPhase::Enemy:
 		{
