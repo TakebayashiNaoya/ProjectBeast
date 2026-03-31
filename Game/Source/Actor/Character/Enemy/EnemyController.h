@@ -1,7 +1,7 @@
 ﻿/**
  * @file EnemyController.h
  * @brief エネミーのコントローラー
- * @author 立山
+ * @author 立山、竹林
  */
 #pragma once
 
@@ -193,7 +193,7 @@ namespace app
 			static void ExitCoolDown(EnemyController* enemy);
 			static int CheckCoolDown(EnemyController* enemy);
 
-			/** クールダウン */
+			/** 咆哮 */
 			static void EnterRoar(EnemyController* enemy);
 			static void UpdateRoar(EnemyController* enemy);
 			static void ExitRoar(EnemyController* enemy);
@@ -237,6 +237,11 @@ namespace app
 			float m_attackTimer;
 			float m_attackDuration;
 			bool m_isAttacking;
+
+			/** スタック検出：前回チェック時の座標 */
+			Vector3 m_lastCheckPosition = Vector3::Zero;
+			/** スタック検出：同じ位置に留まっている時間 */
+			float m_stuckTimer = 0.0f;
 
 			/** 現在の状態 */
 			EnEnemyStateID m_currentState = enEnemyState_Idle;

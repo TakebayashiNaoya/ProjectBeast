@@ -7,7 +7,7 @@
         "runSpeed": 200.0,
         "radius": 100.0,
         "height": 100.0,
-        "swimSpeed": 20.0,
+        "swimSpeed": 100.0,
         "maxEat":3
     }
 ]

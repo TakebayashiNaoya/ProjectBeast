@@ -106,21 +106,21 @@ namespace app
 			/**
 			 * @brief ペンギンを発見
 			 */
-			void SetSeach(const bool isSeach) { m_isSeach = isSeach; }
-			/**
-			 * @brief
-			 */
-			bool IsSeach()const { return m_isSeach; }
-
-
-			/**
-			 * @brief ペンギンを発見
-			 */
 			void SetFindPenguin(const bool isFindPenguin) { m_isFindPenguin = isFindPenguin; }
 			/**
 			 * @brief
 			 */
 			bool IsFindPenguin()const { return m_isFindPenguin; }
+
+
+			/**
+			 * @brief 索敵しているかの設定
+			 */
+			void SetSeach(const bool isSeach) { m_isSeach = isSeach; }
+			/**
+			 * @brief
+			 */
+			bool IsSeach()const { return m_isSeach; }
 
 
 			/**
