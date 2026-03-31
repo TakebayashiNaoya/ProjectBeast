@@ -472,10 +472,10 @@ namespace app
 			// FINISH UI 更新
 			if (m_finishLayout) m_finishLayout->Update();
 
+			SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
 			// 演出終了 → リザルトへ
 			if (m_finishMenu && m_finishMenu->IsFinished())
 			{
-				SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
 				SoundManager::Get().StopBGM();
 				m_nextScene = true;
 			}
@@ -553,6 +553,7 @@ namespace app
 		// ポーズ中の描画（既存のif文の後に追加）
 		if (SceneManager::GetInstance()->IsPause())
 		{
+			SoundManager::Get().StopAllSE();
 			switch (m_pauseState)
 			{
 			case PauseState::Pause:
@@ -596,6 +597,7 @@ namespace app
 		// タイトルへ戻る
 		if (m_goTitle)
 		{
+			SoundManager::Get().StopAllSE();
 			id = TitleScene::ID();
 			waitTime = 0.5f;
 			return true;
@@ -603,6 +605,7 @@ namespace app
 		// リザルトへ（既存）
 		if (m_nextScene)
 		{
+			SoundManager::Get().StopAllSE();
 			id = ResultScene::ID();
 			waitTime = 0.5f;
 			return true;
