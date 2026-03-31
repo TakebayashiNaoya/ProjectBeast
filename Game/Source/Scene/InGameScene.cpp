@@ -598,7 +598,7 @@ namespace app
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
 		actor::EnemyManager::GetInstance()->Render(rc);
 
-		// ポーズ中の描画（既存のif文の後に追加）
+		// ポーズ中の描画
 		if (SceneManager::GetInstance()->IsPause())
 		{
 			SoundManager::Get().StopAllSE();
@@ -611,9 +611,10 @@ namespace app
 				if (m_soundOptionLayout) m_soundOptionLayout->Render(rc);
 				break;
 			}
+			return; // ← ここで早期リターン（インゲームUIを描画しない）
 		}
 
-		// UI 描画
+		// UI 描画（ポーズ中はここに来ない）
 		if (m_loadPhase == LoadPhase::Done)
 		{
 			switch (m_gamePhase)
