@@ -117,6 +117,13 @@ namespace app
 				return m_followers.size();
 			}
 
+			/**
+			 * @brief 救出済み子ペンギンの数を取得
+			 * @details コマンドに関係なく、各子ペンギンの joinDistance 以内にいる数を返す
+			 * @return 救出済み子ペンギンの数
+			 */
+			int GetRescuedNum() const;
+
 
 		private:
 			/**
