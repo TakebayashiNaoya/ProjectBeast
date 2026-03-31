@@ -27,6 +27,26 @@ namespace app
 
 		void EnemySleepingMenu::Update()
 		{
+			// 描画フラグがfalseなら位置計算もスキップして非表示にする
+			// （起動時に原点座標で一瞬表示されるバグを防ぐ）
+			if (!m_isDraw)
+			{
+				auto* gauge = GetUI<UIGauge>(Hash32("GaugeA"));
+				if (gauge) gauge->m_isDraw = false;
+
+				auto* iconA = GetUI<UIIcon>(Hash32("SleepIconA"));
+				if (iconA) iconA->m_isDraw = false;
+
+				auto* iconB = GetUI<UIIcon>(Hash32("SleepIconB"));
+				if (iconB) iconB->m_isDraw = false;
+
+				auto* iconC = GetUI<UIIcon>(Hash32("SleepIconC"));
+				if (iconC) iconC->m_isDraw = false;
+
+				MenuBase::Update();
+				return;
+			}
+
 			// クマの位置によって変える
 			Vector2 screenPosition;
 			g_camera3D->CalcScreenPositionFromWorldPosition(screenPosition, m_targetPosition);
@@ -35,7 +55,7 @@ namespace app
 			if (gauge) {
 				gauge->m_transform.m_localTransform.m_position.Set(screenPosition.x + OFFSET_X, screenPosition.y + OFFSET_Y, 0.0f);
 				gauge->m_transform.m_localTransform.m_scale = Vector3(m_sleepingRate, 1.0f, 1.0f);
-				gauge->m_isDraw = m_isDraw && m_sleepingRate > RATE_MIN;
+				gauge->m_isDraw = m_sleepingRate > RATE_MIN;
 			}
 			// アイコン
 			{
@@ -44,7 +64,7 @@ namespace app
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconA"));
 					if (icon) {
 						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - 50.0f + OFFSET_X, screenPosition.y + OFFSET_Y, 0.0f);
-						icon->m_isDraw = m_isDraw && m_sleepingRate > RATE_MIN;
+						icon->m_isDraw = m_sleepingRate > RATE_MIN;
 					}
 				}
 				// 2個目
@@ -52,7 +72,7 @@ namespace app
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconB"));
 					if (icon) {
 						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - 30.0f + OFFSET_X, screenPosition.y + 10.0f + OFFSET_Y, 0.0f);
-						icon->m_isDraw = m_isDraw && m_sleepingRate > RATE_MIN;
+						icon->m_isDraw = m_sleepingRate > RATE_MIN;
 					}
 				}
 				// 3個目
@@ -60,7 +80,7 @@ namespace app
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconC"));
 					if (icon) {
 						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x + -15.0f + OFFSET_X, screenPosition.y + 20.0f + OFFSET_Y, 0.0f);
-						icon->m_isDraw = m_isDraw && m_sleepingRate > RATE_MIN;
+						icon->m_isDraw = m_sleepingRate > RATE_MIN;
 					}
 				}
 			}
@@ -72,8 +92,18 @@ namespace app
 
 		void EnemySleepingMenu::InitializeLogic()
 		{
-			// TODO: 減った時のアニメーションなど追加したい
+			// 生成直後は全て非表示にする（m_isDraw=trueがデフォルトのため）
+			auto* gauge = GetUI<UIGauge>(Hash32("GaugeA"));
+			if (gauge) gauge->m_isDraw = false;
+
+			auto* iconA = GetUI<UIIcon>(Hash32("SleepIconA"));
+			if (iconA) iconA->m_isDraw = false;
+
+			auto* iconB = GetUI<UIIcon>(Hash32("SleepIconB"));
+			if (iconB) iconB->m_isDraw = false;
+
+			auto* iconC = GetUI<UIIcon>(Hash32("SleepIconC"));
+			if (iconC) iconC->m_isDraw = false;
 		}
 	}
 }
-

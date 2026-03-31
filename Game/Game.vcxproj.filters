@@ -555,6 +555,9 @@
     <ClInclude Include="Source\UI\HPBarMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\EnemySleepingMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
@@ -581,8 +584,5 @@
     <ClInclude Include="Source\UI\RemainingChildMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
   </ItemGroup>
 </Project>

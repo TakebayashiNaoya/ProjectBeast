@@ -32,7 +32,10 @@ namespace app
 			, m_isNearPenguin(false)
 			, m_canAttack(false)
 			, m_isSeach(false)
+			, m_isStun(false)
 			, m_isReturnHome(false)
+			, m_isCoolDown(false)
+			, m_isAttackPlaying(false)
 			, m_isRoar(false)
 		{
 			// ステートの追加

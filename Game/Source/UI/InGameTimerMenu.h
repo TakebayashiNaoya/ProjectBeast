@@ -71,6 +71,9 @@ namespace app
 
 			void Update()override;
 
+			/** ロジックの初期化 */
+			void InitializeLogic() override;
+
 			/** 描画するかどうか */
 			void SetIsDraw(bool isDraw);
 

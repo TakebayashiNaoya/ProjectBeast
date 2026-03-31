@@ -11,6 +11,7 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Util/JsonConverter.h"
 #include "Source/Camera/CameraManager.h"
@@ -38,6 +39,7 @@
 #include "TitleScene.h"
 
 #include "Source/UI/EnemySleepingMenu.h"
+#include "Source/UI/PBWakingUpTimerMenu.h"
 
 #include <random>
 
@@ -63,6 +65,7 @@ namespace app
 		}
 		m_searchLayouts.clear();
 		delete m_enemySleepingLayout;
+		delete m_pbWakingUpTimerLayout;
 
 		// アクター
 		actor::StageSystem::DestroyInstance();
@@ -128,10 +131,31 @@ namespace app
 		m_soundOptionLayout->Initialize<ui::SoundOptionMenu>("Assets/parameter/sound/SoundOption.json");
 		m_soundOptionMenu = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
 
+		// クマの起床ゲージUI
 		m_enemySleepingLayout = new ui::Layout();
 		m_enemySleepingLayout->Initialize<ui::EnemySleepingMenu>(
 			"Assets/parameter/UI/enemySleepGauge/sleepGauge.json"
 		);
+		{
+			auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>();
+			if (menu) {
+				menu->SetDraw(false);
+				menu->SetSleepingRate(0.0f);
+			}
+		}
+
+		// クマの睡眠タイマーUI
+		m_pbWakingUpTimerLayout = new ui::Layout();
+		m_pbWakingUpTimerLayout->Initialize<ui::PBWakingUpTimerMenu>(
+			"Assets/parameter/timer/PBWakingUpTimer.json"
+		);
+		{
+			auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
+			if (menu) {
+				menu->SetDraw(false);
+				menu->SetCurrentPBTime(0.0f);
+			}
+		}
 
 		// ロードフェーズ開始
 		m_loadPhase = LoadPhase::Stage;
@@ -302,6 +326,16 @@ namespace app
 			{
 				m_gamePhase = GamePhase::Playing;
 				BattleManager::GetInstance().SetIsActive(true);
+
+				// Playing に切り替わった直後のフレームで一瞬表示されないよう明示的に非表示にする
+				if (auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>())
+				{
+					menu->SetDraw(false);
+				}
+				if (auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>())
+				{
+					menu->SetDraw(false);
+				}
 			}
 			break;
 		}
@@ -340,49 +374,71 @@ namespace app
 				m_remainingChildLayout->Update();
 			}
 
-			// クマの起床ゲージ UI 更新
-			if (m_enemySleepingLayout) {
-
-				constexpr float MAX_RANGE = 200.0f;
+			// クマの起床ゲージUI・睡眠タイマーUI 更新
+			// 一番近くで寝ているエネミーを1回だけ探して両メニューに渡す
+			if (m_enemySleepingLayout && m_pbWakingUpTimerLayout)
+			{
+				constexpr float MAX_RANGE = 1000.0f;
 				constexpr float MAX_RANGE_SQ = MAX_RANGE * MAX_RANGE;
 
-				// 一番近い敵の座標を取得する
-				auto nearTargetPosition = [this](Vector3& outPosition)
-					{
-						bool isFind = false;
-						const Vector3 playerPosition = m_daddyPenguin->GetTransform().m_position;
-						Vector3 targetPosition;
-						Vector3 distance = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+				// 一番近くで寝ているエネミーを探す
+				actor::Enemy* nearestSleepingEnemy = nullptr;
+				float minDistSq = MAX_RANGE_SQ;
+				const Vector3 playerPosition = m_daddyPenguin->GetTransform().m_position;
 
-						auto positionList = actor::EnemyManager::GetInstance()->GetPositionList();
-						for (const auto& pos : positionList) {
-							Vector3 d = playerPosition - pos;
-							const float dSq = d.LengthSq();
-							// 指定距離以上なら処理しない
-							if (MAX_RANGE_SQ < dSq) {
-								continue;
-							}
-							if (d.LengthSq() < distance.LengthSq()) {
-								targetPosition = pos;
-								distance = d;
-								isFind = true;
-							}
-						}
+				for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())
+				{
+					auto* stateMachine = enemy->GetEnemyStateMachine();
 
-						outPosition = targetPosition;
-						return isFind;
-					};
+					// クールダウン（睡眠）状態でなければ対象外
+					if (!stateMachine->IsCoolDown()) {
+						continue;
+					}
 
-				auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>();
-				if (menu) {
-					Vector3 targetPosition;
-					const bool isFind = nearTargetPosition(targetPosition);
-					// menu->SetSleepingRate(); // NOTE: ここに起床パーセントを入れて
-					menu->SetTargetPosition(targetPosition);
-					menu->SetDraw(isFind);
+					Vector3 d = playerPosition - enemy->GetTransform().m_position;
+					const float dSq = d.LengthSq();
+
+					// 指定距離以上なら処理しない
+					if (dSq > MAX_RANGE_SQ) {
+						continue;
+					}
+
+					if (dSq < minDistSq) {
+						minDistSq = dSq;
+						nearestSleepingEnemy = enemy;
+					}
 				}
 
-				m_enemySleepingLayout->Update();
+				const bool isFind = (nearestSleepingEnemy != nullptr);
+
+				// 起床ゲージUI に渡す
+				{
+					auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>();
+					if (menu) {
+						if (isFind) {
+							auto* sm = nearestSleepingEnemy->GetEnemyStateMachine();
+							// 起床ゲージ（満タン=1.0f、0=起きる）を0〜1に正規化して渡す
+							menu->SetSleepingRate(sm->GetWakeUpGauge() / 100.0f);
+							menu->SetTargetPosition(nearestSleepingEnemy->GetTransform().m_position);
+						}
+						menu->SetDraw(isFind);
+					}
+					m_enemySleepingLayout->Update();
+				}
+
+				// 睡眠タイマーUI に渡す
+				{
+					auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
+					if (menu) {
+						if (isFind) {
+							auto* sm = nearestSleepingEnemy->GetEnemyStateMachine();
+							menu->SetCurrentPBTime(sm->GetSleepTimer());
+							menu->SetTargetPosition(nearestSleepingEnemy->GetTransform().m_position);
+						}
+						menu->SetDraw(isFind);
+					}
+					m_pbWakingUpTimerLayout->Update();
+				}
 			}
 
 			BattleManager::GetInstance().Update();
@@ -516,6 +572,7 @@ namespace app
 					if (layout) layout->Render(rc);
 				}
 				if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
+				if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
 				break;
 			case GamePhase::Finishing:
 				if (m_timerLayout)  m_timerLayout->Render(rc);
