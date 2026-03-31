@@ -39,6 +39,8 @@ namespace app
 
 		enSoundKind_ButtonPush,
 		enSoundKind_Whistle,
+		enSoundKind_CountDown,
+		enSoundKind_GameStart,
 
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
@@ -94,6 +96,8 @@ namespace app
 		SoundInformation("Assets/sound/SE/attack.wav"),
 		SoundInformation("Assets/sound/SE/AS_139690_キャンセルや決定ボタンの選択音（ピコン）.wav"),
 		SoundInformation("Assets/sound/SE/AS_53089_警官のホイッスルを2回吹く.wav"),
+		SoundInformation("Assets/sound/SE/AS_259345_ピッ＿ゲームなどセレクト音.wav"),
+		SoundInformation("Assets/sound/SE/AS_879314_パンッ！スターターピストル（単発）.wav"),
 
 
 		//BGM

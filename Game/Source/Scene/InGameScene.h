@@ -6,6 +6,7 @@
 #pragma once
 #include "IScene.h"
 #include "Source/Camera/CameraSteering.h"
+#include "Source/UI/CountDownMenu.h"
 
 
 namespace app
@@ -118,6 +119,9 @@ namespace app
 		// ポーズ中のサブ状態
 		enum class PauseState { Pause, SoundOption };
 		PauseState m_pauseState = PauseState::Pause;
+
+		/** 前フレームのカウントダウンタイプを保持（初期値は None） */
+		ui::EnCountDownType m_lastCountType = ui::EnCountDownType::None;
 
 		//------------------------------------------------------------
 		// シーン遷移

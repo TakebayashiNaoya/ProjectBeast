@@ -328,20 +328,56 @@ namespace app
 			if (m_countDownLayout) m_countDownLayout->Update();
 
 			// カウントダウン完了 → Playing へ
+			//if (m_countDownMenu && m_countDownMenu->IsCountDownFinished())
+			//{
+			//	m_gamePhase = GamePhase::Playing;
+			//	BattleManager::GetInstance().SetIsActive(true);
+
+			//	// Playing に切り替わった直後のフレームで一瞬表示されないよう明示的に非表示にする
+			//	if (auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>())
+			//	{
+			//		menu->SetDraw(false);
+			//	}
+			//	if (auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>())
+			//	{
+			//		menu->SetDraw(false);
+			//	}
+			//}
+			if (m_countDownMenu)
+			{
+				// 現在のタイプを取得 (Third, Second, First, GO など)
+				ui::EnCountDownType currentType = m_countDownMenu->GetCurrentCountType();
+
+				// 前のフレームからタイプが変わった瞬間だけ音を鳴らす
+				if (currentType != m_lastCountType)
+				{
+					switch (currentType)
+					{
+					case ui::EnCountDownType::Third:  // 「3」が表示された瞬間
+					case ui::EnCountDownType::Second: // 「2」が表示された瞬間
+					case ui::EnCountDownType::First:  // 「1」が表示された瞬間
+						SoundManager::Get().PlaySE(enSoundKind_CountDown); // ピッ
+						break;
+
+					case ui::EnCountDownType::GO:     // 「GO!」が表示された瞬間
+						SoundManager::Get().PlaySE(enSoundKind_GameStart); // パーン！
+						break;
+
+					default:
+						break;
+					}
+
+					// 状態を更新
+					m_lastCountType = currentType;
+				}
+			}
+
+			// カウントダウン終了判定
 			if (m_countDownMenu && m_countDownMenu->IsCountDownFinished())
 			{
 				m_gamePhase = GamePhase::Playing;
 				BattleManager::GetInstance().SetIsActive(true);
-
-				// Playing に切り替わった直後のフレームで一瞬表示されないよう明示的に非表示にする
-				if (auto* menu = m_enemySleepingLayout->GetMenu<ui::EnemySleepingMenu>())
-				{
-					menu->SetDraw(false);
-				}
-				if (auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>())
-				{
-					menu->SetDraw(false);
-				}
+				// ...
 			}
 			break;
 		}
