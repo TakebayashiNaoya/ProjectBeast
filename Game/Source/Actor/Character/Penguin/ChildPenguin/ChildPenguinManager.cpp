@@ -150,6 +150,32 @@ namespace app
 		}
 
 
+		int ChildPenguinManager::GetRescuedNum() const
+		{
+			if (m_daddyPenguin == nullptr) return 0;
+
+			int count = 0;
+			const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
+
+			for (const auto* cp : m_childPenguinList)
+			{
+				if (!cp) continue;
+
+				/** 親との水平距離を計算 */
+				Vector3 diff = daddyPos - cp->GetTransform().m_position;
+				diff.y = 0.0f;
+				const float dist = diff.Length();
+
+				/** 各子ペンギンの joinDistance 以内なら救出済みとみなす */
+				if (dist <= cp->GetJoinDistance())
+				{
+					count++;
+				}
+			}
+			return count;
+		}
+
+
 		void ChildPenguinManager::CalculateFormationPositions()
 		{
 			m_formationPositions.clear();

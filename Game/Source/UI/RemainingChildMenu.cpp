@@ -21,11 +21,21 @@ namespace app
 			auto* icon = GetUI<UIIcon>(Hash32("ChildPenguinIcon"));
 			if (icon) icon->m_isDraw = true;
 
+			auto* slashIcon = GetUI<UIIcon>(Hash32("SlashIcon"));
+			if (slashIcon) slashIcon->m_isDraw = true;
+
 			// 残り子ペンギンの数更新
 			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
 			if (digit) {
 				digit->m_isDraw = true;
 				digit->SetNumber(m_childNum);
+			}
+
+			// ステージ上の総ペンギン数更新
+			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
+			if (totalDigit) {
+				totalDigit->m_isDraw = true;
+				totalDigit->SetNumber(m_totalNum);
 			}
 
 			// Menuの更新。
@@ -39,9 +49,14 @@ namespace app
 			auto* icon = GetUI<UIIcon>(Hash32("ChildPenguinIcon"));
 			if (icon) icon->m_isDraw = false;
 
+			auto* slashIcon = GetUI<UIIcon>(Hash32("SlashIcon"));
+			if (slashIcon) slashIcon->m_isDraw = false;
+
 			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
 			if (digit) digit->m_isDraw = false;
+
+			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
+			if (totalDigit) totalDigit->m_isDraw = false;
 		}
 	}
 }
-

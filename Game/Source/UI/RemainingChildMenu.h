@@ -18,13 +18,18 @@ namespace app
 
 			void Update()override;
 			void InitializeLogic()override;
-			
+
 
 		public:
 			void SetChildNum(const int num) { m_childNum = num; }
+			void SetTotalNum(const int num) { m_totalNum = num; }
+
 
 		private:
+			/** 集めたペンギン数 */
 			int m_childNum = 0;
+			/** ステージ上の総ペンギン数 */
+			int m_totalNum = 0;
 		};
 	}
 }

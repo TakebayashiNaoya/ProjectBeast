@@ -33,6 +33,14 @@ namespace app
 			virtual ~ChildPenguinAIController() = default;
 
 
+		public:
+			/**
+			 * @brief 隊列に加わる距離を取得
+			 * @return 隊列に加わる距離
+			 */
+			float GetJoinDistance() const { return m_joinDistance; }
+
+
 		protected:
 			/**
 			 * @brief DaddyPenguinへの方向ベクトルを計算

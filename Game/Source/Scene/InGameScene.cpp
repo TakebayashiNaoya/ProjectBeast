@@ -370,8 +370,9 @@ namespace app
 			if (m_remainingChildLayout) {
 				auto* menu = m_remainingChildLayout->GetMenu<ui::RemainingChildMenu>();
 				if (menu) {
-					const int childNum = actor::ChildPenguinManager::GetInstance()->GetFollowersNum();
+					const int childNum = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
 					menu->SetChildNum(childNum);
+					menu->SetTotalNum(ScoreManager::GetInstance().GetTotalCount());
 				}
 
 				m_remainingChildLayout->Update();
@@ -473,8 +474,8 @@ namespace app
 			if (m_finishMenu && m_finishMenu->IsFinished())
 			{
 				m_nextScene = true;
-				ResultScene::SetResult(ScoreManager::GetInstance().GetCollectedCount(),
-					TimeManager::GetInstance().GetCurTime());
+				ResultScene::SetResult(TimeManager::GetInstance().GetCurTime(),
+					actor::ChildPenguinManager::GetInstance()->GetRescuedNum());
 			}
 			break;
 		}
