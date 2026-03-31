@@ -23,6 +23,10 @@ namespace app
 
 	TitleScene::~TitleScene()
 	{
+#ifdef DEBUG
+		// デバッグ描画を止めてから破棄する（破棄済みShapeへのアクセスを防ぐ）
+		nsBeastEngine::nsCollision::PhysicsWorld::Get().DisableDrawDebugWireFrame();
+#endif
 		delete m_soundOptionLayout;
 	}
 

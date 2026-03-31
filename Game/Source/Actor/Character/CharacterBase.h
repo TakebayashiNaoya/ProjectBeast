@@ -71,7 +71,7 @@ namespace app
 
 		public:
 			CharacterBase();
-			virtual ~CharacterBase() override = default;
+			virtual ~CharacterBase() override;
 
 
 		protected:

@@ -52,6 +52,13 @@ namespace app
 		{}
 
 
+		CharacterBase::~CharacterBase()
+		{
+			// PhysicsWorldからRigidBodyを明示的に除去してから破棄する
+			m_characterController.RemoveRigidBoby();
+		}
+
+
 		void CharacterBase::Start()
 		{
 			// ステータスを取得

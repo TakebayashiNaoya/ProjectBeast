@@ -41,7 +41,8 @@ namespace nsBeastEngine
 		void RigidBody::Release()
 		{
 			if (m_rigidBody) {
-				//PhysicsWorld::Get().RemoveRigidBody(*this);
+				PhysicsWorld::Get().RemoveRigidBody(*this);
+				m_rigidBody.reset();  // 解放済みフラグとして nullptr にする
 			}
 		}
 	}
