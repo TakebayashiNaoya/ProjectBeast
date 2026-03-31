@@ -5,106 +5,53 @@
  */
 #pragma once
 #include "Menu.h"
-#include "Source/Actor/Character/Enemy/EnemyController.h"
-#include "Source/Actor/Character/Enemy/Enemy.h"
-#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 
 
 namespace app
 {
 	namespace ui
 	{
-		class PBWakingUpTimerDigit
-		{
-		public:
-			PBWakingUpTimerDigit();
-			~PBWakingUpTimerDigit();
-			void Update();
-			void SetUIDigit(UIDigit* digit);
-			void SetValue(float value);
-			inline void SetIsDraw(bool isDraw)
-			{
-				if (m_digit)m_digit->m_isDraw = isDraw;
-			}
-
-
-		private:
-			UIDigit* m_digit;
-		};
-
-
-
-
 		class PBWakingUpTimerMenu : public MenuBase
 		{
 			using PBWakingUpTimerClass = MenuBase;
 
-
 		public:
 			PBWakingUpTimerMenu();
-			~PBWakingUpTimerMenu();
+			~PBWakingUpTimerMenu() = default;
+
 			void Update()override;
 			void InitializeLogic()override;
-			void ResetTimer();
 
 
+		public:
 			/**
-			 * @brief PB起床タイマーの描画距離の取得
-			 * @return m_isLengthDraw 描画距離の取得
+			 * @brief 表示するタイマー値を設定する（EnemyStateMachineのSleepTimerを渡す）
+			 * @param time 現在の睡眠タイマー値（0.0f〜30.0f）
 			 */
-			//inline bool IsLengthDraw()const { return m_isLengthDraw; }
-			/**
-			 * @brief PB起床タイマーの描画距離の設定
-			 * @param isLengthDraw 描画距離に応じての設定
-			 */
-			//inline void SetIsLengthDraw(bool isLengthDraw) { m_isLengthDraw = isLengthDraw; }
+			inline void SetCurrentPBTime(float time) { m_currentPBTime = time; }
 
 			/**
-			 * @brief PB起床タイマーのタイマーアクティブの取得
-			 * @return m_isTimerActive タイマーアクティブの取得
+			 * @brief エネミーのワールド座標を設定する（表示位置の計算に使用）
+			 * @param position エネミーのワールド座標
 			 */
-			inline bool IsPBTimerActive()const { return m_isPBTimerActive; }
-			/**
-			 * @brief PB起床タイマーのタイマーアクティブかの設定
-			 * @param isTimerActive タイマーアクティブの設定
-			 */
-			inline void SetIsPBTimerActive(bool isPBTimerActive) { m_isPBTimerActive = isPBTimerActive; }
-			/**
-			 * @brief 外部からPBの起床タイマーを設定する
-			 * @param time PBの起床タイマー
-			 */
-			inline void SetCurrentPBTime(float time){ m_currentPBTime = time; }
-			
-			/**
-			 * @brief Enemyの設定
-			 * @param enemy しろくま
-			 */
-			void SetEnemy(actor::Enemy* enemy) { m_enemy = enemy; }
+			inline void SetTargetPosition(const Vector3& position) { m_targetPosition = position; }
 
 			/**
-			 * @brief DaddyPenguinの設定
-			 * @param daddyPenguin 親ペンギン
+			 * @brief 描画するかどうかを設定する
+			 * @param isDraw 描画するか
 			 */
-			void SetDaddyPenguin(actor::DaddyPenguin* daddyPenguin) { m_daddyPenguin = daddyPenguin; }
-
-			void SetIsDraw(bool isDraw);
+			inline void SetDraw(bool isDraw) { m_isDraw = isDraw; }
 
 
 		private:
-			float m_currentPBTime;
-			float m_maxTime;
-			float m_minTime;
-			bool m_isLengthDraw;
-			bool m_isPBTimerActive;
+			/** 現在のタイマー値（外部から毎フレーム設定される） */
+			float m_currentPBTime = 0.0f;
 
-			actor::DaddyPenguin* m_daddyPenguin;
-			actor::EnemyController* m_eneCon;
-			actor::Enemy* m_enemy;
+			/** 表示対象エネミーのワールド座標 */
+			Vector3 m_targetPosition = Vector3::Zero;
 
-			using Digit = std::unique_ptr<PBWakingUpTimerDigit>;
-			using Key = uint32_t;
-
-			std::unordered_map<Key, Digit>m_wakingUpTimeMap;
+			/** 描画するかどうか */
+			bool m_isDraw = false;
 		};
 	}
 }

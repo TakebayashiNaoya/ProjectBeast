@@ -106,16 +106,35 @@ namespace app
 
 		void InGameTimerMenu::Update()
 		{
-			// floatからintにキャスト。(小数点以下は切り捨て)
-			int displayTime = static_cast<int>(m_currentTime);
+			// 表示状態にする
+			auto* frameIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameIcon"));
+			if (frameIcon) frameIcon->m_isDraw = true;
+
+			auto* bgIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameBackGroundIcon"));
+			if (bgIcon) bgIcon->m_isDraw = true;
 
 			auto* timerDigit = GetUI<UIDigit>(Hash32("InGameTimerDigit"));
 			if (timerDigit) {
-				timerDigit->SetNumber(displayTime);
+				timerDigit->m_isDraw = true;
+				timerDigit->SetNumber(static_cast<int>(m_currentTime));
 			}
 
 			// MenuBaseの更新処理。
 			InGameTimerClass::Update();
+		}
+
+
+		void InGameTimerMenu::InitializeLogic()
+		{
+			// 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのため）
+			auto* frameIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameIcon"));
+			if (frameIcon) frameIcon->m_isDraw = false;
+
+			auto* bgIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameBackGroundIcon"));
+			if (bgIcon) bgIcon->m_isDraw = false;
+
+			auto* digit = GetUI<UIDigit>(Hash32("InGameTimerDigit"));
+			if (digit) digit->m_isDraw = false;
 		}
 
 

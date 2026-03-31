@@ -138,6 +138,10 @@ namespace app
 				Icon searchIcon = std::make_unique<SearchIcon>(info.type);
 				searchIcon->SetUIIcon(GetUI<UIIcon>(info.key));
 				m_searchIconMap.emplace(info.key, std::move(searchIcon));
+
+				// 生成直後は非表示にする
+				auto* icon = GetUI<UIIcon>(info.key);
+				if (icon) icon->m_isDraw = false;
 			}
 		}
 	}

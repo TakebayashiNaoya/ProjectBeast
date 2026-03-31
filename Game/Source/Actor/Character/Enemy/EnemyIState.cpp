@@ -384,38 +384,61 @@ namespace app
 			m_owner->SetMoveVector(Vector3::Zero);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Sleep);
 			SoundManager::Get().PlaySE(enSoundKind_EnemyRoar);
+
+			// 寝た瞬間に両ゲージを満タンにする
+			m_owner->SetWakeUpGauge(MAX_WAKE_UP_GAUGE);
+			m_owner->SetSleepTimer(MAX_SLEEP_TIME);
 		}
 
 
 		void EnemyCoolDownState::Update()
 		{
-			// 音の検知処理
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			//------------------------------------------------------------
+			// 音ゲージの更新
+			//------------------------------------------------------------
 			Vector3 loudestPos;
 			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
 
-			float currentGauge = m_owner->GetWakeUpGauge();
-			const float MAX_WAKE_UP_GAUGE = 100.0f; // 起床する閾値
+			float wakeUpGauge = m_owner->GetWakeUpGauge();
 
 			if (totalNoise > 0.0f)
 			{
-				currentGauge += totalNoise * g_gameTime->GetFrameDeltaTime();
+				// 騒がしいほどゲージが減る
+				wakeUpGauge -= totalNoise * deltaTime;
+			}
+			else
+			{
+				// 静かなときはゲージが回復する
+				wakeUpGauge += GAUGE_RECOVERY_SPEED * deltaTime;
+			}
 
-				if (currentGauge >= MAX_WAKE_UP_GAUGE)
+			wakeUpGauge = std::clamp(wakeUpGauge, 0.0f, MAX_WAKE_UP_GAUGE);
+			m_owner->SetWakeUpGauge(wakeUpGauge);
+
+			//------------------------------------------------------------
+			// 睡眠タイマーの更新（回復なし、減り続けるのみ）
+			//------------------------------------------------------------
+			float sleepTimer = m_owner->GetSleepTimer();
+			sleepTimer -= deltaTime;
+			sleepTimer = max(0.0f, sleepTimer);
+			m_owner->SetSleepTimer(sleepTimer);
+
+			//------------------------------------------------------------
+			// 起床判定（OR条件：どちらかが0になれば起きる）
+			//------------------------------------------------------------
+			if (wakeUpGauge <= 0.0f || sleepTimer <= 0.0f)
+			{
+				m_owner->SetCoolDown(false);
+
+				// 音で起きた場合は索敵状態へ
+				if (wakeUpGauge <= 0.0f)
 				{
-					currentGauge = 0.0f; // リセット
-
-					m_owner->SetCoolDown(false);
 					m_owner->SetSeach(true);
 					m_owner->SetSearchTargetPos(loudestPos);
 				}
 			}
-			else
-			{
-				currentGauge -= 10.0f * g_gameTime->GetFrameDeltaTime();
-				currentGauge = max(0.0f, currentGauge);
-			}
-
-			m_owner->SetWakeUpGauge(currentGauge);
 		}
 
 

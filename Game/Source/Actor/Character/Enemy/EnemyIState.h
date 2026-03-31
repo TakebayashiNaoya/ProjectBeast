@@ -291,6 +291,14 @@ namespace app
 		public:
 			EnemyCoolDownState(EnemyStateMachine* owner);
 			~EnemyCoolDownState() override = default;
+
+		private:
+			/** 起床ゲージの最大値（満タン=完全に眠っている） */
+			static constexpr float MAX_WAKE_UP_GAUGE = 100.0f;
+			/** 静寂時のゲージ回復速度（毎秒） */
+			static constexpr float GAUGE_RECOVERY_SPEED = 10.0f;
+			/** 睡眠タイマーの最大値（秒） */
+			static constexpr float MAX_SLEEP_TIME = 30.0f;
 		};
 
 
@@ -318,4 +326,3 @@ namespace app
 		};
 	}
 }
-

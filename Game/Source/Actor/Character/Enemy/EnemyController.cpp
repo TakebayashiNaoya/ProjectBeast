@@ -762,26 +762,18 @@ namespace app
 		{
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
 
-			// 耳で音を聞いてステートマシン内部で起き上がった場合（フラグが折られる）
+			// EnemyCoolDownState::Update() 内で起床条件を満たした場合にフラグが折られる
+			// 音で起きた場合は IsSeach() が true になっているのでSearchへ、そうでなければIdleへ
 			if (!sm->IsCoolDown())
 			{
-				// 起きた理由が音による索敵ならSearchへ、そうでなければIdleへ
 				if (sm->IsSeach()) {
 					return enEnemyState_Search;
 				}
 				return enEnemyState_Idle;
 			}
 
-			// 一応、時間経過でも起きるように残しておく
-			enemy->m_coolDownTimer += g_gameTime->GetFrameDeltaTime();
-
-			if (enemy->m_coolDownTimer >= 5.0f)
-			{
-				return enEnemyState_Idle;
-			}
 			return enEnemyState_Invalid;
 		}
-
 
 
 		/** 咆哮 */

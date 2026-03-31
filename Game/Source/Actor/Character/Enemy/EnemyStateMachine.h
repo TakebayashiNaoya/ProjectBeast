@@ -200,6 +200,16 @@ namespace app
 
 
 			/**
+			 * @brief 睡眠タイマーのゲッター
+			 */
+			float GetSleepTimer() const { return m_sleepTimer; }
+			/**
+			 * @brief 睡眠タイマーのセッター
+			 */
+			void SetSleepTimer(float timer) { m_sleepTimer = timer; }
+
+
+			/**
 			 * @brief 索敵目標座標のゲッター
 			 */
 			const Vector3& GetSearchTargetPos() const { return m_searchTargetPos; }
@@ -287,8 +297,11 @@ namespace app
 			/** 咆哮できるかどうか */
 			bool m_isRoar;
 
-			/** 起床ゲージ (0.0f ～ Max) */
+			/** 起床ゲージ（満タン=完全に眠っている、0=起きる） */
 			float m_wakeUpGauge = 0.0f;
+
+			/** 睡眠タイマー（30秒から減り続け、0になると起きる） */
+			float m_sleepTimer = 0.0f;
 
 			/** 索敵時の目標座標 */
 			Vector3 m_searchTargetPos = Vector3::Zero;
