@@ -14,6 +14,7 @@
 #include "Source/Actor/Character/Enemy/EnemyStatus.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Noise/NoiseManager.h"
 
@@ -638,6 +639,14 @@ namespace app
 
 			sm->SetActionButtonX(true);
 			sm->SetIsNearPenguin(true);
+
+			// 子ペンギンにダメージを与える。体力が1なので即死する。
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				enemy->m_foundPenguin->GetStateMachine()->Damage();
+				// ダングリングポインタ防止のためnullptrにリセットする。
+				enemy->m_foundPenguin = nullptr;
+			}
 
 			// 満腹処理
 			enemy->m_eatCount++;

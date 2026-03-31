@@ -37,6 +37,14 @@ namespace app
 		virtual void Render(RenderContext& rc) = 0;
 		virtual void PauseUpdate() = 0;
 
+
+		/**
+		 * @brief シーンのロードが完了したかどうかを返す
+		 * @return 完了していればtrue
+		 */
+		virtual bool IsLoaded() const { return true; }
+
+
 		/**
 		 * @brief シーンを要求
 		 * @param id シーンのID

@@ -348,7 +348,9 @@ namespace nsBeastEngine
 
 		void CharacterController::RemoveRigidBoby()
 		{
+			if (!m_isInited) return; // ← 未初期化なら何もしない
 			PhysicsWorld::Get().RemoveRigidBody(m_rigidBody);
+			m_isInited = false; // ← 二重呼び出し防止
 		}
 
 

@@ -14,8 +14,6 @@ namespace app
 	{
 		namespace
 		{
-			// 最大HP。
-			constexpr float MAX_HP = 100.0f;
 			// 最小HP。
 			constexpr float MIN_HP = 0.0f;
 			// ダメージ量。
@@ -48,12 +46,12 @@ namespace app
 			, m_initialPosX(0.0f)
 			, m_width(0.0f)
 		{}
-		
-		
+
+
 		HPBarIcon::~HPBarIcon()
 		{}
-		
-		
+
+
 		void HPBarIcon::Update()
 		{
 			if (!m_icon)return;
@@ -63,8 +61,8 @@ namespace app
 			if (m_type == EnHPType::Green)speed = 2.0f;
 			else if (m_type == EnHPType::Red)speed = 0.08f;
 			else if (m_type == EnHPType::Gray)speed = 1.0f;
-			
-         if (std::abs(m_currentScale - m_targetHP) > 0.001f)
+
+			if (std::abs(m_currentScale - m_targetHP) > 0.001f)
 			{
 				const float delta = (m_targetHP - m_currentScale) * speed;
 				const float next = m_currentScale + delta;
@@ -81,13 +79,14 @@ namespace app
 			{
 				m_currentScale = m_targetHP;
 			}
+
 			m_icon->m_transform.m_localTransform.m_scale.x = m_currentScale;
 			float offsetX = (m_width * (1.0f - m_currentScale)) / 2.0f;
 			m_icon->m_transform.m_localTransform.m_position.x = m_initialPosX - offsetX;
 		}
 
 
-		void HPBarIcon::SetUIIcon(UIIcon * icon)
+		void HPBarIcon::SetUIIcon(UIIcon* icon)
 		{
 			m_icon = icon;
 			K2_ASSERT(m_icon != nullptr, "登録失敗です。");
@@ -108,33 +107,31 @@ namespace app
 			const float clampedHP = util::clamp(targetHP, MIN_HP, CLAMP_MAX);
 			m_targetHP = clampedHP;
 		}
-		
-		
-		
-		
+
+
+
 
 		/****************************************/
-		
-		
+
+
 		HPBarMenu::HPBarMenu()
 			: m_currentHPType(EnHPType::Green)
-			, m_maxHP(MAX_HP)
-			, m_currentHP(MAX_HP)
-			, m_targetHP(MAX_HP)
+			, m_maxHP(1)
+			, m_currentHP(1)
+			, m_targetHP(1)
 			, m_damage(DAMAGE)
 			, m_isGreenMoving(false)
 			, m_isRedMoving(false)
 			, m_damageRatio(0.0f)
 			//, m_prevGreenMoving(false)
 			//, m_prevRedMoving(false)
-		{
-		}
-		
-		
+		{}
+
+
 		HPBarMenu::~HPBarMenu()
 		{}
-		
-		
+
+
 		void HPBarMenu::Update()
 		{
 			for (auto& icon : m_hpBarIconMap)
@@ -183,7 +180,7 @@ namespace app
 				m_currentHP = m_targetHP;
 			}
 
-		
+
 			// MenuBaseのUpdateを呼び出す。
 			HPBarClass::Update();
 		}
@@ -204,7 +201,8 @@ namespace app
 			auto* green = m_hpBarIconMap[GreenKey].get();
 
 			float current = green->GetCurrentScale();
-			float step = damage / m_maxHP;
+			// m_maxHPを使ってダメージ割合を計算。
+			float step = damage / static_cast<float>(m_maxHP);
 
 			float next = current - step;
 			if (next < 0.0f) next = 0.0f;
@@ -215,8 +213,8 @@ namespace app
 
 			m_isGreenMoving = true;
 		}
-		
-		
+
+
 		void HPBarMenu::InitializeLogic()
 		{
 			m_hpBarIconMap.clear();

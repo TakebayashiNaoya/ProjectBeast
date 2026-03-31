@@ -372,7 +372,9 @@ namespace app
 
 		void PenguinDeadState::Enter()
 		{
-			m_owner->SetActive(false);
+			// 死亡時の処理を派生ステートマシンに委譲する。
+			// ChildPenguinStateMachineはここでマネージャーからの削除とdeleteを行う。
+			m_owner->OnDead();
 		}
 
 

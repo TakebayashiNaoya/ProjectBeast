@@ -40,22 +40,6 @@ namespace app
 
 		void ChildPenguinManager::Update()
 		{
-			///** 子ペンギンが親と同じ移動方法で移動するため、親のステートを確認する */
-			//if (m_daddyPenguin)
-			//{
-			//	auto* daddyState = m_daddyPenguin->GetStateMachine();
-
-			//	/** 走っているかどうか */
-			//	m_isDaddyRunning = daddyState->IsEqualCurrentState(PenguinRunState::ID());
-			//	/** スライドしているかどうか */
-			//	m_isDaddySliding = daddyState->IsEqualCurrentState(PenguinSlidingState::ID()) ||
-			//		daddyState->IsEqualCurrentState(PenguinSlideStartState::ID());
-			//}
-			//else
-			//{
-			//	m_isDaddyRunning = m_isDaddySliding = false;
-			//}
-
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
@@ -71,6 +55,21 @@ namespace app
 				/** 隊列メンバーに割り当て */
 				SortAndAssignFollowers();
 			}
+
+			/** 削除待ちのペンギンを安全に破棄する (遅延削除) */
+			for (auto* deadPenguin : m_destroyList)
+			{
+				// 管理リストから安全に取り除く
+				auto it = std::find(m_childPenguinList.begin(), m_childPenguinList.end(), deadPenguin);
+				if (it != m_childPenguinList.end())
+				{
+					m_childPenguinList.erase(it);
+				}
+
+				// 全ての Update 処理が終わったここで、初めてメモリを解放する
+				delete deadPenguin;
+			}
+			m_destroyList.clear();
 		}
 
 
@@ -108,6 +107,21 @@ namespace app
 			/** 既に子ペンギンがいる場合は追加で生成 */
 			for (int i = 0; i < childPenguinNum; i++) {
 				m_childPenguinList.push_back(new ChildPenguin);
+			}
+		}
+
+
+		void ChildPenguinManager::RemoveAndDestroy(ChildPenguin* penguin)
+		{
+			// 隊列から取り除く (陣形には影響させないため即座に外す)
+			RemoveFollower(penguin);
+
+			// 即座に m_childPenguinList から erase したり delete したりせず、
+			// 削除予定リストに登録するだけに留める
+			auto it = std::find(m_destroyList.begin(), m_destroyList.end(), penguin);
+			if (it == m_destroyList.end())
+			{
+				m_destroyList.push_back(penguin);
 			}
 		}
 

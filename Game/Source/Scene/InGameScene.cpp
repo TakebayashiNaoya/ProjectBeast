@@ -13,27 +13,27 @@
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
-#include "Source/Util/JsonConverter.h"
-#include "Source/Camera/CameraManager.h"
-#include "Source/Camera/CameraController.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Camera/CameraController.h"
+#include "Source/Camera/CameraManager.h"
 #include "Source/Noise/NoiseManager.h"
+#include "Source/Util/JsonConverter.h"
 
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
 
-#include "Source/UI/Layout.h"
 #include "Source/UI/CountDownMenu.h"
-#include "Source/UI/InGameTimerMenu.h"
 #include "Source/UI/FinishMenu.h"
-#include "Source/UI/RemainingChildMenu.h"
+#include "Source/UI/InGameTimerMenu.h"
+#include "Source/UI/Layout.h"
 #include "Source/UI/PauseScreenMenu.h"
-#include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/RemainingChildMenu.h"
 #include "Source/UI/SearchMenu.h"
+#include "Source/UI/SoundOptionMenu.h"
 
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
@@ -52,6 +52,10 @@ namespace app
 
 	InGameScene::~InGameScene()
 	{
+#ifdef DEBUG
+		// デバッグ描画を止めてから破棄する（破棄済みShapeへのアクセスを防ぐ）
+		nsBeastEngine::nsCollision::PhysicsWorld::Get().DisableDrawDebugWireFrame();
+#endif
 		// UI
 		delete m_countDownLayout;
 		delete m_timerLayout;
@@ -67,8 +71,9 @@ namespace app
 		delete m_enemySleepingLayout;
 		delete m_pbWakingUpTimerLayout;
 
+
 		// アクター
-		actor::StageSystem::DestroyInstance();
+		delete m_daddyPenguin;
 		actor::EnemyManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
@@ -153,7 +158,6 @@ namespace app
 			auto* menu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
 			if (menu) {
 				menu->SetDraw(false);
-				menu->SetCurrentPBTime(0.0f);
 			}
 		}
 
@@ -236,7 +240,6 @@ namespace app
 			// マネージャーにJSONを渡して一括生成させる
 			actor::EnemyManager::GetInstance()->LoadEnemies(json);
 
-			// ↓ ここから追加
 			for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())
 			{
 				auto* layout = new ui::Layout();
