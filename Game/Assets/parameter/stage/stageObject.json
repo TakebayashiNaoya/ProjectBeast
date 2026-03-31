@@ -4,14 +4,21 @@
       {
         "objectName" : "bearHome_1",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
-        "position" : [560, 50, 80],
+        "position" : [1970, 97, -159],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
       },
       {
         "objectName" : "bearHome_2",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
-        "position" : [0, 50, 300],
+        "position" : [-116, 47, 1690],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_3",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "position" : [-1358, 237, -1223],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
       },
