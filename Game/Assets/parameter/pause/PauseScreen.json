@@ -15,7 +15,7 @@
             {
                 "type":"UIIcon",
                 "name":"UpDownIcon",
-                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/UporDownButton.dds",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_dpad_round_vertical.dds",
                 "width":60,
                 "height":60,
                 "position":[ 280, -400, 0],
@@ -26,7 +26,7 @@
             {
                 "type":"UIIcon",
                 "name":"PauseButtonMirrorIcon",
-                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/PauseButtonMirror.dds",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_view.dds",
                 "width":60,
                 "height":60,
                 "position":[ 80, -400, 0],
@@ -37,7 +37,7 @@
             {
                 "type":"UIIcon",
                 "name":"AbuttonIcon",
-                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/Abutton.dds",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_a.dds",
                 "width":60,
                 "height":60,
                 "position":[ 460, -400, 0],
