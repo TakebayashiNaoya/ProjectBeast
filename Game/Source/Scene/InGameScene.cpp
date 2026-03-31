@@ -473,6 +473,8 @@ namespace app
 			if (m_finishMenu && m_finishMenu->IsFinished())
 			{
 				m_nextScene = true;
+				ResultScene::SetResult(ScoreManager::GetInstance().GetCollectedCount(),
+					TimeManager::GetInstance().GetCurTime());
 			}
 			break;
 		}
