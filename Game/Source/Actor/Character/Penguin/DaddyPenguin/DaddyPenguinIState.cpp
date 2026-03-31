@@ -34,32 +34,41 @@ namespace app
 		/************************************/
 
 
+		namespace
+		{
+			const Vector3 EFFECT_SCALE = Vector3(70.0f, 70.0f, 70.0f);
+		}
+
+
 		void DaddyPenguinCommandShoutState::Enter()
 		{
 			// 1. マネージャーを介して子ペンギンへの命令を切り替える（トグル）
-			auto* manager = ChildPenguinManager::GetInstance();
-			manager->ToggleCommand();
+			auto* childPenMan = ChildPenguinManager::GetInstance();
+			childPenMan->ToggleCommand();
+
+			auto* effect = &EffectManager::Get();
+			auto* sound = &SoundManager::Get();
 
 			// 2. 切り替わった後の命令を取得
-			auto currentCommand = manager->GetCommand();
+			auto currentCommand = childPenMan->GetCommand();
 
 			// 3. 命令に応じて演出（アニメーションやエフェクト）を分岐
 			if (currentCommand == ChildPenguinManager::EnPenguinCommand::Follow)
 			{
 				// === 「おいで！（追従）」の演出 ===
 				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
-				EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
-				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutFollow, false);
-				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemFollow, false);
+				effect->PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, EFFECT_SCALE);
+				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutFollow, false);
+				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemFollow, false);
 			}
 			else if (currentCommand == ChildPenguinManager::EnPenguinCommand::Wait)
 			{
 				// === 「待て！（待機）」の演出 ===
 				// NOTE: 現状は同じ設定を入れていますが、待機用のアニメーションやエフェクト（例: EnPenguinAnimationID::CommandWait など）があればここを変更してください。
 				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
-				EffectManager::Get().PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, Vector3::One);
-				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutWait, false);
-				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemWait, false);
+				effect->PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, EFFECT_SCALE);
+				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutWait, false);
+				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemWait, false);
 			}
 		}
 
