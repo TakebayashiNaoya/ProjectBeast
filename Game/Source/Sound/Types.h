@@ -44,7 +44,7 @@ namespace app
 
 		enSoundKind_BGM = enSoundKind_SE_Max,
 		/** 下にBGMの設定 */
-		enSoundKind_Game = enSoundKind_BGM,
+		enSoundKind_InGame = enSoundKind_BGM,
 		enSoundKind_Title,
 		enSoundKind_Result,
 
@@ -94,7 +94,7 @@ namespace app
 		SoundInformation("Assets/sound/SE/AS_139690_キャンセルや決定ボタンの選択音（ピコン）.wav"),
 
 		//BGM
-		SoundInformation("Assets/sound/BGM/AS_1419280_氷の世界＿雪＿かわいいフィールドBGM.wav"),
+		SoundInformation("Assets/sound/BGM/AS_1620196_滑稽・NGシーンに＿ドタバタポップ.wav"),
 		SoundInformation("Assets/sound/BGM/AS_1157435_輝く銀世界彩るR_Bポップ＿+.wav"),
 		SoundInformation("Assets/sound/BGM/AS_1408083_かわいい軽やかクリスマスBGM。CM広告.wav"),
 

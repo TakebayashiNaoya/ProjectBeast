@@ -8,6 +8,8 @@
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
 
+#include "Source/Sound/SoundManager.h"
+
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
@@ -278,6 +280,7 @@ namespace app
 			if (m_countDownMenu)
 			{
 				m_countDownMenu->SetCountDownStartFlag(true);
+				SoundManager::Get().PlayBGM(enSoundKind_InGame);
 			}
 			break;
 
@@ -472,6 +475,7 @@ namespace app
 			// 演出終了 → リザルトへ
 			if (m_finishMenu && m_finishMenu->IsFinished())
 			{
+				SoundManager::Get().StopBGM();
 				m_nextScene = true;
 			}
 			break;
