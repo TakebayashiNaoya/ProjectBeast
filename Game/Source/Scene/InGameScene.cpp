@@ -30,6 +30,13 @@
 #include "Source/UI/InGameTimerMenu.h"
 #include "Source/UI/FinishMenu.h"
 #include "Source/UI/RemainingChildMenu.h"
+#include "Source/UI/PauseScreenMenu.h"
+#include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/SearchMenu.h"
+
+#include "Source/Scene/SceneManager.h"
+#include "TitleScene.h"
+
 #include "Source/UI/EnemySleepingMenu.h"
 
 #include <random>
@@ -48,6 +55,13 @@ namespace app
 		delete m_timerLayout;
 		delete m_finishLayout;
 		delete m_remainingChildLayout;
+		delete m_pauseLayout;
+		delete m_soundOptionLayout;
+		for (auto* layout : m_searchLayouts)
+		{
+			delete layout;
+		}
+		m_searchLayouts.clear();
 		delete m_enemySleepingLayout;
 
 		// アクター
@@ -55,9 +69,6 @@ namespace app
 		actor::EnemyManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
-
-		app::TimeManager::DestroyInstance();
-		app::ScoreManager::DestroyInstance();
 
 		DeleteGO(m_ocean);
 
@@ -70,9 +81,6 @@ namespace app
 
 	bool InGameScene::Start()
 	{
-		ScoreManager::CreateInstance();
-		TimeManager::CreateInstance();
-
 		// マネージャー生成
 		app::core::ParameterManager::CreateInstance();
 		BattleManager::CreateInstance();
@@ -99,7 +107,7 @@ namespace app
 
 		m_finishLayout = new ui::Layout();
 		m_finishLayout->Initialize<ui::FinishMenu>(
-			"Assets/parameter/UI/FinishMenu.json"
+			"Assets/parameter/event/FinishMenu.json"
 		);
 		m_finishMenu = m_finishLayout->GetMenu<ui::FinishMenu>();
 
@@ -107,6 +115,18 @@ namespace app
 		m_remainingChildLayout->Initialize<ui::RemainingChildMenu>(
 			"Assets/parameter/UI/remainingChild/remainingChild.json"
 		);
+
+		m_pauseLayout = new ui::Layout();
+		m_pauseLayout->Initialize<ui::PauseScreenMenu>(
+			"Assets/parameter/pause/PauseScreen.json"
+		);
+		m_pauseMenu = m_pauseLayout->GetMenu<ui::PauseScreenMenu>();
+
+
+		// サウンドオプション画面のセットアップ（TitleSceneと同じパスを使用）
+		m_soundOptionLayout = new ui::Layout;
+		m_soundOptionLayout->Initialize<ui::SoundOptionMenu>("Assets/parameter/sound/SoundOption.json");
+		m_soundOptionMenu = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
 
 		m_enemySleepingLayout = new ui::Layout();
 		m_enemySleepingLayout->Initialize<ui::EnemySleepingMenu>(
@@ -191,6 +211,20 @@ namespace app
 
 			// マネージャーにJSONを渡して一括生成させる
 			actor::EnemyManager::GetInstance()->LoadEnemies(json);
+
+			// ↓ ここから追加
+			for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())
+			{
+				auto* layout = new ui::Layout();
+				layout->Initialize<ui::SearchMenu>("Assets/parameter/search/Search.json");
+
+				auto* menu = layout->GetMenu<ui::SearchMenu>();
+				menu->SetEnemy(enemy);
+				menu->SetIsActive(true);
+
+				m_searchLayouts.push_back(layout);
+				m_searchMenus.push_back(menu);
+			}
 
 			m_loadPhase = LoadPhase::Camera;
 			break;
@@ -277,6 +311,11 @@ namespace app
 		//------------------------------------------------------------
 		case GamePhase::Playing:
 		{
+			if (g_pad[0]->IsTrigger(enButtonStart))
+			{
+				SceneManager::GetInstance()->SetPause(true);
+			}
+
 			// プレイヤー・子ペンギン・シロクマ の更新
 			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
 			actor::ChildPenguinManager::GetInstance()->Update();
@@ -284,6 +323,11 @@ namespace app
 
 			// タイマー UI 更新
 			if (m_timerLayout) m_timerLayout->Update();
+			// 探索 UI 更新
+			for (auto* layout : m_searchLayouts)
+			{
+				if (layout) layout->Update();
+			}
 
 			// 残り子ペンギン数 UI 更新
 			if (m_remainingChildLayout) {
@@ -341,6 +385,9 @@ namespace app
 				m_enemySleepingLayout->Update();
 			}
 
+			BattleManager::GetInstance().Update();
+			TimeManager::GetInstance().Update();
+
 			// ノイズリストをクリア
 			NoiseManager::GetInstance().ClearNoises();
 
@@ -353,8 +400,6 @@ namespace app
 				m_gamePhase = GamePhase::Finishing;
 			}
 			break;
-
-			BattleManager::GetInstance().Update();
 		}
 
 		//------------------------------------------------------------
@@ -377,7 +422,60 @@ namespace app
 
 
 	void InGameScene::PauseUpdate()
-	{}
+	{
+		switch (m_pauseState)
+		{
+			//------------------------------------------------------------
+			// ポーズメニュー
+			//------------------------------------------------------------
+		case PauseState::Pause:
+		{
+			if (!m_pauseMenu) break;
+
+			m_pauseMenu->Update();
+			m_pauseMenu->EnterType();
+
+			// ゲームに戻る
+			if (m_pauseMenu->IsRetry())
+			{
+				m_pauseMenu->IsRetry(false);
+				SceneManager::GetInstance()->SetPause(false);
+			}
+			// サウンドオプションへ
+			else if (m_pauseMenu->IsSound())
+			{
+				m_pauseMenu->IsSound(false);
+				m_pauseState = PauseState::SoundOption;
+			}
+			// タイトルへ戻る
+			else if (m_pauseMenu->IsGoTitle())
+			{
+				m_pauseMenu->IsGoTitle(false);
+				SceneManager::GetInstance()->SetPause(false);
+				m_goTitle = true;  // RequesutScene で拾う
+			}
+			break;
+		}
+
+		//------------------------------------------------------------
+		// サウンドオプション（ポーズ中のサブ画面）
+		//------------------------------------------------------------
+		case PauseState::SoundOption:
+		{
+			if (m_soundOptionLayout)
+			{
+				m_soundOptionLayout->Update();
+			}
+
+			// Bボタンでポーズ画面に戻る（IsBack()ではなく直接判定）
+			if (g_pad[0]->IsTrigger(enButtonB))
+			{
+				m_pauseState = PauseState::Pause;
+			}
+			break;
+		}
+		}
+	}
 
 
 	void InGameScene::Render(RenderContext& rc)
@@ -387,6 +485,20 @@ namespace app
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
 		actor::EnemyManager::GetInstance()->Render(rc);
+
+		// ポーズ中の描画（既存のif文の後に追加）
+		if (SceneManager::GetInstance()->IsPause())
+		{
+			switch (m_pauseState)
+			{
+			case PauseState::Pause:
+				if (m_pauseLayout) m_pauseLayout->Render(rc);
+				break;
+			case PauseState::SoundOption:
+				if (m_soundOptionLayout) m_soundOptionLayout->Render(rc);
+				break;
+			}
+		}
 
 		// UI 描画
 		if (m_loadPhase == LoadPhase::Done)
@@ -399,6 +511,10 @@ namespace app
 			case GamePhase::Playing:
 				if (m_timerLayout) m_timerLayout->Render(rc);
 				if (m_remainingChildLayout) m_remainingChildLayout->Render(rc);
+				for (auto* layout : m_searchLayouts)
+				{
+					if (layout) layout->Render(rc);
+				}
 				if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
 				break;
 			case GamePhase::Finishing:
@@ -412,6 +528,14 @@ namespace app
 
 	bool InGameScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
+		// タイトルへ戻る
+		if (m_goTitle)
+		{
+			id = TitleScene::ID();
+			waitTime = 0.5f;
+			return true;
+		}
+		// リザルトへ（既存）
 		if (m_nextScene)
 		{
 			id = ResultScene::ID();

@@ -73,7 +73,7 @@ namespace app
 			float m_timer = 0.0f;
 
 			/** 演出の表示時間（秒） */
-			static constexpr float FINISH_DURATION = 2.5f;
+			static constexpr float FINISH_DURATION = 3.0f;
 
 			using Icon = std::unique_ptr<FinishIcon>;
 			using Key = uint32_t;

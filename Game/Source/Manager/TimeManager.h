@@ -10,11 +10,16 @@ namespace app
 {
 	class TimeManager
 	{
+	private:
+		/** タイムの最大値（試合時間：秒） */
+		static constexpr float MAX_TIME = 180.0f;
+
+
 	public:
 		/**
 		 * @brief タイムの最大値を取得
 		 */
-		inline float GetMaxTime() { return m_maxTime; }
+		inline float GetMaxTime() const { return m_maxTime; }
 		/**
 		 * @brief タイムの最大値を設定
 		 */
@@ -23,17 +28,18 @@ namespace app
 		/**
 		 * @brief 現在のタイムを取得
 		 */
-		inline float GetCurTime() { return m_currentTime; }
+		inline float GetCurTime() const { return m_currentTime; }
 
 		/**
-		 * @brief タイムストップの状態を取得
+		 * @brief タイムストップの状態を設定
 		 */
 		inline void SetIsTimeStop(const bool stop) { m_isTimeStop = stop; }
 
 		/**
 		 * @brief タイムアップしているかどうか
+		 * @return タイムアップしていれば true
 		 */
-		inline bool IsTimeUp() const { return m_isTimeUp; }
+		inline bool IsTimeUp() const { return m_isTimeUp; }	// 修正：m_isTimeUp を返す（旧: m_currentTime <= m_maxTime）
 
 
 	public:
@@ -46,8 +52,8 @@ namespace app
 
 	private:
 		TimeManager()
-			: m_maxTime(FLT_MAX)
-			, m_currentTime(FLT_MAX)
+			: m_maxTime(MAX_TIME)
+			, m_currentTime(MAX_TIME)
 			, m_isTimeStop(false)
 			, m_isTimeUp(false)
 		{};

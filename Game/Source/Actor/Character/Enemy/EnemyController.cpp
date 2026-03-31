@@ -100,11 +100,16 @@ namespace app
 
 			/** 現在のステートのアップデート */
 			currentState->update(this);
-			ChildPenguin* found = FindTarget();
-			if (found != nullptr && m_currentState != enEnemyState_CoolDown)
+			if (m_currentState == enEnemyState_Search ||
+				m_currentState == enEnemyState_Wandering ||
+				m_currentState == enEnemyState_Chase)
 			{
-				m_foundPenguin = found;
-				m_lastKnownPenguinPos = found->GetTransform().m_position;
+				ChildPenguin* found = FindTarget();
+				if (found != nullptr)
+				{
+					m_foundPenguin = found;
+					m_lastKnownPenguinPos = found->GetTransform().m_position;
+				}
 			}
 		}
 
@@ -160,7 +165,7 @@ namespace app
 				auto moveDirection = m_target->GetEnemyStateMachine()->GetMoveDirection();
 				float cosv = moveDirection.Dot(diff);
 				float cosAngle = cosf(Math::PI / 180.0f * 70.0f);
-				if (cosv <= cosAngle)
+				if (cosv < cosAngle)
 				{
 					continue;
 				}
@@ -694,7 +699,7 @@ namespace app
 			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
 			// 到着判定
-			if (toHome.LengthSq() < 100.0f)
+			if (toHome.LengthSq() < 200.0f)
 			{
 				enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 				return;

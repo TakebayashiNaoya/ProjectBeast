@@ -1,7 +1,7 @@
 {
     "enemies": [
       {
-        "spawnPosition": [ 100.0, 30.0, 100.0 ],
+        "spawnPosition": [ 300.0, 100.0, 300.0 ],
         "nestName": "bearHome_1",
         "patrolPoints": [
           [ 100.0, 0.0, 100.0 ],
@@ -11,7 +11,7 @@
         ]
       },
       {
-        "spawnPosition": [ -150.0, 30.0, -50.0 ],
+        "spawnPosition": [ -300.0, 100.0, -300.0 ],
         "nestName": "bearHome_2",
         "patrolPoints": [
           [ -150.0, 0.0, -50.0 ],

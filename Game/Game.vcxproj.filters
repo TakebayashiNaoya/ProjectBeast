@@ -271,24 +271,6 @@
     <ClCompile Include="Source\UI\PBWakingUpTimerMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Camera\CameraCommon.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Camera\CameraController.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Camera\CameraManager.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Camera\CameraSteering.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Camera\WinCamera.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Camera\LoseCamera.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\SearchMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
@@ -306,6 +288,7 @@
     </ClCompile>
     <ClCompile Include="Source\UI\HPBarMenu.cpp">
       <Filter>Source\UI</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.cpp">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
     </ClCompile>
@@ -551,24 +534,6 @@
     <ClInclude Include="Source\UI\PBWakingUpTimerMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Camera\CameraCommon.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera\CameraController.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera\CameraManager.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera\CameraSteering.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera\WinCamera.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera\LoseCamera.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\SearchMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
@@ -587,13 +552,11 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
-    <ClInclude Include="hlsl ModelVSCommon.h" />
     <ClInclude Include="Source\UI\HPBarMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
     </ClInclude>
@@ -601,7 +564,7 @@
       <Filter>Source\Noise</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\CharacterStateMachine.h">
-      <Filter>Source\Actor\Character\penguin</Filter>
+      <Filter>Source\Actor\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Manager\BattleManager.h">
       <Filter>Source\Manager</Filter>
@@ -618,8 +581,8 @@
     <ClInclude Include="Source\UI\RemainingChildMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\EnemySleepingMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_3dba12\assessment.md" />
   </ItemGroup>
 </Project>

@@ -3,11 +3,11 @@
         "comment": "エネミーのステータスのパラメーター",
         "maxHp": 10,
         "hp": 10,
-        "walkSpeed": 3.0,
-        "runSpeed": 6.0,
-        "radius": 2.0,
-        "height": 70.0,
-        "swimSpeed": 2.0,
+        "walkSpeed": 150.0,
+        "runSpeed": 200.0,
+        "radius": 100.0,
+        "height": 100.0,
+        "swimSpeed": 20.0,
         "maxEat":3
     }
 ]

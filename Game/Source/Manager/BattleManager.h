@@ -1,13 +1,19 @@
 ﻿/**
  * @file BattleManager.h
  * @brief バトルの管理をするクラス（クラス間の情報受け渡し）
- * @author 立山、竹林
+ * @author 竹林
  */
 #pragma once
 
 
 namespace app
 {
+	namespace ui
+	{
+		class InGameTimerMenu;
+	}
+
+
 	/**
 	 * @brief バトルの情報受け渡しクラス
 	 * @detail ゲームのフェーズ管理は行わない。
@@ -21,23 +27,30 @@ namespace app
 
 
 	private:
-		BattleManager();
-		~BattleManager();
+		BattleManager() = default;
+		~BattleManager() = default;
 
+
+
+
+		//============================================//
+		// アクティブ状態
+		//============================================//
 
 	public:
 		/**
 		 * @brief バトルがアクティブかどうかを設定
 		 */
-		void SetIsActive(const bool isActive) { m_isActive = isActive; }
+		inline void SetIsActive(const bool isActive) { m_isActive = isActive; }
 		/**
 		 * @brief バトルがアクティブかどうかを取得
 		 */
-		bool IsActive() const { return m_isActive; }
+		inline bool IsActive() const { return m_isActive; }
 
 
 	private:
-		bool m_isActive = false;	/** バトルがアクティブかどうか（ゲーム開始前やリザルト画面などは非アクティブ） */
+		/** バトルがアクティブかどうか（ゲーム開始前などは非アクティブ） */
+		bool m_isActive = false;
 
 
 
@@ -95,6 +108,20 @@ namespace app
 	private:
 		float m_currentTime = 0.0f;	/** 現在のタイム */
 		bool m_isTimeUp = false;	/** タイムアップしているかどうか */
+
+
+
+
+		//============================================//
+		// 登録用関数
+		//============================================//
+
+		/** インゲームタイマーUI */
+	public:
+		inline void Register(ui::InGameTimerMenu* timerMenu) { m_timerMenu = timerMenu; }
+		inline void Unregister(ui::InGameTimerMenu* timerMenu) { m_timerMenu = nullptr; }
+	private:
+		ui::InGameTimerMenu* m_timerMenu = nullptr;
 
 
 

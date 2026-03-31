@@ -41,13 +41,13 @@ namespace app
 
 		SearchIcon::~SearchIcon()
 		{}
-		
-		
+
+
 		void SearchIcon::Update()
 		{}
 
 
-		void SearchIcon::SetUIIcon(UIIcon * icon)
+		void SearchIcon::SetUIIcon(UIIcon* icon)
 		{
 			m_icon = icon;
 			K2_ASSERT(m_icon != nullptr, "登録失敗です。");
@@ -91,7 +91,7 @@ namespace app
 				g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, enemyPos);
 				iconPos = Vector3(screenPos.x, screenPos.y + 250.0f, 0.0f);
 			}
-			
+
 			// 各タイプの描画のオンオフの座標の更新を行う。
 			for (auto& info : SEARCH_ICON_KEYS)
 			{
