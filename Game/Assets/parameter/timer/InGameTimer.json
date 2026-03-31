@@ -34,6 +34,103 @@
                 "position":[630,300,0],
                 "scale":[1,1,1],
                 "rotation":0
+            },
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"AbuttonIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_a.dds",
+                "width":60,
+                "height":60,
+                "position":[605,-340,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"JumpTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/InGame/JumpText.dds",
+                "width":70,
+                "height":45,
+                "position":[615,-385,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+
+
+            {
+                "type":"UIIcon",
+                "name":"BbuttonIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_b.dds",
+                "width":60,
+                "height":60,
+                "position":[650,-300,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+             {
+                "type":"UIIcon",
+                "name":"SneakTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/InGame/SneakText.dds",
+                "width":70,
+                "height":45,
+                "position":[720,-300,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+
+
+            {
+                "type":"UIIcon",
+                "name":"XbuttonIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_x.dds",
+                "width":60,
+                "height":60,
+                "position":[ 560, -300, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SlideTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/InGame/SlideText.dds",
+                "width":70,
+                "height":45,
+                "position":[ 495, -300, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+
+
+            {
+                "type":"UIIcon",
+                "name":"YbuttonIcon",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_y.dds",
+                "width":60,
+                "height":60,
+                "position":[ 605, -260, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"OrdereTextIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/InGame/OrderText.dds",
+                "width":70,
+                "height":45,
+                "position":[ 605, -210, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
             }
         ]
     }
