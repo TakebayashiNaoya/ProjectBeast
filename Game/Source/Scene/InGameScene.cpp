@@ -475,6 +475,7 @@ namespace app
 			// 演出終了 → リザルトへ
 			if (m_finishMenu && m_finishMenu->IsFinished())
 			{
+				SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
 				SoundManager::Get().StopBGM();
 				m_nextScene = true;
 			}

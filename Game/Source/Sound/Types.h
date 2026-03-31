@@ -38,6 +38,7 @@ namespace app
 		enSoundKind_EnemyAttack,
 
 		enSoundKind_ButtonPush,
+		enSoundKind_Whistle,
 
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
@@ -92,6 +93,8 @@ namespace app
 		SoundInformation("Assets/sound/SE/growl.wav"),
 		SoundInformation("Assets/sound/SE/attack.wav"),
 		SoundInformation("Assets/sound/SE/AS_139690_キャンセルや決定ボタンの選択音（ピコン）.wav"),
+		SoundInformation("Assets/sound/SE/AS_53089_警官のホイッスルを2回吹く.wav"),
+
 
 		//BGM
 		SoundInformation("Assets/sound/BGM/AS_1620196_滑稽・NGシーンに＿ドタバタポップ.wav"),
