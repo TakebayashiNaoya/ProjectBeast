@@ -18,11 +18,11 @@ namespace app
 		switch (type)
 		{
 		case EnNoiseType::Sneak:
-			return { 100.0f, 1.0f, 100.0f };
+			return { 100.0f, 1.0f, 200.0f };
 		case EnNoiseType::Dash:
-			return { 200.0f, 1.0f, 200.0f };
+			return { 260.0f, 1.8f, 400.0f };
 		case EnNoiseType::Slide:
-			return { 300.0f, 1.0f, 300.0f };
+			return { 250.0f, 1.9f, 500.0f };
 		case EnNoiseType::Fall:
 			return { 400.0f, 1.0f, 500.0f };
 		default:
