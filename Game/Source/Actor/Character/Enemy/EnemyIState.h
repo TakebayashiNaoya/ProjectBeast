@@ -239,6 +239,11 @@ namespace app
 		public:
 			EnemyAttackState(EnemyStateMachine* owner);
 			~EnemyAttackState() override = default;
+
+
+		private:
+			float m_attackTimer = 0.0f;
+			bool m_hasFiredEffect = false;
 		};
 
 

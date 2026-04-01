@@ -93,7 +93,7 @@ namespace app
 		SoundInformation("Assets/sound/SE/step.wav"),
 		SoundInformation("Assets/sound/SE/roar.wav"),
 		SoundInformation("Assets/sound/SE/growl.wav"),
-		SoundInformation("Assets/sound/SE/attack.wav"),
+		SoundInformation("Assets/sound/SE/enemy/attack.wav"),
 		SoundInformation("Assets/sound/SE/AS_139690_キャンセルや決定ボタンの選択音（ピコン）.wav"),
 		SoundInformation("Assets/sound/SE/AS_53089_警官のホイッスルを2回吹く.wav"),
 		SoundInformation("Assets/sound/SE/AS_259345_ピッ＿ゲームなどセレクト音.wav"),
