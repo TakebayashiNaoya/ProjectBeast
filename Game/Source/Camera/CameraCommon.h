@@ -27,7 +27,7 @@ namespace app
 			Vector3 up = Vector3::Up;
 			float fov = Math::DegToRad(60.0f);
 			float nearClip = 0.01f;
-			float farClip = 5000.0f;
+			float farClip = 9000.0f;
 
 			/** 線形補間（ブレンド用） */
 			static CameraData Lerp(const float t, const CameraData& start, const CameraData& end)
