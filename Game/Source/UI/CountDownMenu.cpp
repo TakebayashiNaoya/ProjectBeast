@@ -24,7 +24,10 @@ namespace app
 			// 割るだけの値。
 			constexpr float TIME_VALUE = 10.0f;
 			// カウントダウンの時間の変化の値。
-			constexpr float COUNT_DOWN_DELTA_VALUE = 1.0f;
+			constexpr float COUNT_DOWN_DELTA_VALUE = 4.0f;
+
+			// カウントダウン前の遅延時間。
+			constexpr float COUNT_DOWN_DELAY_TIME = 4.5f;
 
 			// 初期化時の値。
 			constexpr float TIME_VALUE_FOUR = 4.0f;
@@ -90,12 +93,36 @@ namespace app
 			, m_time(TIME_VALUE_FOUR)
 			, m_countDownStartFlag(false)
 			, m_countDownFinishedFlag(false)
+			, m_isDelayStart(false)
+			, m_delayTime(0.0f)
 		{
 		}
 
 
 		void CountDownMenu::Update()
 		{
+			// ディレイ中はカウントダウンの処理は走らせない。
+			if (m_isDelayStart)
+			{
+				// 1フレームの経過時間を取得。
+				m_delayTime += g_gameTime->GetFrameDeltaTime();
+				// ディレイ時間が経過したら、カウントダウンを開始。
+				if (m_delayTime >= COUNT_DOWN_DELAY_TIME)
+				{
+					m_isDelayStart = false;
+					m_countDownStartFlag = true;
+					m_delayTime = 0.0f;
+				}
+				else
+				{
+					for (const auto& icon : m_countDownMap)
+					{
+						icon.second->SetIsDraw(false);
+					}
+					return;
+				}
+			}
+
 			if (!m_countDownStartFlag)
 			{
 				for (const auto& icon : m_countDownMap)
@@ -105,6 +132,7 @@ namespace app
 				m_time = TIME_VALUE_FOUR;
 				return;
 			}
+
 			//　時間が減る処理。
 			CalcCount();
 
@@ -159,6 +187,7 @@ namespace app
 		void CountDownMenu::ResetCountDown()
 		{
 			m_time = TIME_VALUE_FOUR;
+			m_isDelayStart = false;
 			m_countDownStartFlag = false;
 			m_countDownFinishedFlag = false;
 			m_currentCountType = EnCountDownType::None;
@@ -167,6 +196,10 @@ namespace app
 
 		EnCountDownType CountDownMenu::GetCurrentCountType()
 		{
+           if (!m_countDownStartFlag)
+			{
+				return EnCountDownType::None;
+			}
 			if (m_time > TIME_VALUE_TRHIRD)return EnCountDownType::Third;
 			if (m_time > TIME_VALUE_SECOND)return EnCountDownType::Second;
 			if (m_time > TIME_VALUE_FIRST)return EnCountDownType::First;
