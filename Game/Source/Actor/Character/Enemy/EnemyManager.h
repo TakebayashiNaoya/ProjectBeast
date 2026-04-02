@@ -45,6 +45,13 @@ namespace app
 				return list;
 			}
 
+			/**
+			 * @brief 指定座標から最も近い、睡眠中のエネミーを取得
+			 * @param fromPosition 基準となるワールド座標（プレイヤー位置など）
+			 * @param maxRange      探索半径（この距離より遠いエネミーは無視）
+			 * @return 最近傍の睡眠中エネミーのポインタ。見つからなければ nullptr
+			 */
+			Enemy* GetNearestSleepingEnemy(const Vector3& fromPosition, float maxRange) const;
 
 			/** 全エネミーの座標取得 */
 			std::vector<Vector3> GetPositionList() const;

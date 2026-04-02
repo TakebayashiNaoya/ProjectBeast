@@ -16,19 +16,16 @@ namespace app
 	{
 		class DaddyPenguin;
 		class ChildPenguin;
-		class Enemy;
-		class EnemyController;
 	}
 	namespace ui
 	{
-		class Layout;
 		class CountDownMenu;
-		class InGameTimerMenu;
 		class FinishMenu;
 		class PauseScreenMenu;
 		class SoundOptionMenu;
-		class SearchMenu;
 	}
+
+	class InGameUIManager;
 
 
 	/**
@@ -54,7 +51,7 @@ namespace app
 
 	private:
 		//------------------------------------------------------------
-		// ロードフェーズ（既存）
+		// ロードフェーズ
 		//------------------------------------------------------------
 		enum class LoadPhase
 		{
@@ -64,19 +61,15 @@ namespace app
 		int m_childIndex = 0;
 
 		//------------------------------------------------------------
-		// ゲームフェーズ（新規）
+		// ゲームフェーズ
 		//------------------------------------------------------------
 		enum class GamePhase
 		{
-			CountDown,  // カウントダウン中（プレイヤー・AI・シロクマ停止）
-			Playing,    // プレイ中
-			Finishing,  // FINISH演出中
+			CountDown,  /** カウントダウン中（プレイヤー・AI・シロクマ停止） */
+			Playing,    /** プレイ中 */
+			Finishing,  /** FINISH演出中 */
 		};
 		GamePhase m_gamePhase = GamePhase::CountDown;
-
-		//------------------------------------------------------------
-		// 終了判定
-		//------------------------------------------------------------
 
 		/** ロード完了後のゲームフェーズ更新をまとめた関数 */
 		void UpdateGamePhase();
@@ -92,41 +85,24 @@ namespace app
 		Ocean* m_ocean = nullptr;
 
 		//------------------------------------------------------------
-		// UI レイアウト
+		// UIマネージャー
 		//------------------------------------------------------------
-		ui::Layout* m_countDownLayout = nullptr;
-		ui::Layout* m_timerLayout = nullptr;
-		ui::Layout* m_finishLayout = nullptr;
-		ui::Layout* m_remainingChildLayout = nullptr;
-		ui::Layout* m_pauseLayout = nullptr;
-		std::vector<ui::Layout*> m_searchLayouts;
-		ui::Layout* m_enemySleepingLayout = nullptr;
-		ui::Layout* m_pbWakingUpTimerLayout = nullptr;
+		InGameUIManager* m_uiManager = nullptr;
 
-		ui::CountDownMenu* m_countDownMenu = nullptr;
-		ui::InGameTimerMenu* m_timerMenu = nullptr;
-		ui::FinishMenu* m_finishMenu = nullptr;
-		ui::PauseScreenMenu* m_pauseMenu = nullptr;
-		std::vector<ui::SearchMenu*> m_searchMenus;
-
-		// サウンドオプション（ポーズ中から開く用）
-		ui::Layout* m_soundOptionLayout = nullptr;
-		ui::SoundOptionMenu* m_soundOptionMenu = nullptr;
-
-		// タイトルへ戻るフラグ
-		bool m_goTitle = false;
-
-		// ポーズ中のサブ状態
+		//------------------------------------------------------------
+		// ポーズ
+		//------------------------------------------------------------
 		enum class PauseState { Pause, SoundOption };
 		PauseState m_pauseState = PauseState::Pause;
-
-		/** 前フレームのカウントダウンタイプを保持（初期値は None） */
-		ui::EnCountDownType m_lastCountType = ui::EnCountDownType::None;
 
 		//------------------------------------------------------------
 		// シーン遷移
 		//------------------------------------------------------------
 		bool m_nextScene = false;
+		bool m_goTitle = false;
+
+		/** 前フレームのカウントダウンタイプを保持（初期値は None） */
+		ui::EnCountDownType m_lastCountType = ui::EnCountDownType::None;
 
 		/** クリア判定用定数 */
 		static constexpr int CLEAR_COUNT = 50;

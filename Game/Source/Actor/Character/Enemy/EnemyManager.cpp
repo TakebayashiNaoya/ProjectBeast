@@ -7,6 +7,7 @@
 #include "EnemyManager.h"
 #include "Enemy.h"
 #include "EnemyController.h"
+#include "EnemyStateMachine.h"
 #include "Source/Util/JsonConverter.h"
 #include "Source/Actor/Stage/StageSystem.h"
 
@@ -118,6 +119,39 @@ namespace app
 				positionList.push_back(data.enemy->GetTransform().m_position);
 			}
 			return positionList;
+		}
+
+
+		Enemy* EnemyManager::GetNearestSleepingEnemy(const Vector3& fromPosition, float maxRange) const
+		{
+			const float maxRangeSq = maxRange * maxRange;
+
+			Enemy* nearest = nullptr;
+			float minDistSq = maxRangeSq;
+
+			for (const auto& data : m_enemyList)
+			{
+				if (!data.enemy) continue;
+
+				auto* sm = data.enemy->GetEnemyStateMachine();
+
+				/** クールダウン（睡眠）状態でなければ対象外 */
+				if (!sm->IsCoolDown()) continue;
+
+				const Vector3 diff = fromPosition - data.enemy->GetTransform().m_position;
+				const float distSq = diff.LengthSq();
+
+				/** 探索半径より遠ければスキップ */
+				if (distSq > maxRangeSq) continue;
+
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					nearest = data.enemy;
+				}
+			}
+
+			return nearest;
 		}
 	}
 }

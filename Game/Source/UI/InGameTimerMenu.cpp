@@ -1,5 +1,5 @@
 ﻿/**
- * @file InGameTimer.cpp
+ * @file InGameTimerMenu.cpp
  * @brief インゲームタイマーの動的処理クラス
  * @author 忽那
  */
@@ -20,13 +20,13 @@ namespace app
 				EnInGameTimerType type;
 			};
 
-			// 要素数。
+			/** 要素数 */
 			constexpr int TIMER_ICON_SIZE = static_cast<int>(EnInGameTimerType::Max);
-			// 配列。
+			/** 配列 */
 			constexpr TimerInfo TIMER_ICON_KEYS[TIMER_ICON_SIZE] =
 			{
-					{ Hash32("InGameTimerFrameIcon"),EnInGameTimerType::Frame }
-				,	{ Hash32("InGameTimerFrameBackGroundIcon"),EnInGameTimerType::FrameBackGround }
+					{ Hash32("InGameTimerFrameIcon"),           EnInGameTimerType::Frame           }
+				,	{ Hash32("InGameTimerFrameBackGroundIcon"), EnInGameTimerType::FrameBackGround }
 			};
 		}
 
@@ -49,7 +49,6 @@ namespace app
 			m_icon = icon;
 			K2_ASSERT(m_icon != nullptr, "登録失敗です。");
 		}
-
 
 
 
@@ -87,26 +86,19 @@ namespace app
 
 
 
-
 		/************************************************/
 
 
 		InGameTimerMenu::InGameTimerMenu()
 			: m_currentTime(0.0f)
 		{
-			BattleManager::GetInstance().Register(this);
-		}
-
-
-		InGameTimerMenu::~InGameTimerMenu()
-		{
-			BattleManager::GetInstance().Unregister(this);
+			/** BattleManagerへの登録はInGameUIManagerのlambdaが担うため、ここでは行わない */
 		}
 
 
 		void InGameTimerMenu::Update()
 		{
-			// 表示状態にする
+			/** 表示状態にする */
 			auto* frameIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameIcon"));
 			if (frameIcon) frameIcon->m_isDraw = true;
 
@@ -119,14 +111,14 @@ namespace app
 				timerDigit->SetNumber(static_cast<int>(m_currentTime));
 			}
 
-			// MenuBaseの更新処理。
+			/** MenuBaseの更新処理 */
 			InGameTimerClass::Update();
 		}
 
 
 		void InGameTimerMenu::InitializeLogic()
 		{
-			// 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのため）
+			/** 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのため） */
 			auto* frameIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameIcon"));
 			if (frameIcon) frameIcon->m_isDraw = false;
 
