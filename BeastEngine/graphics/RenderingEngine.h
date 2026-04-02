@@ -10,6 +10,9 @@
 
 namespace nsBeastEngine
 {
+	class Ocean;
+
+
 	class RenderingEngine
 	{
 	public:
@@ -106,6 +109,11 @@ namespace nsBeastEngine
 		 //	return m_shadowMapRender.GetTexture();
 		 //}
 
+		void SetOcean(Ocean* ocean)
+		{
+			m_ocean = ocean;
+		}
+
 
 	private:
 		/** メインレンダリングターゲットをフレームバッファにコピーするためのスプライト */
@@ -130,5 +138,7 @@ namespace nsBeastEngine
 		std::vector<Model*>		m_registerModels;
 		/** 描画するオブジェクトの予約リスト */
 		std::vector<IRenderer*> m_renderObjects;
+
+		Ocean* m_ocean = nullptr;	// 海オブジェクト
 	};
 }

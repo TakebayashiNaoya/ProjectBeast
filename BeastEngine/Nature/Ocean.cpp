@@ -21,33 +21,36 @@ namespace nsBeastEngine
 
 		//g_renderingEngine->SetReflectPlane(m_plane, ReflectLayer::enOcean);
 
-		ModelInitData initData;
-		//tkmファイルのファイルパスを指定する。
-		initData.m_tkmFilePath = "Assets/modelData/Ocean/ocean.tkm";
-		//シェーダーファイルのファイルパスを指定する。
-		initData.m_fxFilePath = "Assets/shader/Ocean.fx";
-		initData.m_vsEntryPointFunc = "VSMain";
-		initData.m_psEntryPointFunc = "PSMain";
-
-		//m_reflectionRenderTarget = &g_renderingEngine->GetPlaneReflectionRenderTarget(ReflectLayer::enOcean);
-		//initData.m_expandShaderResoruceView[0] = &m_reflectionRenderTarget->GetRenderTargetTexture();
-		//initData.m_expandShaderResoruceView[1] = &g_renderingEngine->GetShadowTexture();
-
 		// @todo for test
 		m_constantBuffer.light = *g_sceneLight->GetLight();
 
+		// カラーバッファフォーマットを設定する
+		// Ocean::Render()が呼ばれるパスの実際のRTVフォーマットに合わせる
+		std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> colorBufferFormat = {
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_UNKNOWN,
+			DXGI_FORMAT_UNKNOWN,
+			DXGI_FORMAT_UNKNOWN,
+			DXGI_FORMAT_UNKNOWN,
+			DXGI_FORMAT_UNKNOWN,
+			DXGI_FORMAT_UNKNOWN,
+			DXGI_FORMAT_UNKNOWN,
+		};
 
-		initData.m_expandConstantBuffer = &m_constantBuffer;
-		initData.m_expandConstantBufferSize = sizeof(m_constantBuffer);
+		// OceanMeshを初期化する
+		m_oceanMesh.Init(
+			"Assets/shader/Ocean.fx",
+			"VSMain",
+			"PSMain",
+			&m_constantBuffer,
+			sizeof(m_constantBuffer),
+			colorBufferFormat,
+			L"Assets/modelData/Ocean/Vol_36_5_Base_Color.DDS",
+			L"Assets/modelData/Ocean/Vol_36_5_Normal.DDS",
+			L"Assets/modelData/Ocean/Vol_36_5_Roughness.DDS"
+		);
 
-
-		m_modelRender.InitOcean(initData, initData.m_tkmFilePath);
-		m_modelRender.SetTRS(m_position, g_quatIdentity, m_scale);
-		//m_modelRender.ChangeAlbedoMap("", m_reflectionRenderTarget->GetRenderTargetTexture());
-		m_modelRender.Update();
-
-		//当たり判定の初期化
-		//m_physics.CreateFromModel(m_modelRender.GetModel(), m_modelRender.GetModel().GetWorldMatrix());
+		g_renderingEngine->SetOcean(this);
 
 		return true;
 	}
@@ -68,7 +71,7 @@ namespace nsBeastEngine
 
 	void Ocean::Render(RenderContext& rc)
 	{
-		m_modelRender.Draw(rc);
+		m_oceanMesh.Draw(rc, CalcWorldMatrix());
 	}
 
 }
