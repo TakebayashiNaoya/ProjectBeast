@@ -2,17 +2,34 @@
   "AchievementList" : {
     "Achievement" : [
       {
-        "name" : "",
-        "type" : "",
-        "condition" : "",
-        "targetValue": 0
+        "name" : "子ペンギンを90匹以上集めた",
+        "type" : "Condition",
+        "condition" : "CheckRescuedCount",
+        "targetValue": 90
       },
       {
-        "name" : "",
-        "type" : "",
-        "condition" : "",
-        "targetLocation": [ 0, 0, 0 ],
-        "enableDistance" :  0
+        "name" : "2頭以上のホッキョクグマに追われた",
+        "type" : "Condition",
+        "condition" : "CheckSimultaneousChase",
+        "targetValue": 2
+      },
+      {
+        "name": "3頭のホッキョクグマそれぞれに追われた",
+        "type": "Counter",
+        "condition": "CheckIndividualChase",
+        "targetValue": 3
+      },
+      {
+        "name": "眠っているホッキョクグマを起こした",
+        "type": "Event",
+        "condition": "WakeUpBear",
+        "targetValue": 1
+      },
+      {
+        "name": "ホッキョクグマを振り切ったときの最大マーキング数",
+        "type": "Record",
+        "condition": "MaxEscapeMarking",
+        "targetValue": 0
       }
     ]
   }
