@@ -215,7 +215,7 @@ namespace app
 			/** ロード完了 → カウントダウン開始 */
 			if (m_uiManager->GetCountDownMenu())
 			{
-				m_uiManager->GetCountDownMenu()->SetCountDownStartFlag(true);
+				m_uiManager->GetCountDownMenu()->SetIsDelay(true);
 				SoundManager::Get().PlayBGM(enSoundKind_InGame);
 			}
 			break;
