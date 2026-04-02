@@ -4,11 +4,13 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include "Enemy.h"
 #include "EnemyController.h"
 #include "EnemyIState.h"
 #include "EnemyStateMachine.h"
 #include "EnemyStatus.h"
 #include "EnemyTypes.h"
+#include "Source/Effect/EffectManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Sound/SoundManager.h"
 #include <algorithm>
@@ -311,15 +313,60 @@ namespace app
 		/************************************/
 
 
+		namespace
+		{
+			const float ATTACK_IMPACT_TIME = 0.5f;
+		}
+
+
 		void EnemyAttackState::Enter()
 		{
 			m_owner->PlayAnimation(EnEnemyAnimationType::Attack);
+
+
+			m_attackTimer = 0.0f;
+			m_hasFiredEffect = false;
 		}
 
 
 		void EnemyAttackState::Update()
 		{
+			m_attackTimer += g_gameTime->GetFrameDeltaTime();
 
+			// 指定した時間（振り下ろしの瞬間）が経過し、かつまだ発生させていない場合
+			if (!m_hasFiredEffect && m_attackTimer >= ATTACK_IMPACT_TIME)
+			{
+
+				Vector3 effectPos = m_owner->GetPosition();
+
+				Quaternion rot = m_owner->GetTransform().m_rotation;
+				Vector3 forward = Vector3::AxisZ;
+				rot.Apply(forward);
+				if (forward.LengthSq() > 0.001f) {
+					forward.Normalize();
+				}
+
+				// 3. 座標をずらす
+				const float OFFSET_FORWARD = 60.0f;
+				effectPos += forward * OFFSET_FORWARD;
+
+				const float OFFSET_DOWN = 10.0f;
+				effectPos.y += OFFSET_DOWN;
+
+
+				// エフェクトの再生
+				EffectManager::Get().PlayEffect(
+					EnEffectKind::EnemyAttack,
+					effectPos,
+					Quaternion::Identity,
+					Vector3(5.0f, 5.0f, 5.0f)
+				);
+
+				SoundManager::Get().PlaySE(enSoundKind_EnemyAttack);
+
+				// 発生済みフラグを立てる（何度も呼ばれないようにする）
+				m_hasFiredEffect = true;
+			}
 		}
 
 

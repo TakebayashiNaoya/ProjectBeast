@@ -75,6 +75,7 @@ namespace app
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
 
+		DeleteGO(m_skyCube);
 		DeleteGO(m_ocean);
 
 		/** マネージャー */
@@ -199,6 +200,15 @@ namespace app
 		}
 
 		case LoadPhase::Ocean:
+
+			/**
+			 * NOTE:SkyCubeは後で生み出す場所を変えるかもしれない。
+			 */
+			m_skyCube = NewGO<SkyCube>(0);
+			m_skyCube->SetType(enSkyCubeType_Day);
+			m_skyCube->SetScale(Vector3(450.0f, 450.0f, 450.0f));
+			m_skyCube->SetLuminance(0.8f);
+
 			m_ocean = NewGO<Ocean>(0);
 			m_loadPhase = LoadPhase::Done;
 

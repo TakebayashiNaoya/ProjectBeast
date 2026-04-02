@@ -82,7 +82,9 @@ namespace app
 		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
 
 		camera::CameraSteering m_cameraSteering;
+
 		Ocean* m_ocean = nullptr;
+		SkyCube* m_skyCube = nullptr;
 
 		//------------------------------------------------------------
 		// UIマネージャー
