@@ -313,6 +313,9 @@
     <ClCompile Include="Source\UI\EnemySleepingMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Manager\InGameUImanager.cpp">
+      <Filter>Source\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -557,6 +560,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\EnemySleepingMenu.h">
       <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Manager\InGameUImanager.h">
+      <Filter>Source\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

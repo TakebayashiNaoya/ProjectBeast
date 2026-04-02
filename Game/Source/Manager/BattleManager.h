@@ -4,16 +4,11 @@
  * @author 竹林
  */
 #pragma once
+#include <functional>
 
 
 namespace app
 {
-	namespace ui
-	{
-		class InGameTimerMenu;
-	}
-
-
 	/**
 	 * @brief バトルの情報受け渡しクラス
 	 * @detail ゲームのフェーズ管理は行わない。
@@ -71,15 +66,15 @@ namespace app
 		};
 
 		/**
-		 * @brief バトルの状態を設定
+		 * @brief バトルの状態を取得
 		 */
 		EnBattleState GetBattleState() const { return m_battleState; }
 
 
 	private:
 		/**
-		  * @brief バトルの状態を確認して返す
-		  */
+		 * @brief バトルの状態を確認して返す
+		 */
 		EnBattleState CheckBattleState() const;
 
 
@@ -113,15 +108,56 @@ namespace app
 
 
 		//============================================//
-		// 登録用関数
+		// UI通知用function
 		//============================================//
 
-		/** インゲームタイマーUI */
 	public:
-		inline void Register(ui::InGameTimerMenu* timerMenu) { m_timerMenu = timerMenu; }
-		inline void Unregister(ui::InGameTimerMenu* timerMenu) { m_timerMenu = nullptr; }
+		/**
+		 * @brief タイマーUI通知functionを設定
+		 * @param func 引数：現在タイム（秒）
+		 */
+		inline void SetOnTimeChanged(std::function<void(float)> func)
+		{
+			m_onTimeChanged = std::move(func);
+		}
+
+		/**
+		 * @brief 残り子ペンギン数UI通知functionを設定
+		 * @param func 引数：救助済み数、ステージ上の総数
+		 */
+		inline void SetOnRescuedNumChanged(std::function<void(int, int)> func)
+		{
+			m_onRescuedNumChanged = std::move(func);
+		}
+
+		/**
+		 * @brief 睡眠中クマUI通知functionを設定
+		 * @detail 探索ロジックはlambda内で完結させる（BattleManagerはプレイヤー座標を知らない）
+		 * @param func 引数なし。lambda内でEnemyManagerへの探索と、UIへのセットを行う
+		 */
+		inline void SetOnSleepingEnemyChanged(std::function<void()> func)
+		{
+			m_onSleepingEnemyChanged = std::move(func);
+		}
+
+		/**
+		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
+		 */
+		void ResetObservers();
+
+
 	private:
-		ui::InGameTimerMenu* m_timerMenu = nullptr;
+		/** タイマーUI更新通知 */
+		std::function<void(float)> m_onTimeChanged;
+
+		/** 残り子ペンギン数UI更新通知 */
+		std::function<void(int, int)> m_onRescuedNumChanged;
+
+		/**
+		 * 睡眠中クマUI更新通知
+		 * 探索・UIセットはlambda内で完結する
+		 */
+		std::function<void()> m_onSleepingEnemyChanged;
 
 
 
