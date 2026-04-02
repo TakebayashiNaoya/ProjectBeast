@@ -33,7 +33,13 @@ namespace nsBeastEngine
 
 	public:
 		Ocean() = default;
-		~Ocean() = default;
+		~Ocean()
+		{
+			if (g_renderingEngine != nullptr)
+			{
+				g_renderingEngine->SetOcean(nullptr);
+			}
+		};
 
 		/**
 		 * @brief 波のスクロール速度を設定
