@@ -14,24 +14,24 @@ struct SSkinVSIn
 // 頂点シェーダーへの入力。
 struct SVSIn
 {
-    float4 pos : POSITION;      // モデルの頂点座標。
-    float2 uv : TEXCOORD0;      // UV座標。
-    SSkinVSIn skinVert;         // スキン用のデータ。
-    float3 normal : NORMAL;     // 法線。
+    float4 pos : POSITION;
+    float2 uv : TEXCOORD0;
+    SSkinVSIn skinVert;
+    float3 normal : NORMAL;
     float3 tangent : TANGENT;
     float3 biNormal : BINORMAL;
 };
 // ピクセルシェーダーへの入力。
 struct SPSIn
 {
-    float4 pos : SV_POSITION;               // スクリーン空間でのピクセルの座標。
-    float2 uv : TEXCOORD0;                  // uv座標。
-    float3 worldPos : TEXCOORD1;            // ワールド座標。
-    float3 normal : NORMAL;                 // 法線。
-    float3 tangent : TANGENT;               // 接ベクトル。
-    float3 biNormal : BINORMAL;             // 従ベクトル。
-    float4 posRefCamViewProj : TEXCOORD3;   // 反射用カメラのビュー投影行列をかけた座標。
-    float4 refClip : TEXCOORDn;
+    float4 pos : SV_POSITION;
+    float2 uv : TEXCOORD0;
+    float3 worldPos : TEXCOORD1;
+    float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float3 biNormal : BINORMAL;
+    float4 posRefCamViewProj : TEXCOORD3;
+    //float4 refClip : TEXCOORDn;
 };
 
 // ディレクションライト構造体。
@@ -76,7 +76,7 @@ struct HemisphereLight
     float3 skyColor;
     float  padding1;
     float3 groundNormal;
-    float  padding2; // 16バイトアライメント用
+    float  padding2;
 };
 
 // ライトの構造体。
@@ -90,8 +90,6 @@ struct Light
     float3 cameraEyePos;
     int    usedSpotLightCount;
     float3 ambientColor;
-    //float4x4 mLVP; //ライトビュー投影行列。
-    //float4x4 mViewProjInv; // ライトビュー行列
 };
 
 ////////////////////////////////////////////////
@@ -108,28 +106,31 @@ cbuffer ModelCb : register(b0)
 // 海用の定数バッファー。
 cbuffer OceanCb : register(b1)
 {
-    // float4x4 ReflectionCameraVP; // 反射用カメラビュー投影行列。
     Light light;
-    // 反射の割合の下限値、必ずこの値以上は反射する。（真上から見た反射率）。
-    float baseReflectance; // 基本反射率。
-    float waveScroll;
+    float baseReflectance;
+    float waveScroll;		// 頂点移動用スクロール値
+    float textureScroll;	// テクスチャスクロール用スクロール値
 
+    // 波パラメータ
+    float wave1Amplitude;   // 波①の振幅
+    float wave1Frequency;   // 波①の空間周波数
+    float wave2Amplitude;   // 波②の振幅
+    float wave2Frequency;   // 波②の空間周波数
 }
 
 ////////////////////////////////////////////////
 // グローバル変数。
 ////////////////////////////////////////////////
-Texture2D<float4> g_albedo : register(t0); //アルベドマップ
-StructuredBuffer<float4x4> g_boneMatrix : register(t3); //ボーン行列。
-sampler g_sampler : register(s0); //サンプラステート。
-Texture2D<float4> g_normalMap : register(t1); //法線マップにアクセスするための変数。
-Texture2D<float4> g_specularMap : register(t2); //スペキュラマップにアクセスするための変数。
-Texture2D<float4> g_refLect : register(t10); // 反射マップ
+Texture2D<float4> g_albedo : register(t0);
+//StructuredBuffer<float4x4> g_boneMatrix : register(t3);
+sampler g_sampler : register(s0);
+Texture2D<float4> g_normalMap : register(t1);
+Texture2D<float4> g_specularMap : register(t2);
+Texture2D<float4> g_refLect : register(t10);
 Texture2D<float4> g_shadowMap : register(t11);
 
-
 ////////////////////////////////////////////////
-// 関数定義。
+// 関数宣言。
 ////////////////////////////////////////////////
 float3 CalcLigFromDrectionLight(SPSIn psIn, float3 normal);
 float3 CalcLambertDiffuse(float3 lightDirection, float3 lightColor, float3 normal);
@@ -140,26 +141,47 @@ float2 DistortUVByNormal(float2 uv, float3 normal, float distortionStrength);
 float3 ComputeNomal(SPSIn psIn, float2 uv, float scroll);
 float CalcShadowPow(float3 worldPos);
 
+////////////////////////////////////////////////
+// 波のオフセット計算。
+// waveScroll を時間軸とし、2本のsin波を重ねてY方向オフセットを返す。
+// 波①：正面方向(1,0)、波②：斜め方向(0.6, 0.8)。
+// 各波のspeed倍率は波①=1.0、波②=1.7（ハードコード）。
+////////////////////////////////////////////////
+float CalcWaveOffset(float3 worldPos)
+{
+    // 波①
+    float2 dir1 = float2(1.0, 0.0);
+    float phase1 = dot(dir1, worldPos.xz) * wave1Frequency + waveScroll * 1.0;
+    float offset1 = wave1Amplitude * sin(phase1);
+
+    // 波②
+    float2 dir2 = float2(0.6, 0.8);
+    float phase2 = dot(dir2, worldPos.xz) * wave2Frequency + waveScroll * 1.7;
+    float offset2 = wave2Amplitude * sin(phase2);
+
+    return offset1 + offset2;
+}
+
 /// <summary>
 //スキン行列を計算する。
 /// </summary>
-float4x4 CalcSkinMatrix(SSkinVSIn skinVert)
-{
-    float4x4 skinning = 0;
-    float w = 0.0f;
-	[unroll]
-    for (int i = 0; i < 3; i++)
-    {
-        skinning += g_boneMatrix[skinVert.Indices[i]] * skinVert.Weights[i];
-        w += skinVert.Weights[i];
-    }
-    
-    skinning += g_boneMatrix[skinVert.Indices[3]] * (1.0f - w);
-	
-    return skinning;
-}
+// float4x4 CalcSkinMatrix(SSkinVSIn skinVert)
+// {
+//     float4x4 skinning = 0;
+//     float w = 0.0f;
+// 	[unroll]
+//     for (int i = 0; i < 3; i++)
+//     {
+//         skinning += g_boneMatrix[skinVert.Indices[i]] * skinVert.Weights[i];
+//         w += skinVert.Weights[i];
+//     }
 
-/// <sumary>
+//     skinning += g_boneMatrix[skinVert.Indices[3]] * (1.0f - w);
+
+//     return skinning;
+// }
+
+/// <summary>
 /// 頂点シェーダーのコア関数。
 /// </summary>
 SPSIn VSMain(SVSIn vsIn)
@@ -167,23 +189,42 @@ SPSIn VSMain(SVSIn vsIn)
     SPSIn psIn;
 
     float4 worldPos = mul(mWorld, vsIn.pos);
-    psIn.worldPos = worldPos;
-    psIn.pos = mul(mWorld, vsIn.pos);
+
+    // WPO：Y方向にsin波オフセットを加算する
+    float wpoCenter = CalcWaveOffset(worldPos.xyz);
+    worldPos.y += wpoCenter;
+
+    // 差分近似で法線を再計算する
+    // 隣接点のXZ座標にepsilonだけずらした位置のWPOを求め、
+    // 接線・従線ベクトルを構築して外積から法線を得る
+    const float epsilon = 0.1;
+
+    float3 neighborX = worldPos.xyz + float3(epsilon, 0.0, 0.0);
+    neighborX.y = (worldPos.y - wpoCenter) + CalcWaveOffset(neighborX);
+
+    float3 neighborZ = worldPos.xyz + float3(0.0, 0.0, epsilon);
+    neighborZ.y = (worldPos.y - wpoCenter) + CalcWaveOffset(neighborZ);
+
+    // X方向・Z方向の接線ベクトルを求め、外積で法線を得る
+    float3 tangentX  = normalize(neighborX - worldPos.xyz);
+    float3 tangentZ  = normalize(neighborZ - worldPos.xyz);
+    // cross(tangentX, tangentZ) でY成分が正の上向き法線になる
+    float3 waveNormal = normalize(cross(tangentX, tangentZ));
+
+    psIn.worldPos = worldPos.xyz;
     psIn.pos = mul(mView, worldPos);
     psIn.pos = mul(mProj, psIn.pos);
-    
+
     psIn.uv = vsIn.uv;
-   
-    //法線、接ベクトル、従ベクトルをワールド空間に変換する。
-    //平行移動を無視するために、3x3行列に変換してから乗算する。
-    float3x3 m3x3 = (float3x3) mWorld;
-    psIn.normal = normalize(mul(m3x3, vsIn.normal));
-    psIn.tangent = normalize(mul(m3x3, vsIn.tangent));
-    psIn.biNormal = normalize(mul(m3x3, vsIn.biNormal));
-    
-    //クリップ座標を用意しておく。
-    //psIn.refClip = mul(ReflectionCameraVP, float4(psIn.worldPos.xyz, 1.0));
-    
+
+    // 法線はWPOから再計算した値を使う
+    // tangentとbiNormalはwaveNormalから再構築する
+    float3x3 m3x3    = (float3x3)mWorld;
+    float3 baseTangent = normalize(mul(m3x3, vsIn.tangent));
+    psIn.normal   = waveNormal;
+    psIn.tangent  = normalize(baseTangent - dot(baseTangent, waveNormal) * waveNormal);
+    psIn.biNormal = normalize(cross(waveNormal, psIn.tangent));
+
     return psIn;
 }
 
@@ -192,50 +233,27 @@ SPSIn VSMain(SVSIn vsIn)
 /// </summary>
 float4 PSMain(SPSIn psIn) : SV_Target0
 {
-    //UV座標をスケーリングしてテクスチャを繰り返す。
     float2 uvScaled = psIn.uv * float2(20.0, 20.0);
-    
+
     float3 ligDirection = light.directionLight.direction;
-    
-    //法線の計算
-    float3 normal = ComputeNomal(psIn, uvScaled, waveScroll);
-    //uvの歪みの強さ
-    float refMapDistortionStrength=0.2;
-    float albedoDistortionStrength=0.3;
-    
-    // //反射マップuvを計算
-    // float2 ReflectionMapUV = CalcReflectUV(psIn.refClip);
-    // ReflectionMapUV = saturate(ReflectionMapUV);
-    // //法線でUVを歪ませる
-    // ReflectionMapUV = DistortUVByNormal(ReflectionMapUV, normal, refMapDistortionStrength);
-    
-    // float4 reflect = g_refLect.Sample(g_sampler, ReflectionMapUV);
-    
-    //アルベドテクスチャのサンプリング
+
+    float3 normal = ComputeNomal(psIn, uvScaled, textureScroll);	// waveScroll → textureScroll
+    float refMapDistortionStrength = 0.2;
+    float albedoDistortionStrength = 0.3;
+
     float2 albedoUv = uvScaled + normal.xz * albedoDistortionStrength;
     float4 albedoColor = g_albedo.Sample(g_sampler, albedoUv);
 
-
-    
-    //ライトの計算
     float3 directionLight = CalcLigFromDrectionLight(psIn, normal);
     float3 lig = directionLight;
-    
-    //最終的な色
-    
-    //フレネル反射率を計算
+
     float flesnel = ComputeFresnel(normal, normalize(light.cameraEyePos - psIn.worldPos), baseReflectance);
-    
+
     float4 litColor = albedoColor;
     litColor.xyz += lig;
-    
-    //float shadowPow = CalcShadowPow(psIn.worldPos);
-    
+
     float4 finalColor;
     finalColor = litColor;
-    //finalColor = lerp(litColor, reflect, flesnel);
-    //finalColor *= shadowPow;
-    
 
     return finalColor;
 }
@@ -247,19 +265,14 @@ float3 CalcLambertDiffuse(float3 lightDirection, float3 lightColor, float3 norma
 {
     normal = normalize(normal);
     lightDirection = normalize(lightDirection);
-    
-	//ピクセルの法線とライトの方向の内積を計算し、ライトの影響度を求める
+
     float t = dot(normal, lightDirection);
-    
-    //内積の結果の-1をかける
     t *= -1.0f;
-	//内積の結果が0以下なら0にする
     if (t < 0.0f)
     {
         t = 0.0f;
     }
-    
-	//ライトの影響度を返す
+
     return lightColor * t;
 }
 
@@ -268,25 +281,16 @@ float3 CalcLambertDiffuse(float3 lightDirection, float3 lightColor, float3 norma
 //////////////////////////////////////////////////////////////////////////////////
 float3 CalcPhongSpecular(float3 lightDirection, float3 lightColor, float3 worldPos, float3 normal, float2 uv)
 {
-	//反射ベクトルを求める
     float3 refVec = reflect(lightDirection, normal);
-	//光が当たったサーフェイス(表面)から視点に伸びるベクトルを求める
     float3 toEye = light.cameraEyePos - worldPos;
     toEye = normalize(toEye);
 
-	//鏡面反射の強さを求める
     float t = dot(refVec, toEye);
-
-	//鏡面反射の強さを0~1にする
     t = max(0.0f, t);
-
-	//鏡面反射の強さを絞る
     t = pow(t, 10.0f);
 
-    //スペキュラマップからスペキュラ反射の強さをサンプリング
     float specPower = g_specularMap.Sample(g_sampler, uv).r;
-    
-	//鏡面反射光
+
     float3 specularLig = lightColor * t;
 
     return specularLig;
@@ -297,14 +301,10 @@ float3 CalcPhongSpecular(float3 lightDirection, float3 lightColor, float3 worldP
 //////////////////////////////////////////////////////////////////////////////////
 float3 CalcLigFromDrectionLight(SPSIn psIn, float3 normal)
 {
-	//拡散反射
     float3 diffDirection = CalcLambertDiffuse(
 		light.directionLight.direction, light.directionLight.color, normal);
-	//鏡面反射
     float3 specDirection = CalcPhongSpecular(
 		light.directionLight.direction, light.directionLight.color, psIn.worldPos, normal, psIn.uv);
-
-	//最終的な光
 
     return diffDirection + specDirection;
 }
@@ -312,29 +312,21 @@ float3 CalcLigFromDrectionLight(SPSIn psIn, float3 normal)
 //////////////////////////////////////////////////////////////////////////////////
 //反射カメラのuvを計算
 //////////////////////////////////////////////////////////////////////////////////
-
 float2 CalcReflectUV(float4 clip)
 {
-    //これから除算するので、0割りを防止するために絶対値の最大値を1e-6で制限する。
     float w = max(abs(clip.w), 1e-6);
-    //rcpは1/xを計算する関数。(普通にするより早い)
     float invW = rcp(w);
-    float2 uv = clip.xy * invW * 0.5f + 0.5f; // NDC→[0,1]
+    float2 uv = clip.xy * invW * 0.5f + 0.5f;
     uv.y = 1.0f - uv.y;
     return uv;
 }
 
 float ComputeFresnel(float3 normal, float3 viewDir, float baseReflectance)
 {
-    
     float cosTheta = saturate(dot(normalize(normal), -normalize(viewDir)));
-    
-    //角度により反射率の係数。
     float angleFactor = pow(1.0f - cosTheta, 5.0f);
-    //angleFactorの割合の上限。
     float remainingReflectance = 1 - baseReflectance;
 
-    //フレネル反射率
     return baseReflectance + remainingReflectance * angleFactor;
 }
 
@@ -346,13 +338,10 @@ float2 DistortUVByNormal(float2 uv, float3 normal, float distortionStrength)
 
 float3 ComputeNomal(SPSIn psIn, float2 uv, float scroll)
 {
-    //法線マップのサンプリング
     float3 localNormal = g_normalMap.Sample(g_sampler, uv + scroll).xyz;
     localNormal = normalize(localNormal);
-    
-    //0～1の範囲を-1～1の範囲にする。
     localNormal = (localNormal - 0.5f) * 2.0f;
-    //接ベクトル空間からワールド空間に変換する
+
     float3 normal = psIn.normal;
     normal = psIn.tangent * localNormal.x + psIn.biNormal * localNormal.y + normal * localNormal.z;
     normal = normalize(normal);
@@ -362,28 +351,5 @@ float3 ComputeNomal(SPSIn psIn, float2 uv, float scroll)
 float CalcShadowPow(float3 worldPos)
 {
     float shadowPow = 1.0f;
-        //ライトビュースクリーン区間からUV座標空間に変換
-    //float4 posInLVP = mul(light.mLVP, float4(worldPos, 1.0f));
-    
-    //float zInLVP = posInLVP.z / posInLVP.w;
-    // if (zInLVP >= 0.0f && zInLVP <= 1.0f)
-    // {
-
-    //     float2 shadowUV = posInLVP.xy / posInLVP.w;
-    //     shadowUV *= float2(0.5f, -0.5f);
-    //     shadowUV += 0.5f;
-
-	//         //UV座標を使ってシャドウマップから影情報をサンプリング
-    //     if (shadowUV.x >= 0.0f && shadowUV.x <= 1.0f &&
-    //             shadowUV.y >= 0.0f && shadowUV.y <= 1.0f)
-    //     {
-    //             //シャドウマップから深度をサンプリング
-    //         float zInShadowMap = g_shadowMap.Sample(g_sampler, shadowUV).r;
-    //         if (zInLVP > zInShadowMap)
-    //         {
-    //             shadowPow = 0.5f; //影が落ちている。
-    //         }
-    //     }
-    // }
     return shadowPow;
 }
