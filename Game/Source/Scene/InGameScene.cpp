@@ -25,9 +25,11 @@
 #include "Source/Util/JsonConverter.h"
 
 #include "Source/Manager/BattleManager.h"
+#include "Source/Manager/InGameUIManager.h"
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
-#include "Source/Manager/InGameUIManager.h"
+
+#include "Source/Achivement/AchievementManager.h"
 
 #include "Source/UI/CountDownMenu.h"
 #include "Source/UI/FinishMenu.h"
@@ -82,6 +84,13 @@ namespace app
 		BattleManager::DestroyInstance();
 		ScoreManager::DestroyInstance();
 		TimeManager::DestroyInstance();
+
+
+		if (m_goTitle) {
+			if (app::achievement::AchievementManager::GetInstance()) {
+				app::achievement::AchievementManager::DestroyInstance();
+			}
+		}
 	}
 
 
@@ -92,6 +101,9 @@ namespace app
 		BattleManager::CreateInstance();
 		ScoreManager::CreateInstance();
 		TimeManager::CreateInstance();
+
+		app::achievement::AchievementManager::CreateInstance();
+		app::achievement::AchievementManager::GetInstance()->Start();
 
 		/** アクター系シングルトン生成 */
 		actor::StageSystem::CreateInstance();
@@ -320,6 +332,8 @@ namespace app
 
 			BattleManager::GetInstance().Update();
 			TimeManager::GetInstance().Update();
+
+			app::achievement::AchievementManager::GetInstance()->Update();
 
 			/** ノイズリストをクリア */
 			NoiseManager::GetInstance().ClearNoises();
