@@ -16,10 +16,10 @@ namespace app
 
 		namespace
 		{
-			/** 海面の高さ */
+			/** 海面の基準高さ */
 			constexpr float SEA_LEVEL = 0.0f;
 			/** 海面付近のしきい値（ゆらゆら中にSwimmingStateを維持するための余裕） */
-			constexpr float SEA_SURFACE_THRESHOLD = 10.0f;
+			constexpr float SEA_SURFACE_THRESHOLD = 1.0f;
 		}
 
 		/**
@@ -119,7 +119,7 @@ namespace app
 			 */
 			inline bool CanChangeSwimState() const
 			{
-				return  m_isSwimming || IsInWater();
+				return m_isSwimming || IsInWater();
 			}
 			/**
 			 * @地面についているかどうか
@@ -131,13 +131,22 @@ namespace app
 			}
 			/**
 			 * @brief 水の中にいるかどうか
+			 * @details 現在の波面Y（CalcCurrentWaveY）を基準に判定する。
 			 * @return 水の中にいるかどうか
 			 */
 			inline bool IsInWater() const
 			{
 				const float height = m_ownerActor->GetTransform().m_position.y;
-				return height < SEA_LEVEL + SEA_SURFACE_THRESHOLD;
+				const float waveY = CalcCurrentWaveY();
+				return height < waveY + SEA_SURFACE_THRESHOLD;
 			}
+
+			/**
+			 * @brief 自身のXZ座標における現在の波面Yを取得する。
+			 * @details g_renderingEngine->GetOcean() が nullptr の場合は SEA_LEVEL を返す。
+			 * @return 波面Yオフセット
+			 */
+			float CalcCurrentWaveY() const;
 
 
 		public:

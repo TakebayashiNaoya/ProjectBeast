@@ -109,9 +109,22 @@ namespace nsBeastEngine
 		 //	return m_shadowMapRender.GetTexture();
 		 //}
 
+		/**
+		 * @brief 海オブジェクトを設定する
+		 * @param ocean 海オブジェクトのポインタ
+		 */
 		void SetOcean(Ocean* ocean)
 		{
 			m_ocean = ocean;
+		}
+
+		/**
+		 * @brief 海オブジェクトを取得する
+		 * @return 海オブジェクトのポインタ（未設定の場合はnullptr）
+		 */
+		Ocean* GetOcean() const
+		{
+			return m_ocean;
 		}
 
 
@@ -139,6 +152,7 @@ namespace nsBeastEngine
 		/** 描画するオブジェクトの予約リスト */
 		std::vector<IRenderer*> m_renderObjects;
 
-		Ocean* m_ocean = nullptr;	// 海オブジェクト
+		/** 海オブジェクト */
+		Ocean* m_ocean = nullptr;
 	};
 }

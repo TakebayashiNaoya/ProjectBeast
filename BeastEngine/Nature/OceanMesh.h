@@ -36,6 +36,30 @@ namespace nsBeastEngine
 		};
 
 	public:
+		/// <summary>
+		/// コンピュートシェーダー用定数バッファ（b0）。
+		/// OceanWaveCS.hlsl の WaveCb と同じレイアウト。
+		/// Ocean::BuildWaveCb() から参照するため public に定義する。
+		/// </summary>
+		struct SWaveConstantBuffer
+		{
+			float waveScroll;       // 波のスクロール値
+			float wave1Amplitude;   // 波①の振幅
+			float wave1Frequency;   // 波①の空間周波数
+			float wave2Amplitude;   // 波②の振幅
+			float wave2Frequency;   // 波②の空間周波数
+			float gridHalfSize;     // グリッド半辺長（= GRID_SIZE / 2）
+			float cellSize;         // セルサイズ（= GRID_SIZE / GRID_DIVISION）
+			int   numVertsPerRow;   // 1行あたりの頂点数（= GRID_DIVISION + 1）
+		};
+
+		// グリッド設定
+		// Ocean::BuildWaveCb() / SampleWaveHeight() から参照するため public に定義する
+		static constexpr int   GRID_DIVISION = 512;		// 分割数（N×N）
+		static constexpr float GRID_SIZE = 5000.0f;	// 1辺の長さ（ワールド単位）
+
+
+	public:
 		OceanMesh() = default;
 		~OceanMesh() = default;
 
@@ -43,12 +67,6 @@ namespace nsBeastEngine
 		/// 初期化。
 		/// グリッド頂点・インデックスを生成し、シェーダー・パイプラインを構築する。
 		/// </summary>
-		/// <param name="fxFilePath">fx ファイルパス</param>
-		/// <param name="vsEntryPoint">頂点シェーダーエントリーポイント</param>
-		/// <param name="psEntryPoint">ピクセルシェーダーエントリーポイント</param>
-		/// <param name="expandConstantBuffer">拡張定数バッファ（b1）のポインタ</param>
-		/// <param name="expandConstantBufferSize">拡張定数バッファのサイズ</param>
-		/// <param name="colorBufferFormat">カラーバッファのフォーマット</param>
 		void Init(
 			const char* fxFilePath,
 			const char* vsEntryPoint,
@@ -63,10 +81,10 @@ namespace nsBeastEngine
 
 		/// <summary>
 		/// 描画。
+		/// 冒頭でコンピュートシェーダーをディスパッチし、
+		/// Readback してキャッシュを更新してから通常描画を行う。
 		/// </summary>
-		/// <param name="rc">レンダリングコンテキスト</param>
-		/// <param name="mWorld">ワールド行列</param>
-		void Draw(RenderContext& rc, const Matrix& mWorld);
+		void Draw(RenderContext& rc, const Matrix& mWorld, const SWaveConstantBuffer& waveCb);
 
 		/// <summary>
 		/// 拡張定数バッファを更新する。
@@ -79,48 +97,49 @@ namespace nsBeastEngine
 			}
 		}
 
+		/// <summary>
+		/// 波高さキャッシュを取得する。
+		/// インデックス = iz * (GRID_DIVISION + 1) + ix。
+		/// </summary>
+		const float* GetWaveHeightCache() const
+		{
+			return m_waveHeightCache.data();
+		}
+
 
 	private:
-		/// <summary>
-		/// グリッド頂点・インデックスを生成する。
-		/// </summary>
 		void CreateGridMesh();
 
-		/// <summary>
-		/// シェーダーをロードする。
-		/// </summary>
-		/// <param name="fxFilePath">fx ファイルパス</param>
-		/// <param name="vsEntryPoint">頂点シェーダーエントリーポイント</param>
-		/// <param name="psEntryPoint">ピクセルシェーダーエントリーポイント</param>
 		void InitShaders(
 			const char* fxFilePath,
 			const char* vsEntryPoint,
 			const char* psEntryPoint
 		);
 
-		/// <summary>
-		/// ルートシグネチャを構築する。
-		/// </summary>
 		void InitRootSignature();
 
-		/// <summary>
-		/// パイプラインステートを構築する。
-		/// </summary>
-		/// <param name="colorBufferFormat">カラーバッファのフォーマット</param>
 		void InitPipelineState(
 			const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat
 		);
 
-		/// <summary>
-		/// ディスクリプタヒープを構築する。
-		/// </summary>
 		void InitDescriptorHeap();
+
+		/// <summary>
+		/// コンピュートシェーダー関連リソースを初期化する。
+		/// ルートシグネチャ・PSO・UAVバッファ・Readbackバッファ・
+		/// ディスクリプタヒープ・フェンスをすべて生DX12 APIで構築する。
+		/// </summary>
+		void InitComputeShader();
+
+		/// <summary>
+		/// コンピュートシェーダーをディスパッチし、結果をReadbackする。
+		/// </summary>
+		void DispatchWaveCS(RenderContext& rc, const SWaveConstantBuffer& waveCb);
 
 
 	private:
-		// グリッド設定
-		static constexpr int   GRID_DIVISION = 64;		// 分割数（N×N）
-		static constexpr float GRID_SIZE = 5000.0f;	// 1辺の長さ（ワールド単位）
+		// NUM_VERTS は内部専用（GRID_DIVISION は public で定義済み）
+		static constexpr int NUM_VERTS = (GRID_DIVISION + 1) * (GRID_DIVISION + 1);
 
 		// テクスチャ
 		Texture m_albedoMap;
@@ -132,20 +151,57 @@ namespace nsBeastEngine
 		IndexBuffer  m_indexBuffer;
 		int          m_indexCount = 0;
 
-		// シェーダー
+		// 描画用シェーダー
 		Shader* m_vs = nullptr;
 		Shader* m_ps = nullptr;
 
-		// パイプライン
+		// 描画用パイプライン（エンジンラッパー）
 		RootSignature m_rootSignature;
 		PipelineState m_pipelineState;
 
-		// 定数バッファ
-		ConstantBuffer m_commonConstantBuffer;		// b0：ワールド・ビュー・プロジェクション
-		ConstantBuffer m_expandConstantBuffer;		// b1：拡張（OceanConstantBuffer）
-		void* m_expandData = nullptr;		// 拡張定数バッファのCPU側ポインタ
+		// 描画用定数バッファ
+		ConstantBuffer m_commonConstantBuffer;
+		ConstantBuffer m_expandConstantBuffer;
+		void* m_expandData = nullptr;
 
-		// ディスクリプタヒープ
+		// 描画用ディスクリプタヒープ
 		DescriptorHeap m_descriptorHeap;
+
+		//------------------------------------------------------------
+		// コンピュートシェーダー関連（生DX12 API で管理）
+		//------------------------------------------------------------
+
+		// CS用シェーダー（エンジンラッパーの LoadCS を使う）
+		Shader m_csShader;
+
+		// CS用ルートシグネチャ（生ComPtr）
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> m_csRootSignature;
+
+		// CS用パイプラインステート（生ComPtr）
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> m_csPipelineState;
+
+		// CS用定数バッファ（CPU側データ）
+		// Map/Unmap で毎フレーム更新する
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_csCbResource;
+		void* m_csCbMapped = nullptr;
+
+		// CS用ディスクリプタヒープ（生ComPtr）
+		// CBV(b0) + UAV(u0) の2エントリ
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_csDescHeap;
+		UINT m_csDescriptorSize = 0;
+
+		// UAVバッファ（GPU書き込み先）
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_uavBuffer;
+
+		// Readbackバッファ（CPU読み出し用）
+		Microsoft::WRL::ComPtr<ID3D12Resource> m_readbackBuffer;
+
+		// CPU側波高さキャッシュ
+		std::array<float, NUM_VERTS> m_waveHeightCache = {};
+
+		// GPU完了待ち用フェンス
+		Microsoft::WRL::ComPtr<ID3D12Fence> m_fence;
+		HANDLE                              m_fenceEvent = nullptr;
+		UINT64                              m_fenceValue = 0;
 	};
 }

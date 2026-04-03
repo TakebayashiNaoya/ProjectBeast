@@ -112,6 +112,20 @@ namespace nsK2EngineLow {
 			m_commandList->SetComputeRootSignature(rootSignature.Get());
 		}
 		/// <summary>
+		/// ディスクリプタテーブルを設定。
+		/// </summary>
+		/// <param name="RootParameterIndex"></param>
+		/// <param name="BaseDescriptor"></param>
+		void SetComputeRootDescriptorTable(
+			UINT RootParameterIndex,
+			D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
+		{
+			m_commandList->SetComputeRootDescriptorTable(
+				RootParameterIndex,
+				BaseDescriptor
+			);
+		}
+		/// <summary>
 		/// パイプラインステートを設定。
 		/// </summary>
 		void SetPipelineState(ID3D12PipelineState* pipelineState)
@@ -419,20 +433,6 @@ namespace nsK2EngineLow {
 			D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
 		{
 			m_commandList->SetGraphicsRootDescriptorTable(
-				RootParameterIndex,
-				BaseDescriptor
-			);
-		}
-		/// <summary>
-		/// ディスクリプタテーブルを設定。
-		/// </summary>
-		/// <param name="RootParameterIndex"></param>
-		/// <param name="BaseDescriptor"></param>
-		void SetComputeRootDescriptorTable(
-			UINT RootParameterIndex,
-			D3D12_GPU_DESCRIPTOR_HANDLE BaseDescriptor)
-		{
-			m_commandList->SetComputeRootDescriptorTable(
 				RootParameterIndex,
 				BaseDescriptor
 			);
