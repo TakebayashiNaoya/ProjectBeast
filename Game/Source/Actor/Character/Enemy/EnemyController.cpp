@@ -10,6 +10,7 @@
 #include "EnemyController.h"
 #include "EnemyManager.h"
 
+#include "Source/Achivement/AchievementManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Enemy/EnemyStatus.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
@@ -17,6 +18,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Noise/NoiseManager.h"
+#include "Source/Util/CRC32.h"
 
 
 namespace app
@@ -543,6 +545,15 @@ namespace app
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(false);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+
+			if (auto* am = app::achievement::AchievementManager::GetInstance()) {
+				auto* baseAchieve = am->GetAchievement(Hash32("MaxEscapeMarking"));
+				if (auto* recordAchieve = dynamic_cast<app::achievement::RecordAchievement*>(baseAchieve)) {
+					// 現在連れている子ペンギンの数を取得して更新
+					int currentFollowers = app::actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
+					recordAchieve->UpdateRecord(static_cast<uint32_t>(currentFollowers));
+				}
+			}
 		}
 
 
@@ -851,6 +862,14 @@ namespace app
 			if (!sm->IsCoolDown())
 			{
 				if (sm->IsSeach()) {
+					if (auto* am = app::achievement::AchievementManager::GetInstance()) {
+						// JSONのcondition名 "WakeUpBear" をハッシュ化して探す
+						auto* baseAchieve = am->GetAchievement(Hash32("WakeUpBear"));
+						if (auto* eventAchieve = dynamic_cast<app::achievement::EventAchievement*>(baseAchieve)) {
+							eventAchieve->Unlock();
+						}
+					}
+
 					return enEnemyState_Search;
 				}
 				return enEnemyState_Idle;

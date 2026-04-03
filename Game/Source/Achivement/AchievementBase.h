@@ -40,6 +40,10 @@ namespace app
 			  */
 			inline uint32_t GetID() const { return m_id; }
 			/**
+			 * @brief アチーブメントが達成されているかどうかを設定
+			 */
+			inline void SetIsAchieved(const bool achieved) { m_isAchieved = achieved; }
+			/**
 			 * @brief アチーブメントが達成されているかどうかを取得
 			 * @return アチーブメントが達成されているかどうかを取得
 			 */
@@ -61,6 +65,13 @@ namespace app
 		public:
 			AchievementBase();
 			virtual ~AchievementBase();
+
+
+		public:
+			inline int GetIndex() const { return m_index; }
+			inline void SetIndex(int index) { m_index = index; }
+
+			inline const std::string& GetSpriteName() const { return m_spriteName; }
 
 
 		protected:
@@ -97,6 +108,10 @@ namespace app
 			bool m_isAchieved;
 			/** アチーブメントが達成された時間(秒) */
 			uint32_t m_achievedTime;
+
+			int m_index = -1;
+			/** 画像の名前 */
+			std::string m_spriteName;
 		};
 
 
@@ -162,6 +177,9 @@ namespace app
 			~LocationAchievement() override;
 
 
+			void Update()override final;
+
+
 		private:
 			void InitAchievementImpl(const nlohmann::json& json) override final;
 
@@ -171,6 +189,96 @@ namespace app
 			Vector3 m_targetLocation;
 			/** 達成するための距離の閾値 */
 			float m_enableDistance;
+		};
+
+
+
+
+		/*************************************************/
+
+
+		/**
+		 * @brief 条件判定タイプのアチーブメントクラス
+		 * @details条件判定アチーブメントは、条件を満たした瞬間に達成されるアチーブメントです。
+		 */
+		class ConditionAchievement :public AchievementBase
+		{
+		public:
+			ConditionAchievement();
+			~ConditionAchievement()override;
+
+
+			/**
+			 * @brief 達成条件
+			 */
+			void SetCondition(std::function<bool()>condition) { m_conditionFunc = condition; }
+
+
+			void Update()override final;
+
+
+		private:
+			void InitAchievementImpl(const nlohmann::json& json) override final;
+		};
+
+
+
+
+		/*************************************************/
+
+
+		/**
+		 * @brief イベントタイプのアチーブメントクラス
+		 * @details イベントアチーブメントは、特定の処理が実行された瞬間に達成されるアチーブメントです。
+		 */
+		class EventAchievement : public AchievementBase
+		{
+		public:
+			EventAchievement();
+			~EventAchievement() override;
+
+			/** 更新処理：何もしない（イベント駆動のため） */
+			void Update() override final {}
+
+			/**
+			 * @brief 外部から達成を通知する
+			 */
+			void Unlock();
+
+		private:
+			void InitAchievementImpl(const nlohmann::json& json) override final {}
+		};
+
+
+		/*************************************************/
+
+		/**
+		 * @brief レコード（記録）タイプのアチーブメントクラス
+		 * @details レコードアチーブメントは、ゲーム中の最大値や最高記録を継続して更新・保持するためのアチーブメントです。
+		 */
+		class RecordAchievement : public AchievementBase
+		{
+		public:
+			RecordAchievement();
+			~RecordAchievement() override;
+
+			/** 更新処理：何もしない（イベント駆動で数値を更新するため） */
+			void Update() override final {}
+
+			/**
+			 * @brief 記録を更新する（現在の記録より大きければ上書き）
+			 * @param value 新しい記録値
+			 */
+			void UpdateRecord(uint32_t value);
+
+			/** 現在の最大記録を取得 */
+			inline uint32_t GetRecordValue() const { return m_recordValue; }
+
+		private:
+			void InitAchievementImpl(const nlohmann::json& json) override final {}
+
+		private:
+			uint32_t m_recordValue; // 保持する記録（今回の場合は最大マーキング数）
 		};
 	}
 }
