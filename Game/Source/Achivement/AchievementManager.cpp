@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "AchievementManager.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Util/CRC32.h"
 #include "Source/Util/JsonConverter.h"
 
@@ -12,7 +13,7 @@
 namespace
 {
 	/** アチーブメントのデータファイルのパス */
-	const char* JSON_FILE_PATH = "Assets/parameter/achievement/achievementList.json";
+	const char* JSON_FILE_PATH = "Assets/parameter/achievement/AchievementList.json";
 
 	/** アチーブメントリストのキー */
 	const char* ACHIEVE_LIST_KEY = "AchievementList";
@@ -45,7 +46,15 @@ namespace app
 
 
 		void AchievementManager::Update()
-		{}
+		{
+			for (auto& pair : m_achievementMap)
+			{
+				if (pair.second)
+				{
+					pair.second->Update();
+				}
+			}
+		}
 
 
 		void AchievementManager::Render(RenderContext& rc)
@@ -64,36 +73,115 @@ namespace app
 
 		void AchievementManager::CreateAchievement(const nlohmann::json& json)
 		{
+			//for (const auto& achieveData : json)
+			//{
+			//	// タイプのキーが存在しない場合はエラー
+			//	K2_ASSERT(achieveData.contains("type"), "typeが未設定");
+			//	// タイプを取得
+			//	const std::string type = app::util::JsonConverter::ToString(achieveData["type"]);
+
+			//	Achieve newAchieve;
+
+			//	// タイプに応じてアチーブメントを作成
+
+
+			//	if (type == "counter")
+			//	{
+			//		// カウンタータイプのアチーブメントを作成
+			//		newAchieve = std::make_unique<CounterAchievement>();
+			//	}
+			//	if (type == "location")
+			//	{
+			//		// ロケーションタイプのアチーブメントを作成
+			//		//achieve = std::make_unique<LocationAchievement>();
+			//	}
+
+			//	// アチーブメントを初期化
+			//	newAchieve->Init(json);
+
+			//	// 登録したキーを取得
+			//	uint32_t key = newAchieve->GetID();
+			//	// マップに追加
+			//	m_achievementMap.emplace(key, std::move(newAchieve));
 			for (const auto& achieveData : json)
 			{
 				// タイプのキーが存在しない場合はエラー
 				K2_ASSERT(achieveData.contains("type"), "typeが未設定");
-				// タイプを取得
-				const std::string type = app::util::JsonConverter::ToString(achieveData["type"]);
 
-				Achieve newAchieve;
+				// ★ json ではなく achieveData から取得するように修正
+				std::string type = app::util::JsonConverter::ToString(achieveData["type"]);
+
+				// conditionやtargetValueが設定されていない場合のエラー回避
+				std::string conditionStr = "";
+				if (achieveData.contains("condition")) {
+					conditionStr = app::util::JsonConverter::ToString(achieveData["condition"]);
+				}
+
+				uint32_t targetValue = 0;
+				if (achieveData.contains("targetValue")) {
+					targetValue = app::util::JsonConverter::ToUInt32(achieveData["targetValue"]);
+				}
+
+				Achieve newAchieve; // std::unique_ptr<AchievementBase> と同義
 
 				// タイプに応じてアチーブメントを作成
-
-
-				if (type == "counter")
+				if (type == "Condition")
 				{
-					// カウンタータイプのアチーブメントを作成
+					auto conditionAchieve = std::make_unique<ConditionAchievement>();
+
+					if (conditionStr == "CheckRescuedCount")
+					{
+						// 子ペンギンを90匹以上集めたか判定
+						conditionAchieve->SetCondition([targetValue]() {
+							return app::actor::ChildPenguinManager::GetInstance()->GetRescuedNum() >= static_cast<int>(targetValue);
+							});
+					}
+					else if (conditionStr == "CheckSimultaneousChase")
+					{
+						conditionAchieve->SetCondition([targetValue]() {
+							int chaseCount = 0;
+							// TODO: 実際のゲームに合わせて書き換えてください
+							/* 例:
+							auto enemies = app::actor::EnemyManager::GetInstance()->GetEnemies();
+							for(auto* enemy : enemies) {
+								if(enemy->GetController()->GetCurrentState() == app::actor::EnemyController::enEnemyState_Chase) {
+									chaseCount++;
+								}
+							}
+							*/
+							return chaseCount >= static_cast<int>(targetValue);
+							});
+					}
+					newAchieve = std::move(conditionAchieve);
+				}
+				else if (type == "Counter" || type == "counter")
+				{
 					newAchieve = std::make_unique<CounterAchievement>();
 				}
-				if (type == "location")
+				else if (type == "Event")
 				{
-					// ロケーションタイプのアチーブメントを作成
-					//achieve = std::make_unique<LocationAchievement>();
+					newAchieve = std::make_unique<EventAchievement>();
+				}
+				else if (type == "Record")
+				{
+					newAchieve = std::make_unique<RecordAchievement>();
+				}
+				else if (type == "Location" || type == "location")
+				{
+					newAchieve = std::make_unique<LocationAchievement>();
 				}
 
-				// アチーブメントを初期化
-				newAchieve->Init(json);
+				// アチーブメントを初期化して登録
+				if (newAchieve)
+				{
+					// ★ ここも json ではなく achieveData を渡す
+					newAchieve->Init(achieveData);
 
-				// 登録したキーを取得
-				uint32_t key = newAchieve->GetID();
-				// マップに追加
-				m_achievementMap.emplace(key, std::move(newAchieve));
+					// 登録したキーを取得
+					uint32_t key = newAchieve->GetID();
+					// マップに追加
+					m_achievementMap.emplace(key, std::move(newAchieve));
+				}
 			}
 		}
 
@@ -112,6 +200,17 @@ namespace app
 			}
 
 			return allList;
+		}
+
+
+		AchievementBase* AchievementManager::GetAchievement(uint32_t id)
+		{
+			auto it = m_achievementMap.find(id);
+			if (it != m_achievementMap.end())
+			{
+				return it->second.get();
+			}
+			return nullptr;
 		}
 
 

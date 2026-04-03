@@ -39,6 +39,13 @@ namespace app
 			 * @brief 達成済みのアチーブメントの配列を取得する
 			 */
 			std::vector<AchievementBase*> GetAllAchievements() const;
+
+			/**
+			 * @brief IDからアチーブメントを取得する
+			 */
+			AchievementBase* GetAchievement(uint32_t id);
+
+
 		public:
 			AchievementManager();
 			~AchievementManager();

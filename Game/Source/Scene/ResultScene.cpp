@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "ResultScene.h"
+#include "Source/Achivement/AchievementManager.h"
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
 #include "Source/Sound/SoundManager.h"
@@ -27,7 +28,11 @@ namespace app
 
 
 	ResultScene::~ResultScene()
-	{}
+	{
+		if (app::achievement::AchievementManager::GetInstance()) {
+			app::achievement::AchievementManager::DestroyInstance();
+		}
+	}
 
 
 	bool ResultScene::Start()
@@ -169,14 +174,13 @@ namespace app
 		Vector3 startPos = { -200.0f, -150.0f, 0.0f };
 		float offsetX = 100.0f;
 
-		// ★追加：達成済みアイコンを詰めて描画するためのインデックス
+		// 達成済みアイコンを詰めて描画するためのインデックス
 		int drawIndex = 0;
 
 		for (size_t i = 0; i < m_allAchievementList.size(); ++i)
 		{
 			auto* achieve = m_allAchievementList[i];
 
-			// ★変更：ResultScene側で達成済みかどうかを判定する
 			if (achieve && achieve->IsAchieved())
 			{
 				std::string keyName = "AchieveIcon_" + std::to_string(i);
@@ -199,6 +203,8 @@ namespace app
 						Quaternion::Identity, // rotation
 						Vector4::White // color
 					);
+
+					icon->m_isDraw = true;
 
 					drawIndex++; // 描画したらインデックスを進める
 				}
