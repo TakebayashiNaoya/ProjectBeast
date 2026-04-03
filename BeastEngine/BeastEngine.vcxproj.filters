@@ -90,6 +90,9 @@
     <ClCompile Include="Resource\AnimationClipResource.cpp">
       <Filter>Resource</Filter>
     </ClCompile>
+    <ClCompile Include="Nature\OceanMesh.cpp">
+      <Filter>Nature</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -200,6 +203,9 @@
       <Filter>Resource</Filter>
     </ClInclude>
     <ClInclude Include="Resource\SkeletonResource.h" />
+    <ClInclude Include="Nature\OceanMesh.h">
+      <Filter>Nature</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

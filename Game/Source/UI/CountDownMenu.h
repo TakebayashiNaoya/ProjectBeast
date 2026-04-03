@@ -99,14 +99,43 @@ namespace app
 			}
 
 
+			/**
+			 * @brief カウントダウンの遅延開始フラグを取得する
+			 * @return カウントダウンの遅延開始フラグ
+			 */
+			inline bool IsDelayStart()const {return m_isDelayStart; }
+
+
+			/**
+			 * @brief カウントダウンの遅延開始フラグを設定する
+			 * @param isDelay カウントダウンの遅延開始フラグ
+			 * @note trueが開始、falseがディレイ終了
+			 */
+			inline void SetIsDelay(bool isDelay) 
+			{
+              m_isDelayStart = isDelay; 
+				if (m_isDelayStart)
+				{
+					m_delayTime = 0.0f;
+					m_countDownStartFlag = false;
+					for (const auto& icon : m_countDownMap)
+					{
+						icon.second->SetIsDraw(false);
+					}
+				}
+			}
+			
+
 		private:
 			float m_time;
-			
+			float m_delayTime;
+
 			EnCountDownType m_currentCountType;
 			using Icon = std::unique_ptr<CountDownIcon>;
 			using Key = uint32_t;
 			std::unordered_map<Key, Icon>m_countDownMap;
 
+			bool m_isDelayStart;
 			bool m_countDownStartFlag;
 			bool m_countDownFinishedFlag;
 		};

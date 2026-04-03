@@ -139,6 +139,11 @@ namespace nsBeastEngine
 		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
 		rc.ClearRenderTargetView(m_mainRenderTarget);
 		RenderToShadowMap(rc);
+		// Oceanを描画（モデルより先に描画）
+		if (m_ocean != nullptr)
+		{
+			m_ocean->Render(rc);
+		}
 		for (auto model : m_registerModels)
 		{
 			model->Draw(rc);
