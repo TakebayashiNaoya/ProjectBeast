@@ -9,15 +9,15 @@ namespace nsBeastEngine
 		const Vector3 INIT_OCEAN_PLANE_POSITION = g_vec3Zero;	// 平面のポジション（平面が通る点）
 	}
 
-	class Ocean :public IGameObject
+	class Ocean : public IGameObject
 	{
 		struct OceanConstantBuffer
 		{
 			//Matrix ReflectionCameraVP; // 反射用カメラビュー投影行列
 			Light light;
 
-			//反射の割合の下限値、必ずこの値以上は反射する。
-			//（真上から見た反射率）
+			// 反射の割合の下限値、必ずこの値以上は反射する。
+			// （真上から見た反射率）
 			float baseReflectance = 0.0f;	// 基本反射率
 
 			float waveScroll = 0.0f;		// 波のスクロール値（頂点移動用）
@@ -66,13 +66,25 @@ namespace nsBeastEngine
 		 */
 		inline void SetWave2Frequency(float frequency) { m_constantBuffer.wave2Frequency = frequency; }
 
+		/**
+		 * @brief 指定ワールドXZ座標における波面Yをバイリニア補間で取得する。
+		 * @details コンピュートシェーダーが計算したキャッシュから補間する。
+		 *          ペンギン・エネミー・ステージオブジェクトなど
+		 *          あらゆるゲームオブジェクトから呼び出し可能。
+		 *          キャッシュ未更新（初回フレーム前）は 0.0f を返す。
+		 * @param worldX ワールドX座標
+		 * @param worldZ ワールドZ座標
+		 * @return 補間された波面Yオフセット
+		 */
+		float SampleWaveHeight(float worldX, float worldZ) const;
 
-		void Render(RenderContext& rc)override final;
+
+		void Render(RenderContext& rc) override final;
 
 
 	private:
-		bool Start()override final;
-		void Update()override final;
+		bool Start() override final;
+		void Update() override final;
 
 		/**
 		 * @brief 波のスクロール値を更新
@@ -83,6 +95,12 @@ namespace nsBeastEngine
 			m_constantBuffer.waveScroll += deltaTime * m_waveSpeed;
 			m_constantBuffer.textureScroll += deltaTime * m_textureSpeed;
 		}
+
+		/**
+		 * @brief 現在の定数バッファからCSに渡す波パラメータを構築する
+		 * @return OceanMesh::SWaveConstantBuffer
+		 */
+		OceanMesh::SWaveConstantBuffer BuildWaveCb() const;
 
 		/**
 		 * @brief 位置を設定
@@ -127,16 +145,16 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief 定数バッファを設定
-		 * @param vpMatrix ビュープロジェクション行列
-		 * @param inLight ライト
-		 * @param cameraPos カメラ位置
-		 * @param baseReflectance 基本反射率
+		 * @param vpMatrix         ビュープロジェクション行列
+		 * @param inLight          ライト
+		 * @param cameraPos        カメラ位置
+		 * @param baseReflectance  基本反射率
 		 */
 		void SetConstatntBuffer(
 			const Matrix& vpMatrix,
 			const Light& inLight,
-			Vector3 cameraPos,
-			float baseReflectance
+			Vector3        cameraPos,
+			float          baseReflectance
 		) {
 			//m_constantBuffer.ReflectionCameraVP = vpMatrix;
 			m_constantBuffer.light = inLight;

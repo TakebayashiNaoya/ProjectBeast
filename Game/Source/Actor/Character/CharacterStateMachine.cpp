@@ -1,5 +1,5 @@
 ﻿/**
- * @file CharacterStateMachine.h
+ * @file CharacterStateMachine.cpp
  * @brief キャラクターのステートマシン
  * @author 藤谷
  */
@@ -23,14 +23,17 @@ namespace app
 		void CharacterStateMachine::Move()
 		{
 			// 移動方向を正規化して移動ベクトルを計算
-			const float deltaTime = g_gameTime->GetFrameDeltaTime();  // 追加
-			const Vector3 moveVector = m_moveDirection * m_moveSpeed * deltaTime;  // deltaTime を追加
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+			const Vector3 moveVector = m_moveDirection * m_moveSpeed * deltaTime;
 			Vector3 nextPosition = m_transform.m_position + moveVector;
 
 			const float currentY = m_transform.m_position.y;
 
-			// 海面（y=0）を下回っている場合は浮力（重力反転）を適用して浮かせる
-			if (currentY < SEA_LEVEL)
+			// 現在のXZ座標における波面Yをバイリニア補間で取得する
+			const float waveY = CalcCurrentWaveY();
+
+			// 波面（waveY）を下回っている場合は浮力（重力反転）を適用して浮かせる
+			if (currentY < waveY)
 			{
 				m_ownerCharacter->GetCharacterController()->SetGravity(BUOYANCY);
 			}
@@ -38,8 +41,8 @@ namespace app
 			{
 				m_ownerCharacter->GetCharacterController()->SetGravity(GRAVITY);
 
-				// 前フレームが水中（y<0）で今フレームが水面以上になった瞬間のみ垂直速度をリセットする
-				if (m_prevPositionY < SEA_LEVEL)
+				// 前フレームが水中（y < waveY）で今フレームが水面以上になった瞬間のみ垂直速度をリセットする
+				if (m_prevPositionY < waveY)
 				{
 					m_ownerCharacter->GetCharacterController()->SetVerticalVelocity(0.0f);
 				}
@@ -51,13 +54,36 @@ namespace app
 			Vector3 prevPosition = m_ownerCharacter->GetCharacterController()->Execute(nextPosition, 1.0f / 60.0f);
 			m_transform.m_position = prevPosition;
 
-			// 移動入力がある場合のみ回転を更新する
-			if (m_moveDirection.LengthSq() > FLT_EPSILON)
+			// ↓ この処理を追加する
+			// 地面コライダーがなく、かつ波面付近にいる場合は波面Yに追従させる
+			if (!IsOnGround() && !m_isSwimming)
 			{
-				Quaternion rotation = m_transform.m_rotation;
-				rotation.SetRotationYFromDirectionXZ(m_moveDirection);
-				m_transform.m_rotation = rotation;
+				const float posY = m_transform.m_position.y;
+				if (posY < waveY + SEA_SURFACE_THRESHOLD)
+				{
+					m_transform.m_position.y = waveY;
+					m_ownerCharacter->GetCharacterController()->SetPosition(m_transform.m_position);
+					m_ownerCharacter->GetCharacterController()->SetVerticalVelocity(0.0f);
+				}
 			}
+		}
+
+
+		float CharacterStateMachine::CalcCurrentWaveY() const
+		{
+			const nsBeastEngine::Ocean* ocean = g_renderingEngine->GetOcean();
+
+			// Oceanが未設定の場合は固定の海面高さを返す
+			if (ocean == nullptr)
+			{
+				return SEA_LEVEL;
+			}
+
+			const Vector3& pos = m_ownerActor->GetTransform().m_position;
+
+			// コンピュートシェーダーのキャッシュからバイリニア補間した波面Yを返す
+			float y = ocean->SampleWaveHeight(pos.x, pos.z);
+			return y;
 		}
 
 

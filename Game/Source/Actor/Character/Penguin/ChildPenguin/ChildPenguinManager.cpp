@@ -187,7 +187,7 @@ namespace app
 		float ChildPenguinManager::GetGroundY(float x, float z)
 		{
 			const Vector3 rayStart = Vector3(x, SPAWN_RAY_START_Y, z);
-			const Vector3 rayEnd = Vector3(x, 0.0f, z);
+			const Vector3 rayEnd = Vector3(x, -10.0f, z);
 
 			nsBeastEngine::nsCollision::RaycastHit hit;
 			const bool isHit = nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(

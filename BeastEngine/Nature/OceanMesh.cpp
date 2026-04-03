@@ -44,6 +44,9 @@ namespace nsBeastEngine
 
 		// ディスクリプタヒープを構築する
 		InitDescriptorHeap();
+
+		// コンピュートシェーダー関連リソースを初期化する
+		InitComputeShader();
 	}
 
 
@@ -257,8 +260,329 @@ namespace nsBeastEngine
 	}
 
 
-	void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld)
+	void OceanMesh::InitComputeShader()
 	{
+		ID3D12Device* device = g_graphicsEngine->GetD3DDevice();
+
+		//------------------------------------------------------------
+		// CS用シェーダーをロードする
+		//------------------------------------------------------------
+		m_csShader.LoadCS("Assets/shader/OceanWaveCS.hlsl", "CSMain");
+
+		//------------------------------------------------------------
+		// CS用ルートシグネチャを生DX12 APIで構築する
+		// レイアウト: [0] CBV テーブル(b0), [1] UAV テーブル(u0)
+		//------------------------------------------------------------
+		{
+			D3D12_DESCRIPTOR_RANGE ranges[2] = {};
+
+			// b0：定数バッファ
+			ranges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+			ranges[0].NumDescriptors = 1;
+			ranges[0].BaseShaderRegister = 0;
+			ranges[0].RegisterSpace = 0;
+			ranges[0].OffsetInDescriptorsFromTableStart = 0;
+
+			// u0：UAV
+			ranges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+			ranges[1].NumDescriptors = 1;
+			ranges[1].BaseShaderRegister = 0;
+			ranges[1].RegisterSpace = 0;
+			ranges[1].OffsetInDescriptorsFromTableStart = 0;
+
+			D3D12_ROOT_PARAMETER rootParams[2] = {};
+
+			rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+			rootParams[0].DescriptorTable.NumDescriptorRanges = 1;
+			rootParams[0].DescriptorTable.pDescriptorRanges = &ranges[0];
+			rootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+			rootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+			rootParams[1].DescriptorTable.NumDescriptorRanges = 1;
+			rootParams[1].DescriptorTable.pDescriptorRanges = &ranges[1];
+			rootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+			D3D12_ROOT_SIGNATURE_DESC rsDesc = {};
+			rsDesc.NumParameters = 2;
+			rsDesc.pParameters = rootParams;
+			rsDesc.NumStaticSamplers = 0;
+			rsDesc.pStaticSamplers = nullptr;
+			rsDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+			Microsoft::WRL::ComPtr<ID3DBlob> serialized;
+			Microsoft::WRL::ComPtr<ID3DBlob> error;
+			D3D12SerializeRootSignature(
+				&rsDesc,
+				D3D_ROOT_SIGNATURE_VERSION_1,
+				serialized.GetAddressOf(),
+				error.GetAddressOf()
+			);
+			device->CreateRootSignature(
+				0,
+				serialized->GetBufferPointer(),
+				serialized->GetBufferSize(),
+				IID_PPV_ARGS(m_csRootSignature.GetAddressOf())
+			);
+		}
+
+		//------------------------------------------------------------
+		// CS用パイプラインステートを生DX12 APIで構築する
+		//------------------------------------------------------------
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+			psoDesc.pRootSignature = m_csRootSignature.Get();
+			psoDesc.CS = CD3DX12_SHADER_BYTECODE(m_csShader.GetCompiledBlob());
+			device->CreateComputePipelineState(
+				&psoDesc,
+				IID_PPV_ARGS(m_csPipelineState.GetAddressOf())
+			);
+		}
+
+		//------------------------------------------------------------
+		// CS用定数バッファリソースを作成する（UPLOAD ヒープ、Map永続）
+		//------------------------------------------------------------
+		{
+			// 256バイトアライン
+			const UINT64 cbSize = (sizeof(SWaveConstantBuffer) + 255) & ~255;
+
+			D3D12_HEAP_PROPERTIES heapProps = {};
+			heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+			D3D12_RESOURCE_DESC resDesc = {};
+			resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			resDesc.Width = cbSize;
+			resDesc.Height = 1;
+			resDesc.DepthOrArraySize = 1;
+			resDesc.MipLevels = 1;
+			resDesc.Format = DXGI_FORMAT_UNKNOWN;
+			resDesc.SampleDesc.Count = 1;
+			resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+			device->CreateCommittedResource(
+				&heapProps,
+				D3D12_HEAP_FLAG_NONE,
+				&resDesc,
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				IID_PPV_ARGS(m_csCbResource.GetAddressOf())
+			);
+
+			// 永続的にMapしておく（WriteOnly相当）
+			D3D12_RANGE readRange = { 0, 0 };
+			m_csCbResource->Map(0, &readRange, &m_csCbMapped);
+		}
+
+		//------------------------------------------------------------
+		// UAVバッファを作成する（GPU書き込み先）
+		//------------------------------------------------------------
+		{
+			const UINT64 bufferSize = sizeof(float) * NUM_VERTS;
+
+			D3D12_HEAP_PROPERTIES heapProps = {};
+			heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+			D3D12_RESOURCE_DESC resDesc = {};
+			resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			resDesc.Width = bufferSize;
+			resDesc.Height = 1;
+			resDesc.DepthOrArraySize = 1;
+			resDesc.MipLevels = 1;
+			resDesc.Format = DXGI_FORMAT_UNKNOWN;
+			resDesc.SampleDesc.Count = 1;
+			resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
+			device->CreateCommittedResource(
+				&heapProps,
+				D3D12_HEAP_FLAG_NONE,
+				&resDesc,
+				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+				nullptr,
+				IID_PPV_ARGS(m_uavBuffer.GetAddressOf())
+			);
+		}
+
+		//------------------------------------------------------------
+		// Readbackバッファを作成する（CPU読み出し用）
+		//------------------------------------------------------------
+		{
+			const UINT64 bufferSize = sizeof(float) * NUM_VERTS;
+
+			D3D12_HEAP_PROPERTIES heapProps = {};
+			heapProps.Type = D3D12_HEAP_TYPE_READBACK;
+
+			D3D12_RESOURCE_DESC resDesc = {};
+			resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+			resDesc.Width = bufferSize;
+			resDesc.Height = 1;
+			resDesc.DepthOrArraySize = 1;
+			resDesc.MipLevels = 1;
+			resDesc.Format = DXGI_FORMAT_UNKNOWN;
+			resDesc.SampleDesc.Count = 1;
+			resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+			resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+			device->CreateCommittedResource(
+				&heapProps,
+				D3D12_HEAP_FLAG_NONE,
+				&resDesc,
+				D3D12_RESOURCE_STATE_COPY_DEST,
+				nullptr,
+				IID_PPV_ARGS(m_readbackBuffer.GetAddressOf())
+			);
+		}
+
+		//------------------------------------------------------------
+		// CS用ディスクリプタヒープを生DX12 APIで構築する
+		// エントリ0: CBV(b0)、エントリ1: UAV(u0)
+		//------------------------------------------------------------
+		{
+			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			heapDesc.NumDescriptors = 2;
+			heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+			device->CreateDescriptorHeap(
+				&heapDesc,
+				IID_PPV_ARGS(m_csDescHeap.GetAddressOf())
+			);
+
+			m_csDescriptorSize = device->GetDescriptorHandleIncrementSize(
+				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV
+			);
+
+			D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle =
+				m_csDescHeap->GetCPUDescriptorHandleForHeapStart();
+
+			// エントリ0: CBV
+			{
+				const UINT64 cbSize = (sizeof(SWaveConstantBuffer) + 255) & ~255;
+				D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+				cbvDesc.BufferLocation = m_csCbResource->GetGPUVirtualAddress();
+				cbvDesc.SizeInBytes = static_cast<UINT>(cbSize);
+				device->CreateConstantBufferView(&cbvDesc, cpuHandle);
+			}
+
+			// エントリ1: UAV
+			cpuHandle.ptr += m_csDescriptorSize;
+			{
+				D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+				uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+				uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+				uavDesc.Buffer.FirstElement = 0;
+				uavDesc.Buffer.NumElements = NUM_VERTS;
+				uavDesc.Buffer.StructureByteStride = sizeof(float);
+				uavDesc.Buffer.CounterOffsetInBytes = 0;
+				uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+				device->CreateUnorderedAccessView(
+					m_uavBuffer.Get(),
+					nullptr,
+					&uavDesc,
+					cpuHandle
+				);
+			}
+		}
+
+		//------------------------------------------------------------
+		// フェンスを作成する（GPU完了待ち用）
+		//------------------------------------------------------------
+		device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_fence.GetAddressOf()));
+		m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+		m_fenceValue = 0;
+	}
+
+
+	void OceanMesh::DispatchWaveCS(RenderContext& rc, const SWaveConstantBuffer& waveCb)
+	{
+		// CS用定数バッファをCPUから更新する（永続Mapにコピー）
+		memcpy(m_csCbMapped, &waveCb, sizeof(SWaveConstantBuffer));
+
+		//------------------------------------------------------------
+		// コンピュートパスを設定する
+		// RenderContext のラッパーメソッドを使う
+		//------------------------------------------------------------
+		rc.SetDescriptorHeap(m_csDescHeap.Get());
+		rc.SetComputeRootSignature(m_csRootSignature.Get());
+		rc.SetPipelineState(m_csPipelineState.Get());
+
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle =
+			m_csDescHeap->GetGPUDescriptorHandleForHeapStart();
+
+		// テーブル0: CBV(b0)
+		rc.SetComputeRootDescriptorTable(0, gpuHandle);
+
+		// テーブル1: UAV(u0)
+		gpuHandle.ptr += m_csDescriptorSize;
+		rc.SetComputeRootDescriptorTable(1, gpuHandle);
+
+		// グループ数：(GRID_DIVISION+1) 頂点を 8スレッド単位でカバーする
+		// ceil(65 / 8) = 9
+		const UINT groupCount = (GRID_DIVISION + 1 + 7) / 8;
+		rc.Dispatch(groupCount, groupCount, 1);
+
+		//------------------------------------------------------------
+		// UAV書き込み完了を保証するバリアを張る
+		//------------------------------------------------------------
+		auto uavBarrier = CD3DX12_RESOURCE_BARRIER::UAV(m_uavBuffer.Get());
+		rc.ResourceBarrier(uavBarrier);
+
+		//------------------------------------------------------------
+		// UAVバッファを COPY_SOURCE に遷移させて Readback にコピーする
+		//------------------------------------------------------------
+		rc.TransitionResourceState(
+			m_uavBuffer.Get(),
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+			D3D12_RESOURCE_STATE_COPY_SOURCE
+		);
+
+		rc.CopyResource(m_readbackBuffer.Get(), m_uavBuffer.Get());
+
+		// UAVバッファを元のステートに戻す
+		rc.TransitionResourceState(
+			m_uavBuffer.Get(),
+			D3D12_RESOURCE_STATE_COPY_SOURCE,
+			D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+		);
+
+		//------------------------------------------------------------
+		// フェンスをシグナルして GPU の完了を待つ
+		//------------------------------------------------------------
+		m_fenceValue++;
+		ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
+		commandQueue->Signal(m_fence.Get(), m_fenceValue);
+
+		if (m_fence->GetCompletedValue() < m_fenceValue)
+		{
+			m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent);
+			WaitForSingleObject(m_fenceEvent, INFINITE);
+		}
+
+		//------------------------------------------------------------
+		// Readback バッファを Map して CPU 側キャッシュに書き出す
+		//------------------------------------------------------------
+		{
+			const UINT64 bufferSize = sizeof(float) * NUM_VERTS;
+
+			D3D12_RANGE readRange = { 0, static_cast<SIZE_T>(bufferSize) };
+			void* pData = nullptr;
+			m_readbackBuffer->Map(0, &readRange, &pData);
+			memcpy(m_waveHeightCache.data(), pData, bufferSize);
+			D3D12_RANGE writeRange = { 0, 0 };
+			m_readbackBuffer->Unmap(0, &writeRange);
+		}
+	}
+
+
+	void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld, const SWaveConstantBuffer& waveCb)
+	{
+		// コンピュートシェーダーをディスパッチし波高さキャッシュを更新する
+		DispatchWaveCS(rc, waveCb);
+
+		//------------------------------------------------------------
+		// 通常描画
+		//------------------------------------------------------------
+
 		// 共通定数バッファを更新する（b0）
 		SCommonConstantBuffer cb;
 		cb.mWorld = mWorld;
