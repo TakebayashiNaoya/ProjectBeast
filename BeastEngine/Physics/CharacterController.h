@@ -31,6 +31,13 @@ namespace nsBeastEngine
 			inline void SetGravity(const float gravity) { m_gravity = gravity; }
 
 			/**
+			 * @brief 波面の高さを設定
+			 * @details Execute() 内の落下処理で、この高さより下に潜らないようにする
+			 * @param seaLevel 波面のY座標
+			 */
+			inline void SetSeaLevel(const float seaLevel) { m_seaLevel = seaLevel; }
+
+			/**
 			 * @brief 座標を取得
 			 * @return 座標
 			 */
@@ -140,6 +147,8 @@ namespace nsBeastEngine
 			float m_radius;
 			/** 高さ */
 			float m_height;
+			/** 波面の高さ（この高さより下に潜らないようにする） */
+			float m_seaLevel;
 
 			/** 初期化済みフラグ */
 			bool m_isInited;

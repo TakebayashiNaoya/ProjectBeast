@@ -15,8 +15,6 @@ namespace app
 		{
 			/** 重力の値 */
 			constexpr float GRAVITY = -9.8f * 150;
-			/** 海面の浮力（重力を反転した値） */
-			constexpr float BUOYANCY = -GRAVITY;
 		}
 
 
@@ -32,16 +30,16 @@ namespace app
 			// 現在のXZ座標における波面Yをバイリニア補間で取得する
 			const float waveY = CalcCurrentWaveY();
 
-			// 波面（waveY）を下回っている場合は浮力（重力反転）を適用して浮かせる
-			if (currentY < waveY)
-			{
-				m_ownerCharacter->GetCharacterController()->SetGravity(BUOYANCY);
-			}
-			else
+			// 波面の高さをキャラクターコントローラーに毎フレーム渡す
+			// これにより落下処理で波面より下に潜らないようにする
+			m_ownerCharacter->GetCharacterController()->SetSeaLevel(waveY);
+
+			// 水中にいる間は重力の切り替えを行わず、波面追従に任せる
+			// 水から出た瞬間（前フレームは水中、今フレームは水上）のみ垂直速度をリセットして重力に戻す
+			if (!IsInWater())
 			{
 				m_ownerCharacter->GetCharacterController()->SetGravity(GRAVITY);
 
-				// 前フレームが水中（y < waveY）で今フレームが水面以上になった瞬間のみ垂直速度をリセットする
 				if (m_prevPositionY < waveY)
 				{
 					m_ownerCharacter->GetCharacterController()->SetVerticalVelocity(0.0f);
@@ -54,8 +52,15 @@ namespace app
 			Vector3 prevPosition = m_ownerCharacter->GetCharacterController()->Execute(nextPosition, 1.0f / 60.0f);
 			m_transform.m_position = prevPosition;
 
-			// ↓ この処理を追加する
-			// 地面コライダーがなく、かつ波面付近にいる場合は波面Yに追従させる
+			// 移動入力がある場合のみ回転を更新する
+			if (m_moveDirection.LengthSq() > FLT_EPSILON)
+			{
+				Quaternion rotation = m_transform.m_rotation;
+				rotation.SetRotationYFromDirectionXZ(m_moveDirection);
+				m_transform.m_rotation = rotation;
+			}
+
+			// 地面コライダーがなく、かつ泳いでいない場合は波面Yに追従させる
 			if (!IsOnGround() && !m_isSwimming)
 			{
 				const float posY = m_transform.m_position.y;

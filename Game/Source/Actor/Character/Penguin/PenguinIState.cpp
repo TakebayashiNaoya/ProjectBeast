@@ -274,6 +274,7 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSwimSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
+			m_owner->SetIsSwimming(true);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
 			if (m_seHandle == -1)
 			{
@@ -299,6 +300,7 @@ namespace app
 
 		void PenguinSwimmingState::Exit()
 		{
+			m_owner->SetIsSwimming(false);
 			SoundManager* sound = &SoundManager::Get();
 			if (m_seHandle != -1)
 			{
