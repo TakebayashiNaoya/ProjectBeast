@@ -5,31 +5,41 @@
         "name" : "子ペンギンを90匹以上集めた",
         "type" : "Condition",
         "condition" : "CheckRescuedCount",
-        "targetValue": 90
+        "targetValue": 90,
+        "spriteIndex": 0,
+        "spriteName":"penguin_rescue90"
       },
       {
         "name" : "2頭以上のホッキョクグマに追われた",
         "type" : "Condition",
         "condition" : "CheckSimultaneousChase",
-        "targetValue": 2
+        "targetValue": 2,
+        "spriteIndex": 1,
+        "spriteName":"bear_chase_2"
       },
       {
         "name": "3頭のホッキョクグマそれぞれに追われた",
         "type": "Counter",
         "condition": "CheckIndividualChase",
-        "targetValue": 3
+        "targetValue": 3,
+        "spriteIndex": 2,
+        "spriteName":"bear_chase_all"
       },
       {
         "name": "眠っているホッキョクグマを起こした",
         "type": "Event",
         "condition": "WakeUpBear",
-        "targetValue": 1
+        "targetValue": 1,
+        "spriteIndex": 3,
+        "spriteName":"bear_wakeup"
       },
       {
         "name": "ホッキョクグマを振り切ったときの最大マーキング数",
         "type": "Record",
         "condition": "MaxEscapeMarking",
-        "targetValue": 0
+        "targetValue": 0,
+        "spriteIndex": 4,
+        "spriteName":"bear_shakeoff"
       }
     ]
   }

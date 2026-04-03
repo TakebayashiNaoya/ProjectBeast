@@ -40,6 +40,10 @@ namespace app
 			  */
 			inline uint32_t GetID() const { return m_id; }
 			/**
+			 * @brief アチーブメントが達成されているかどうかを設定
+			 */
+			inline void SetIsAchieved(const bool achieved) { m_isAchieved = achieved; }
+			/**
 			 * @brief アチーブメントが達成されているかどうかを取得
 			 * @return アチーブメントが達成されているかどうかを取得
 			 */
@@ -61,6 +65,13 @@ namespace app
 		public:
 			AchievementBase();
 			virtual ~AchievementBase();
+
+
+		public:
+			inline int GetIndex() const { return m_index; }
+			inline void SetIndex(int index) { m_index = index; }
+
+			inline const std::string& GetSpriteName() const { return m_spriteName; }
 
 
 		protected:
@@ -97,6 +108,10 @@ namespace app
 			bool m_isAchieved;
 			/** アチーブメントが達成された時間(秒) */
 			uint32_t m_achievedTime;
+
+			int m_index = -1;
+			/** 画像の名前 */
+			std::string m_spriteName;
 		};
 
 

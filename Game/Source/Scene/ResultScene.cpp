@@ -57,13 +57,13 @@ namespace app
 		{
 			m_allAchievementList = am->GetAllAchievements();
 		}
-
-		CalcTotalScore();
-
 		// JSONレイアウトを読み込んでUIを構築
 		m_layout.Initialize<app::ui::MenuBase>("Assets/parameter/result/result.json");
 
 		SetupAchievementUI();
+
+		CalcTotalScore();
+
 
 		// 取得した値を UIDigit にセット
 		auto* timeDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultTimeDigit"));
@@ -171,42 +171,56 @@ namespace app
 		auto* canvas = menu->GetCanvas();
 		if (!canvas) return;
 
-		Vector3 startPos = { -200.0f, -150.0f, 0.0f };
-		float offsetX = 100.0f;
+		//float rowOffsetY = -50.0f;
+		Vector3 iconStartPos = { /*-500.0f, 90.0f, 0.0f*/-200.0f,100.0f,0.0f }; // 1個目の画像の位置（xで横、yで縦）
+		float checkOffsetX = -10.0f;  // チェックアイコンのX位置
+		float nameOffsetX = 250.0f;   // 名前画像のX位置
 
-		// 達成済みアイコンを詰めて描画するためのインデックス
-		int drawIndex = 0;
+		float iconOffsetY = -45.0f;
+
+		int rowIndex = 0;
 
 		for (size_t i = 0; i < m_allAchievementList.size(); ++i)
 		{
 			auto* achieve = m_allAchievementList[i];
+			if (!achieve)continue;
 
-			if (achieve && achieve->IsAchieved())
+			float iconOffset = iconOffsetY * static_cast<float>(rowIndex);
+
+			// 共通のY計算
+			float commonY = iconStartPos.y + iconOffset;
+
+			Vector3 currentIconPos = iconStartPos;
+			currentIconPos.x += checkOffsetX;
+			currentIconPos.y = commonY;
+
+			Vector3 currentNamePos = iconStartPos;
+			currentNamePos.x += nameOffsetX;
+			currentNamePos.y = commonY; // 同じY値を使う
+
+
+			//achieve->SetIsAchieved(true);
+			if (achieve->IsAchieved())
 			{
-				std::string keyName = "AchieveIcon_" + std::to_string(i);
-				uint32_t key = Hash32(keyName.c_str());
+				std::string checkKeyName = "AchieveCheck_" + std::to_string(i);
+				uint32_t checkKey = Hash32(checkKeyName.c_str());
 
-				canvas->CreateUI<app::ui::UIIcon>(key);
-				auto* icon = canvas->FindUI<app::ui::UIIcon>(key);
+				canvas->CreateUI<app::ui::UIIcon>(checkKey);
+				auto* checkIcon = canvas->FindUI<app::ui::UIIcon>(checkKey);
 
-				if (icon)
+				if (checkIcon)
 				{
-					Vector3 pos = startPos;
-					// i ではなく drawIndex を使うことで、隙間なくアイコンを並べる
-					pos.x += offsetX * static_cast<float>(drawIndex);
-
-					icon->Initialize(
-						"Assets/spriteData/UI/Icon/DummyIcon.DDS",
-						80.0f, 80.0f, // width, height
-						pos,
+					checkIcon->Initialize(
+						"Assets/spriteData/UI/Achievement/check.DDS",
+						50.0f, 50.0f, // width, height
+						currentIconPos,
 						Vector3::One, // scale
 						Quaternion::Identity, // rotation
 						Vector4::White // color
 					);
 
-					icon->m_isDraw = true;
+					checkIcon->m_isDraw = true;
 
-					drawIndex++; // 描画したらインデックスを進める
 				}
 			}
 			else
@@ -215,6 +229,28 @@ namespace app
 				// ※もし「未達成の場合はシルエット（真っ黒の画像や半透明）を表示したい」
 				// といった機能を追加したい場合は、ここに処理を書くことができます。
 			}
+
+			std::string nameAssetPath = "Assets/spriteData/UI/Achievement/AchieveName_/"
+				+ (achieve->GetSpriteName()) + ".DDS";
+
+			std::string nameKeyName = "AchieveName_" + std::to_string(i);
+			uint32_t nameKey = Hash32(nameKeyName.c_str());
+			canvas->CreateUI<app::ui::UIIcon>(nameKey); // UITextではなくUIIconに変更
+			auto* nameIcon = canvas->FindUI<app::ui::UIIcon>(nameKey);
+			if (nameIcon)
+			{
+				nameIcon->Initialize(
+					nameAssetPath.c_str(),
+					500.0f, 30.0f, // 幅・高さは画像サイズに合わせて調整
+					currentNamePos,
+					Vector3::One,
+					Quaternion::Identity,
+					Vector4::White
+				);
+				nameIcon->m_isDraw = true;
+			}
+
+			rowIndex++;
 		}
 	}
 }

@@ -67,42 +67,13 @@ namespace app
 
 		AchievementManager::~AchievementManager()
 		{
-			m_achievementMap.clear();
+			m_achievementList.clear(); // こちらが所有権を持つ
+			m_achievementMap.clear();  // 生ポインタなのでclearだけでOK
 		}
 
 
 		void AchievementManager::CreateAchievement(const nlohmann::json& json)
 		{
-			//for (const auto& achieveData : json)
-			//{
-			//	// タイプのキーが存在しない場合はエラー
-			//	K2_ASSERT(achieveData.contains("type"), "typeが未設定");
-			//	// タイプを取得
-			//	const std::string type = app::util::JsonConverter::ToString(achieveData["type"]);
-
-			//	Achieve newAchieve;
-
-			//	// タイプに応じてアチーブメントを作成
-
-
-			//	if (type == "counter")
-			//	{
-			//		// カウンタータイプのアチーブメントを作成
-			//		newAchieve = std::make_unique<CounterAchievement>();
-			//	}
-			//	if (type == "location")
-			//	{
-			//		// ロケーションタイプのアチーブメントを作成
-			//		//achieve = std::make_unique<LocationAchievement>();
-			//	}
-
-			//	// アチーブメントを初期化
-			//	newAchieve->Init(json);
-
-			//	// 登録したキーを取得
-			//	uint32_t key = newAchieve->GetID();
-			//	// マップに追加
-			//	m_achievementMap.emplace(key, std::move(newAchieve));
 			for (const auto& achieveData : json)
 			{
 				// タイプのキーが存在しない場合はエラー
@@ -174,13 +145,20 @@ namespace app
 				// アチーブメントを初期化して登録
 				if (newAchieve)
 				{
-					// ★ ここも json ではなく achieveData を渡す
-					newAchieve->Init(achieveData);
+					//// ★ ここも json ではなく achieveData を渡す
+					//newAchieve->Init(achieveData);
 
-					// 登録したキーを取得
+					//// 登録したキーを取得
+					//uint32_t key = newAchieve->GetID();
+					//// マップに追加
+					//m_achievementMap.emplace(key, std::move(newAchieve));
+
+					newAchieve->Init(achieveData);
+					newAchieve->SetIndex(static_cast<int>(m_achievementList.size())); // ← インデックスをセット
+
 					uint32_t key = newAchieve->GetID();
-					// マップに追加
-					m_achievementMap.emplace(key, std::move(newAchieve));
+					m_achievementMap.emplace(key, newAchieve.get()); // 生ポインタをmapに
+					m_achievementList.push_back(std::move(newAchieve)); // 所有権はvectorが持つ
 				}
 			}
 		}
@@ -189,16 +167,13 @@ namespace app
 		std::vector<AchievementBase*> AchievementManager::GetAllAchievements() const
 		{
 			std::vector<AchievementBase*> allList;
-
-			for (const auto& pair : m_achievementMap)
+			for (const auto& achieve : m_achievementList) // vectorなのでJSON順が保証される
 			{
-				if (pair.second)
+				if (achieve)
 				{
-					// 達成状況に関わらず、全て返す
-					allList.push_back(pair.second.get());
+					allList.push_back(achieve.get());
 				}
 			}
-
 			return allList;
 		}
 
@@ -208,7 +183,7 @@ namespace app
 			auto it = m_achievementMap.find(id);
 			if (it != m_achievementMap.end())
 			{
-				return it->second.get();
+				return it->second;
 			}
 			return nullptr;
 		}

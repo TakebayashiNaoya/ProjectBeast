@@ -25,6 +25,16 @@ namespace app
 			m_name = app::util::JsonConverter::ToString(json["name"]);
 			std::string condition = app::util::JsonConverter::ToString(json["condition"]);
 			m_id = Hash32(m_name.c_str());
+
+			if (json.contains("spriteIndex"))
+			{
+				m_index = static_cast<int>(app::util::JsonConverter::ToUInt32(json["spriteIndex"]));
+			}
+
+			if (json.contains("spriteName"))
+			{
+				m_spriteName = app::util::JsonConverter::ToString(json["spriteName"]);
+			}
 		}
 
 

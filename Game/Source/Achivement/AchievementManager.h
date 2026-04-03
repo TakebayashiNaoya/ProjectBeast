@@ -64,8 +64,8 @@ namespace app
 
 
 		private:
-			/** アチーブメントのマップ */
-			std::unordered_map<AchieveKey, Achieve> m_achievementMap;
+			std::vector<Achieve> m_achievementList; // JSON順を保持
+			std::unordered_map<AchieveKey, AchievementBase*> m_achievementMap; // IDから検索用
 
 
 			/** シングルトン関係 */
