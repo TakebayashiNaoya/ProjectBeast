@@ -11,23 +11,19 @@ namespace app
 	namespace ui
 	{
 		UIImage::UIImage()
-		{
-		}
+		{}
 
 
 		UIImage::~UIImage()
-		{
-		}
+		{}
 
 
 		void UIImage::Update()
-		{
-		}
+		{}
 
 
 		void UIImage::Render(RenderContext& rc)
-		{
-		}
+		{}
 
 
 
@@ -38,13 +34,11 @@ namespace app
 
 
 		UIIcon::UIIcon()
-		{
-		}
+		{}
 
 
 		UIIcon::~UIIcon()
-		{
-		}
+		{}
 
 
 		void UIIcon::Update()
@@ -69,7 +63,7 @@ namespace app
 		}
 
 
-		void UIIcon::Initialize(const char* assetName, const float width, const float height,const Vector3& position,const Vector3& scale,const Quaternion& rotation, const Vector4& color)
+		void UIIcon::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector4& color)
 		{
 			m_transform.m_localTransform.m_position = position;
 			m_transform.m_localTransform.m_scale = scale;
@@ -92,13 +86,11 @@ namespace app
 
 
 		UIButton::UIButton()
-		{
-		}
+		{}
 
 
 		UIButton::~UIButton()
-		{
-		}
+		{}
 
 
 		void UIButton::Update()
@@ -148,13 +140,11 @@ namespace app
 
 
 		UIGauge::UIGauge()
-		{
-		}
+		{}
 
 
 		UIGauge::~UIGauge()
-		{
-		}
+		{}
 
 
 		void UIGauge::Update()
@@ -178,7 +168,7 @@ namespace app
 		}
 
 
-		void UIGauge::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector4& color,const Vector2& pivot)
+		void UIGauge::Initialize(const char* assetName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector4& color, const Vector2& pivot)
 		{
 			m_transform.m_localTransform.m_position = position;
 			m_transform.m_localTransform.m_scale = scale;
@@ -336,6 +326,56 @@ namespace app
 			digit -= 1;
 			int divisor = static_cast<int>(pow(10, digit));
 			return (number_ / divisor) % 10;
+		}
+
+
+
+
+		/*************************************/
+
+
+		UIText::UIText() : m_scale(1.0f)
+		{}
+
+
+		UIText::~UIText()
+		{}
+
+
+		void UIText::Update()
+		{
+			UpdateAnimation();
+			m_transform.UpdateTransform();
+
+			m_fontRender.SetPosition(m_transform.m_localTransform.m_position.x, m_transform.m_localTransform.m_position.y);
+			m_fontRender.SetRotation(m_transform.m_localTransform.m_rotation.x);
+			m_fontRender.SetScale(m_scale);
+			m_fontRender.SetColor(m_color);
+			m_fontRender.SetPivot(m_pivot);
+		}
+
+
+		void UIText::Render(RenderContext& rc)
+		{
+			if (m_isDraw) {
+				m_fontRender.Draw(rc);
+			}
+		}
+
+
+		void UIText::SetText(const std::string& text)
+		{
+			if (text.empty()) {
+				m_fontRender.SetText(L"");
+				return;
+			}
+
+			// Windows APIを使って UTF-8 から wstring(UTF-16) へ正しく変換する
+			int size_needed = MultiByteToWideChar(CP_UTF8, 0, &text[0], (int)text.size(), NULL, 0);
+			std::wstring wstrTo(size_needed, 0);
+			MultiByteToWideChar(CP_UTF8, 0, &text[0], (int)text.size(), &wstrTo[0], size_needed);
+
+			m_fontRender.SetText(wstrTo.c_str());
 		}
 
 

@@ -4,8 +4,8 @@
  * @author 忽那
  */
 #pragma once
-#include "Source/UI/UIAnimation.h"
 #include "Source/Core/HierarchicalTransform.h"
+#include "Source/UI/UIAnimation.h"
 #include <unordered_map>
 
 
@@ -34,7 +34,7 @@ namespace app
 		public:
 			UIBase()
 				: m_color(Vector4::White)
-				, m_pivot(0.5f,0.5f)
+				, m_pivot(0.5f, 0.5f)
 				, m_isDraw(true)
 			{
 				m_uiAnimationMap.clear();
@@ -61,7 +61,7 @@ namespace app
 
 
 		public:
-			/** 
+			/**
 			 * @brief 全てのUIアニメーションの更新処理
 			 * @param animation UIAnimationBase
 			 */
@@ -74,7 +74,7 @@ namespace app
 			}
 
 
-			/** 
+			/**
 			 * @brief UIアニメーションを流す処理
 			 * @param animation UIAnimationBase
 			 */
@@ -89,7 +89,7 @@ namespace app
 
 			/**
 			 * @brief UIアニメーションを再生するかどうか
-			 * @param 
+			 * @param
 			 */
 			bool IsPlayAnimation()
 			{
@@ -108,12 +108,12 @@ namespace app
 			}
 
 
-			/** 
+			/**
 			 * @brief UIアニメーションの追加
 			 * @param key キー
 			 * @param animation 値(UIAnimationBase)
 			 */
-			void AddAnimation(const uint32_t key,std::unique_ptr<UIAnimationBase> animation)
+			void AddAnimation(const uint32_t key, std::unique_ptr<UIAnimationBase> animation)
 			{
 				animation->SetUI(this);
 				m_uiAnimationMap.emplace(key, std::move(animation));
@@ -156,7 +156,7 @@ namespace app
 				}
 				return nullptr;
 			}
-			
+
 
 		protected:
 			/** キーと値(UIAnimationBase)の登録する */
@@ -182,7 +182,7 @@ namespace app
 
 
 		public:
-			/** 
+			/**
 			 * @brief 基底軸の設定
 			 * @param pivot 基底軸
 			 */
@@ -218,20 +218,20 @@ namespace app
 
 
 		public:
-			/** 
+			/**
 			 * @brief 初期化
 			 * @param assetName 画像の名前
 			 * @param width 横
 			 * @param height 縦
 			 */
 			void Initialize(
-					const char* assetName
-				,   const float width
-				,   const float height
-				,	const Vector3& position
-				,	const Vector3& scale
-				,	const Quaternion& rotation
-				,	const Vector4& color
+				const char* assetName
+				, const float width
+				, const float height
+				, const Vector3& position
+				, const Vector3& scale
+				, const Quaternion& rotation
+				, const Vector4& color
 			);
 		};
 
@@ -243,7 +243,7 @@ namespace app
 		class UIButton : public UIImage
 		{
 		private:
-			/** 
+			/**
 			 * @brief ボタンが押された時の処理(外部から委譲される)
 			 */
 			std::function<void()>m_delegete;
@@ -272,13 +272,13 @@ namespace app
 			 * @param color カラー
 			 */
 			void Initialize(
-					const char* assetName
-				,	const float width
-				,	const float height
-				,	const Vector3& position
-				,	const Vector3& scale
-				,	const Quaternion& rotation
-				,	const Vector4& color
+				const char* assetName
+				, const float width
+				, const float height
+				, const Vector3& position
+				, const Vector3& scale
+				, const Quaternion& rotation
+				, const Vector4& color
 			);
 		};
 
@@ -311,18 +311,18 @@ namespace app
 			 * @param pivot 基底軸
 			 */
 			void Initialize(
-					const char* assetName
-				,	const float width
-				,	const float height
-				,	const Vector3& position
-				,	const Vector3& scale
-				,	const Quaternion& rotation
-				,	const Vector4& color
-				,	const Vector2& pivot
+				const char* assetName
+				, const float width
+				, const float height
+				, const Vector3& position
+				, const Vector3& scale
+				, const Quaternion& rotation
+				, const Vector4& color
+				, const Vector2& pivot
 			);
 		};
 
-		
+
 		// ============================================
 // UI桁表示(スコア表示などで使用)
 // ============================================
@@ -387,6 +387,32 @@ namespace app
 
 			/** 対象の桁 */
 			int GetDigit(int digit);
+		};
+
+
+		/**
+		 * @brief テキストを表示するUI
+		 */
+		class UIText : public UIBase
+		{
+		public:
+			UIText();
+			~UIText();
+
+			/** 更新処理 */
+			void Update() override;
+			/** 描画処理 */
+			void Render(RenderContext& rc) override;
+
+			/** テキストを設定 */
+			void SetText(const std::string& text);
+
+			/** スケールの設定 */
+			void SetScale(float scale) { m_scale = scale; }
+
+		private:
+			nsBeastEngine::FontRender m_fontRender;
+			float m_scale;
 		};
 
 
