@@ -10,6 +10,7 @@
 #include "Source/UI/Layout.h"
 #include "Source/UI/SoundOptionMenu.h"
 #include "TitleScene.h"
+#include "Source/UI/TitleEventMenu.h"
 
 
 namespace app
@@ -18,6 +19,8 @@ namespace app
 		:m_state(TitleState::Title)
 		, m_soundOption(nullptr)
 		, m_soundOptionLayout(nullptr)
+		, m_titleEventMenu(nullptr)
+		, m_titleLayout(nullptr)
 	{}
 
 
@@ -28,25 +31,29 @@ namespace app
 		nsBeastEngine::nsCollision::PhysicsWorld::Get().DisableDrawDebugWireFrame();
 #endif
 		delete m_soundOptionLayout;
+		delete m_titleLayout;
 	}
 
 
 	bool TitleScene::Start()
 	{
 		m_titleRender.Init("Assets/spriteData/Scene/NorthPole.DDS", 1920.0f, 1080.0f);
-		m_PenTakt.Init("Assets/spriteData/Scene/PenTakt.DDS", 480.0f, 270.0f);
-		m_AButton.Init("Assets/spriteData/UI/Button/TitleScreen/Abutton.DDS", 480.0f, 270.0f);
-		m_XButton.Init("Assets/spriteData/UI/Button/TitleScreen/Xbutton.DDS", 480.0f, 270.0f);
-		m_PenTakt.SetPosition(Vector3(0.0f, 150.0f, 0.0f));
-		m_PenTakt.SetScale(Vector2(2.5f, 2.5f));
-		m_AButton.SetPosition(Vector2(-300.0f, -300.0f));
-		m_XButton.SetPosition(Vector2(300.0f, -300.0f));
+
+		m_titleLayout = new ui::Layout;
+		m_titleLayout->Initialize<ui::TitleEventMenu>(
+			"Assets/parameter/title/Title.json"
+		);
+		m_titleEventMenu = m_titleLayout->GetMenu<ui::TitleEventMenu>();
+
+
 		m_soundOptionLayout = new ui::Layout;
 
 		m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
 			"Assets/parameter/sound/SoundOption.json"
 		);
-
+		m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
+		
+		m_titleLayout->Reload();
 		m_soundOptionLayout->Reload();
 
 		SoundManager::Get().PlayBGM(enSoundKind_Title);
@@ -59,34 +66,56 @@ namespace app
 	{
 		switch (m_state)
 		{
+#if defined(APP_DEBUG)
 		case TitleState::Title:
 		{
+			if (!m_titleLayout)
+			{
+				m_titleLayout = new ui::Layout;
+				m_titleLayout->Initialize<ui::TitleEventMenu>(
+					"Assets/parameter/title/Title.json"
+				);
+				m_titleEventMenu = m_titleLayout->GetMenu<ui::TitleEventMenu>();
+			}
+
+			
 			if (g_pad[0]->IsTrigger(enButtonA))
 			{
-				SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-				SoundManager::Get().StopBGM();
-				m_nextScene = true;
+				const uint32_t selectKey = m_titleEventMenu->GetSelectKey();
+				if (selectKey == Hash32("StartHightLightIcon"))
+				{
+					// ゲーム開始。
+					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+					SoundManager::Get().StopBGM();
+					m_nextScene = true;
+				}
+				else if (selectKey == Hash32("OptionHightLightIcon"))
+				{
+					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+					SoundManager::Get().StopBGM();
+					m_state = TitleState::SoundOption;
+					// オプション画面。
+					if (!m_soundOption)
+					{
+						m_soundOptionLayout = new ui::Layout;
+						m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
+							"Assets/parameter/sound/SoundOption.json"
+						);
+						m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
+					}
+				}
+				else if (selectKey == Hash32("ReTitleHightLightIcon"))
+				{
+					// タイトルに。現在はタイトルから遷移しないため、ここにくることはない。
+					K2_ASSERT(false, "警告です。");
+					return;
+				}
 			}
 
 			m_titleRender.Update();
-			m_AButton.Update();
-			m_XButton.Update();
-			m_PenTakt.Update();
+			m_titleLayout->Update();
 
-			if (g_pad[0]->IsTrigger(enButtonX))
-			{
-				SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-				m_state = TitleState::SoundOption;
-				if (!m_soundOptionLayout)
-				{
-					m_soundOptionLayout = new ui::Layout;
-					m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
-						"Assets/parameter/sound/SoundOption.json"
-					);
-
-					m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
-				}
-			}
+			
 			break;
 		}
 
@@ -113,13 +142,13 @@ namespace app
 
 	void TitleScene::Render(RenderContext& rc)
 	{
-
 		if (m_state == TitleState::Title)
 		{
 			m_titleRender.Draw(rc);
-			m_AButton.Draw(rc);
-			m_XButton.Draw(rc);
-			m_PenTakt.Draw(rc);
+			if (m_titleLayout)
+			{
+				m_titleLayout->Render(rc);
+			}
 		}
 		else if (m_state == TitleState::SoundOption)
 		{
@@ -129,7 +158,7 @@ namespace app
 			}
 		}
 	}
-
+#endif
 
 	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{

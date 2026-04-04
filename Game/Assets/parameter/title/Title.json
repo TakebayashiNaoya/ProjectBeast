@@ -1,0 +1,97 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"PentaktRogoIcon",
+                "asset":"Assets/spriteData/Scene/Pentakt.dds",
+                "width":1000,
+                "height":450,
+                "position":[0,250,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"StartHightLightIcon",
+                "asset":"Assets/spriteData/UI/Icon/TitleIcon/StartHightLiteIcons.dds",
+                "width":320,
+                "height":130,
+                "position":[ 0, 0, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"OptionHightLightIcon",
+                "asset":"Assets/spriteData/UI/Icon/TitleIcon/OptionHightLiteIcon.dds",
+                "width":340,
+                "height":120,
+                "position":[ 0, -150, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"ReTitleHightLightIcon",
+                "asset":"Assets/spriteData/UI/Icon/TitleIcon/reTitleHightIconLiteIcon.dds",
+                "width":340,
+                "height":130,
+                "position":[ 0, -300, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"StartIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/StartText.dds",
+                "width":270,
+                "height":90,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            
+
+
+            {
+                "type":"UIIcon",
+                "name":"OptionIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/OptionText.dds",
+                "width":300,
+                "height":100,
+                "position":[ 0, -150, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            
+
+
+            {
+                "type":"UIIcon",
+                "name":"ReturnTitleIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/ReturnTitleText.dds",
+                "width":300,
+                "height":100,
+                "position":[ 0, -300, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            }
+        ]
+    }
+}

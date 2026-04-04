@@ -88,6 +88,19 @@ namespace app
 
 
 			/**
+			 * @brief UIアニメーションを止める処理
+			 * @param animation UIAnimationBase
+			 */
+			void StopAnimation()
+			{
+				ForEachAnimation([](UIAnimationBase* animation)
+					{
+						animation->StopAnimation();
+					});
+			}
+
+
+			/**
 			 * @brief UIアニメーションを再生するかどうか
 			 * @param 
 			 */

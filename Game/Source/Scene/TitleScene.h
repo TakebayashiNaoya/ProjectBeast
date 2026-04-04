@@ -13,6 +13,7 @@ namespace app
 	{
 		class Layout;
 		class SoundOptionMenu;
+		class TitleEventMenu;
 	}
 
 	class TitleScene :public IScene
@@ -55,5 +56,6 @@ namespace app
 		ui::Layout* m_titleLayout;
 		ui::Layout* m_soundOptionLayout;
 		ui::SoundOptionMenu* m_soundOption;
+		ui::TitleEventMenu* m_titleEventMenu;
 	};
 }
