@@ -61,7 +61,7 @@ namespace nsBeastEngine
 
 	public:
 		OceanMesh() = default;
-		~OceanMesh() = default;
+		~OceanMesh();
 
 		/// <summary>
 		/// 初期化。
