@@ -66,7 +66,6 @@ namespace app
 	{
 		switch (m_state)
 		{
-#if defined(APP_DEBUG)
 		case TitleState::Title:
 		{
 			if (!m_titleLayout)
@@ -158,7 +157,6 @@ namespace app
 			}
 		}
 	}
-#endif
 
 	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
