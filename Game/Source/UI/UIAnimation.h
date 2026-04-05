@@ -97,7 +97,7 @@ namespace app
 			{
 				return m_curve.IsPlaying();
 			}
-
+			
 
 			/**
 			 * @brief UIアニメーションのパラメーターを設定

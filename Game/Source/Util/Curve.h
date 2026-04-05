@@ -159,8 +159,6 @@ namespace app
 				/**
 				 * @brief clamp関数を使って0.0f~1.0fの範囲に収める
 				 */
-
-
 				float t = clamp<float>(m_currentTime / m_duration, 0.0f, 1.0f);
 				float rete = ApplyEasingInternal(t);
 				return m_startValue + (m_endValue - m_startValue) * rete;
