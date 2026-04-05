@@ -50,6 +50,47 @@ namespace nsBeastEngine
 	}
 
 
+	OceanMesh::~OceanMesh()
+	{
+		// m_fenceEvent が未初期化（Init 未呼び出し）の場合は何もしない
+		if (m_fenceEvent == nullptr)
+		{
+			return;
+		}
+
+		//------------------------------------------------------------
+		// GPU がコマンドキューを使い終わるまで待つ
+		// ComPtr が Release される前に完了を保証する
+		//------------------------------------------------------------
+		m_fenceValue++;
+		ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
+		commandQueue->Signal(m_fence.Get(), m_fenceValue);
+
+		if (m_fence->GetCompletedValue() < m_fenceValue)
+		{
+			m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent);
+			WaitForSingleObject(m_fenceEvent, INFINITE);
+		}
+
+		//------------------------------------------------------------
+		// Map したままのリソースを Unmap してから解放する
+		// Unmap を省略すると D3D12 検証レイヤーが警告を出す
+		//------------------------------------------------------------
+		if (m_csCbMapped != nullptr)
+		{
+			m_csCbResource->Unmap(0, nullptr);
+			m_csCbMapped = nullptr;
+		}
+
+		// フェンスイベントハンドルを閉じる
+		CloseHandle(m_fenceEvent);
+		m_fenceEvent = nullptr;
+
+		// ComPtr メンバ（m_fence, m_csCbResource, m_uavBuffer 等）は
+		// ここでスコープを抜けて自動解放される
+	}
+
+
 	void OceanMesh::CreateGridMesh()
 	{
 		const int   numDivision = GRID_DIVISION;
