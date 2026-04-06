@@ -51,6 +51,18 @@ namespace app
 			/** 描画処理 */
 			virtual void Render(RenderContext& rc) = 0;
 
+			/**
+			 * @brief 描画するかどうか
+			 * @return 描画するかどうか
+			 */
+			inline bool IsDraw()const { return m_isDraw; }
+
+			/**
+			 * @brief 描画するかどうかの設定
+			 * @param isDraw 描画するかどうか
+			 */
+			inline void SetIsDraw(const bool isDraw) { m_isDraw = isDraw; }
+
 
 		public:
 			void SetKey(const uint32_t key)
