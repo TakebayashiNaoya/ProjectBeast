@@ -56,6 +56,14 @@ namespace app
 
 
 	private:
+		std::vector<app::ui::UIIcon*> m_checkIconList; // 達成済みチェックアイコン（表示順）
+		float m_checkRevealTimer = 0.0f;   // 経過タイマー
+		float m_checkRevealDelay = 1.0f;   // シーン開始から最初の表示までの待機秒数
+		float m_checkRevealInterval = 0.5f;   // チェックマーク1つごとの表示間隔（秒）
+		int   m_checkRevealIndex = 0;      // 次に表示するインデックス
+
+
+	private:
 		static float s_clearTime;
 		static int   s_collectedPenguin;
 

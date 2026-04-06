@@ -102,6 +102,22 @@ namespace app
 		if (scoreDigit) scoreDigit->SetNumber(m_collectedPenguin);
 		if (totalDigit) totalDigit->SetNumber(m_totalScore);
 
+		if (m_checkRevealIndex < static_cast<int>(m_checkIconList.size()))
+		{
+			m_checkRevealTimer += g_gameTime->GetFrameDeltaTime();
+
+			// 最初の1つはDelay秒後、それ以降はInterval秒ごと
+			float threshold = (m_checkRevealIndex == 0)
+				? m_checkRevealDelay
+				: m_checkRevealDelay + m_checkRevealInterval * m_checkRevealIndex;
+
+			if (m_checkRevealTimer >= threshold)
+			{
+				m_checkIconList[m_checkRevealIndex]->m_isDraw = true;
+				m_checkRevealIndex++;
+			}
+		}
+
 		if (g_pad[0]->IsTrigger(enButtonA))
 		{
 			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
@@ -173,7 +189,7 @@ namespace app
 
 		//float rowOffsetY = -50.0f;
 		Vector3 iconStartPos = { /*-500.0f, 90.0f, 0.0f*/-200.0f,100.0f,0.0f }; // 1個目の画像の位置（xで横、yで縦）
-		float checkOffsetX = -10.0f;  // チェックアイコンのX位置
+		float checkOffsetX = -50.0f;  // チェックアイコンのX位置
 		float nameOffsetX = 250.0f;   // 名前画像のX位置
 
 		float iconOffsetY = -45.0f;
@@ -198,38 +214,6 @@ namespace app
 			currentNamePos.x += nameOffsetX;
 			currentNamePos.y = commonY; // 同じY値を使う
 
-
-			//achieve->SetIsAchieved(true);
-			if (achieve->IsAchieved())
-			{
-				std::string checkKeyName = "AchieveCheck_" + std::to_string(i);
-				uint32_t checkKey = Hash32(checkKeyName.c_str());
-
-				canvas->CreateUI<app::ui::UIIcon>(checkKey);
-				auto* checkIcon = canvas->FindUI<app::ui::UIIcon>(checkKey);
-
-				if (checkIcon)
-				{
-					checkIcon->Initialize(
-						"Assets/spriteData/UI/Achievement/check.DDS",
-						50.0f, 50.0f, // width, height
-						currentIconPos,
-						Vector3::One, // scale
-						Quaternion::Identity, // rotation
-						Vector4::White // color
-					);
-
-					checkIcon->m_isDraw = true;
-
-				}
-			}
-			else
-			{
-				// 未達成のアチーブメントに対する処理
-				// ※もし「未達成の場合はシルエット（真っ黒の画像や半透明）を表示したい」
-				// といった機能を追加したい場合は、ここに処理を書くことができます。
-			}
-
 			std::string nameAssetPath = "Assets/spriteData/UI/Achievement/AchieveName_/"
 				+ (achieve->GetSpriteName()) + ".DDS";
 
@@ -249,6 +233,58 @@ namespace app
 				);
 				nameIcon->m_isDraw = true;
 			}
+
+
+			std::string checkBoxKeyName = "AchieveCheckBox_" + std::to_string(i);
+			uint32_t checkBoxKey = Hash32(checkBoxKeyName.c_str());
+
+			canvas->CreateUI<app::ui::UIIcon>(checkBoxKey);
+			auto* checkBoxIcon = canvas->FindUI<app::ui::UIIcon>(checkBoxKey);
+			if (checkBoxIcon)
+			{
+				checkBoxIcon->Initialize(
+					"Assets/spriteData/UI/Achievement/checkBox.DDS",
+					40.0f, 40.0f, // width, height
+					currentIconPos,
+					Vector3::One, // scale
+					Quaternion::Identity, // rotation
+					Vector4::White // color
+				);
+				checkBoxIcon->m_isDraw = true;
+			}
+
+
+			achieve->SetIsAchieved(true);
+			if (achieve->IsAchieved())
+			{
+				std::string checkKeyName = "AchieveCheck_" + std::to_string(i);
+				uint32_t checkKey = Hash32(checkKeyName.c_str());
+
+				canvas->CreateUI<app::ui::UIIcon>(checkKey);
+				auto* checkIcon = canvas->FindUI<app::ui::UIIcon>(checkKey);
+
+				if (checkIcon)
+				{
+					checkIcon->Initialize(
+						"Assets/spriteData/UI/Achievement/check.DDS",
+						60.0f, 60.0f, // width, height
+						currentIconPos,
+						Vector3::One, // scale
+						Quaternion::Identity, // rotation
+						Vector4::White // color
+					);
+
+					checkIcon->m_isDraw = false;
+					m_checkIconList.push_back(checkIcon);
+				}
+			}
+			else
+			{
+				// 未達成のアチーブメントに対する処理
+				// ※もし「未達成の場合はシルエット（真っ黒の画像や半透明）を表示したい」
+				// といった機能を追加したい場合は、ここに処理を書くことができます。
+			}
+
 
 			rowIndex++;
 		}
