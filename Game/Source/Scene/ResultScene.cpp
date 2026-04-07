@@ -42,12 +42,31 @@ namespace app
 		m_rescueRender.Init("Assets/spriteData/UI/TextSprite/Result/Rescue.DDS", 480.0f, 270.0f);
 		m_titleBackRender.Init("Assets/spriteData/UI/TextSprite/Result/TitleBack.DDS", 480.0f, 270.0f);
 		m_frame.Init("Assets/spriteData/UI/Frame/ResultFrame.DDS", 1920.0f, 1080.0f);
+		m_totalRender.Init("Assets/spriteData/UI/TextSprite/Result/Total.DDS", 480.0f, 270.0f);
+		m_clockRender.Init("Assets/spriteData/UI/Icon/ResultIcon/tokei.DDS", 480.0f, 480.0f);
+		m_childPenguinRender.Init("Assets/spriteData/UI/Icon/ResultIcon/kopennginn.DDS", 480.0f, 480.0f);
+		m_totalFrameRender.Init("Assets/spriteData/UI/Frame/ResultFrame.DDS", 1920.0f, 1080.0f);
 
-		m_clearTimeRender.SetPosition(Vector2(-300.0f, 300.0f));
-		m_rescueRender.SetPosition(Vector2(300.0f, 300.0f));
-		m_titleBackRender.SetPosition(Vector2(-450.0f, -375.0f));
 
-		m_frame.SetScale(Vector2(1.2f, 1.5f));
+		m_clearTimeRender.SetPosition(Vector2(-300.0f, 400.0f));
+		m_rescueRender.SetPosition(Vector2(300.0f, 400.0f));
+		m_totalRender.SetPosition(Vector2(0.0f, -200.0f));
+		m_totalFrameRender.SetPosition(Vector2(0.0f, -270.0f));
+		m_totalFrameRender.SetScale(Vector2(0.3f, 0.2f));
+		//m_totalRender.SetScale(Vector2(0.3f, 0.3f));
+
+		m_clockRender.SetScale(Vector2(0.3f, 0.3f));
+		m_clockRender.SetPosition(Vector2(-550.0f, 300.0f));
+
+		m_childPenguinRender.SetScale(Vector2(0.3f, 0.3f));
+		m_childPenguinRender.SetPosition(Vector2(80.0f, 300.0f));
+
+		m_titleBackRender.SetPosition(Vector2(500.0f, -375.0f));
+
+		m_frame.SetPosition(Vector2(0.0f, -10.0f));
+		m_frame.SetScale(Vector2(0.8f, 0.8f));
+		m_frame.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 0.7f)); // 最初は透明
+
 
 
 		m_clearTime = s_clearTime;
@@ -68,6 +87,7 @@ namespace app
 		// 取得した値を UIDigit にセット
 		auto* timeDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultTimeDigit"));
 		auto* scoreDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultScoreDigit"));
+		//auto* totalDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("TotalDigit"));
 
 		if (timeDigit)
 		{
@@ -79,6 +99,16 @@ namespace app
 			scoreDigit->SetNumber(m_collectedPenguin);
 			scoreDigit->m_isDraw = true;
 		}
+		//if (totalDigit)
+		//{
+		//	//totalDigit->SetNumber(static_cast<int>(m_totalScore));
+		//	totalDigit->m_isDraw = false;
+		//	totalDigit->m_color = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+		//}
+
+		// Aボタンガイドも最初は非表示（アルファ0で隠す）
+		m_titleBackRender.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
+
 
 		SoundManager::Get().PlayBGM(enSoundKind_Result);
 
@@ -93,19 +123,119 @@ namespace app
 		m_rescueRender.Update();
 		m_titleBackRender.Update();
 		m_frame.Update();
+		m_childPenguinRender.Update();
+		m_clockRender.Update();
+		m_totalRender.Update();
+		m_totalFrameRender.Update();
 
 		auto* timeDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultTimeDigit"));
 		auto* scoreDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultScoreDigit"));
-		auto* totalDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("TotalDigit"));
+		//auto* totalDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("TotalDigit"));
 
-		if (timeDigit)  timeDigit->SetNumber(static_cast<int>(m_clearTime));
-		if (scoreDigit) scoreDigit->SetNumber(m_collectedPenguin);
-		if (totalDigit) totalDigit->SetNumber(m_totalScore);
+		if (timeDigit)
+		{
+			timeDigit->m_color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+			timeDigit->SetNumber(static_cast<int>(m_clearTime));
+		}
+		if (scoreDigit)
+		{
+			scoreDigit->m_color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+			scoreDigit->SetNumber(m_collectedPenguin);
+		}
 
-		if (g_pad[0]->IsTrigger(enButtonA))
+		UpdateRevealSequence();
+
+		if (m_titleButtonShown && g_pad[0]->IsTrigger(enButtonA))
 		{
 			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
 			m_nextScene = true;
+		}
+	}
+
+
+	void ResultScene::UpdateRevealSequence()
+	{
+		const float dt = g_gameTime->GetFrameDeltaTime();
+
+		// ── フェーズ1：チェックマークを1つずつ表示 ──────────────
+		if (!m_allChecksRevealed)
+		{
+			if (m_checkRevealIndex < static_cast<int>(m_checkIconList.size()))
+			{
+				m_checkRevealTimer += dt;
+
+				float threshold = m_checkRevealDelay
+					+ m_checkRevealInterval * static_cast<float>(m_checkRevealIndex);
+
+				if (m_checkRevealTimer >= threshold)
+				{
+					m_checkIconList[m_checkRevealIndex]->m_isDraw = true;
+					SoundManager::Get().PlaySE(enSoundKind_ResultCheck);
+					m_checkRevealIndex++;
+				}
+			}
+			else
+			{
+				// 全チェック表示完了
+				m_allChecksRevealed = true;
+				m_postCheckTimer = 0.0f;
+			}
+			return; // フェーズ1中はここで終わり
+		}
+
+		// ── フェーズ2：スコアを表示 ──────────────────────────────
+		if (!m_totalScoreShown)
+		{
+			m_postCheckTimer += dt;
+			if (m_postCheckTimer >= m_totalRevealDelay)
+			{
+				// この時点で初めてUIDigitを動的生成する
+				auto* canvas = m_layout.GetMenu<app::ui::MenuBase>()->GetCanvas();
+				if (canvas && !m_totalDigit)
+				{
+					uint32_t key = Hash32("TotalDigit");
+					canvas->CreateUI<app::ui::UIDigit>(key);
+					m_totalDigit = canvas->FindUI<app::ui::UIDigit>(key);
+					if (m_totalDigit)
+					{
+						// JSONで定義していた位置・サイズに合わせて調整してください
+						m_totalDigit->Initialize(
+							"Assets/spriteData/UI/Number/White",  // 数字画像のパス
+							3,                             // 桁数
+							static_cast<int>(m_totalScore),
+							80.0f, 100.0f,                 // 幅・高さ
+							Vector3(80.0f, -300.0f, 0.0f),  // 位置
+							Vector3::One,
+							Quaternion::Identity
+						);
+						m_totalDigit->m_color = Vector4(1.0f, 1.0f, 0.0f, 1.0f); // 最初は透明
+						m_totalDigit->m_isDraw = false;  // ← まず非表示のまま
+						m_totalDigit->Update();          // ← 位置を即確定させる
+						m_totalDigit->m_isDraw = true;   // ← その後に表示
+					}
+				}
+				m_totalScoreShown = true;
+				m_postCheckTimer = 0.0f;
+			}
+			return;
+		}
+
+		// ── フェーズ3：Aボタンガイドを表示 ──────────────────────
+		if (!m_titleButtonShown)
+		{
+			// スコアの数値を毎フレーム維持（消えないように）
+			if (m_totalDigit)
+			{
+				m_totalDigit->SetNumber(static_cast<int>(m_totalScore));
+				m_totalDigit->m_isDraw = true;
+			}
+
+			m_postCheckTimer += dt;
+			if (m_postCheckTimer >= m_titleButtonDelay)
+			{
+				m_titleBackRender.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+				m_titleButtonShown = true;
+			}
 		}
 	}
 
@@ -118,9 +248,13 @@ namespace app
 	{
 		m_resultRender.Draw(rc);
 		m_frame.Draw(rc);
+		m_totalFrameRender.Draw(rc);
+		m_totalRender.Draw(rc);
 		m_rescueRender.Draw(rc);
 		m_clearTimeRender.Draw(rc);
 		m_titleBackRender.Draw(rc);
+		m_clockRender.Draw(rc);
+		m_childPenguinRender.Draw(rc);
 		m_layout.Render(rc); // UIの描画
 	}
 
@@ -172,11 +306,11 @@ namespace app
 		if (!canvas) return;
 
 		//float rowOffsetY = -50.0f;
-		Vector3 iconStartPos = { /*-500.0f, 90.0f, 0.0f*/-200.0f,100.0f,0.0f }; // 1個目の画像の位置（xで横、yで縦）
-		float checkOffsetX = -10.0f;  // チェックアイコンのX位置
+		Vector3 iconStartPos = { /*-500.0f, 90.0f, 0.0f*/-300.0f,200.0f,0.0f }; // 1個目の画像の位置（xで横、yで縦）
+		float checkOffsetX = -70.0f;  // チェックアイコンのX位置
 		float nameOffsetX = 250.0f;   // 名前画像のX位置
 
-		float iconOffsetY = -45.0f;
+		float iconOffsetY = -80.0f;
 
 		int rowIndex = 0;
 
@@ -198,8 +332,47 @@ namespace app
 			currentNamePos.x += nameOffsetX;
 			currentNamePos.y = commonY; // 同じY値を使う
 
+			std::string nameAssetPath = "Assets/spriteData/UI/Achievement/AchieveName_/"
+				+ (achieve->GetSpriteName()) + ".DDS";
 
-			//achieve->SetIsAchieved(true);
+			std::string nameKeyName = "AchieveName_" + std::to_string(i);
+			uint32_t nameKey = Hash32(nameKeyName.c_str());
+			canvas->CreateUI<app::ui::UIIcon>(nameKey); // UITextではなくUIIconに変更
+			auto* nameIcon = canvas->FindUI<app::ui::UIIcon>(nameKey);
+			if (nameIcon)
+			{
+				nameIcon->Initialize(
+					nameAssetPath.c_str(),
+					570.0f, 50.0f, // 幅・高さは画像サイズに合わせて調整
+					currentNamePos,
+					Vector3::One,
+					Quaternion::Identity,
+					Vector4::White
+				);
+				nameIcon->m_isDraw = true;
+			}
+
+
+			std::string checkBoxKeyName = "AchieveCheckBox_" + std::to_string(i);
+			uint32_t checkBoxKey = Hash32(checkBoxKeyName.c_str());
+
+			canvas->CreateUI<app::ui::UIIcon>(checkBoxKey);
+			auto* checkBoxIcon = canvas->FindUI<app::ui::UIIcon>(checkBoxKey);
+			if (checkBoxIcon)
+			{
+				checkBoxIcon->Initialize(
+					"Assets/spriteData/UI/Achievement/checkBox.DDS",
+					40.0f, 40.0f, // width, height
+					currentIconPos,
+					Vector3::One, // scale
+					Quaternion::Identity, // rotation
+					Vector4::White // color
+				);
+				checkBoxIcon->m_isDraw = true;
+			}
+
+
+			achieve->SetIsAchieved(true);
 			if (achieve->IsAchieved())
 			{
 				std::string checkKeyName = "AchieveCheck_" + std::to_string(i);
@@ -212,15 +385,15 @@ namespace app
 				{
 					checkIcon->Initialize(
 						"Assets/spriteData/UI/Achievement/check.DDS",
-						50.0f, 50.0f, // width, height
+						90.0f, 90.0f, // width, height
 						currentIconPos,
 						Vector3::One, // scale
 						Quaternion::Identity, // rotation
 						Vector4::White // color
 					);
 
-					checkIcon->m_isDraw = true;
-
+					checkIcon->m_isDraw = false;
+					m_checkIconList.push_back(checkIcon);
 				}
 			}
 			else
@@ -230,25 +403,6 @@ namespace app
 				// といった機能を追加したい場合は、ここに処理を書くことができます。
 			}
 
-			std::string nameAssetPath = "Assets/spriteData/UI/Achievement/AchieveName_/"
-				+ (achieve->GetSpriteName()) + ".DDS";
-
-			std::string nameKeyName = "AchieveName_" + std::to_string(i);
-			uint32_t nameKey = Hash32(nameKeyName.c_str());
-			canvas->CreateUI<app::ui::UIIcon>(nameKey); // UITextではなくUIIconに変更
-			auto* nameIcon = canvas->FindUI<app::ui::UIIcon>(nameKey);
-			if (nameIcon)
-			{
-				nameIcon->Initialize(
-					nameAssetPath.c_str(),
-					500.0f, 30.0f, // 幅・高さは画像サイズに合わせて調整
-					currentNamePos,
-					Vector3::One,
-					Quaternion::Identity,
-					Vector4::White
-				);
-				nameIcon->m_isDraw = true;
-			}
 
 			rowIndex++;
 		}
