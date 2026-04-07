@@ -3,11 +3,22 @@
         "elements":[
             {
                 "type":"UIIcon",
+                "name":"TitleBackGround",
+                "asset":"Assets/spriteData/Scene/IceBerg.dds",
+                "width":1920,
+                "height":1080,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
                 "name":"PentaktRogoIcon",
-                "asset":"Assets/spriteData/Scene/Pentakt.dds",
-                "width":1000,
-                "height":450,
-                "position":[0,250,0],
+                "asset":"Assets/spriteData/Scene/PENTAKT.dds",
+                "width":1200,
+                "height":650,
+                "position":[0,120,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -16,50 +27,36 @@
 
 
 
+
             {
                 "type":"UIIcon",
-                "name":"StartHightLightIcon",
-                "asset":"Assets/spriteData/UI/Icon/TitleIcon/StartHightLiteIcons.dds",
-                "width":320,
+                "name":"StartFrameIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
+                "width":350,
                 "height":130,
-                "position":[ 0, 0, 0],
-                "scale":[1,1,1],
+                "position":[ -420, -310, 0],
+                "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
-                "name":"OptionHightLightIcon",
-                "asset":"Assets/spriteData/UI/Icon/TitleIcon/OptionHightLiteIcon.dds",
-                "width":340,
-                "height":120,
-                "position":[ 0, -150, 0],
-                "scale":[1,1,1],
+                "name":"StartFrameBackIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
+                "width":324,
+                "height":101,
+                "position":[ -420, -309, 0],
+                "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[ 255, 255, 255, 120]
             },
-            {
-                "type":"UIIcon",
-                "name":"ReTitleHightLightIcon",
-                "asset":"Assets/spriteData/UI/Icon/TitleIcon/reTitleHightIconLiteIcon.dds",
-                "width":340,
-                "height":130,
-                "position":[ 0, -300, 0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
-            },
-
-
-
-
             {
                 "type":"UIIcon",
                 "name":"StartIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/StartText.dds",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/StartTextIcon.dds",
                 "width":270,
-                "height":90,
-                "position":[ 0, 0, 0],
+                "height":65,
+                "position":[ -420, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -67,13 +64,35 @@
             
 
 
+            {
+                "type":"UIIcon",
+                "name":"OptionFrameIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
+                "width":350,
+                "height":130,
+                "position":[ 0, -310, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"OptionFrameBackIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
+                "width":324,
+                "height":101,
+                "position":[ 0, -309, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 120]
+            },
             {
                 "type":"UIIcon",
                 "name":"OptionIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/OptionText.dds",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/OptionTextIcon.dds",
                 "width":300,
-                "height":100,
-                "position":[ 0, -150, 0],
+                "height":65,
+                "position":[ 0, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -81,13 +100,36 @@
             
 
 
+
             {
                 "type":"UIIcon",
-                "name":"ReturnTitleIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/ReturnTitleText.dds",
-                "width":300,
-                "height":100,
-                "position":[ 0, -300, 0],
+                "name":"EndFrameIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
+                "width":350,
+                "height":130,
+                "position":[ 420, -310, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"EndFrameBackIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
+                "width":324,
+                "height":101,
+                "position":[ 420, -309, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 120]
+            },
+            {
+                "type":"UIIcon",
+                "name":"EndIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/EndTextIcon.dds",
+                "width":250,
+                "height":50,
+                "position":[ 420, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]

@@ -19,11 +19,20 @@ namespace app
 				uint32_t key;
 			};
 
+			// タイトルイベントのアイコンのキー。
 			constexpr TitleEventInfo TITLE_EVENT_ICON_KEYS[] =
 			{
-					{ Hash32("StartHightLightIcon") }
-				,	{ Hash32("OptionHightLightIcon") }
-				,	{ Hash32("ReTitleHightLightIcon") }
+					{ Hash32("StartFrameBackIcon") }
+				,	{ Hash32("OptionFrameBackIcon") }
+				,	{ Hash32("EndFrameBackIcon") }
+			};
+
+			// タイトルイベントのフレームアイコンのキー。
+			constexpr TitleEventInfo TITLE_EVENT_FRAME_ICON_KEYS[] =
+			{
+					{ Hash32("StartFrameIcon")}
+				,	{ Hash32("OptionFrameIcon")}
+				,	{ Hash32("EndFrameIcon")}
 			};
 		}
 		TitleEventMenu::TitleEventMenu()
@@ -45,11 +54,11 @@ namespace app
 			const int menuSize = static_cast<int>(std::size(TITLE_EVENT_ICON_KEYS));
 			
 			// 左スティックのY軸の値を取得。
-			const float stickY = m_gamePad->GetLStickYF();
+			const float stickY = m_gamePad->GetLStickXF();
 
 			// 入力の闘値を超えているか。
 			const float InputThreshold = 0.5f;
-			// Y軸の入力がある場合。
+			// X軸の入力がある場合。
 			if (fabsf(stickY) < InputThreshold)
 			{
 				m_isStickNeutral = true;
@@ -57,15 +66,15 @@ namespace app
 
 			if (m_isStickNeutral)
 			{
-				// 上に入力がある場合。
-				if (stickY < -InputThreshold)
+				// 右に入力がある場合。
+				if (stickY > InputThreshold)
 				{
 					m_selectIndex = (m_selectIndex + 1) % menuSize;
 					m_isStickNeutral = false;
 					SelectVisual();
 				}
-				// 下に入力がある場合。
-				if (stickY > InputThreshold)
+				// 左に入力がある場合。
+				if (stickY < -InputThreshold)
 				{
 					m_selectIndex = (m_selectIndex - 1 + menuSize) % menuSize;
 					m_isStickNeutral = false;
@@ -87,6 +96,9 @@ namespace app
 				auto* icon = GetUI<UIIcon>(info.key);
 				if (icon == nullptr)return;
 
+				// 最初はアイコンを非表示にする。
+				icon->SetIsDraw(false);
+
 				auto colorAnim = std::make_unique<UIColorAnimation>();
 				colorAnim->SetParameter(
 						startColor
@@ -98,6 +110,9 @@ namespace app
 				// アイコンにアニメーションを登録。
 				icon->AddAnimation(Hash32("EventColorAnim"), std::move(colorAnim));
 			}
+
+			// 最初の選択状態を設定。
+			SelectVisual();
 		}
 
 
@@ -105,51 +120,79 @@ namespace app
 		{
 			// アニメーションにかける秒数。
 			float transDuration = 0.6f;
+			// 項目数。
+			const int menuSize = static_cast<int>(std::size(TITLE_EVENT_ICON_KEYS));
 
-			for (int i = 0; i < static_cast<int>(std::size(TITLE_EVENT_ICON_KEYS)); i++)
+			for (int i = 0; i < menuSize; i++)
 			{
+				// 選択されている時はスキップ。
+				if (i == m_selectIndex) continue;
+
+				// アイコンとフレームアイコンを取得。
 				auto* icon = GetUI<UIIcon>(TITLE_EVENT_ICON_KEYS[i].key);
-				if (icon == nullptr)continue;
+				auto* frame = GetUI<UIIcon>(TITLE_EVENT_FRAME_ICON_KEYS[i].key);
+				if (icon == nullptr && frame == nullptr) continue;
 
-				auto* baseAnim = icon->FindAnimation(Hash32("EventColorAnim"));
-				if (baseAnim == nullptr)continue;
-				
-				// キャスト処理を行う。
-				auto* colorAnim = static_cast<UIColorAnimation*>(baseAnim);
+				// 非選択中はアイコンを非表示にする。
+				icon->SetIsDraw(false);
+				// 非選択中はフレームアイコンを非表示にする。
+				frame->SetIsDraw(false);
 
+				auto* colorAnim = static_cast<UIColorAnimation*>
+					(icon->FindAnimation(Hash32("EventColorAnim")));
+				if (colorAnim == nullptr) continue;
 
-				// 選択されている場合はアニメーションを再生して、選択されていない場合はアニメーションを再生しない。
 				if (i == m_selectIndex)
 				{
-					Vector4 blinkStart(1.0f, 1.0f, 1.0f, 1.0f);
-					Vector4 blinkEnd(1.0f, 1.0f, 1.0f, 0.2f);
+					Vector4 blinkStart(1.0f, 1.0f, 1.0f, 0.2f);
+					Vector4 blinkEnd(1.0f, 1.0f, 1.0f, 1.0f);
 
 					colorAnim->SetParameter(
 							blinkStart
 						,	blinkEnd
 						,	transDuration
 						,	util::EasingType::EaseOut
-						,	util::LoopMode::PingPong
+						,	util::LoopMode::Once
 					);
 					// アニメーションを再生する。
 					colorAnim->PlayAnimation();
 				}
-				else
-				{
-					Vector4 startColor(1.0f, 1.0f, 1.0f, 0.2f);
-					Vector4 endColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-					colorAnim->SetParameter(
-							startColor
-						,	endColor
-						,	transDuration
-						,	util::EasingType::EaseOut
-						,	util::LoopMode::Once
-					);
-					colorAnim->PlayAnimation();
-				}
 			}
+			
+			
+			// 選択されているアイコンを取得。
+			auto* selectedIcon = GetUI<UIIcon>(TITLE_EVENT_ICON_KEYS[m_selectIndex].key);
+			// 選択されているフレームアイコンを取得。
+			auto* selectedFrame = GetUI<UIIcon>(TITLE_EVENT_FRAME_ICON_KEYS[m_selectIndex].key);
+			// アイコンがないかつ、フレームアイコンが無いときは処理しない。
+			if (selectedIcon == nullptr && selectedFrame == nullptr) return;
+
+			// 選択中はアイコンを表示する。
+			selectedIcon->SetIsDraw(true);
+			// 選択中はフレームアイコンを表示する。
+			selectedFrame->SetIsDraw(true);
+
+
+			// 選択されているアイコンのアニメーションを取得。
+			auto* selectedAnim = static_cast<UIColorAnimation*>
+				(selectedIcon->FindAnimation(Hash32("EventColorAnim")));
+			if (selectedAnim == nullptr) return;
+
+
+			Vector4 selectedStart(1.0f, 1.0f, 1.0f, 1.0f);
+			Vector4 selectedEnd(1.0f, 1.0f, 1.0f, 0.2f);
+
+			selectedAnim->SetParameter(
+					selectedStart
+				,	selectedEnd
+				,	transDuration
+				,	util::EasingType::EaseOut
+				,	util::LoopMode::PingPong
+			);
+           // アニメーションを再生する。
+			selectedAnim->PlayAnimation();
 		}
+
 
 		uint32_t TitleEventMenu::GetSelectKey() const
 		{
