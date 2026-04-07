@@ -4,7 +4,7 @@
             {
                 "type":"UIDigit",
                 "name":"ResultTimeDigit",
-                "asset": "Assets/spriteData/UI/Number",
+                "asset": "Assets/spriteData/UI/Number/White",
                 "digit": 3,
                 "number": 0,
                 "width": 64.0,
@@ -16,7 +16,7 @@
             {
                 "type": "UIDigit",
                 "name": "ResultScoreDigit",
-                "asset": "Assets/spriteData/UI/Number",
+                "asset": "Assets/spriteData/UI/Number/White",
                 "digit": 3,
                 "number": 0,
                 "width": 64.0,

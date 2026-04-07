@@ -86,8 +86,11 @@ namespace app
 		SpriteRender m_rescueRender;
 		SpriteRender m_clearTimeRender;
 		SpriteRender m_frame;
-		SpriteRender m_totalFrame;
+		SpriteRender m_totalRender;
 		SpriteRender m_titleBackRender;
+		SpriteRender m_clockRender;
+		SpriteRender m_childPenguinRender;
+		SpriteRender m_totalFrameRender;
 
 
 	private:

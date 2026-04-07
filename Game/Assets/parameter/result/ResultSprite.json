@@ -1,0 +1,46 @@
+{
+    "canvas":{
+        "elements":[
+             {
+            "name": "background",
+            "asset": "Assets/spriteData/Scene/NorthPole.DDS",
+            "width": 1920.0,
+            "height": 1080.0,
+            "position": [0.0, 0.0, 0.0],
+            "scale": [1.0, 1.0]
+        },
+        {
+            "name": "frame",
+            "asset": "Assets/spriteData/UI/Frame/ResultFrame.DDS",
+            "width": 1920.0,
+            "height": 1080.0,
+            "position": [0.0, 0.0, 0.0],
+            "scale": [1.2, 1.5]
+        },
+        {
+            "name": "clearTime",
+            "asset": "Assets/spriteData/UI/TextSprite/Result/ClearTime.DDS",
+            "width": 480.0,
+            "height": 270.0,
+            "position": [-300.0, 300.0, 0.0],
+            "scale": [1.0, 1.0]
+        },
+        {
+            "name": "rescue",
+            "asset": "Assets/spriteData/UI/TextSprite/Result/Rescue.DDS",
+            "width": 480.0,
+            "height": 270.0,
+            "position": [300.0, 300.0, 0.0],
+            "scale": [1.0, 1.0]
+        },
+        {
+            "name": "titleBack",
+            "asset": "Assets/spriteData/UI/TextSprite/Result/TitleBack.DDS",
+            "width": 480.0,
+            "height": 270.0,
+            "position": [-450.0, -375.0, 0.0],
+            "scale": [1.0, 1.0]
+        }
+        ]
+    }
+}
