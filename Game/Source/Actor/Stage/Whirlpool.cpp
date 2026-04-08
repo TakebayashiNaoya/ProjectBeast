@@ -19,6 +19,9 @@ namespace app
 
 		void Whirlpool::Update()
 		{
+			// 渦潮を回転させる
+			m_transform.m_rotation.AddRotationDegY(3.0f);
+
 			IStageObject::Update();
 		}
 
