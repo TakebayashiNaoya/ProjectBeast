@@ -39,6 +39,7 @@
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
 
+#include "Source/Actor/Stage/WhirlpoolManager.h"
 #include <random>
 
 
@@ -107,8 +108,10 @@ namespace app
 
 		/** アクター系シングルトン生成 */
 		actor::StageSystem::CreateInstance();
+		actor::WhirlpoolManager::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
 		actor::EnemyManager::CreateInstance();
+
 
 		/** UIManager生成（Layoutの生成はDaddyPenguin生成後のInitializeで行う） */
 		m_uiManager = new InGameUIManager();
@@ -133,6 +136,7 @@ namespace app
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
+			actor::WhirlpoolManager::GetInstance()->StartWrapper();
 			m_loadPhase = LoadPhase::StageWait;
 			break;
 		}
@@ -256,6 +260,7 @@ namespace app
 
 		/** ステージは常に更新 */
 		actor::StageSystem::GetInstance()->Update();
+		actor::WhirlpoolManager::GetInstance()->UpdateWrapper();
 
 		switch (m_gamePhase)
 		{
@@ -439,6 +444,7 @@ namespace app
 	void InGameScene::Render(RenderContext& rc)
 	{
 		actor::StageSystem::GetInstance()->Render(rc);
+		actor::WhirlpoolManager::GetInstance()->RenderWrapper(rc);
 
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
