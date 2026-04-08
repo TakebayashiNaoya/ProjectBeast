@@ -52,6 +52,7 @@ namespace app
 				// 渦潮を生成
 				auto* newWhirlpool = new Whirlpool();
 				// 
+				newWhirlpool->SetIsNeedCollision(false);
 				newWhirlpool->SetPosition(position);
 				newWhirlpool->SetScale(Vector3(2.5f, 2.5f, 2.5f));
 				newWhirlpool->StartWrapper();
