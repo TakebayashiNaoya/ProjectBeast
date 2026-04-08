@@ -319,6 +319,12 @@
     <ClCompile Include="Source\UI\TitleEventMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\Whirlpool.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\WhirlpoolManager.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -569,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\TitleEventMenu.h">
       <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\Whirlpool.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h">
+      <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
