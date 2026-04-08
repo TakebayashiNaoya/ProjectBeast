@@ -37,8 +37,6 @@ namespace app
 
 	bool TitleScene::Start()
 	{
-		m_titleRender.Init("Assets/spriteData/Scene/NorthPole.DDS", 1920.0f, 1080.0f);
-
 		m_titleLayout = new ui::Layout;
 		m_titleLayout->Initialize<ui::TitleEventMenu>(
 			"Assets/parameter/title/Title.json"
@@ -77,21 +75,20 @@ namespace app
 				m_titleEventMenu = m_titleLayout->GetMenu<ui::TitleEventMenu>();
 			}
 
-			
+
 			if (g_pad[0]->IsTrigger(enButtonA))
 			{
 				const uint32_t selectKey = m_titleEventMenu->GetSelectKey();
-				if (selectKey == Hash32("StartHightLightIcon"))
+				if (selectKey == Hash32("StartFrameBackIcon"))
 				{
 					// ゲーム開始。
 					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
 					SoundManager::Get().StopBGM();
 					m_nextScene = true;
 				}
-				else if (selectKey == Hash32("OptionHightLightIcon"))
+				else if (selectKey == Hash32("OptionFrameBackIcon"))
 				{
 					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-					SoundManager::Get().StopBGM();
 					m_state = TitleState::SoundOption;
 					// オプション画面。
 					if (!m_soundOption)
@@ -103,9 +100,10 @@ namespace app
 						m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
 					}
 				}
-				else if (selectKey == Hash32("ReTitleHightLightIcon"))
+				else if (selectKey == Hash32("EndFrameBackIcon"))
 				{
-					// タイトルに。現在はタイトルから遷移しないため、ここにくることはない。
+					// タイトルに。
+					// 現在はタイトルから遷移しないため、ここにくることはない。
 					K2_ASSERT(false, "警告です。");
 					return;
 				}
@@ -113,8 +111,6 @@ namespace app
 
 			m_titleRender.Update();
 			m_titleLayout->Update();
-
-			
 			break;
 		}
 
@@ -143,7 +139,6 @@ namespace app
 	{
 		if (m_state == TitleState::Title)
 		{
-			m_titleRender.Draw(rc);
 			if (m_titleLayout)
 			{
 				m_titleLayout->Render(rc);
