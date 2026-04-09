@@ -319,6 +319,12 @@
     <ClCompile Include="Source\UI\TitleEventMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -569,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\TitleEventMenu.h">
       <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

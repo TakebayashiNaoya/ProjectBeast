@@ -1,7 +1,7 @@
 ﻿/**
  * @file ChildPenguinAIController.h
  * @brief 子ペンギンのAIコントローラー
- * @author 藤谷
+ * @author 藤谷、竹林
  */
 #pragma once
 #include "ChildPenguinTypes.h"
@@ -14,6 +14,7 @@ namespace app
 		/** 前方宣言 */
 		class ChildPenguin;
 		class ChildPenguinStateMachine;
+		class ClumsyChildPenguinStateMachine;
 
 
 		/**
@@ -47,17 +48,20 @@ namespace app
 			 * @return DaddyPenguinへの正規化された方向ベクトル
 			 */
 			Vector3 CalculateDirectionToDaddy() const;
+
 			/**
 			 * @brief DaddyPenguinまでの距離を取得
 			 * @return DaddyPenguinまでの距離
 			 */
 			float GetDistanceToDaddy() const;
+
 			/**
 			 * @brief 任意の目標座標への正規化された方向ベクトルを計算
 			 * @param targetPos 目標座標
 			 * @return 正規化された方向ベクトル
 			 */
 			Vector3 CalculateDirectionToTarget(const Vector3& targetPos) const;
+
 			/**
 			 * @brief 任意の目標座標までの距離を取得
 			 * @param targetPos 目標座標
@@ -88,6 +92,13 @@ namespace app
 			 */
 			void BuildInput();
 
+			/**
+			 * @brief 任意の目標座標へ向かう入力を組み立てる（BuildInputの座標指定版）
+			 * @param targetPos 移動先の座標
+			 * @note 世話焼きペンギンの介入移動などに使用する
+			 */
+			void BuildInputToTarget(const Vector3& targetPos);
+
 
 		protected:
 			/** 子ペンギンのポインタ */
@@ -107,8 +118,6 @@ namespace app
 			/**
 			 * @brief 追跡をあきらめてその場で待機する距離（参加中→離脱）
 			 * @details m_joinDistance より大きい値にすること。
-			 *          m_joinDistance と差を設けることで、離脱後に少し戻るだけで
-			 *          すぐ追従を再開するような挙動を防ぐ。
 			 */
 			float m_giveUpDistance;
 
@@ -138,6 +147,11 @@ namespace app
 		};
 
 
+
+
+		/**************************************************************/
+
+
 		/**
 		 * @brief まじめタイプの子ペンギンAI
 		 * @details 追従命令→ついてくる、待機命令→その場待機
@@ -153,54 +167,146 @@ namespace app
 		};
 
 
+
+
+		/**************************************************************/
+
+
 		/**
 		 * @brief 甘えん坊タイプの子ペンギンAI
-		 * @details 命令に関わらず常にDaddyに追従する
+		 * @details 命令に関わらず常にDaddyに追従しようとする。制止されている間は待機する
 		 */
 		class ClingyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
 			void Update() override;
 
+			/**
+			 * @brief 世話焼きペンギンによる制止フラグを設定する
+			 * @param isRestrained 制止フラグ
+			 */
+			inline void SetRestrained(const bool isRestrained)
+			{
+				m_isRestrained = isRestrained;
+			}
+
+			/**
+			 * @brief 制止中かどうかを取得する
+			 * @return 制止中ならtrue
+			 */
+			inline bool IsRestrained() const
+			{
+				return m_isRestrained;
+			}
+
 		public:
 			ClingyChildPenguinAI(ChildPenguin* owner);
 			~ClingyChildPenguinAI() override = default;
+
+		private:
+			/** 世話焼きペンギンに制止されているかどうか */
+			bool m_isRestrained = false;
 		};
+
+
+
+
+		/**************************************************************/
 
 
 		/**
 		 * @brief やんちゃタイプの子ペンギンAI
-		 * @details 追従命令→ついてくる、待機命令→その場待機
+		 * @details 追従命令→ついてくる、待機命令かつ親が一定距離以上離れたら→徘徊する
 		 */
 		class NaughtyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
 			void Update() override;
 
+			/**
+			 * @brief 世話焼きペンギンによる制止フラグを設定する
+			 * @param isRestrained 制止フラグ
+			 */
+			inline void SetRestrained(const bool isRestrained)
+			{
+				m_isRestrained = isRestrained;
+			}
+
+			/**
+			 * @brief 制止中かどうかを取得する
+			 * @return 制止中ならtrue
+			 */
+			inline bool IsRestrained() const
+			{
+				return m_isRestrained;
+			}
+
 		public:
 			NaughtyChildPenguinAI(ChildPenguin* owner);
 			~NaughtyChildPenguinAI() override = default;
+
+		private:
+			/**
+			 * @brief 次の徘徊目標座標をランダムに選ぶ
+			 */
+			void PickNewRoamTarget();
+
+		private:
+			/** 世話焼きペンギンに制止されているかどうか */
+			bool m_isRestrained = false;
+			/** 徘徊先の目標座標 */
+			Vector3 m_roamTarget = Vector3::Zero;
+			/** 待機命令中に徘徊を開始する親との距離 */
+			float m_roamTriggerDistance = 0.0f;
+			/** 徘徊先を選ぶ現在地からの半径 */
+			float m_roamRadius = 0.0f;
 		};
+
+
+
+
+		/**************************************************************/
 
 
 		/**
 		 * @brief おっちょこちょいタイプの子ペンギンAI
-		 * @details 追従命令→ついてくる、待機命令→その場待機
+		 * @details 歩き・走り中に確率で転倒し、スライド解除時に確率でスリップする
 		 */
 		class ClumsyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
 			void Update() override;
 
+			/**
+			 * @brief 世話焼きペンギンに助けてもらう
+			 * @note 転倒・スリップ中に呼ばれるとアニメ終了を待たず即座に起き上がる
+			 */
+			void HelpedByCaringPenguin();
+
 		public:
 			ClumsyChildPenguinAI(ChildPenguin* owner);
 			~ClumsyChildPenguinAI() override = default;
+
+		private:
+			/** おっちょこちょい固有ステートマシンへのポインタ（キャスト済みのキャッシュ） */
+			ClumsyChildPenguinStateMachine* m_clumsyStateMachine = nullptr;
+			/** 歩き・走り中の転倒確率（秒あたり） */
+			float m_tripChancePerSec = 0.0f;
+			/** スライド解除時のスリップ確率 */
+			float m_slipChance = 0.0f;
+			/** 前フレームにスライド中だったかどうか（スライド解除の検出に使う） */
+			bool m_wasSliding = false;
 		};
+
+
+
+
+		/**************************************************************/
 
 
 		/**
 		 * @brief 世話焼きタイプの子ペンギンAI
-		 * @details 追従命令→ついてくる、待機命令→その場待機
+		 * @details 待機命令中に問題を起こしている子ペンギンに近づいて制止・助けを行う
 		 */
 		class CaringChildPenguinAI : public ChildPenguinAIController
 		{
@@ -210,6 +316,37 @@ namespace app
 		public:
 			CaringChildPenguinAI(ChildPenguin* owner);
 			~CaringChildPenguinAI() override = default;
+
+		private:
+			/**
+			 * @brief 介入対象への到達判定
+			 * @param target 介入対象
+			 * @return 十分近ければtrue
+			 */
+			bool IsCloseEnoughTo(const ChildPenguin* target) const;
+
+			/**
+			 * @brief 介入対象に制止・助けの処理を適用する
+			 * @param target 介入対象
+			 */
+			void ApplyIntervention(ChildPenguin* target) const;
+
+			/**
+			 * @brief 制止していた対象への制止を解除する
+			 * @param target 制止を解除する対象
+			 */
+			void ReleaseSuppression(ChildPenguin* target) const;
+
+		private:
+			/** 現在介入中の対象ペンギン */
+			ChildPenguin* m_interventionTarget = nullptr;
+			/**
+			 * @brief 介入対象を探す最大距離（JSONパラメーターから読み込む）
+			 * @details この距離より遠いペンギンには介入しない
+			 */
+			float m_interventionRange = 0.0f;
+			/** 介入到達とみなす距離 */
+			static constexpr float INTERVENTION_REACH_DISTANCE = 10.0f;
 		};
 	}
 }
