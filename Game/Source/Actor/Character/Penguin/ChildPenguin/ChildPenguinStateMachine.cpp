@@ -76,8 +76,8 @@ namespace app
 
 		core::IState* ChildPenguinStateMachine::GetChangeState()
 		{
-         // 1. システム・環境系の判定（ダメージ、死亡、水泳など）
-			// 死亡中状態の維持
+			// 1. システム・環境系の判定（ダメージ、死亡、水泳など）
+			   // 死亡中状態の維持
 			if (IsEqualCurrentState(PenguinDiyingState::ID()))
 			{
 				if (IsPlayingAnimation())
@@ -109,7 +109,14 @@ namespace app
 				return FindState(PenguinSwimmingState::ID());
 			}
 
-			// 2. アクション系の判定（スライド、ジャンプ、移動など）
+			// 2. タイプ固有の判定（転倒・起き上がりなど）
+			// アクション系より先に評価することで、転倒中にジャンプ等へ割り込まれるのを防ぐ
+			if (auto* typeState = GetTypeSpecificChangeState())
+			{
+				return typeState;
+			}
+
+			// 3. アクション系の判定（スライド、ジャンプ、移動など）
 			// スライド開始アニメ中→スライド
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
 			{
@@ -151,12 +158,6 @@ namespace app
 			if (CanChangeMoveState())
 			{
 				return FindState(PenguinSneakState::ID());
-			}
-
-			// その他（固有ステートなど）
-			if (auto* typeState = GetTypeSpecificChangeState())
-			{
-				return typeState;
 			}
 
 			// どれにも当てはまらなければ待機

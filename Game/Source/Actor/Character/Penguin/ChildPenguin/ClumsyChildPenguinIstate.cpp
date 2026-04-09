@@ -27,11 +27,9 @@ namespace app
 
 		void ClumsyTripState::Enter()
 		{
-			/** 移動を止めてこけるアニメーションを再生する */
+			m_owner->SetActionInput(Vector3::Zero, false, false, false, false); // 追加
 			m_owner->SetMoveSpeed(0.0f);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Trip);
-
-			/** Managerに転倒中であることを登録する */
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
 		}
 

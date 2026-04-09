@@ -561,6 +561,8 @@ namespace app
 			/** Managerに登録されている転倒・スリップ中フラグで判定する */
 			if (manager->IsDowning(m_owner))
 			{
+				/** 転倒・スリップ中は移動入力をゼロにして固有ステートの評価を妨げないようにする */
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				m_wasSliding = false;
 				return;
 			}
@@ -668,16 +670,81 @@ namespace app
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
-			/** 追従命令のとき：制止を解除して通常の追従行動に戻る */
+			/** 追従命令のとき */
 			if (isFollowCmd)
 			{
-				if (m_interventionTarget != nullptr)
+				/** 甘えん坊・やんちゃへの制止は解除して通常追従に戻す */
+				if (m_interventionTarget != nullptr &&
+					m_interventionTarget->GetChildPenguinType() != EnChildPenguinType::Clumsy)
 				{
 					ReleaseSuppression(m_interventionTarget);
 					manager->UnregisterAssigned(m_interventionTarget);
 					m_interventionTarget = nullptr;
 				}
 
+				/** おっちょこちょいへの介入：助け終わったらターゲットをクリアする */
+				if (m_interventionTarget != nullptr &&
+					m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Clumsy)
+				{
+					if (!manager->IsDowning(m_interventionTarget))
+					{
+						/** 起き上がり完了 → 介入終了 */
+						manager->UnregisterAssigned(m_interventionTarget);
+						m_interventionTarget = nullptr;
+					}
+				}
+
+				/** 担当対象が消えていたら（死亡など）クリアする */
+				if (m_interventionTarget != nullptr)
+				{
+					const auto& childList = manager->GetChildPenguin();
+					const bool exists = std::find(childList.begin(), childList.end(), m_interventionTarget) != childList.end();
+					if (!exists)
+					{
+						manager->UnregisterAssigned(m_interventionTarget);
+						m_interventionTarget = nullptr;
+					}
+				}
+
+				/** 担当がいなければ転倒中のおっちょこちょいを探す */
+				if (m_interventionTarget == nullptr)
+				{
+					const auto& assigned = manager->GetAssignedTargets();
+					const Vector3& myPos = m_owner->GetTransform().m_position;
+
+					ChildPenguin* target = manager->FindNearestDowning(myPos, assigned, m_interventionRange);
+					if (target != nullptr)
+					{
+						m_interventionTarget = target;
+						manager->RegisterAssigned(m_interventionTarget);
+					}
+				}
+
+				/** 担当のおっちょこちょいがいる場合 */
+				if (m_interventionTarget != nullptr)
+				{
+					/** 助けに向かう間は隊列から外れる */
+					if (m_isFollowing)
+					{
+						manager->RemoveFollower(m_owner);
+						m_isFollowing = false;
+					}
+
+					if (IsCloseEnoughTo(m_interventionTarget))
+					{
+						/** 十分近づいたら介入処理を適用してその場で待機する */
+						ApplyIntervention(m_interventionTarget);
+						m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					}
+					else
+					{
+						/** ターゲットの座標へ向かって移動する */
+						BuildInputToTarget(m_interventionTarget->GetTransform().m_position);
+					}
+					return;
+				}
+
+				/** 介入対象がいなければ通常の追従行動 */
 				const float distDaddy = GetDistanceToDaddy();
 
 				if (!m_isFollowing && distDaddy <= m_joinDistance)

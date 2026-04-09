@@ -7,6 +7,7 @@
 #include "ClumsyChildPenguinIState.h"
 #include "ClumsyChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 
 
@@ -27,15 +28,9 @@ namespace app
 
 		core::IState* ClumsyChildPenguinStateMachine::GetTypeSpecificChangeState()
 		{
-			/** 転倒・スリップ中のアニメーション（Trip）が終わったら起き上がりへ */
+			/** 転倒・スリップ中のアニメーションが終わったら起き上がりへ */
 			if (IsEqualCurrentState(ClumsyTripState::ID()) || IsEqualCurrentState(ClumsySlipState::ID()))
 			{
-				/** 世話焼きペンギンに助けてもらった場合はアニメ終了を待たず即座に起き上がる */
-				if (m_isHelped)
-				{
-					return FindState(ClumsyStandUpState::ID());
-				}
-
 				if (!IsPlayingAnimation())
 				{
 					return FindState(ClumsyStandUpState::ID());
@@ -47,9 +42,17 @@ namespace app
 					: FindState(ClumsySlipState::ID());
 			}
 
-			/** 起き上がりアニメーションが終わったら通常行動に戻る（nullptrを返すことでIdleへ落ちる） */
+			/** 起き上がりアニメーション中 */
 			if (IsEqualCurrentState(ClumsyStandUpState::ID()))
 			{
+				/** 世話焼きペンギンに助けてもらった場合はStandUpをスキップして即座にIdleへ戻る */
+				if (m_isHelped)
+				{
+					ChildPenguinManager::GetInstance()->UnregisterDowning(m_ownerChildPenguin);
+					m_isHelped = false;
+					return nullptr;
+				}
+
 				if (!IsPlayingAnimation())
 				{
 					return nullptr;
