@@ -44,17 +44,17 @@ namespace app
 			 * @brief 座標を設定
 			 * @param position 座標
 			 */
-			void SetPosition(const Vector3& position) { m_transform.m_position = position; }
+			void SetPosition(const Vector3 position) { m_transform.m_position = position; }
 			/**
 			 * @brief 回転を設定
 			 * @param rotation 回転
 			 */
-			void SetRotation(const Quaternion& rotation) { m_transform.m_rotation = rotation; }
+			void SetRotation(const Quaternion rotation) { m_transform.m_rotation = rotation; }
 			/**
 			 * @brief 拡大率を設定
 			 * @param scale 拡大率
 			 */
-			void SetScale(const Vector3& scale) { m_transform.m_scale = scale; }
+			void SetScale(const Vector3 scale) { m_transform.m_scale = scale; }
 
 
 		public:

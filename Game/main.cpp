@@ -3,6 +3,7 @@
 
 #include<dxgidebug.h>
 #include<InitGUID.h>
+#include<time.h>
 
 #include "Source/Application.h"
 
@@ -33,6 +34,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここから初期化を行うコードを記述する。
 	//////////////////////////////////////
 
+
+	srand(time(nullptr));
 	app::Application* application = new app::Application();
 
 	//////////////////////////////////////
