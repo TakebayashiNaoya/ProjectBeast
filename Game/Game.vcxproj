@@ -363,6 +363,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
+    <ClInclude Include="Source\Actor\Stage\Types.h" />
     <ClInclude Include="Source\Actor\Stage\Whirlpool.h" />
     <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h" />
     <ClInclude Include="Source\Application.h" />

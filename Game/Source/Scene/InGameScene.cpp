@@ -77,6 +77,7 @@ namespace app
 		actor::EnemyManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
+		actor::WhirlpoolManager::DestroyInstance();
 
 		DeleteGO(m_skyCube);
 		DeleteGO(m_ocean);

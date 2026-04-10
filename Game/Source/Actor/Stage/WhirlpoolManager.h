@@ -26,16 +26,30 @@ namespace app
 
 
 		private:
-			WhirlpoolManager() = default;
+			WhirlpoolManager();
 			virtual ~WhirlpoolManager() override = default;
 
 
 		public:
-			void ForEach(std::function<void(Whirlpool*)> cb);
+			/**
+			 * @brief 渦潮に対してコールバック関数を実行する関数
+			 * @param cb コールバック関数
+			 */
+			void ForEach(std::function<void(Whirlpool* info)> cb);
 
 
 		private:
-			std::vector<Whirlpool*> m_whirlpools;
+			/**
+			 * @brief 渦潮を生成する関数
+			 */
+			void CreateWhirlpool();
+
+
+		private:
+			/** 渦潮のマップ */
+			std::unordered_map<uint8_t, Whirlpool*> m_whirlpoolMap;
+			/** 渦潮の生成タイマー */
+			float m_timer;
 
 
 		public:
@@ -70,6 +84,7 @@ namespace app
 
 
 		private:
+			/** インスタンス */
 			static WhirlpoolManager* m_instance;
 		};
 	}

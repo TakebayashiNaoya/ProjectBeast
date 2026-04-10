@@ -582,6 +582,9 @@
     <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h">
       <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\Types.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
