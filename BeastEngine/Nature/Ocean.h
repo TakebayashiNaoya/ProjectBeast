@@ -1,5 +1,11 @@
-﻿#pragma once
+﻿/**
+ * @file Ocean.h
+ * @brief 海のクラス
+ * @author 竹林
+ */
+#pragma once
 #include "OceanMesh.h"
+
 
 namespace nsBeastEngine
 {
@@ -8,6 +14,7 @@ namespace nsBeastEngine
 		const Vector3 INIT_OCEAN_PLANE_NORMAL = g_vec3Up;		// 平面の法線
 		const Vector3 INIT_OCEAN_PLANE_POSITION = g_vec3Zero;	// 平面のポジション（平面が通る点）
 	}
+
 
 	class Ocean : public IGameObject
 	{
@@ -35,7 +42,7 @@ namespace nsBeastEngine
 		Ocean() = default;
 		~Ocean()
 		{
-			if (g_renderingEngine != nullptr)
+			if (g_renderingEngine)
 			{
 				g_renderingEngine->SetOcean(nullptr);
 			}

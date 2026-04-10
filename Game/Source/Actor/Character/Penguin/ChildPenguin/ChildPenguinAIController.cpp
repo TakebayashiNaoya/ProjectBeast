@@ -12,8 +12,10 @@
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "ChildPenguinTypes.h"
+#include "ClumsyChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Core/ParameterManager.h"
 
 
@@ -40,6 +42,16 @@ namespace app
 			float RollRange(const MasterChildPenguinParameter::Range& r)
 			{
 				std::uniform_real_distribution<float> dist(r.min, r.max);
+				return dist(GetRandomEngine());
+			}
+
+			/**
+			 * @brief [0, 1) の一様乱数を生成する
+			 * @return 生成された乱数値
+			 */
+			float RollUnit()
+			{
+				std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 				return dist(GetRandomEngine());
 			}
 
@@ -141,7 +153,13 @@ namespace app
 		void ChildPenguinAIController::BuildInput()
 		{
 			const Vector3 targetPos = m_owner->GetFormationTargetPosition();
-			const float   distToTarget = GetDistanceToTarget(targetPos);
+			BuildInputToTarget(targetPos);
+		}
+
+
+		void ChildPenguinAIController::BuildInputToTarget(const Vector3& targetPos)
+		{
+			const float distToTarget = GetDistanceToTarget(targetPos);
 
 			/**
 			 * ヒステリシスと「目標到達までステートを維持する」処理を考慮したフェーズ遷移
@@ -164,14 +182,14 @@ namespace app
 				break;
 
 			case MovePhase::Run:
-				// さらに離されたら Slide へ上げる
+				/** さらに離されたら Slide へ上げる */
 				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
-				// 途中の m_walkDistance では減速せず、所定の位置（m_stopDistance）まで来たら Walk に一気に戻す
+				/** 途中の m_walkDistance では減速せず、所定の位置（m_stopDistance）まで来たら Walk に一気に戻す */
 				else if (distToTarget <= m_stopDistance) { m_movePhase = MovePhase::Walk; }
 				break;
 
 			case MovePhase::Slide:
-				// 所定の位置（m_stopDistance）まで Slide を維持し、到着したら Walk に一気に戻す
+				/** 所定の位置（m_stopDistance）まで Slide を維持し、到着したら Walk に一気に戻す */
 				if (distToTarget <= m_stopDistance) { m_movePhase = MovePhase::Walk; }
 				break;
 			}
@@ -189,6 +207,7 @@ namespace app
 			switch (m_movePhase)
 			{
 			case MovePhase::Stop:
+				/** 停止 */
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				break;
 
@@ -269,6 +288,8 @@ namespace app
 		}
 
 
+
+
 		/**************************************************************/
 
 
@@ -285,8 +306,56 @@ namespace app
 		{
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
+			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
-			/** 親との距離を取得 */
+			/** 追従命令のとき：制止・登録を解除して通常追従する */
+			if (isFollowCmd)
+			{
+				m_isRestrained = false;
+				manager->UnregisterAttempting(m_owner);
+
+				const float distDaddy = GetDistanceToDaddy();
+
+				if (!m_isFollowing && distDaddy <= m_joinDistance)
+				{
+					manager->AddFollower(m_owner);
+					m_isFollowing = true;
+				}
+				else if (m_isFollowing && distDaddy > m_giveUpDistance)
+				{
+					manager->RemoveFollower(m_owner);
+					m_isFollowing = false;
+				}
+
+				if (!m_isFollowing)
+				{
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					return;
+				}
+
+				BuildInput();
+				return;
+			}
+
+			/** 待機命令のとき */
+
+			/** 世話焼きペンギンに制止されているときはその場で待機する */
+			if (m_isRestrained)
+			{
+				/** 制止中は追従しようとしている登録を解除する */
+				manager->UnregisterAttempting(m_owner);
+				if (m_isFollowing)
+				{
+					manager->RemoveFollower(m_owner);
+					m_isFollowing = false;
+				}
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
+			/** 待機命令中に追従しようとしていることをManagerに登録する */
+			manager->RegisterAttempting(m_owner);
+
 			const float distDaddy = GetDistanceToDaddy();
 
 			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
@@ -326,7 +395,11 @@ namespace app
 
 		NaughtyChildPenguinAI::NaughtyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Naughty)
-		{}
+		{
+			const auto& td = GetTypeData(EnChildPenguinType::Naughty);
+			m_roamTriggerDistance = RollRange(td.roamTriggerDistance);
+			m_roamRadius = RollRange(td.roamRadius);
+		}
 
 
 		void NaughtyChildPenguinAI::Update()
@@ -338,43 +411,125 @@ namespace app
 			/** 親との距離を取得 */
 			const float distDaddy = GetDistanceToDaddy();
 
-			/** 待機命令のとき */
-			if (!isFollowCmd)
+			/** 世話焼きペンギンに制止されているときはその場で待機する */
+			/** （命令に関わらず最優先で制止を適用する） */
+			if (m_isRestrained)
 			{
-				/** 隊列から離脱 */
 				if (m_isFollowing)
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
-				/** その場で待機 */
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
-			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= m_joinDistance)
+			/** 追従命令のとき */
+			if (isFollowCmd)
 			{
-				manager->AddFollower(m_owner);
-				m_isFollowing = true;
+				/** joinDistance以内に入ったら徘徊を終了して隊列に参加する */
+				if (distDaddy <= m_joinDistance)
+				{
+					/** 徘徊登録を解除する */
+					manager->UnregisterRoaming(m_owner);
+
+					if (!m_isFollowing)
+					{
+						manager->AddFollower(m_owner);
+						m_isFollowing = true;
+					}
+				}
+
+				/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
+				else if (m_isFollowing && distDaddy > m_giveUpDistance)
+				{
+					manager->RemoveFollower(m_owner);
+					m_isFollowing = false;
+				}
+
+				/** 隊列に参加していない状態（＝まだ遠くにいる）なら徘徊を継続する */
+				if (!m_isFollowing)
+				{
+					/** 徘徊中でなければ新しい目標を選ぶ */
+					if (!manager->IsRoaming(m_owner))
+					{
+						manager->RegisterRoaming(m_owner);
+						PickNewRoamTarget();
+					}
+
+					const float distToRoamTarget = GetDistanceToTarget(m_roamTarget);
+
+					/** 目標地点に到達したら次の目標を選ぶ */
+					if (distToRoamTarget <= m_stopDistance)
+					{
+						PickNewRoamTarget();
+					}
+
+					BuildInputToTarget(m_roamTarget);
+					return;
+				}
+
+				/** 隊列参加中：通常の追従入力 */
+				BuildInput();
+				return;
 			}
 
-			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > m_giveUpDistance)
+			/** 待機命令のとき */
+
+			/** 隊列から離脱する */
+			if (m_isFollowing)
 			{
 				manager->RemoveFollower(m_owner);
 				m_isFollowing = false;
 			}
 
-			/** 隊列に参加していない状態ならその場で待機する */
-			if (!m_isFollowing)
+			/** 親が一定距離以上離れたら徘徊を開始する */
+			if (!manager->IsRoaming(m_owner) && distDaddy >= m_roamTriggerDistance)
 			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				manager->RegisterRoaming(m_owner);
+				PickNewRoamTarget();
+			}
+
+			/** 徘徊中 */
+			if (manager->IsRoaming(m_owner))
+			{
+				const float distToRoamTarget = GetDistanceToTarget(m_roamTarget);
+
+				/** 目標地点に到達したら次の目標を選ぶ */
+				if (distToRoamTarget <= m_stopDistance)
+				{
+					PickNewRoamTarget();
+				}
+
+				BuildInputToTarget(m_roamTarget);
 				return;
 			}
 
-			/** 隊列参加中：距離だけで移動手段を決定する */
-			BuildInput();
+			/** 待機命令中かつ親が近い場合はその場で待機する */
+			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+		}
+
+
+		void NaughtyChildPenguinAI::PickNewRoamTarget()
+		{
+			std::uniform_real_distribution<float> dist(-m_roamRadius, m_roamRadius);
+			auto& engine = GetRandomEngine();
+
+			/** 円内のランダムな座標を選ぶ（拒絶サンプリング） */
+			const Vector3& currentPos = m_owner->GetTransform().m_position;
+			for (int i = 0; i < 10; i++)
+			{
+				const float x = dist(engine);
+				const float z = dist(engine);
+				if ((x * x + z * z) <= (m_roamRadius * m_roamRadius))
+				{
+					m_roamTarget = Vector3(currentPos.x + x, currentPos.y, currentPos.z + z);
+					return;
+				}
+			}
+
+			/** 最大試行回数を超えた場合は現在地をそのまま目標にする */
+			m_roamTarget = currentPos;
 		}
 
 
@@ -389,7 +544,12 @@ namespace app
 
 		ClumsyChildPenguinAI::ClumsyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Clumsy)
-		{}
+			, m_clumsyStateMachine(static_cast<ClumsyChildPenguinStateMachine*>(owner->GetStateMachine()))
+		{
+			const auto& td = GetTypeData(EnChildPenguinType::Clumsy);
+			m_tripChancePerSec = td.tripChancePerSec;
+			m_slipChance = td.slipChance;
+		}
 
 
 		void ClumsyChildPenguinAI::Update()
@@ -398,46 +558,92 @@ namespace app
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
-			/** 親との距離を取得 */
-			const float distDaddy = GetDistanceToDaddy();
+			/** Managerに登録されている転倒・スリップ中フラグで判定する */
+			if (manager->IsDowning(m_owner))
+			{
+				/** 転倒・スリップ中は移動入力をゼロにして固有ステートの評価を妨げないようにする */
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_wasSliding = false;
+				return;
+			}
 
 			/** 待機命令のとき */
 			if (!isFollowCmd)
 			{
-				/** 隊列から離脱 */
 				if (m_isFollowing)
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
-				/** その場で待機 */
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_wasSliding = false;
 				return;
 			}
 
-			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
+			const float distDaddy = GetDistanceToDaddy();
+
 			if (!m_isFollowing && distDaddy <= m_joinDistance)
 			{
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
 			}
-
-			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
 			else if (m_isFollowing && distDaddy > m_giveUpDistance)
 			{
 				manager->RemoveFollower(m_owner);
 				m_isFollowing = false;
 			}
 
-			/** 隊列に参加していない状態ならその場で待機する */
 			if (!m_isFollowing)
 			{
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_wasSliding = false;
 				return;
 			}
 
-			/** 隊列参加中：距離だけで移動手段を決定する */
+			/** スライド解除検出：前フレームがスライド中（PenguinSlidingStateのみ）で */
+			/** 今フレームがスライド中でなく、かつ泳ぎ中でもなければスリップ判定を行う */
+			const bool isCurrentlySliding = m_stateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
+			const bool isCurrentlySwimming = m_stateMachine->IsEqualCurrentState(PenguinSwimmingState::ID());
+
+			if (m_wasSliding && !isCurrentlySliding && !isCurrentlySwimming)
+			{
+				if (RollUnit() < m_slipChance)
+				{
+					m_clumsyStateMachine->SetIsSlipped(true);
+					m_wasSliding = false;
+					return;
+				}
+			}
+			m_wasSliding = isCurrentlySliding;
+
+			/** 泳ぎ中は転倒判定をしない */
+			if (isCurrentlySwimming)
+			{
+				BuildInput();
+				return;
+			}
+
+			/** 隊列参加中の通常移動入力 */
 			BuildInput();
+
+			/** 歩き・走り中のみ転倒判定を行う（秒あたりの確率をフレーム確率に変換） */
+			const bool isWalking = m_stateMachine->IsEqualCurrentState(PenguinSneakState::ID());
+			const bool isRunning = m_stateMachine->IsEqualCurrentState(PenguinRunState::ID());
+
+			if (isWalking || isRunning)
+			{
+				const float tripChancePerFrame = m_tripChancePerSec * g_gameTime->GetFrameDeltaTime();
+				if (RollUnit() < tripChancePerFrame)
+				{
+					m_clumsyStateMachine->SetIsTripped(true);
+				}
+			}
+		}
+
+
+		void ClumsyChildPenguinAI::HelpedByCaringPenguin()
+		{
+			m_clumsyStateMachine->SetIsHelped(true);
 		}
 
 
@@ -452,7 +658,10 @@ namespace app
 
 		CaringChildPenguinAI::CaringChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Caring)
-		{}
+		{
+			const auto& td = GetTypeData(EnChildPenguinType::Caring);
+			m_interventionRange = td.interventionRange;
+		}
 
 
 		void CaringChildPenguinAI::Update()
@@ -461,46 +670,252 @@ namespace app
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
-			/** 親との距離を取得 */
-			const float distDaddy = GetDistanceToDaddy();
-
-			/** 待機命令のとき */
-			if (!isFollowCmd)
+			/** 追従命令のとき */
+			if (isFollowCmd)
 			{
-				/** 隊列から離脱 */
-				if (m_isFollowing)
+				/** 甘えん坊・やんちゃへの制止は解除して通常追従に戻す */
+				if (m_interventionTarget != nullptr &&
+					m_interventionTarget->GetChildPenguinType() != EnChildPenguinType::Clumsy)
+				{
+					ReleaseSuppression(m_interventionTarget);
+					manager->UnregisterAssigned(m_interventionTarget);
+					m_interventionTarget = nullptr;
+				}
+
+				/** おっちょこちょいへの介入：助け終わったらターゲットをクリアする */
+				if (m_interventionTarget != nullptr &&
+					m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Clumsy)
+				{
+					if (!manager->IsDowning(m_interventionTarget))
+					{
+						/** 起き上がり完了 → 介入終了 */
+						manager->UnregisterAssigned(m_interventionTarget);
+						m_interventionTarget = nullptr;
+					}
+				}
+
+				/** 担当対象が消えていたら（死亡など）クリアする */
+				if (m_interventionTarget != nullptr)
+				{
+					const auto& childList = manager->GetChildPenguin();
+					const bool exists = std::find(childList.begin(), childList.end(), m_interventionTarget) != childList.end();
+					if (!exists)
+					{
+						manager->UnregisterAssigned(m_interventionTarget);
+						m_interventionTarget = nullptr;
+					}
+				}
+
+				/** 担当がいなければ転倒中のおっちょこちょいを探す */
+				if (m_interventionTarget == nullptr)
+				{
+					const auto& assigned = manager->GetAssignedTargets();
+					const Vector3& myPos = m_owner->GetTransform().m_position;
+
+					ChildPenguin* target = manager->FindNearestDowning(myPos, assigned, m_interventionRange);
+					if (target != nullptr)
+					{
+						m_interventionTarget = target;
+						manager->RegisterAssigned(m_interventionTarget);
+					}
+				}
+
+				/** 担当のおっちょこちょいがいる場合 */
+				if (m_interventionTarget != nullptr)
+				{
+					/** 助けに向かう間は隊列から外れる */
+					if (m_isFollowing)
+					{
+						manager->RemoveFollower(m_owner);
+						m_isFollowing = false;
+					}
+
+					if (IsCloseEnoughTo(m_interventionTarget))
+					{
+						/** 十分近づいたら介入処理を適用してその場で待機する */
+						ApplyIntervention(m_interventionTarget);
+						m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					}
+					else
+					{
+						/** ターゲットの座標へ向かって移動する */
+						BuildInputToTarget(m_interventionTarget->GetTransform().m_position);
+					}
+					return;
+				}
+
+				/** 介入対象がいなければ通常の追従行動 */
+				const float distDaddy = GetDistanceToDaddy();
+
+				if (!m_isFollowing && distDaddy <= m_joinDistance)
+				{
+					manager->AddFollower(m_owner);
+					m_isFollowing = true;
+				}
+				else if (m_isFollowing && distDaddy > m_giveUpDistance)
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
-				/** その場で待機 */
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+
+				if (!m_isFollowing)
+				{
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					return;
+				}
+
+				BuildInput();
 				return;
 			}
 
-			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= m_joinDistance)
-			{
-				manager->AddFollower(m_owner);
-				m_isFollowing = true;
-			}
-
-			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > m_giveUpDistance)
+			/** 待機命令のとき */
+			if (m_isFollowing)
 			{
 				manager->RemoveFollower(m_owner);
 				m_isFollowing = false;
 			}
 
-			/** 隊列に参加していない状態ならその場で待機する */
-			if (!m_isFollowing)
+			/** おっちょこちょいへの介入：助け終わったらターゲットをクリアして次を探す */
+			if (m_interventionTarget != nullptr &&
+				m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Clumsy)
 			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				if (!manager->IsDowning(m_interventionTarget))
+				{
+					/** 起き上がり完了 → 介入終了 */
+					manager->UnregisterAssigned(m_interventionTarget);
+					m_interventionTarget = nullptr;
+				}
+			}
+
+			/** 担当対象が消えていたら（死亡など）クリアする */
+			if (m_interventionTarget != nullptr)
+			{
+				const auto& childList = manager->GetChildPenguin();
+				const bool exists = std::find(childList.begin(), childList.end(), m_interventionTarget) != childList.end();
+				if (!exists)
+				{
+					manager->UnregisterAssigned(m_interventionTarget);
+					m_interventionTarget = nullptr;
+				}
+			}
+
+			/** 担当がいなければ新たに探す */
+			if (m_interventionTarget == nullptr)
+			{
+				const auto& assigned = manager->GetAssignedTargets();
+				const Vector3& myPos = m_owner->GetTransform().m_position;
+
+				/** 優先①：倒れているおっちょこちょい */
+				ChildPenguin* target = manager->FindNearestDowning(myPos, assigned, m_interventionRange);
+
+				/** 優先②：問題行動中の甘えん坊・やんちゃ */
+				if (target == nullptr)
+				{
+					target = manager->FindNearestNeedingSupervision(myPos, assigned, m_interventionRange);
+				}
+
+				if (target != nullptr)
+				{
+					m_interventionTarget = target;
+					manager->RegisterAssigned(m_interventionTarget);
+				}
+			}
+
+			/** 担当対象がいる場合 */
+			if (m_interventionTarget != nullptr)
+			{
+				if (IsCloseEnoughTo(m_interventionTarget))
+				{
+					/** 十分近づいたら介入処理を適用してその場で待機する */
+					ApplyIntervention(m_interventionTarget);
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				}
+				else
+				{
+					/** ターゲットの座標へ向かって移動する */
+					BuildInputToTarget(m_interventionTarget->GetTransform().m_position);
+				}
 				return;
 			}
 
-			/** 隊列参加中：距離だけで移動手段を決定する */
-			BuildInput();
+			/** 介入対象がいなければその場で待機する */
+			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+		}
+
+
+		bool CaringChildPenguinAI::IsCloseEnoughTo(const ChildPenguin* target) const
+		{
+			return GetDistanceToTarget(target->GetTransform().m_position) <= INTERVENTION_REACH_DISTANCE;
+		}
+
+
+		void CaringChildPenguinAI::ApplyIntervention(ChildPenguin* target) const
+		{
+			switch (target->GetChildPenguinType())
+			{
+			case EnChildPenguinType::Clumsy:
+			{
+				/** おっちょこちょいを助けて即座に起き上がらせる */
+				auto* ai = static_cast<ClumsyChildPenguinAI*>(target->GetAIController());
+				if (ai)
+				{
+					ai->HelpedByCaringPenguin();
+				}
+				break;
+			}
+			case EnChildPenguinType::Clingy:
+			{
+				/** 甘えん坊を制止する */
+				auto* ai = static_cast<ClingyChildPenguinAI*>(target->GetAIController());
+				if (ai)
+				{
+					ai->SetRestrained(true);
+				}
+				break;
+			}
+			case EnChildPenguinType::Naughty:
+			{
+				/** やんちゃを制止する */
+				auto* ai = static_cast<NaughtyChildPenguinAI*>(target->GetAIController());
+				if (ai)
+				{
+					ai->SetRestrained(true);
+				}
+				break;
+			}
+			default:
+				break;
+			}
+		}
+
+
+		void CaringChildPenguinAI::ReleaseSuppression(ChildPenguin* target) const
+		{
+			switch (target->GetChildPenguinType())
+			{
+			case EnChildPenguinType::Clingy:
+			{
+				/** 甘えん坊の制止を解除する */
+				auto* ai = static_cast<ClingyChildPenguinAI*>(target->GetAIController());
+				if (ai)
+				{
+					ai->SetRestrained(false);
+				}
+				break;
+			}
+			case EnChildPenguinType::Naughty:
+			{
+				/** やんちゃの制止を解除する */
+				auto* ai = static_cast<NaughtyChildPenguinAI*>(target->GetAIController());
+				if (ai)
+				{
+					ai->SetRestrained(false);
+				}
+				break;
+			}
+			default:
+				break;
+			}
 		}
 	}
 }

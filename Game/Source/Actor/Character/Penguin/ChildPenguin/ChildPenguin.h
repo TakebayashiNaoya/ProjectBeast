@@ -30,6 +30,11 @@ namespace app
 			 */
 			inline ChildPenguinStateMachine* GetStateMachine() { return m_stateMachine.get(); }
 			/**
+			 * @brief AIコントローラーを取得
+			 * @return AIコントローラーのポインタ
+			 */
+			inline ChildPenguinAIController* GetAIController()const { return m_aiController.get(); }
+			/**
 			 * @brief 子ペンギンのタイプを取得
 			 * @return 子ペンギンのタイプ
 			 */

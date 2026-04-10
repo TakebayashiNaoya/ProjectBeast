@@ -1,10 +1,17 @@
-﻿#include "BeastEnginePreCompile.h"
+﻿/**
+ * @file Ocean.cpp
+ * @brief 海のクラス
+ * @author 竹林
+ */
+#include "BeastEnginePreCompile.h"
 #include "Ocean.h"
+
 
 namespace
 {
 	const float BASEREFLECTANCE = 0.05f;
 }
+
 
 namespace nsBeastEngine
 {
@@ -124,5 +131,4 @@ namespace nsBeastEngine
 		const float bottom = p01 + (p11 - p01) * fx;
 		return top + (bottom - top) * fz;
 	}
-
 }

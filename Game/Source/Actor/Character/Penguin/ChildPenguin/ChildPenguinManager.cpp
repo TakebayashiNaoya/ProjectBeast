@@ -1,7 +1,7 @@
 ﻿/**
  * @file ChildPenguinManager.cpp
  * @brief 子ペンギンのマネージャー
- * @author 立山
+ * @author 立山、竹林
  */
 #include "stdafx.h"
 #include <random>
@@ -29,16 +29,13 @@ namespace app
 
 		ChildPenguinManager* ChildPenguinManager::m_instance = nullptr;
 
-		ChildPenguinManager::ChildPenguinManager()
-		{
 
-		}
+		ChildPenguinManager::ChildPenguinManager()
+		{}
 
 
 		ChildPenguinManager::~ChildPenguinManager()
-		{
-
-		}
+		{}
 
 
 		void ChildPenguinManager::Start()
@@ -49,6 +46,7 @@ namespace app
 				cp->StartWrapper();
 			}
 		}
+
 
 		void ChildPenguinManager::Update()
 		{
@@ -209,8 +207,17 @@ namespace app
 
 		void ChildPenguinManager::RemoveAndDestroy(ChildPenguin* penguin)
 		{
-			/** 隊列から取り除く (陣形には影響させないため即座に外す) */
+			/** 隊列から取り除く */
 			RemoveFollower(penguin);
+
+			/** ステージ上のペンギン総数を減らす */
+			ScoreManager::GetInstance().SubTotalCount();
+
+			/** 状態管理セットからも取り除く */
+			m_downingPenguins.erase(penguin);
+			m_attemptingPenguins.erase(penguin);
+			m_roamingPenguins.erase(penguin);
+			m_assignedTargets.erase(penguin);
 
 			/** 即座に m_childPenguinList から erase したり delete したりせず、 */
 			/** 削除予定リストに登録するだけに留める */
@@ -279,8 +286,8 @@ namespace app
 			/** 親の現在座標を取得 */
 			Vector3 centerPos = m_daddyPenguin->GetTransform().m_position;
 
-			int currentCount = 0;	/** 今何匹目を配置しているかのカウント */
-			int layer = 1;			/** 階層カウント（1が一番内側の円） */
+			int currentCount = 0; /** 今何匹目を配置しているかのカウント */
+			int layer = 1;        /** 階層カウント（1が一番内側の円） */
 
 			/** 最大数に達するまで円を広げながら計算 */
 			while (currentCount < MAX_FORMATION_COUNT)
@@ -344,6 +351,150 @@ namespace app
 					m_followers[i]->SetFormationTargetPosition(m_formationPositions[i]);
 				}
 			}
+		}
+
+
+
+
+		//============================================//
+		// 世話焼き用：問題行動ペンギンの状態管理
+		//============================================//
+
+		void ChildPenguinManager::RegisterDowning(ChildPenguin* penguin)
+		{
+			m_downingPenguins.insert(penguin);
+		}
+
+
+		void ChildPenguinManager::UnregisterDowning(ChildPenguin* penguin)
+		{
+			m_downingPenguins.erase(penguin);
+		}
+
+
+		bool ChildPenguinManager::IsDowning(const ChildPenguin* penguin) const
+		{
+			return m_downingPenguins.count(const_cast<ChildPenguin*>(penguin)) > 0;
+		}
+
+
+		void ChildPenguinManager::RegisterAttempting(ChildPenguin* penguin)
+		{
+			m_attemptingPenguins.insert(penguin);
+		}
+
+
+		void ChildPenguinManager::UnregisterAttempting(ChildPenguin* penguin)
+		{
+			m_attemptingPenguins.erase(penguin);
+		}
+
+
+		bool ChildPenguinManager::IsAttempting(const ChildPenguin* penguin) const
+		{
+			return m_attemptingPenguins.count(const_cast<ChildPenguin*>(penguin)) > 0;
+		}
+
+
+		void ChildPenguinManager::RegisterRoaming(ChildPenguin* penguin)
+		{
+			m_roamingPenguins.insert(penguin);
+		}
+
+
+		void ChildPenguinManager::UnregisterRoaming(ChildPenguin* penguin)
+		{
+			m_roamingPenguins.erase(penguin);
+		}
+
+
+		bool ChildPenguinManager::IsRoaming(const ChildPenguin* penguin) const
+		{
+			return m_roamingPenguins.count(const_cast<ChildPenguin*>(penguin)) > 0;
+		}
+
+
+		void ChildPenguinManager::RegisterAssigned(ChildPenguin* penguin)
+		{
+			m_assignedTargets.insert(penguin);
+		}
+
+
+		void ChildPenguinManager::UnregisterAssigned(ChildPenguin* penguin)
+		{
+			m_assignedTargets.erase(penguin);
+		}
+
+
+		ChildPenguin* ChildPenguinManager::FindNearestDowning(
+			const Vector3& from,
+			const std::unordered_set<ChildPenguin*>& excludeSet,
+			float maxRange
+		) const
+		{
+			ChildPenguin* nearest = nullptr;
+			const float maxRangeSq = maxRange * maxRange;
+			float minDistSq = maxRangeSq;
+
+			for (auto* penguin : m_downingPenguins)
+			{
+				/** 既に他の世話焼きが担当しているペンギンはスキップする */
+				if (excludeSet.count(penguin) > 0) continue;
+
+				Vector3 diff = penguin->GetTransform().m_position - from;
+				diff.y = 0.0f;
+				const float distSq = diff.LengthSq();
+
+				/** 最大距離より遠ければスキップする */
+				if (distSq > maxRangeSq) continue;
+
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					nearest = penguin;
+				}
+			}
+
+			return nearest;
+		}
+
+
+		ChildPenguin* ChildPenguinManager::FindNearestNeedingSupervision(
+			const Vector3& from,
+			const std::unordered_set<ChildPenguin*>& excludeSet,
+			float maxRange
+		) const
+		{
+			ChildPenguin* nearest = nullptr;
+			const float maxRangeSq = maxRange * maxRange;
+			float minDistSq = maxRangeSq;
+
+			/** 甘えん坊と徘徊中のやんちゃを合わせて最近傍を探す */
+			auto checkSet = [&](const std::unordered_set<ChildPenguin*>& targetSet)
+				{
+					for (auto* penguin : targetSet)
+					{
+						if (excludeSet.count(penguin) > 0) continue;
+
+						Vector3 diff = penguin->GetTransform().m_position - from;
+						diff.y = 0.0f;
+						const float distSq = diff.LengthSq();
+
+						/** 最大距離より遠ければスキップする */
+						if (distSq > maxRangeSq) continue;
+
+						if (distSq < minDistSq)
+						{
+							minDistSq = distSq;
+							nearest = penguin;
+						}
+					}
+				};
+
+			checkSet(m_attemptingPenguins);
+			checkSet(m_roamingPenguins);
+
+			return nearest;
 		}
 	}
 }

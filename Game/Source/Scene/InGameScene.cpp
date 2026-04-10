@@ -51,11 +51,11 @@ namespace app
 		constexpr float CHILD_SPAWN_RADIUS = 3000.0f;
 
 		/** タイプ別の生成数 */
-		constexpr int SERIOUS_NUM = 50;
-		constexpr int CLINGY_NUM = 50;
-		constexpr int NAUGHTY_NUM = 0;
-		constexpr int CLUMSY_NUM = 0;
-		constexpr int CARING_NUM = 0;
+		constexpr int SERIOUS_NUM = 20;
+		constexpr int CLINGY_NUM = 20;
+		constexpr int NAUGHTY_NUM = 20;
+		constexpr int CLUMSY_NUM = 20;
+		constexpr int CARING_NUM = 20;
 	}
 
 
