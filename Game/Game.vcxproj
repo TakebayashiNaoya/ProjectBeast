@@ -282,6 +282,7 @@
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
+    <ClCompile Include="Source\Manager\IglooManager.cpp" />
     <ClCompile Include="Source\Manager\InGameUImanager.cpp" />
     <ClCompile Include="Source\Manager\ScoreManager.cpp" />
     <ClCompile Include="Source\Manager\TimeManager.cpp" />
@@ -378,6 +379,7 @@
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
+    <ClInclude Include="Source\Manager\IglooManager.h" />
     <ClInclude Include="Source\Manager\InGameUImanager.h" />
     <ClInclude Include="Source\Manager\ScoreManager.h" />
     <ClInclude Include="Source\Manager\TimeManager.h" />

@@ -23,6 +23,13 @@
         "scale" : [1, 1, 1]
       },
       {
+        "objectName" : "igloo",
+        "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
+        "position" : [200, 25, 150],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [6, 6, 6]
+      },
+      {
         "objectName" : "iceWall",
         "fileName" : "Assets/modelData/stage/Wall/iceWall.tkm",
         "position" : [0, -1800, 0],
@@ -41,7 +48,7 @@
         "fileName" : "Assets/modelData/Stage/SnowEmbankment/SnowEmbankment.tkm",
         "position" : [0, 0, 0],
         "rotationDeg" : [0, -10, 0],
-        "scale" : [4, 4, 4]
+        "scale" : [4, 4, 6]
       },
       {
         "objectName" : "Ground03",

@@ -4,14 +4,15 @@
  * @author 立山
  */
 #include "stdafx.h"
-#include <random>
 #include "ChildPenguin.h"
+#include "ChildPenguinAIController.h"
 #include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include <random>
 
 
 namespace app
@@ -344,6 +345,34 @@ namespace app
 					m_followers[i]->SetFormationTargetPosition(m_formationPositions[i]);
 				}
 			}
+		}
+
+
+		void ChildPenguinManager::StartIglooEvent(const Vector3& interactPos)
+		{
+			// イベント開始時に、連れ歩いている子ペンギンの数をカウントにセットする
+			m_iglooEnteringCount = static_cast<int>(m_followers.size());
+
+			// 全員に「入り口へ向かえ！」と命令を出す
+			for (auto* child : m_followers)
+			{
+				if (child && child->GetAIController())
+				{
+					child->GetAIController()->StartEnterIglooEvent(interactPos);
+				}
+			}
+		}
+
+		void ChildPenguinManager::FinishEnterIglooOne()
+		{
+			// 報告を受けるたびにカウントを1減らす
+			m_iglooEnteringCount--;
+		}
+
+		bool ChildPenguinManager::IsIglooEventFinished() const
+		{
+			// カウントが0以下になったら全員入り終わったと判定
+			return m_iglooEnteringCount <= 0;
 		}
 	}
 }

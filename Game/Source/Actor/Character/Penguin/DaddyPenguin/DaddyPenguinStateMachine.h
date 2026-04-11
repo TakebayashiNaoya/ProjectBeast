@@ -48,6 +48,27 @@ namespace app
 			{
 				m_isLose = isLose;
 			}
+			/**
+			 * @brief かまくらに入るかどうかを設定
+			 */
+			inline void SetIsEnterIgloo(const bool isEnterIgloo)
+			{
+				m_isEnterIgloo = isEnterIgloo;
+			}
+			/**
+			 * @brief イベント中かどうか
+			 */
+			inline void SetIsIglooEventFinished(const bool isFinished)
+			{
+				m_isIglooEventFinished = isFinished;
+			}
+			/**
+			 * @brief かまくら内にいるかどうかを設定
+			 */
+			inline void SetIsInsideIgloo(const bool isInside)
+			{
+				m_isInsideIgloo = isInside;
+			}
 
 
 			// ここに親ペンギン固有のゲッター関数を追加していく
@@ -67,6 +88,27 @@ namespace app
 			inline bool IsCommandState() const
 			{
 				return CanChangeCommandState();
+			}
+			/**
+			 * @brief かまくらに入るかどうかを取得
+			 */
+			inline bool GetIsEnterIgloo() const
+			{
+				return m_isEnterIgloo;
+			}
+			/**
+			 * @brief イベント中かどうかの取得
+			 */
+			inline bool GetIsIglooEventFinished() const
+			{
+				return m_isIglooEventFinished;
+			}
+			/**
+			 * @brief かまくら内にいるかどうかを取得
+			 */
+			inline bool GetIsInsideIgloo() const
+			{
+				return m_isInsideIgloo;
 			}
 			/**
 			 * @brief 親ペンギンのステータスを取得
@@ -102,6 +144,11 @@ namespace app
 			core::IState* CheckSystemState();
 			core::IState* CheckCommandState();
 			core::IState* CheckActionState();
+			core::IState* CheckEventState();
+
+
+		private:
+			bool CanChangeEnterIglooState() const;
 
 
 		public:
@@ -120,6 +167,12 @@ namespace app
 			bool m_isWin;
 			/** 負けたかどうか */
 			bool m_isLose;
+			/** かまくらに入るかどうか */
+			bool m_isEnterIgloo;
+			/** イベントが完了したか */
+			bool m_isIglooEventFinished;
+			/** かまくら内にいるかどうか */
+			bool m_isInsideIgloo;
 		};
 	}
 }

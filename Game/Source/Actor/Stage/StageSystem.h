@@ -106,6 +106,8 @@ namespace app
 			Vector3 GetObjectPosition(const std::string& key)const;
 
 
+			Quaternion GetObjectRotation(const std::string& key)const;
+
 		private:
 			/** シングルトンインスタンス */
 			static StageSystem* m_instance;

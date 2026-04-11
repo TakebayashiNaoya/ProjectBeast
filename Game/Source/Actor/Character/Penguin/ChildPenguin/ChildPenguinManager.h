@@ -293,6 +293,15 @@ namespace app
 			}
 
 
+		public:
+			/** かまくらイベントを開始する */
+			void StartIglooEvent(const Vector3& interactPos);
+			/** 子ペンギンが1匹かまくらに入り終わった時の報告を受け取る */
+			void FinishEnterIglooOne();
+			/** 全員がかまくらに入り終わったか確認する */
+			bool IsIglooEventFinished() const;
+
+
 		private:
 			ChildPenguinManager();
 			~ChildPenguinManager();
@@ -301,6 +310,10 @@ namespace app
 		private:
 			/** シングルトンインスタンス */
 			static ChildPenguinManager* m_instance;
+
+
+			/** かまくらに入ろうとしている子ペンギンの残り数 */
+			int m_iglooEnteringCount = 0;
 		};
 	}
 }

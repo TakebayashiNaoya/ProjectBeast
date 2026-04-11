@@ -12,7 +12,7 @@ namespace app
 	{
 	private:
 		/** タイムの最大値（試合時間：秒） */
-		static constexpr float MAX_TIME = 180.0f;
+		static constexpr float MAX_TIME = 60.0f;
 
 
 	public:

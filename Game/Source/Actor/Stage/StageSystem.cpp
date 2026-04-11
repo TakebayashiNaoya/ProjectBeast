@@ -287,6 +287,19 @@ namespace app
 			return Vector3::Zero;
 		}
 
+
+		Quaternion StageSystem::GetObjectRotation(const std::string& key)const
+		{
+			auto it = m_objectMap.find(key);
+			if (it != m_objectMap.end())
+			{
+				return it->second->GetTransform().m_rotation;
+			}
+
+			// 見つからなかった場合は無回転を返す
+			return Quaternion::Identity;
+		}
+
 		/** インスタンスを初期化 */
 		StageSystem* StageSystem::m_instance = nullptr;
 	}

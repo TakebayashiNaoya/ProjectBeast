@@ -4,9 +4,10 @@
  * @author 藤谷、竹林
  */
 #include "stdafx.h"
-#include "DaddyPenguinController.h"
 #include "DaddyPenguin.h"
+#include "DaddyPenguinController.h"
 #include "DaddyPenguinStateMachine.h"
+#include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
 #include <algorithm> // std::min用
 
@@ -107,6 +108,39 @@ namespace app
 			bool isJump = g_pad[0]->IsTrigger(enButtonA);
 			bool isCommandToggle = g_pad[0]->IsTrigger(enButtonY);
 			bool isSlide = g_pad[0]->IsPress(enButtonX);
+			bool isEnterIgloo = false;
+
+			// ★ Aボタンが押されたとき、かまくらの近くにいるか判定する
+			if (isJump)
+			{
+				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+				Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+
+				// 1. 入り口の方向ベクトルを取得（IStateで成功した -1.0f のX軸）
+				Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+				iglooRot.Apply(forwardVec);
+
+				// 2. リーダーの図の「青い円の中心」の座標を計算
+				// ※ IStateでの移動先と同じ 200.0f を基準にしつつ、必要に応じて少し遠くするなど微調整してください
+				float interactAreaOffset = 250.0f;
+				Vector3 interactPos = iglooPos + (forwardVec * interactAreaOffset);
+
+				Vector3 myPos = m_owner->GetTransform().m_position;
+
+				// 3. 親ペンギンと「青い円の中心」との距離を測る
+				Vector3 diff = myPos - interactPos;
+				diff.y = 0.0f;
+
+				// 青い円の半径（反応する範囲の広さ）
+				float interactRadius = 150.0f;
+
+				// 青いエリアの中にいるなら、イベントコマンドをオンにする
+				if (diff.Length() <= interactRadius)
+				{
+					isEnterIgloo = true;
+					isJump = false; // ジャンプが暴発しないように入力を消す！
+				}
+			}
 
 			// =========================================================
 			// ステートマシンへ一括入力
@@ -116,6 +150,8 @@ namespace app
 
 			// 親ペンギン固有の入力
 			m_stateMachine->SetIsCommandToggle(isCommandToggle);
+
+			m_stateMachine->SetIsEnterIgloo(isEnterIgloo);
 		}
 	}
 }
