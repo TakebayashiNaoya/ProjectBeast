@@ -244,8 +244,7 @@ namespace app
 				m_owner->SetInsideIgloo(true);
 
 				// ★ m_owner->SetPosition() を削除し、ステートマシン経由に変更
-				//m_owner->SetPosition(m_iglooTargetPos);
-				m_stateMachine->SetPosition(m_iglooTargetPos);
+				m_owner->GetCharacterController()->SetPosition(m_iglooTargetPos);
 
 				// マネージャーへの報告
 				IglooManager::GetInstance().AddPenguin(m_owner);
