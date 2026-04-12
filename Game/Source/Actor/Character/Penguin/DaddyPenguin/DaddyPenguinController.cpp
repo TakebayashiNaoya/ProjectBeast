@@ -122,7 +122,7 @@ namespace app
 
 				// 2. リーダーの図の「青い円の中心」の座標を計算
 				// ※ IStateでの移動先と同じ 200.0f を基準にしつつ、必要に応じて少し遠くするなど微調整してください
-				float interactAreaOffset = 250.0f;
+				float interactAreaOffset = 150.0f;
 				Vector3 interactPos = iglooPos + (forwardVec * interactAreaOffset);
 
 				Vector3 myPos = m_owner->GetTransform().m_position;
@@ -132,7 +132,7 @@ namespace app
 				diff.y = 0.0f;
 
 				// 青い円の半径（反応する範囲の広さ）
-				float interactRadius = 150.0f;
+				float interactRadius = 100.0f;
 
 				// 青いエリアの中にいるなら、イベントコマンドをオンにする
 				if (diff.Length() <= interactRadius)

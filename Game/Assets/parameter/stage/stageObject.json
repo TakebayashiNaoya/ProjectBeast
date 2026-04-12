@@ -27,7 +27,7 @@
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "position" : [200, 25, 150],
         "rotationDeg" : [0, 90, 0],
-        "scale" : [6, 6, 6]
+        "scale" : [4, 4, 4]
       },
       {
         "objectName" : "iceWall",

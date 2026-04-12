@@ -235,7 +235,7 @@ namespace app
 				// ワープ先を取得
 				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
 				Vector3 insidePos = iglooPos;
-				insidePos.y += 30.0f;
+				insidePos.y += 0.0f;
 				insidePos.x += (float)(std::rand() % 60) - 30.0f;
 				insidePos.z += (float)(std::rand() % 60) - 30.0f;
 

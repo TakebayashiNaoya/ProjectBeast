@@ -182,7 +182,7 @@ namespace app
 			iglooRot.Apply(forwardVec);
 
 			// 3. 入り口の座標を算出
-			float offsetDistance = 250.0f;
+			float offsetDistance = 150.0f;
 			m_entrancePos = iglooPos + (forwardVec * offsetDistance);
 			Vector3 insidePos = iglooPos; // かまくらの中心座標
 
@@ -266,7 +266,7 @@ namespace app
 			iglooRot.Apply(forwardVec);
 
 			// コントローラーと同じ距離（青い円の中心）
-			Vector3 interactPos = iglooPos + (forwardVec * 250.0f);
+			Vector3 interactPos = iglooPos + (forwardVec * 150.0f);
 
 			// =========================================================
 			// ★ ここで「引数1つ」で呼ぶのが大正解です！
@@ -285,7 +285,7 @@ namespace app
 				Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
 				iglooRot.Apply(forwardVec);
 
-				Vector3 exitPos = iglooPos + (forwardVec * 250.0f);
+				Vector3 exitPos = iglooPos + (forwardVec * 150.0f);
 				exitPos.y += 20.0f; // 親ペンギンの高さ
 
 				// 2. 親ペンギン自身を入り口にワープさせる
