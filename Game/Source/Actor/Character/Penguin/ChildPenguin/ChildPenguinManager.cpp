@@ -383,22 +383,6 @@ namespace app
 
 		void ChildPenguinManager::EndIglooEvent(const Vector3& exitPos)
 		{
-			//// 全ての子ペンギンをチェックし、中に入っている子だけを外に出す
-			//for (auto* child : m_childPenguinList)
-			//{
-			//	if (child && child->IsInsideIgloo())
-			//	{
-			//		if (child->GetAIController())
-			//		{
-			//			// AIに脱出とワープを命令
-			//			child->GetAIController()->EndEnterIglooEvent(exitPos);
-			//		}
-
-			//		// 再び親の後ろをついてくるように、隊列（フォロワー）に復帰させる！
-			//		AddFollower(child);
-			//	}
-			//}
-
 			// 全ての子ペンギンをチェックし、イベントに参加している子全員をリセットする
 			for (auto* child : m_childPenguinList)
 			{
