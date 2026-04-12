@@ -5,7 +5,7 @@
                 "type":"UIIcon",
                 "name":"InGameTimerFrameBackGroundIcon",
                 "asset":"Assets/spriteData/UI/Time/InGameTimerFrameBackGround.dds",
-                "width":250,
+                "width":280,
                 "height":90,
                 "position":[550,300,0],
                 "scale":[1,1,1],
@@ -16,26 +16,79 @@
                 "type":"UIIcon",
                 "name":"InGameTimerFrameIcon",
                 "asset":"Assets/spriteData/UI/Time/InGameTimerFrame.dds",
-                "width":280,
+                "width":320,
                 "height":120,
                 "position":[550,300,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
             },
+
+
+
             {
                 "type":"UIDigit",
-                "name":"InGameTimerDigit",
-                "asset":"Assets/spriteData/UI/TimerNumber",
-                "digit":3,
-                "number":300,
-                "width":70,
+                "name":"MinutesDigits",
+                "asset":"Assets/spriteData/UI/Number/White",
+                "digit":1,
+                "number":3,
+                "width":50,
                 "height":50,
-                "position":[630,300,0],
+                "position":[ 525, 300, 0],
+                "scale":[1,1,1],
+                "rotation":0
+            },
+            {
+                "type":"UIDigit",
+                "name":"TensPlaceDigits",
+                "asset":"Assets/spriteData/UI/Number/White",
+                "digit":2,
+                "number":0,
+                "width":50,
+                "height":50,
+                "position":[ 595, 300, 0],
+                "scale":[1,1,1],
+                "rotation":0
+            },
+            {
+                "type":"UIIcon",
+                "name":"CloneIcon",
+                "asset":"Assets/spriteData/UI/Icon/InGameTimerIcon/Clone.dds",
+                "width":15,
+                "height":50,
+                "position":[ 560, 300, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIDigit",
+                "name":"OnesPlaceDigits",
+                "asset":"Assets/spriteData/UI/Number/White",
+                "digit":1,
+                "number":0,
+                "width":50,
+                "height":50,
+                "position":[ 640, 300, 0],
                 "scale":[1,1,1],
                 "rotation":0
             },
 
+
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"TimeClockIcon",
+                "asset":"Assets/spriteData/UI/Icon/InGameTimerIcon/Clock.dds",
+                "width":55,
+                "height":50,
+                "position":[ 468, 300, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
 
 
             {
