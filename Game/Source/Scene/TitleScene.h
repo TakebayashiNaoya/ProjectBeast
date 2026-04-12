@@ -14,6 +14,7 @@ namespace app
 		class Layout;
 		class SoundOptionMenu;
 		class TitleEventMenu;
+		class TutorialMenu;
 	}
 
 	class TitleScene :public IScene
@@ -36,7 +37,8 @@ namespace app
 		enum class TitleState
 		{
 			Title,
-			SoundOption
+			SoundOption,
+			Tutorial
 		};
 
 		TitleState m_state;
@@ -55,7 +57,9 @@ namespace app
 	private:
 		ui::Layout* m_titleLayout;
 		ui::Layout* m_soundOptionLayout;
+		ui::Layout* m_tutorialLayout;
 		ui::SoundOptionMenu* m_soundOption;
 		ui::TitleEventMenu* m_titleEventMenu;
+		ui::TutorialMenu* m_tutorialMenu;
 	};
 }

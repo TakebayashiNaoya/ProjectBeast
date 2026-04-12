@@ -19,6 +19,7 @@ namespace app
 			TitleType,
 			ReturnPlayType,
 			SoundOptionType,
+			RuleType,
 			GoBackTitleType,
 			Max
 		};
@@ -64,7 +65,7 @@ namespace app
 
 		public:
 			PauseScreenMenu();
-			
+
 			void Update()override;
 			void InitializeLogic()override;
 
@@ -116,6 +117,11 @@ namespace app
 			 * @brief ポーズ画面の結果を取得
 			 * @return ポーズ画面の結果
 			 */
+			bool IsRule()const { return m_isRule; }
+			/**
+			 * @brief ポーズ画面の結果を取得
+			 * @return ポーズ画面の結果
+			 */
 			bool IsGoTitle()const { return m_isGoTitle; }
 
 			/**
@@ -133,6 +139,11 @@ namespace app
 			 * @param isSound サウンドオプションに行くかどうか
 			 */
 			void IsSound(bool isSound) { m_isSound = isSound; }
+			/**
+			 * @brief ポーズ画面の結果を設定
+			 * @param isRule ルール画面に行くかどうか
+			 */
+			void IsRule(bool isRule) { m_isRule = isRule; }
 
 
 		private:
@@ -144,10 +155,12 @@ namespace app
 			bool m_isRetry;
 			/** サウンド */
 			bool m_isSound;
+			/** ルール */
+			bool m_isRule;
 			/** タイトル */
 			bool m_isGoTitle;
 
-			
+
 			using Icon = std::unique_ptr<PauseScreenIcon>;
 			using Button = std::unique_ptr<PauseScreenButton>;
 			using Key = uint32_t;

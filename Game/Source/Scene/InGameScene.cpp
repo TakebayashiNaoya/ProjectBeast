@@ -35,6 +35,7 @@
 #include "Source/UI/FinishMenu.h"
 #include "Source/UI/PauseScreenMenu.h"
 #include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/TutorialMenu.h"
 
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
@@ -410,6 +411,18 @@ namespace app
 				pauseMenu->IsSound(false);
 				m_pauseState = PauseState::SoundOption;
 			}
+			/** ルール画面へ */
+			else if (pauseMenu->IsRule())
+			{
+				pauseMenu->IsRule(false);
+				auto* tutorialMenu = m_uiManager->GetTutorialMenu();
+				if (tutorialMenu)
+				{
+					tutorialMenu->SetClosed(false);
+					tutorialMenu->InitializeLogic();
+				}
+				m_pauseState = PauseState::Tutorial;
+			}
 			/** タイトルへ戻る */
 			else if (pauseMenu->IsGoTitle())
 			{
@@ -438,6 +451,26 @@ namespace app
 			}
 			break;
 		}
+
+		//------------------------------------------------------------
+		// チュートリアル画面（ポーズ中のサブ画面）
+		//------------------------------------------------------------
+		case PauseState::Tutorial:
+		{
+			auto* tutorialMenu = m_uiManager->GetTutorialMenu();
+			if (tutorialMenu)
+			{
+				tutorialMenu->Update();
+
+				/** TutorialMenu 内で Bボタンが押されたら閉じる */
+				if (tutorialMenu->IsClosed())
+				{
+					tutorialMenu->SetClosed(false);
+					m_pauseState = PauseState::Pause;
+				}
+			}
+			break;
+		}
 		}
 	}
 
@@ -462,6 +495,9 @@ namespace app
 				break;
 			case PauseState::SoundOption:
 				m_uiManager->RenderSoundOption(rc);
+				break;
+			case PauseState::Tutorial:
+				m_uiManager->RenderTutorial(rc);
 				break;
 			}
 			return;

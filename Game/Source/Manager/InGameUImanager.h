@@ -23,6 +23,7 @@ namespace app
 		class FinishMenu;
 		class PauseScreenMenu;
 		class SoundOptionMenu;
+		class TutorialMenu;
 		class SearchMenu;
 		class RemainingChildMenu;
 		class EnemySleepingMenu;
@@ -94,6 +95,12 @@ namespace app
 		 */
 		void RenderSoundOption(RenderContext& rc);
 
+		/**
+		 * @brief チュートリアル画面の描画
+		 * @param rc レンダーコンテキスト
+		 */
+		void RenderTutorial(RenderContext& rc);
+
 
 		//------------------------------------------------------------
 		// 外部から参照が必要なMenuのゲッター
@@ -107,6 +114,8 @@ namespace app
 		inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pauseMenu; }
 		/** @brief サウンドオプションMenuを取得 */
 		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionMenu; }
+		/** @brief チュートリアルMenuを取得 */
+		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
@@ -134,6 +143,7 @@ namespace app
 		ui::Layout* m_remainingChildLayout = nullptr;
 		ui::Layout* m_pauseLayout = nullptr;
 		ui::Layout* m_soundOptionLayout = nullptr;
+		ui::Layout* m_tutorialLayout = nullptr;
 		ui::Layout* m_enemySleepingLayout = nullptr;
 		ui::Layout* m_pbWakingUpTimerLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
@@ -148,6 +158,7 @@ namespace app
 		ui::RemainingChildMenu* m_remainingChildMenu = nullptr;
 		ui::PauseScreenMenu* m_pauseMenu = nullptr;
 		ui::SoundOptionMenu* m_soundOptionMenu = nullptr;
+		ui::TutorialMenu* m_tutorialMenu = nullptr;
 		ui::EnemySleepingMenu* m_enemySleepingMenu = nullptr;
 		ui::PBWakingUpTimerMenu* m_pbWakingUpTimerMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
