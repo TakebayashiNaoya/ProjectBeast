@@ -25,6 +25,7 @@
 #include "Source/Util/JsonConverter.h"
 
 #include "Source/Manager/BattleManager.h"
+#include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
@@ -77,6 +78,8 @@ namespace app
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
 
+		actor::IglooManager::DestroyInstance();
+
 		DeleteGO(m_skyCube);
 		DeleteGO(m_ocean);
 
@@ -109,6 +112,8 @@ namespace app
 		actor::StageSystem::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
 		actor::EnemyManager::CreateInstance();
+
+		actor::IglooManager::CreateInstance();
 
 		/** UIManager生成（Layoutの生成はDaddyPenguin生成後のInitializeで行う） */
 		m_uiManager = new InGameUIManager();

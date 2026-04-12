@@ -53,6 +53,17 @@ namespace app
 			}
 
 
+			// ★ 追加：イベント中かどうかを取得する関数
+			bool IsEnterIglooMode() const { return m_isEnterIglooMode; }
+
+
+			/**
+			 * @brief かまくらから出てくるイベントを開始する
+			 * @param exitPos 出てくる座標（青い円）
+			 */
+			void EndEnterIglooEvent(const Vector3& exitPos);
+
+
 		protected:
 			/**
 			 * @brief DaddyPenguinへの方向ベクトルを計算

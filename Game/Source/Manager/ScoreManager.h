@@ -21,7 +21,7 @@ namespace app
 		void SubCollectedCount()
 		{
 			m_collectedCount--;
-			m_totalCount--;
+			//m_totalCount--;
 		}
 
 		void SetTotalCount(int total) { m_totalCount = total; }

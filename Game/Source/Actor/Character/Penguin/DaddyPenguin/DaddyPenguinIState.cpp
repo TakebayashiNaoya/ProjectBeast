@@ -277,7 +277,27 @@ namespace app
 
 		void DaddyPenguinInsideIglooState::Update()
 		{
-			// ここでは特に処理は入れませんが、必要に応じてかまくらの中での演出などを追加してください。
+			if (g_pad[0]->IsTrigger(enButtonA))
+			{
+				// 1. 入り口の座標を再計算（入る時と同じ計算）
+				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+				Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+				Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+				iglooRot.Apply(forwardVec);
+
+				Vector3 exitPos = iglooPos + (forwardVec * 250.0f);
+				exitPos.y += 20.0f; // 親ペンギンの高さ
+
+				// 2. 親ペンギン自身を入り口にワープさせる
+				m_owner->SetPosition(exitPos);
+
+				// 3. マネージャー経由で、子ペンギン全員に「外に出ろ！」と命令する
+				ChildPenguinManager::GetInstance()->EndIglooEvent(exitPos);
+
+				// 4. 中にいるフラグを折る（これで次フレームから通常のIdle状態などに戻ります）
+				m_owner->SetIsInsideIgloo(false);
+			}
+			int A = 0;
 		}
 
 

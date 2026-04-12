@@ -203,7 +203,17 @@ namespace app
 		{
 			if (IsEqualCurrentState(DaddyPenguinInsideIglooState::ID()))
 			{
-				// TODO: ここに「外に出る」ボタンが押されたら nullptr を返して外に出る処理を後で追加します
+				// =========================================================
+				// ★ 修正：外に出た（フラグが折れた）場合はステートを抜ける！
+				// =========================================================
+				if (!GetIsInsideIgloo())
+				{
+					// nullptr を返すことで、この下の「歩き」や「待機(Idle)」の判定に進み、
+					// 自動的にステートが切り替わります！
+					return nullptr;
+				}
+
+				// まだ中にいるなら維持
 				return FindState(DaddyPenguinInsideIglooState::ID());
 			}
 

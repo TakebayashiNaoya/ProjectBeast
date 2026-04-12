@@ -243,12 +243,11 @@ namespace app
 				m_owner->SetIglooFixedPos(m_iglooTargetPos);
 				m_owner->SetInsideIgloo(true);
 
-				// ★ m_owner->SetPosition() を削除し、ステートマシン経由に変更
 				m_owner->GetCharacterController()->SetPosition(m_iglooTargetPos);
 
 				// マネージャーへの報告
-				IglooManager::GetInstance().AddPenguin(m_owner);
-				ChildPenguinManager::GetInstance()->FinishEnterIglooOne();
+				//IglooManager::GetInstance().AddPenguin(m_owner);
+				//ChildPenguinManager::GetInstance()->FinishEnterIglooOne();
 
 				// 隊列リストからの離脱（コメントアウトを外す）
 				if (m_isFollowing)
@@ -268,6 +267,24 @@ namespace app
 				}
 				m_stateMachine->SetActionInput(dirToTarget, true, false, false, false);
 			}
+		}
+
+
+		void ChildPenguinAIController::EndEnterIglooEvent(const Vector3& exitPos)
+		{
+			// 1. 各種イベントフラグを解除（これで通常の追従AIに戻る）
+			m_isEnterIglooMode = false;
+			m_isInsideIgloo = false;
+			m_owner->SetInsideIgloo(false);
+
+			// 2. 出現座標を少しばらけさせる
+			Vector3 spawnPos = exitPos;
+			spawnPos.x += (float)(std::rand() % 60) - 30.0f;
+			spawnPos.z += (float)(std::rand() % 60) - 30.0f;
+
+			// 3. キャラクターコントローラーとステートマシン両方をワープ！
+			m_owner->GetCharacterController()->SetPosition(spawnPos);
+			m_stateMachine->SetPosition(spawnPos);
 		}
 
 

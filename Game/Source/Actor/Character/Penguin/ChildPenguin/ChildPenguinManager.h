@@ -296,6 +296,8 @@ namespace app
 		public:
 			/** かまくらイベントを開始する */
 			void StartIglooEvent(const Vector3& interactPos);
+			// ★ 追加：かまくらイベントを終了して外に出る
+			void EndIglooEvent(const Vector3& exitPos);
 			/** 子ペンギンが1匹かまくらに入り終わった時の報告を受け取る */
 			void FinishEnterIglooOne();
 			/** 全員がかまくらに入り終わったか確認する */

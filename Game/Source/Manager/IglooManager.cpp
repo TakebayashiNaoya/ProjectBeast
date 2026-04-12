@@ -12,6 +12,8 @@ namespace app
 {
 	namespace actor {
 
+		IglooManager* IglooManager::m_instance = nullptr;
+
 		void IglooManager::AddPenguin(ChildPenguin* penguin)
 		{
 			// 重複登録を防ぐ
