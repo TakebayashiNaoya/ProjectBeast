@@ -42,6 +42,29 @@ namespace app
 			float GetJoinDistance() const { return m_joinDistance; }
 
 
+			/**
+			 * @brief かまくらに入るイベントを開始する
+			 * @param targetPos 向かうべき入り口の座標（青い円）
+			 */
+			void StartEnterIglooEvent(const Vector3& targetPos)
+			{
+				m_iglooTargetPos = targetPos;
+				m_isEnterIglooMode = true;
+				m_isInsideIgloo = false;
+			}
+
+
+			// ★ 追加：イベント中かどうかを取得する関数
+			bool IsEnterIglooMode() const { return m_isEnterIglooMode; }
+
+
+			/**
+			 * @brief かまくらから出てくるイベントを開始する
+			 * @param exitPos 出てくる座標（青い円）
+			 */
+			void EndEnterIglooEvent(const Vector3& exitPos);
+
+
 		protected:
 			/**
 			 * @brief DaddyPenguinへの方向ベクトルを計算
@@ -100,6 +123,10 @@ namespace app
 			void BuildInputToTarget(const Vector3& targetPos);
 
 
+			/** かまくらイベントの更新処理 */
+			void UpdateIglooEvent();
+
+
 		protected:
 			/** 子ペンギンのポインタ */
 			ChildPenguin* m_owner;
@@ -120,6 +147,14 @@ namespace app
 			 * @details m_joinDistance より大きい値にすること。
 			 */
 			float m_giveUpDistance;
+
+
+			/** かまくらイベント中かどうか */
+			bool m_isEnterIglooMode = false;
+			/** すでにかまくらの中に入ったか */
+			bool m_isInsideIgloo = false;
+			/** かまくらの入り口（青い円）の目標座標 */
+			Vector3 m_iglooTargetPos = Vector3::Zero;
 
 
 		private:

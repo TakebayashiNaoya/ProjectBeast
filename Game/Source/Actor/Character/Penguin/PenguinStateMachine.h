@@ -46,6 +46,14 @@ namespace app
 			{
 				m_isSlide = isSlide;
 			}
+			/**
+			 * @brief 渦潮の中にいるかどうかを設定
+			 * @param isInWhirlpool 渦潮の中にいるかどうか
+			 */
+			inline void SetIsInWhirlpool(const bool isInWhirlpool)
+			{
+				m_isInWhirlpool = isInWhirlpool;
+			}
 
 
 			// ここに親ペンギン共通のゲッター関数を追加していく
@@ -85,6 +93,14 @@ namespace app
 			inline PenguinBase* GetOwnerPenguinBase() const
 			{
 				return m_ownerPenguinBase;
+			}
+			/**
+			 * @brief 渦潮の中にいるかどうかを取得
+			 * @return 渦潮の中にいるかどうか
+			 */
+			inline bool GetIsInWhirlpool() const
+			{
+				return m_isInWhirlpool;
 			}
 
 
@@ -176,6 +192,14 @@ namespace app
 			{
 				return IsInWater();
 			}
+			/**
+			 * @brief 渦潮の中にいるステートに切り替えられるかどうか
+			 * @return 渦潮の中にいるステートに切り替えられるかどうか
+			 */
+			bool CanChangeInWhirlpoolState() const
+			{
+				return m_isInWhirlpool;
+			}
 
 
 		public:
@@ -196,6 +220,8 @@ namespace app
 			bool m_isSlide;
 			/** 被弾したかどうか */
 			bool m_isDamaged;
+			/** 渦潮の中にいるかどうか */
+			bool m_isInWhirlpool;
 		};
 	}
 }
