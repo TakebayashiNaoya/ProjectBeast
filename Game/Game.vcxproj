@@ -286,6 +286,7 @@
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
+    <ClCompile Include="Source\Manager\IglooManager.cpp" />
     <ClCompile Include="Source\Manager\InGameUImanager.cpp" />
     <ClCompile Include="Source\Manager\ScoreManager.cpp" />
     <ClCompile Include="Source\Manager\TimeManager.cpp" />
@@ -303,6 +304,7 @@
     <ClCompile Include="Source\UI\EventMenu.cpp" />
     <ClCompile Include="Source\UI\HPBarMenu.cpp" />
     <ClCompile Include="Source\UI\FinishMenu.cpp" />
+    <ClCompile Include="Source\UI\IglooPromptMenu.cpp" />
     <ClCompile Include="Source\UI\InGameTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
@@ -388,6 +390,7 @@
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
+    <ClInclude Include="Source\Manager\IglooManager.h" />
     <ClInclude Include="Source\Manager\InGameUImanager.h" />
     <ClInclude Include="Source\Manager\ScoreManager.h" />
     <ClInclude Include="Source\Manager\TimeManager.h" />
@@ -407,6 +410,7 @@
     <ClInclude Include="Source\UI\EventMenu.h" />
     <ClInclude Include="Source\UI\HPBarMenu.h" />
     <ClInclude Include="Source\UI\FinishMenu.h" />
+    <ClInclude Include="Source\UI\IglooPromptMenu.h" />
     <ClInclude Include="Source\UI\InGameTimerMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />

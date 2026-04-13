@@ -112,5 +112,53 @@ namespace app
 			/** 演出用タイマー */
 			float m_timer = 0.0f;
 		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンのかまくらイベントステート
+		 */
+		class DaddyPenguinEnterIglooState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinEnterIglooState);
+		public:
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+		public:
+			DaddyPenguinEnterIglooState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinEnterIglooState() override = default;
+
+		private:
+			Vector3 m_entrancePos; // 入り口の座標
+			bool m_isArrivedEntrance; // 入り口に到着したか
+		};
+
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 親ペンギンのかまくら内待機ステート
+		 */
+		class DaddyPenguinInsideIglooState : public DaddyPenguinIState
+		{
+			appState(DaddyPenguinInsideIglooState);
+		public:
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+		public:
+			DaddyPenguinInsideIglooState(DaddyPenguinStateMachine* owner);
+			~DaddyPenguinInsideIglooState() override = default;
+		};
 	}
 }

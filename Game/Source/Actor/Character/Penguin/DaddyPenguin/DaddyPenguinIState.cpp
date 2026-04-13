@@ -11,6 +11,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
+#include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Camera/LoseCamera.h"
 #include "Source/Camera/WinCamera.h"
@@ -157,6 +158,155 @@ namespace app
 
 
 		DaddyPenguinLoseState::DaddyPenguinLoseState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinEnterIglooState::Enter()
+		{
+			// 1. かまくらの座標と回転を取得
+			Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+			Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+
+			// 2. 正面ベクトルを計算する
+			// まず基準となるZ軸方向（正面）のベクトルを作成します
+			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+
+			// iglooRot の Apply関数に forwardVec を渡して、かまくらの向きに回転させます
+			// ※この一行を実行すると、forwardVec の中身が自動的に書き換わります
+			iglooRot.Apply(forwardVec);
+
+			// 3. 入り口の座標を算出
+			float offsetDistance = 170.0f;
+			m_entrancePos = iglooPos + (forwardVec * offsetDistance);
+			Vector3 insidePos = iglooPos; // かまくらの中心座標
+
+			// 4. 子ペンギンたちにイベント開始を通知
+			// ※事前に ChildPenguinManager に StartIglooEvent 関数を追加しておいてください
+			//ChildPenguinManager::GetInstance()->StartIglooEvent(m_entrancePos);
+
+			// 5. 親ペンギン自身の状態をセット
+			m_isArrivedEntrance = false;
+			m_owner->PlayAnimation(EnPenguinAnimationID::MoveWalk); // 歩きアニメ再生
+		}
+
+
+		void DaddyPenguinEnterIglooState::Update()
+		{
+			if (!m_isArrivedEntrance)
+			{
+				Vector3 myPos = m_owner->GetTransform().m_position;
+				Vector3 dir = m_entrancePos - myPos;
+				dir.y = 0.0f; // 高さは無視
+
+				if (dir.Length() < 5.0f)
+				{
+					// 入り口に到着した！
+					m_isArrivedEntrance = true;
+					m_owner->SetMoveSpeed(0.0f);
+					m_owner->SetMoveDirection(Vector3::Zero);
+
+					// =========================================================
+					// ★ ワープ処理とフラグ切り替え
+					// =========================================================
+					Vector3 insidePos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+
+					// ※めり込んだり、空中に浮いたりする場合は insidePos.y を微調整してください
+					insidePos.y += 20.0f;
+
+					// ワープ実行！（プロジェクトの仕様に合わせて SetPosition 関数などを呼び出してください）
+					// m_owner->GetDaddyPenguin()->SetPosition(insidePos); // ← アクターの座標更新
+					m_owner->SetPosition(insidePos);                       // ← ステートマシンの座標更新
+
+					// 「中にいるよ」フラグを立てて、次フレームで InsideIglooState に遷移させる
+					m_owner->SetIsInsideIgloo(true);
+
+					// ※子ペンギンを呼び寄せる処理は、次の InsideIglooState の Enter() で行います
+				}
+				else
+				{
+					// 入り口に向かって歩く処理
+					dir.Normalize();
+					m_owner->SetMoveDirection(dir);
+					m_owner->SetMoveSpeed(m_owner->GetPenguinStatus()->GetSneakSpeed());
+					m_owner->Move();
+				}
+			}
+		}
+
+
+		void DaddyPenguinEnterIglooState::Exit()
+		{}
+
+
+		DaddyPenguinEnterIglooState::DaddyPenguinEnterIglooState(DaddyPenguinStateMachine* owner)
+			: DaddyPenguinIState(owner)
+			, m_entrancePos(Vector3::Zero)
+			, m_isArrivedEntrance(false)
+		{}
+
+
+
+
+		/************************************/
+
+
+		void DaddyPenguinInsideIglooState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::IdleStanding);
+
+			Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+			Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+			iglooRot.Apply(forwardVec);
+
+			// コントローラーと同じ距離（青い円の中心）
+			Vector3 interactPos = iglooPos + (forwardVec * 150.0f);
+
+			// =========================================================
+			// ★ ここで「引数1つ」で呼ぶのが大正解です！
+			ChildPenguinManager::GetInstance()->StartIglooEvent(interactPos);
+			// =========================================================
+		}
+
+
+		void DaddyPenguinInsideIglooState::Update()
+		{
+			if (g_pad[0]->IsTrigger(enButtonA))
+			{
+				// 1. 入り口の座標を再計算（入る時と同じ計算）
+				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+				Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+				Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+				iglooRot.Apply(forwardVec);
+
+				Vector3 exitPos = iglooPos + (forwardVec * 200.0f);
+				exitPos.y += 20.0f; // 親ペンギンの高さ
+
+				// 2. 親ペンギン自身を入り口にワープさせる
+				m_owner->SetPosition(exitPos);
+
+				// 3. マネージャー経由で、子ペンギン全員に「外に出ろ！」と命令する
+				ChildPenguinManager::GetInstance()->EndIglooEvent(exitPos);
+
+				// 4. 中にいるフラグを折る（これで次フレームから通常のIdle状態などに戻ります）
+				m_owner->SetIsInsideIgloo(false);
+			}
+		}
+
+
+		void DaddyPenguinInsideIglooState::Exit()
+		{
+			m_owner->SetIsInsideIgloo(false);
+		}
+
+
+		DaddyPenguinInsideIglooState::DaddyPenguinInsideIglooState(DaddyPenguinStateMachine* owner)
 			: DaddyPenguinIState(owner)
 		{}
 	}

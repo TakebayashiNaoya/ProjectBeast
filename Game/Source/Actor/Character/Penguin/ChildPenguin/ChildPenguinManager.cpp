@@ -4,14 +4,16 @@
  * @author 立山、竹林
  */
 #include "stdafx.h"
-#include <random>
 #include "ChildPenguin.h"
+#include "ChildPenguinAIController.h"
 #include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Manager/IglooManager.h"
+#include <random>
 
 
 namespace app
@@ -360,6 +362,53 @@ namespace app
 		}
 
 
+		void ChildPenguinManager::StartIglooEvent(const Vector3& interactPos)
+		{
+			// イベント開始時に、連れ歩いている子ペンギンの数をカウントにセットする
+			m_iglooEnteringCount = static_cast<int>(m_followers.size());
+
+			// 全員に「入り口へ向かえ！」と命令を出す
+			for (auto* child : m_followers)
+			{
+				if (child && child->GetAIController())
+				{
+					child->GetAIController()->StartEnterIglooEvent(interactPos);
+				}
+			}
+		}
+
+
+		void ChildPenguinManager::FinishEnterIglooOne()
+		{
+			// 報告を受けるたびにカウントを1減らす
+			m_iglooEnteringCount--;
+		}
+
+
+		bool ChildPenguinManager::IsIglooEventFinished() const
+		{
+			// カウントが0以下になったら全員入り終わったと判定
+			return m_iglooEnteringCount <= 0;
+		}
+
+
+		void ChildPenguinManager::EndIglooEvent(const Vector3& exitPos)
+		{
+			// 全ての子ペンギンをチェックし、イベントに参加している子全員をリセットする
+			for (auto* child : m_childPenguinList)
+			{
+				if (child && child->GetAIController())
+				{
+					// ★ 修正：中に入っているかではなく「イベント命令を受けているか」で判定！
+					// これで、まだ歩いている途中の子も全員キャンセルされて外にワープします！
+					if (child->GetAIController()->IsEnterIglooMode())
+					{
+						child->GetAIController()->EndEnterIglooEvent(exitPos);
+					}
+				}
+			}
+      
+      
 		//============================================//
 		// サウンド：近傍ペンギンの可聴管理
 		//============================================//
