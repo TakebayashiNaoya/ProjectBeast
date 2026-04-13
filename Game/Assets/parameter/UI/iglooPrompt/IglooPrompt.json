@@ -1,0 +1,28 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"IglooPromptIconA",
+                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/Whiteback_Button_A.DDS",
+                "width":80,
+                "height":80,
+                "position":[0,-10,0],
+                "scale":[2,2,2],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"IglooEnterText",
+                "asset":"Assets/spriteData/UI/TextSprite/IglooEnterText.DDS",
+                "width":60,
+                "height":60,
+                "position":[0,-10,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            }
+        ]
+    }
+}

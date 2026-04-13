@@ -119,7 +119,7 @@ namespace app
 			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
 			iglooRot.Apply(forwardVec);
 
-			float interactAreaOffset = 150.0f;
+			float interactAreaOffset = 220.0f;
 			Vector3 interactPos = iglooPos + (forwardVec * interactAreaOffset);
 
 			Vector3 myPos = m_owner->GetTransform().m_position;
@@ -127,7 +127,7 @@ namespace app
 			Vector3 diff = myPos - interactPos;
 			diff.y = 0.0f;
 
-			float interactRadius = 100.0f;
+			float interactRadius = 80.0f;
 			bool isNearIgloo = (diff.Length() <= interactRadius);
 
 			// Aボタンプロンプトの表示・非表示を更新
