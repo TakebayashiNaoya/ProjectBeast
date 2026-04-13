@@ -365,7 +365,12 @@ namespace app
 			/** FINISH UI 更新 */
 			m_uiManager->UpdateFinishing();
 
-			SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
+			/** ホイッスルは演出開始時に1回だけ鳴らす */
+			if (!m_isWhistlePlayed)
+			{
+				SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
+				m_isWhistlePlayed = true;
+			}
 
 			/** 演出終了 → リザルトへ */
 			auto* finishMenu = m_uiManager->GetFinishMenu();
@@ -386,6 +391,13 @@ namespace app
 
 	void InGameScene::PauseUpdate()
 	{
+		/** ポーズ開始フレームに1回だけ全SEを停止する */
+		if (!m_isPauseEntered)
+		{
+			SoundManager::Get().StopAllSE();
+			m_isPauseEntered = true;
+		}
+
 		switch (m_pauseState)
 		{
 			//------------------------------------------------------------
@@ -404,6 +416,8 @@ namespace app
 			{
 				pauseMenu->IsRetry(false);
 				SceneManager::GetInstance()->SetPause(false);
+				/** ポーズ解除時にフラグをリセットする */
+				m_isPauseEntered = false;
 			}
 			/** サウンドオプションへ */
 			else if (pauseMenu->IsSound())
@@ -428,6 +442,8 @@ namespace app
 			{
 				pauseMenu->IsGoTitle(false);
 				SceneManager::GetInstance()->SetPause(false);
+				/** ポーズ解除時にフラグをリセットする */
+				m_isPauseEntered = false;
 				m_goTitle = true;
 			}
 			break;
@@ -487,7 +503,6 @@ namespace app
 		/** ポーズ中の描画 */
 		if (SceneManager::GetInstance()->IsPause())
 		{
-			SoundManager::Get().StopAllSE();
 			switch (m_pauseState)
 			{
 			case PauseState::Pause:

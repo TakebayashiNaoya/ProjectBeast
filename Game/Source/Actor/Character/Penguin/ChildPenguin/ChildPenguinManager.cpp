@@ -66,6 +66,9 @@ namespace app
 				SortAndAssignFollowers();
 			}
 
+			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */
+			UpdateAudiblePenguins();
+
 			/** 削除待ちのペンギンを安全に破棄する (遅延削除) */
 			for (auto* deadPenguin : m_destroyList)
 			{
@@ -219,6 +222,9 @@ namespace app
 			m_roamingPenguins.erase(penguin);
 			m_assignedTargets.erase(penguin);
 
+			/** 可聴セットからも取り除く */
+			m_audiblePenguins.erase(penguin);
+
 			/** 即座に m_childPenguinList から erase したり delete したりせず、 */
 			/** 削除予定リストに登録するだけに留める */
 			auto it = std::find(m_destroyList.begin(), m_destroyList.end(), penguin);
@@ -354,6 +360,52 @@ namespace app
 		}
 
 
+		//============================================//
+		// サウンド：近傍ペンギンの可聴管理
+		//============================================//
+
+		void ChildPenguinManager::UpdateAudiblePenguins()
+		{
+			m_audiblePenguins.clear();
+
+			/** DaddyPenguinがいなければ全員不可聴にして終わる */
+			if (m_daddyPenguin == nullptr) return;
+
+			const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
+
+			/** 有効な子ペンギンを距離付きで収集する */
+			std::vector<std::pair<float, ChildPenguin*>> distList;
+			distList.reserve(m_childPenguinList.size());
+
+			for (auto* cp : m_childPenguinList)
+			{
+				if (!cp) continue;
+
+				Vector3 diff = cp->GetTransform().m_position - daddyPos;
+				diff.y = 0.0f;
+				const float distSq = diff.LengthSq();
+				distList.emplace_back(distSq, cp);
+			}
+
+			/** 距離の昇順でソートし、上位 AUDIBLE_PENGUIN_NUM 匹を可聴対象に登録する */
+			std::sort(distList.begin(), distList.end(),
+				[](const std::pair<float, ChildPenguin*>& a, const std::pair<float, ChildPenguin*>& b)
+				{
+					return a.first < b.first;
+				});
+
+			const int audibleCount = min(static_cast<int>(distList.size()), AUDIBLE_PENGUIN_NUM);
+			for (int i = 0; i < audibleCount; ++i)
+			{
+				m_audiblePenguins.insert(distList[i].second);
+			}
+		}
+
+
+		bool ChildPenguinManager::IsAudible(const ChildPenguin* penguin) const
+		{
+			return m_audiblePenguins.count(const_cast<ChildPenguin*>(penguin)) > 0;
+		}
 
 
 		//============================================//
