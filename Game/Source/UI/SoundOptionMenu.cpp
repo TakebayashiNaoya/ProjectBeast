@@ -48,7 +48,7 @@ namespace app
 
 
 			/** 音量の初期値 */
-			constexpr float INITIALIZE_VOLUME_VALUE = 1.0f;
+			constexpr float INITIALIZE_VOLUME_VALUE = 0.5f;
 			/** 音量の最小値 */
 			constexpr float MIN_VOLUME_VALUE = 0.0f;
 			/** 音量の最大値 */
@@ -68,22 +68,56 @@ namespace app
 
 			///** ポジションの最大から最小までの値 */
 			//constexpr float POSITION_VALUE_WIDHT = RIGHT_LIMITE_POSITION_VALUE - LEFT_LIMITE_POSITION_VALUE;
+
+
+			/**
+			 * @brief タイプに対応する SoundManager の現在音量を取得する
+			 * @param type 音量タイプ
+			 * @return 現在の音量（0.0f 〜 1.0f）
+			 */
+			float GetCurrentVolumeFromManager(SoundType type)
+			{
+				const auto& sound = SoundManager::Get();
+				switch (type)
+				{
+				case SoundType::Master: return sound.GetMasterVolume();
+				case SoundType::Voice:  return sound.GetVoiceVolume();
+				case SoundType::SE:     return sound.GetSEVolume();
+				case SoundType::BGM:    return sound.GetBGMVolume();
+				default:
+					K2_ASSERT(false, "無効なタイプです。");
+					return INITIALIZE_VOLUME_VALUE;
+				}
+			}
+
+
+			/**
+			 * @brief 音量（0.0f 〜 1.0f）をノブの X 座標に変換する
+			 * @param volume 音量
+			 * @return ノブの X 座標
+			 */
+			float VolumeToKnobPosX(float volume)
+			{
+				/** スライダーの全幅に対する音量の比率でノブ位置を逆算する */
+				const float range = RIGHT_LIMITE_POSITION_VALUE - LEFT_LIMITE_POSITION_VALUE;
+				return LEFT_LIMITE_POSITION_VALUE + range * volume;
+			}
 		}
 
 
 		SoundIcon::SoundIcon(SoundType type)
-			: m_currentValue(INITIALIZE_VOLUME_VALUE)
-			, m_deltaValue(DELTA_VOLUME_VALUE)
+			: m_deltaValue(DELTA_VOLUME_VALUE)
 			, m_icon(nullptr)
 			, m_type(type)
 			, m_gamePad(g_pad[0])
 		{
+			/** シーン遷移後も音量設定が維持されるよう、SoundManager の現在値で初期化する */
+			m_currentValue = GetCurrentVolumeFromManager(type);
 		}
 
 
 		SoundIcon::~SoundIcon()
-		{
-		}
+		{}
 
 
 		void SoundIcon::Update()
@@ -164,10 +198,10 @@ namespace app
 		{
 			m_icon = icon;
 			K2_ASSERT(m_icon != nullptr, "登録失敗！");
+
+			/** UIが設定されたタイミングで、現在の音量に合わせてノブ位置を初期化する */
+			m_icon->m_transform.m_localTransform.m_position.x = VolumeToKnobPosX(m_currentValue);
 		}
-
-
-
 
 
 		/********************************************************/
@@ -177,13 +211,11 @@ namespace app
 			: m_type(type)
 			, m_digit(nullptr)
 			, m_soundIcon(nullptr)
-		{
-		}
+		{}
 
 
 		SoundDigit::~SoundDigit()
-		{
-		}
+		{}
 
 
 		void SoundDigit::Update()
@@ -238,17 +270,13 @@ namespace app
 		}
 
 
-
-
-
 		/********************************************************/
 
 
 		SoundOptionMenu::SoundOptionMenu()
 			: m_currentSoundType(SoundType::Master)
 			, m_isBack(false)
-		{
-		}
+		{}
 
 
 		void SoundOptionMenu::Update()
@@ -274,21 +302,21 @@ namespace app
 				m_currentSoundType = static_cast<SoundType>((currentType + add) % SOUND_SIZE);
 			}
 
-			
+
 			const uint8_t type = static_cast<uint8_t>(m_currentSoundType);
 			const Key key = SOUND_ICON_KEYS[type].key;
 
-			const Key digitKey = SOUND_DIGIT_KEYS[type].key;
 			// アイコンマップの更新。
 			m_soundIconMap[key].get()->Update();
 
 			// 全てのdigitを更新。
 			for (int i = 0; i < SOUND_SIZE; i++)
 			{
-				// ディジットマップの更新。
-				m_soundDigitMap[digitKey].get()->Update();
+				// 各タイプのキーを取得して、それぞれのdigitを更新する。
+				const Key eachDigitKey = SOUND_DIGIT_KEYS[i].key;
+				m_soundDigitMap[eachDigitKey].get()->Update();
 			}
-			
+
 			// ここでキャンバスの更新が行われる
 			SoundClass::Update();
 		}
@@ -314,7 +342,7 @@ namespace app
 			{
 				// 新しいバーを作成
 				Icon newIcon = std::make_unique<SoundIcon>(info.type);
-				// UIパーツの設定
+				// UIパーツの設定（SetUIIcon内でノブ位置も現在値から初期化される）
 				newIcon->SetUIIcon(GetUI<UIIcon>(info.key));
 				// マップにアイコンを追加
 				m_soundIconMap.emplace(info.key, std::move(newIcon));

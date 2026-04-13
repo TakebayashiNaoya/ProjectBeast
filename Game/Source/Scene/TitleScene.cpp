@@ -9,6 +9,7 @@
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Layout.h"
 #include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/TutorialMenu.h"
 #include "TitleScene.h"
 #include "Source/UI/TitleEventMenu.h"
 
@@ -19,6 +20,8 @@ namespace app
 		:m_state(TitleState::Title)
 		, m_soundOption(nullptr)
 		, m_soundOptionLayout(nullptr)
+		, m_tutorialLayout(nullptr)
+		, m_tutorialMenu(nullptr)
 		, m_titleEventMenu(nullptr)
 		, m_titleLayout(nullptr)
 	{}
@@ -31,6 +34,7 @@ namespace app
 		nsBeastEngine::nsCollision::PhysicsWorld::Get().DisableDrawDebugWireFrame();
 #endif
 		delete m_soundOptionLayout;
+		delete m_tutorialLayout;
 		delete m_titleLayout;
 	}
 
@@ -45,14 +49,20 @@ namespace app
 
 
 		m_soundOptionLayout = new ui::Layout;
-
 		m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
 			"Assets/parameter/sound/SoundOption.json"
 		);
 		m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
-		
+
+		m_tutorialLayout = new ui::Layout;
+		m_tutorialLayout->Initialize<ui::TutorialMenu>(
+			"Assets/parameter/tutorial/Tutorial.json"
+		);
+		m_tutorialMenu = m_tutorialLayout->GetMenu<ui::TutorialMenu>();
+
 		m_titleLayout->Reload();
 		m_soundOptionLayout->Reload();
+		m_tutorialLayout->Reload();
 
 		SoundManager::Get().PlayBGM(enSoundKind_Title);
 
@@ -100,6 +110,16 @@ namespace app
 						m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
 					}
 				}
+				else if (selectKey == Hash32("RuleFrameBackIcon"))
+				{
+					// ルール画面。
+					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+					m_state = TitleState::Tutorial;
+					if (m_tutorialMenu)
+					{
+						m_tutorialMenu->SetClosed(false);
+					}
+				}
 				else if (selectKey == Hash32("EndFrameBackIcon"))
 				{
 					// タイトルに。
@@ -128,6 +148,23 @@ namespace app
 			}
 			break;
 		}
+
+		case TitleState::Tutorial:
+		{
+			if (m_tutorialLayout)
+			{
+				m_tutorialLayout->Update();
+			}
+
+			// TutorialMenu 内で Bボタンが押されたら閉じる。
+			if (m_tutorialMenu && m_tutorialMenu->IsClosed())
+			{
+				SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+				m_tutorialMenu->SetClosed(false);
+				m_state = TitleState::Title;
+			}
+			break;
+		}
 		}
 	}
 
@@ -149,6 +186,13 @@ namespace app
 			if (m_soundOptionLayout)
 			{
 				m_soundOptionLayout->Render(rc);
+			}
+		}
+		else if (m_state == TitleState::Tutorial)
+		{
+			if (m_tutorialLayout)
+			{
+				m_tutorialLayout->Render(rc);
 			}
 		}
 	}

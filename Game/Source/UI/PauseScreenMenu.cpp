@@ -33,24 +33,26 @@ namespace app
 
 			constexpr int PAUSE_SCREEN_ONE_VALUE = 1;
 			constexpr int PAUSE_SCREEN_MIN_VALUE = static_cast<int>(PauseScreenType::ReturnPlayType);
-            // 共通の要素数。
+			// 共通の要素数。
 			constexpr int PAUSE_SCREEN_ICON_SIZE = static_cast<int>(PauseScreenType::Max);
 			constexpr int PAUSE_SCREEN_BUTTON_SIZE = static_cast<int>(PauseScreenType::GoBackTitleType);
 			// nameとtypeの配列。UI側でkeyをもとにUIを取得するために必要。
 			constexpr PauseScreenInfo PAUSE_SCREEN_ICON_KEYS[PAUSE_SCREEN_ICON_SIZE] =
 			{
-					{ Hash32("PauseTitleIcon"), PauseScreenType::TitleType }
-				,	{ Hash32("PauseRetryIcon"), PauseScreenType::ReturnPlayType }
-				,	{ Hash32("PauseSoundOptionTextIcon"), PauseScreenType::SoundOptionType }
-				,	{ Hash32("PauseGoBackTileTextIcon"), PauseScreenType::GoBackTitleType }
+					{ Hash32("PauseTitleIcon"),              PauseScreenType::TitleType      }
+				,	{ Hash32("PauseRetryIcon"),              PauseScreenType::ReturnPlayType }
+				,	{ Hash32("PauseSoundOptionTextIcon"),    PauseScreenType::SoundOptionType}
+				,	{ Hash32("PauseRuleTextIcon"),           PauseScreenType::RuleType       }
+				,	{ Hash32("PauseGoBackTileTextIcon"),     PauseScreenType::GoBackTitleType}
 			};
 
 			// nameとtypeの配列。UI側でkeyをもとにUIを取得するために必要。
 			constexpr PauseScreenInfo PAUSE_SCREEN_BUTTON_KEYS[PAUSE_SCREEN_BUTTON_SIZE] =
 			{
-					{  Hash32("PauseOnePartsButton"), PauseScreenType::ReturnPlayType }
-				,	{  Hash32("PauseTwoPartsButton"), PauseScreenType::SoundOptionType }
-				,	{  Hash32("PauseThreePartsButton"), PauseScreenType::GoBackTitleType }
+					{ Hash32("PauseOnePartsButton"),   PauseScreenType::ReturnPlayType }
+				,	{ Hash32("PauseTwoPartsButton"),   PauseScreenType::SoundOptionType}
+				,	{ Hash32("PauseThreePartsButton"), PauseScreenType::RuleType       }
+				,	{ Hash32("PauseFourPartsButton"),  PauseScreenType::GoBackTitleType}
 			};
 		}
 
@@ -58,13 +60,11 @@ namespace app
 			: m_gamePad(g_pad[0])
 			, m_icon(nullptr)
 			, m_type(type)
-		{
-		}
+		{}
 
 
 		PauseScreenIcon::~PauseScreenIcon()
-		{
-		}
+		{}
 
 
 		void PauseScreenIcon::UpdateSelect(PauseScreenType currentType)
@@ -83,15 +83,12 @@ namespace app
 			}
 		}
 
-		
+
 		void PauseScreenIcon::SetUIIcon(UIIcon* icon)
 		{
 			m_icon = icon;
 			K2_ASSERT(m_icon != nullptr, "登録失敗です。");
 		}
-
-
-
 
 
 		/***************************************/
@@ -102,13 +99,11 @@ namespace app
 			, m_pauseIcon(nullptr)
 			, m_gamePad(g_pad[0])
 			, m_type(type)
-		{
-		}
+		{}
 
 
 		PauseScreenButton::~PauseScreenButton()
-		{
-		}
+		{}
 
 
 		void PauseScreenButton::UpdateSelect(PauseScreenType currentType)
@@ -128,7 +123,7 @@ namespace app
 		}
 
 
-		void PauseScreenButton::SetUIButton(UIButton * button)
+		void PauseScreenButton::SetUIButton(UIButton* button)
 		{
 			m_button = button;
 			K2_ASSERT(m_button != nullptr, "登録失敗です。");
@@ -142,9 +137,6 @@ namespace app
 		}
 
 
-
-
-
 		/***************************************/
 
 
@@ -154,8 +146,8 @@ namespace app
 			, m_isRetry(false)
 			, m_isGoTitle(false)
 			, m_isSound(false)
-		{
-		}
+			, m_isRule(false)
+		{}
 
 
 		void PauseScreenMenu::Update()
@@ -165,6 +157,9 @@ namespace app
 
 			// アイコンとボタンの更新処理。
 			UpdateSelect();
+
+			// 決定処理。
+			EnterType();
 
 			// キャンバスの更新処理。
 			PauseClass::Update();
@@ -183,7 +178,7 @@ namespace app
 				button.second->UpdateSelect(m_currentType);
 			}
 		}
-				
+
 
 		void PauseScreenMenu::MoveCursor()
 		{
@@ -211,6 +206,9 @@ namespace app
 				break;
 			case PauseScreenType::SoundOptionType:
 				m_isSound = true;
+				break;
+			case PauseScreenType::RuleType:
+				m_isRule = true;
 				break;
 			case PauseScreenType::GoBackTitleType:
 				m_isGoTitle = true;
@@ -270,7 +268,7 @@ namespace app
 				const Key pauseIconKey = PAUSE_SCREEN_ICON_KEYS[static_cast<int>(info.type)].key;
 				// アイコンの情報を持ってくる。
 				pauseButton->SetPauseIcon(m_pauseIconMap[pauseIconKey].get());
-				
+
 				// マップにボタンを追加。
 				m_pauseButtonMap.emplace(info.key, std::move(pauseButton));
 			}

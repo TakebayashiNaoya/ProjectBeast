@@ -8,6 +8,8 @@
 #include "PenguinIState.h"
 #include "PenguinStateMachine.h"
 #include "PenguinStatus.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Sound/SoundManager.h"
 
@@ -60,7 +62,16 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveWalk);
-			soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
+
+			soundHandle = static_cast<uint32_t>(-1);
+
+			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr
+				|| ChildPenguinManager::GetInstance()->IsAudible(child))
+			{
+				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
+			}
 		}
 
 
@@ -73,12 +84,34 @@ namespace app
 				m_owner->GetTransform().m_position,
 				app::EnNoiseType::Sneak
 			);
+
+			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr) return;
+
+			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
+			/** soundHandle が有効値かどうかだけで再生中を判定する */
+			/** （FindSE は PlaySE のリクエスト方式により Enter 直後は nullptr を返すため使用しない） */
+			const bool isPlaying = (soundHandle != static_cast<uint32_t>(-1));
+
+			if (isAudible && !isPlaying)
+			{
+				/** 可聴対象になったのでSEを開始する */
+				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
+			}
+			else if (!isAudible && isPlaying)
+			{
+				/** 可聴対象から外れたのでSEを停止する */
+				SoundManager::Get().StopSE(soundHandle);
+				soundHandle = static_cast<uint32_t>(-1);
+			}
 		}
 
 
 		void PenguinSneakState::Exit()
 		{
 			SoundManager::Get().StopSE(soundHandle);
+			soundHandle = static_cast<uint32_t>(-1);
 		}
 
 
@@ -97,7 +130,16 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetRunSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveRun);
-			soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
+
+			soundHandle = static_cast<uint32_t>(-1);
+
+			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr
+				|| ChildPenguinManager::GetInstance()->IsAudible(child))
+			{
+				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
+			}
 		}
 
 
@@ -110,12 +152,33 @@ namespace app
 				m_owner->GetTransform().m_position,
 				app::EnNoiseType::Dash
 			);
+
+			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr) return;
+
+			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
+			/** soundHandle が有効値かどうかだけで再生中を判定する */
+			const bool isPlaying = (soundHandle != static_cast<uint32_t>(-1));
+
+			if (isAudible && !isPlaying)
+			{
+				/** 可聴対象になったのでSEを開始する */
+				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
+			}
+			else if (!isAudible && isPlaying)
+			{
+				/** 可聴対象から外れたのでSEを停止する */
+				SoundManager::Get().StopSE(soundHandle);
+				soundHandle = static_cast<uint32_t>(-1);
+			}
 		}
 
 
 		void PenguinRunState::Exit()
 		{
 			SoundManager::Get().StopSE(soundHandle);
+			soundHandle = static_cast<uint32_t>(-1);
 		}
 
 
@@ -208,7 +271,16 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Sliding);
-			soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
+
+			soundHandle = static_cast<uint32_t>(-1);
+
+			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr
+				|| ChildPenguinManager::GetInstance()->IsAudible(child))
+			{
+				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
+			}
 		}
 
 
@@ -221,12 +293,33 @@ namespace app
 				m_owner->GetTransform().m_position,
 				app::EnNoiseType::Slide
 			);
+
+			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr) return;
+
+			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
+			/** soundHandle が有効値かどうかだけで再生中を判定する */
+			const bool isPlaying = (soundHandle != static_cast<uint32_t>(-1));
+
+			if (isAudible && !isPlaying)
+			{
+				/** 可聴対象になったのでSEを開始する */
+				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
+			}
+			else if (!isAudible && isPlaying)
+			{
+				/** 可聴対象から外れたのでSEを停止する */
+				SoundManager::Get().StopSE(soundHandle);
+				soundHandle = static_cast<uint32_t>(-1);
+			}
 		}
 
 
 		void PenguinSlidingState::Exit()
 		{
 			SoundManager::Get().StopSE(soundHandle);
+			soundHandle = static_cast<uint32_t>(-1);
 		}
 
 
