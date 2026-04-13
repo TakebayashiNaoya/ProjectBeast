@@ -340,6 +340,9 @@
     <ClCompile Include="Source\UI\TutorialMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\WhirlpoolPowerSystem.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -609,7 +612,7 @@
     <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h">
       <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Stage\Types.h">
+    <ClInclude Include="Source\Actor\Stage\WhirlpoolPowerSystem.h">
       <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\TutorialMenu.h">

@@ -36,6 +36,7 @@ namespace app
 			AddState<PenguinDamagedState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDiyingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDeadState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinInWhirlpoolState>(static_cast<PenguinStateMachine*>(this));
 
 			// Daddy固有のステートの追加
 			AddState<DaddyPenguinCommandShoutState>(this);
@@ -119,12 +120,21 @@ namespace app
 				return FindState(PenguinDamagedState::ID());
 			}
 
-			/** 4. Swim中は「水面より完全に出た（IsInWater() == false）」かつ「地面にいる（IsOnGround() == true）」
+			/** 4. 渦潮の中にいるなら渦潮の中ステートへ */
+			if (CanChangeInWhirlpoolState())
+			{
+				return FindState(PenguinInWhirlpoolState::ID());
+			}
+
+
+			/** 5. Swim中は「水面より完全に出た（IsInWater() == false）」かつ「地面にいる（IsOnGround() == true）」
 					の両方を満たすまで維持する。
 					これにより、波の下に陸がある波打ち際でのチャタリングを防ぐ。
 					現在は泳いでおらず、泳げる状態なら泳ぎステートを返す */
 			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
+				if (CanChangeInWhirlpoolState()) return FindState(PenguinInWhirlpoolState::ID());
+
 				if (IsInWater() || !IsOnGround()) return FindState(PenguinSwimmingState::ID());
 			}
 			else if (CanChangeSwimState())

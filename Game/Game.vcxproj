@@ -270,6 +270,7 @@
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
     <ClCompile Include="Source\Actor\Stage\Whirlpool.cpp" />
     <ClCompile Include="Source\Actor\Stage\WhirlpoolManager.cpp" />
+    <ClCompile Include="Source\Actor\Stage\WhirlpoolPowerSystem.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera\CameraCommon.cpp" />
     <ClCompile Include="Source\Camera\CameraController.cpp" />
@@ -370,9 +371,9 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
-    <ClInclude Include="Source\Actor\Stage\Types.h" />
     <ClInclude Include="Source\Actor\Stage\Whirlpool.h" />
     <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h" />
+    <ClInclude Include="Source\Actor\Stage\WhirlpoolPowerSystem.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera\CameraCommon.h" />
     <ClInclude Include="Source\Camera\CameraController.h" />
