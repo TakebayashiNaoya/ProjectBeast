@@ -86,7 +86,9 @@ namespace app
 			if (nsBeastEngine::ResourceManager::GetInstance().IsIdle() &&
 				m_currentScene->IsLoaded())
 			{
-				//core::Fade::Get().HideLoadingCircle();
+				// ローディングサークルをフェードイン開始前に非表示にする
+				// FadingIn 中は m_state == FadeIn のため背景は描画され続け黒画面にならない
+				core::Fade::Get().HideLoadingCircle();
 				core::Fade::Get().FadeIn(m_fadeDuration);
 				m_transitionState = TransitionState::FadingIn;
 			}
@@ -98,7 +100,6 @@ namespace app
 			m_currentScene->Update();
 			if (!core::Fade::Get().IsFading())
 			{
-				core::Fade::Get().HideLoadingCircle();
 				m_fadeDuration = 0.0f;
 				m_transitionState = TransitionState::Idle;
 			}

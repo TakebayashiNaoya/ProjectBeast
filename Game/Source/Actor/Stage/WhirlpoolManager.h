@@ -80,6 +80,7 @@ namespace app
 			static void DestroyInstance()
 			{
 				delete m_instance;
+				m_instance = nullptr;
 			}
 
 
@@ -89,4 +90,3 @@ namespace app
 		};
 	}
 }
-
