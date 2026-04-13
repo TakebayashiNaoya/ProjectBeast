@@ -94,7 +94,7 @@ namespace app
 		//------------------------------------------------------------
 		// ポーズ
 		//------------------------------------------------------------
-		enum class PauseState { Pause, SoundOption };
+		enum class PauseState { Pause, SoundOption, Tutorial };
 		PauseState m_pauseState = PauseState::Pause;
 
 		//------------------------------------------------------------
