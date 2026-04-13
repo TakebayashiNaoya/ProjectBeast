@@ -4,6 +4,7 @@
       {
         "objectName" : "bearHome_1",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
         "position" : [1970, 97, -159],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
@@ -11,6 +12,7 @@
       {
         "objectName" : "bearHome_2",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
         "position" : [-116, 47, 1690],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
@@ -18,6 +20,7 @@
       {
         "objectName" : "bearHome_3",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
         "position" : [-1358, 237, -1223],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
@@ -32,6 +35,7 @@
       {
         "objectName" : "iceWall",
         "fileName" : "Assets/modelData/stage/Wall/iceWall.tkm",
+        "isNeedCollision" : true,
         "position" : [0, -1800, 0],
         "rotationDeg" : [0, 0, 0],
         "scale" : [0.3, 0.3, 0.3]
@@ -39,6 +43,7 @@
       {
         "objectName" : "Ground01",
         "fileName" : "Assets/modelData/stage/SnowyGround/SnowyGround.tkm",
+        "isNeedCollision" : true,
         "position" : [-100, 0, 1900],
         "rotationDeg" : [0, 160, 0],
         "scale" : [4, 4, 4]
@@ -46,6 +51,7 @@
       {
         "objectName" : "Ground02",
         "fileName" : "Assets/modelData/Stage/SnowEmbankment/SnowEmbankment.tkm",
+        "isNeedCollision" : true,
         "position" : [0, 0, 0],
         "rotationDeg" : [0, -10, 0],
         "scale" : [4, 4, 6]
@@ -53,6 +59,7 @@
       {
         "objectName" : "Ground03",
         "fileName" : "Assets/modelData/Stage/RockySnowPile_1/RockySnowPile_1.tkm",
+        "isNeedCollision" : true,
         "position" : [2000, 0, 0],
         "rotationDeg" : [0, 100, 0],
         "scale" : [4, 4, 4]
@@ -60,6 +67,7 @@
       {
         "objectName" : "Ground04",
         "fileName" : "Assets/modelData/stage/RockySnowPile_2/RockySnowPile_2.tkm",
+        "isNeedCollision" : true,
         "position" : [500, 0, -1500],
         "rotationDeg" : [0, 0, 0],
         "scale" : [4, 4, 4]
@@ -67,6 +75,7 @@
       {
         "objectName" : "Ground05",
         "fileName" : "Assets/modelData/stage/RockySnowPile_2/RockySnowPile_2.tkm",
+        "isNeedCollision" : true,
         "position" : [1400, 0, -1300],
          "rotationDeg" : [0, 70, 0],
         "scale" : [4, 4, 4]
@@ -74,6 +83,7 @@
       {
         "objectName" : "Ground06",
         "fileName" : "Assets/modelData/stage/SnowPile/SnowPile.tkm",
+        "isNeedCollision" : true,
         "position" : [-1400, 20, -1300],
         "rotationDeg" : [0, 40,  0],
         "scale" : [4, 4, 4]
@@ -81,6 +91,7 @@
       {
         "objectName" : "Ground07",
         "fileName" : "Assets/modelData/stage/SnowPile/SnowPile.tkm",
+        "isNeedCollision" : true,
         "position" : [2000, 0, 1500],
         "rotationDeg" : [0, 0, 0],
         "scale" : [4, 4, 4]
@@ -88,6 +99,7 @@
       {
         "objectName" : "Ground08",
         "fileName" : "Assets/modelData/stage/SnowHill/SnowHill.tkm",
+        "isNeedCollision" : true,
         "position" : [-2510, 0, 10],
         "rotationDeg" : [0, -30, 0],
         "scale" : [2, 2, 2]
@@ -95,9 +107,42 @@
       {
         "objectName" : "Ground9",
         "fileName" : "Assets/modelData/stage/HugeSnowHill/HugeSnowHill.tkm",
+        "isNeedCollision" : true,
         "position" : [-400, 0, -2300],
         "rotationDeg" : [0, 90, 0],
         "scale" : [2, 2, 2]
+      },
+      {
+        "objectName" : "whirlpool1",
+        "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
+        "isNeedCollision" : false,
+        "position" : [1000, 50, 1000],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [0.0001, 0.0001, 0.0001]
+      },
+      {
+        "objectName" : "whirlpool2",
+        "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
+        "isNeedCollision" : false,
+        "position" : [-1000, 50, 1000],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [0.0001, 0.0001, 0.0001]
+      },
+      {
+        "objectName" : "whirlpool3",
+        "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
+        "isNeedCollision" : false,
+        "position" : [1000, 50, -1000],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [0.0001, 0.0001, 0.0001]
+      },
+      {
+        "objectName" : "whirlpool4",
+        "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
+        "isNeedCollision" : false,
+        "position" : [-1000, 50, -1000],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [0.0001, 0.0001, 0.0001]
       }
     ]
   }

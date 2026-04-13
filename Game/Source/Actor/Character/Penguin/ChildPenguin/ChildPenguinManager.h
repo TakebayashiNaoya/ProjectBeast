@@ -4,6 +4,7 @@
  * @author 立山、竹林
  */
 #pragma once
+#include <unordered_set>
 #include "ChildPenguinTypes.h"
 
 
@@ -117,7 +118,7 @@ namespace app
 
 		private:
 			/** 子ペンギンのリスト */
-			std::vector<actor::ChildPenguin*>m_childPenguinList;
+			std::vector<actor::ChildPenguin*> m_childPenguinList;
 			/** 削除待ちのペンギンを入れるリスト */
 			std::vector<ChildPenguin*> m_destroyList;
 
@@ -133,6 +134,7 @@ namespace app
 			 * @brief 親ペンギンの現在座標を取得する
 			 */
 			Vector3 GetDaddyPosition() const;
+
 			/**
 			 * @brief 親ペンギンを設定（GameSceneなどで呼び出す）
 			 * @param daddy 親ペンギンのポインタ
@@ -191,9 +193,9 @@ namespace app
 			std::vector<Vector3> m_formationPositions;
 
 			/** 陣形調整用のパラメータ */
-			const int MAX_FORMATION_COUNT = 100;		/** 隊列の最大数 */
-			const float FORMATION_BASE_RADIUS = 30.0f;  /** 一番内側の円の半径 */
-			const float FORMATION_RADIUS_STEP = 20.0f;  /** 円が外側になるごとの増加量 */
+			const int   MAX_FORMATION_COUNT = 100;   /** 隊列の最大数 */
+			const float FORMATION_BASE_RADIUS = 0.0f;  /** 一番内側の円の半径 */
+			const float FORMATION_RADIUS_STEP = 20.0f; /** 円が外側になるごとの増加量 */
 			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
 
 
@@ -256,6 +258,159 @@ namespace app
 
 
 			//============================================//
+			// サウンド：近傍ペンギンの可聴管理
+			//============================================//
+
+		public:
+			/**
+			 * @brief 指定した子ペンギンが可聴対象かどうかを返す
+			 * @details DaddyPenguinに近い上位 AUDIBLE_PENGUIN_NUM 匹のみ true を返す
+			 * @param penguin 確認する子ペンギン
+			 * @return 可聴対象なら true
+			 */
+			bool IsAudible(const ChildPenguin* penguin) const;
+
+
+		private:
+			/**
+			 * @brief 毎フレーム呼び出し、DaddyPenguinに近い順で
+			 *        上位 AUDIBLE_PENGUIN_NUM 匹を m_audiblePenguins に格納する
+			 */
+			void UpdateAudiblePenguins();
+
+			/** DaddyPenguinに近い順の上位 N 匹（可聴対象） */
+			std::unordered_set<ChildPenguin*> m_audiblePenguins;
+
+			/** 可聴対象とする子ペンギンの最大数 */
+			static constexpr int AUDIBLE_PENGUIN_NUM = 5;
+
+
+
+
+			//============================================//
+			// 世話焼き用：問題行動ペンギンの状態管理
+			//============================================//
+
+		public:
+			/**
+			 * @brief 転倒・スリップ中のペンギンを登録する
+			 * @param penguin 登録するペンギン
+			 */
+			void RegisterDowning(ChildPenguin* penguin);
+
+			/**
+			 * @brief 転倒・スリップ中の登録を解除する
+			 * @param penguin 解除するペンギン
+			 */
+			void UnregisterDowning(ChildPenguin* penguin);
+
+			/**
+			 * @brief 転倒・スリップ中かどうかを取得する
+			 * @param penguin 確認するペンギン
+			 * @return 転倒・スリップ中ならtrue
+			 */
+			bool IsDowning(const ChildPenguin* penguin) const;
+
+			/**
+			 * @brief 待機命令中に追従しようとしている甘えん坊を登録する
+			 * @param penguin 登録するペンギン
+			 */
+			void RegisterAttempting(ChildPenguin* penguin);
+
+			/**
+			 * @brief 追従しようとしている甘えん坊の登録を解除する
+			 * @param penguin 解除するペンギン
+			 */
+			void UnregisterAttempting(ChildPenguin* penguin);
+
+			/**
+			 * @brief 待機命令中に追従しようとしているかどうかを取得する
+			 * @param penguin 確認するペンギン
+			 * @return 追従しようとしているならtrue
+			 */
+			bool IsAttempting(const ChildPenguin* penguin) const;
+
+			/**
+			 * @brief 徘徊中のやんちゃペンギンを登録する
+			 * @param penguin 登録するペンギン
+			 */
+			void RegisterRoaming(ChildPenguin* penguin);
+
+			/**
+			 * @brief 徘徊中のやんちゃペンギンの登録を解除する
+			 * @param penguin 解除するペンギン
+			 */
+			void UnregisterRoaming(ChildPenguin* penguin);
+
+			/**
+			 * @brief 徘徊中かどうかを取得する
+			 * @param penguin 確認するペンギン
+			 * @return 徘徊中ならtrue
+			 */
+			bool IsRoaming(const ChildPenguin* penguin) const;
+
+			/**
+			 * @brief 現在いずれかの世話焼きペンギンが担当しているペンギンの集合を取得する
+			 * @return 担当済みペンギンの集合
+			 */
+			const std::unordered_set<ChildPenguin*>& GetAssignedTargets() const
+			{
+				return m_assignedTargets;
+			}
+
+			/**
+			 * @brief 世話焼きペンギンの担当ペンギンを登録する
+			 * @param penguin 担当するペンギン
+			 */
+			void RegisterAssigned(ChildPenguin* penguin);
+
+			/**
+			 * @brief 世話焼きペンギンの担当ペンギンの登録を解除する
+			 * @param penguin 解除するペンギン
+			 */
+			void UnregisterAssigned(ChildPenguin* penguin);
+
+			/**
+			 * @brief 最も近い転倒・スリップ中のペンギンを取得する
+			 * @param from       基準座標（世話焼きペンギンの座標）
+			 * @param excludeSet 既に他の世話焼きが担当しているペンギンの集合
+			 * @param maxRange   探索する最大距離
+			 * @return 最も近いペンギン。いなければnullptr
+			 */
+			ChildPenguin* FindNearestDowning(
+				const Vector3& from,
+				const std::unordered_set<ChildPenguin*>& excludeSet,
+				float maxRange
+			) const;
+
+			/**
+			 * @brief 最も近い監視が必要なペンギン（甘えん坊・やんちゃ）を取得する
+			 * @param from       基準座標（世話焼きペンギンの座標）
+			 * @param excludeSet 既に他の世話焼きが担当しているペンギンの集合
+			 * @param maxRange   探索する最大距離
+			 * @return 最も近いペンギン。いなければnullptr
+			 */
+			ChildPenguin* FindNearestNeedingSupervision(
+				const Vector3& from,
+				const std::unordered_set<ChildPenguin*>& excludeSet,
+				float maxRange
+			) const;
+
+
+		private:
+			/** 転倒・スリップ中のペンギンの集合 */
+			std::unordered_set<ChildPenguin*> m_downingPenguins;
+			/** 待機命令中に追従しようとしている甘えん坊の集合 */
+			std::unordered_set<ChildPenguin*> m_attemptingPenguins;
+			/** 徘徊中のやんちゃペンギンの集合 */
+			std::unordered_set<ChildPenguin*> m_roamingPenguins;
+			/** いずれかの世話焼きが担当しているペンギンの集合 */
+			std::unordered_set<ChildPenguin*> m_assignedTargets;
+
+
+
+
+			//============================================//
 			// シングルトン関連
 			//============================================//
 
@@ -271,6 +426,7 @@ namespace app
 					m_instance = new ChildPenguinManager;
 				}
 			}
+
 			/**
 			 * @brief シングルトンインスタンスを取得
 			 * @return シングルトンインスタンスのポインタ
@@ -279,6 +435,7 @@ namespace app
 			{
 				return m_instance;
 			}
+
 			/**
 			 * @brief シングルトンインスタンスを削除
 			 * @brief GameSceneのデストラクタで呼び出す

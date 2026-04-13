@@ -58,6 +58,15 @@ namespace app
 
 #endif // APP_DEBUG
 			/**
+			 * @brief jsonからboolを読み込む
+			 * @param json 読み込むjsonファイル
+			 * @return 読み込んだbool
+			 */
+			static inline bool ToBool(const nlohmann::json& json)
+			{
+				return json.get<bool>();
+			}
+			/**
 			 * @brief jsonからintを読み込む
 			 * @param json 読み込むjsonファイル
 			 * @return 読み込んだint

@@ -33,7 +33,7 @@ namespace app
 			 * @brief AIコントローラーを取得
 			 * @return AIコントローラーのポインタ
 			 */
-			inline ChildPenguinAIController* GetAIController() const { return m_aiController.get(); }
+			inline ChildPenguinAIController* GetAIController()const { return m_aiController.get(); }
 			/**
 			 * @brief 子ペンギンのタイプを取得
 			 * @return 子ペンギンのタイプ

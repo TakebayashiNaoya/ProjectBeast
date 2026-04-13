@@ -78,6 +78,14 @@ namespace app
 			{
 				return m_isDamaged;
 			}
+			/**
+			 * @brief オーナーのペンギンベースを取得
+			 * @return オーナーのペンギンベースポインタ
+			 */
+			inline PenguinBase* GetOwnerPenguinBase() const
+			{
+				return m_ownerPenguinBase;
+			}
 
 
 			/** ステートの変更先を取得する */

@@ -16,25 +16,22 @@
                 "type":"UIIcon",
                 "name":"PentaktRogoIcon",
                 "asset":"Assets/spriteData/Scene/PENTAKT.dds",
-                "width":1200,
-                "height":650,
-                "position":[0,120,0],
+                "width":800,
+                "height":500,
+                "position":[0,50,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
             },
 
 
-
-
-
             {
                 "type":"UIIcon",
                 "name":"StartFrameIcon",
                 "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
-                "width":350,
+                "width":300,
                 "height":130,
-                "position":[ -420, -310, 0],
+                "position":[ -500, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -43,9 +40,9 @@
                 "type":"UIIcon",
                 "name":"StartFrameBackIcon",
                 "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
-                "width":324,
+                "width":280,
                 "height":101,
-                "position":[ -420, -309, 0],
+                "position":[ -500, -309, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
@@ -54,23 +51,22 @@
                 "type":"UIIcon",
                 "name":"StartIcon",
                 "asset":"Assets/spriteData/UI/TextSprite/Title/StartTextIcon.dds",
-                "width":270,
+                "width":240,
                 "height":65,
-                "position":[ -420, -310, 0],
+                "position":[ -500, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
             },
-            
 
 
             {
                 "type":"UIIcon",
                 "name":"OptionFrameIcon",
                 "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
-                "width":350,
+                "width":300,
                 "height":130,
-                "position":[ 0, -310, 0],
+                "position":[ -175, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -79,35 +75,68 @@
                 "type":"UIIcon",
                 "name":"OptionFrameBackIcon",
                 "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
-                "width":324,
+                "width":280,
                 "height":101,
-                "position":[ 0, -309, 0],
+                "position":[ -175, -309, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
             },
             {
                 "type":"UIIcon",
-                "name":"OptionIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/OptionTextIcon.dds",
-                "width":300,
+                "name":"SoundIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/SoundTextIcon.dds",
+                "width":240,
                 "height":65,
-                "position":[ 0, -310, 0],
+                "position":[ -175, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
             },
-            
 
+
+            {
+                "type":"UIIcon",
+                "name":"RuleFrameIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
+                "width":300,
+                "height":130,
+                "position":[ 175, -310, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"RuleFrameBackIcon",
+                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
+                "width":280,
+                "height":101,
+                "position":[ 175, -309, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 120]
+            },
+            {
+                "type":"UIIcon",
+                "name":"RuleIcon",
+                "asset":"Assets/spriteData/UI/TextSprite/Title/RuleTextIcon.dds",
+                "width":180,
+                "height":65,
+                "position":[ 175, -310, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
 
 
             {
                 "type":"UIIcon",
                 "name":"EndFrameIcon",
                 "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
-                "width":350,
+                "width":300,
                 "height":130,
-                "position":[ 420, -310, 0],
+                "position":[ 500, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -116,9 +145,9 @@
                 "type":"UIIcon",
                 "name":"EndFrameBackIcon",
                 "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
-                "width":324,
+                "width":280,
                 "height":101,
-                "position":[ 420, -309, 0],
+                "position":[ 500, -309, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
@@ -127,9 +156,9 @@
                 "type":"UIIcon",
                 "name":"EndIcon",
                 "asset":"Assets/spriteData/UI/TextSprite/Title/EndTextIcon.dds",
-                "width":250,
-                "height":50,
-                "position":[ 420, -310, 0],
+                "width":180,
+                "height":65,
+                "position":[ 500, -310, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]

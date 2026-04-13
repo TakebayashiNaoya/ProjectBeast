@@ -252,6 +252,8 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinParameter.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.cpp" />
@@ -266,6 +268,8 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\Stage\IStage.cpp" />
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
+    <ClCompile Include="Source\Actor\Stage\Whirlpool.cpp" />
+    <ClCompile Include="Source\Actor\Stage\WhirlpoolManager.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera\CameraCommon.cpp" />
     <ClCompile Include="Source\Camera\CameraController.cpp" />
@@ -310,6 +314,7 @@
     <ClCompile Include="Source\UI\SearchMenu.cpp" />
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp" />
     <ClCompile Include="Source\UI\TitleEventMenu.cpp" />
+    <ClCompile Include="Source\UI\TutorialMenu.cpp" />
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
@@ -349,6 +354,8 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinIState.h" />
@@ -363,6 +370,9 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
+    <ClInclude Include="Source\Actor\Stage\Types.h" />
+    <ClInclude Include="Source\Actor\Stage\Whirlpool.h" />
+    <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera\CameraCommon.h" />
     <ClInclude Include="Source\Camera\CameraController.h" />
@@ -410,6 +420,7 @@
     <ClInclude Include="Source\UI\SearchMenu.h" />
     <ClInclude Include="Source\UI\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\TitleEventMenu.h" />
+    <ClInclude Include="Source\UI\TutorialMenu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\Util\CRC32.h" />

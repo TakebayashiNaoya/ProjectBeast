@@ -36,9 +36,6 @@ namespace app
 			/**
 			 * @brief モデルレンダーを初期化
 			 * @param fileName アセットファイルパス
-			 * @param position 座標
-			 * @param rotation 回転
-			 @param scale 拡大率
 			 */
 			void Init(const char* fileName);
 
@@ -49,7 +46,15 @@ namespace app
 			bool IsLoaded() const { return m_isModelLoaded; }
 
 
+			/**
+			 * @brief 物理判定が必要かどうかを設定
+			 * @param needCollision 物理判定が必要かどうか
+			 */
+			void SetIsNeedCollision(const bool needCollision) { m_IsNeedCollision = needCollision; }
+
 		private:
+			/** 物理判定が必要かどうか */
+			bool m_IsNeedCollision;
 			/** 物理静的オブジェクト */
 			//PhysicsStaticObject m_physicsStaticObject;
 			nsBeastEngine::nsCollision::PhysicalBody m_physicalObj;

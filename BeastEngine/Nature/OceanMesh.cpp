@@ -1,5 +1,11 @@
-﻿#include "BeastEnginePreCompile.h"
+﻿/**
+ * @file OceanMesh.cpp
+ * @brief 海のグリッドメッシュクラス
+ * @author 竹林
+ */
+#include "BeastEnginePreCompile.h"
 #include "OceanMesh.h"
+
 
 namespace nsBeastEngine
 {
@@ -53,10 +59,7 @@ namespace nsBeastEngine
 	OceanMesh::~OceanMesh()
 	{
 		// m_fenceEvent が未初期化（Init 未呼び出し）の場合は何もしない
-		if (m_fenceEvent == nullptr)
-		{
-			return;
-		}
+		if (m_fenceEvent == nullptr) return;
 
 		//------------------------------------------------------------
 		// GPU がコマンドキューを使い終わるまで待つ
@@ -114,6 +117,7 @@ namespace nsBeastEngine
 				v.normal = Vector3(0.0f, 1.0f, 0.0f);
 				v.tangent = Vector3(1.0f, 0.0f, 0.0f);
 				v.biNormal = Vector3(0.0f, 0.0f, 1.0f);
+				// 0～512 → 0.0～1.0正規化
 				v.uv = Vector2(
 					static_cast<float>(x) / static_cast<float>(numDivision),
 					static_cast<float>(z) / static_cast<float>(numDivision)
@@ -180,7 +184,13 @@ namespace nsBeastEngine
 		if (m_vs == nullptr)
 		{
 			m_vs = new Shader;
+
+			// "Assets/shader/Ocean.fx" を開き、"VSMain" という名前の関数を頂点シェーダーとしてコンパイルする
+			// → コンパイル済みバイナリ（バイトコード）が m_vs の中に格納される
 			m_vs->LoadVS(fxFilePath, vsEntryPoint);
+			// コンパイル済みシェーダーを辞書に登録する
+			// キー = "Assets/shader/Ocean.fx" + "VSMain"
+			// 値  = m_vs（Shader*）
 			g_engine->RegistShaderToBank(fxFilePath, vsEntryPoint, m_vs);
 		}
 
@@ -189,7 +199,9 @@ namespace nsBeastEngine
 		if (m_ps == nullptr)
 		{
 			m_ps = new Shader;
+			// "Assets/shader/Ocean.fx" の "PSMain" をピクセルシェーダーとしてコンパイル
 			m_ps->LoadPS(fxFilePath, psEntryPoint);
+			// キー = "Assets/shader/Ocean.fx" + "PSMain" で登録
 			g_engine->RegistShaderToBank(fxFilePath, psEntryPoint, m_ps);
 		}
 	}

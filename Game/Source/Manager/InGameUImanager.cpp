@@ -27,6 +27,7 @@
 #include "Source/UI/RemainingChildMenu.h"
 #include "Source/UI/SearchMenu.h"
 #include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/TutorialMenu.h"
 
 
 namespace app
@@ -57,6 +58,7 @@ namespace app
 		delete m_enemySleepingLayout;
 		delete m_pbWakingUpTimerLayout;
 		delete m_iglooPromptLayout;
+		delete m_tutorialLayout;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -138,6 +140,12 @@ namespace app
 			m_iglooPromptMenu->SetDraw(false);
 		}
 		daddyPenguin->GetController()->SetIglooPromptMenu(m_iglooPromptMenu);
+    
+		m_tutorialLayout = new ui::Layout();
+		m_tutorialLayout->Initialize<ui::TutorialMenu>(
+			"Assets/parameter/tutorial/Tutorial.json"
+		);
+		m_tutorialMenu = m_tutorialLayout->GetMenu<ui::TutorialMenu>();
 
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);
@@ -318,5 +326,10 @@ namespace app
 	void InGameUIManager::RenderSoundOption(RenderContext& rc)
 	{
 		if (m_soundOptionLayout) m_soundOptionLayout->Render(rc);
+	}
+
+	void InGameUIManager::RenderTutorial(RenderContext& rc)
+	{
+		if (m_tutorialLayout) m_tutorialLayout->Render(rc);
 	}
 }

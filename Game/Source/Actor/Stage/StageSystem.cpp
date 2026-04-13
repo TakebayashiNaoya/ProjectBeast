@@ -57,10 +57,12 @@ namespace
 	 */
 	void LoadTransform(app::actor::IStageObject* object, const nlohmann::json& json)
 	{
+		const bool isNeedCollision = app::util::JsonConverter::ToBool(json["isNeedCollision"]);
 		const Vector3 position = app::util::JsonConverter::ToVector3(json["position"]);
 		const Quaternion rotation = ToRotation(json["rotationDeg"]);
 		const Vector3 scale = app::util::JsonConverter::ToVector3(json["scale"]);
 
+		object->SetIsNeedCollision(isNeedCollision);
 		object->SetPosition(position);
 		object->SetRotation(rotation);
 		object->SetScale(scale);

@@ -45,9 +45,6 @@
                 "rotation":0,
                 "color":[255,255,255,255]
             },
-
-
-
             {
                 "type":"UIIcon",
                 "name":"EnaterIcon",
@@ -70,7 +67,7 @@
                 "rotation":0,
                 "color":[255,255,255,255]
             },
-             {
+            {
                 "type":"UIIcon",
                 "name":"SelectTextIcon",
                 "asset":"Assets/spriteData/UI/TextSprite/SelectText.dds",
@@ -81,7 +78,6 @@
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
             },
-
 
 
             {
@@ -101,7 +97,7 @@
                 "asset":"Assets/spriteData/UI/Button/PauseScreen/PauseButton.dds",
                 "width":500,
                 "height":100,
-                "position":[0,-50,0],
+                "position":[0,-20,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,120]
@@ -112,11 +108,24 @@
                 "asset":"Assets/spriteData/UI/Button/PauseScreen/PauseButton.dds",
                 "width":500,
                 "height":100,
-                "position":[0,-200,0],
+                "position":[0,-140,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,120]
             },
+            {
+                "type":"UIButton",
+                "name":"PauseFourPartsButton",
+                "asset":"Assets/spriteData/UI/Button/PauseScreen/PauseButton.dds",
+                "width":500,
+                "height":100,
+                "position":[0,-260,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,120]
+            },
+
+
             {
                 "type":"UIIcon",
                 "name":"PauseTitleIcon",
@@ -132,8 +141,8 @@
                 "type":"UIIcon",
                 "name":"PauseRetryIcon",
                 "asset":"Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseTypeReturnPlayText.dds",
-                "width":160,
-                "height":70,
+                "width":120,
+                "height":60,
                 "position":[0,100,0],
                 "scale":[1,1,1],
                 "rotation":0,
@@ -143,9 +152,20 @@
                 "type":"UIIcon",
                 "name":"PauseSoundOptionTextIcon",
                 "asset":"Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseTypeSoundOptionText.dds",
-                "width":300,
+                "width":360,
                 "height":60,
-                "position":[5,-50,0],
+                "position":[5,-20,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"PauseRuleTextIcon",
+                "asset":"Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseTypeRuleText.dds",
+                "width":180,
+                "height":60,
+                "position":[0,-140,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -156,7 +176,7 @@
                 "asset":"Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseTypeGoBackTitleText.dds",
                 "width":300,
                 "height":60,
-                "position":[0,-200,0],
+                "position":[0,-260,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]

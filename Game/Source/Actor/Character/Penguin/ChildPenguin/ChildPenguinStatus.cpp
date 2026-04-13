@@ -22,7 +22,7 @@ namespace app
 
 		ChildPenguinStatus::ChildPenguinStatus()
 		{
-			// 外部ファイルを読み込み
+			/** 外部ファイルを読み込み */
 			core::ParameterManager::Get()->LoadParameter<MasterChildPenguinParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterChildPenguinParameter& parameter)
 				{
 					parameter.maxHp = j["maxHp"].get<int>();
@@ -30,7 +30,7 @@ namespace app
 					parameter.radius = j["radius"].get<float>();
 					parameter.height = j["height"].get<float>();
 
-					// タイプ別個体差パラメーター範囲を読み込む
+					/** タイプ別個体差パラメーター範囲を読み込む */
 					const auto& jRange = j["randomRanges"];
 					const int typeIndex = j["type"].get<int>();
 					auto& td = parameter.typeData[typeIndex];
@@ -58,20 +58,48 @@ namespace app
 					td.joinDistance.max = jRange["joinDistance"][1].get<float>();
 					td.giveUpDistance.min = jRange["giveUpDistance"][0].get<float>();
 					td.giveUpDistance.max = jRange["giveUpDistance"][1].get<float>();
+
+					/** やんちゃペンギン固有パラメーターの読み込み（他タイプはデフォルト値のまま） */
+					if (jRange.contains("roamTriggerDistance"))
+					{
+						td.roamTriggerDistance.min = jRange["roamTriggerDistance"][0].get<float>();
+						td.roamTriggerDistance.max = jRange["roamTriggerDistance"][1].get<float>();
+					}
+					if (jRange.contains("roamRadius"))
+					{
+						td.roamRadius.min = jRange["roamRadius"][0].get<float>();
+						td.roamRadius.max = jRange["roamRadius"][1].get<float>();
+					}
+
+					/** おっちょこちょいペンギン固有パラメーターの読み込み（他タイプはデフォルト値のまま） */
+					if (j.contains("tripChancePerSec"))
+					{
+						td.tripChancePerSec = j["tripChancePerSec"].get<float>();
+					}
+					if (j.contains("slipChance"))
+					{
+						td.slipChance = j["slipChance"].get<float>();
+					}
+
+					/** 世話焼きペンギン固有パラメーターの読み込み（他タイプはデフォルト値のまま） */
+					if (j.contains("interventionRange"))
+					{
+						td.interventionRange = j["interventionRange"].get<float>();
+					}
 				});
 		}
 
 
 		ChildPenguinStatus::~ChildPenguinStatus()
 		{
-			// 使用終了
+			/** 使用終了 */
 			core::ParameterManager::Get()->UnloadParameter<MasterChildPenguinParameter>();
 		}
 
 
 		void ChildPenguinStatus::Setup()
 		{
-			// 読み込んだパラメーター取得
+			/** 読み込んだパラメーター取得 */
 			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterChildPenguinParameter>();
 			m_maxHp = parameter->maxHp;
 			m_hp = parameter->hp;
@@ -82,7 +110,7 @@ namespace app
 
 		void ChildPenguinStatus::Update()
 		{
-			// 個体値がロックされている間はホットリロードによる上書きをスキップする
+			/** 個体値がロックされている間はホットリロードによる上書きをスキップする */
 			if (!m_isIndividualValueLocked)
 			{
 				Setup();

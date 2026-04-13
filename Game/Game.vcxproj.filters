@@ -320,7 +320,26 @@
       <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Manager\IglooManager.cpp" />
+      <Filter>Source\Manager</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\IglooPromptMenu.cpp" />
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\Whirlpool.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\WhirlpoolManager.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\TutorialMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -573,7 +592,29 @@
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Manager\IglooManager.h" />
+     <Filter>Source\Manager</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\IglooPromptMenu.h" />
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\Whirlpool.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\Types.h">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\TutorialMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
