@@ -1,7 +1,7 @@
 ﻿/**
  * @file IglooPromptMenu.h
  * @brief かまくら入口でAボタンアイコンを表示するクラス
- * @author （担当者名）
+ * @author 立山
  */
 #pragma once
 #include "Menu.h"
@@ -27,6 +27,14 @@ namespace app
 			void Update() override;
 			void InitializeLogic() override;
 
+		public:
+			enum class PromptType
+			{
+				None,
+				Enter,
+				Exit
+			};
+
 
 		public:
 			/**
@@ -41,6 +49,12 @@ namespace app
 			 */
 			inline void SetDraw(bool isDraw) { m_isDraw = isDraw; }
 
+			/**
+			 * @brief プロンプトの種類を設定する
+			 * @param type プロンプトの種類
+			 */
+			inline void SetPromptType(PromptType type) { m_promptType = type; }
+
 
 		private:
 			/** 表示対象のワールド座標（親ペンギンの位置） */
@@ -48,6 +62,8 @@ namespace app
 
 			/** 描画フラグ */
 			bool m_isDraw = false;
+
+			PromptType m_promptType = PromptType::None;
 		};
 	}
 }

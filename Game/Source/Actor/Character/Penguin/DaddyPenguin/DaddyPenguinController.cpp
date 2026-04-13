@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "DaddyPenguin.h"
 #include "DaddyPenguinController.h"
+#include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
@@ -130,11 +131,30 @@ namespace app
 			float interactRadius = 80.0f;
 			bool isNearIgloo = (diff.Length() <= interactRadius);
 
-			// Aボタンプロンプトの表示・非表示を更新
 			if (m_iglooPromptMenu)
 			{
-				m_iglooPromptMenu->SetTargetPosition(interactPos);
-				m_iglooPromptMenu->SetDraw(isNearIgloo);
+				// 1. ステートマシンに「今かまくらの中にいるステートか？」を確認
+				bool isInside = m_stateMachine->IsEqualCurrentState(DaddyPenguinInsideIglooState::ID());
+
+				if (isInside)
+				{
+					// 【かまくらの中にいるとき】 -> 「出る」を表示
+					// 位置は親ペンギン自身の足元（頭上にUIが出るように計算される）
+					m_iglooPromptMenu->SetPromptType(ui::IglooPromptMenu::PromptType::Exit);
+					m_iglooPromptMenu->SetTargetPosition(m_owner->GetTransform().m_position);
+				}
+				else if (isNearIgloo)
+				{
+					// 【外にいて、入り口の近くにいるとき】 -> 「入る」を表示
+					// 位置はかまくらの入り口（interactPos）
+					m_iglooPromptMenu->SetPromptType(ui::IglooPromptMenu::PromptType::Enter);
+					m_iglooPromptMenu->SetTargetPosition(interactPos);
+				}
+				else
+				{
+					// 【どちらでもないとき】 -> 非表示
+					m_iglooPromptMenu->SetPromptType(ui::IglooPromptMenu::PromptType::None);
+				}
 			}
 
 			// Aボタンが押されていて、かつかまくら近くにいるならイベント開始

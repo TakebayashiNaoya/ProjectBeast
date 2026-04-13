@@ -1,7 +1,7 @@
 ﻿/**
  * @file IglooPromptMenu.cpp
  * @brief かまくら入口でAボタンアイコンを表示するクラス
- * @author （担当者名）
+ * @author 立山
  */
 #include "stdafx.h"
 #include "IglooPromptMenu.h"
@@ -22,6 +22,7 @@ namespace app
 		IglooPromptMenu::IglooPromptMenu()
 			: m_targetPosition(Vector3::Zero)
 			, m_isDraw(false)
+			, m_promptType(PromptType::None)
 		{}
 
 
@@ -35,18 +36,16 @@ namespace app
 			//	return;
 			//}
 
-			// 描画フラグが false のとき、起動直後に原点で一瞬表示されるバグを防ぐため
-			// 位置計算をスキップして非表示にする
-			if (!m_isDraw)
+			auto* iconA = GetUI<UIIcon>(Hash32("IglooPromptIconA"));
+			auto* textEnter = GetUI<UIIcon>(Hash32("IglooEnterText"));
+			auto* textExit = GetUI<UIIcon>(Hash32("IglooExitText"));
+			// 非表示のとき（None）は全て隠して終わる
+			if (m_promptType == PromptType::None)
 			{
-				//icon->m_isDraw = false;
-				//MenuBase::Update();
-				auto* icon = GetUI<UIIcon>(Hash32("IglooPromptIconA"));
-				if (icon) icon->m_isDraw = false;
-
-				auto* text = GetUI<UIIcon>(Hash32("IglooEnterText"));
-				if (text) text->m_isDraw = false;
-
+				if (iconA) iconA->m_isDraw = false;
+				if (textEnter) textEnter->m_isDraw = false;
+				if (textExit) textExit->m_isDraw = false;
+				MenuBase::Update();
 				return;
 			}
 
@@ -54,18 +53,25 @@ namespace app
 			Vector2 screenPos = Vector2::Zero;
 			g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, m_targetPosition);
 
-			// アイコンをペンギンの頭上に配置
-			auto* icon = GetUI<UIIcon>(Hash32("IglooPromptIconA"));
-			if (icon)
-			{
-				icon->m_transform.m_localTransform.m_position = Vector3(screenPos.x, screenPos.y + OFFSET_Y, 0.0f);
-				icon->m_isDraw = true;
+			if (iconA) {
+				iconA->m_isDraw = true;
+				iconA->m_transform.m_localTransform.m_position = Vector3(screenPos.x, screenPos.y + OFFSET_Y + 50.0f, 0.0f);
 			}
-			auto* text = GetUI<UIIcon>(Hash32("IglooEnterText"));
-			if (text)
+			if (m_promptType == PromptType::Enter)
 			{
-				text->m_transform.m_localTransform.m_position = Vector3(screenPos.x, screenPos.y + OFFSET_Y - 80.0f, 0.0f);
-				text->m_isDraw = true;
+				if (textEnter) {
+					textEnter->m_isDraw = true;
+					textEnter->m_transform.m_localTransform.m_position = Vector3(screenPos.x, screenPos.y + OFFSET_Y - 20.0f, 0.0f);
+				}
+				if (textExit) { textExit->m_isDraw = false; }
+			}
+			else if (m_promptType == PromptType::Exit)
+			{
+				if (textEnter) { textEnter->m_isDraw = false; }
+				if (textExit) {
+					textExit->m_isDraw = true;
+					textExit->m_transform.m_localTransform.m_position = Vector3(screenPos.x, screenPos.y + OFFSET_Y - 20.0f, 0.0f);
+				}
 			}
 
 			MenuBase::Update();
@@ -78,8 +84,11 @@ namespace app
 			auto* icon = GetUI<UIIcon>(Hash32("IglooPromptIconA"));
 			if (icon) icon->m_isDraw = false;
 
-			auto* text = GetUI<UIIcon>(Hash32("IglooEnterText"));
-			if (text) text->m_isDraw = false;
+			auto* enterText = GetUI<UIIcon>(Hash32("IglooEnterText"));
+			if (enterText) enterText->m_isDraw = false;
+
+			auto* exitText = GetUI<UIIcon>(Hash32("IglooExitText"));
+			if (exitText) exitText->m_isDraw = false;
 		}
 	}
 }
