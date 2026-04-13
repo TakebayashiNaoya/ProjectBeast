@@ -391,5 +391,29 @@ namespace app
 		PenguinDeadState::PenguinDeadState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
 		{}
+
+
+
+
+		/****************************************/
+
+
+		void PenguinInWhirlpoolState::Enter()
+		{
+			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
+		}
+
+
+		void PenguinInWhirlpoolState::Update()
+		{}
+
+
+		void PenguinInWhirlpoolState::Exit()
+		{}
+
+
+		PenguinInWhirlpoolState::PenguinInWhirlpoolState(PenguinStateMachine* owner)
+			: PenguinIState(owner)
+		{}
 	}
 }

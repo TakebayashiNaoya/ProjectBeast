@@ -33,6 +33,7 @@ namespace app
 			, m_isSneak(false)
 			, m_isSlide(false)
 			, m_isDamaged(false)
+			, m_isInWhirlpool(false)
 		{}
 
 
