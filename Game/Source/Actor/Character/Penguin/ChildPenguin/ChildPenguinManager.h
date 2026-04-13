@@ -258,6 +258,36 @@ namespace app
 
 
 			//============================================//
+			// サウンド：近傍ペンギンの可聴管理
+			//============================================//
+
+		public:
+			/**
+			 * @brief 指定した子ペンギンが可聴対象かどうかを返す
+			 * @details DaddyPenguinに近い上位 AUDIBLE_PENGUIN_NUM 匹のみ true を返す
+			 * @param penguin 確認する子ペンギン
+			 * @return 可聴対象なら true
+			 */
+			bool IsAudible(const ChildPenguin* penguin) const;
+
+
+		private:
+			/**
+			 * @brief 毎フレーム呼び出し、DaddyPenguinに近い順で
+			 *        上位 AUDIBLE_PENGUIN_NUM 匹を m_audiblePenguins に格納する
+			 */
+			void UpdateAudiblePenguins();
+
+			/** DaddyPenguinに近い順の上位 N 匹（可聴対象） */
+			std::unordered_set<ChildPenguin*> m_audiblePenguins;
+
+			/** 可聴対象とする子ペンギンの最大数 */
+			static constexpr int AUDIBLE_PENGUIN_NUM = 5;
+
+
+
+
+			//============================================//
 			// 世話焼き用：問題行動ペンギンの状態管理
 			//============================================//
 

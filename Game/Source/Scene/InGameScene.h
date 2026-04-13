@@ -97,6 +97,9 @@ namespace app
 		enum class PauseState { Pause, SoundOption, Tutorial };
 		PauseState m_pauseState = PauseState::Pause;
 
+		/** ポーズ開始フレームかどうか（SEの停止を1回だけ行うためのフラグ） */
+		bool m_isPauseEntered = false;
+
 		//------------------------------------------------------------
 		// シーン遷移
 		//------------------------------------------------------------
@@ -105,6 +108,9 @@ namespace app
 
 		/** 前フレームのカウントダウンタイプを保持（初期値は None） */
 		ui::EnCountDownType m_lastCountType = ui::EnCountDownType::None;
+
+		/** ホイッスルを鳴らしたかどうか（Finishing フェーズで1回だけ鳴らすためのフラグ） */
+		bool m_isWhistlePlayed = false;
 
 		/** クリア判定用定数 */
 		static constexpr int CLEAR_COUNT = 50;
