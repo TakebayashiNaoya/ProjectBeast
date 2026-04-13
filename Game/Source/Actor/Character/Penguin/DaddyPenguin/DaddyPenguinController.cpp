@@ -9,6 +9,7 @@
 #include "DaddyPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
+#include "Source/UI/IglooPromptMenu.h"
 #include <algorithm> // std::min用
 
 
@@ -19,6 +20,7 @@ namespace app
 		DaddyPenguinController::DaddyPenguinController(DaddyPenguin* owner)
 			: m_owner(owner)
 			, m_stateMachine(owner->GetStateMachine())
+			, m_iglooPromptMenu(nullptr)
 		{}
 
 		void DaddyPenguinController::Update()
@@ -110,36 +112,36 @@ namespace app
 			bool isSlide = g_pad[0]->IsPress(enButtonX);
 			bool isEnterIgloo = false;
 
-			// ★ Aボタンが押されたとき、かまくらの近くにいるか判定する
-			if (isJump)
+			// かまくら近接判定（毎フレーム実行）
+			Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+			Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+
+			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+			iglooRot.Apply(forwardVec);
+
+			float interactAreaOffset = 150.0f;
+			Vector3 interactPos = iglooPos + (forwardVec * interactAreaOffset);
+
+			Vector3 myPos = m_owner->GetTransform().m_position;
+
+			Vector3 diff = myPos - interactPos;
+			diff.y = 0.0f;
+
+			float interactRadius = 100.0f;
+			bool isNearIgloo = (diff.Length() <= interactRadius);
+
+			// Aボタンプロンプトの表示・非表示を更新
+			if (m_iglooPromptMenu)
 			{
-				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
-				Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+				m_iglooPromptMenu->SetTargetPosition(interactPos);
+				m_iglooPromptMenu->SetDraw(isNearIgloo);
+			}
 
-				// 1. 入り口の方向ベクトルを取得（IStateで成功した -1.0f のX軸）
-				Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
-				iglooRot.Apply(forwardVec);
-
-				// 2. リーダーの図の「青い円の中心」の座標を計算
-				// ※ IStateでの移動先と同じ 200.0f を基準にしつつ、必要に応じて少し遠くするなど微調整してください
-				float interactAreaOffset = 150.0f;
-				Vector3 interactPos = iglooPos + (forwardVec * interactAreaOffset);
-
-				Vector3 myPos = m_owner->GetTransform().m_position;
-
-				// 3. 親ペンギンと「青い円の中心」との距離を測る
-				Vector3 diff = myPos - interactPos;
-				diff.y = 0.0f;
-
-				// 青い円の半径（反応する範囲の広さ）
-				float interactRadius = 100.0f;
-
-				// 青いエリアの中にいるなら、イベントコマンドをオンにする
-				if (diff.Length() <= interactRadius)
-				{
-					isEnterIgloo = true;
-					isJump = false; // ジャンプが暴発しないように入力を消す！
-				}
+			// Aボタンが押されていて、かつかまくら近くにいるならイベント開始
+			if (isJump && isNearIgloo)
+			{
+				isEnterIgloo = true;
+				isJump = false;
 			}
 
 			// =========================================================
