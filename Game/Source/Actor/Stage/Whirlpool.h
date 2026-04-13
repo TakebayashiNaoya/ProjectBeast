@@ -6,6 +6,7 @@
 #pragma once
 #include "IStage.h"
 #include "Source/Util/Curve.h"
+#include "WhirlpoolPowerSystem.h"
 
 
 namespace app
@@ -79,6 +80,9 @@ namespace app
 			EnWhirlpoolState m_state;
 			/** 渦潮のタイマー */
 			float m_timer;
+			/** 渦潮の引き寄せ、押し出しを管理するクラス */
+			std::unique_ptr<WhirlpoolPowerSytem> m_whirlpoolPowerSystem;
+
 		};
 	}
 }
