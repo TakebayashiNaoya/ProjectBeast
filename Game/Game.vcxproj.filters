@@ -320,6 +320,7 @@
       <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Manager\IglooManager.cpp" />
+    <ClCompile Include="Source\UI\IglooPromptMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -572,6 +573,7 @@
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Manager\IglooManager.h" />
+    <ClInclude Include="Source\UI\IglooPromptMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
