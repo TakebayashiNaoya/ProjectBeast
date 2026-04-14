@@ -169,9 +169,10 @@ namespace app
 
 		void DaddyPenguinEnterIglooState::Enter()
 		{
-			// 1. かまくらの座標と回転を取得
-			Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
-			Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+			// 1. 親ペンギンの現在位置を基準に最も近いイグルーの座標と回転を取得
+			const Vector3 myPos = m_owner->GetTransform().m_position;
+			Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
+			Quaternion iglooRot = StageSystem::GetInstance()->GetNearestIglooRotation(myPos);
 
 			// 2. 正面ベクトルを計算する
 			// まず基準となるZ軸方向（正面）のベクトルを作成します
@@ -214,7 +215,8 @@ namespace app
 					// =========================================================
 					// ★ ワープ処理とフラグ切り替え
 					// =========================================================
-					Vector3 insidePos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+					// 現在地を基準に最も近いイグルーの中心座標を取得
+					Vector3 insidePos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
 
 					// ※めり込んだり、空中に浮いたりする場合は insidePos.y を微調整してください
 					insidePos.y += 20.0f;
@@ -260,8 +262,10 @@ namespace app
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::IdleStanding);
 
-			Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
-			Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+			// 現在地を基準に最も近いイグルーの座標と回転を取得
+			const Vector3 myPos = m_owner->GetTransform().m_position;
+			Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
+			Quaternion iglooRot = StageSystem::GetInstance()->GetNearestIglooRotation(myPos);
 			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
 			iglooRot.Apply(forwardVec);
 
@@ -280,8 +284,10 @@ namespace app
 			if (g_pad[0]->IsTrigger(enButtonA))
 			{
 				// 1. 入り口の座標を再計算（入る時と同じ計算）
-				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
-				Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+				// 現在地を基準に最も近いイグルーの座標と回転を取得
+				const Vector3 myPos = m_owner->GetTransform().m_position;
+				Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
+				Quaternion iglooRot = StageSystem::GetInstance()->GetNearestIglooRotation(myPos);
 				Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
 				iglooRot.Apply(forwardVec);
 

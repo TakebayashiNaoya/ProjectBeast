@@ -116,6 +116,23 @@ namespace app
 
 			Quaternion GetObjectRotation(const std::string& key)const;
 
+
+			/**
+			 * @brief "igloo" で始まるオブジェクトの中から from に最も近い座標を返す
+			 * @param from 基準座標（プレイヤーや子ペンギンの現在位置）
+			 * @return 最近傍イグルーの座標。該当なしの場合は Vector3::Zero
+			 */
+			Vector3 GetNearestIglooPosition(const Vector3& from) const;
+
+			/**
+			 * @brief "igloo" で始まるオブジェクトの中から from に最も近いオブジェクトの回転を返す
+			 * @param from 基準座標（プレイヤーや子ペンギンの現在位置）
+			 * @return 最近傍イグルーの回転。該当なしの場合は Quaternion::Identity
+			 */
+			Quaternion GetNearestIglooRotation(const Vector3& from) const;
+
+
+
 		private:
 			/** シングルトンインスタンス */
 			static StageSystem* m_instance;

@@ -21,10 +21,10 @@ namespace app
 		namespace
 		{
 			/** 渦潮の位置の数 */
-			constexpr int MIN_WHIRLPOOL_INDEX = 1;
-			constexpr int MAX_WHIRLPOOL_INDEX = 10;
+			constexpr int MIN_WHIRLPOOL_INDEX = 0;
+			constexpr int MAX_WHIRLPOOL_INDEX = 9;
 			/** 渦潮の生成間隔 */
-			constexpr float WHIRLPOOL_CREATE_INTERVAL = 5.0f;
+			constexpr float WHIRLPOOL_CREATE_INTERVAL = 2.0f;
 			/** 渦潮のY座標 */
 			constexpr float WHIRLPOOL_Y = 0.0f;
 		}
@@ -121,10 +121,16 @@ namespace app
 			std::uniform_int_distribution<int> dist(0, static_cast<int>(candidates.size() - 1));
 
 			uint8_t index = candidates[dist(gen)];
-
+			std::string key = "whirlpool" + std::to_string(index);
 
 			// ステージオブジェクトの位置を取得
-			Vector3 position = StageSystem::GetInstance()->GetObjectPosition("whirlpool" + std::to_string(index));
+			Vector3 position = StageSystem::GetInstance()->GetObjectPosition(key);
+
+			if (position.x == 0.0f && position.y == 0.0f && position.z == 0.0f)
+			{
+				K2_ASSERT(false, "失敗");
+			}
+
 			position.y = WHIRLPOOL_Y;
 
 			auto newWhirlpool = std::make_unique<Whirlpool>();
