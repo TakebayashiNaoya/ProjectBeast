@@ -5,9 +5,9 @@
                 "type":"UIIcon",
                 "name":"ChildPenguinIcon",
                 "asset":"Assets/spriteData/UI/Icon/ChildPenguinIcon.dds",
-                "width":70,
-                "height":70,
-                "position":[-700,50,0],
+                "width":65,
+                "height":65,
+                "position":[-690,50,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -18,9 +18,9 @@
                 "asset":"Assets/spriteData/UI/Number/White",
                 "digit": 3,
                 "number": 100,
-                "width":70,
-                "height":70,
-                "position":[-590,50,0],
+                "width":60,
+                "height":60,
+                "position":[-560,50,0],
                 "scale":[1,1,1],
                 "rotation":0
             },
@@ -30,7 +30,7 @@
                 "asset":"Assets/spriteData/UI/Icon/SlashIcon.dds",
                 "width":90,
                 "height":85,
-                "position":[-520,50,0],
+                "position":[-500,50,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -41,9 +41,9 @@
                 "asset":"Assets/spriteData/UI/Number/White",
                 "digit": 3,
                 "number": 100,
-                "width":70,
-                "height":70,
-                "position":[-340,55,0],
+                "width":60,
+                "height":60,
+                "position":[-360,55,0],
                 "scale":[1,1,1],
                 "rotation":0
             }
