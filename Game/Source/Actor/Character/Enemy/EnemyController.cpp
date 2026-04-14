@@ -104,6 +104,7 @@ namespace app
 				m_isInitialized = true;
 			}
 
+
 			/** 遷移判定 */
 			const int nextState = currentState->check(this);
 			if (nextState != -1 && nextState != m_currentState) {
@@ -121,7 +122,8 @@ namespace app
 			currentState->update(this);
 			if (m_currentState == enEnemyState_Search ||
 				m_currentState == enEnemyState_Wandering ||
-				m_currentState == enEnemyState_Chase)
+				m_currentState == enEnemyState_Chase ||
+				m_currentState == enEnemyState_Swim)
 			{
 				ChildPenguin* found = FindTarget();
 				if (found != nullptr)
@@ -652,8 +654,24 @@ namespace app
 
 		void EnemyController::UpdateSwim(EnemyController* enemy)
 		{
+			Vector3 targetPos;
+
+			// 帰巣中なら巣へ、ターゲットがいるならペンギンへ、それ以外は徘徊ポイントへ
+			if (enemy->m_target->GetEnemyStateMachine()->IsReturnHome())
+			{
+				targetPos = enemy->m_target->GetHomePosition();
+			}
+			else if (enemy->m_foundPenguin != nullptr)
+			{
+				targetPos = enemy->m_foundPenguin->GetTransform().m_position;
+			}
+			else
+			{
+				targetPos = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex];
+			}
+
 			// 対象座標までの距離
-			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
+			Vector3 distance = targetPos - enemy->m_target->GetTransform().m_position;
 			// 方向
 			Vector3 direction = distance;
 			direction.Normalize();
@@ -679,21 +697,21 @@ namespace app
 
 		int EnemyController::CheckSwim(EnemyController* enemy)
 		{
-			if (enemy->m_foundPenguin != nullptr)
-			{
-				return enEnemyState_Chase;
-			}
-			if (enemy->IsFarFromHome())
-			{
-				return enEnemyState_ReturnHome;
-			}
+			//if (enemy->m_foundPenguin != nullptr)
+			//{
+			//	return enEnemyState_Chase;
+			//}
+			//if (enemy->IsFarFromHome())
+			//{
+			//	return enEnemyState_ReturnHome;
+			//}
 
-			Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
+			//Vector3 distance = enemy->m_wanderingPosList[enemy->m_wanderingPosListIndex] - enemy->m_target->GetTransform().m_position;
 
-			if (distance.Length() <= 20.0f)
-			{
-				return enEnemyState_Idle;
-			}
+			//if (distance.Length() <= 20.0f)
+			//{
+			//	return enEnemyState_Idle;
+			//}
 			return enEnemyState_Invalid;
 		}
 
