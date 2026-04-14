@@ -176,6 +176,7 @@ namespace app
 			{
 				info.isAffected = false;
 				info.isPushing = false;
+				info.target->GetStateMachine()->SetIsInWhirlpool(false);
 				return;
 			}
 
