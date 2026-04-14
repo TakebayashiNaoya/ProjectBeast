@@ -200,13 +200,13 @@ namespace app
 
 	private:
 		/** 全体の音量 */
-		float m_masterVolume = 0.5f;
+		float m_masterVolume = 0.1f;
 		/** BGMの音量 */
-		float m_bgmVolume = 0.5f;
+		float m_bgmVolume = 0.1f;
 		/** SEの音量 */
-		float m_seVolume = 0.5f;
+		float m_seVolume = 0.1f;
 		/** ボイスの音量 */
-		float m_voiceVolume = 0.5f;
+		float m_voiceVolume = 0.1f;
 
 
 	private:
