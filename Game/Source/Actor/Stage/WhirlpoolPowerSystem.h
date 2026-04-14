@@ -52,6 +52,14 @@ namespace app
 			~WhirlpoolPowerSytem() override = default;
 
 
+		public:
+			/** 引き寄せ、押し出しの情報のリストを取得 */
+			std::vector<WhirlpoolPowerInfo>& GetWhirlpoolPowerInfos()
+			{
+				return m_whirlpoolPowerInfos;
+			}
+
+
 		private:
 			/** 渦潮の引き寄せ、押し出しの情報を初期化する関数 */
 			void InitializeWhirlpoolInfo();

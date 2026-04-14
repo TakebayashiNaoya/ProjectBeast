@@ -107,6 +107,16 @@ namespace app
 					continue;
 				}
 
+				// 渦潮が消滅済みなら影響を解除してスキップ
+				if (m_ownerWhirlpool->GetState() == Whirlpool::EnWhirlpoolState::None)
+				{
+					it->isAffected = false;
+					it->isPushing = false;
+					it->target->GetStateMachine()->SetIsInWhirlpool(false);
+					++it;
+					continue;
+				}
+
 				// 渦潮から子ペンギンへのベクトルを更新
 				it->toTargetVector = it->target->GetTransform().m_position - whirlpoolPos;
 
@@ -176,6 +186,7 @@ namespace app
 			{
 				info.isAffected = false;
 				info.isPushing = false;
+				info.target->GetStateMachine()->SetIsInWhirlpool(false);
 				return;
 			}
 
