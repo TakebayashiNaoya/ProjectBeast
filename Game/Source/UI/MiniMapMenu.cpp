@@ -65,7 +65,7 @@ namespace app
 				,	{ "childGreenIcon",  0 }  // 4: Green  (世話焼き)
 			};
 
-			const Vector3 MAP_CENTER_POS = Vector3(-500.0f, 0.0f, 0.0f);
+			const Vector3 MAP_CENTER_POS = Vector3(-530.0f, 270.0f, 0.0f);
 			constexpr float MAP_RADIUS = 200.0f;
 			constexpr float MAP_LIMITE_DISTANCE = 400.0f;
 		}

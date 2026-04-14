@@ -7,7 +7,7 @@
                 "asset":"Assets/spriteData/UI/Time/InGameTimerFrameBackGround.dds",
                 "width":280,
                 "height":90,
-                "position":[550,300,0],
+                "position":[ 0,300,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,120]
@@ -18,7 +18,7 @@
                 "asset":"Assets/spriteData/UI/Time/InGameTimerFrame.dds",
                 "width":320,
                 "height":120,
-                "position":[550,300,0],
+                "position":[0,300,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -34,7 +34,7 @@
                 "number":3,
                 "width":50,
                 "height":50,
-                "position":[ 525, 300, 0],
+                "position":[ -35, 300, 0],
                 "scale":[1,1,1],
                 "rotation":0
             },
@@ -46,7 +46,7 @@
                 "number":0,
                 "width":50,
                 "height":50,
-                "position":[ 595, 300, 0],
+                "position":[ 30, 300, 0],
                 "scale":[1,1,1],
                 "rotation":0
             },
@@ -56,7 +56,7 @@
                 "asset":"Assets/spriteData/UI/Icon/InGameTimerIcon/Clone.dds",
                 "width":15,
                 "height":50,
-                "position":[ 560, 300, 0],
+                "position":[ 0, 300, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -69,7 +69,7 @@
                 "number":0,
                 "width":50,
                 "height":50,
-                "position":[ 640, 300, 0],
+                "position":[ 75, 300, 0],
                 "scale":[1,1,1],
                 "rotation":0
             },
@@ -84,7 +84,7 @@
                 "asset":"Assets/spriteData/UI/Icon/InGameTimerIcon/Clock.dds",
                 "width":55,
                 "height":50,
-                "position":[ 468, 300, 0],
+                "position":[ -90, 300, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[255,255,255,255]
