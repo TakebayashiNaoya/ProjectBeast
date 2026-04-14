@@ -20,11 +20,9 @@ namespace app
 
 		namespace
 		{
-			/** 最大渦潮数 */
-			constexpr int MAX_WHIRLPOOL_NUM = 3;
 			/** 渦潮の位置の数 */
 			constexpr int MIN_WHIRLPOOL_INDEX = 1;
-			constexpr int MAX_WHIRLPOOL_INDEX = 4;
+			constexpr int MAX_WHIRLPOOL_INDEX = 10;
 			/** 渦潮の生成間隔 */
 			constexpr float WHIRLPOOL_CREATE_INTERVAL = 5.0f;
 			/** 渦潮のY座標 */
@@ -106,9 +104,6 @@ namespace app
 
 		void WhirlpoolManager::CreateWhirlpool()
 		{
-			// 既に最大数の渦潮が存在する場合は生成しない
-			if (m_whirlpoolMap.size() >= MAX_WHIRLPOOL_NUM) return;
-
 			std::vector<uint8_t> candidates;
 			for (int i = MIN_WHIRLPOOL_INDEX; i <= MAX_WHIRLPOOL_INDEX; ++i)
 			{
