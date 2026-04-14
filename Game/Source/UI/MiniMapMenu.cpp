@@ -8,6 +8,7 @@
 #include "Source/Actor/Character/penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Util/CRC32.h"
 
 
@@ -108,8 +109,11 @@ namespace app
 			auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon"));
 			if (greenIcon) greenIcon->m_isDraw = m_isDraw;
 
-			auto* bearIcon = GetUI<UIIcon>(Hash32("bearIcon"));
-			if (bearIcon)bearIcon->m_isDraw = m_isDraw;
+			for (auto key : POLAR_BEAR_ICON_KEYS)
+			{
+				auto* bearIcon = GetUI<UIIcon>(key);
+				if (bearIcon) bearIcon->m_isDraw = m_isDraw;
+			}
 
 			// 親ペンギンのが存在する時に、親ペンギン、子ペンギン、シロクマのアイコンをマップに表示する。
 			if (m_daddyPenguin)
@@ -310,22 +314,22 @@ namespace app
 				else
 				{
 					// ミニマップの範囲外は非表示。
-					bearIcon->m_isDraw = false;
+					bearIcon->m_isDraw = !isBearDraw;
 				}
 
 				// シロクマのアイコンの要素数を超えないようにインデックスを増加させる。
 				bearIconIndex++;
 			}
-
-			// 使われなかったアイコンを非表示にする。
-        for (uint32_t i = bearIconIndex; i < static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS)); i++)
+			
+          // 使われなかったアイコンを非表示にする。
+			for (uint32_t i = bearIconIndex; i < static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS)); i++)
 			{
 				auto* bearIcon = GetUI<UIIcon>(POLAR_BEAR_ICON_KEYS[i]);
-				if (bearIcon)bearIcon->m_isDraw = false;
+				if (bearIcon) bearIcon->m_isDraw = false;
 			}
 		}
 
-
+		
 		void MiniMapMenu::InitializeLogic()
 		{
 			// 初期は非表示。
@@ -350,8 +354,11 @@ namespace app
 			auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon"));
 			if (greenIcon) greenIcon->m_isDraw = !m_isDraw;
 
-			auto* polarBear = GetUI<UIIcon>(Hash32("PolarBearIcon"));
-			if (polarBear)polarBear->m_isDraw = !m_isDraw;
+        for (auto key : POLAR_BEAR_ICON_KEYS)
+		{
+			auto* polarBear = GetUI<UIIcon>(key);
+			if (polarBear) polarBear->m_isDraw = !m_isDraw;
+		}
 		}
 	}
 }
