@@ -22,7 +22,7 @@ namespace app
 		{
 			/** 渦潮の位置の数 */
 			constexpr int MIN_WHIRLPOOL_INDEX = 0;
-			constexpr int MAX_WHIRLPOOL_INDEX = 10;
+			constexpr int MAX_WHIRLPOOL_INDEX = 9;
 			/** 渦潮の生成間隔 */
 			constexpr float WHIRLPOOL_CREATE_INTERVAL = 2.0f;
 			/** 渦潮のY座標 */
