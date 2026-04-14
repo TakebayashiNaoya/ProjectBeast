@@ -4,37 +4,61 @@
  * @author 藤谷
  */
 #include "stdafx.h"
-#include "types.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Whirlpool.h"
-
 
 namespace app
 {
 	namespace actor
 	{
+
+		namespace
+		{
+			/** 渦潮の回転速度 */
+			constexpr float ROTATION_SPEED = -3.0f;
+			/** 渦潮の拡大率の変化にかかる時間 */
+			constexpr float SCALE_CHANGE_TIME = 2.5f;
+			/** 渦潮の拡大率が最大値で留まる時間 */
+			constexpr float WHIRLPOOL_STAY_TIME = 10.0f;
+			/** 渦潮の最小値 */
+			const Vector3 MIN_SCALE = Vector3(0.0f, 0.0f, 0.0f);
+			/** 渦潮の最大値 */
+			const Vector3 MAX_SCALE = Vector3(5.0f, 5.0f, 5.0f);
+			/** フェードアウトにかかる時間 */
+			constexpr float FADE_OUT_TIME = 3.0f;
+		}
+
 		void Whirlpool::Start()
 		{
+			m_whirlpoolPowerSystem = std::make_unique<WhirlpoolPowerSytem>(this);
+
 			Init("Assets/modelData/stage/Whirlpool/whirlpool.tkm");
 
 			m_scaleBigger.Initialize(MIN_SCALE, MAX_SCALE, SCALE_CHANGE_TIME, util::EasingType::EaseInOut, util::LoopMode::Once);
 			m_scaleSmaller.Initialize(MAX_SCALE, MIN_SCALE, SCALE_CHANGE_TIME, util::EasingType::EaseInOut, util::LoopMode::Once);
+
+			m_whirlpoolPowerSystem->Start();
 		}
 
 
 		void Whirlpool::Update()
 		{
 			StateMachine();
+			m_whirlpoolPowerSystem->Update();
 		}
 
 
 		void Whirlpool::Render(RenderContext& rc)
 		{
 			IStageObject::Render(rc);
+			m_whirlpoolPowerSystem->Render(rc);
 		}
 
 		Whirlpool::Whirlpool()
 			: m_state(EnWhirlpoolState::ModelLoading)
 			, m_timer(0.0f)
+			, m_index(0)
 		{}
 
 
@@ -95,6 +119,8 @@ namespace app
 			}
 			case EnWhirlpoolState::None:
 			{
+
+
 
 			}
 			break;

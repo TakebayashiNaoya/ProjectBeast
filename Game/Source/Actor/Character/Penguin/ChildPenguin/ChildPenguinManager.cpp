@@ -4,14 +4,16 @@
  * @author 立山、竹林
  */
 #include "stdafx.h"
-#include <random>
 #include "ChildPenguin.h"
+#include "ChildPenguinAIController.h"
 #include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Manager/IglooManager.h"
+#include <random>
 
 
 namespace app
@@ -65,6 +67,9 @@ namespace app
 				/** 隊列メンバーに割り当て */
 				SortAndAssignFollowers();
 			}
+
+			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */
+			UpdateAudiblePenguins();
 
 			/** 削除待ちのペンギンを安全に破棄する (遅延削除) */
 			for (auto* deadPenguin : m_destroyList)
@@ -219,6 +224,9 @@ namespace app
 			m_roamingPenguins.erase(penguin);
 			m_assignedTargets.erase(penguin);
 
+			/** 可聴セットからも取り除く */
+			m_audiblePenguins.erase(penguin);
+
 			/** 即座に m_childPenguinList から erase したり delete したりせず、 */
 			/** 削除予定リストに登録するだけに留める */
 			auto it = std::find(m_destroyList.begin(), m_destroyList.end(), penguin);
@@ -250,6 +258,13 @@ namespace app
 				ScoreManager::GetInstance().SubCollectedCount();
 			}
 			/** メンバーが減ったので外側の子が内側に詰める処理が次フレームで自然に行われる */
+		}
+
+
+		bool ChildPenguinManager::IsFollower(const ChildPenguin* penguin) const
+		{
+			auto it = std::find(m_followers.begin(), m_followers.end(), penguin);
+			return it != m_followers.end();
 		}
 
 
@@ -354,6 +369,99 @@ namespace app
 		}
 
 
+		void ChildPenguinManager::StartIglooEvent(const Vector3& interactPos)
+		{
+			// イベント開始時に、連れ歩いている子ペンギンの数をカウントにセットする
+			m_iglooEnteringCount = static_cast<int>(m_followers.size());
+
+			// 全員に「入り口へ向かえ！」と命令を出す
+			for (auto* child : m_followers)
+			{
+				if (child && child->GetAIController())
+				{
+					child->GetAIController()->StartEnterIglooEvent(interactPos);
+				}
+			}
+		}
+
+
+		void ChildPenguinManager::FinishEnterIglooOne()
+		{
+			// 報告を受けるたびにカウントを1減らす
+			m_iglooEnteringCount--;
+		}
+
+
+		bool ChildPenguinManager::IsIglooEventFinished() const
+		{
+			// カウントが0以下になったら全員入り終わったと判定
+			return m_iglooEnteringCount <= 0;
+		}
+
+
+		void ChildPenguinManager::EndIglooEvent(const Vector3& exitPos)
+		{
+			// 全ての子ペンギンをチェックし、イベントに参加している子全員をリセットする
+			for (auto* child : m_childPenguinList)
+			{
+				if (child && child->GetAIController())
+				{
+					// ★ 修正：中に入っているかではなく「イベント命令を受けているか」で判定！
+					// これで、まだ歩いている途中の子も全員キャンセルされて外にワープします！
+					if (child->GetAIController()->IsEnterIglooMode())
+					{
+						child->GetAIController()->EndEnterIglooEvent(exitPos);
+					}
+				}
+			}
+
+		}
+		//============================================//
+		// サウンド：近傍ペンギンの可聴管理
+		//============================================//
+
+		void ChildPenguinManager::UpdateAudiblePenguins()
+		{
+			m_audiblePenguins.clear();
+
+			/** DaddyPenguinがいなければ全員不可聴にして終わる */
+			if (m_daddyPenguin == nullptr) return;
+
+			const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
+
+			/** 有効な子ペンギンを距離付きで収集する */
+			std::vector<std::pair<float, ChildPenguin*>> distList;
+			distList.reserve(m_childPenguinList.size());
+
+			for (auto* cp : m_childPenguinList)
+			{
+				if (!cp) continue;
+
+				Vector3 diff = cp->GetTransform().m_position - daddyPos;
+				diff.y = 0.0f;
+				const float distSq = diff.LengthSq();
+				distList.emplace_back(distSq, cp);
+			}
+
+			/** 距離の昇順でソートし、上位 AUDIBLE_PENGUIN_NUM 匹を可聴対象に登録する */
+			std::sort(distList.begin(), distList.end(),
+				[](const std::pair<float, ChildPenguin*>& a, const std::pair<float, ChildPenguin*>& b)
+				{
+					return a.first < b.first;
+				});
+
+			const int audibleCount = min(static_cast<int>(distList.size()), AUDIBLE_PENGUIN_NUM);
+			for (int i = 0; i < audibleCount; ++i)
+			{
+				m_audiblePenguins.insert(distList[i].second);
+			}
+		}
+
+
+		bool ChildPenguinManager::IsAudible(const ChildPenguin* penguin) const
+		{
+			return m_audiblePenguins.count(const_cast<ChildPenguin*>(penguin)) > 0;
+		}
 
 
 		//============================================//

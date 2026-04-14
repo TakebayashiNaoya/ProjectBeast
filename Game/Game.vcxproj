@@ -270,6 +270,7 @@
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
     <ClCompile Include="Source\Actor\Stage\Whirlpool.cpp" />
     <ClCompile Include="Source\Actor\Stage\WhirlpoolManager.cpp" />
+    <ClCompile Include="Source\Actor\Stage\WhirlpoolPowerSystem.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera\CameraCommon.cpp" />
     <ClCompile Include="Source\Camera\CameraController.cpp" />
@@ -286,6 +287,7 @@
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
+    <ClCompile Include="Source\Manager\IglooManager.cpp" />
     <ClCompile Include="Source\Manager\InGameUImanager.cpp" />
     <ClCompile Include="Source\Manager\ScoreManager.cpp" />
     <ClCompile Include="Source\Manager\TimeManager.cpp" />
@@ -303,6 +305,8 @@
     <ClCompile Include="Source\UI\EventMenu.cpp" />
     <ClCompile Include="Source\UI\HPBarMenu.cpp" />
     <ClCompile Include="Source\UI\FinishMenu.cpp" />
+    <ClCompile Include="Source\UI\IglooPromptMenu.cpp" />
+    <ClCompile Include="Source\UI\InGameAchievementMenu.cpp" />
     <ClCompile Include="Source\UI\InGameTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
@@ -313,6 +317,7 @@
     <ClCompile Include="Source\UI\SearchMenu.cpp" />
     <ClCompile Include="Source\UI\SoundOptionMenu.cpp" />
     <ClCompile Include="Source\UI\TitleEventMenu.cpp" />
+    <ClCompile Include="Source\UI\TutorialMenu.cpp" />
     <ClCompile Include="Source\UI\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
@@ -368,9 +373,9 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
-    <ClInclude Include="Source\Actor\Stage\Types.h" />
     <ClInclude Include="Source\Actor\Stage\Whirlpool.h" />
     <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h" />
+    <ClInclude Include="Source\Actor\Stage\WhirlpoolPowerSystem.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera\CameraCommon.h" />
     <ClInclude Include="Source\Camera\CameraController.h" />
@@ -388,6 +393,7 @@
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
+    <ClInclude Include="Source\Manager\IglooManager.h" />
     <ClInclude Include="Source\Manager\InGameUImanager.h" />
     <ClInclude Include="Source\Manager\ScoreManager.h" />
     <ClInclude Include="Source\Manager\TimeManager.h" />
@@ -407,6 +413,8 @@
     <ClInclude Include="Source\UI\EventMenu.h" />
     <ClInclude Include="Source\UI\HPBarMenu.h" />
     <ClInclude Include="Source\UI\FinishMenu.h" />
+    <ClInclude Include="Source\UI\IglooPromptMenu.h" />
+    <ClInclude Include="Source\UI\InGameAchievementMenu.h" />
     <ClInclude Include="Source\UI\InGameTimerMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
@@ -417,6 +425,7 @@
     <ClInclude Include="Source\UI\SearchMenu.h" />
     <ClInclude Include="Source\UI\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\TitleEventMenu.h" />
+    <ClInclude Include="Source\UI\TutorialMenu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\Util\CRC32.h" />

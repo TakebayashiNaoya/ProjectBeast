@@ -4,19 +4,23 @@
  * @author 藤谷、竹林
  */
 #include "stdafx.h"
-#include <random>
-#include <algorithm>
+
 #include "ChildPenguin.h"
 #include "ChildPenguinAIController.h"
 #include "ChildPenguinParameter.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "ChildPenguinTypes.h"
+#include "Source/Actor/Stage/StageSystem.h"
 #include "ClumsyChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Manager/IglooManager.h"
+#include <algorithm>
+#include <random>
+
 
 
 namespace app
@@ -229,6 +233,78 @@ namespace app
 		}
 
 
+		void ChildPenguinAIController::UpdateIglooEvent()
+		{
+			if (m_isInsideIgloo)
+			{
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
+			Vector3 myPos = m_owner->GetTransform().m_position;
+
+			Vector3 dirToTarget = m_iglooTargetPos - myPos;
+			dirToTarget.y = 0.0f;
+
+			// 青い円に十分近づいたらワープ発動！
+			if (dirToTarget.Length() < 150.0f)
+			{
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+
+				// ワープ先を取得
+				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+				Vector3 insidePos = iglooPos;
+				insidePos.y += 0.0f;
+				insidePos.x += (float)(std::rand() % 60) - 30.0f;
+				insidePos.z += (float)(std::rand() % 60) - 30.0f;
+
+				m_iglooTargetPos = insidePos;
+				m_owner->SetIglooFixedPos(m_iglooTargetPos);
+				m_owner->SetInsideIgloo(true);
+
+				m_owner->GetCharacterController()->SetPosition(m_iglooTargetPos);
+
+				// マネージャーへの報告
+				//IglooManager::GetInstance().AddPenguin(m_owner);
+				//ChildPenguinManager::GetInstance()->FinishEnterIglooOne();
+
+				// 隊列リストからの離脱（コメントアウトを外す）
+				if (m_isFollowing)
+				{
+					ChildPenguinManager::GetInstance()->RemoveFollower(m_owner);
+					m_isFollowing = false;
+				}
+
+				m_isInsideIgloo = true;
+			}
+			else
+			{
+				// まだ遠い場合は青い円に向かって歩く
+				if (dirToTarget.LengthSq() > 0.0001f)
+				{
+					dirToTarget.Normalize();
+				}
+				m_stateMachine->SetActionInput(dirToTarget, true, false, false, false);
+			}
+		}
+
+
+		void ChildPenguinAIController::EndEnterIglooEvent(const Vector3& exitPos)
+		{
+			// 1. 各種イベントフラグを解除（これで通常の追従AIに戻る）
+			m_isEnterIglooMode = false;
+			m_isInsideIgloo = false;
+			m_owner->SetInsideIgloo(false);
+
+			// 2. 出現座標を少しばらけさせる
+			Vector3 spawnPos = exitPos;
+			spawnPos.x += (float)(std::rand() % 60) - 30.0f;
+			spawnPos.z += (float)(std::rand() % 60) - 30.0f;
+
+			// 3. キャラクターコントローラーとステートマシン両方をワープ！
+			m_owner->GetCharacterController()->SetPosition(spawnPos);
+			m_stateMachine->SetPosition(spawnPos);
+		}
 
 
 		/**************************************************************/
@@ -245,6 +321,10 @@ namespace app
 
 		void SeriousChildPenguinAI::Update()
 		{
+			if (m_isEnterIglooMode) {
+				UpdateIglooEvent();
+				return;
+			}
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 
@@ -304,6 +384,10 @@ namespace app
 
 		void ClingyChildPenguinAI::Update()
 		{
+			if (m_isEnterIglooMode) {
+				UpdateIglooEvent();
+				return;
+			}
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
@@ -404,6 +488,10 @@ namespace app
 
 		void NaughtyChildPenguinAI::Update()
 		{
+			if (m_isEnterIglooMode) {
+				UpdateIglooEvent();
+				return;
+			}
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
@@ -554,6 +642,10 @@ namespace app
 
 		void ClumsyChildPenguinAI::Update()
 		{
+			if (m_isEnterIglooMode) {
+				UpdateIglooEvent();
+				return;
+			}
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
@@ -666,6 +758,10 @@ namespace app
 
 		void CaringChildPenguinAI::Update()
 		{
+			if (m_isEnterIglooMode) {
+				UpdateIglooEvent();
+				return;
+			}
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;

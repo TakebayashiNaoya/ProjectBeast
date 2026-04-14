@@ -169,6 +169,13 @@ namespace app
 			 */
 			int GetRescuedNum() const;
 
+			/**
+			 * @brief 指定した子ペンギンが現在隊列に参加しているか判定する
+			 * @param penguin 判定する子ペンギンのポインタ
+			 * @return 隊列中なら true
+			 */
+			bool IsFollower(const ChildPenguin* penguin) const;
+
 
 		private:
 			/**
@@ -195,7 +202,7 @@ namespace app
 			/** 陣形調整用のパラメータ */
 			const int   MAX_FORMATION_COUNT = 100;   /** 隊列の最大数 */
 			const float FORMATION_BASE_RADIUS = 0.0f;  /** 一番内側の円の半径 */
-			const float FORMATION_RADIUS_STEP = 20.0f; /** 円が外側になるごとの増加量 */
+			const float FORMATION_RADIUS_STEP = 20.0f;
 			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
 
 
@@ -258,6 +265,36 @@ namespace app
 
 
 			//============================================//
+			// サウンド：近傍ペンギンの可聴管理
+			//============================================//
+
+		public:
+			/**
+			 * @brief 指定した子ペンギンが可聴対象かどうかを返す
+			 * @details DaddyPenguinに近い上位 AUDIBLE_PENGUIN_NUM 匹のみ true を返す
+			 * @param penguin 確認する子ペンギン
+			 * @return 可聴対象なら true
+			 */
+			bool IsAudible(const ChildPenguin* penguin) const;
+
+
+		private:
+			/**
+			 * @brief 毎フレーム呼び出し、DaddyPenguinに近い順で
+			 *        上位 AUDIBLE_PENGUIN_NUM 匹を m_audiblePenguins に格納する
+			 */
+			void UpdateAudiblePenguins();
+
+			/** DaddyPenguinに近い順の上位 N 匹（可聴対象） */
+			std::unordered_set<ChildPenguin*> m_audiblePenguins;
+
+			/** 可聴対象とする子ペンギンの最大数 */
+			static constexpr int AUDIBLE_PENGUIN_NUM = 5;
+
+
+
+
+			//============================================//
 			// 世話焼き用：問題行動ペンギンの状態管理
 			//============================================//
 
@@ -269,59 +306,60 @@ namespace app
 			void RegisterDowning(ChildPenguin* penguin);
 
 			/**
-			 * @brief 転倒・スリップ中の登録を解除する
+			 * @brief 転倒・スリップ中のペンギンを解除する
 			 * @param penguin 解除するペンギン
 			 */
 			void UnregisterDowning(ChildPenguin* penguin);
 
 			/**
-			 * @brief 転倒・スリップ中かどうかを取得する
+			 * @brief 転倒・スリップ中かどうか
 			 * @param penguin 確認するペンギン
-			 * @return 転倒・スリップ中ならtrue
+			 * @return 転倒中なら true
 			 */
 			bool IsDowning(const ChildPenguin* penguin) const;
 
 			/**
 			 * @brief 待機命令中に追従しようとしている甘えん坊を登録する
-			 * @param penguin 登録するペンギン
 			 */
 			void RegisterAttempting(ChildPenguin* penguin);
 
 			/**
-			 * @brief 追従しようとしている甘えん坊の登録を解除する
-			 * @param penguin 解除するペンギン
+			 * @brief 待機命令中に追従しようとしている甘えん坊を解除する
 			 */
 			void UnregisterAttempting(ChildPenguin* penguin);
 
 			/**
-			 * @brief 待機命令中に追従しようとしているかどうかを取得する
-			 * @param penguin 確認するペンギン
-			 * @return 追従しようとしているならtrue
+			 * @brief 追従しようとしているかどうか
 			 */
 			bool IsAttempting(const ChildPenguin* penguin) const;
 
 			/**
 			 * @brief 徘徊中のやんちゃペンギンを登録する
-			 * @param penguin 登録するペンギン
 			 */
 			void RegisterRoaming(ChildPenguin* penguin);
 
 			/**
-			 * @brief 徘徊中のやんちゃペンギンの登録を解除する
-			 * @param penguin 解除するペンギン
+			 * @brief 徘徊中のやんちゃペンギンを解除する
 			 */
 			void UnregisterRoaming(ChildPenguin* penguin);
 
 			/**
-			 * @brief 徘徊中かどうかを取得する
-			 * @param penguin 確認するペンギン
-			 * @return 徘徊中ならtrue
+			 * @brief 徘徊中かどうか
 			 */
 			bool IsRoaming(const ChildPenguin* penguin) const;
 
 			/**
-			 * @brief 現在いずれかの世話焼きペンギンが担当しているペンギンの集合を取得する
-			 * @return 担当済みペンギンの集合
+			 * @brief 世話焼きが担当しているペンギンを登録する
+			 */
+			void RegisterAssigned(ChildPenguin* penguin);
+
+			/**
+			 * @brief 世話焼きが担当しているペンギンを解除する
+			 */
+			void UnregisterAssigned(ChildPenguin* penguin);
+
+			/**
+			 * @brief 世話焼きが担当しているペンギンの集合を取得する
 			 */
 			const std::unordered_set<ChildPenguin*>& GetAssignedTargets() const
 			{
@@ -329,19 +367,7 @@ namespace app
 			}
 
 			/**
-			 * @brief 世話焼きペンギンの担当ペンギンを登録する
-			 * @param penguin 担当するペンギン
-			 */
-			void RegisterAssigned(ChildPenguin* penguin);
-
-			/**
-			 * @brief 世話焼きペンギンの担当ペンギンの登録を解除する
-			 * @param penguin 解除するペンギン
-			 */
-			void UnregisterAssigned(ChildPenguin* penguin);
-
-			/**
-			 * @brief 最も近い転倒・スリップ中のペンギンを取得する
+			 * @brief 最も近い転倒中のペンギンを取得する
 			 * @param from       基準座標（世話焼きペンギンの座標）
 			 * @param excludeSet 既に他の世話焼きが担当しているペンギンの集合
 			 * @param maxRange   探索する最大距離
@@ -420,6 +446,17 @@ namespace app
 			}
 
 
+		public:
+			/** かまくらイベントを開始する */
+			void StartIglooEvent(const Vector3& interactPos);
+			// ★ 追加：かまくらイベントを終了して外に出る
+			void EndIglooEvent(const Vector3& exitPos);
+			/** 子ペンギンが1匹かまくらに入り終わった時の報告を受け取る */
+			void FinishEnterIglooOne();
+			/** 全員がかまくらに入り終わったか確認する */
+			bool IsIglooEventFinished() const;
+
+
 		private:
 			ChildPenguinManager();
 			~ChildPenguinManager();
@@ -428,6 +465,10 @@ namespace app
 		private:
 			/** シングルトンインスタンス */
 			static ChildPenguinManager* m_instance;
+
+
+			/** かまくらに入ろうとしている子ペンギンの残り数 */
+			int m_iglooEnteringCount = 0;
 		};
 	}
 }

@@ -62,7 +62,14 @@ namespace app
 
 		void CounterAchievement::Update()
 		{
+			// 達成済みなら何もしない
+			if (m_isAchieved) return;
 
+			// 条件関数が設定されていれば評価して達成判定する
+			if (m_conditionFunc && m_conditionFunc())
+			{
+				m_isAchieved = true;
+			}
 		}
 
 

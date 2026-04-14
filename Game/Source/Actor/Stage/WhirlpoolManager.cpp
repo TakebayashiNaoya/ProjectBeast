@@ -7,6 +7,8 @@
 #include "StageSystem.h"
 #include "Whirlpool.h"
 #include "WhirlpoolManager.h"
+#include <algorithm>
+#include <random>
 
 
 namespace app
@@ -18,12 +20,11 @@ namespace app
 
 		namespace
 		{
-			/** 最大渦潮数 */
-			constexpr int MAX_WHIRLPOOL_NUM = 3;
 			/** 渦潮の位置の数 */
-			constexpr int WHIRLPOOL_INDEX = 4;
+			constexpr int MIN_WHIRLPOOL_INDEX = 1;
+			constexpr int MAX_WHIRLPOOL_INDEX = 10;
 			/** 渦潮の生成間隔 */
-			constexpr float WHIRLPOOL_CREATE_INTERVAL = 20.0f;
+			constexpr float WHIRLPOOL_CREATE_INTERVAL = 5.0f;
 			/** 渦潮のY座標 */
 			constexpr float WHIRLPOOL_Y = 0.0f;
 		}
@@ -40,15 +41,7 @@ namespace app
 			if (m_timer >= WHIRLPOOL_CREATE_INTERVAL)
 			{
 				m_timer = 0.0f;
-
-				int createNum = rand() % MAX_WHIRLPOOL_NUM;
-
-				for (int i = 0; i < createNum; i++)
-				{
-					if (m_whirlpoolMap.size() >= MAX_WHIRLPOOL_NUM) break;
-
-					CreateWhirlpool();
-				}
+				CreateWhirlpool();
 			}
 
 
@@ -70,7 +63,6 @@ namespace app
 				auto iter = m_whirlpoolMap.find(it);
 				if (iter != m_whirlpoolMap.end())
 				{
-					delete iter->second;
 					m_whirlpoolMap.erase(iter);
 				}
 			}
@@ -91,6 +83,12 @@ namespace app
 		{}
 
 
+		WhirlpoolManager::~WhirlpoolManager()
+		{
+			m_whirlpoolMap.clear();
+		}
+
+
 		void WhirlpoolManager::ForEach(std::function<void(Whirlpool* info)> cb)
 		{
 			if (m_whirlpoolMap.empty()) return;
@@ -99,47 +97,43 @@ namespace app
 			{
 				if (!it.second) continue;
 
-				cb(it.second);
+				cb(it.second.get());
 			}
 		}
 
 
 		void WhirlpoolManager::CreateWhirlpool()
 		{
-			if (m_whirlpoolMap.size() >= MAX_WHIRLPOOL_NUM) return;
-
-			bool isUsed = true;
-			int index = -1;
-			while (isUsed)
+			std::vector<uint8_t> candidates;
+			for (int i = MIN_WHIRLPOOL_INDEX; i <= MAX_WHIRLPOOL_INDEX; ++i)
 			{
-				// 生成する座標が既に存在する渦潮の座標と被っていないか
-				index = (rand() % WHIRLPOOL_INDEX) + 1;
-
-				if (m_whirlpoolMap.empty()) break;
-
-				for (auto& it : m_whirlpoolMap)
+				if (m_whirlpoolMap.find(i) == m_whirlpoolMap.end())
 				{
-					if (it.first == index) continue;
-
-					isUsed = false;
+					candidates.push_back(i);
 				}
 			}
 
+			if (candidates.empty()) return;
 
-			if (index == -1) return;
+
+			std::random_device rd;
+			std::mt19937 gen(rd());
+			std::uniform_int_distribution<int> dist(0, static_cast<int>(candidates.size() - 1));
+
+			uint8_t index = candidates[dist(gen)];
 
 
 			// ステージオブジェクトの位置を取得
 			Vector3 position = StageSystem::GetInstance()->GetObjectPosition("whirlpool" + std::to_string(index));
 			position.y = WHIRLPOOL_Y;
 
-			auto* newWhirlpool = new Whirlpool();
+			auto newWhirlpool = std::make_unique<Whirlpool>();
 			// 渦潮を初期化
 			newWhirlpool->SetIsNeedCollision(false);
 			newWhirlpool->SetPosition(position);
 			newWhirlpool->SetIndex(static_cast<uint8_t>(index));
 			newWhirlpool->StartWrapper();
-			m_whirlpoolMap.insert({ index, newWhirlpool });
+			m_whirlpoolMap.insert({ index, std::move(newWhirlpool) });
 		}
 	}
 }

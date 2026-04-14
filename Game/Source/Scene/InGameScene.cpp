@@ -25,6 +25,7 @@
 #include "Source/Util/JsonConverter.h"
 
 #include "Source/Manager/BattleManager.h"
+#include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
@@ -35,6 +36,7 @@
 #include "Source/UI/FinishMenu.h"
 #include "Source/UI/PauseScreenMenu.h"
 #include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/TutorialMenu.h"
 
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
@@ -79,6 +81,8 @@ namespace app
 		actor::StageSystem::DestroyInstance();
 		actor::WhirlpoolManager::DestroyInstance();
 
+		actor::IglooManager::DestroyInstance();
+
 		DeleteGO(m_skyCube);
 		DeleteGO(m_ocean);
 
@@ -87,12 +91,17 @@ namespace app
 		ScoreManager::DestroyInstance();
 		TimeManager::DestroyInstance();
 
-
+		/** タイトルへ戻る場合は ResultScene を経由しないため、ここで破棄する。
+		 *  リザルト遷移の場合は ResultScene::~ResultScene が担当する。 */
 		if (m_goTitle) {
 			if (app::achievement::AchievementManager::GetInstance()) {
 				app::achievement::AchievementManager::DestroyInstance();
 			}
 		}
+
+		/** 2周目以降のために GameCamera の登録を解除する。
+		 *  次の InGameScene::LoadPhase::Camera で新しいインスタンスを Register できるようにする。 */
+		camera::CameraManager::Get().Unregister(camera::GameCamera::ID());
 	}
 
 
@@ -113,6 +122,7 @@ namespace app
 		actor::ChildPenguinManager::CreateInstance();
 		actor::EnemyManager::CreateInstance();
 
+		actor::IglooManager::CreateInstance();
 
 		/** UIManager生成（Layoutの生成はDaddyPenguin生成後のInitializeで行う） */
 		m_uiManager = new InGameUIManager();
@@ -209,6 +219,7 @@ namespace app
 			m_cameraSteering.SetConfig(config);
 			m_cameraSteering.SetTargetCharacter(m_daddyPenguin);
 
+			/** 2周目以降は Unregister 済みのため、毎回新しいインスタンスを登録できる */
 			auto gameCamera = std::make_shared<camera::GameCamera>();
 			camera::CameraManager::Get().Register(camera::GameCamera::ID(), gameCamera);
 			camera::CameraManager::Get().SwitchCamera(camera::GameCamera::ID());
@@ -364,7 +375,12 @@ namespace app
 			/** FINISH UI 更新 */
 			m_uiManager->UpdateFinishing();
 
-			SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
+			/** ホイッスルは演出開始時に1回だけ鳴らす */
+			if (!m_isWhistlePlayed)
+			{
+				SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
+				m_isWhistlePlayed = true;
+			}
 
 			/** 演出終了 → リザルトへ */
 			auto* finishMenu = m_uiManager->GetFinishMenu();
@@ -385,6 +401,13 @@ namespace app
 
 	void InGameScene::PauseUpdate()
 	{
+		/** ポーズ開始フレームに1回だけ全SEを停止する */
+		if (!m_isPauseEntered)
+		{
+			SoundManager::Get().StopAllSE();
+			m_isPauseEntered = true;
+		}
+
 		switch (m_pauseState)
 		{
 			//------------------------------------------------------------
@@ -403,6 +426,8 @@ namespace app
 			{
 				pauseMenu->IsRetry(false);
 				SceneManager::GetInstance()->SetPause(false);
+				/** ポーズ解除時にフラグをリセットする */
+				m_isPauseEntered = false;
 			}
 			/** サウンドオプションへ */
 			else if (pauseMenu->IsSound())
@@ -410,11 +435,25 @@ namespace app
 				pauseMenu->IsSound(false);
 				m_pauseState = PauseState::SoundOption;
 			}
+			/** ルール画面へ */
+			else if (pauseMenu->IsRule())
+			{
+				pauseMenu->IsRule(false);
+				auto* tutorialMenu = m_uiManager->GetTutorialMenu();
+				if (tutorialMenu)
+				{
+					tutorialMenu->SetClosed(false);
+					tutorialMenu->InitializeLogic();
+				}
+				m_pauseState = PauseState::Tutorial;
+			}
 			/** タイトルへ戻る */
 			else if (pauseMenu->IsGoTitle())
 			{
 				pauseMenu->IsGoTitle(false);
 				SceneManager::GetInstance()->SetPause(false);
+				/** ポーズ解除時にフラグをリセットする */
+				m_isPauseEntered = false;
 				m_goTitle = true;
 			}
 			break;
@@ -438,6 +477,26 @@ namespace app
 			}
 			break;
 		}
+
+		//------------------------------------------------------------
+		// チュートリアル画面（ポーズ中のサブ画面）
+		//------------------------------------------------------------
+		case PauseState::Tutorial:
+		{
+			auto* tutorialMenu = m_uiManager->GetTutorialMenu();
+			if (tutorialMenu)
+			{
+				tutorialMenu->Update();
+
+				/** TutorialMenu 内で Bボタンが押されたら閉じる */
+				if (tutorialMenu->IsClosed())
+				{
+					tutorialMenu->SetClosed(false);
+					m_pauseState = PauseState::Pause;
+				}
+			}
+			break;
+		}
 		}
 	}
 
@@ -454,7 +513,6 @@ namespace app
 		/** ポーズ中の描画 */
 		if (SceneManager::GetInstance()->IsPause())
 		{
-			SoundManager::Get().StopAllSE();
 			switch (m_pauseState)
 			{
 			case PauseState::Pause:
@@ -462,6 +520,9 @@ namespace app
 				break;
 			case PauseState::SoundOption:
 				m_uiManager->RenderSoundOption(rc);
+				break;
+			case PauseState::Tutorial:
+				m_uiManager->RenderTutorial(rc);
 				break;
 			}
 			return;

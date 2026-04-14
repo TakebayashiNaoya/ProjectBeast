@@ -27,7 +27,7 @@ namespace app
 
 		private:
 			WhirlpoolManager();
-			virtual ~WhirlpoolManager() override = default;
+			~WhirlpoolManager() override;
 
 
 		public:
@@ -47,7 +47,7 @@ namespace app
 
 		private:
 			/** 渦潮のマップ */
-			std::unordered_map<uint8_t, Whirlpool*> m_whirlpoolMap;
+			std::unordered_map<uint8_t, std::unique_ptr<Whirlpool>> m_whirlpoolMap;
 			/** 渦潮の生成タイマー */
 			float m_timer;
 
@@ -80,6 +80,7 @@ namespace app
 			static void DestroyInstance()
 			{
 				delete m_instance;
+				m_instance = nullptr;
 			}
 
 
@@ -89,4 +90,3 @@ namespace app
 		};
 	}
 }
-

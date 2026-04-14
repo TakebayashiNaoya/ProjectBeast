@@ -28,6 +28,11 @@ namespace app
 			 */
 			inline DaddyPenguinStateMachine* GetStateMachine() { return m_stateMachine.get(); }
 			/**
+			 * @brief キャラクターコントローラーを取得
+			 * @return キャラクターコントローラーのポインタ
+			 */
+			inline DaddyPenguinController* GetController() { return m_controller.get(); }
+			/**
 			 * @brief Activeフラグの設定
 			 * @param isActive Activeフラグ
 			 */

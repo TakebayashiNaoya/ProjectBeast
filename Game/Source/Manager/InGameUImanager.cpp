@@ -9,23 +9,27 @@
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/ScoreManager.h"
 
-#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
 
-#include "Source/UI/Layout.h"
 #include "Source/UI/CountDownMenu.h"
-#include "Source/UI/InGameTimerMenu.h"
-#include "Source/UI/FinishMenu.h"
-#include "Source/UI/RemainingChildMenu.h"
-#include "Source/UI/PauseScreenMenu.h"
-#include "Source/UI/SoundOptionMenu.h"
-#include "Source/UI/SearchMenu.h"
 #include "Source/UI/EnemySleepingMenu.h"
+#include "Source/UI/FinishMenu.h"
+#include "Source/UI/IglooPromptMenu.h"
+#include "Source/UI/InGameAchievementMenu.h"
+#include "Source/UI/InGameTimerMenu.h"
+#include "Source/UI/Layout.h"
+#include "Source/UI/PauseScreenMenu.h"
 #include "Source/UI/PBWakingUpTimerMenu.h"
 #include "Source/UI/MiniMapMenu.h"
+#include "Source/UI/RemainingChildMenu.h"
+#include "Source/UI/SearchMenu.h"
+#include "Source/UI/SoundOptionMenu.h"
+#include "Source/UI/TutorialMenu.h"
 
 
 namespace app
@@ -55,6 +59,9 @@ namespace app
 		delete m_soundOptionLayout;
 		delete m_enemySleepingLayout;
 		delete m_pbWakingUpTimerLayout;
+		delete m_iglooPromptLayout;
+		delete m_tutorialLayout;
+		delete m_achievementLayout;
 		delete m_miniMapLayout;
 
 		for (auto* layout : m_searchLayouts)
@@ -138,6 +145,31 @@ namespace app
 			m_miniMapMenu->SetDraw(true);
 			m_miniMapMenu->SetDaddyPenguin(daddyPenguin);
 		}
+
+		m_iglooPromptLayout = new ui::Layout();
+		m_iglooPromptLayout->Initialize<ui::IglooPromptMenu>(
+			"Assets/parameter/UI/iglooPrompt/IglooPrompt.json"
+		);
+		m_iglooPromptMenu = m_iglooPromptLayout->GetMenu<ui::IglooPromptMenu>();
+		if (m_iglooPromptMenu)
+		{
+			m_iglooPromptMenu->SetDraw(false);
+		}
+		daddyPenguin->GetController()->SetIglooPromptMenu(m_iglooPromptMenu);
+
+		m_tutorialLayout = new ui::Layout();
+		m_tutorialLayout->Initialize<ui::TutorialMenu>(
+			"Assets/parameter/tutorial/Tutorial.json"
+		);
+		m_tutorialMenu = m_tutorialLayout->GetMenu<ui::TutorialMenu>();
+
+		// アチーブメント表示：他のUIと同じLayout経由で生成する
+		// Layout::Reload()→InitializeLogic()の流れでホットリロードも自動的に対応される
+		m_achievementLayout = new ui::Layout();
+		m_achievementLayout->Initialize<ui::InGameAchievementMenu>(
+			"Assets/parameter/UI/inGameAchievement/InGameAchievement.json"
+		);
+		m_achievementMenu = m_achievementLayout->GetMenu<ui::InGameAchievementMenu>();
 
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);
@@ -261,8 +293,6 @@ namespace app
 		if (m_enemySleepingLayout) m_enemySleepingLayout->Update();
 
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
-
-		if (m_miniMapLayout)m_miniMapLayout->Update();
 	}
 
 
@@ -296,8 +326,6 @@ namespace app
 		if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
 
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
-
-		if (m_miniMapLayout)m_miniMapLayout->Render(rc);
 	}
 
 
@@ -318,5 +346,10 @@ namespace app
 	void InGameUIManager::RenderSoundOption(RenderContext& rc)
 	{
 		if (m_soundOptionLayout) m_soundOptionLayout->Render(rc);
+	}
+
+	void InGameUIManager::RenderTutorial(RenderContext& rc)
+	{
+		if (m_tutorialLayout) m_tutorialLayout->Render(rc);
 	}
 }

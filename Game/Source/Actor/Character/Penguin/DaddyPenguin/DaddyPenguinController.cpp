@@ -4,10 +4,13 @@
  * @author 藤谷、竹林
  */
 #include "stdafx.h"
-#include "DaddyPenguinController.h"
 #include "DaddyPenguin.h"
+#include "DaddyPenguinController.h"
+#include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
+#include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
+#include "Source/UI/IglooPromptMenu.h"
 #include <algorithm> // std::min用
 
 
@@ -18,6 +21,7 @@ namespace app
 		DaddyPenguinController::DaddyPenguinController(DaddyPenguin* owner)
 			: m_owner(owner)
 			, m_stateMachine(owner->GetStateMachine())
+			, m_iglooPromptMenu(nullptr)
 		{}
 
 		void DaddyPenguinController::Update()
@@ -107,6 +111,58 @@ namespace app
 			bool isJump = g_pad[0]->IsTrigger(enButtonA);
 			bool isCommandToggle = g_pad[0]->IsTrigger(enButtonY);
 			bool isSlide = g_pad[0]->IsPress(enButtonX);
+			bool isEnterIgloo = false;
+
+			// かまくら近接判定（毎フレーム実行）
+			Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+			Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+
+			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+			iglooRot.Apply(forwardVec);
+
+			float interactAreaOffset = 220.0f;
+			Vector3 interactPos = iglooPos + (forwardVec * interactAreaOffset);
+
+			Vector3 myPos = m_owner->GetTransform().m_position;
+
+			Vector3 diff = myPos - interactPos;
+			diff.y = 0.0f;
+
+			float interactRadius = 80.0f;
+			bool isNearIgloo = (diff.Length() <= interactRadius);
+
+			if (m_iglooPromptMenu)
+			{
+				// 1. ステートマシンに「今かまくらの中にいるステートか？」を確認
+				bool isInside = m_stateMachine->IsEqualCurrentState(DaddyPenguinInsideIglooState::ID());
+
+				if (isInside)
+				{
+					// 【かまくらの中にいるとき】 -> 「出る」を表示
+					// 位置は親ペンギン自身の足元（頭上にUIが出るように計算される）
+					m_iglooPromptMenu->SetPromptType(ui::IglooPromptMenu::PromptType::Exit);
+					m_iglooPromptMenu->SetTargetPosition(m_owner->GetTransform().m_position);
+				}
+				else if (isNearIgloo)
+				{
+					// 【外にいて、入り口の近くにいるとき】 -> 「入る」を表示
+					// 位置はかまくらの入り口（interactPos）
+					m_iglooPromptMenu->SetPromptType(ui::IglooPromptMenu::PromptType::Enter);
+					m_iglooPromptMenu->SetTargetPosition(interactPos);
+				}
+				else
+				{
+					// 【どちらでもないとき】 -> 非表示
+					m_iglooPromptMenu->SetPromptType(ui::IglooPromptMenu::PromptType::None);
+				}
+			}
+
+			// Aボタンが押されていて、かつかまくら近くにいるならイベント開始
+			if (isJump && isNearIgloo)
+			{
+				isEnterIgloo = true;
+				isJump = false;
+			}
 
 			// =========================================================
 			// ステートマシンへ一括入力
@@ -116,6 +172,8 @@ namespace app
 
 			// 親ペンギン固有の入力
 			m_stateMachine->SetIsCommandToggle(isCommandToggle);
+
+			m_stateMachine->SetIsEnterIgloo(isEnterIgloo);
 		}
 	}
 }

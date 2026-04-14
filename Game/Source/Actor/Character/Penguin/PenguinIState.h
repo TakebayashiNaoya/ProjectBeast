@@ -311,5 +311,27 @@ namespace app
 			PenguinDeadState(PenguinStateMachine* owner);
 			~PenguinDeadState() override = default;
 		};
+
+
+
+
+		/****************************************/
+
+
+
+		class PenguinInWhirlpoolState : public PenguinIState
+		{
+			appState(PenguinInWhirlpoolState);
+		public:
+			// IStateの仮想関数のオーバーライド
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+
+		public:
+			PenguinInWhirlpoolState(PenguinStateMachine* owner);
+			~PenguinInWhirlpoolState() override = default;
+		};
 	}
 }

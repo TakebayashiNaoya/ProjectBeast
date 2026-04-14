@@ -32,6 +32,7 @@ namespace app
 			AddState<PenguinDamagedState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDiyingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinDeadState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinInWhirlpoolState>(static_cast<PenguinStateMachine*>(this));
 
 			/** タイプ固有のステートの追加 */
 			switch (m_type)
@@ -77,7 +78,8 @@ namespace app
 		core::IState* ChildPenguinStateMachine::GetChangeState()
 		{
 			// 1. システム・環境系の判定（ダメージ、死亡、水泳など）
-			   // 死亡中状態の維持
+
+			// 死亡中状態の維持
 			if (IsEqualCurrentState(PenguinDiyingState::ID()))
 			{
 				if (IsPlayingAnimation())
@@ -99,10 +101,20 @@ namespace app
 				return FindState(PenguinDamagedState::ID());
 			}
 
+			// 渦潮の中判定
+			if (CanChangeInWhirlpoolState())
+			{
+				return FindState(PenguinInWhirlpoolState::ID());
+			}
+
+
 			// 泳ぎ判定
+			// Swim中は「水面より完全に出た（IsInWater() == false）」かつ「地面にいる（IsOnGround() == true）」
+			// の両方を満たすまで維持する。
+			// これにより、波の下に陸がある波打ち際でのチャタリングを防ぐ。
 			if (IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{
-				if (!IsOnGround()) return FindState(PenguinSwimmingState::ID());
+				if (IsInWater() || !IsOnGround()) return FindState(PenguinSwimmingState::ID());
 			}
 			else if (CanChangeSwimState())
 			{
@@ -117,6 +129,7 @@ namespace app
 			}
 
 			// 3. アクション系の判定（スライド、ジャンプ、移動など）
+
 			// スライド開始アニメ中→スライド
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
 			{
