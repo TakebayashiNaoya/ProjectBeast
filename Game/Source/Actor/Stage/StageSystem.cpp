@@ -23,6 +23,8 @@ namespace
 	const char* OBJECT_ARRAY_KEY = "object";
 	/** オブジェクトネームのキー */
 	const char* OBJECT_NAME = "objectName";
+	/** イグルーのキープレフィックス */
+	const char* IGLOO_KEY_PREFIX = "igloo";
 
 	/** ステージ上に配置できる最大の数 : 512 */
 	constexpr uint32_t MAX_OBJECT_NUM = 0x200;
@@ -277,7 +279,7 @@ namespace app
 		}
 
 
-		Vector3 StageSystem::GetObjectPosition(const std::string& key)const
+		Vector3 StageSystem::GetObjectPosition(const std::string& key) const
 		{
 			auto it = m_objectMap.find(key);
 			if (it != m_objectMap.end())
@@ -290,7 +292,7 @@ namespace app
 		}
 
 
-		Quaternion StageSystem::GetObjectRotation(const std::string& key)const
+		Quaternion StageSystem::GetObjectRotation(const std::string& key) const
 		{
 			auto it = m_objectMap.find(key);
 			if (it != m_objectMap.end())
@@ -302,9 +304,68 @@ namespace app
 			return Quaternion::Identity;
 		}
 
+
+		Vector3 StageSystem::GetNearestIglooPosition(const Vector3& from) const
+		{
+			const IStageObject* nearest = nullptr;
+			float minDistSq = FLT_MAX;
+
+			for (const auto& obj : m_objectMap)
+			{
+				// キー名が "igloo" で始まるオブジェクトのみ対象とする
+				if (obj.first.find(IGLOO_KEY_PREFIX) != 0) continue;
+
+				const Vector3& pos = obj.second->GetTransform().m_position;
+				const Vector3 diff = pos - from;
+				const float distSq = diff.LengthSq();
+
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					nearest = obj.second.get();
+				}
+			}
+
+			if (nearest == nullptr)
+			{
+				return Vector3::Zero;
+			}
+
+			return nearest->GetTransform().m_position;
+		}
+
+
+		Quaternion StageSystem::GetNearestIglooRotation(const Vector3& from) const
+		{
+			const IStageObject* nearest = nullptr;
+			float minDistSq = FLT_MAX;
+
+			for (const auto& obj : m_objectMap)
+			{
+				// キー名が "igloo" で始まるオブジェクトのみ対象とする
+				if (obj.first.find(IGLOO_KEY_PREFIX) != 0) continue;
+
+				const Vector3& pos = obj.second->GetTransform().m_position;
+				const Vector3 diff = pos - from;
+				const float distSq = diff.LengthSq();
+
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					nearest = obj.second.get();
+				}
+			}
+
+			if (nearest == nullptr)
+			{
+				return Quaternion::Identity;
+			}
+
+			return nearest->GetTransform().m_rotation;
+		}
+
+
 		/** インスタンスを初期化 */
 		StageSystem* StageSystem::m_instance = nullptr;
 	}
 }
-
-

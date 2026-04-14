@@ -87,7 +87,7 @@ namespace app
 				}
 				moveDirection = inputDir;
 
-				/** スティックの倒し具合とBボタンの状態でスニークかダッシュかを決める */
+				/** Bボタンの状態でスニークかダッシュかを決める */
 				const float SNEAK_THRESHOLD = 0.9f;
 				if (stickLength <= SNEAK_THRESHOLD || isPressB) {
 					isSneak = true;
@@ -114,16 +114,16 @@ namespace app
 			bool isEnterIgloo = false;
 
 			// かまくら近接判定（毎フレーム実行）
-			Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
-			Quaternion iglooRot = StageSystem::GetInstance()->GetObjectRotation("igloo");
+			// 親ペンギンの現在位置を基準に最も近いイグルーを取得する
+			Vector3 myPos = m_owner->GetTransform().m_position;
+			Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
+			Quaternion iglooRot = StageSystem::GetInstance()->GetNearestIglooRotation(myPos);
 
 			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
 			iglooRot.Apply(forwardVec);
 
 			float interactAreaOffset = 220.0f;
 			Vector3 interactPos = iglooPos + (forwardVec * interactAreaOffset);
-
-			Vector3 myPos = m_owner->GetTransform().m_position;
 
 			Vector3 diff = myPos - interactPos;
 			diff.y = 0.0f;

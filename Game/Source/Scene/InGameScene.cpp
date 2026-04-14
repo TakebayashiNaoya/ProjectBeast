@@ -396,6 +396,12 @@ namespace app
 			break;
 		}
 		}
+
+
+		wchar_t debugStr[256];
+		const Vector3 pos = m_daddyPenguin->GetTransform().m_position;
+		swprintf(debugStr, 256, L"pos: %1f, %1f, %1f", pos.x, pos.y, pos.z);
+		fontRender.SetText(debugStr);
 	}
 
 
@@ -503,6 +509,7 @@ namespace app
 
 	void InGameScene::Render(RenderContext& rc)
 	{
+		fontRender.Draw(rc);
 		actor::StageSystem::GetInstance()->Render(rc);
 		actor::WhirlpoolManager::GetInstance()->RenderWrapper(rc);
 

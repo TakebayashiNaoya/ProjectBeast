@@ -11,11 +11,11 @@
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "ChildPenguinTypes.h"
-#include "Source/Actor/Stage/StageSystem.h"
 #include "ClumsyChildPenguinStateMachine.h"
-#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Manager/IglooManager.h"
 #include <algorithm>
@@ -251,8 +251,8 @@ namespace app
 			{
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 
-				// ワープ先を取得
-				Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition("igloo");
+				// 子ペンギンの現在位置を基準に最も近いイグルーの中心座標を取得
+				Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
 				Vector3 insidePos = iglooPos;
 				insidePos.y += 0.0f;
 				insidePos.x += (float)(std::rand() % 60) - 30.0f;
@@ -769,27 +769,6 @@ namespace app
 			/** 追従命令のとき */
 			if (isFollowCmd)
 			{
-				/** 甘えん坊・やんちゃへの制止は解除して通常追従に戻す */
-				if (m_interventionTarget != nullptr &&
-					m_interventionTarget->GetChildPenguinType() != EnChildPenguinType::Clumsy)
-				{
-					ReleaseSuppression(m_interventionTarget);
-					manager->UnregisterAssigned(m_interventionTarget);
-					m_interventionTarget = nullptr;
-				}
-
-				/** おっちょこちょいへの介入：助け終わったらターゲットをクリアする */
-				if (m_interventionTarget != nullptr &&
-					m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Clumsy)
-				{
-					if (!manager->IsDowning(m_interventionTarget))
-					{
-						/** 起き上がり完了 → 介入終了 */
-						manager->UnregisterAssigned(m_interventionTarget);
-						m_interventionTarget = nullptr;
-					}
-				}
-
 				/** 担当対象が消えていたら（死亡など）クリアする */
 				if (m_interventionTarget != nullptr)
 				{
@@ -802,7 +781,27 @@ namespace app
 					}
 				}
 
-				/** 担当がいなければ転倒中のおっちょこちょいを探す */
+				/** 助け終わったらターゲットをクリアして次を探す */
+				if (m_interventionTarget != nullptr &&
+					m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Clumsy)
+				{
+					if (!manager->IsDowning(m_interventionTarget))
+					{
+						/** 起き上がり完了 → 介入終了 */
+						ReleaseSuppression(m_interventionTarget);
+						manager->UnregisterAssigned(m_interventionTarget);
+						m_interventionTarget = nullptr;
+					}
+				}
+				else if (m_interventionTarget != nullptr)
+				{
+					/** 制止対象の命令が Follow になったら制止を解除する */
+					ReleaseSuppression(m_interventionTarget);
+					manager->UnregisterAssigned(m_interventionTarget);
+					m_interventionTarget = nullptr;
+				}
+
+				/** 担当がいなければ新たに探す */
 				if (m_interventionTarget == nullptr)
 				{
 					const auto& assigned = manager->GetAssignedTargets();
