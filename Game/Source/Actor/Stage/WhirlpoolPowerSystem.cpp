@@ -198,7 +198,8 @@ namespace app
 			pos.z = whirlpoolPos.z + newRadius * sinf(info.angle);
 			// Y座標は変化させない
 
-			info.target->GetStateMachine()->SetPosition(pos);
+			const Vector3 prevPos = info.target->GetCharacterController()->Execute(pos, deltaTime);
+			info.target->GetStateMachine()->SetPosition(prevPos);
 		}
 	}
 }
