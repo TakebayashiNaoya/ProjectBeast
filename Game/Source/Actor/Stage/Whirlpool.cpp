@@ -4,8 +4,9 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Whirlpool.h"
-
 
 namespace app
 {
@@ -118,6 +119,8 @@ namespace app
 			}
 			case EnWhirlpoolState::None:
 			{
+
+
 
 			}
 			break;
