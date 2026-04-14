@@ -25,6 +25,7 @@
 #include "Source/UI/Layout.h"
 #include "Source/UI/PauseScreenMenu.h"
 #include "Source/UI/PBWakingUpTimerMenu.h"
+#include "Source/UI/MiniMapMenu.h"
 #include "Source/UI/RemainingChildMenu.h"
 #include "Source/UI/SearchMenu.h"
 #include "Source/UI/SoundOptionMenu.h"
@@ -61,6 +62,7 @@ namespace app
 		delete m_iglooPromptLayout;
 		delete m_tutorialLayout;
 		delete m_achievementLayout;
+		delete m_miniMapLayout;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -129,7 +131,19 @@ namespace app
 		m_pbWakingUpTimerMenu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
 		if (m_pbWakingUpTimerMenu)
 		{
-			m_pbWakingUpTimerMenu->SetDraw(false);
+			m_pbWakingUpTimerMenu->SetDraw(true);
+		}
+
+		m_miniMapLayout = new ui::Layout();
+		m_miniMapLayout->Initialize<ui::MiniMapMenu>(
+			"Assets/parameter/miniMap/MiniMap.json"
+		);
+
+		m_miniMapMenu = m_miniMapLayout->GetMenu<ui::MiniMapMenu>();
+		if (m_miniMapMenu)
+		{
+			m_miniMapMenu->SetDraw(true);
+			m_miniMapMenu->SetDaddyPenguin(daddyPenguin);
 		}
 
 		m_iglooPromptLayout = new ui::Layout();
@@ -279,11 +293,6 @@ namespace app
 		if (m_enemySleepingLayout) m_enemySleepingLayout->Update();
 
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
-
-		if (m_iglooPromptLayout) m_iglooPromptLayout->Update();
-
-		/** アチーブメント表示の更新（ホットリロードも Layout::Update() が自動で担う） */
-		if (m_achievementLayout) m_achievementLayout->Update();
 	}
 
 
@@ -317,11 +326,6 @@ namespace app
 		if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
 
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
-
-		if (m_iglooPromptLayout) m_iglooPromptLayout->Render(rc);
-
-		/** アチーブメント表示の描画 */
-		if (m_achievementLayout) m_achievementLayout->Render(rc);
 	}
 
 

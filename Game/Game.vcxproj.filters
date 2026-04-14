@@ -346,6 +346,9 @@
     <ClCompile Include="Source\UI\InGameAchievementMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\MiniMapMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -622,6 +625,9 @@
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\InGameAchievementMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\MiniMapMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>
