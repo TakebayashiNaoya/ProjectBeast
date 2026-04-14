@@ -5,9 +5,9 @@
                 "type":"UIIcon",
                 "name":"MiniMapIcon",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/MiniMap.dds",
-                "width":400,
-                "height":400,
-                "position":[ -500, 0, 0],
+                "width":350,
+                "height":350,
+                "position":[ -530, 270, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
