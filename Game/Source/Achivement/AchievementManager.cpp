@@ -6,6 +6,10 @@
 #include "stdafx.h"
 #include "AchievementManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/Enemy/EnemyController.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Util/CRC32.h"
 #include "Source/Util/JsonConverter.h"
 
@@ -109,17 +113,38 @@ namespace app
 					}
 					else if (conditionStr == "CheckSimultaneousChase")
 					{
+						// 2頭以上のシロクマに【同時に】隊列ペンギンを追われているか判定
+						// GetEnemies() と GetControllers() は同じ順序で返るため、
+						// インデックスを合わせてエネミーとコントローラーを対応させる
 						conditionAchieve->SetCondition([targetValue]() {
+							auto* em = app::actor::EnemyManager::GetInstance();
+							auto* cm = app::actor::ChildPenguinManager::GetInstance();
+							if (!em || !cm) return false;
+
+							auto enemies = em->GetEnemies();
+							auto controllers = em->GetControllers();
+							const size_t count = enemies.size();
+
 							int chaseCount = 0;
-							// TODO: 実際のゲームに合わせて書き換えてください
-							/* 例:
-							auto enemies = app::actor::EnemyManager::GetInstance()->GetEnemies();
-							for(auto* enemy : enemies) {
-								if(enemy->GetController()->GetCurrentState() == app::actor::EnemyController::enEnemyState_Chase) {
-									chaseCount++;
+							for (size_t idx = 0; idx < count; ++idx)
+							{
+								auto* enemy = enemies[idx];
+								auto* controller = (idx < controllers.size()) ? controllers[idx] : nullptr;
+								if (!enemy || !controller) continue;
+
+								auto* sm = enemy->GetEnemyStateMachine();
+								if (!sm) continue;
+
+								// Chase中かつ追跡対象が隊列ペンギンであるものだけカウント
+								if (sm->IsChasing())
+								{
+									const auto* found = controller->GetFoundPenguin();
+									if (found != nullptr && cm->IsFollower(found))
+									{
+										chaseCount++;
+									}
 								}
 							}
-							*/
 							return chaseCount >= static_cast<int>(targetValue);
 							});
 					}
@@ -127,7 +152,27 @@ namespace app
 				}
 				else if (type == "Counter" || type == "counter")
 				{
-					newAchieve = std::make_unique<CounterAchievement>();
+					auto counterAchieve = std::make_unique<CounterAchievement>();
+
+					if (conditionStr == "CheckIndividualChase")
+					{
+						// 3頭それぞれが一度でも隊列ペンギンを追跡したかをカウント
+						counterAchieve->SetCondition([targetValue]() {
+							auto* em = app::actor::EnemyManager::GetInstance();
+							if (!em) return false;
+
+							uint32_t chasedCount = 0;
+							for (auto* controller : em->GetControllers())
+							{
+								if (controller && controller->HasChased())
+								{
+									chasedCount++;
+								}
+							}
+							return chasedCount >= targetValue;
+							});
+					}
+					newAchieve = std::move(counterAchieve);
 				}
 				else if (type == "Event")
 				{
@@ -145,14 +190,6 @@ namespace app
 				// アチーブメントを初期化して登録
 				if (newAchieve)
 				{
-					//// ★ ここも json ではなく achieveData を渡す
-					//newAchieve->Init(achieveData);
-
-					//// 登録したキーを取得
-					//uint32_t key = newAchieve->GetID();
-					//// マップに追加
-					//m_achievementMap.emplace(key, std::move(newAchieve));
-
 					newAchieve->Init(achieveData);
 					newAchieve->SetIndex(static_cast<int>(m_achievementList.size())); // ← インデックスをセット
 

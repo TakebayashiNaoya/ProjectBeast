@@ -19,7 +19,8 @@
 #include "Source/UI/CountDownMenu.h"
 #include "Source/UI/EnemySleepingMenu.h"
 #include "Source/UI/FinishMenu.h"
-#include"Source/UI/IglooPromptMenu.h"
+#include "Source/UI/IglooPromptMenu.h"
+#include "Source/UI/InGameAchievementMenu.h"
 #include "Source/UI/InGameTimerMenu.h"
 #include "Source/UI/Layout.h"
 #include "Source/UI/PauseScreenMenu.h"
@@ -59,6 +60,7 @@ namespace app
 		delete m_pbWakingUpTimerLayout;
 		delete m_iglooPromptLayout;
 		delete m_tutorialLayout;
+		delete m_achievementLayout;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -140,12 +142,20 @@ namespace app
 			m_iglooPromptMenu->SetDraw(false);
 		}
 		daddyPenguin->GetController()->SetIglooPromptMenu(m_iglooPromptMenu);
-    
+
 		m_tutorialLayout = new ui::Layout();
 		m_tutorialLayout->Initialize<ui::TutorialMenu>(
 			"Assets/parameter/tutorial/Tutorial.json"
 		);
 		m_tutorialMenu = m_tutorialLayout->GetMenu<ui::TutorialMenu>();
+
+		// アチーブメント表示：他のUIと同じLayout経由で生成する
+		// Layout::Reload()→InitializeLogic()の流れでホットリロードも自動的に対応される
+		m_achievementLayout = new ui::Layout();
+		m_achievementLayout->Initialize<ui::InGameAchievementMenu>(
+			"Assets/parameter/UI/inGameAchievement/InGameAchievement.json"
+		);
+		m_achievementMenu = m_achievementLayout->GetMenu<ui::InGameAchievementMenu>();
 
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);
@@ -271,6 +281,9 @@ namespace app
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
 
 		if (m_iglooPromptLayout) m_iglooPromptLayout->Update();
+
+		/** アチーブメント表示の更新（ホットリロードも Layout::Update() が自動で担う） */
+		if (m_achievementLayout) m_achievementLayout->Update();
 	}
 
 
@@ -306,6 +319,9 @@ namespace app
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
 
 		if (m_iglooPromptLayout) m_iglooPromptLayout->Render(rc);
+
+		/** アチーブメント表示の描画 */
+		if (m_achievementLayout) m_achievementLayout->Render(rc);
 	}
 
 

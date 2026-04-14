@@ -29,6 +29,7 @@ namespace app
 		class EnemySleepingMenu;
 		class PBWakingUpTimerMenu;
 		class IglooPromptMenu;
+		class InGameAchievementMenu;
 	}
 
 
@@ -148,6 +149,8 @@ namespace app
 		ui::Layout* m_enemySleepingLayout = nullptr;
 		ui::Layout* m_pbWakingUpTimerLayout = nullptr;
 		ui::Layout* m_iglooPromptLayout = nullptr;
+		/** アチーブメント表示Layout */
+		ui::Layout* m_achievementLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
 
 
@@ -164,6 +167,8 @@ namespace app
 		ui::EnemySleepingMenu* m_enemySleepingMenu = nullptr;
 		ui::PBWakingUpTimerMenu* m_pbWakingUpTimerMenu = nullptr;
 		ui::IglooPromptMenu* m_iglooPromptMenu = nullptr;
+		/** アチーブメント表示Menu（所有権はm_achievementLayoutが持つ） */
+		ui::InGameAchievementMenu* m_achievementMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
 	};
 }

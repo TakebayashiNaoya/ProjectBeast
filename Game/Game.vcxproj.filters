@@ -343,6 +343,9 @@
     <ClCompile Include="Source\Actor\Stage\WhirlpoolPowerSystem.cpp">
       <Filter>Source\Actor\Stage</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\InGameAchievementMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -595,7 +598,7 @@
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Manager\IglooManager.h">
-     <Filter>Source\Manager</Filter>
+      <Filter>Source\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\IglooPromptMenu.h">
       <Filter>Source\UI</Filter>
@@ -616,6 +619,9 @@
       <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\TutorialMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameAchievementMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>
