@@ -25,6 +25,7 @@
 #include "Source/UI/SearchMenu.h"
 #include "Source/UI/EnemySleepingMenu.h"
 #include "Source/UI/PBWakingUpTimerMenu.h"
+#include "Source/UI/MiniMapMenu.h"
 
 
 namespace app
@@ -54,6 +55,7 @@ namespace app
 		delete m_soundOptionLayout;
 		delete m_enemySleepingLayout;
 		delete m_pbWakingUpTimerLayout;
+		delete m_miniMapLayout;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -122,7 +124,19 @@ namespace app
 		m_pbWakingUpTimerMenu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
 		if (m_pbWakingUpTimerMenu)
 		{
-			m_pbWakingUpTimerMenu->SetDraw(false);
+			m_pbWakingUpTimerMenu->SetDraw(true);
+		}
+
+		m_miniMapLayout = new ui::Layout();
+		m_miniMapLayout->Initialize<ui::MiniMapMenu>(
+			"Assets/parameter/miniMap/MiniMap.json"
+		);
+
+		m_miniMapMenu = m_miniMapLayout->GetMenu<ui::MiniMapMenu>();
+		if (m_miniMapMenu)
+		{
+			m_miniMapMenu->SetDraw(true);
+			m_miniMapMenu->SetDaddyPenguin(daddyPenguin);
 		}
 
 		/** BattleManagerへのUI通知functionを登録 */
@@ -247,6 +261,8 @@ namespace app
 		if (m_enemySleepingLayout) m_enemySleepingLayout->Update();
 
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
+
+		if (m_miniMapLayout)m_miniMapLayout->Update();
 	}
 
 
@@ -280,6 +296,8 @@ namespace app
 		if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
 
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
+
+		if (m_miniMapLayout)m_miniMapLayout->Render(rc);
 	}
 
 

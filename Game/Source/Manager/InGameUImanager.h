@@ -27,6 +27,7 @@ namespace app
 		class RemainingChildMenu;
 		class EnemySleepingMenu;
 		class PBWakingUpTimerMenu;
+		class MiniMapMenu;
 	}
 
 
@@ -136,6 +137,7 @@ namespace app
 		ui::Layout* m_soundOptionLayout = nullptr;
 		ui::Layout* m_enemySleepingLayout = nullptr;
 		ui::Layout* m_pbWakingUpTimerLayout = nullptr;
+		ui::Layout* m_miniMapLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
 
 
@@ -150,6 +152,7 @@ namespace app
 		ui::SoundOptionMenu* m_soundOptionMenu = nullptr;
 		ui::EnemySleepingMenu* m_enemySleepingMenu = nullptr;
 		ui::PBWakingUpTimerMenu* m_pbWakingUpTimerMenu = nullptr;
+		ui::MiniMapMenu* m_miniMapMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
 	};
 }
