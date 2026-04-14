@@ -29,6 +29,8 @@ namespace app
 		class EnemySleepingMenu;
 		class PBWakingUpTimerMenu;
 		class IglooPromptMenu;
+		class InGameAchievementMenu;
+		class MiniMapMenu;
 	}
 
 
@@ -148,6 +150,8 @@ namespace app
 		ui::Layout* m_enemySleepingLayout = nullptr;
 		ui::Layout* m_pbWakingUpTimerLayout = nullptr;
 		ui::Layout* m_iglooPromptLayout = nullptr;
+		ui::Layout* m_achievementLayout = nullptr;
+		ui::Layout* m_miniMapLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
 
 
@@ -164,6 +168,8 @@ namespace app
 		ui::EnemySleepingMenu* m_enemySleepingMenu = nullptr;
 		ui::PBWakingUpTimerMenu* m_pbWakingUpTimerMenu = nullptr;
 		ui::IglooPromptMenu* m_iglooPromptMenu = nullptr;
+		ui::InGameAchievementMenu* m_achievementMenu = nullptr;
+		ui::MiniMapMenu* m_miniMapMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
 	};
 }

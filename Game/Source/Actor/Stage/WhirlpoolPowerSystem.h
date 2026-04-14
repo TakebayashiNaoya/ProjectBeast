@@ -49,18 +49,24 @@ namespace app
 
 		public:
 			WhirlpoolPowerSytem(Whirlpool* ownerWhirlpool);
-			~WhirlpoolPowerSytem() override;
+			~WhirlpoolPowerSytem() override = default;
 
 
 		public:
-			/** 渦潮の引き寄せ、押し出しの情報のリストを取得する関数 */
-			std::vector<WhirlpoolPowerInfo>& GetWhirlpoolPowerInfos() { return m_whirlpoolPowerInfos; }
-
+			/** 引き寄せ、押し出しの情報のリストを取得 */
+			std::vector<WhirlpoolPowerInfo>& GetWhirlpoolPowerInfos()
+			{
+				return m_whirlpoolPowerInfos;
+			}
 
 
 		private:
+			/** 渦潮の引き寄せ、押し出しの情報を初期化する関数 */
+			void InitializeWhirlpoolInfo();
+
+
 			/** 渦潮、子ペンギンの情報を更新する */
-			void UpdateWhirlpoolInfo();
+			void UpdateWhirlpoolInfo(const float deltaTime);
 
 			/**
 			 * @brief 引き寄せ処理：円を描きながら中心へ近づける
@@ -92,8 +98,6 @@ namespace app
 			ChildPenguinManager* m_childPenguinManager;
 			/** 引き寄せ、押し出しの情報のリスト */
 			std::vector<WhirlpoolPowerInfo> m_whirlpoolPowerInfos;
-			/** 子ペンギンの数 */
-			uint8_t m_childPenguinNum;
 		};
 	}
 }

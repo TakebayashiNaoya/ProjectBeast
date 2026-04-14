@@ -319,10 +319,10 @@
     <ClCompile Include="Source\UI\TitleEventMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Manager\IglooManager.cpp" />
+    <ClCompile Include="Source\Manager\IglooManager.cpp">
       <Filter>Source\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\IglooPromptMenu.cpp" />
+    <ClCompile Include="Source\UI\IglooPromptMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp">
@@ -342,6 +342,12 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Stage\WhirlpoolPowerSystem.cpp">
       <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\InGameAchievementMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\MiniMapMenu.cpp">
+      <Filter>Source\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -594,10 +600,10 @@
     <ClInclude Include="Source\UI\TitleEventMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Manager\IglooManager.h" />
-     <Filter>Source\Manager</Filter>
+    <ClInclude Include="Source\Manager\IglooManager.h">
+      <Filter>Source\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\IglooPromptMenu.h" />
+    <ClInclude Include="Source\UI\IglooPromptMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h">
@@ -616,6 +622,12 @@
       <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\TutorialMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameAchievementMenu.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\MiniMapMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>

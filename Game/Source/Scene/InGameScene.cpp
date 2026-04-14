@@ -91,12 +91,17 @@ namespace app
 		ScoreManager::DestroyInstance();
 		TimeManager::DestroyInstance();
 
-
+		/** タイトルへ戻る場合は ResultScene を経由しないため、ここで破棄する。
+		 *  リザルト遷移の場合は ResultScene::~ResultScene が担当する。 */
 		if (m_goTitle) {
 			if (app::achievement::AchievementManager::GetInstance()) {
 				app::achievement::AchievementManager::DestroyInstance();
 			}
 		}
+
+		/** 2周目以降のために GameCamera の登録を解除する。
+		 *  次の InGameScene::LoadPhase::Camera で新しいインスタンスを Register できるようにする。 */
+		camera::CameraManager::Get().Unregister(camera::GameCamera::ID());
 	}
 
 
@@ -214,6 +219,7 @@ namespace app
 			m_cameraSteering.SetConfig(config);
 			m_cameraSteering.SetTargetCharacter(m_daddyPenguin);
 
+			/** 2周目以降は Unregister 済みのため、毎回新しいインスタンスを登録できる */
 			auto gameCamera = std::make_shared<camera::GameCamera>();
 			camera::CameraManager::Get().Register(camera::GameCamera::ID(), gameCamera);
 			camera::CameraManager::Get().SwitchCamera(camera::GameCamera::ID());
@@ -390,6 +396,12 @@ namespace app
 			break;
 		}
 		}
+
+
+		wchar_t debugStr[256];
+		const Vector3 pos = m_daddyPenguin->GetTransform().m_position;
+		swprintf(debugStr, 256, L"pos: %1f, %1f, %1f", pos.x, pos.y, pos.z);
+		fontRender.SetText(debugStr);
 	}
 
 
@@ -497,6 +509,7 @@ namespace app
 
 	void InGameScene::Render(RenderContext& rc)
 	{
+		fontRender.Draw(rc);
 		actor::StageSystem::GetInstance()->Render(rc);
 		actor::WhirlpoolManager::GetInstance()->RenderWrapper(rc);
 

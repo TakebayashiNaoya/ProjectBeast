@@ -261,6 +261,13 @@ namespace app
 		}
 
 
+		bool ChildPenguinManager::IsFollower(const ChildPenguin* penguin) const
+		{
+			auto it = std::find(m_followers.begin(), m_followers.end(), penguin);
+			return it != m_followers.end();
+		}
+
+
 		int ChildPenguinManager::GetRescuedNum() const
 		{
 			if (m_daddyPenguin == nullptr) return 0;

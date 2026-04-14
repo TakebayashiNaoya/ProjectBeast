@@ -20,13 +20,11 @@ namespace app
 
 		namespace
 		{
-			/** 最大渦潮数 */
-			constexpr int MAX_WHIRLPOOL_NUM = 3;
 			/** 渦潮の位置の数 */
-			constexpr int MIN_WHIRLPOOL_INDEX = 1;
-			constexpr int MAX_WHIRLPOOL_INDEX = 4;
+			constexpr int MIN_WHIRLPOOL_INDEX = 0;
+			constexpr int MAX_WHIRLPOOL_INDEX = 9;
 			/** 渦潮の生成間隔 */
-			constexpr float WHIRLPOOL_CREATE_INTERVAL = 5.0f;
+			constexpr float WHIRLPOOL_CREATE_INTERVAL = 2.0f;
 			/** 渦潮のY座標 */
 			constexpr float WHIRLPOOL_Y = 0.0f;
 		}
@@ -106,9 +104,6 @@ namespace app
 
 		void WhirlpoolManager::CreateWhirlpool()
 		{
-			// 既に最大数の渦潮が存在する場合は生成しない
-			if (m_whirlpoolMap.size() >= MAX_WHIRLPOOL_NUM) return;
-
 			std::vector<uint8_t> candidates;
 			for (int i = MIN_WHIRLPOOL_INDEX; i <= MAX_WHIRLPOOL_INDEX; ++i)
 			{
@@ -126,10 +121,16 @@ namespace app
 			std::uniform_int_distribution<int> dist(0, static_cast<int>(candidates.size() - 1));
 
 			uint8_t index = candidates[dist(gen)];
-
+			std::string key = "whirlpool" + std::to_string(index);
 
 			// ステージオブジェクトの位置を取得
-			Vector3 position = StageSystem::GetInstance()->GetObjectPosition("whirlpool" + std::to_string(index));
+			Vector3 position = StageSystem::GetInstance()->GetObjectPosition(key);
+
+			if (position.x == 0.0f && position.y == 0.0f && position.z == 0.0f)
+			{
+				K2_ASSERT(false, "失敗");
+			}
+
 			position.y = WHIRLPOOL_Y;
 
 			auto newWhirlpool = std::make_unique<Whirlpool>();

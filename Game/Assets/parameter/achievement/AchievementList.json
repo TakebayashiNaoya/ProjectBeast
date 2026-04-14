@@ -2,15 +2,17 @@
   "AchievementList" : {
     "Achievement" : [
       {
-        "name" : "子ペンギンを90匹以上集めた",
+        "name" : "RescuePenguins50",
+        "description" : "子ペンギンを50匹以上集めた",
         "type" : "Condition",
         "condition" : "CheckRescuedCount",
-        "targetValue": 90,
+        "targetValue": 50,
         "spriteIndex": 0,
-        "spriteName":"penguin_rescue90"
+        "spriteName":"penguin_rescue50"
       },
       {
-        "name" : "2頭以上のホッキョクグマに追われた",
+        "name" : "ChasedByTwoBears",
+        "description" : "2頭以上のホッキョクグマに追われた",
         "type" : "Condition",
         "condition" : "CheckSimultaneousChase",
         "targetValue": 2,
@@ -18,7 +20,8 @@
         "spriteName":"bear_chase_2"
       },
       {
-        "name": "3頭のホッキョクグマそれぞれに追われた",
+        "name": "ChasedByAllBears",
+        "description" : "3頭のホッキョクグマそれぞれに追われた",
         "type": "Counter",
         "condition": "CheckIndividualChase",
         "targetValue": 3,
@@ -26,20 +29,13 @@
         "spriteName":"bear_chase_all"
       },
       {
-        "name": "眠っているホッキョクグマを起こした",
+        "name": "WakeUpBear",
+        "description" : "眠っているホッキョクグマを起こした",
         "type": "Event",
         "condition": "WakeUpBear",
         "targetValue": 1,
         "spriteIndex": 3,
         "spriteName":"bear_wakeup"
-      },
-      {
-        "name": "ホッキョクグマを振り切ったときの最大マーキング数",
-        "type": "Record",
-        "condition": "MaxEscapeMarking",
-        "targetValue": 0,
-        "spriteIndex": 4,
-        "spriteName":"bear_shakeoff"
       }
     ]
   }

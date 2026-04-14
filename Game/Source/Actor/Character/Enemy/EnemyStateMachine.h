@@ -217,6 +217,16 @@ namespace app
 			 * @brief 索敵目標座標のセッター
 			 */
 			void SetSearchTargetPos(const Vector3& pos) { m_searchTargetPos = pos; }
+      
+			/**
+			 * @brief 追跡（チェイス）状態かどうかを設定
+			 */
+			void SetIsChasing(const bool isChasing) { m_isChasing = isChasing; }
+			/**
+			 * @brief 追跡（チェイス）状態かどうかを取得
+			 * @return Chase中なら true
+			 */
+			bool IsChasing() const { return m_isChasing; }
 
 
 		public:
@@ -301,6 +311,9 @@ namespace app
 
 			/** 咆哮できるかどうか */
 			bool m_isRoar;
+
+			/** 追跡（チェイス）中かどうか */
+			bool m_isChasing = false;
 
 			/** 起床ゲージ（満タン=完全に眠っている、0=起きる） */
 			float m_wakeUpGauge = 0.0f;

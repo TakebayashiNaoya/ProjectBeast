@@ -1,0 +1,147 @@
+{
+  "canvas": {
+    "elements": [
+      {
+        "type": "UIIcon",
+        "name": "AchieveName_0",
+        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/penguin_rescue50.DDS",
+        "width": 400.0,
+        "height": 40.0,
+        "position": [650.0, 300.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveBox_0",
+        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
+        "width": 30.0,
+        "height": 30.0,
+        "position": [420.0, 300.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveCheck_0",
+        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
+        "width": 60.0,
+        "height": 60.0,
+        "position": [420.0, 300.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+
+
+
+      {
+        "type": "UIIcon",
+        "name": "AchieveName_1",
+        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_chase_2.DDS",
+        "width": 400.0,
+        "height": 40.0,
+        "position": [650.0, 240.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveBox_1",
+        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
+        "width": 30.0,
+        "height": 30.0,
+        "position": [420.0, 240.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveCheck_1",
+        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
+        "width": 60.0,
+        "height": 60.0,
+        "position": [420.0, 240.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+
+
+
+      {
+        "type": "UIIcon",
+        "name": "AchieveName_2",
+        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_chase_all.DDS",
+        "width": 400.0,
+        "height": 40.0,
+        "position": [650.0, 180.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveBox_2",
+        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
+        "width": 30.0,
+        "height": 30.0,
+        "position": [420.0, 180.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveCheck_2",
+        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
+        "width": 60.0,
+        "height": 60.0,
+        "position": [420.0, 180.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+
+
+
+      {
+        "type": "UIIcon",
+        "name": "AchieveName_3",
+        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_wakeup.DDS",
+        "width": 400.0,
+        "height": 40.0,
+        "position": [650.0, 120.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveBox_3",
+        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
+        "width": 30.0,
+        "height": 30.0,
+        "position": [420.0, 120.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      },
+      {
+        "type": "UIIcon",
+        "name": "AchieveCheck_3",
+        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
+        "width": 60.0,
+        "height": 60.0,
+        "position": [420.0, 120.0, 0.0],
+        "scale": [1.0, 1.0, 1.0],
+        "rotation": 0.0,
+        "color": [255, 255, 255, 255]
+      }
+    ]
+  }
+}

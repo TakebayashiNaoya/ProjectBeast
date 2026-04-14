@@ -46,6 +46,19 @@ namespace app
 			}
 
 			/**
+			 * @brief エネミーのコントローラーリストを取得
+			 */
+			std::vector<EnemyController*> GetControllers() const
+			{
+				std::vector<EnemyController*> list;
+				for (const auto& data : m_enemyList)
+				{
+					list.push_back(data.controller);
+				}
+				return list;
+			}
+
+			/**
 			 * @brief 指定座標から最も近い、睡眠中のエネミーを取得
 			 * @param fromPosition 基準となるワールド座標（プレイヤー位置など）
 			 * @param maxRange      探索半径（この距離より遠いエネミーは無視）
