@@ -285,6 +285,8 @@ namespace app
 
 		if (m_remainingChildLayout) m_remainingChildLayout->Update();
 
+		if (m_miniMapLayout) m_miniMapLayout->Update();
+
 		for (auto* layout : m_searchLayouts)
 		{
 			if (layout) layout->Update();
@@ -317,6 +319,8 @@ namespace app
 		if (m_timerLayout) m_timerLayout->Render(rc);
 
 		if (m_remainingChildLayout) m_remainingChildLayout->Render(rc);
+
+		if (m_miniMapLayout) m_miniMapLayout->Render(rc);
 
 		for (auto* layout : m_searchLayouts)
 		{
