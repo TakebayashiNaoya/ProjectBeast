@@ -113,13 +113,6 @@ namespace app
 				if (!m_scaleSmaller.IsPlaying())
 				{
 					m_state = EnWhirlpoolState::None;
-
-					auto& infos = m_whirlpoolPowerSystem->GetWhirlpoolPowerInfos();
-					for (auto& it : infos)
-					{
-						if (it.target == nullptr) continue;
-						it.target->GetStateMachine()->SetIsInWhirlpool(false);
-					}
 				}
 
 				break;
