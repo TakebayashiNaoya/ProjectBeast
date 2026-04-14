@@ -40,26 +40,7 @@ namespace app
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
-			UpdateWhirlpoolInfo();
-
-			for (auto& info : m_whirlpoolPowerInfos)
-			{
-				if (!info.isAffected) continue;
-
-				// 子ペンギンが渦潮の影響を受けると渦潮が消えるまで変わらない
-				info.target->GetStateMachine()->SetIsInWhirlpool(true);
-
-				if (info.isPushing)
-				{
-					// 押し出しフェーズ
-					UpdatePush(info, deltaTime);
-				}
-				else
-				{
-					// 引き寄せフェーズ
-					UpdateAttract(info, deltaTime);
-				}
-			}
+			UpdateWhirlpoolInfo(deltaTime);
 		}
 
 
@@ -70,55 +51,97 @@ namespace app
 		WhirlpoolPowerSytem::WhirlpoolPowerSytem(Whirlpool* ownerWhirlpool)
 			: m_ownerWhirlpool(ownerWhirlpool)
 			, m_childPenguinManager(nullptr)
-			, m_childPenguinNum(0)
 		{
 			m_childPenguinManager = ChildPenguinManager::GetInstance();
-			m_childPenguinNum = m_childPenguinManager->GetChildPenguinNum();
 
-			// 引き寄せ、押し出しの情報を初期化
-			for (auto& cp : m_childPenguinManager->GetChildPenguin())
+			InitializeWhirlpoolInfo();
+		}
+
+
+		void WhirlpoolPowerSytem::InitializeWhirlpoolInfo()
+		{
+			const Vector3& whirlpoolPos = m_ownerWhirlpool->GetTransform().m_position;
+
+			auto childPenguins = m_childPenguinManager->GetChildPenguin();
+			auto& oldInfo = m_whirlpoolPowerInfos;
+
+			// 子ペンギンの数が変わっている場合は、情報リストを再構築する
+			if (oldInfo.empty() || oldInfo.size() != childPenguins.size())
 			{
-				WhirlpoolPowerInfo newInfo;
-				// 渦潮から子ペンギンへのベクトル
-				newInfo.toTargetVector = cp->GetTransform().m_position - m_ownerWhirlpool->GetTransform().m_position;
-				newInfo.target = cp;
-				newInfo.isAffected = false;
-				newInfo.isPushing = false;
-				// 初期角度をXZ平面で計算
-				newInfo.angle = atan2f(newInfo.toTargetVector.z, newInfo.toTargetVector.x);
+				oldInfo.clear();
 
-				m_whirlpoolPowerInfos.push_back(newInfo);
+				std::vector<WhirlpoolPowerInfo> newInfos;
+
+				for (auto& cp : childPenguins)
+				{
+					WhirlpoolPowerInfo newInfo;
+					// 渦潮から子ペンギンへのベクトル
+					newInfo.toTargetVector = cp->GetTransform().m_position - whirlpoolPos;
+					newInfo.target = cp;
+					newInfo.isAffected = false;
+					newInfo.isPushing = false;
+					// 初期角度をXZ平面で計算
+					newInfo.angle = atan2f(newInfo.toTargetVector.z, newInfo.toTargetVector.x);
+
+					newInfos.push_back(newInfo);
+				}
+
+				oldInfo = std::move(newInfos);
 			}
 		}
 
 
-		WhirlpoolPowerSytem::~WhirlpoolPowerSytem()
-		{}
-
-
-		void WhirlpoolPowerSytem::UpdateWhirlpoolInfo()
+		void WhirlpoolPowerSytem::UpdateWhirlpoolInfo(const float deltaTime)
 		{
 			const Vector3& whirlpoolPos = m_ownerWhirlpool->GetTransform().m_position;
 
-			for (auto& info : m_whirlpoolPowerInfos)
+			InitializeWhirlpoolInfo();
+
+			// イテレータで走査し、target が nullptr のエントリを安全に削除する
+			for (auto it = m_whirlpoolPowerInfos.begin(); it != m_whirlpoolPowerInfos.end(); )
 			{
-				if (info.target == nullptr) continue;
+				if (it->target == nullptr)
+				{
+					// ループ中に erase し、次の有効イテレータを受け取る
+					it = m_whirlpoolPowerInfos.erase(it);
+					continue;
+				}
 
 				// 渦潮から子ペンギンへのベクトルを更新
-				info.toTargetVector = info.target->GetTransform().m_position - whirlpoolPos;
+				it->toTargetVector = it->target->GetTransform().m_position - whirlpoolPos;
 
 				// XZ平面での距離を計算（Y成分を0にして Length() を利用）
-				const Vector3 toTargetXZ = Vector3(info.toTargetVector.x, 0.0f, info.toTargetVector.z);
+				const Vector3 toTargetXZ = Vector3(it->toTargetVector.x, 0.0f, it->toTargetVector.z);
 				const float distXZ = toTargetXZ.Length();
 
 				// 渦潮の範囲内に入ったら影響フラグを立てる
-				if (!info.isAffected && distXZ <= WHIRLPOOL_RADIUS)
+				if (!it->isAffected && distXZ <= WHIRLPOOL_RADIUS)
 				{
-					info.isAffected = true;
-					info.isPushing = false;
+					it->isAffected = true;
+					it->isPushing = false;
 					// 範囲に入った瞬間の角度を記録
-					info.angle = atan2f(info.toTargetVector.z, info.toTargetVector.x);
+					it->angle = atan2f(it->toTargetVector.z, it->toTargetVector.x);
 				}
+
+				// 影響を受けているペンギンのフェーズ処理
+				if (it->isAffected)
+				{
+					// 子ペンギンが渦潮の影響を受けると渦潮が消えるまで変わらない
+					it->target->GetStateMachine()->SetIsInWhirlpool(true);
+
+					if (it->isPushing)
+					{
+						// 押し出しフェーズ
+						UpdatePush(*it, deltaTime);
+					}
+					else
+					{
+						// 引き寄せフェーズ
+						UpdateAttract(*it, deltaTime);
+					}
+				}
+
+				++it;
 			}
 		}
 
