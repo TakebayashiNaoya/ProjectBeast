@@ -218,6 +218,11 @@ namespace app
 			 */
 			void SetSearchTargetPos(const Vector3& pos) { m_searchTargetPos = pos; }
 
+
+		public:
+			bool IsSwim()const;
+
+
 		private:
 			/** 待機状態に変更できるか */
 			bool CanChangeIdle() const;

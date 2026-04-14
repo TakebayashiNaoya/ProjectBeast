@@ -18,10 +18,13 @@ namespace app
 			AnimationData ANIMATION_DATA[] =
 			{
 				{ "Assets/animData/bear/idle.tka", true },
+				{ "Assets/animData/bear/idle_UnderWater.tka", true },
 				{ "Assets/animData/bear/walk.tka", true },
 				{ "Assets/animData/bear/attack.tka", false },
+				{ "Assets/animData/bear/attack_UnderWater.tka", false },
 				{ "Assets/animData/bear/backWalk.tka", true },
 				{ "Assets/animData/bear/run.tka", true },
+				{ "Assets/animData/bear/swim.tka", true },
 				{ "Assets/animData/bear/buff.tka", false },
 				{ "Assets/animData/bear/damage.tka", true },
 				{ "Assets/animData/bear/eat.tka", true },
