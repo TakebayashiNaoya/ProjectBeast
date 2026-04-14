@@ -68,9 +68,10 @@ namespace app
 
 			using ObjectKey = std::string;
 			using Object = std::unique_ptr<IStageObject>;
+			using ObjectMap = std::unordered_map<ObjectKey, Object>;
 
 			/** オブジェクトのマップ */
-			std::unordered_map<ObjectKey, Object> m_objectMap;
+			ObjectMap m_objectMap;
 
 
 		public:
@@ -100,6 +101,13 @@ namespace app
 			{
 				return m_instance;
 			}
+
+
+			/**
+			 * @brief ステージオブジェクトのマップのキーを取得
+			 * @return ステージオブジェクトのマップのキー
+			 */
+			const ObjectMap& GetObjectMap() { return m_objectMap; }
 
 
 		public:

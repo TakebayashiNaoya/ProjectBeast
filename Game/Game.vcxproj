@@ -306,9 +306,11 @@
     <ClCompile Include="Source\UI\HPBarMenu.cpp" />
     <ClCompile Include="Source\UI\FinishMenu.cpp" />
     <ClCompile Include="Source\UI\IglooPromptMenu.cpp" />
+    <ClCompile Include="Source\UI\InGameAchievementMenu.cpp" />
     <ClCompile Include="Source\UI\InGameTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
+    <ClCompile Include="Source\UI\MiniMapMenu.cpp" />
     <ClCompile Include="Source\UI\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\RemainingChildMenu.cpp" />
@@ -412,9 +414,11 @@
     <ClInclude Include="Source\UI\HPBarMenu.h" />
     <ClInclude Include="Source\UI\FinishMenu.h" />
     <ClInclude Include="Source\UI\IglooPromptMenu.h" />
+    <ClInclude Include="Source\UI\InGameAchievementMenu.h" />
     <ClInclude Include="Source\UI\InGameTimerMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
+    <ClInclude Include="Source\UI\MiniMapMenu.h" />
     <ClInclude Include="Source\UI\PauseScreenMenu.h" />
     <ClInclude Include="Source\UI\PBWakingUpTimerMenu.h" />
     <ClInclude Include="Source\UI\RemainingChildMenu.h" />
