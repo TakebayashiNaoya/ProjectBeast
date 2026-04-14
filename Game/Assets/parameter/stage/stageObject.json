@@ -45,7 +45,7 @@
         "objectName" : "igloo03",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
-        "position" : [2000, 175, -3000],
+        "position" : [2000, 170, -3000],
         "rotationDeg" : [0, 0, 0],
         "scale" : [4, 4, 4]
       },
@@ -57,6 +57,14 @@
         "rotationDeg" : [0, 160, 0],
         "scale" : [2, 4, 6]
       },
+      {
+        "objectName" : "Ground02",
+        "fileName" : "Assets/modelData/Stage/SnowEmbankment/SnowEmbankment.tkm",
+        "isNeedCollision" : true,
+        "position" : [0, 0, 0],
+        "rotationDeg" : [0, -10, 0],
+        "scale" : [6, 4, 7]
+      }, 
       {
         "objectName" : "Ground03",
         "fileName" : "Assets/modelData/Stage/RockySnowPile_1/RockySnowPile_1.tkm",
@@ -173,7 +181,7 @@
         "objectName" : "whirlpool2",
         "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
         "isNeedCollision" : false,
-        "position" : [-400, -50, -2000],
+        "position" : [-38, -50, -1500],
         "rotationDeg" : [0, 0, 0],
         "scale" : [0.0001, 0.0001, 0.0001]
       },
@@ -186,7 +194,7 @@
         "scale" : [0.0001, 0.0001, 0.0001]
       },
       {
-        "objectName" : "whirlpoo4",
+        "objectName" : "whirlpool4",
         "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
         "isNeedCollision" : false,
         "position" : [-2700, -50, 93],
@@ -213,7 +221,7 @@
         "objectName" : "whirlpool7",
         "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
         "isNeedCollision" : false,
-        "position" : [-685, -50, -1800],
+        "position" : [-423, -50, -3591],
         "rotationDeg" : [0, 0, 0],
         "scale" : [0.0001, 0.0001, 0.0001]
       },
@@ -221,7 +229,7 @@
         "objectName" : "whirlpool8",
         "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
         "isNeedCollision" : false,
-        "position" : [-2000, 50, -2200],
+        "position" : [-1344, 50, -1765],
         "rotationDeg" : [0, 0, 0],
         "scale" : [0.0001, 0.0001, 0.0001]
       },
