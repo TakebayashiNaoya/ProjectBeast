@@ -114,5 +114,7 @@ namespace app
 
 		/** クリア判定用定数 */
 		static constexpr int CLEAR_COUNT = 50;
+
+		FontRender fontRender;
 	};
 }
