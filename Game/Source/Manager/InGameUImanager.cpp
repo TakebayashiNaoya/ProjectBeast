@@ -138,7 +138,6 @@ namespace app
 		m_miniMapLayout->Initialize<ui::MiniMapMenu>(
 			"Assets/parameter/miniMap/MiniMap.json"
 		);
-
 		m_miniMapMenu = m_miniMapLayout->GetMenu<ui::MiniMapMenu>();
 		if (m_miniMapMenu)
 		{
@@ -281,20 +280,19 @@ namespace app
 
 	void InGameUIManager::UpdatePlaying()
 	{
-		if (m_timerLayout) m_timerLayout->Update();
-
-		if (m_remainingChildLayout) m_remainingChildLayout->Update();
-
-		if (m_miniMapLayout) m_miniMapLayout->Update();
+		if (m_timerLayout)           m_timerLayout->Update();
+		if (m_remainingChildLayout)  m_remainingChildLayout->Update();
 
 		for (auto* layout : m_searchLayouts)
 		{
 			if (layout) layout->Update();
 		}
 
-		if (m_enemySleepingLayout) m_enemySleepingLayout->Update();
-
+		if (m_enemySleepingLayout)   m_enemySleepingLayout->Update();
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
+		if (m_iglooPromptLayout)     m_iglooPromptLayout->Update();
+		if (m_miniMapLayout)         m_miniMapLayout->Update();
+		if (m_achievementLayout)     m_achievementLayout->Update();
 	}
 
 
@@ -316,27 +314,25 @@ namespace app
 
 	void InGameUIManager::RenderPlaying(RenderContext& rc)
 	{
-		if (m_timerLayout) m_timerLayout->Render(rc);
-
-		if (m_remainingChildLayout) m_remainingChildLayout->Render(rc);
-
-		if (m_miniMapLayout) m_miniMapLayout->Render(rc);
+		if (m_timerLayout)           m_timerLayout->Render(rc);
+		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
 
 		for (auto* layout : m_searchLayouts)
 		{
 			if (layout) layout->Render(rc);
 		}
 
-		if (m_enemySleepingLayout) m_enemySleepingLayout->Render(rc);
-
+		if (m_enemySleepingLayout)   m_enemySleepingLayout->Render(rc);
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
+		if (m_iglooPromptLayout)     m_iglooPromptLayout->Render(rc);
+		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);
+		if (m_achievementLayout)     m_achievementLayout->Render(rc);
 	}
 
 
 	void InGameUIManager::RenderFinishing(RenderContext& rc)
 	{
-		if (m_timerLayout) m_timerLayout->Render(rc);
-
+		if (m_timerLayout)  m_timerLayout->Render(rc);
 		if (m_finishLayout) m_finishLayout->Render(rc);
 	}
 
@@ -351,6 +347,7 @@ namespace app
 	{
 		if (m_soundOptionLayout) m_soundOptionLayout->Render(rc);
 	}
+
 
 	void InGameUIManager::RenderTutorial(RenderContext& rc)
 	{
