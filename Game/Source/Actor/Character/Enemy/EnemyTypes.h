@@ -11,10 +11,13 @@
 enum class EnEnemyAnimationType : uint8_t
 {
 	Idle,
+	Idle_UnderWater,
 	Walk,
 	Attack,
+	Attack_UnderWater,
 	BackWalk,
 	Run,
+	Swim,
 	Buff,
 	Damage,
 	Eat,

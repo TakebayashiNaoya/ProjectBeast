@@ -89,56 +89,90 @@ namespace app
 
 		core::IState* EnemyStateMachine::GetChangeState()
 		{
-			if (CanChangeReturnHome())
+			//// 泳ぎ判定（チャタリング防止ロジック）
+			//if (m_currentState == FindState(EnemySwimState::ID()))
+			//{
+			//	// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
+			//	if (IsInWater() || !IsOnGround())
+			//	{
+			//		return FindState(EnemySwimState::ID());
+			//	}
+			//}
+			//else if (CanChangeSwimState())
+			//{
+			//	// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
+			//	return FindState(EnemySwimState::ID());
+			//}
+
+			//if (CanChangeReturnHome())
+			//{
+			//	return FindState(EnemyReturnHomeState::ID());
+			//}
+			//if (CanChangeStun())
+			//{
+			//	return FindState(EnemyStunState::ID());
+			//}
+
+			//if (CanChangeAttack())
+			//{
+			//	return FindState(EnemyAttackState::ID());
+			//}
+			//if (CanChangeRoar())
+			//{
+			//	return FindState(EnemyRoarState::ID());
+			//}
+
+			//if (CanChangeChace())
+			//{
+			//	return FindState(EnemyChaseState::ID());
+			//}
+			//if (CanChangeSearch())
+			//{
+			//	return FindState(EnemySearchState::ID());
+			//}
+
+			//if (CanChangeWalk())
+			//{
+			//	return FindState(EnemyWalkState::ID());
+			//}
+			//if (CanChangeCoolDown())
+			//{
+			//	return FindState(EnemyCoolDownState::ID());
+			//}
+
+			//return FindState(EnemyIdleState::ID());
+			// ① クールダウン中は絶対維持
+			if (m_currentState == FindState(EnemyCoolDownState::ID()))
 			{
-				return FindState(EnemyReturnHomeState::ID());
-			}
-			if (CanChangeStun())
-			{
-				return FindState(EnemyStunState::ID());
+				if (m_isCoolDown) return FindState(EnemyCoolDownState::ID());
 			}
 
-			if (CanChangeAttack())
-			{
-				return FindState(EnemyAttackState::ID());
-			}
-			if (CanChangeRoar())
-			{
-				return FindState(EnemyRoarState::ID());
-			}
+			// ② スタンは最優先
+			if (CanChangeStun()) return FindState(EnemyStunState::ID());
 
-			if (CanChangeChace())
-			{
-				return FindState(EnemyChaseState::ID());
-			}
-			if (CanChangeSearch())
-			{
-				return FindState(EnemySearchState::ID());
-			}
+			// ③ 攻撃も水中より優先（水中でも攻撃できるようにする）
+			if (CanChangeAttack()) return FindState(EnemyAttackState::ID());
 
-			// 泳ぎ判定（チャタリング防止ロジック）
+			// ④ 咆哮
+			if (CanChangeRoar()) return FindState(EnemyRoarState::ID());
+
+			// ⑤ 泳ぎ判定（攻撃・スタンより後）
 			if (m_currentState == FindState(EnemySwimState::ID()))
 			{
-				// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
-				if (!IsOnGround())
-				{
-					return FindState(EnemySwimState::ID());
-				}
+				if (IsInWater() || !IsOnGround()) return FindState(EnemySwimState::ID());
+				// 陸に上がったら以下の判定へ続く
 			}
 			else if (CanChangeSwimState())
 			{
-				// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
 				return FindState(EnemySwimState::ID());
 			}
 
-			if (CanChangeWalk())
-			{
-				return FindState(EnemyWalkState::ID());
-			}
-			if (CanChangeCoolDown())
-			{
-				return FindState(EnemyCoolDownState::ID());
-			}
+			// ⑥ 以降は既存の優先度
+			if (CanChangeReturnHome()) return FindState(EnemyReturnHomeState::ID());
+			if (CanChangeChace())      return FindState(EnemyChaseState::ID());
+			if (CanChangeSearch())     return FindState(EnemySearchState::ID());
+			if (CanChangeWalk())       return FindState(EnemyWalkState::ID());
+			if (CanChangeCoolDown())   return FindState(EnemyCoolDownState::ID());
 
 			return FindState(EnemyIdleState::ID());
 		}
@@ -228,6 +262,12 @@ namespace app
 				return true;
 			}
 			return false;
+		}
+
+
+		bool EnemyStateMachine::IsSwim() const
+		{
+			return IsInWater();
 		}
 
 

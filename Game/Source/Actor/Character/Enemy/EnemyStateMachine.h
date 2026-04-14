@@ -217,8 +217,7 @@ namespace app
 			 * @brief 索敵目標座標のセッター
 			 */
 			void SetSearchTargetPos(const Vector3& pos) { m_searchTargetPos = pos; }
-
-
+      
 			/**
 			 * @brief 追跡（チェイス）状態かどうかを設定
 			 */
@@ -228,6 +227,10 @@ namespace app
 			 * @return Chase中なら true
 			 */
 			bool IsChasing() const { return m_isChasing; }
+
+
+		public:
+			bool IsSwim()const;
 
 
 		private:

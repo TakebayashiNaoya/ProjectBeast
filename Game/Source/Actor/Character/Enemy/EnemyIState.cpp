@@ -32,7 +32,14 @@ namespace app
 
 		void EnemyIdleState::Enter()
 		{
-			m_owner->PlayAnimation(EnEnemyAnimationType::Idle);
+			if (m_owner->IsSwim())
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
+			}
+			else
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Idle);
+			}
 
 
 			SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
@@ -111,7 +118,14 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-			m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
+			if (m_owner->IsSwim())
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
+			}
+			else
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
+			}
 			if (rand() % 100 < 30)
 			{
 				SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
@@ -153,7 +167,15 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+			if (m_owner->IsSwim())
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
+				return;
+			}
+			else
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+			}
 
 			if (m_stepSE == -1)
 			{
@@ -213,8 +235,15 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetRunSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
-
+			if (m_owner->IsSwim())
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
+				return;
+			}
+			else
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Run);
+			}
 
 			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 
@@ -286,12 +315,17 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetSwimSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-			m_owner->PlayAnimation(EnEnemyAnimationType::Run);
+			m_owner->SetIsSwimming(true);
+			m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
 		}
 
 
 		void EnemySwimState::Update()
 		{
+			if (m_owner->GetStickLAmount() < 0.0001f)
+			{
+				return;
+			}
 			m_owner->Move();
 		}
 
@@ -299,6 +333,7 @@ namespace app
 		void EnemySwimState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
+			m_owner->SetIsSwimming(false);
 		}
 
 		EnemySwimState::EnemySwimState(EnemyStateMachine* owner)
@@ -321,8 +356,14 @@ namespace app
 
 		void EnemyAttackState::Enter()
 		{
-			m_owner->PlayAnimation(EnEnemyAnimationType::Attack);
-
+			if (m_owner->IsSwim())
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Attack_UnderWater);
+			}
+			else
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Attack);
+			}
 
 			m_attackTimer = 0.0f;
 			m_hasFiredEffect = false;
@@ -388,7 +429,15 @@ namespace app
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetWalkSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-			m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+			if (m_owner->IsSwim())
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
+				return;
+			}
+			else
+			{
+				m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
+			}
 
 			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 
