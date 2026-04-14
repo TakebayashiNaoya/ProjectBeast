@@ -86,7 +86,6 @@ namespace app
 
 			/**
 			 * @brief 派生先の条件用変数を初期化する関数
-			 * @todo 派生先の条件用変数を初期化する関数を実装する
 			 */
 			virtual void InitAchievementImpl(const nlohmann::json& json) = 0;
 
@@ -137,6 +136,12 @@ namespace app
 			 * @return カウンターアチーブメントの目標の値を取得
 			 */
 			inline uint32_t GetTargetValue() const { return m_targetValue; }
+
+			/**
+			 * @brief 達成条件関数を設定する
+			 * @param condition 条件を返すラムダ式（trueで達成）
+			 */
+			void SetCondition(std::function<bool()> condition) { m_conditionFunc = condition; }
 
 
 		public:
@@ -282,4 +287,3 @@ namespace app
 		};
 	}
 }
-

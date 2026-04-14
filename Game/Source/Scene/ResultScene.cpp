@@ -87,7 +87,6 @@ namespace app
 		// 取得した値を UIDigit にセット
 		auto* timeDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultTimeDigit"));
 		auto* scoreDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultScoreDigit"));
-		//auto* totalDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("TotalDigit"));
 
 		if (timeDigit)
 		{
@@ -99,12 +98,6 @@ namespace app
 			scoreDigit->SetNumber(m_collectedPenguin);
 			scoreDigit->m_isDraw = true;
 		}
-		//if (totalDigit)
-		//{
-		//	//totalDigit->SetNumber(static_cast<int>(m_totalScore));
-		//	totalDigit->m_isDraw = false;
-		//	totalDigit->m_color = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
-		//}
 
 		// Aボタンガイドも最初は非表示（アルファ0で隠す）
 		m_titleBackRender.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 0.0f));
@@ -130,7 +123,6 @@ namespace app
 
 		auto* timeDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultTimeDigit"));
 		auto* scoreDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("ResultScoreDigit"));
-		//auto* totalDigit = m_layout.GetMenu<app::ui::MenuBase>()->GetUI<app::ui::UIDigit>(Hash32("TotalDigit"));
 
 		if (timeDigit)
 		{
@@ -198,17 +190,44 @@ namespace app
 					m_totalDigit = canvas->FindUI<app::ui::UIDigit>(key);
 					if (m_totalDigit)
 					{
-						// JSONで定義していた位置・サイズに合わせて調整してください
+						// ★ 桁数を計算してX座標を中央揃えに補正する
+						// UIDigit::UpdatePosition は position.x から左へ w_ * index ずつ並べる（1の位が基準）
+						// そのため「基準X = 中央X + (桁数-1) * 文字幅 / 2」で中央揃えになる
+						const float digitWidth = 80.0f;
+						const float digitHeight = 100.0f;
+						const float centerX = 0.0f;   // 画面中央
+						const float scoreY = -300.0f;
+
+						int score = static_cast<int>(m_totalScore);
+						int digitCount = 1;
+						{
+							int tmp = score;
+							if (tmp == 0) {
+								digitCount = 1;
+							}
+							else {
+								digitCount = 0;
+								while (tmp > 0) {
+									tmp /= 10;
+									digitCount++;
+								}
+							}
+						}
+
+						// 1の位の画像が基準座標になり、そこから左へ伸びるため
+						// 中央に揃えるには「基準X = 中央X + (桁数-1)/2.0f * 文字幅」とする
+						float baseX = centerX + static_cast<float>(digitCount - 1) * digitWidth / 2.0f;
+
 						m_totalDigit->Initialize(
 							"Assets/spriteData/UI/Number/White",  // 数字画像のパス
-							3,                             // 桁数
-							static_cast<int>(m_totalScore),
-							80.0f, 100.0f,                 // 幅・高さ
-							Vector3(80.0f, -300.0f, 0.0f),  // 位置
+							digitCount,                           // 桁数
+							score,
+							digitWidth, digitHeight,
+							Vector3(baseX, scoreY, 0.0f),         // 中央揃えした座標
 							Vector3::One,
 							Quaternion::Identity
 						);
-						m_totalDigit->m_color = Vector4(1.0f, 1.0f, 0.0f, 1.0f); // 最初は透明
+						m_totalDigit->m_color = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 						m_totalDigit->m_isDraw = false;  // ← まず非表示のまま
 						m_totalDigit->Update();          // ← 位置を即確定させる
 						m_totalDigit->m_isDraw = true;   // ← その後に表示
@@ -284,7 +303,8 @@ namespace app
 		}
 
 		// ① アチーブメントの数による倍率（0個の場合は1倍にする）
-		int achieveMultiplier = (achievedCount > 0) ? achievedCount : 1;
+		int achieveMultiplier = (achievedCount > 0) ?
+			achievedCount : 1;
 
 		// ② タイムボーナス倍率
 		float timeMultiplier = 1.0f + (m_clearTime / 100.0f);
@@ -305,8 +325,7 @@ namespace app
 		auto* canvas = menu->GetCanvas();
 		if (!canvas) return;
 
-		//float rowOffsetY = -50.0f;
-		Vector3 iconStartPos = { /*-500.0f, 90.0f, 0.0f*/-300.0f,200.0f,0.0f }; // 1個目の画像の位置（xで横、yで縦）
+		Vector3 iconStartPos = { -200.0f, 150.0f, 0.0f }; // 1個目の画像の位置（xで横、yで縦）
 		float checkOffsetX = -70.0f;  // チェックアイコンのX位置
 		float nameOffsetX = 250.0f;   // 名前画像のX位置
 
@@ -317,7 +336,7 @@ namespace app
 		for (size_t i = 0; i < m_allAchievementList.size(); ++i)
 		{
 			auto* achieve = m_allAchievementList[i];
-			if (!achieve)continue;
+			if (!achieve) continue;
 
 			float iconOffset = iconOffsetY * static_cast<float>(rowIndex);
 
@@ -337,13 +356,13 @@ namespace app
 
 			std::string nameKeyName = "AchieveName_" + std::to_string(i);
 			uint32_t nameKey = Hash32(nameKeyName.c_str());
-			canvas->CreateUI<app::ui::UIIcon>(nameKey); // UITextではなくUIIconに変更
+			canvas->CreateUI<app::ui::UIIcon>(nameKey);
 			auto* nameIcon = canvas->FindUI<app::ui::UIIcon>(nameKey);
 			if (nameIcon)
 			{
 				nameIcon->Initialize(
 					nameAssetPath.c_str(),
-					570.0f, 50.0f, // 幅・高さは画像サイズに合わせて調整
+					570.0f, 50.0f,
 					currentNamePos,
 					Vector3::One,
 					Quaternion::Identity,
@@ -362,17 +381,16 @@ namespace app
 			{
 				checkBoxIcon->Initialize(
 					"Assets/spriteData/UI/Achievement/checkBox.DDS",
-					40.0f, 40.0f, // width, height
+					40.0f, 40.0f,
 					currentIconPos,
-					Vector3::One, // scale
-					Quaternion::Identity, // rotation
-					Vector4::White // color
+					Vector3::One,
+					Quaternion::Identity,
+					Vector4::White
 				);
 				checkBoxIcon->m_isDraw = true;
 			}
 
-
-			achieve->SetIsAchieved(true);
+			// ★ 達成済みの場合のみチェックアイコンを生成して表示キューに追加する
 			if (achieve->IsAchieved())
 			{
 				std::string checkKeyName = "AchieveCheck_" + std::to_string(i);
@@ -385,24 +403,18 @@ namespace app
 				{
 					checkIcon->Initialize(
 						"Assets/spriteData/UI/Achievement/check.DDS",
-						90.0f, 90.0f, // width, height
+						90.0f, 90.0f,
 						currentIconPos,
-						Vector3::One, // scale
-						Quaternion::Identity, // rotation
-						Vector4::White // color
+						Vector3::One,
+						Quaternion::Identity,
+						Vector4::White
 					);
 
 					checkIcon->m_isDraw = false;
 					m_checkIconList.push_back(checkIcon);
 				}
 			}
-			else
-			{
-				// 未達成のアチーブメントに対する処理
-				// ※もし「未達成の場合はシルエット（真っ黒の画像や半透明）を表示したい」
-				// といった機能を追加したい場合は、ここに処理を書くことができます。
-			}
-
+			// 未達成の場合はチェックアイコンを生成しない（チェックボックスのみ表示）
 
 			rowIndex++;
 		}

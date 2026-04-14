@@ -509,6 +509,17 @@ namespace app
 		void EnemyController::EnterChase(EnemyController* enemy)
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(true);
+			// Chase開始を StateMachine に通知する
+			enemy->m_target->GetEnemyStateMachine()->SetIsChasing(true);
+
+			// 追跡対象が隊列中の子ペンギンであれば HasChased フラグを立てる
+			if (enemy->m_foundPenguin != nullptr)
+			{
+				if (app::actor::ChildPenguinManager::GetInstance()->IsFollower(enemy->m_foundPenguin))
+				{
+					enemy->m_hasChased = true;
+				}
+			}
 		}
 
 
@@ -545,6 +556,8 @@ namespace app
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetActionButtonB(false);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
+			// Chase終了を StateMachine に通知する
+			enemy->m_target->GetEnemyStateMachine()->SetIsChasing(false);
 
 			if (auto* am = app::achievement::AchievementManager::GetInstance()) {
 				auto* baseAchieve = am->GetAchievement(Hash32("MaxEscapeMarking"));

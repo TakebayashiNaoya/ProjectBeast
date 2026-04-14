@@ -40,6 +40,19 @@ namespace app
 		public:
 			void SetStun(const bool isStun) { m_isStun = isStun; }
 
+		public:
+			/**
+			 * @brief 現在追跡中の子ペンギンを取得する
+			 * @return 追跡中の子ペンギンのポインタ。見失っている場合は nullptr
+			 */
+			const ChildPenguin* GetFoundPenguin() const { return m_foundPenguin; }
+
+			/**
+			 * @brief このエネミーが過去に一度でも隊列ペンギンを追跡したかを取得する
+			 * @return 追跡したことがあれば true
+			 */
+			bool HasChased() const { return m_hasChased; }
+
 		private:
 			/** 子ペンギンを探す */
 			ChildPenguin* FindTarget();
@@ -110,27 +123,19 @@ namespace app
 				state.enter = (enter != nullptr) ? enter : DoNothing;
 				state.update = (update != nullptr) ? update : DoNothing;
 				state.exit = (exit != nullptr) ? exit : DoNothing;
-				state.check = (check != nullptr) ? check : CheckNothing;
-				// mapに登録
-				m_stateMap.emplace(id, state);
+				state.check = (check != nullptr) ? check : DoNothingCheck;
+				m_stateMap[id] = state;
 			}
 
-			/** AIStateを探す */
-			AIState* FindAIState(const EnEnemyStateID id)
+			static void DoNothing(EnemyController*) {}
+			static int DoNothingCheck(EnemyController*) { return enEnemyState_Invalid; }
+
+			AIState* FindAIState(EnEnemyStateID id)
 			{
 				auto it = m_stateMap.find(id);
-				if (it != m_stateMap.end()) {
-					return &it->second;
-				}
+				if (it != m_stateMap.end()) return &it->second;
 				return nullptr;
 			}
-
-			/**
-			 * 何もしない関数
-			 */
-			static void  DoNothing(EnemyController*) {};
-			/** 遷移なし */
-			static int CheckNothing(EnemyController*) { return -1; }
 
 		private:
 			/** 待機 */
@@ -213,9 +218,6 @@ namespace app
 			/** 徘徊開始位置 */
 			Vector3 m_startPosition = Vector3::Zero;
 
-			/** 巣の位置 */
-			//Vector3 m_homePosition;
-
 			/** ペンギンを最後に見た位置 */
 			Vector3 m_lastKnownPenguinPos;
 
@@ -251,6 +253,9 @@ namespace app
 			bool m_isStun;
 			bool m_isHomeInitialized;
 			bool m_isParamInitialized;
+
+			/** 過去に一度でも隊列ペンギンを追跡したことがあるかのフラグ */
+			bool m_hasChased = false;
 		};
 	}
 }
