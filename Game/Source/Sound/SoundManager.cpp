@@ -21,10 +21,10 @@ namespace app
 
 
 	SoundManager::SoundManager()
-		: m_masterVolume(0.5f)
-		, m_bgmVolume(0.5f)
-		, m_seVolume(0.5f)
-		, m_voiceVolume(0.5f)
+		: m_masterVolume(0.1f)
+		, m_bgmVolume(0.1f)
+		, m_seVolume(0.1f)
+		, m_voiceVolume(0.1f)
 	{
 		m_seList.clear();
 
