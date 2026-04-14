@@ -109,8 +109,11 @@ namespace app
 			auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon"));
 			if (greenIcon) greenIcon->m_isDraw = m_isDraw;
 
-			auto* bearIcon = GetUI<UIIcon>(Hash32("bearIcon"));
-			if (bearIcon)bearIcon->m_isDraw = m_isDraw;
+			for (auto key : POLAR_BEAR_ICON_KEYS)
+			{
+				auto* bearIcon = GetUI<UIIcon>(key);
+				if (bearIcon) bearIcon->m_isDraw = m_isDraw;
+			}
 
 			// 親ペンギンのが存在する時に、親ペンギン、子ペンギン、シロクマのアイコンをマップに表示する。
 			if (m_daddyPenguin)
@@ -318,11 +321,11 @@ namespace app
 				bearIconIndex++;
 			}
 			
-			// 使われなかったアイコンを非表示にする。
-			for (uint32_t i = 0; i < static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS)); i++)
+          // 使われなかったアイコンを非表示にする。
+			for (uint32_t i = bearIconIndex; i < static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS)); i++)
 			{
 				auto* bearIcon = GetUI<UIIcon>(POLAR_BEAR_ICON_KEYS[i]);
-				if (bearIcon)bearIcon->m_isDraw = false;
+				if (bearIcon) bearIcon->m_isDraw = false;
 			}
 		}
 
@@ -351,8 +354,11 @@ namespace app
 			auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon"));
 			if (greenIcon) greenIcon->m_isDraw = !m_isDraw;
 
-			auto* polarBear = GetUI<UIIcon>(Hash32("bearIcon"));
-			if (polarBear)polarBear->m_isDraw = !m_isDraw;
+        for (auto key : POLAR_BEAR_ICON_KEYS)
+		{
+			auto* polarBear = GetUI<UIIcon>(key);
+			if (polarBear) polarBear->m_isDraw = !m_isDraw;
+		}
 		}
 	}
 }
