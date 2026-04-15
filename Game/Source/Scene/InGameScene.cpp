@@ -165,7 +165,7 @@ namespace app
 
 		case LoadPhase::Daddy:
 			m_daddyPenguin = new actor::DaddyPenguin();
-			m_daddyPenguin->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
+			m_daddyPenguin->SetPosition(Vector3(0.0f, 27.3f, 0.0f));
 			m_daddyPenguin->StartWrapper();
 
 			/** DaddyPenguin生成後にUIManagerを初期化（睡眠クマ探索のキャプチャに使用） */
