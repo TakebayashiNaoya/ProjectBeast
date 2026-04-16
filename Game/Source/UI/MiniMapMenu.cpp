@@ -18,8 +18,10 @@ namespace app
 	{
 		namespace
 		{
+			// シロクマのアイコンの数。
+			constexpr uint32_t BEAR_ICON_SIZE = 3;
 			// シロクマのアイコンキー。
-			constexpr uint32_t POLAR_BEAR_ICON_KEYS[] =
+			constexpr uint32_t POLAR_BEAR_ICON_KEYS[BEAR_ICON_SIZE] =
 			{
 					{ Hash32("bearIcon0")}
 				,	{ Hash32("bearIcon1")}
@@ -65,9 +67,12 @@ namespace app
 				,	{ "childGreenIcon",  0 }  // 4: Green  (世話焼き)
 			};
 
-			const Vector3 MAP_CENTER_POS = Vector3(-530.0f, 270.0f, 0.0f);
-			constexpr float MAP_RADIUS = 200.0f;
-			constexpr float MAP_LIMITE_DISTANCE = 400.0f;
+			// マップの中心ワールド座標。
+			const Vector3 MAP_CENTER_POS = Vector3(-560.0f, 220.0f, 0.0f);
+			// マップの半径。
+			constexpr float MAP_RADIUS = 175.0f;
+			// アイコンがマップに表示される距離の限界値。
+			constexpr float MAP_LIMITE_DISTANCE = 150.0f;
 		}
 
 
@@ -142,14 +147,18 @@ namespace app
 
 			float length = diff.Length();
 
+			// カメラの向きに合わせてワールド座標の差分を回転させる。
 			Vector3 forward = g_camera3D->GetForward();
 			Quaternion rot;
 			rot.SetRotationY(atan2(-forward.x, forward.z));
+			// ベクトルの回転を適用。
 			rot.Apply(diff);
 
 			diff.Normalize();
+			// マップの大きさ / 距離の限界値。
 			diff *= length * MAP_RADIUS / MAP_LIMITE_DISTANCE;
 
+			// マップの中心座標 + 回転させた差分。
 			mapPos = Vector3(MAP_CENTER_POS.x + diff.x, MAP_CENTER_POS.y + diff.z, 0.0f);
 			return true;
 		}
@@ -321,8 +330,8 @@ namespace app
 				bearIconIndex++;
 			}
 			
-          // 使われなかったアイコンを非表示にする。
-			for (uint32_t i = bearIconIndex; i < static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS)); i++)
+			// 使われなかったアイコンを非表示にする。
+			for (uint32_t i = bearIconIndex; i < BEAR_ICON_SIZE; i++)
 			{
 				auto* bearIcon = GetUI<UIIcon>(POLAR_BEAR_ICON_KEYS[i]);
 				if (bearIcon) bearIcon->m_isDraw = false;
@@ -354,11 +363,11 @@ namespace app
 			auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon"));
 			if (greenIcon) greenIcon->m_isDraw = !m_isDraw;
 
-        for (auto key : POLAR_BEAR_ICON_KEYS)
-		{
-			auto* polarBear = GetUI<UIIcon>(key);
-			if (polarBear) polarBear->m_isDraw = !m_isDraw;
-		}
+			for (auto key : POLAR_BEAR_ICON_KEYS)
+			{
+				auto* polarBear = GetUI<UIIcon>(key);
+				if (polarBear) polarBear->m_isDraw = !m_isDraw;
+			}
 		}
 	}
 }

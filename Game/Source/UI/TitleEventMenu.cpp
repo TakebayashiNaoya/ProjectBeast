@@ -40,6 +40,7 @@ namespace app
 		TitleEventMenu::TitleEventMenu()
 			: m_isSelect(false)
 			, m_isStickNeutral(true)
+			, m_isDraw(false)
 			, m_selectIndex(0)
 			, m_gamePad(g_pad[0])
 		{}
@@ -106,7 +107,7 @@ namespace app
 					, endColor
 					, duration
 					, util::EasingType::EaseOut
-					, util::LoopMode::Once
+					, util::LoopMode::PingPong
 				);
 				// アイコンにアニメーションを登録。
 				icon->AddAnimation(Hash32("EventColorAnim"), std::move(colorAnim));

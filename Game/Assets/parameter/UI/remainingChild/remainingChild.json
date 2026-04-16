@@ -7,7 +7,7 @@
                 "asset":"Assets/spriteData/UI/Icon/ChildPenguinIcon.dds",
                 "width":65,
                 "height":65,
-                "position":[-690,50,0],
+                "position":[ -720, -20, 0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -20,7 +20,7 @@
                 "number": 100,
                 "width":60,
                 "height":60,
-                "position":[-560,50,0],
+                "position":[-585,-20,0],
                 "scale":[1,1,1],
                 "rotation":0
             },
@@ -28,9 +28,9 @@
                 "type":"UIIcon",
                 "name":"SlashIcon",
                 "asset":"Assets/spriteData/UI/Icon/SlashIcon.dds",
-                "width":90,
+                "width":50,
                 "height":85,
-                "position":[-500,50,0],
+                "position":[-515,-20,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -43,7 +43,7 @@
                 "number": 100,
                 "width":60,
                 "height":60,
-                "position":[-360,55,0],
+                "position":[-360,-20,0],
                 "scale":[1,1,1],
                 "rotation":0
             }
