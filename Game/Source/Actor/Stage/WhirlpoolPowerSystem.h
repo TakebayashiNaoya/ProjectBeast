@@ -56,7 +56,7 @@ namespace app
 			/** 引き寄せ、押し出しの情報のリストを取得 */
 			std::vector<WhirlpoolPowerInfo>& GetWhirlpoolPowerInfos()
 			{
-				return m_whirlpoolPowerInfos;
+				return m_wpPowerInfos;
 			}
 
 
@@ -93,11 +93,11 @@ namespace app
 
 		private:
 			/** 渦潮のポインタ */
-			Whirlpool* m_ownerWhirlpool;
+			Whirlpool* m_owner;
 			/** 子ペンギンマネージャーのポインタ */
-			ChildPenguinManager* m_childPenguinManager;
+			ChildPenguinManager* m_cpManager;
 			/** 引き寄せ、押し出しの情報のリスト */
-			std::vector<WhirlpoolPowerInfo> m_whirlpoolPowerInfos;
+			std::vector<WhirlpoolPowerInfo> m_wpPowerInfos;
 		};
 	}
 }

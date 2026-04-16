@@ -102,6 +102,14 @@ namespace app
 			}
 
 			// 渦潮の中判定
+			if (IsEqualCurrentState(PenguinInWhirlpoolState::ID()))
+			{
+				return CanChangeInWhirlpoolState()
+					? FindState(PenguinInWhirlpoolState::ID())
+					: FindState(PenguinSwimmingState::ID());
+			}
+
+
 			if (CanChangeInWhirlpoolState())
 			{
 				return FindState(PenguinInWhirlpoolState::ID());
