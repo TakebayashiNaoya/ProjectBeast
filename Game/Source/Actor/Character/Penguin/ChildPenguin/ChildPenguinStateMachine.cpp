@@ -116,12 +116,6 @@ namespace app
 			}
 
 
-			if (CanChangeInWhirlpoolState())
-			{
-				return FindState(PenguinInWhirlpoolState::ID());
-			}
-
-
 			// 泳ぎ判定
 			// Swim中は「水面より完全に出た（IsInWater() == false）」かつ「地面にいる（IsOnGround() == true）」
 			// の両方を満たすまで維持する。
