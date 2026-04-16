@@ -47,6 +47,12 @@ namespace app
 			~SearchMenu();
 			void Update()override;
 			void InitializeLogic()override;
+			
+			/**
+			 * @brief 見つけているか見つけていないかの内部的処理をまとめる用
+			 */
+			void Searching();
+			
 			/**
 			 * @brief タイプの取得
 			 * @return m_currentType タイプの取得
