@@ -48,6 +48,8 @@ namespace app
 		private:
 			/** 渦潮のマップ */
 			std::unordered_map<uint8_t, std::unique_ptr<Whirlpool>> m_whirlpoolMap;
+			/** 渦潮の座標マップ（JSONから読み込んだインデックスと座標の対応表） */
+			std::unordered_map<uint8_t, Vector3> m_positionMap;
 			/** 渦潮の生成タイマー */
 			float m_timer;
 

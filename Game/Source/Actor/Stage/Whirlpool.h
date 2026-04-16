@@ -1,7 +1,7 @@
 ﻿/**
  * @file Whirlpool.h
  * @brief 渦潮のクラス
- * @author 藤谷
+ * @author 藤谷、竹林
  */
 #pragma once
 #include "IStage.h"
@@ -16,7 +16,7 @@ namespace app
 		/**
 		 * @brief 渦潮のクラス
 		 */
-		class Whirlpool : public IStageObject
+		class Whirlpool : public Actor
 		{
 		public:
 			/**
@@ -27,9 +27,47 @@ namespace app
 				Bigger,
 				Smaller,
 				Stay,
-				ModelLoading,
 				Num,
 				None = Num
+			};
+
+
+		private:
+			/**
+			 * @brief 頂点構造体
+			 * @details OceanMeshと同じ頂点レイアウト（Material::InitPipelineState準拠）
+			 */
+			struct WhirlpoolVertex
+			{
+				Vector3 pos;		/** 座標 */
+				Vector3 normal;		/** 法線 */
+				Vector3 tangent;	/** 接線 */
+				Vector3 biNormal;	/** 従法線 */
+				Vector2 uv;			/** テクスチャ座標 */
+				int     indices[4];	/** ボーンインデックス（未使用・ゼロ埋め） */
+				Vector4 weights;	/** ボーンウェイト（未使用・ゼロ埋め） */
+			};
+
+			/**
+			 * @brief 共通定数バッファ（b0）
+			 * @details OceanMeshのSCommonConstantBufferと同じレイアウト
+			 */
+			struct SCommonConstantBuffer
+			{
+				Matrix  mWorld;		/** ワールド行列 */
+				Matrix  mView;		/** ビュー行列 */
+				Matrix  mProj;		/** プロジェクション行列 */
+				Vector4 mulColor;	/** 乗算カラー */
+			};
+
+			/**
+			 * @brief 拡張定数バッファ（b1）
+			 * @details UVスクロール（渦回転）に使用する
+			 */
+			struct SWhirlpoolConstantBuffer
+			{
+				float uvRotation;	/** UV回転角度（ラジアン） */
+				float padding[3];	/** パディング（16バイトアライン） */
 			};
 
 
@@ -68,8 +106,71 @@ namespace app
 			 */
 			void StateMachine();
 
+			/**
+			 * @brief 円形グリッド頂点・インデックスを生成する
+			 */
+			void CreateCircleMesh();
+
+			/**
+			 * @brief シェーダーを初期化する
+			 */
+			void InitShaders();
+
+			/**
+			 * @brief ルートシグネチャを初期化する
+			 * @details
+			 *   - b0: SCommonConstantBuffer
+			 *   - b1: SWhirlpoolConstantBuffer
+			 *   - t0: アルベドマップ
+			 */
+			void InitRootSignature();
+
+			/**
+			 * @brief パイプラインステートを初期化する
+			 * @details アルファブレンド有効（渦潮テクスチャの円形マスク用）
+			 */
+			void InitPipelineState();
+
+			/**
+			 * @brief ディスクリプタヒープを初期化する
+			 */
+			void InitDescriptorHeap();
+
+			/**
+			 * @brief 毎フレーム頂点バッファのYをOceanの波面に合わせて更新する
+			 */
+			void UpdateVertexHeights();
+
 
 		private:
+			/**
+			 * @brief 円形グリッドの分割設定
+			 * @details これらの値を変更することで頂点密度を調整できる
+			 */
+			static constexpr int   NUM_RINGS = 16;		/** リング数（中心から外周までの分割数） */
+			static constexpr int   NUM_SEGMENTS = 64;		/** 円周方向の分割数 */
+			static constexpr float MESH_RADIUS = 100.0f;	/** メッシュの半径（ワールド単位） */
+
+			/** 頂点データ（CPU側キャッシュ・毎フレーム更新） */
+			std::vector<WhirlpoolVertex> m_vertices;
+
+			Texture        m_albedoMap;					/** アルベドマップ */
+
+			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
+			IndexBuffer    m_indexBuffer;				/** インデックスバッファ */
+			int            m_indexCount = 0;			/** インデックス数 */
+
+			Shader* m_vs = nullptr;				/** 頂点シェーダー */
+			Shader* m_ps = nullptr;				/** ピクセルシェーダー */
+
+			RootSignature  m_rootSignature;				/** ルートシグネチャ */
+			PipelineState  m_pipelineState;				/** パイプラインステート */
+
+			ConstantBuffer m_commonConstantBuffer;		/** 共通定数バッファ（b0） */
+			ConstantBuffer m_whirlpoolConstantBuffer;	/** 渦潮定数バッファ（b1） */
+
+			DescriptorHeap m_descriptorHeap;			/** ディスクリプタヒープ */
+
 			/** 渦潮の拡大カーブ */
 			app::util::Vector3Curve m_scaleBigger;
 			/** 渦潮の縮小カーブ */
@@ -80,10 +181,10 @@ namespace app
 			EnWhirlpoolState m_state;
 			/** 渦潮のタイマー */
 			float m_timer;
+			/** UV回転角度（ラジアン）：ピクセルシェーダーに渡してテクスチャを回す */
+			float m_uvRotation;
 			/** 渦潮の引き寄せ、押し出しを管理するクラス */
 			std::unique_ptr<WhirlpoolPowerSytem> m_whirlpoolPowerSystem;
-
 		};
 	}
 }
-

@@ -4,39 +4,78 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "Whirlpool.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
-#include "Whirlpool.h"
+#include "Nature/Ocean.h"
+
 
 namespace app
 {
 	namespace actor
 	{
-
 		namespace
 		{
-			/** 渦潮の回転速度 */
-			constexpr float ROTATION_SPEED = -3.0f;
+			/** 渦潮シェーダーのパス */
+			const char* WHIRLPOOL_SHADER_PATH = "Assets/shader/Whirlpool.fx";
+			/** アルベドマップのパス */
+			const wchar_t* WHIRLPOOL_ALBEDO_PATH = L"Assets/modelData/stage/Whirlpool/whirlpool.DDS";
+
+			/** UV回転速度（ラジアン/秒） */
+			constexpr float UV_ROTATION_SPEED = 1.5f;
 			/** 渦潮の拡大率の変化にかかる時間 */
 			constexpr float SCALE_CHANGE_TIME = 2.5f;
 			/** 渦潮の拡大率が最大値で留まる時間 */
 			constexpr float WHIRLPOOL_STAY_TIME = 10.0f;
-			/** 渦潮の最小値 */
-			const Vector3 MIN_SCALE = Vector3(0.0f, 0.0f, 0.0f);
-			/** 渦潮の最大値 */
-			const Vector3 MAX_SCALE = Vector3(5.0f, 5.0f, 5.0f);
-			/** フェードアウトにかかる時間 */
-			constexpr float FADE_OUT_TIME = 3.0f;
+			/** 渦潮の最小スケール */
+			const Vector3   MIN_SCALE = Vector3(0.0f, 0.0f, 0.0f);
+			/** 渦潮の最大スケール */
+			const Vector3   MAX_SCALE = Vector3(5.0f, 5.0f, 5.0f);
 		}
+
 
 		void Whirlpool::Start()
 		{
 			m_whirlpoolPowerSystem = std::make_unique<WhirlpoolPowerSytem>(this);
 
-			Init("Assets/modelData/stage/Whirlpool/whirlpool.tkm");
+			// 円形グリッドメッシュを生成する
+			CreateCircleMesh();
 
-			m_scaleBigger.Initialize(MIN_SCALE, MAX_SCALE, SCALE_CHANGE_TIME, util::EasingType::EaseInOut, util::LoopMode::Once);
-			m_scaleSmaller.Initialize(MAX_SCALE, MIN_SCALE, SCALE_CHANGE_TIME, util::EasingType::EaseInOut, util::LoopMode::Once);
+			// シェーダーをロードする
+			InitShaders();
+
+			// テクスチャをロードする
+			m_albedoMap.InitFromDDSFile(WHIRLPOOL_ALBEDO_PATH);
+
+			// ルートシグネチャを構築する
+			InitRootSignature();
+
+			// パイプラインステートを構築する
+			InitPipelineState();
+
+			// 定数バッファを初期化する
+			m_commonConstantBuffer.Init(sizeof(SCommonConstantBuffer), nullptr);
+			m_whirlpoolConstantBuffer.Init(sizeof(SWhirlpoolConstantBuffer), nullptr);
+
+			// ディスクリプタヒープを構築する
+			InitDescriptorHeap();
+
+			// スケールカーブを初期化する
+			m_scaleBigger.Initialize(
+				MIN_SCALE, MAX_SCALE,
+				SCALE_CHANGE_TIME,
+				util::EasingType::EaseInOut,
+				util::LoopMode::Once
+			);
+			m_scaleSmaller.Initialize(
+				MAX_SCALE, MIN_SCALE,
+				SCALE_CHANGE_TIME,
+				util::EasingType::EaseInOut,
+				util::LoopMode::Once
+			);
+
+			m_state = EnWhirlpoolState::Bigger;
+			m_scaleBigger.Play();
 
 			m_whirlpoolPowerSystem->Start();
 		}
@@ -51,36 +90,72 @@ namespace app
 
 		void Whirlpool::Render(RenderContext& rc)
 		{
-			IStageObject::Render(rc);
+			if (m_state == EnWhirlpoolState::None) return;
+
+			// 毎フレーム頂点YをOceanの波面に合わせて更新する
+			UpdateVertexHeights();
+
+			// ワールド行列を計算する（スケール × 回転 × 平行移動）
+			Matrix mScale;
+			mScale.MakeScaling(m_transform.m_scale);
+			Matrix mRot;
+			mRot.MakeRotationFromQuaternion(m_transform.m_rotation);
+			Matrix mTrans;
+			mTrans.MakeTranslation(m_transform.m_position);
+			Matrix mWorld = mScale * mRot * mTrans;
+
+			// 共通定数バッファを更新する（b0）
+			SCommonConstantBuffer commonCb;
+			commonCb.mWorld = mWorld;
+			commonCb.mView = g_camera3D->GetViewMatrix();
+			commonCb.mProj = g_camera3D->GetProjectionMatrix();
+			commonCb.mulColor = Vector4::One;
+			m_commonConstantBuffer.CopyToVRAM(commonCb);
+
+			// 渦潮定数バッファを更新する（b1）
+			SWhirlpoolConstantBuffer whirlpoolCb;
+			whirlpoolCb.uvRotation = m_uvRotation;
+			whirlpoolCb.padding[0] = 0.0f;
+			whirlpoolCb.padding[1] = 0.0f;
+			whirlpoolCb.padding[2] = 0.0f;
+			m_whirlpoolConstantBuffer.CopyToVRAM(whirlpoolCb);
+
+			// 描画コマンドを発行する
+			rc.SetRootSignature(m_rootSignature);
+			rc.SetPipelineState(m_pipelineState);
+			rc.SetDescriptorHeap(m_descriptorHeap);
+			rc.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			rc.SetVertexBuffer(m_vertexBuffer);
+			rc.SetIndexBuffer(m_indexBuffer);
+			rc.DrawIndexedInstance(m_indexCount, 1);
+
 			m_whirlpoolPowerSystem->Render(rc);
 		}
 
+
 		Whirlpool::Whirlpool()
-			: m_state(EnWhirlpoolState::ModelLoading)
+			: m_state(EnWhirlpoolState::Bigger)
 			, m_timer(0.0f)
+			, m_uvRotation(0.0f)
 			, m_index(0)
+			, m_indexCount(0)
+			, m_vs(nullptr)
+			, m_ps(nullptr)
 		{}
 
 
 		void Whirlpool::StateMachine()
 		{
-			float deltaTime = g_gameTime->GetFrameDeltaTime();
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			// UV回転を毎フレーム加算する（ピクセルシェーダーでテクスチャが回って見える）
+			m_uvRotation += UV_ROTATION_SPEED * deltaTime;
 
 			switch (m_state)
 			{
-			case EnWhirlpoolState::ModelLoading:
-			{
-				if (IsLoaded())
-				{
-					m_state = EnWhirlpoolState::Bigger;
-					m_scaleBigger.Play();
-				}
-				break;
-			}
 			case EnWhirlpoolState::Bigger:
 			{
 				m_scaleBigger.Update(deltaTime);
-				m_transform.m_rotation.AddRotationDegY(ROTATION_SPEED);
 				m_transform.m_scale = m_scaleBigger.GetCurrentValue();
 
 				if (!m_scaleBigger.IsPlaying())
@@ -93,7 +168,6 @@ namespace app
 			case EnWhirlpoolState::Stay:
 			{
 				m_timer += deltaTime;
-				m_transform.m_rotation.AddRotationDegY(ROTATION_SPEED);
 
 				if (m_timer >= WHIRLPOOL_STAY_TIME)
 				{
@@ -107,7 +181,6 @@ namespace app
 			case EnWhirlpoolState::Smaller:
 			{
 				m_scaleSmaller.Update(deltaTime);
-				m_transform.m_rotation.AddRotationDegY(ROTATION_SPEED);
 				m_transform.m_scale = m_scaleSmaller.GetCurrentValue();
 
 				if (!m_scaleSmaller.IsPlaying())
@@ -119,17 +192,283 @@ namespace app
 			}
 			case EnWhirlpoolState::None:
 			{
-
-
-
+				break;
 			}
-			break;
 			default:
 				break;
 			}
+		}
 
-			// 以下共通処理
-			IStageObject::Update();
+
+		void Whirlpool::CreateCircleMesh()
+		{
+			const int   numRings = NUM_RINGS;
+			const int   numSegments = NUM_SEGMENTS;
+			const float radius = MESH_RADIUS;
+
+			// 頂点数：中心1点 + リングごとの頂点
+			const int numVerts = 1 + numRings * numSegments;
+			m_vertices.resize(numVerts);
+
+			// 中心頂点（インデックス0）
+			{
+				WhirlpoolVertex& v = m_vertices[0];
+				v.pos = Vector3(0.0f, 0.0f, 0.0f);
+				v.normal = Vector3(0.0f, 1.0f, 0.0f);
+				v.tangent = Vector3(1.0f, 0.0f, 0.0f);
+				v.biNormal = Vector3(0.0f, 0.0f, 1.0f);
+				v.uv = Vector2(0.5f, 0.5f);
+				v.indices[0] = v.indices[1] = v.indices[2] = v.indices[3] = 0;
+				v.weights = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+			}
+
+			// リングごとの頂点を生成する
+			for (int ring = 0; ring < numRings; ++ring)
+			{
+				// 0.0（中心）～1.0（外周）の割合
+				const float t = static_cast<float>(ring + 1) / static_cast<float>(numRings);
+				const float ringRadius = radius * t;
+
+				for (int seg = 0; seg < numSegments; ++seg)
+				{
+					const float angle = (2.0f * DirectX::XM_PI * static_cast<float>(seg))
+						/ static_cast<float>(numSegments);
+
+					const int vertIdx = 1 + ring * numSegments + seg;
+					WhirlpoolVertex& v = m_vertices[vertIdx];
+
+					v.pos = Vector3(
+						ringRadius * cosf(angle),
+						0.0f,
+						ringRadius * sinf(angle)
+					);
+					v.normal = Vector3(0.0f, 1.0f, 0.0f);
+					v.tangent = Vector3(1.0f, 0.0f, 0.0f);
+					v.biNormal = Vector3(0.0f, 0.0f, 1.0f);
+
+					// UV：円形テクスチャに合わせて0.0～1.0にマッピングする
+					v.uv = Vector2(
+						0.5f + 0.5f * t * cosf(angle),
+						0.5f + 0.5f * t * sinf(angle)
+					);
+
+					v.indices[0] = v.indices[1] = v.indices[2] = v.indices[3] = 0;
+					v.weights = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+				}
+			}
+
+			// 頂点バッファを初期化する
+			m_vertexBuffer.Init(
+				static_cast<int>(sizeof(WhirlpoolVertex) * m_vertices.size()),
+				sizeof(WhirlpoolVertex)
+			);
+			m_vertexBuffer.Copy(m_vertices.data());
+
+			// インデックスを生成する
+			std::vector<uint32_t> indices;
+			indices.reserve(numSegments * 3 + (numRings - 1) * numSegments * 6);
+
+			// 中心点と最初のリングの三角形を生成する
+			for (int seg = 0; seg < numSegments; ++seg)
+			{
+				const int curr = 1 + seg;
+				const int next = 1 + (seg + 1) % numSegments;
+				indices.push_back(0);
+				indices.push_back(curr);
+				indices.push_back(next);
+			}
+
+			// 隣接リング間の四角形を三角形2枚に分割して生成する
+			for (int ring = 0; ring < numRings - 1; ++ring)
+			{
+				for (int seg = 0; seg < numSegments; ++seg)
+				{
+					const int curr = 1 + ring * numSegments + seg;
+					const int next = 1 + ring * numSegments + (seg + 1) % numSegments;
+					const int currOuter = 1 + (ring + 1) * numSegments + seg;
+					const int nextOuter = 1 + (ring + 1) * numSegments + (seg + 1) % numSegments;
+
+					// 三角形①
+					indices.push_back(curr);
+					indices.push_back(currOuter);
+					indices.push_back(next);
+
+					// 三角形②
+					indices.push_back(next);
+					indices.push_back(currOuter);
+					indices.push_back(nextOuter);
+				}
+			}
+
+			// インデックスバッファを初期化する
+			m_indexCount = static_cast<int>(indices.size());
+			m_indexBuffer.Init(
+				static_cast<int>(sizeof(uint32_t) * indices.size()),
+				sizeof(uint32_t)
+			);
+			m_indexBuffer.Copy(indices.data());
+		}
+
+
+		void Whirlpool::InitShaders()
+		{
+			// 頂点シェーダーをロードする
+			m_vs = g_engine->GetShaderFromBank(WHIRLPOOL_SHADER_PATH, "VSMain");
+			if (m_vs == nullptr)
+			{
+				m_vs = new Shader;
+				m_vs->LoadVS(WHIRLPOOL_SHADER_PATH, "VSMain");
+				g_engine->RegistShaderToBank(WHIRLPOOL_SHADER_PATH, "VSMain", m_vs);
+			}
+
+			// ピクセルシェーダーをロードする
+			m_ps = g_engine->GetShaderFromBank(WHIRLPOOL_SHADER_PATH, "PSMain");
+			if (m_ps == nullptr)
+			{
+				m_ps = new Shader;
+				m_ps->LoadPS(WHIRLPOOL_SHADER_PATH, "PSMain");
+				g_engine->RegistShaderToBank(WHIRLPOOL_SHADER_PATH, "PSMain", m_ps);
+			}
+		}
+
+
+		void Whirlpool::InitRootSignature()
+		{
+			// サンプラーを設定する
+			D3D12_STATIC_SAMPLER_DESC samplerDesc = {};
+			samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+			samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+			samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+			samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+			samplerDesc.MipLODBias = 0;
+			samplerDesc.MaxAnisotropy = 0;
+			samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+			samplerDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
+			samplerDesc.MinLOD = 0.0f;
+			samplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+			samplerDesc.ShaderRegister = 0;
+			samplerDesc.RegisterSpace = 0;
+			samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+			m_rootSignature.Init(
+				&samplerDesc,
+				1,	// サンプラー数
+				2,	// CBV数（b0, b1）
+				1,	// SRV数（t0）
+				1	// UAV=0だと内部でシリアライズ失敗するので最低1にする
+			);
+		}
+
+
+		void Whirlpool::InitPipelineState()
+		{
+			// OceanMeshと同じ頂点レイアウトを使用する
+			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+			{
+				{ "POSITION",     0, DXGI_FORMAT_R32G32B32_FLOAT,    0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "NORMAL",       0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "TANGENT",      0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "BINORMAL",     0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD",     0, DXGI_FORMAT_R32G32_FLOAT,       0, 48, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_SINT,  0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "BLENDWEIGHT",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			};
+
+			// カラーバッファフォーマットをOceanに合わせる
+			std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> colorBufferFormat = {
+				DXGI_FORMAT_R32G32B32A32_FLOAT,
+				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_UNKNOWN,
+			};
+
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
+			psoDesc.InputLayout = { inputElementDescs, _countof(inputElementDescs) };
+			psoDesc.pRootSignature = m_rootSignature.Get();
+			psoDesc.VS = CD3DX12_SHADER_BYTECODE(m_vs->GetCompiledBlob());
+			psoDesc.PS = CD3DX12_SHADER_BYTECODE(m_ps->GetCompiledBlob());
+
+			// アルファブレンドを有効にする（テクスチャ円形マスク用）
+			psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			psoDesc.BlendState.RenderTarget[0].BlendEnable = TRUE;
+			psoDesc.BlendState.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+			psoDesc.BlendState.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+			psoDesc.BlendState.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+			psoDesc.BlendState.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+			psoDesc.BlendState.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+			psoDesc.BlendState.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+			psoDesc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+			psoDesc.SampleMask = UINT_MAX;
+			psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+			psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+			psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+			psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+			psoDesc.SampleDesc.Count = 1;
+
+			// カラーバッファのフォーマットを設定する
+			int numRenderTargets = 0;
+			for (int i = 0; i < MAX_RENDERING_TARGET; ++i)
+			{
+				if (colorBufferFormat[i] == DXGI_FORMAT_UNKNOWN)
+				{
+					break;
+				}
+				psoDesc.RTVFormats[i] = colorBufferFormat[i];
+				numRenderTargets++;
+			}
+			psoDesc.NumRenderTargets = numRenderTargets;
+
+			m_pipelineState.Init(psoDesc);
+		}
+
+
+		void Whirlpool::InitDescriptorHeap()
+		{
+			// CBV：b0（共通）、b1（渦潮）の2枠
+			// SRV：t0（アルベド）の1枠
+			m_descriptorHeap.ResizeConstantBuffer(2);
+			m_descriptorHeap.ResizeShaderResource(1);
+			m_descriptorHeap.ResizeUnorderAccessResource(1);
+
+			m_descriptorHeap.RegistConstantBuffer(0, m_commonConstantBuffer);
+			m_descriptorHeap.RegistConstantBuffer(1, m_whirlpoolConstantBuffer);
+			m_descriptorHeap.RegistShaderResource(0, m_albedoMap);
+
+			m_descriptorHeap.Commit();
+		}
+
+
+		void Whirlpool::UpdateVertexHeights()
+		{
+			const nsBeastEngine::Ocean* ocean = g_renderingEngine->GetOcean();
+
+			for (auto& v : m_vertices)
+			{
+				// ローカル座標をワールド座標に変換してサンプリングする
+				const float worldX = m_transform.m_position.x + v.pos.x;
+				const float worldZ = m_transform.m_position.z + v.pos.z;
+
+				if (ocean != nullptr)
+				{
+					// 波面のYをローカル座標系に変換する（ワールドY - 渦潮の基準Y）
+					v.pos.y = ocean->SampleWaveHeight(worldX, worldZ) - m_transform.m_position.y;
+				}
+				else
+				{
+					v.pos.y = 0.0f;
+				}
+			}
+
+			// 更新した頂点データをGPUにアップロードする
+			m_vertexBuffer.Copy(m_vertices.data());
 		}
 	}
 }
