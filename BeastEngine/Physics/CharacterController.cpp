@@ -13,12 +13,13 @@ namespace nsBeastEngine
 		/** 地面判定 */
 		struct SweepResultGround : public btCollisionWorld::ConvexResultCallback {
 			bool isHit = false;
+			bool isGround = false;       // 立てる床か
+			bool isSteepSlope = false;   // 滑り落ちる急斜面か
 			Vector3 hitPos;
 			Vector3 startPos;
 			Vector3 hitNormal;
 			btCollisionObject* me = nullptr;
-			float dist = FLT_MAX;
-			float closestFraction = 1.0f;
+			float closestFraction = 1.0f; // dist を削除してこれに統一
 
 			virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace) {
 				if (convexResult.m_hitCollisionObject == me || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
@@ -26,15 +27,32 @@ namespace nsBeastEngine
 				}
 
 				Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
-				float angle = acosf(hitNormalTmp.y);
 
-				if (fabsf(angle) < Math::PI * 0.35f) {
-					if (convexResult.m_hitFraction < closestFraction) {
-						isHit = true;
-						closestFraction = convexResult.m_hitFraction;
+				// acosfのNaNエラーを防ぐためのクランプ処理
+				float dotY = hitNormalTmp.y;
+				if (dotY > 1.0f) dotY = 1.0f;
+				if (dotY < -1.0f) dotY = -1.0f;
+				float angle = acosf(dotY);
 
-						hitPos = *(Vector3*)&convexResult.m_hitPointLocal;
-						hitNormal = hitNormalTmp;
+				// 約85度以上の完全な壁は、落下判定では無視する
+				if (fabsf(angle) >= Math::PI * 0.47f) {
+					return 1.0f;
+				}
+
+				if (convexResult.m_hitFraction < closestFraction) {
+					isHit = true;
+					closestFraction = convexResult.m_hitFraction;
+					hitPos = *(Vector3*)&convexResult.m_hitPointLocal;
+					hitNormal = hitNormalTmp;
+
+					// 約63度未満なら立てる床、それ以上なら急斜面
+					if (fabsf(angle) < Math::PI * 0.35f) {
+						isGround = true;
+						isSteepSlope = false;
+					}
+					else {
+						isGround = false;
+						isSteepSlope = true;
 					}
 				}
 
@@ -50,7 +68,7 @@ namespace nsBeastEngine
 			Vector3 startPos;
 			Vector3 hitNormal;
 			btCollisionObject* me = nullptr;
-			float dist = FLT_MAX;
+			float closestFraction = 1.0f;
 
 			virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace) {
 				if (convexResult.m_hitCollisionObject == me || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
@@ -59,19 +77,17 @@ namespace nsBeastEngine
 
 				Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
 				float angle = fabsf(acosf(hitNormalTmp.y));
+
+				// 54度以上の傾斜を壁とみなす
 				if (angle >= Math::PI * 0.3f) {
-					isHit = true;
-					Vector3 hitPosTmp = *(Vector3*)&convexResult.m_hitPointLocal;
-					Vector3 vDist = hitPosTmp - startPos;
-					vDist.y = 0.0f;
-					float distTmp = vDist.Length();
-					if (distTmp < dist) {
-						hitPos = hitPosTmp;
-						dist = distTmp;
+					if (convexResult.m_hitFraction < closestFraction) {
+						isHit = true;
+						closestFraction = convexResult.m_hitFraction;
+						hitPos = *(Vector3*)&convexResult.m_hitPointLocal;
 						hitNormal = hitNormalTmp;
 					}
 				}
-				return 0.0f;
+				return 1.0f;
 			}
 		};
 
@@ -215,20 +231,38 @@ namespace nsBeastEngine
 						PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
 
 						if (callback.isHit) {
-							Vector3 vT0(intendedXZPos.x, 0.0f, intendedXZPos.z);
-							Vector3 vT1(callback.hitPos.x, 0.0f, callback.hitPos.z);
-							Vector3 vMerikomi = vT0 - vT1;
-
+							// 1. 壁のXZ平面上の法線を取得
 							Vector3 hitNormalXZ = callback.hitNormal;
 							hitNormalXZ.y = 0.0f;
-							hitNormalXZ.Normalize();
+							if (hitNormalXZ.LengthSq() > FLT_EPSILON) {
+								hitNormalXZ.Normalize();
+							}
+							else {
+								hitNormalXZ = Vector3(0, 0, 0);
+							}
 
-							float fT0 = hitNormalXZ.Dot(vMerikomi);
-							Vector3 vOffset = hitNormalXZ;
-							vOffset.Scale(-fT0 + m_radius + 0.001f);
+							// 2. カプセルが壁に接触した瞬間の「安全な中心座標」を逆算
+							Vector3 dir = end - start;
+							Vector3 hitCenter = start + dir * callback.closestFraction;
 
-							intendedXZPos += vOffset;
-							currentIterPos = callback.hitPos;
+							// 連続でヒットしてスタックするのを防ぐため、法線方向にわずかに（0.001f）押し返す
+							hitCenter += hitNormalXZ * 0.001f;
+
+							// 3. 行きたかった残りの移動ベクトルを計算
+							Vector3 remainingMove = end - hitCenter;
+
+							// 4. 壁の法線方向の移動成分を打ち消す（壁に沿って滑らせるベクトル計算）
+							float dot = remainingMove.Dot(hitNormalXZ);
+							if (dot < 0.0f) {
+								remainingMove -= hitNormalXZ * dot;
+							}
+
+							// 5. 次の目標座標を更新
+							intendedXZPos = hitCenter + remainingMove;
+							intendedXZPos.y = m_position.y;
+
+							// 6. 次のループの開始地点を「壁の表面」ではなく「安全な中心座標」に設定（★一番の修正点）
+							currentIterPos = hitCenter;
 							currentIterPos.y = m_position.y;
 						}
 						else {
@@ -296,14 +330,68 @@ namespace nsBeastEngine
 					PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
 
 					if (callback.isHit) {
-						m_isOnGround = true;
-						m_isJump = false;
-						m_verticalVelocity = 0.0f;
-
+						// ぶつかった地点のY座標を計算
 						float hitCenterY = start.y - totalSweepDist * callback.closestFraction;
-						m_position.y = hitCenterY - (m_height * 0.5f + m_radius);
+						float newY = hitCenterY - (m_height * 0.5f + m_radius);
+
+						if (callback.isGround) {
+							// 立てる床の場合：着地
+							m_position.y = newY;
+							m_isOnGround = true;
+							m_isJump = false;
+							m_verticalVelocity = 0.0f;
+						}
+						else if (callback.isSteepSlope) {
+							// 急斜面の場合：接地判定にせず、法線の外側に滑り落とす
+							m_isOnGround = false;
+
+							// 坂のXZ方向の法線ベクトルを計算
+							Vector3 normalXZ(callback.hitNormal.x, 0.0f, callback.hitNormal.z);
+							if (normalXZ.LengthSq() > FLT_EPSILON) {
+								normalXZ.Normalize();
+							}
+
+							// 急な坂を「登る」のを防ぎつつ、ガタつきをなくす
+							// ぶつかった地点(newY)が元の高さより高い＝足元より高い斜面に突っ込んで登ろうとしている
+							if (newY > m_prevPosition.y + 0.01f) {
+								// 現在のフレームでのXZ移動ベクトル
+								Vector3 currentXZMove(m_position.x - m_prevPosition.x, 0.0f, m_position.z - m_prevPosition.z);
+
+								// 内積(Dot)を使って、坂の法線と逆向き（めり込む方向）にどれくらい進んだかを計算
+								float dot = currentXZMove.Dot(normalXZ);
+
+								// 坂に向かって進んでいる場合のみ、その成分を正確に打ち消す
+								if (dot < 0.0f) {
+									m_position.x -= normalXZ.x * dot;
+									m_position.z -= normalXZ.z * dot;
+								}
+								// 高さは上げず、そのまま重力に従って落ちる
+								m_position.y -= downAmount;
+							}
+							else {
+								// 上から落ちてきて斜面にぶつかった場合は、めり込みを防ぐため高さを合わせる
+								m_position.y = newY;
+							}
+
+							// 重力で落下速度が無限に加速し続けるのを防ぐ
+							const float MAX_SLIDE_SPEED = 8.0f;
+							if (m_verticalVelocity < -MAX_SLIDE_SPEED) {
+								m_verticalVelocity = -MAX_SLIDE_SPEED;
+							}
+
+							// 制限をかけた速度でXZ方向の押し出し量（滑り落ちる量）を計算
+							if (normalXZ.LengthSq() > FLT_EPSILON) {
+								float slideAmount = fabsf(m_verticalVelocity * deltaTime);
+								float slopeFactor = 1.0f - callback.hitNormal.y;
+
+								// 落下速度に応じて斜面を滑り落ちるようにXZ方向に押し出す
+								m_position.x += normalXZ.x * slideAmount * slopeFactor;
+								m_position.z += normalXZ.z * slideAmount * slopeFactor;
+							}
+						}
 					}
 					else {
+						// ★ここが外に出ます！：何にもぶつからなかった場合（空中）
 						m_isOnGround = false;
 						m_position.y -= downAmount;
 
