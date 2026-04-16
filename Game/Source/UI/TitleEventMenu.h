@@ -30,12 +30,19 @@ namespace app
 			 */
 			uint32_t GetSelectKey()const;
 
+			/**
+			 * @brief 描画の設定。
+			 * @param isDraw 描画するかどうかのフラグ。
+			 */
+			void SetDraw(bool isDraw) { m_isDraw = isDraw; }
+
 
 		private:
 			GamePad* m_gamePad;
 			int m_selectIndex;
 			bool m_isStickNeutral;
 			bool m_isSelect;
+			bool m_isDraw;
 		};
 	}
 }

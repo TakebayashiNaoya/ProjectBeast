@@ -90,12 +90,12 @@ namespace app
 			 * @biref 戻るフラグを設定
 			 * @param isReturn 戻るフラグ
 			 */
-			void SetBack(bool isBack)const { m_isBack = isBack; }
+			void SetBack(bool isBack) { m_isBack = isBack; }
 			
 
 		private:
 			/** 戻るボタンのフラグ */
-			mutable bool m_isBack;
+			bool m_isBack;
 			SoundType m_currentSoundType;
 
 
