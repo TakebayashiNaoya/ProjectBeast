@@ -31,6 +31,7 @@ namespace app
 		class IglooPromptMenu;
 		class InGameAchievementMenu;
 		class MiniMapMenu;
+		class TitleEventMenu;
 	}
 
 
@@ -152,6 +153,7 @@ namespace app
 		ui::Layout* m_iglooPromptLayout = nullptr;
 		ui::Layout* m_achievementLayout = nullptr;
 		ui::Layout* m_miniMapLayout = nullptr;
+		ui::Layout* m_titleEventLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
 
 
@@ -170,6 +172,7 @@ namespace app
 		ui::IglooPromptMenu* m_iglooPromptMenu = nullptr;
 		ui::InGameAchievementMenu* m_achievementMenu = nullptr;
 		ui::MiniMapMenu* m_miniMapMenu = nullptr;
+		ui::TitleEventMenu* m_titleEventMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
 	};
 }

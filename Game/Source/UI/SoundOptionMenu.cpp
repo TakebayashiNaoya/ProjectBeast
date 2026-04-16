@@ -66,10 +66,7 @@ namespace app
 			/** ポジションの左側の制限値 */
 			constexpr float LEFT_LIMITE_POSITION_VALUE = -420.0f;
 
-			///** ポジションの最大から最小までの値 */
-			//constexpr float POSITION_VALUE_WIDHT = RIGHT_LIMITE_POSITION_VALUE - LEFT_LIMITE_POSITION_VALUE;
-
-
+			
 			/**
 			 * @brief タイプに対応する SoundManager の現在音量を取得する
 			 * @param type 音量タイプ

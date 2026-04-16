@@ -55,7 +55,6 @@ namespace app
 
 		CountDownIcon::CountDownIcon(EnCountDownType type)
 			: m_icon(nullptr)
-			, m_currentTime(0.0f)
 			, m_type(type)
 		{
 		}

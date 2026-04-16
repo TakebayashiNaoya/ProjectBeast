@@ -45,9 +45,6 @@ namespace app
 		private:
 			EnCountDownType m_type;
 			UIIcon* m_icon;
-
-			// 現在のカウントダウンの時間。
-			float m_currentTime;
 		};
 
 

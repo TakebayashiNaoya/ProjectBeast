@@ -30,6 +30,7 @@
 #include "Source/UI/SearchMenu.h"
 #include "Source/UI/SoundOptionMenu.h"
 #include "Source/UI/TutorialMenu.h"
+#include "Source/UI/TitleEventMenu.h"
 
 
 namespace app
@@ -63,6 +64,7 @@ namespace app
 		delete m_tutorialLayout;
 		delete m_achievementLayout;
 		delete m_miniMapLayout;
+		delete m_titleEventLayout;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -143,6 +145,16 @@ namespace app
 		{
 			m_miniMapMenu->SetDraw(true);
 			m_miniMapMenu->SetDaddyPenguin(daddyPenguin);
+		}
+
+		m_titleEventLayout = new ui::Layout();
+		m_titleEventLayout->Initialize<ui::TitleEventMenu>(
+			"Assets/parameter/event/TitleEvent.json"
+		);
+		m_titleEventMenu = m_titleEventLayout->GetMenu<ui::TitleEventMenu>();
+		if (m_titleEventMenu)
+		{
+			m_titleEventMenu->SetDraw(true);
 		}
 
 		m_iglooPromptLayout = new ui::Layout();
@@ -314,9 +326,6 @@ namespace app
 
 	void InGameUIManager::RenderPlaying(RenderContext& rc)
 	{
-		if (m_timerLayout)           m_timerLayout->Render(rc);
-		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
-
 		for (auto* layout : m_searchLayouts)
 		{
 			if (layout) layout->Render(rc);
@@ -326,6 +335,8 @@ namespace app
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Render(rc);
 		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);
+		if (m_timerLayout)           m_timerLayout->Render(rc);
+		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
 		if (m_achievementLayout)     m_achievementLayout->Render(rc);
 	}
 
