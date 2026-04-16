@@ -49,10 +49,10 @@ namespace app
 
 
 		WhirlpoolPowerSytem::WhirlpoolPowerSytem(Whirlpool* ownerWhirlpool)
-			: m_ownerWhirlpool(ownerWhirlpool)
-			, m_childPenguinManager(nullptr)
+			: m_owner(ownerWhirlpool)
+			, m_cpManager(nullptr)
 		{
-			m_childPenguinManager = ChildPenguinManager::GetInstance();
+			m_cpManager = ChildPenguinManager::GetInstance();
 
 			InitializeWhirlpoolInfo();
 		}
@@ -60,10 +60,10 @@ namespace app
 
 		void WhirlpoolPowerSytem::InitializeWhirlpoolInfo()
 		{
-			const Vector3& whirlpoolPos = m_ownerWhirlpool->GetTransform().m_position;
+			const Vector3& whirlpoolPos = m_owner->GetTransform().m_position;
 
-			auto childPenguins = m_childPenguinManager->GetChildPenguin();
-			auto& oldInfo = m_whirlpoolPowerInfos;
+			auto childPenguins = m_cpManager->GetChildPenguin();
+			auto& oldInfo = m_wpPowerInfos;
 
 			// 子ペンギンの数が変わっている場合は、情報リストを再構築する
 			if (oldInfo.empty() || oldInfo.size() != childPenguins.size())
@@ -93,26 +93,28 @@ namespace app
 
 		void WhirlpoolPowerSytem::UpdateWhirlpoolInfo(const float deltaTime)
 		{
-			const Vector3& whirlpoolPos = m_ownerWhirlpool->GetTransform().m_position;
+			const Vector3& whirlpoolPos = m_owner->GetTransform().m_position;
 
 			InitializeWhirlpoolInfo();
 
 			// イテレータで走査し、target が nullptr のエントリを安全に削除する
-			for (auto it = m_whirlpoolPowerInfos.begin(); it != m_whirlpoolPowerInfos.end(); )
+			for (auto it = m_wpPowerInfos.begin(); it != m_wpPowerInfos.end(); )
 			{
 				if (it->target == nullptr)
 				{
 					// ループ中に erase し、次の有効イテレータを受け取る
-					it = m_whirlpoolPowerInfos.erase(it);
+					it = m_wpPowerInfos.erase(it);
 					continue;
 				}
 
 				// 渦潮が消滅済みなら影響を解除してスキップ
-				if (m_ownerWhirlpool->GetState() == Whirlpool::EnWhirlpoolState::None)
+				if (m_owner->GetState() == Whirlpool::EnWhirlpoolState::None)
 				{
 					it->isAffected = false;
 					it->isPushing = false;
 					it->target->GetStateMachine()->SetIsInWhirlpool(false);
+
+					m_cpManager->UnregisterDowning(it->target);
 					++it;
 					continue;
 				}
@@ -186,7 +188,7 @@ namespace app
 			{
 				info.isAffected = false;
 				info.isPushing = false;
-				info.target->GetStateMachine()->SetIsInWhirlpool(false);
+				//info.target->GetStateMachine()->SetIsInWhirlpool(false);
 				return;
 			}
 
@@ -198,7 +200,7 @@ namespace app
 
 		void WhirlpoolPowerSytem::UpdateSpiral(WhirlpoolPowerInfo& info, float newRadius, float deltaTime)
 		{
-			const Vector3& whirlpoolPos = m_ownerWhirlpool->GetTransform().m_position;
+			const Vector3& whirlpoolPos = m_owner->GetTransform().m_position;
 
 			// 角度を回転させる（渦巻き）
 			info.angle += ROTATE_SPEED * deltaTime;
