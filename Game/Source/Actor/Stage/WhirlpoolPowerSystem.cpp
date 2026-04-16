@@ -62,7 +62,7 @@ namespace app
 		{
 			const Vector3& whirlpoolPos = m_owner->GetTransform().m_position;
 
-			auto childPenguins = m_cpManager->GetChildPenguin();
+			auto& childPenguins = m_cpManager->GetChildPenguin();
 			auto& oldInfo = m_wpPowerInfos;
 
 			// 子ペンギンの数が変わっている場合は、情報リストを再構築する
@@ -188,7 +188,7 @@ namespace app
 			{
 				info.isAffected = false;
 				info.isPushing = false;
-				//info.target->GetStateMachine()->SetIsInWhirlpool(false);
+				info.target->GetStateMachine()->SetIsInWhirlpool(false);
 				return;
 			}
 
