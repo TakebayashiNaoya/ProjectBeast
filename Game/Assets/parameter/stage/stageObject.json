@@ -229,7 +229,7 @@
         "objectName" : "whirlpool8",
         "fileName" : "Assets/modelData/stage/Whirlpool/whirlpool.tkm",
         "isNeedCollision" : false,
-        "position" : [-1344, 50, -1765],
+        "position" : [-460, -50, -2029],
         "rotationDeg" : [0, 0, 0],
         "scale" : [0.0001, 0.0001, 0.0001]
       },
