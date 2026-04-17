@@ -14,6 +14,25 @@ namespace app
 	{
 		namespace
 		{
+			// 50%時にゲージの色を変更するための値。
+			constexpr float GAUGE_RATIO_FIFTY_PERCENT = 0.5f;
+			// 50%の割合。
+			constexpr float RATIO_FIFTY_PERCENT = 0.5f;
+
+			// 25%時にゲージの色を変更するための値。
+			constexpr float GAUGE_RATIO_TWENTY_FIVE_PERCENT = 0.25f;
+			// 25%の割合。
+			constexpr float RATIO_TWENTY_FIVE_PERCENT = 0.25f;
+
+			// 黄色。
+			const Vector4 RATIO_COLOR_FIFTY_PERCENT = Vector4(1.0f, 1.0f, 0.5f, 1.0f);
+			// オレンジ色。
+			const Vector4 RATIO_COLOR_TWENTY_FIVE_PERCENT = Vector4(1.0f, 0.5f, 0.3f, 1.0f);
+			// 赤色。
+			//const Vector4 RATIO_COLOR_TWENTY_FIVE_PERCENT = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+			// ゲージのリセット色。
+			const Vector4 RESET_COLOR = Vector4(0.3f, 0.5f, 0.8f, 1.0f);
+			
 			constexpr float OFFSET_X = -200.0f;
 			constexpr float OFFSET_Y = 150.0f;
 
@@ -56,6 +75,24 @@ namespace app
 				gauge->m_transform.m_localTransform.m_position.Set(screenPosition.x + OFFSET_X, screenPosition.y + OFFSET_Y, 0.0f);
 				gauge->m_transform.m_localTransform.m_scale = Vector3(m_sleepingRate, 1.0f, 1.0f);
 				gauge->m_isDraw = m_sleepingRate > RATE_MIN;
+
+				// ゲージの色を変える処理。
+				if (m_sleepingRate <= RATIO_FIFTY_PERCENT)
+				{
+					// 50%以下ならオレンジ色。
+					gauge->m_color = RATIO_COLOR_FIFTY_PERCENT;
+					if (m_sleepingRate <= RATIO_TWENTY_FIVE_PERCENT)
+					{
+						// 25%以下なら赤色。
+						gauge->m_color = RATIO_COLOR_TWENTY_FIVE_PERCENT;
+					}
+				}
+				else
+				{
+					// それ以外は通常色。
+					gauge->m_color = RESET_COLOR;
+				}
+
 			}
 			// アイコン
 			{

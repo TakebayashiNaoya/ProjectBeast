@@ -18,11 +18,11 @@ namespace app
 
 			void Update()override;
 			void InitializeLogic()override;
-			
+
 
 		public:
 			void SetTargetPosition(const Vector3& position) { m_targetPosition = position; }
-			void SetSleepingRate(const float rate) { m_sleepingRate = rate; }
+			void SetSleepingRate(const float rate){ m_sleepingRate = rate; }
 			void SetDraw(const bool isDraw) { m_isDraw = isDraw; }
 
 
