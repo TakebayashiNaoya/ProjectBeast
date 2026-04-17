@@ -366,7 +366,7 @@ namespace nsBeastEngine
 									m_position.z -= normalXZ.z * dot;
 								}
 								// 高さは上げず、そのまま重力に従って落ちる
-								m_position.y -= downAmount;
+								m_position.y = m_prevPosition.y;
 							}
 							else {
 								// 上から落ちてきて斜面にぶつかった場合は、めり込みを防ぐため高さを合わせる
@@ -374,7 +374,7 @@ namespace nsBeastEngine
 							}
 
 							// 重力で落下速度が無限に加速し続けるのを防ぐ
-							const float MAX_SLIDE_SPEED = 8.0f;
+							const float MAX_SLIDE_SPEED = 100.0f;
 							if (m_verticalVelocity < -MAX_SLIDE_SPEED) {
 								m_verticalVelocity = -MAX_SLIDE_SPEED;
 							}
