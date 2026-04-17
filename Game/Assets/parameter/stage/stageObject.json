@@ -2,6 +2,14 @@
   "StageObject": {
     "object": [      
       {
+        "objectName" : "wall",
+        "fileName" : "Assets/modelData/stage/Wall/iceWall.tkm",       
+        "isNeedCollision" : true,
+        "position" : [0, 1000, 0],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [0.32, 2, 0.32]
+      },
+      {
         "objectName" : "bearHome_1",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
         "isNeedCollision" : true,
