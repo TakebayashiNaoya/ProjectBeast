@@ -1,18 +1,18 @@
 ﻿/**
  * @file Whirlpool.cpp
  * @brief 渦潮クラス
- * @author 藤谷
+ * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "Whirlpool.h"
+#include "Ocean.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
-#include "Nature/Ocean.h"
 
 
 namespace app
 {
-	namespace actor
+	namespace nature
 	{
 		namespace
 		{
@@ -77,14 +77,14 @@ namespace app
 			m_state = EnWhirlpoolState::Bigger;
 			m_scaleBigger.Play();
 
-			m_whirlpoolPowerSystem->Start();
+			m_whirlpoolPowerSystem->StartWrapper();
 		}
 
 
 		void Whirlpool::Update()
 		{
 			StateMachine();
-			m_whirlpoolPowerSystem->Update();
+			m_whirlpoolPowerSystem->UpdateWrapper();
 		}
 
 
@@ -129,7 +129,7 @@ namespace app
 			rc.SetIndexBuffer(m_indexBuffer);
 			rc.DrawIndexedInstance(m_indexCount, 1);
 
-			m_whirlpoolPowerSystem->Render(rc);
+			m_whirlpoolPowerSystem->RenderWrapper(rc);
 		}
 
 
@@ -417,10 +417,7 @@ namespace app
 			int numRenderTargets = 0;
 			for (int i = 0; i < MAX_RENDERING_TARGET; ++i)
 			{
-				if (colorBufferFormat[i] == DXGI_FORMAT_UNKNOWN)
-				{
-					break;
-				}
+				if (colorBufferFormat[i] == DXGI_FORMAT_UNKNOWN) break;
 				psoDesc.RTVFormats[i] = colorBufferFormat[i];
 				numRenderTargets++;
 			}
@@ -448,7 +445,7 @@ namespace app
 
 		void Whirlpool::UpdateVertexHeights()
 		{
-			const nsBeastEngine::Ocean* ocean = g_renderingEngine->GetOcean();
+			const Ocean* ocean = Ocean::GetInstance();
 
 			for (auto& v : m_vertices)
 			{

@@ -268,9 +268,6 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\Stage\IStage.cpp" />
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
-    <ClCompile Include="Source\Actor\Stage\Whirlpool.cpp" />
-    <ClCompile Include="Source\Actor\Stage\WhirlpoolManager.cpp" />
-    <ClCompile Include="Source\Actor\Stage\WhirlpoolPowerSystem.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera\CameraCommon.cpp" />
     <ClCompile Include="Source\Camera\CameraController.cpp" />
@@ -291,6 +288,10 @@
     <ClCompile Include="Source\Manager\InGameUImanager.cpp" />
     <ClCompile Include="Source\Manager\ScoreManager.cpp" />
     <ClCompile Include="Source\Manager\TimeManager.cpp" />
+    <ClCompile Include="Source\Nature\Ocean.cpp" />
+    <ClCompile Include="Source\Nature\Whirlpool.cpp" />
+    <ClCompile Include="Source\Nature\WhirlpoolManager.cpp" />
+    <ClCompile Include="Source\Nature\WhirlpoolPowerSystem.cpp" />
     <ClCompile Include="Source\Noise\NoiseManager.cpp" />
     <ClCompile Include="Source\Scene\DebugScene.cpp" />
     <ClCompile Include="Source\Scene\InGameScene.cpp" />
@@ -373,9 +374,6 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
-    <ClInclude Include="Source\Actor\Stage\Whirlpool.h" />
-    <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h" />
-    <ClInclude Include="Source\Actor\Stage\WhirlpoolPowerSystem.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera\CameraCommon.h" />
     <ClInclude Include="Source\Camera\CameraController.h" />
@@ -397,6 +395,10 @@
     <ClInclude Include="Source\Manager\InGameUImanager.h" />
     <ClInclude Include="Source\Manager\ScoreManager.h" />
     <ClInclude Include="Source\Manager\TimeManager.h" />
+    <ClInclude Include="Source\Nature\Ocean.h" />
+    <ClInclude Include="Source\Nature\Whirlpool.h" />
+    <ClInclude Include="Source\Nature\WhirlpoolManager.h" />
+    <ClInclude Include="Source\Nature\WhirlpoolPowerSystem.h" />
     <ClInclude Include="Source\Noise\NoiseManager.h" />
     <ClInclude Include="Source\Scene\DebugScene.h" />
     <ClInclude Include="Source\Scene\InGameScene.h" />

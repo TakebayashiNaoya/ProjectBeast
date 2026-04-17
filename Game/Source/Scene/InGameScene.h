@@ -83,7 +83,6 @@ namespace app
 
 		camera::CameraSteering m_cameraSteering;
 
-		Ocean* m_ocean = nullptr;
 		SkyCube* m_skyCube = nullptr;
 
 		//------------------------------------------------------------

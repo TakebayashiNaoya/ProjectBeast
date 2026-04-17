@@ -4,7 +4,7 @@
  * @author 藤谷
  */
 #pragma once
-#include "IStage.h"
+#include "IObject.h"
 
 
 namespace app
@@ -14,13 +14,18 @@ namespace app
 		/** 前方宣言 */
 		class ChildPenguin;
 		class ChildPenguinManager;
+	}
+
+	namespace nature
+	{
+		/** 前方宣言 */
 		class Whirlpool;
 
 
 		/**
 		 * @brief 渦潮の引き寄せ、押し出しを管理するクラス
 		 */
-		class WhirlpoolPowerSytem : public Actor
+		class WhirlpoolPowerSytem : public IObject
 		{
 		public:
 			/**
@@ -31,7 +36,7 @@ namespace app
 				/** 渦潮から子ペンギンへのベクトル */
 				Vector3 toTargetVector;
 				/** 対象の子ペンギン */
-				ChildPenguin* target;
+				actor::ChildPenguin* target;
 				/** 渦潮の影響を受けているか */
 				bool isAffected;
 				/** 引き寄せ完了（押し出しフェーズ中）か */
@@ -49,11 +54,14 @@ namespace app
 
 		public:
 			WhirlpoolPowerSytem(Whirlpool* ownerWhirlpool);
-			~WhirlpoolPowerSytem() override = default;
+			~WhirlpoolPowerSytem() = default;
 
 
 		public:
-			/** 引き寄せ、押し出しの情報のリストを取得 */
+			/**
+			 * @brief 引き寄せ、押し出しの情報のリストを取得
+			 * @return 情報リストの参照
+			 */
 			std::vector<WhirlpoolPowerInfo>& GetWhirlpoolPowerInfos()
 			{
 				return m_wpPowerInfos;
@@ -61,11 +69,15 @@ namespace app
 
 
 		private:
-			/** 渦潮の引き寄せ、押し出しの情報を初期化する関数 */
+			/**
+			 * @brief 渦潮の引き寄せ、押し出しの情報を初期化する関数
+			 */
 			void InitializeWhirlpoolInfo();
 
-
-			/** 渦潮、子ペンギンの情報を更新する */
+			/**
+			 * @brief 渦潮、子ペンギンの情報を更新する
+			 * @param deltaTime フレーム間の経過時間
+			 */
 			void UpdateWhirlpoolInfo(const float deltaTime);
 
 			/**
@@ -84,9 +96,9 @@ namespace app
 
 			/**
 			 * @brief 共通の渦巻き移動処理：角度を進めて極座標で位置を更新する
-			 * @param info        対象の渦潮情報
-			 * @param newRadius   今フレームの半径
-			 * @param deltaTime   フレーム間の経過時間
+			 * @param info      対象の渦潮情報
+			 * @param newRadius 今フレームの半径
+			 * @param deltaTime フレーム間の経過時間
 			 */
 			void UpdateSpiral(WhirlpoolPowerInfo& info, float newRadius, float deltaTime);
 
@@ -95,7 +107,7 @@ namespace app
 			/** 渦潮のポインタ */
 			Whirlpool* m_owner;
 			/** 子ペンギンマネージャーのポインタ */
-			ChildPenguinManager* m_cpManager;
+			actor::ChildPenguinManager* m_cpManager;
 			/** 引き寄せ、押し出しの情報のリスト */
 			std::vector<WhirlpoolPowerInfo> m_wpPowerInfos;
 		};

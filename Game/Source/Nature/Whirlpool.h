@@ -1,22 +1,23 @@
 ﻿/**
  * @file Whirlpool.h
  * @brief 渦潮のクラス
- * @author 藤谷、竹林
+ * @author 藤谷
  */
 #pragma once
-#include "IStage.h"
+#include "IObject.h"
+#include "Source/Core/Transform.h"
 #include "Source/Util/Curve.h"
 #include "WhirlpoolPowerSystem.h"
 
 
 namespace app
 {
-	namespace actor
+	namespace nature
 	{
 		/**
 		 * @brief 渦潮のクラス
 		 */
-		class Whirlpool : public Actor
+		class Whirlpool : public IObject
 		{
 		public:
 			/**
@@ -50,7 +51,6 @@ namespace app
 
 			/**
 			 * @brief 共通定数バッファ（b0）
-			 * @details OceanMeshのSCommonConstantBufferと同じレイアウト
 			 */
 			struct SCommonConstantBuffer
 			{
@@ -87,6 +87,16 @@ namespace app
 			 * @param index 渦潮のインデックス
 			 */
 			void SetIndex(const uint8_t index) { m_index = index; }
+			/**
+			 * @brief 座標を設定
+			 * @param position 座標
+			 */
+			void SetPosition(const Vector3& position) { m_transform.m_position = position; }
+			/**
+			 * @brief トランスフォームを取得
+			 * @return トランスフォームの参照
+			 */
+			const core::Transform& GetTransform() const { return m_transform; }
 
 
 		public:
@@ -97,7 +107,7 @@ namespace app
 
 		public:
 			Whirlpool();
-			virtual ~Whirlpool() override = default;
+			~Whirlpool() = default;
 
 
 		private:
@@ -171,6 +181,8 @@ namespace app
 
 			DescriptorHeap m_descriptorHeap;			/** ディスクリプタヒープ */
 
+			/** 渦潮のトランスフォーム */
+			core::Transform m_transform;
 			/** 渦潮の拡大カーブ */
 			app::util::Vector3Curve m_scaleBigger;
 			/** 渦潮の縮小カーブ */

@@ -1,7 +1,7 @@
 ﻿/**
  * @file WhirlpoolManager.cpp
  * @brief 渦潮を管理するクラス
- * @author 藤谷
+ * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "Whirlpool.h"
@@ -13,13 +13,13 @@
 
 namespace app
 {
-	namespace actor
+	namespace nature
 	{
 		WhirlpoolManager* WhirlpoolManager::m_instance = nullptr;
 
 		namespace
 		{
-			/** 渦潮の位置JSONのパス */
+			/** 渦潮の座標JSONのパス */
 			const char* WHIRLPOOL_POSITIONS_JSON_PATH = "Assets/parameter/stage/whirlpoolPositions.json";
 			/** 渦潮の位置のキー */
 			const char* WHIRLPOOL_POSITIONS_KEY = "whirlpoolPositions";
@@ -58,7 +58,7 @@ namespace app
 
 		void WhirlpoolManager::Update()
 		{
-			// 渦潮の生成タイマーを更新
+			// 渦潮の生成タイマーを更新する
 			m_timer += g_gameTime->GetFrameDeltaTime();
 			if (m_timer >= WHIRLPOOL_CREATE_INTERVAL)
 			{
@@ -117,7 +117,6 @@ namespace app
 			for (auto& it : m_whirlpoolMap)
 			{
 				if (!it.second) continue;
-
 				cb(it.second.get());
 			}
 		}
@@ -142,9 +141,7 @@ namespace app
 			std::mt19937 gen(rd());
 			std::uniform_int_distribution<int> dist(0, static_cast<int>(candidates.size() - 1));
 
-			const uint8_t index = candidates[dist(gen)];
-
-			// 座標マップからポジションを取得する
+			const uint8_t  index = candidates[dist(gen)];
 			const Vector3& position = m_positionMap.at(index);
 
 			auto newWhirlpool = std::make_unique<Whirlpool>();

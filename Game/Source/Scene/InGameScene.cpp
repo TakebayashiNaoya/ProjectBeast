@@ -41,7 +41,8 @@
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
 
-#include "Source/Actor/Stage/WhirlpoolManager.h"
+#include "Source/Nature/WhirlpoolManager.h"
+#include "Source/Nature/Ocean.h"
 #include <random>
 
 
@@ -79,12 +80,12 @@ namespace app
 		actor::EnemyManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
-		actor::WhirlpoolManager::DestroyInstance();
+		nature::WhirlpoolManager::DestroyInstance();
 
 		actor::IglooManager::DestroyInstance();
 
 		DeleteGO(m_skyCube);
-		DeleteGO(m_ocean);
+		nature::Ocean::DestroyInstance();
 
 		/** マネージャー */
 		BattleManager::DestroyInstance();
@@ -118,7 +119,7 @@ namespace app
 
 		/** アクター系シングルトン生成 */
 		actor::StageSystem::CreateInstance();
-		actor::WhirlpoolManager::CreateInstance();
+		nature::WhirlpoolManager::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
 		actor::EnemyManager::CreateInstance();
 
@@ -147,7 +148,7 @@ namespace app
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
-			actor::WhirlpoolManager::GetInstance()->StartWrapper();
+			nature::WhirlpoolManager::GetInstance()->Start();
 			m_loadPhase = LoadPhase::StageWait;
 			break;
 		}
@@ -237,7 +238,8 @@ namespace app
 			m_skyCube->SetScale(Vector3(450.0f, 450.0f, 450.0f));
 			m_skyCube->SetLuminance(0.8f);
 
-			m_ocean = NewGO<Ocean>(0);
+			nature::Ocean::CreateInstance();
+			nature::Ocean::GetInstance()->Start();
 			m_loadPhase = LoadPhase::Done;
 
 			/** ロード完了 → カウントダウン開始 */
@@ -272,7 +274,11 @@ namespace app
 
 		/** ステージは常に更新 */
 		actor::StageSystem::GetInstance()->Update();
-		actor::WhirlpoolManager::GetInstance()->UpdateWrapper();
+		nature::WhirlpoolManager::GetInstance()->Update();
+		if (nature::Ocean::GetInstance() != nullptr)
+		{
+			nature::Ocean::GetInstance()->Update();
+		}
 
 		switch (m_gamePhase)
 		{
@@ -504,7 +510,6 @@ namespace app
 	void InGameScene::Render(RenderContext& rc)
 	{
 		actor::StageSystem::GetInstance()->Render(rc);
-		actor::WhirlpoolManager::GetInstance()->RenderWrapper(rc);
 
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
 		actor::ChildPenguinManager::GetInstance()->Render(rc);

@@ -4,19 +4,18 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "Whirlpool.h"
+#include "WhirlpoolPowerSystem.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
-#include "Source/Actor/Stage/Whirlpool.h"
-#include "WhirlpoolPowerSystem.h"
 
 using namespace nsK2EngineLow;
 
 namespace app
 {
-	namespace actor
+	namespace nature
 	{
-
 		namespace
 		{
 			/** 渦潮の影響範囲半径 */
@@ -39,7 +38,6 @@ namespace app
 		void WhirlpoolPowerSytem::Update()
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
-
 			UpdateWhirlpoolInfo(deltaTime);
 		}
 
@@ -52,8 +50,7 @@ namespace app
 			: m_owner(ownerWhirlpool)
 			, m_cpManager(nullptr)
 		{
-			m_cpManager = ChildPenguinManager::GetInstance();
-
+			m_cpManager = actor::ChildPenguinManager::GetInstance();
 			InitializeWhirlpoolInfo();
 		}
 
@@ -75,12 +72,10 @@ namespace app
 				for (auto& cp : childPenguins)
 				{
 					WhirlpoolPowerInfo newInfo;
-					// 渦潮から子ペンギンへのベクトル
 					newInfo.toTargetVector = cp->GetTransform().m_position - whirlpoolPos;
 					newInfo.target = cp;
 					newInfo.isAffected = false;
 					newInfo.isPushing = false;
-					// 初期角度をXZ平面で計算
 					newInfo.angle = atan2f(newInfo.toTargetVector.z, newInfo.toTargetVector.x);
 
 					newInfos.push_back(newInfo);
@@ -97,12 +92,11 @@ namespace app
 
 			InitializeWhirlpoolInfo();
 
-			// イテレータで走査し、target が nullptr のエントリを安全に削除する
+			// イテレータで走査し、targetがnullptrのエントリを安全に削除する
 			for (auto it = m_wpPowerInfos.begin(); it != m_wpPowerInfos.end(); )
 			{
 				if (it->target == nullptr)
 				{
-					// ループ中に erase し、次の有効イテレータを受け取る
 					it = m_wpPowerInfos.erase(it);
 					continue;
 				}
@@ -113,7 +107,6 @@ namespace app
 					it->isAffected = false;
 					it->isPushing = false;
 					it->target->GetStateMachine()->SetIsInWhirlpool(false);
-
 					m_cpManager->UnregisterDowning(it->target);
 					++it;
 					continue;
@@ -122,7 +115,6 @@ namespace app
 				// 渦潮から子ペンギンへのベクトルを更新
 				it->toTargetVector = it->target->GetTransform().m_position - whirlpoolPos;
 
-				// XZ平面での距離を計算（Y成分を0にして Length() を利用）
 				const Vector3 toTargetXZ = Vector3(it->toTargetVector.x, 0.0f, it->toTargetVector.z);
 				const float distXZ = toTargetXZ.Length();
 
@@ -131,24 +123,20 @@ namespace app
 				{
 					it->isAffected = true;
 					it->isPushing = false;
-					// 範囲に入った瞬間の角度を記録
 					it->angle = atan2f(it->toTargetVector.z, it->toTargetVector.x);
 				}
 
 				// 影響を受けているペンギンのフェーズ処理
 				if (it->isAffected)
 				{
-					// 子ペンギンが渦潮の影響を受けると渦潮が消えるまで変わらない
 					it->target->GetStateMachine()->SetIsInWhirlpool(true);
 
 					if (it->isPushing)
 					{
-						// 押し出しフェーズ
 						UpdatePush(*it, deltaTime);
 					}
 					else
 					{
-						// 引き寄せフェーズ
 						UpdateAttract(*it, deltaTime);
 					}
 				}
@@ -160,7 +148,6 @@ namespace app
 
 		void WhirlpoolPowerSytem::UpdateAttract(WhirlpoolPowerInfo& info, float deltaTime)
 		{
-			// XZ平面での現在の距離（半径）
 			const Vector3 toTargetXZ = Vector3(info.toTargetVector.x, 0.0f, info.toTargetVector.z);
 			const float currentRadius = toTargetXZ.Length();
 
@@ -179,16 +166,14 @@ namespace app
 
 		void WhirlpoolPowerSytem::UpdatePush(WhirlpoolPowerInfo& info, float deltaTime)
 		{
-			// XZ平面での現在の距離（半径）
 			const Vector3 toTargetXZ = Vector3(info.toTargetVector.x, 0.0f, info.toTargetVector.z);
 			const float currentRadius = toTargetXZ.Length();
 
-			// 渦潮範囲外に出たら影響終了（渦潮の範囲より少し外側まで続ける）
+			// 渦潮範囲外に出たら影響終了
 			if (currentRadius >= WHIRLPOOL_RADIUS * 1.5f)
 			{
 				info.isAffected = false;
 				info.isPushing = false;
-				//info.target->GetStateMachine()->SetIsInWhirlpool(false);
 				return;
 			}
 
@@ -205,11 +190,10 @@ namespace app
 			// 角度を回転させる（渦巻き）
 			info.angle += ROTATE_SPEED * deltaTime;
 
-			// 極座標 → デカルト座標 でXZ位置を更新
+			// 極座標 → デカルト座標でXZ位置を更新
 			Vector3 pos = info.target->GetTransform().m_position;
 			pos.x = whirlpoolPos.x + newRadius * cosf(info.angle);
 			pos.z = whirlpoolPos.z + newRadius * sinf(info.angle);
-			// Y座標は変化させない
 
 			const Vector3 prevPos = info.target->GetCharacterController()->Execute(pos, deltaTime);
 			info.target->GetStateMachine()->SetPosition(prevPos);

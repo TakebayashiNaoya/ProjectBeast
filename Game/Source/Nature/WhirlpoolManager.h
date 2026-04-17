@@ -1,15 +1,15 @@
 ﻿/**
  * @file WhirlpoolManager.h
  * @brief 渦潮を管理するクラス
- * @author 藤谷
+ * @author 藤谷、竹林
  */
 #pragma once
-#include "IStage.h"
+#include "Nature/INatureObject.h"
 
 
 namespace app
 {
-	namespace actor
+	namespace nature
 	{
 		/** 前方宣言 */
 		class Whirlpool;
@@ -17,17 +17,28 @@ namespace app
 		/**
 		 * @brief 渦潮を管理するクラス
 		 */
-		class WhirlpoolManager : public Actor
+		class WhirlpoolManager : public nsBeastEngine::INatureObject
 		{
 		public:
-			void Start() override;
-			void Update() override;
-			void Render(RenderContext& rc) override;
+			/**
+			 * @brief 初期化処理
+			 * @details whirlpoolPositions.jsonを読み込み座標マップを構築する
+			 */
+			void Start();
+			/**
+			 * @brief 更新処理
+			 */
+			void Update();
+			/**
+			 * @brief 描画処理
+			 * @param rc レンダリングコンテキスト
+			 */
+			void Render(RenderContext& rc);
 
 
 		private:
 			WhirlpoolManager();
-			~WhirlpoolManager() override;
+			~WhirlpoolManager();
 
 
 		public:
@@ -74,7 +85,6 @@ namespace app
 			{
 				return m_instance;
 			}
-
 
 			/**
 			 * @brief インスタンスの破棄
