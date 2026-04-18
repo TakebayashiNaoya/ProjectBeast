@@ -25,7 +25,7 @@ namespace app
 		class UIAnimationBase
 		{
 		public:
-			UIAnimationBase() : m_ui(nullptr),m_timeSec(0.0f){}
+			UIAnimationBase() : m_ui(nullptr),m_timeSec(0.0f),m_isFinished(false){}
 			~UIAnimationBase(){}
 
 
@@ -43,8 +43,26 @@ namespace app
 			 */
 			void SetUI(UIBase* ui) { m_ui = ui; }
 
+			/**
+			 * @brief フィニッシュが呼ばれた時のコールバックを設定。
+			 */
+			void SetOnFinished(std::function<void()> callBack) 
+			{
+				m_onFinished = std::move(callBack);
+			}
+			
 
 		protected:
+			/**
+			 * @brief アニメーション更新の最後に呼ばれる
+			 */
+			void NotifyFinished()
+			{
+				m_isFinished = true;
+				if (m_onFinished)m_onFinished();
+			}
+
+
 			/** UIBaseのポインタ */
 			UIBase* m_ui;
 			/** 秒数 */
@@ -53,6 +71,13 @@ namespace app
 			app::util::EasingType m_type = app::util::EasingType::Linear;
 			/** 片道 */
 			app::util::LoopMode m_loopMode = app::util::LoopMode::Once;
+
+
+		private:
+			/** フィニッシュが呼ばれた時のコールバック */
+			bool m_isFinished;
+			/** ファンクション変数 */
+			std::function<void()>m_onFinished;
 		};
 
 
@@ -70,10 +95,13 @@ namespace app
 			/** 更新処理 */
 			void Update()override
 			{
+				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				if (m_applyFunc)
+				m_applyFunc(m_curve.GetCurrentValue());
+				// 再生中かつ停止に変わった瞬間が終了のタイミング。
+				if (wasPlaying && !m_curve.IsPlaying())
 				{
-					m_applyFunc(m_curve.GetCurrentValue());
+					NotifyFinished();
 				}
 			}
 
@@ -160,10 +188,13 @@ namespace app
 			/** 更新処理 */
 			void Update()override
 			{
+				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				if (m_applyFunc)
+				m_applyFunc(m_curve.GetCurrentValue());
+				// 再生中かつ停止に変わった瞬間が終了のタイミング。
+				if (wasPlaying && !m_curve.IsPlaying())
 				{
-					m_curve.GetCurrentValue();
+					NotifyFinished();
 				}
 			}
 
@@ -242,10 +273,12 @@ namespace app
 			/** 更新処理 */
 			void Update()override
 			{
+				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				if (m_applyFunc)
+				m_applyFunc(m_curve.GetCurrentValue());
+				if (wasPlaying && !m_curve.IsPlaying())
 				{
-					m_applyFunc(m_curve.GetCurrentValue());
+					NotifyFinished();
 				}
 			}
 
@@ -329,10 +362,12 @@ namespace app
 			/** 更新処理 */
 			void Update()override
 			{
+				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				if (m_applyFunc)
+				m_applyFunc(m_curve.GetCurrentValue());
+				if (wasPlaying && !m_curve.IsPlaying())
 				{
-					m_applyFunc(m_curve.GetCurrentValue());
+					NotifyFinished();
 				}
 			}
 
@@ -418,6 +453,7 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
+				NotifyFinished();
 			}
 		};
 
@@ -438,6 +474,7 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
+				NotifyFinished();
 			}
 		};
 
@@ -458,6 +495,7 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
+				NotifyFinished();
 			}
 		};
 
@@ -478,6 +516,7 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
+				NotifyFinished();
 			}
 		};
 
@@ -498,6 +537,7 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
+				NotifyFinished();
 			}
 		};
 	}

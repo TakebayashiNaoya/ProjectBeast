@@ -14,24 +14,21 @@ namespace app
 	{
 		namespace
 		{
-			// 50%時にゲージの色を変更するための値。
-			constexpr float GAUGE_RATIO_FIFTY_PERCENT = 0.5f;
-			// 50%の割合。
-			constexpr float RATIO_FIFTY_PERCENT = 0.5f;
+			// 65%の割合。
+			constexpr float RATIO_SIXTY_FIVE_PERCENT = 0.65f;
 
-			// 25%時にゲージの色を変更するための値。
-			constexpr float GAUGE_RATIO_TWENTY_FIVE_PERCENT = 0.25f;
-			// 25%の割合。
-			constexpr float RATIO_TWENTY_FIVE_PERCENT = 0.25f;
+			// 35%の割合。
+			constexpr float RATIO_THERTY_FIVE_PERCENT = 0.35f;
 
+			// 0%の割合。
+			constexpr float RATIO_ZERO = 0.0f;
+			
 			// 黄色。
-			const Vector4 RATIO_COLOR_FIFTY_PERCENT = Vector4(1.0f, 1.0f, 0.5f, 1.0f);
-			// オレンジ色。
-			const Vector4 RATIO_COLOR_TWENTY_FIVE_PERCENT = Vector4(1.0f, 0.5f, 0.3f, 1.0f);
+			const Vector4 RATIO_ORANGE_COLOR = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 			// 赤色。
-			//const Vector4 RATIO_COLOR_TWENTY_FIVE_PERCENT = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-			// ゲージのリセット色。
-			const Vector4 RESET_COLOR = Vector4(0.3f, 0.5f, 0.8f, 1.0f);
+			const Vector4 RATIO_RED_COLOR = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+			// 緑色。
+			const Vector4 RATIO_BLUE_COLOR = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 			
 			constexpr float OFFSET_X = -200.0f;
 			constexpr float OFFSET_Y = 150.0f;
@@ -53,6 +50,9 @@ namespace app
 				auto* gauge = GetUI<UIGauge>(Hash32("GaugeA"));
 				if (gauge) gauge->m_isDraw = false;
 
+				auto* icon = GetUI<UIIcon>(Hash32("FrameIcon"));
+				if (icon)icon->m_isDraw = false;
+
 				auto* iconA = GetUI<UIIcon>(Hash32("SleepIconA"));
 				if (iconA) iconA->m_isDraw = false;
 
@@ -66,7 +66,7 @@ namespace app
 				return;
 			}
 
-			// クマの位置によって変える
+			// クマの位置によって変える。
 			Vector2 screenPosition;
 			g_camera3D->CalcScreenPositionFromWorldPosition(screenPosition, m_targetPosition);
 
@@ -76,24 +76,34 @@ namespace app
 				gauge->m_transform.m_localTransform.m_scale = Vector3(m_sleepingRate, 1.0f, 1.0f);
 				gauge->m_isDraw = m_sleepingRate > RATE_MIN;
 
-				// ゲージの色を変える処理。
-				if (m_sleepingRate <= RATIO_FIFTY_PERCENT)
+				// ゲージの色を割合によって変える。
+				if (m_sleepingRate >= RATIO_SIXTY_FIVE_PERCENT)
 				{
-					// 50%以下ならオレンジ色。
-					gauge->m_color = RATIO_COLOR_FIFTY_PERCENT;
-					if (m_sleepingRate <= RATIO_TWENTY_FIVE_PERCENT)
-					{
-						// 25%以下なら赤色。
-						gauge->m_color = RATIO_COLOR_TWENTY_FIVE_PERCENT;
-					}
+					gauge->m_color = RATIO_BLUE_COLOR;
 				}
-				else
+				else if (m_sleepingRate >= RATIO_THERTY_FIVE_PERCENT)
 				{
-					// それ以外は通常色。
-					gauge->m_color = RESET_COLOR;
+					gauge->m_color = RATIO_ORANGE_COLOR;
 				}
-
+				else if (m_sleepingRate >= RATIO_ZERO)
+				{
+					gauge->m_color = RATIO_RED_COLOR;
+				}
 			}
+			
+			
+
+			Vector2 framePosition;
+			g_camera3D->CalcScreenPositionFromWorldPosition(framePosition, m_targetPosition);
+			
+			{
+				auto* frame = GetUI<UIIcon>(Hash32("FrameIcon"));
+				if (frame) {
+					frame->m_transform.m_localTransform.m_position.Set(screenPosition.x + 10.0f, screenPosition.y + OFFSET_Y, 0.0f);
+					frame->m_isDraw = m_sleepingRate > RATE_MIN;
+				}
+			}
+
 			// アイコン
 			{
 				// 1個目
@@ -131,7 +141,7 @@ namespace app
 		{
 			// 生成直後は全て非表示にする（m_isDraw=trueがデフォルトのため）
 			auto* gauge = GetUI<UIGauge>(Hash32("GaugeA"));
-			if (gauge) gauge->m_isDraw = false;
+			if (gauge)gauge->m_isDraw = false;
 
 			auto* iconA = GetUI<UIIcon>(Hash32("SleepIconA"));
 			if (iconA) iconA->m_isDraw = false;
@@ -141,6 +151,9 @@ namespace app
 
 			auto* iconC = GetUI<UIIcon>(Hash32("SleepIconC"));
 			if (iconC) iconC->m_isDraw = false;
+
+			auto* icon = GetUI<UIIcon>(Hash32("FrameIcon"));
+			if (icon)icon->m_isDraw = false;
 		}
 	}
 }

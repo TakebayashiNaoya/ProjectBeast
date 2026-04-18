@@ -35,6 +35,17 @@
                 "color":[255,255,255,255]
             },
             {
+                "type":"UIIcon",
+                "name":"FrameIcon",
+                "asset":"Assets/spriteData/UI/Icon/SleepFrameIcon.dds",
+                "width":443,
+                "height":37,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
                 "type":"UIGauge",
                 "name":"GaugeA",
                 "asset":"Assets/spriteData/UI/white.dds",

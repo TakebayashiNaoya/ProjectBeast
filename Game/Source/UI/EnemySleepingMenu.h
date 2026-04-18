@@ -19,6 +19,11 @@ namespace app
 			void Update()override;
 			void InitializeLogic()override;
 
+			/**
+			 * @brief 寝ている割合に応じてゲージの色を変える。
+			 */
+			void VisualColor();
+
 
 		public:
 			void SetTargetPosition(const Vector3& position) { m_targetPosition = position; }
@@ -30,6 +35,7 @@ namespace app
 			Vector3 m_targetPosition = Vector3::Zero;
 			float m_sleepingRate = 0.0f;
 			bool m_isDraw = false;
+			bool m_isStartAnimationPlayed = false;
 		};
 	}
 }
