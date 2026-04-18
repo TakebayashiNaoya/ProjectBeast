@@ -38,58 +38,29 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::InitMainRenderTarget()
+	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
 	{
-		float clearColor[4] = { 0.5f,0.5f,0.5f,1.0f };
+		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+		rc.ClearRenderTargetView(m_mainRenderTarget);
+		RenderToShadowMap(rc);
 
-		m_mainRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
-			1,
-			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			DXGI_FORMAT_D32_FLOAT,
-			clearColor
-		);
-	}
+		// 自然オブジェクトを描画する（モデルより先に描画）
+		for (auto* obj : m_natureObjects)
+		{
+			obj->Render(rc);
+		}
 
+		for (auto model : m_registerModels)
+		{
+			model->Draw(rc);
+		}
 
-	void RenderingEngine::Init2DRenderTarget()
-	{
-		float clearColor[4] = { 0.0f,0.0f,0.0f,0.0f };
-
-		m_2DRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),  // ★UI_SPACE_WIDTHの代わり
-			g_graphicsEngine->GetFrameBufferHeight(), // ★UI_SPACE_HEIGHTの代わり
-			1,
-			1,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			DXGI_FORMAT_UNKNOWN,
-			clearColor
-		);
-
-		nsK2EngineLow::SpriteInitData spriteInitData;
-
-		spriteInitData.m_textures[0] = &m_2DRenderTarget.GetRenderTargetTexture();
-		spriteInitData.m_width = m_mainRenderTarget.GetWidth();
-		spriteInitData.m_height = m_mainRenderTarget.GetHeight();
-		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
-		spriteInitData.m_vsEntryPointFunc = "VSMain";
-		spriteInitData.m_psEntryPoinFunc = "PSMain";
-		spriteInitData.m_alphaBlendMode = nsK2EngineLow::AlphaBlendMode_None;
-		spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
-		m_2DSprite.Init(spriteInitData);
-
-		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
-		spriteInitData.m_width = m_2DRenderTarget.GetWidth();
-		spriteInitData.m_height = m_2DRenderTarget.GetHeight();
-		m_mainSprite.Init(spriteInitData);
-	}
-
-
-	void RenderingEngine::InitShadowMapRender()
-	{
-		// m_shadowMapRender.Init(); // ★一時コメントアウト
+		// m_postEffect.Render(rc, m_mainRenderTarget); // ★一時コメントアウト
+		EffectEngine::GetInstance()->Draw();
+		Render2D(rc);
+		CopyMainRenderTargetToFrameBufferSprite(rc);
+		m_registerModels.clear();
+		m_renderObjects.clear();
 	}
 
 
@@ -98,10 +69,8 @@ namespace nsBeastEngine
 		nsK2EngineLow::SpriteInitData spriteInitData;
 
 		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
-
 		spriteInitData.m_width = g_graphicsEngine->GetFrameBufferWidth();
 		spriteInitData.m_height = g_graphicsEngine->GetFrameBufferHeight();
-
 		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
 		spriteInitData.m_psEntryPoinFunc = "PSMain";
 		spriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -112,7 +81,7 @@ namespace nsBeastEngine
 
 	void RenderingEngine::CopyMainRenderTargetToFrameBufferSprite(nsK2EngineLow::RenderContext& rc)
 	{
-		// BeginGPUEvent("CopyMainRenderTargetToFrameBuffer"); // ★k2engine側でエラーが出る場合はコメントアウト
+		// BeginGPUEvent("CopyMainRenderTargetToFrameBuffer");
 
 		rc.SetRenderTarget(
 			g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
@@ -133,28 +102,6 @@ namespace nsBeastEngine
 		// EndGPUEvent();
 	}
 
-
-	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
-	{
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-		rc.ClearRenderTargetView(m_mainRenderTarget);
-		RenderToShadowMap(rc);
-		// Oceanを描画（モデルより先に描画）
-		if (m_ocean != nullptr)
-		{
-			m_ocean->Render(rc);
-		}
-		for (auto model : m_registerModels)
-		{
-			model->Draw(rc);
-		}
-		// m_postEffect.Render(rc, m_mainRenderTarget); // ★一時コメントアウト
-		EffectEngine::GetInstance()->Draw();
-		Render2D(rc);
-		CopyMainRenderTargetToFrameBufferSprite(rc);
-		m_registerModels.clear();
-		m_renderObjects.clear();
-	}
 
 
 	void RenderingEngine::RenderToShadowMap(nsK2EngineLow::RenderContext& rc)
@@ -185,5 +132,56 @@ namespace nsBeastEngine
 		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
 		m_2DSprite.Draw(rc);
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+	}
+
+
+	void RenderingEngine::InitMainRenderTarget()
+	{
+		float clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+
+		m_mainRenderTarget.Create(
+			g_graphicsEngine->GetFrameBufferWidth(),
+			g_graphicsEngine->GetFrameBufferHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_D32_FLOAT,
+			clearColor
+		);
+	}
+
+
+	void RenderingEngine::Init2DRenderTarget()
+	{
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		m_2DRenderTarget.Create(
+			g_graphicsEngine->GetFrameBufferWidth(),
+			g_graphicsEngine->GetFrameBufferHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			DXGI_FORMAT_UNKNOWN,
+			clearColor
+		);
+
+		nsK2EngineLow::SpriteInitData spriteInitData;
+
+		spriteInitData.m_textures[0] = &m_2DRenderTarget.GetRenderTargetTexture();
+		spriteInitData.m_width = m_mainRenderTarget.GetWidth();
+		spriteInitData.m_height = m_mainRenderTarget.GetHeight();
+		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
+		spriteInitData.m_vsEntryPointFunc = "VSMain";
+		spriteInitData.m_psEntryPoinFunc = "PSMain";
+		spriteInitData.m_alphaBlendMode = AlphaBlendMode_None;
+		spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
+
+		m_2DSprite.Init(spriteInitData);
+
+		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
+		spriteInitData.m_width = m_2DRenderTarget.GetWidth();
+		spriteInitData.m_height = m_2DRenderTarget.GetHeight();
+
+		m_mainSprite.Init(spriteInitData);
 	}
 }
