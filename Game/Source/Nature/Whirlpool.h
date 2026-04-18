@@ -98,6 +98,11 @@ namespace app
 			 * @return トランスフォームの参照
 			 */
 			const core::Transform& GetTransform() const { return m_transform; }
+			/**
+			 * @brief 最大スケールXZを取得
+			 * @return 最大スケールXZ（Bigger完了時のスケール）
+			 */
+			float GetMaxScaleXZ() const { return m_maxScaleXZ; }
 
 
 		public:
@@ -160,7 +165,7 @@ namespace app
 			 */
 			static constexpr int   NUM_RINGS = 8;			/** リング数（中心から外周までの分割数） */
 			static constexpr int   NUM_SEGMENTS = 32;		/** 円周方向の分割数 */
-			static constexpr float MESH_RADIUS = 100.0f;	/** メッシュの半径（ワールド単位） */
+			static constexpr float MESH_RADIUS = 1000.0f;	/** メッシュの半径（ワールド単位） */
 
 			/** 頂点データ（CPU側キャッシュ・毎フレーム更新） */
 			std::vector<WhirlpoolVertex> m_vertices;
@@ -171,8 +176,8 @@ namespace app
 			IndexBuffer    m_indexBuffer;				/** インデックスバッファ */
 			int            m_indexCount = 0;			/** インデックス数 */
 
-			Shader* m_vs = nullptr;				/** 頂点シェーダー */
-			Shader* m_ps = nullptr;				/** ピクセルシェーダー */
+			Shader* m_vs = nullptr;						/** 頂点シェーダー */
+			Shader* m_ps = nullptr;						/** ピクセルシェーダー */
 
 			RootSignature  m_rootSignature;				/** ルートシグネチャ */
 			PipelineState  m_pipelineState;				/** パイプラインステート */
@@ -196,6 +201,8 @@ namespace app
 			float m_timer;
 			/** UV回転角度（ラジアン）：ピクセルシェーダーに渡してテクスチャを回す */
 			float m_uvRotation;
+			/** Bigger完了時の最大スケールXZ */
+			float m_maxScaleXZ;
 			/** 渦潮の引き寄せ、押し出しを管理するクラス */
 			std::unique_ptr<WhirlpoolPowerSytem> m_whirlpoolPowerSystem;
 		};

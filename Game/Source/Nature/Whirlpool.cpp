@@ -67,10 +67,10 @@ namespace app
 			// パラメーターからスケールの最大値を計算する
 			// メッシュ半径にスケールを掛けたワールド半径が渦潮の影響範囲と一致するように設定する
 			const MasterWhirlpoolParameter* param = GetParam();
-			const float maxScaleXZ = (param != nullptr)
+			m_maxScaleXZ = (param != nullptr)
 				? param->whirlpoolRadius / MESH_RADIUS
 				: 2.0f;
-			const Vector3 maxScale = Vector3(maxScaleXZ, 1.0f, maxScaleXZ);
+			const Vector3 maxScale = Vector3(m_maxScaleXZ, 1.0f, m_maxScaleXZ);
 
 			// スケールカーブを初期化する
 			m_scaleBigger.Initialize(
@@ -151,6 +151,7 @@ namespace app
 			, m_uvRotation(0.0f)
 			, m_index(0)
 			, m_indexCount(0)
+			, m_maxScaleXZ(2.0f)
 			, m_vs(nullptr)
 			, m_ps(nullptr)
 		{}

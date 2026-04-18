@@ -11,6 +11,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Core/ParameterManager.h"
+#include <random>
 
 using namespace nsK2EngineLow;
 
@@ -27,6 +28,19 @@ namespace app
 			const MasterWhirlpoolParameter* GetParam()
 			{
 				return core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
+			}
+
+			/**
+			 * @brief ランダムな浮動小数点値を生成する
+			 * @param min 最小値
+			 * @param max 最大値
+			 * @return min ～ max のランダム値
+			 */
+			float GenerateRandomFloat(const float min, const float max)
+			{
+				static std::mt19937 engine(std::random_device{}());
+				std::uniform_real_distribution<float> dist(min, max);
+				return dist(engine);
 			}
 		}
 
@@ -75,8 +89,11 @@ namespace app
 					newInfo.toTargetVector = cp->GetTransform().m_position - whirlpoolPos;
 					newInfo.target = cp;
 					newInfo.isAffected = false;
-					newInfo.isPushing = false;
 					newInfo.angle = atan2f(newInfo.toTargetVector.z, newInfo.toTargetVector.x);
+					newInfo.radiusOffset = 0.0f;
+					newInfo.radiusOffsetTarget = 0.0f;
+					newInfo.individualOrbitOffset = 0.0f;
+					newInfo.individualRotateScale = 1.0f;
 
 					newInfos.push_back(newInfo);
 				}
@@ -108,7 +125,6 @@ namespace app
 				if (m_owner->GetState() == Whirlpool::EnWhirlpoolState::None)
 				{
 					it->isAffected = false;
-					it->isPushing = false;
 					it->target->GetStateMachine()->SetIsInWhirlpool(false);
 					m_cpManager->UnregisterDowning(it->target);
 					++it;
@@ -121,27 +137,36 @@ namespace app
 				const Vector3 toTargetXZ = Vector3(it->toTargetVector.x, 0.0f, it->toTargetVector.z);
 				const float   distXZ = toTargetXZ.Length();
 
-				// 渦潮の範囲内に入ったら影響フラグを立てる
-				if (!it->isAffected && distXZ <= wpRadius)
+				// Bigger状態ではスケール比率に応じて判定半径を動的に広げる
+				float effectiveRadius = wpRadius;
+				if (m_owner->GetState() == Whirlpool::EnWhirlpoolState::Bigger)
 				{
+					const float currentScaleXZ = m_owner->GetTransform().m_scale.x;
+					const float maxScaleXZ = m_owner->GetMaxScaleXZ();
+					const float ratio = (maxScaleXZ > 0.0f) ? (currentScaleXZ / maxScaleXZ) : 1.0f;
+					effectiveRadius = wpRadius * ratio;
+				}
+
+				// 渦潮の範囲内に入ったら影響フラグを立てる
+				if (!it->isAffected && distXZ <= effectiveRadius)
+				{
+					const MasterWhirlpoolParameter* param = GetParam();
+					const float orbitOffsetVariation = (param != nullptr) ? param->orbitOffsetVariation : 30.0f;
+					const float rotateScaleVariation = (param != nullptr) ? param->rotateScaleVariation : 0.3f;
+
 					it->isAffected = true;
-					it->isPushing = false;
 					it->angle = atan2f(it->toTargetVector.z, it->toTargetVector.x);
+					it->radiusOffset = 0.0f;
+					it->radiusOffsetTarget = 0.0f;
+					it->individualOrbitOffset = GenerateRandomFloat(-orbitOffsetVariation, orbitOffsetVariation);
+					it->individualRotateScale = 1.0f + GenerateRandomFloat(-rotateScaleVariation, rotateScaleVariation);
 				}
 
 				// 影響を受けているペンギンのフェーズ処理
 				if (it->isAffected)
 				{
 					it->target->GetStateMachine()->SetIsInWhirlpool(true);
-
-					if (it->isPushing)
-					{
-						UpdatePush(*it, deltaTime);
-					}
-					else
-					{
-						UpdateAttract(*it, deltaTime);
-					}
+					UpdateAttract(*it, deltaTime);
 				}
 
 				++it;
@@ -152,45 +177,66 @@ namespace app
 		void WhirlpoolPowerSytem::UpdateAttract(WhirlpoolPowerInfo& info, float deltaTime)
 		{
 			const MasterWhirlpoolParameter* param = GetParam();
-			const float                     attractSpeed = (param != nullptr) ? param->attractSpeed : 30.0f;
-			const float                     attractThreshold = (param != nullptr) ? param->attractThreshold : 10.0f;
+			const float attractSpeed = (param != nullptr) ? param->attractSpeed : 30.0f;
+			const float orbitRadius = (param != nullptr) ? param->orbitRadius : 80.0f;
+			const float orbitRadiusVariation = (param != nullptr) ? param->orbitRadiusVariation : 20.0f;
+			const float wpRadius = (param != nullptr) ? param->whirlpoolRadius : 200.0f;
 
-			const Vector3 toTargetXZ = Vector3(info.toTargetVector.x, 0.0f, info.toTargetVector.z);
-			const float   currentRadius = toTargetXZ.Length();
-
-			// 中心に十分近づいたら押し出しフェーズへ移行
-			if (currentRadius <= attractThreshold)
+			// Smaller状態では渦潮の現在スケールに比例して軌道半径の上限を縮める
+			float effectiveOrbitRadius = orbitRadius + info.individualOrbitOffset;
+			if (m_owner->GetState() == Whirlpool::EnWhirlpoolState::Smaller)
 			{
-				info.isPushing = true;
-				return;
+				const float currentScaleXZ = m_owner->GetTransform().m_scale.x;
+				const float maxScaleXZ = m_owner->GetMaxScaleXZ();
+				const float ratio = (maxScaleXZ > 0.0f) ? (currentScaleXZ / maxScaleXZ) : 1.0f;
+				const float scaledWpRadius = wpRadius * ratio;
+				effectiveOrbitRadius = min(effectiveOrbitRadius, scaledWpRadius);
 			}
 
-			// 半径を縮めて渦巻き移動
-			const float newRadius = currentRadius - attractSpeed * deltaTime;
-			UpdateSpiral(info, newRadius, deltaTime);
-		}
+			// 負にならないようにクランプ
+			effectiveOrbitRadius = max(effectiveOrbitRadius, 0.0f);
 
-
-		void WhirlpoolPowerSytem::UpdatePush(WhirlpoolPowerInfo& info, float deltaTime)
-		{
-			const MasterWhirlpoolParameter* param = GetParam();
-			const float                     pushSpeed = (param != nullptr) ? param->pushSpeed : 3.0f;
-			const float                     wpRadius = (param != nullptr) ? param->whirlpoolRadius : 200.0f;
-
+			const bool  isSmaller = (m_owner->GetState() == Whirlpool::EnWhirlpoolState::Smaller);
 			const Vector3 toTargetXZ = Vector3(info.toTargetVector.x, 0.0f, info.toTargetVector.z);
-			const float   currentRadius = toTargetXZ.Length();
+			const float currentRadius = toTargetXZ.Length();
 
-			// 渦潮範囲外に出たら影響終了
-			if (currentRadius >= wpRadius * 1.5f)
+			if (isSmaller)
 			{
-				info.isAffected = false;
-				info.isPushing = false;
-				return;
+				// Smaller状態では毎フレーム強制的に effectiveOrbitRadius に追従させる
+				// attractSpeed に依存せず縮小速度に必ず追いつく
+				info.radiusOffset = 0.0f;
+				info.radiusOffsetTarget = 0.0f;
+				UpdateSpiral(info, effectiveOrbitRadius, deltaTime);
 			}
+			else if (currentRadius > effectiveOrbitRadius)
+			{
+				// 軌道半径より外側にいる：effectiveOrbitRadius に向かって近づく
+				const float newRadius = currentRadius - attractSpeed * deltaTime;
+				UpdateSpiral(info, max(newRadius, effectiveOrbitRadius), deltaTime);
+			}
+			else
+			{
+				// 軌道半径に到達：radiusOffset を目標に向けて近づけながら軌道を維持する
+				const float step = attractSpeed * deltaTime;
+				const float diff = info.radiusOffsetTarget - info.radiusOffset;
 
-			// 半径を広げて渦巻き移動
-			const float newRadius = currentRadius + pushSpeed * deltaTime;
-			UpdateSpiral(info, newRadius, deltaTime);
+				if (fabsf(diff) <= step)
+				{
+					// 目標に到達したら次のランダム目標をセットする
+					info.radiusOffset = info.radiusOffsetTarget;
+					info.radiusOffsetTarget = GenerateRandomFloat(-orbitRadiusVariation, orbitRadiusVariation);
+				}
+				else
+				{
+					// 目標に向かって一定速度で近づく
+					info.radiusOffset += (diff > 0.0f ? step : -step);
+				}
+
+				// radiusOffset が effectiveOrbitRadius を超えないようにクランプする
+				info.radiusOffset = min(info.radiusOffset, 0.0f);
+				const float finalRadius = effectiveOrbitRadius + info.radiusOffset;
+				UpdateSpiral(info, max(finalRadius, 0.0f), deltaTime);
+			}
 		}
 
 
@@ -201,8 +247,8 @@ namespace app
 
 			const Vector3& whirlpoolPos = m_owner->GetTransform().m_position;
 
-			// 角度を回転させる（渦巻き）
-			info.angle += rotateSpeed * deltaTime;
+			// 角度を逆方向に回転させる（渦巻き）。個体固有の速度倍率を適用する
+			info.angle -= rotateSpeed * info.individualRotateScale * deltaTime;
 
 			// 極座標 → デカルト座標でXZ位置を更新
 			Vector3 pos = info.target->GetTransform().m_position;

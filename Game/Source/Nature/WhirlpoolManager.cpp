@@ -77,13 +77,15 @@ namespace app
 				{
 					p.whirlpoolRadius = j["whirlpoolRadius"].get<float>();
 					p.attractSpeed = j["attractSpeed"].get<float>();
-					p.pushSpeed = j["pushSpeed"].get<float>();
 					p.rotateSpeed = j["rotateSpeed"].get<float>();
-					p.attractThreshold = j["attractThreshold"].get<float>();
 					p.uvRotationSpeed = j["uvRotationSpeed"].get<float>();
 					p.scaleChangeTime = j["scaleChangeTime"].get<float>();
 					p.stayTime = j["stayTime"].get<float>();
 					p.createInterval = j["createInterval"].get<float>();
+					p.orbitRadius = j["orbitRadius"].get<float>();
+					p.orbitRadiusVariation = j["orbitRadiusVariation"].get<float>();
+					p.orbitOffsetVariation = j["orbitOffsetVariation"].get<float>();
+					p.rotateScaleVariation = j["rotateScaleVariation"].get<float>();
 				}
 			);
 
@@ -97,8 +99,10 @@ namespace app
 
 			LoadPositionMap(json);
 
-			// 座標JSONの最終更新時刻を記録する
+			// 座標JSONの最終更新時刻を記録する（デバッグビルドのみ）
+#ifdef APP_DEBUG
 			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(WHIRLPOOL_POSITIONS_JSON_PATH);
+#endif // APP_DEBUG
 
 			// RenderingEngineに自身を登録する
 			g_renderingEngine->RegisterNatureObject(this);
@@ -118,7 +122,8 @@ namespace app
 
 			// 渦潮の生成タイマーを更新する
 			const MasterWhirlpoolParameter* param = core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
-			const float                     createInterval = (param != nullptr) ? param->createInterval : 2.0f;
+			const float                     createInterval = (param != nullptr) ?
+				param->createInterval : 2.0f;
 
 			m_timer += g_gameTime->GetFrameDeltaTime();
 			if (m_timer >= createInterval)

@@ -29,7 +29,7 @@ namespace app
 		{
 		public:
 			/**
-			 * @brief 渦潮の引き寄せ、押し出しの情報
+			 * @brief 渦潮の引き寄せの情報
 			 */
 			struct WhirlpoolPowerInfo
 			{
@@ -39,10 +39,16 @@ namespace app
 				actor::ChildPenguin* target;
 				/** 渦潮の影響を受けているか */
 				bool isAffected;
-				/** 引き寄せ完了（押し出しフェーズ中）か */
-				bool isPushing;
 				/** 現在の回転角度（ラジアン） */
 				float angle;
+				/** 現在の半径オフセット（ランダム変動量） */
+				float radiusOffset;
+				/** 目標の半径オフセット */
+				float radiusOffsetTarget;
+				/** 個体固有の軌道半径オフセット（巻き込まれた瞬間にランダム決定） */
+				float individualOrbitOffset;
+				/** 個体固有の回転速度倍率（巻き込まれた瞬間にランダム決定） */
+				float individualRotateScale;
 			};
 
 
@@ -59,7 +65,7 @@ namespace app
 
 		public:
 			/**
-			 * @brief 引き寄せ、押し出しの情報のリストを取得
+			 * @brief 引き寄せの情報のリストを取得
 			 * @return 情報リストの参照
 			 */
 			std::vector<WhirlpoolPowerInfo>& GetWhirlpoolPowerInfos()
@@ -70,7 +76,7 @@ namespace app
 
 		private:
 			/**
-			 * @brief 渦潮の引き寄せ、押し出しの情報を初期化する関数
+			 * @brief 渦潮の引き寄せの情報を初期化する関数
 			 */
 			void InitializeWhirlpoolInfo();
 
@@ -81,18 +87,11 @@ namespace app
 			void UpdateWhirlpoolInfo(const float deltaTime);
 
 			/**
-			 * @brief 引き寄せ処理：円を描きながら中心へ近づける
+			 * @brief 引き寄せ処理：軌道半径まで近づき、そこで回転しながらランダムにふらつく
 			 * @param info      対象の渦潮情報
 			 * @param deltaTime フレーム間の経過時間
 			 */
 			void UpdateAttract(WhirlpoolPowerInfo& info, float deltaTime);
-
-			/**
-			 * @brief 押し出し処理：円を描きながら外へ押し出す
-			 * @param info      対象の渦潮情報
-			 * @param deltaTime フレーム間の経過時間
-			 */
-			void UpdatePush(WhirlpoolPowerInfo& info, float deltaTime);
 
 			/**
 			 * @brief 共通の渦巻き移動処理：角度を進めて極座標で位置を更新する
@@ -108,7 +107,7 @@ namespace app
 			Whirlpool* m_owner;
 			/** 子ペンギンマネージャーのポインタ */
 			actor::ChildPenguinManager* m_cpManager;
-			/** 引き寄せ、押し出しの情報のリスト */
+			/** 引き寄せの情報のリスト */
 			std::vector<WhirlpoolPowerInfo> m_wpPowerInfos;
 		};
 	}
