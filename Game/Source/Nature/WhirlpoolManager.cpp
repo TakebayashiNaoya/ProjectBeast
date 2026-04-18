@@ -6,9 +6,12 @@
 #include "stdafx.h"
 #include "Whirlpool.h"
 #include "WhirlpoolManager.h"
+#include "WhirlpoolParameter.h"
 #include "Source/Util/JsonConverter.h"
+#include "Source/Core/ParameterManager.h"
 #include <algorithm>
 #include <random>
+#include <sys/stat.h>
 
 
 namespace app
@@ -21,6 +24,9 @@ namespace app
 		{
 			/** 渦潮の座標JSONのパス */
 			const char* WHIRLPOOL_POSITIONS_JSON_PATH = "Assets/parameter/stage/whirlpoolPositions.json";
+			/** 渦潮のパラメーターJSONのパス */
+			const char* WHIRLPOOL_PARAMETER_JSON_PATH = "Assets/parameter/nature/whirlpoolParameter.json";
+
 			/** 渦潮の位置のキー */
 			const char* WHIRLPOOL_POSITIONS_KEY = "whirlpoolPositions";
 			/** 渦潮のインデックスのキー */
@@ -28,15 +34,59 @@ namespace app
 			/** 渦潮の座標のキー */
 			const char* WHIRLPOOL_POSITION_KEY = "position";
 
-			/** 渦潮の生成間隔 */
-			constexpr float WHIRLPOOL_CREATE_INTERVAL = 2.0f;
 			/** 渦潮のY座標 */
 			constexpr float WHIRLPOOL_Y = 0.0f;
+
+
+			/**
+			 * @brief JSONファイルが更新されていれば読み込む
+			 * @param json      読み込んだJSONを格納する変数
+			 * @param filePath  ファイルパス
+			 * @param lastTime  前回の更新時刻（更新があれば書き換える）
+			 * @return 読み込んだ場合true
+			 */
+			bool TryReloadJsonFile(nlohmann::json& json, const char* filePath, time_t& lastTime)
+			{
+				struct stat st;
+
+				// ファイル情報の取得に失敗、または更新時刻が変わっていない場合はスキップ
+				if (stat(filePath, &st) != 0 || lastTime == st.st_mtime)
+				{
+					return false;
+				}
+
+				// JSONの読み込みを試みる
+				if (!util::JsonConverter::IsLoadJsonFile(json, filePath))
+				{
+					return false;
+				}
+
+				// 更新時刻を記録する
+				lastTime = st.st_mtime;
+				return true;
+			}
 		}
 
 
 		void WhirlpoolManager::Start()
 		{
+			// 渦潮のパラメーターJSONを読み込む
+			core::ParameterManager::Get()->LoadParameter<MasterWhirlpoolParameter>(
+				WHIRLPOOL_PARAMETER_JSON_PATH,
+				[](const nlohmann::json& j, MasterWhirlpoolParameter& p)
+				{
+					p.whirlpoolRadius = j["whirlpoolRadius"].get<float>();
+					p.attractSpeed = j["attractSpeed"].get<float>();
+					p.pushSpeed = j["pushSpeed"].get<float>();
+					p.rotateSpeed = j["rotateSpeed"].get<float>();
+					p.attractThreshold = j["attractThreshold"].get<float>();
+					p.uvRotationSpeed = j["uvRotationSpeed"].get<float>();
+					p.scaleChangeTime = j["scaleChangeTime"].get<float>();
+					p.stayTime = j["stayTime"].get<float>();
+					p.createInterval = j["createInterval"].get<float>();
+				}
+			);
+
 			// 渦潮の座標JSONを読み込む
 			nlohmann::json json;
 			if (!util::JsonConverter::IsLoadJsonFile(json, WHIRLPOOL_POSITIONS_JSON_PATH))
@@ -45,22 +95,33 @@ namespace app
 				return;
 			}
 
-			// 座標をインデックスをキーとしてマップに格納する
-			for (const auto& entry : json[WHIRLPOOL_POSITIONS_KEY])
-			{
-				const uint8_t index = static_cast<uint8_t>(entry[WHIRLPOOL_INDEX_KEY].get<int>());
-				Vector3       position = util::JsonConverter::ToVector3(entry[WHIRLPOOL_POSITION_KEY]);
-				position.y = WHIRLPOOL_Y;
-				m_positionMap.emplace(index, position);
-			}
+			LoadPositionMap(json);
+
+			// 座標JSONの最終更新時刻を記録する
+			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(WHIRLPOOL_POSITIONS_JSON_PATH);
+
+			// RenderingEngineに自身を登録する
+			g_renderingEngine->RegisterNatureObject(this);
 		}
 
 
 		void WhirlpoolManager::Update()
 		{
+			// 座標JSONのホットリロードを試みる（デバッグビルドのみ）
+#ifdef APP_DEBUG
+			nlohmann::json posJson;
+			if (TryReloadJsonFile(posJson, WHIRLPOOL_POSITIONS_JSON_PATH, m_posLastWriteTime))
+			{
+				LoadPositionMap(posJson);
+			}
+#endif // APP_DEBUG
+
 			// 渦潮の生成タイマーを更新する
+			const MasterWhirlpoolParameter* param = core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
+			const float                     createInterval = (param != nullptr) ? param->createInterval : 2.0f;
+
 			m_timer += g_gameTime->GetFrameDeltaTime();
-			if (m_timer >= WHIRLPOOL_CREATE_INTERVAL)
+			if (m_timer >= createInterval)
 			{
 				m_timer = 0.0f;
 				CreateWhirlpool();
@@ -101,12 +162,18 @@ namespace app
 
 		WhirlpoolManager::WhirlpoolManager()
 			: m_timer(0.0f)
+			, m_posLastWriteTime(0)
 		{}
 
 
 		WhirlpoolManager::~WhirlpoolManager()
 		{
+			// RenderingEngineから自身の登録を解除する
+			g_renderingEngine->UnregisterNatureObject(this);
 			m_whirlpoolMap.clear();
+
+			// パラメーターをアンロードする
+			core::ParameterManager::Get()->UnloadParameter<MasterWhirlpoolParameter>();
 		}
 
 
@@ -118,6 +185,23 @@ namespace app
 			{
 				if (!it.second) continue;
 				cb(it.second.get());
+			}
+		}
+
+
+		void WhirlpoolManager::LoadPositionMap(const nlohmann::json& json)
+		{
+			if (!json.contains(WHIRLPOOL_POSITIONS_KEY)) return;
+
+			m_positionMap.clear();
+
+			// 座標をインデックスをキーとしてマップに格納する
+			for (const auto& entry : json[WHIRLPOOL_POSITIONS_KEY])
+			{
+				const uint8_t index = static_cast<uint8_t>(entry[WHIRLPOOL_INDEX_KEY].get<int>());
+				Vector3       position = util::JsonConverter::ToVector3(entry[WHIRLPOOL_POSITION_KEY]);
+				position.y = WHIRLPOOL_Y;
+				m_positionMap.emplace(index, position);
 			}
 		}
 

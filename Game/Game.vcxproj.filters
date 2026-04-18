@@ -639,6 +639,9 @@
     <ClInclude Include="Source\Nature\WhirlpoolManager.h">
       <Filter>Source\Nature</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Nature\WhirlpoolParameter.h">
+      <Filter>Source\Nature</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">

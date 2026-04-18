@@ -398,6 +398,7 @@
     <ClInclude Include="Source\Nature\Ocean.h" />
     <ClInclude Include="Source\Nature\Whirlpool.h" />
     <ClInclude Include="Source\Nature\WhirlpoolManager.h" />
+    <ClInclude Include="Source\Nature\WhirlpoolParameter.h" />
     <ClInclude Include="Source\Nature\WhirlpoolPowerSystem.h" />
     <ClInclude Include="Source\Noise\NoiseManager.h" />
     <ClInclude Include="Source\Scene\DebugScene.h" />

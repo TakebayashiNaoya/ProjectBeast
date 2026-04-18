@@ -1,13 +1,14 @@
 ﻿/**
  * @file Whirlpool.h
  * @brief 渦潮のクラス
- * @author 藤谷
+ * @author 藤谷、竹林
  */
 #pragma once
 #include "IObject.h"
 #include "Source/Core/Transform.h"
 #include "Source/Util/Curve.h"
 #include "WhirlpoolPowerSystem.h"
+#include "WhirlpoolParameter.h"
 
 
 namespace app
@@ -154,10 +155,10 @@ namespace app
 
 		private:
 			/**
-			 * @brief 円形グリッドの分割設定
+			 * @brief グリッドの分割設定
 			 * @details これらの値を変更することで頂点密度を調整できる
 			 */
-			static constexpr int   NUM_RINGS = 16;		/** リング数（中心から外周までの分割数） */
+			static constexpr int   NUM_RINGS = 16;			/** リング数（中心から外周までの分割数） */
 			static constexpr int   NUM_SEGMENTS = 64;		/** 円周方向の分割数 */
 			static constexpr float MESH_RADIUS = 100.0f;	/** メッシュの半径（ワールド単位） */
 

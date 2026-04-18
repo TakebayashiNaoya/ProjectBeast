@@ -51,6 +51,12 @@ namespace app
 
 		private:
 			/**
+			 * @brief 渦潮の座標JSONを読み込んでm_positionMapを更新する
+			 * @param json 読み込んだJSONオブジェクト
+			 */
+			void LoadPositionMap(const nlohmann::json& json);
+
+			/**
 			 * @brief 渦潮を生成する関数
 			 */
 			void CreateWhirlpool();
@@ -63,6 +69,8 @@ namespace app
 			std::unordered_map<uint8_t, Vector3> m_positionMap;
 			/** 渦潮の生成タイマー */
 			float m_timer;
+			/** 座標JSONの最終更新時刻（ホットリロード用） */
+			time_t m_posLastWriteTime;
 
 
 		public:

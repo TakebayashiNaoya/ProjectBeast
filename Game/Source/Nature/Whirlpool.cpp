@@ -8,6 +8,7 @@
 #include "Ocean.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
+#include "Source/Core/ParameterManager.h"
 
 
 namespace app
@@ -21,16 +22,17 @@ namespace app
 			/** アルベドマップのパス */
 			const wchar_t* WHIRLPOOL_ALBEDO_PATH = L"Assets/modelData/stage/Whirlpool/whirlpool.DDS";
 
-			/** UV回転速度（ラジアン/秒） */
-			constexpr float UV_ROTATION_SPEED = 1.5f;
-			/** 渦潮の拡大率の変化にかかる時間 */
-			constexpr float SCALE_CHANGE_TIME = 2.5f;
-			/** 渦潮の拡大率が最大値で留まる時間 */
-			constexpr float WHIRLPOOL_STAY_TIME = 10.0f;
 			/** 渦潮の最小スケール */
-			const Vector3   MIN_SCALE = Vector3(0.0f, 0.0f, 0.0f);
-			/** 渦潮の最大スケール */
-			const Vector3   MAX_SCALE = Vector3(5.0f, 5.0f, 5.0f);
+			const Vector3 MIN_SCALE = Vector3(0.0f, 0.0f, 0.0f);
+
+			/**
+			 * @brief パラメーターを取得するヘルパー関数
+			 * @return パラメーターポインタ（取得失敗時はnullptr）
+			 */
+			const MasterWhirlpoolParameter* GetParam()
+			{
+				return core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
+			}
 		}
 
 
@@ -60,16 +62,24 @@ namespace app
 			// ディスクリプタヒープを構築する
 			InitDescriptorHeap();
 
+			// パラメーターからスケールの最大値を計算する
+			// メッシュ半径にスケールを掛けたワールド半径が渦潮の影響範囲と一致するように設定する
+			const MasterWhirlpoolParameter* param = GetParam();
+			const float maxScaleXZ = (param != nullptr)
+				? param->whirlpoolRadius / MESH_RADIUS
+				: 2.0f;
+			const Vector3 maxScale = Vector3(maxScaleXZ, maxScaleXZ, maxScaleXZ);
+
 			// スケールカーブを初期化する
 			m_scaleBigger.Initialize(
-				MIN_SCALE, MAX_SCALE,
-				SCALE_CHANGE_TIME,
+				MIN_SCALE, maxScale,
+				(param != nullptr) ? param->scaleChangeTime : 2.5f,
 				util::EasingType::EaseInOut,
 				util::LoopMode::Once
 			);
 			m_scaleSmaller.Initialize(
-				MAX_SCALE, MIN_SCALE,
-				SCALE_CHANGE_TIME,
+				maxScale, MIN_SCALE,
+				(param != nullptr) ? param->scaleChangeTime : 2.5f,
 				util::EasingType::EaseInOut,
 				util::LoopMode::Once
 			);
@@ -147,9 +157,11 @@ namespace app
 		void Whirlpool::StateMachine()
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+			const MasterWhirlpoolParameter* param = GetParam();
 
 			// UV回転を毎フレーム加算する（ピクセルシェーダーでテクスチャが回って見える）
-			m_uvRotation += UV_ROTATION_SPEED * deltaTime;
+			const float uvRotationSpeed = (param != nullptr) ? param->uvRotationSpeed : 1.5f;
+			m_uvRotation += uvRotationSpeed * deltaTime;
 
 			switch (m_state)
 			{
@@ -169,7 +181,8 @@ namespace app
 			{
 				m_timer += deltaTime;
 
-				if (m_timer >= WHIRLPOOL_STAY_TIME)
+				const float stayTime = (param != nullptr) ? param->stayTime : 10.0f;
+				if (m_timer >= stayTime)
 				{
 					m_timer = 0.0f;
 					m_state = EnWhirlpoolState::Smaller;
@@ -449,9 +462,9 @@ namespace app
 
 			for (auto& v : m_vertices)
 			{
-				// ローカル座標をワールド座標に変換してサンプリングする
-				const float worldX = m_transform.m_position.x + v.pos.x;
-				const float worldZ = m_transform.m_position.z + v.pos.z;
+				// ローカル座標にスケールを乗算してワールド座標に変換してサンプリングする
+				const float worldX = m_transform.m_position.x + v.pos.x * m_transform.m_scale.x;
+				const float worldZ = m_transform.m_position.z + v.pos.z * m_transform.m_scale.z;
 
 				if (ocean != nullptr)
 				{

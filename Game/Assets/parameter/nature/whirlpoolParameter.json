@@ -1,0 +1,13 @@
+[
+    {
+        "whirlpoolRadius":  200.0,
+        "attractSpeed":     30.0,
+        "pushSpeed":        3.0,
+        "rotateSpeed":      3.0,
+        "attractThreshold": 10.0,
+        "uvRotationSpeed":  1.5,
+        "scaleChangeTime":  2.5,
+        "stayTime":         10.0,
+        "createInterval":   2.0
+    }
+]
