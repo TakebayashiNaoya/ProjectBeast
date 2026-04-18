@@ -39,10 +39,3 @@ using namespace nsK2EngineLow;
 
 #include "BeastEngine.h"
 #include "Nature/SkyCube.h"
-#include "Nature/PlaneReflectionPass.h"
-#include "Nature/Ocean.h"
-
-
-//#include "Level3DRender/LevelRender.h"
-//#include "graphics/light/VolumeSpotLight.h"
-//#include "graphics/light/VolumePointLight.h"
