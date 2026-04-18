@@ -19,16 +19,26 @@ namespace app
 
 			// 35%の割合。
 			constexpr float RATIO_THERTY_FIVE_PERCENT = 0.35f;
-
+			
 			// 0%の割合。
 			constexpr float RATIO_ZERO = 0.0f;
+
+			// 配列のサイズ。
+			constexpr int FLOAT_SIZE = 8;
 			
+			// 配列。
+			constexpr float ADD_POS[FLOAT_SIZE] =
+			{
+					75.0f,40.0f,35.0f,60.0f
+				,	55.0f,65.0f,50.0f,0.0f
+			};
+
+			// 緑色。
+			const Vector4 RATIO_GREEN_COLOR = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 			// 黄色。
-			const Vector4 RATIO_ORANGE_COLOR = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+			const Vector4 RATIO_YELLOW_COLOR = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 			// 赤色。
 			const Vector4 RATIO_RED_COLOR = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-			// 緑色。
-			const Vector4 RATIO_BLUE_COLOR = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 			
 			constexpr float OFFSET_X = -200.0f;
 			constexpr float OFFSET_Y = 150.0f;
@@ -62,6 +72,9 @@ namespace app
 				auto* iconC = GetUI<UIIcon>(Hash32("SleepIconC"));
 				if (iconC) iconC->m_isDraw = false;
 
+				auto* iconD = GetUI<UIIcon>(Hash32("SleepIconD"));
+				if (iconD)iconD->m_isDraw = false;
+
 				MenuBase::Update();
 				return;
 			}
@@ -79,11 +92,11 @@ namespace app
 				// ゲージの色を割合によって変える。
 				if (m_sleepingRate >= RATIO_SIXTY_FIVE_PERCENT)
 				{
-					gauge->m_color = RATIO_BLUE_COLOR;
+					gauge->m_color = RATIO_GREEN_COLOR;
 				}
 				else if (m_sleepingRate >= RATIO_THERTY_FIVE_PERCENT)
 				{
-					gauge->m_color = RATIO_ORANGE_COLOR;
+					gauge->m_color = RATIO_YELLOW_COLOR;
 				}
 				else if (m_sleepingRate >= RATIO_ZERO)
 				{
@@ -110,7 +123,7 @@ namespace app
 				{
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconA"));
 					if (icon) {
-						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - 50.0f + OFFSET_X, screenPosition.y + OFFSET_Y, 0.0f);
+						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - ADD_POS[0] + OFFSET_X, screenPosition.y + ADD_POS[1] + OFFSET_Y, ADD_POS[7]);
 						icon->m_isDraw = m_sleepingRate > RATE_MIN;
 					}
 				}
@@ -118,7 +131,7 @@ namespace app
 				{
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconB"));
 					if (icon) {
-						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - 30.0f + OFFSET_X, screenPosition.y + 10.0f + OFFSET_Y, 0.0f);
+						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - ADD_POS[4] + OFFSET_X, screenPosition.y + ADD_POS[4] + OFFSET_Y, ADD_POS[7]);
 						icon->m_isDraw = m_sleepingRate > RATE_MIN;
 					}
 				}
@@ -126,9 +139,19 @@ namespace app
 				{
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconC"));
 					if (icon) {
-						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x + -15.0f + OFFSET_X, screenPosition.y + 20.0f + OFFSET_Y, 0.0f);
+						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x  - ADD_POS[2] + OFFSET_X, screenPosition.y + ADD_POS[5] + OFFSET_Y, ADD_POS[7]);
 						icon->m_isDraw = m_sleepingRate > RATE_MIN;
 					}
+				}
+
+				// 吹き出し
+				{
+					auto* icon = GetUI<UIIcon>(Hash32("SleepIconD"));
+						if (icon)
+						{
+							icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - ADD_POS[3] + OFFSET_X, screenPosition.y + ADD_POS[6] + OFFSET_Y, ADD_POS[7]);
+							icon->m_isDraw = m_sleepingRate > RATE_MIN;
+						}
 				}
 			}
 
@@ -154,6 +177,9 @@ namespace app
 
 			auto* icon = GetUI<UIIcon>(Hash32("FrameIcon"));
 			if (icon)icon->m_isDraw = false;
+
+			auto* iconD = GetUI<UIIcon>(Hash32("SleepIconD"));
+			if (iconD)iconD->m_isDraw = false;
 		}
 	}
 }
