@@ -3,6 +3,17 @@
         "elements":[
             {
                 "type":"UIIcon",
+                "name":"SleepIconD",
+                "asset":"Assets/spriteData/UI/Icon/SpeechBubbleIcon.dds",
+                "width":120,
+                "height":80,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 120]
+            },
+            {
+                "type":"UIIcon",
                 "name":"SleepIconA",
                 "asset":"Assets/spriteData/UI/Icon/SleepIcon.dds",
                 "width":50,
@@ -33,6 +44,17 @@
                 "scale":[0.6,0.6,1],
                 "rotation":0,
                 "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"FrameIcon",
+                "asset":"Assets/spriteData/UI/Icon/SleepFrameIcon.dds",
+                "width":443,
+                "height":37,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIGauge",
