@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "CharacterStateMachine.h"
+#include "Source/Nature/Ocean.h"
 
 
 namespace app
@@ -76,7 +77,7 @@ namespace app
 
 		float CharacterStateMachine::CalcCurrentWaveY() const
 		{
-			const nsBeastEngine::Ocean* ocean = g_renderingEngine->GetOcean();
+			const nature::Ocean* ocean = nature::Ocean::GetInstance();
 
 			// Oceanが未設定の場合は固定の海面高さを返す
 			if (ocean == nullptr)
@@ -87,8 +88,7 @@ namespace app
 			const Vector3& pos = m_ownerActor->GetTransform().m_position;
 
 			// コンピュートシェーダーのキャッシュからバイリニア補間した波面Yを返す
-			float y = ocean->SampleWaveHeight(pos.x, pos.z);
-			return y;
+			return ocean->SampleWaveHeight(pos.x, pos.z);
 		}
 
 

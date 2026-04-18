@@ -1,18 +1,16 @@
 ﻿/**
  * @file RenderingEngine.h
  * @brief RenderingEngineクラスのヘッダー
- * @author 竹林尚哉
+ * @author 竹林
  */
 #pragma once
 #include "MyRenderer.h"
 #include "Graphics/Light/SceneLight.h"
+#include "Nature/INatureObject.h"
 
 
 namespace nsBeastEngine
 {
-	class Ocean;
-
-
 	class RenderingEngine
 	{
 	public:
@@ -101,30 +99,26 @@ namespace nsBeastEngine
 		void Render2D(RenderContext& rc);
 
 		/**
-		 * @brief シャドウマップを取得
-		 * @return シャドウマップのテクスチャ
+		 * @brief 自然オブジェクトを登録する
+		 * @details 登録されたオブジェクトはExecute()内でモデルより先に描画される
+		 * @param obj 登録する自然オブジェクト
 		 */
-		 //Texture& GetShadowMap()
-		 //{
-		 //	return m_shadowMapRender.GetTexture();
-		 //}
-
-		/**
-		 * @brief 海オブジェクトを設定する
-		 * @param ocean 海オブジェクトのポインタ
-		 */
-		void SetOcean(Ocean* ocean)
+		void RegisterNatureObject(INatureObject* obj)
 		{
-			m_ocean = ocean;
+			m_natureObjects.push_back(obj);
 		}
 
 		/**
-		 * @brief 海オブジェクトを取得する
-		 * @return 海オブジェクトのポインタ（未設定の場合はnullptr）
+		 * @brief 自然オブジェクトの登録を解除する
+		 * @param obj 登録解除する自然オブジェクト
 		 */
-		Ocean* GetOcean() const
+		void UnregisterNatureObject(INatureObject* obj)
 		{
-			return m_ocean;
+			auto it = std::find(m_natureObjects.begin(), m_natureObjects.end(), obj);
+			if (it != m_natureObjects.end())
+			{
+				m_natureObjects.erase(it);
+			}
 		}
 
 
@@ -142,17 +136,11 @@ namespace nsBeastEngine
 
 		Sprite			m_mainSprite;
 
-		///** ポストエフェクト */
-		//PostEffect		m_postEffect;
-		///** シャドウマップ */
-		//ShadowMapRender m_shadowMapRender;
-
 		/** 登録されたモデルのリスト */
 		std::vector<Model*>		m_registerModels;
 		/** 描画するオブジェクトの予約リスト */
 		std::vector<IRenderer*> m_renderObjects;
-
-		/** 海オブジェクト */
-		Ocean* m_ocean = nullptr;
+		/** 自然オブジェクトのリスト（Ocean・WhirlpoolManagerなど） */
+		std::vector<INatureObject*> m_natureObjects;
 	};
 }

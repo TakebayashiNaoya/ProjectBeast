@@ -58,6 +58,9 @@
     <Filter Include="Source\Manager">
       <UniqueIdentifier>{f2113126-0993-4392-b78c-f9c9c06c8671}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Nature">
+      <UniqueIdentifier>{b6ca2941-3d62-46dc-a3a0-425d9f251aaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -331,23 +334,26 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Stage\Whirlpool.cpp">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Stage\WhirlpoolManager.cpp">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\TutorialMenu.cpp">
       <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Actor\Stage\WhirlpoolPowerSystem.cpp">
-      <Filter>Source\Actor\Stage</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\InGameAchievementMenu.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\MiniMapMenu.cpp">
       <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Nature\Ocean.cpp">
+      <Filter>Source\Nature</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Nature\Whirlpool.cpp">
+      <Filter>Source\Nature</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Nature\WhirlpoolManager.cpp">
+      <Filter>Source\Nature</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Nature\WhirlpoolPowerSystem.cpp">
+      <Filter>Source\Nature</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -612,15 +618,6 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Stage\Whirlpool.h">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Stage\WhirlpoolManager.h">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Stage\WhirlpoolPowerSystem.h">
-      <Filter>Source\Actor\Stage</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\TutorialMenu.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
@@ -629,6 +626,21 @@
     </ClInclude>
     <ClInclude Include="Source\UI\MiniMapMenu.h">
       <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Nature\WhirlpoolPowerSystem.h">
+      <Filter>Source\Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Nature\Ocean.h">
+      <Filter>Source\Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Nature\Whirlpool.h">
+      <Filter>Source\Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Nature\WhirlpoolManager.h">
+      <Filter>Source\Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Nature\WhirlpoolParameter.h">
+      <Filter>Source\Nature</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
