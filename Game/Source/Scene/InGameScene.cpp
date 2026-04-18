@@ -119,7 +119,6 @@ namespace app
 
 		/** アクター系シングルトン生成 */
 		actor::StageSystem::CreateInstance();
-		nature::WhirlpoolManager::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
 		actor::EnemyManager::CreateInstance();
 
@@ -148,7 +147,6 @@ namespace app
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
-			nature::WhirlpoolManager::GetInstance()->Start();
 			m_loadPhase = LoadPhase::StageWait;
 			break;
 		}
@@ -240,6 +238,10 @@ namespace app
 
 			nature::Ocean::CreateInstance();
 			nature::Ocean::GetInstance()->Start();
+
+			nature::WhirlpoolManager::CreateInstance();
+			nature::WhirlpoolManager::GetInstance()->Start();
+
 			m_loadPhase = LoadPhase::Done;
 
 			/** ロード完了 → カウントダウン開始 */
@@ -274,11 +276,10 @@ namespace app
 
 		/** ステージは常に更新 */
 		actor::StageSystem::GetInstance()->Update();
-		nature::WhirlpoolManager::GetInstance()->Update();
-		if (nature::Ocean::GetInstance() != nullptr)
-		{
+		if (nature::Ocean::GetInstance()) {
 			nature::Ocean::GetInstance()->Update();
 		}
+		nature::WhirlpoolManager::GetInstance()->Update();
 
 		switch (m_gamePhase)
 		{

@@ -158,8 +158,8 @@ namespace app
 			 * @brief グリッドの分割設定
 			 * @details これらの値を変更することで頂点密度を調整できる
 			 */
-			static constexpr int   NUM_RINGS = 16;			/** リング数（中心から外周までの分割数） */
-			static constexpr int   NUM_SEGMENTS = 64;		/** 円周方向の分割数 */
+			static constexpr int   NUM_RINGS = 8;			/** リング数（中心から外周までの分割数） */
+			static constexpr int   NUM_SEGMENTS = 32;		/** 円周方向の分割数 */
 			static constexpr float MESH_RADIUS = 100.0f;	/** メッシュの半径（ワールド単位） */
 
 			/** 頂点データ（CPU側キャッシュ・毎フレーム更新） */

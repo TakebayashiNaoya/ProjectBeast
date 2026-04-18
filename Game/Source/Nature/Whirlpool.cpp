@@ -23,7 +23,9 @@ namespace app
 			const wchar_t* WHIRLPOOL_ALBEDO_PATH = L"Assets/modelData/stage/Whirlpool/whirlpool.DDS";
 
 			/** 渦潮の最小スケール */
-			const Vector3 MIN_SCALE = Vector3(0.0f, 0.0f, 0.0f);
+			const Vector3 MIN_SCALE = Vector3(0.0f, 1.0f, 0.0f);
+
+			constexpr float WHIRLPOOL_Y_OFFSET = 5.0f;	/** ワールドの海面から渦潮メッシュの頂点が浮いている高さ（ワールド単位） */
 
 			/**
 			 * @brief パラメーターを取得するヘルパー関数
@@ -68,7 +70,7 @@ namespace app
 			const float maxScaleXZ = (param != nullptr)
 				? param->whirlpoolRadius / MESH_RADIUS
 				: 2.0f;
-			const Vector3 maxScale = Vector3(maxScaleXZ, maxScaleXZ, maxScaleXZ);
+			const Vector3 maxScale = Vector3(maxScaleXZ, 1.0f, maxScaleXZ);
 
 			// スケールカーブを初期化する
 			m_scaleBigger.Initialize(
@@ -469,7 +471,7 @@ namespace app
 				if (ocean != nullptr)
 				{
 					// 波面のYをローカル座標系に変換する（ワールドY - 渦潮の基準Y）
-					v.pos.y = ocean->SampleWaveHeight(worldX, worldZ) - m_transform.m_position.y;
+					v.pos.y = ocean->SampleWaveHeight(worldX, worldZ) + WHIRLPOOL_Y_OFFSET;
 				}
 				else
 				{
