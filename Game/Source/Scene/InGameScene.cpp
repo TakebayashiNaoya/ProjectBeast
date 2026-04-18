@@ -234,7 +234,7 @@ namespace app
 			 */
 			m_skyCube = NewGO<SkyCube>(0);
 			m_skyCube->SetType(enSkyCubeType_Day);
-			m_skyCube->SetScale(Vector3(600.0f, 600.0f, 600.0f));
+			m_skyCube->SetScale(Vector3(700.0f, 600.0f, 700.0f));
 			m_skyCube->SetLuminance(0.8f);
 
 			m_ocean = NewGO<Ocean>(0);
