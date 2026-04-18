@@ -26,7 +26,14 @@ namespace nsBeastEngine
 					return 1.0f;
 				}
 
-				Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
+				Vector3 hitNormalTmp;
+				if (normalInWorldSpace) {
+					hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
+				}
+				else {
+					btVector3 normalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis() * convexResult.m_hitNormalLocal;
+					hitNormalTmp = *(Vector3*)&normalWorld;
+				}
 
 				// acosfのNaNエラーを防ぐためのクランプ処理
 				float dotY = hitNormalTmp.y;
@@ -75,7 +82,15 @@ namespace nsBeastEngine
 					return 1.0f;
 				}
 
-				Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
+				Vector3 hitNormalTmp;
+				if (normalInWorldSpace) {
+					hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
+				}
+				else {
+					btVector3 normalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis() * convexResult.m_hitNormalLocal;
+					hitNormalTmp = *(Vector3*)&normalWorld;
+				}
+
 				float angle = fabsf(acosf(hitNormalTmp.y));
 
 				// 54度以上の傾斜を壁とみなす
@@ -103,10 +118,18 @@ namespace nsBeastEngine
 			virtual	btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace)
 			{
 				if (convexResult.m_hitCollisionObject == me || convexResult.m_hitCollisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT) {
-					return 0.0f;
+					return 1.0f;
 				}
 
-				Vector3 hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
+				Vector3 hitNormalTmp;
+				if (normalInWorldSpace) {
+					hitNormalTmp = *(Vector3*)&convexResult.m_hitNormalLocal;
+				}
+				else {
+					btVector3 normalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis() * convexResult.m_hitNormalLocal;
+					hitNormalTmp = *(Vector3*)&normalWorld;
+				}
+
 				if (hitNormalTmp.y < -0.5f) {
 					isHit = true;
 					Vector3 hitPosTmp = *(Vector3*)&convexResult.m_hitPointLocal;
@@ -118,7 +141,7 @@ namespace nsBeastEngine
 						dist = distTmp;
 					}
 				}
-				return 0.0f;
+				return 1.0f;
 			}
 		};
 
