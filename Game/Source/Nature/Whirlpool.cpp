@@ -9,6 +9,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -35,6 +36,9 @@ namespace app
 			{
 				return core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
 			}
+
+			/** エフェクトの大きさ */
+			const Vector3 EFFECT_SCALE = Vector3(40.0f, 50.0f, 40.0f);
 		}
 
 
@@ -89,6 +93,7 @@ namespace app
 			m_state = EnWhirlpoolState::Bigger;
 			m_scaleBigger.Play();
 
+			// 引き寄せシステムを開始する
 			m_whirlpoolPowerSystem->StartWrapper();
 		}
 
