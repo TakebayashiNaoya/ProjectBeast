@@ -168,6 +168,11 @@ namespace app
 			 */
 			void StopWhirlpoolEffect();
 
+			/**
+			 * @brief 渦潮エフェクトのスケールを更新する
+			 */
+			void UpdateWhirlpoolEffectScale();
+
 
 		private:
 			/**

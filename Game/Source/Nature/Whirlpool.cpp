@@ -26,7 +26,7 @@ namespace app
 			/** 渦潮の最小スケール */
 			const Vector3 MIN_SCALE = Vector3(0.0f, 1.0f, 0.0f);
 
-			constexpr float WHIRLPOOL_Y_OFFSET = 5.0f;	/** ワールドの海面から渦潮メッシュの頂点が浮いている高さ（ワールド単位） */
+			constexpr float WHIRLPOOL_Y_OFFSET = 4.0f;	/** ワールドの海面から渦潮メッシュの頂点が浮いている高さ（ワールド単位） */
 
 			/**
 			 * @brief パラメーターを取得するヘルパー関数
@@ -37,8 +37,8 @@ namespace app
 				return core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
 			}
 
-			/** エフェクトの大きさ */
-			const Vector3 EFFECT_SCALE = Vector3(40.0f, 50.0f, 40.0f);
+			/** エフェクトの基準スケール（渦潮が最大サイズのときのスケール） */
+			const Vector3 EFFECT_SCALE = Vector3(1.0f, 1.0f, 1.0f);
 		}
 
 
@@ -104,6 +104,8 @@ namespace app
 		void Whirlpool::Update()
 		{
 			StateMachine();
+			// エフェクトのスケールを渦潮のスケールに合わせて更新する
+			UpdateWhirlpoolEffectScale();
 			m_whirlpoolPowerSystem->UpdateWrapper();
 		}
 
@@ -199,9 +201,6 @@ namespace app
 					m_timer = 0.0f;
 					m_state = EnWhirlpoolState::Smaller;
 					m_scaleSmaller.Play();
-
-					// Smaller開始と同時にエフェクトを停止する
-					StopWhirlpoolEffect();
 				}
 
 				break;
@@ -213,6 +212,8 @@ namespace app
 
 				if (!m_scaleSmaller.IsPlaying())
 				{
+					// Smaller完了時にエフェクトを停止する
+					StopWhirlpoolEffect();
 					m_state = EnWhirlpoolState::None;
 				}
 
@@ -245,6 +246,24 @@ namespace app
 
 			EffectManager::Get().StopEffect(m_effectHandle);
 			m_effectHandle = INVALID_EFFECT_HANDLE;
+		}
+
+
+		void Whirlpool::UpdateWhirlpoolEffectScale()
+		{
+			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;
+
+			auto* effect = EffectManager::Get().FindEffect(m_effectHandle);
+			if (effect == nullptr)
+			{
+				// エフェクトが自己削除済みの場合はハンドルを無効化する
+				m_effectHandle = INVALID_EFFECT_HANDLE;
+				return;
+			}
+
+			// 渦潮のXZスケール比率（0.0〜1.0）をエフェクトスケールに反映する
+			const float ratio = (m_maxScaleXZ > 0.0f) ? (m_transform.m_scale.x / m_maxScaleXZ) : 1.0f;
+			effect->SetScale(EFFECT_SCALE * ratio);
 		}
 
 
