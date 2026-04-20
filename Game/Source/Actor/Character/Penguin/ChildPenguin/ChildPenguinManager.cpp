@@ -369,13 +369,52 @@ namespace app
 		}
 
 
+		/**
+		 * @brief かまくらイベントを開始する
+		 * @param interactPos 向かうべきかまくらの入り口（青い円）の座標
+		 */
 		void ChildPenguinManager::StartIglooEvent(const Vector3& interactPos)
 		{
-			// イベント開始時に、連れ歩いている子ペンギンの数をカウントにセットする
-			m_iglooEnteringCount = static_cast<int>(m_followers.size());
+			// イベントに参加させるペンギンを一時的に格納するリスト
+			std::vector<ChildPenguin*> targetPenguins;
+
+			// 現在「隊列」にいるペンギン（m_followers）を無条件で全員追加
+			for (auto* child : m_followers)
+			{
+				if (child) targetPenguins.push_back(child);
+			}
+
+			// 隊列から一時的に外れているが、親の近くにいるペンギンも追加
+			if (m_daddyPenguin != nullptr)
+			{
+				const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
+
+				for (auto* child : m_childPenguinList)
+				{
+					if (!child) continue;
+
+					// リストに入っている子（隊列内の子）はスキップ
+					auto it = std::find(targetPenguins.begin(), targetPenguins.end(), child);
+					if (it != targetPenguins.end()) continue;
+
+					// 隊列にいないペンギンについて、親との水平距離を計算
+					Vector3 diff = daddyPos - child->GetTransform().m_position;
+					diff.y = 0.0f;
+					float distToDaddy = diff.Length();
+
+					// 隊列に加わる距離(JoinDistance)の範囲にいる子ペンギンを呼ぶ
+					if (distToDaddy <= child->GetJoinDistance())
+					{
+						targetPenguins.push_back(child);
+					}
+				}
+			}
+
+			// ターゲットになったペンギンの総数をカウントにセットする
+			m_iglooEnteringCount = static_cast<int>(targetPenguins.size());
 
 			// 全員に「入り口へ向かえ！」と命令を出す
-			for (auto* child : m_followers)
+			for (auto* child : targetPenguins)
 			{
 				if (child && child->GetAIController())
 				{
