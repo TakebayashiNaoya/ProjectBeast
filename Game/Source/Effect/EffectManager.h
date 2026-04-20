@@ -39,6 +39,7 @@ namespace app
 	public:
 		/**
 		 * @brief 更新処理
+		 * @details 再生が終了したエフェクトをm_effectListから除外する
 		 */
 		void Update();
 
@@ -52,24 +53,33 @@ namespace app
 		 * @param scale エフェクトのスケール
 		 */
 		EffectHandle PlayEffect(const EnEffectKind kind, const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+
 		/**
 		 * @brief エフェクト停止
 		 * @param handle エフェクトのハンドル
 		 */
 		void StopEffect(const EffectHandle handle);
 
-
+		/**
+		 * @brief ハンドルからエフェクトを取得する
+		 * @param handle エフェクトのハンドル
+		 * @return エフェクトのポインタ（存在しない場合はnullptr）
+		 */
 		EffectEmitter* FindEffect(const EffectHandle handle)
 		{
 			auto it = m_effectList.find(handle);
 			if (it != m_effectList.end()) {
 				return it->second;
 			}
-			K2_ASSERT(false, "削除済みか追加されていないエフェクトにアクセスしようとしています。\n");
 			return nullptr;
 		}
 
-
+		/**
+		 * @brief ハンドルをm_effectListから除外する
+		 * @details EffectEmitterが自己削除される際に呼び出す
+		 * @param handle 除外するエフェクトのハンドル
+		 */
+		void UnregisterEffect(const EffectHandle handle);
 
 
 		/**

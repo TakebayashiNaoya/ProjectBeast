@@ -29,7 +29,23 @@ namespace app
 
 
 	void EffectManager::Update()
-	{}
+	{
+		// 再生が終了したエフェクトをm_effectListから除外する
+		// NOTE: EffectEmitterはIsPlay()がfalseになるとDeleteGO(this)で自己削除される。
+		//       自己削除のタイミングでm_effectListは更新されないため、
+		//       毎フレームここで再生状態を確認し、無効なエントリを除外する。
+		for (auto it = m_effectList.begin(); it != m_effectList.end(); )
+		{
+			if (it->second == nullptr || !it->second->IsPlay())
+			{
+				it = m_effectList.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
 
 
 	EffectHandle EffectManager::PlayEffect(const EnEffectKind kind, const Vector3& position, const Quaternion& rotation, const Vector3& scale)
@@ -60,5 +76,15 @@ namespace app
 			return;
 		}
 		effect->Stop();
+	}
+
+
+	void EffectManager::UnregisterEffect(const EffectHandle handle)
+	{
+		auto it = m_effectList.find(handle);
+		if (it != m_effectList.end())
+		{
+			m_effectList.erase(it);
+		}
 	}
 }
