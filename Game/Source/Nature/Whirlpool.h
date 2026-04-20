@@ -9,6 +9,7 @@
 #include "Source/Util/Curve.h"
 #include "WhirlpoolPowerSystem.h"
 #include "WhirlpoolParameter.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -157,6 +158,16 @@ namespace app
 			 */
 			void UpdateVertexHeights();
 
+			/**
+			 * @brief 渦潮エフェクトを再生する
+			 */
+			void PlayWhirlpoolEffect();
+
+			/**
+			 * @brief 渦潮エフェクトを停止する
+			 */
+			void StopWhirlpoolEffect();
+
 
 		private:
 			/**
@@ -203,6 +214,8 @@ namespace app
 			float m_uvRotation;
 			/** Bigger完了時の最大スケールXZ */
 			float m_maxScaleXZ;
+			/** 渦潮エフェクトのハンドル */
+			EffectHandle m_effectHandle;
 			/** 渦潮の引き寄せ、押し出しを管理するクラス */
 			std::unique_ptr<WhirlpoolPowerSytem> m_whirlpoolPowerSystem;
 		};
