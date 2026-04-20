@@ -237,6 +237,14 @@ namespace app
 		{
 			if (m_isInsideIgloo)
 			{
+				// ★ リーダーの助言通り、かまくらの中にいる間は「毎フレーム」座標をセットし続ける
+				m_owner->GetCharacterController()->SetPosition(m_iglooTargetPos);
+				m_owner->GetCharacterController()->RequestTeleport();
+
+				// ★ 渦潮の処理と同じように、ステートマシン（モデルの見た目位置）も毎フレーム同期する！
+				// これがないと見た目だけ屋根の上に押し出されてしまいます
+				m_stateMachine->SetPosition(m_iglooTargetPos);
+
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
@@ -246,7 +254,7 @@ namespace app
 			Vector3 dirToTarget = m_iglooTargetPos - myPos;
 			dirToTarget.y = 0.0f;
 
-			// 青い円に十分近づいたらワープ発動！
+			// 青い円に十分近づいたらワープ発動
 			if (dirToTarget.Length() < 150.0f)
 			{
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
@@ -255,20 +263,28 @@ namespace app
 				Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
 				Vector3 insidePos = iglooPos;
 				insidePos.y += 0.0f;
-				insidePos.x += (float)(std::rand() % 60) - 30.0f;
-				insidePos.z += (float)(std::rand() % 60) - 30.0f;
+
+				// 一列に並ぶのを防ぐため、浮動小数点で円形にばらけさせる
+				auto& engine = GetRandomEngine();
+				std::uniform_real_distribution<float> angleDist(0.0f, 360.0f);
+				std::uniform_real_distribution<float> radiusDist(0.0f, 60.0f); // かまくらの中に収まる半径
+
+				float angleRad = angleDist(engine) * (Math::PI / 180.0f);
+				float r = radiusDist(engine);
+
+				insidePos.x += r * cosf(angleRad);
+				insidePos.z += r * sinf(angleRad);
 
 				m_iglooTargetPos = insidePos;
 				m_owner->SetIglooFixedPos(m_iglooTargetPos);
 				m_owner->SetInsideIgloo(true);
 
+				// 最初のワープ時も両方の座標をセットする
 				m_owner->GetCharacterController()->SetPosition(m_iglooTargetPos);
+				m_owner->GetCharacterController()->RequestTeleport();
+				m_stateMachine->SetPosition(m_iglooTargetPos);
 
-				// マネージャーへの報告
-				//IglooManager::GetInstance().AddPenguin(m_owner);
-				//ChildPenguinManager::GetInstance()->FinishEnterIglooOne();
-
-				// 隊列リストからの離脱（コメントアウトを外す）
+				// 隊列リストからの離脱
 				if (m_isFollowing)
 				{
 					ChildPenguinManager::GetInstance()->RemoveFollower(m_owner);
