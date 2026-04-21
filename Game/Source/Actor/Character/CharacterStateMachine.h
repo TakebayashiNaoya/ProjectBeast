@@ -222,11 +222,11 @@ namespace app
 			Vector3 m_currentVelocity = Vector3::Zero;
 
 			/** 加速度（目標速度への到達の早さ） */
-			float m_acceleration = 10.0f;
+			float m_acceleration;
 			/** 摩擦係数（入力がないときの減速の早さ） */
-			float m_friction = 5.0f;
+			float m_friction;
 			/** 旋回速度（Slerpによる回転の滑らかさ） */
-			float m_turnSpeed = 8.0f;
+			float m_turnSpeed;
 		};
 
 	}
