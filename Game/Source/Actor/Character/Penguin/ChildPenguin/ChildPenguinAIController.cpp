@@ -224,9 +224,9 @@ namespace app
 
 			// 停止距離の2倍以内に入ったら、倍率を 1.0 から 0.0 へ徐々に下げる
 			float brakeRange = m_stopDistance * 2.0f;
-			if (distToTarget < brakeRange && m_movePhase != MovePhase::Stop)
+			if (distToTarget > m_stopDistance && distToTarget < brakeRange && m_movePhase != MovePhase::Stop)
 			{
-				// 目標に近づくほど比率が 0.0 に近づく
+				// 停止距離の外側にいる間だけ減速補間し、入力と実移動の不一致を防ぐ
 				float ratio = (distToTarget - m_stopDistance) / (brakeRange - m_stopDistance);
 				speedMultiplier = max(0.0f, min(1.0f, ratio));
 			}
