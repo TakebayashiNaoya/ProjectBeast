@@ -100,6 +100,26 @@ namespace app
 			}
 
 
+			/**
+			 * @brief 移動速度の倍率を設定
+			 * @param multiplier 倍率 (0.0f ~ 1.0f)
+			 */
+			inline void SetSpeedMultiplier(const float multiplier)
+			{
+				m_speedMultiplier = multiplier;
+			}
+
+
+			/**
+			 * @brief 現在の物理移動速度（慣性）を取得
+			 * @return 現在の速度ベクトル
+			 */
+			inline const Vector3& GetCurrentVelocity() const
+			{
+				return m_currentVelocity;
+			}
+
+
 		public:
 			/**
 			 * @brief 移動処理
@@ -183,6 +203,8 @@ namespace app
 			/** 移動速度 */
 			float m_moveSpeed;
 
+			/** 移動速度の倍率（減速・アナログスティック用：0.0f ~ 1.0f） */
+			float m_speedMultiplier;
 
 			/** ダッシュしているかどうか */
 			bool m_isDash;

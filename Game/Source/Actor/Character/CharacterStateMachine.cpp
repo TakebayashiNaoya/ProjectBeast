@@ -23,18 +23,18 @@ namespace app
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
-			// --- 1. 慣性と摩擦の計算 ---
+			// --- 慣性と摩擦の計算 ---
 			if (m_moveDirection.LengthSq() > FLT_EPSILON)
 			{
-				// 入力がある場合：目標速度に向かって加速
-				Vector3 targetVelocity = m_moveDirection * m_moveSpeed;
+				// アナログスティックの倒し具合(m_speedMultiplier)を考慮した目標速度
+				Vector3 targetVelocity = m_moveDirection * (m_moveSpeed * m_speedMultiplier);
 
-				// m_currentVelocity自身を更新する
+				// m_currentVelocity自身を目標速度に向かって加速させる
 				m_currentVelocity.Lerp(m_acceleration * deltaTime, m_currentVelocity, targetVelocity);
 			}
 			else
 			{
-				// 入力がない場合：摩擦で徐々に減速
+				// 入力がない場合は、摩擦係数を使って徐々に速度をゼロに近づける（滑りながら止まる）
 				m_currentVelocity.Lerp(m_friction * deltaTime, m_currentVelocity, Vector3::Zero);
 			}
 
@@ -62,17 +62,18 @@ namespace app
 			Vector3 prevPosition = m_ownerCharacter->GetCharacterController()->Execute(nextPosition, 1.0f / 60.0f);
 			m_transform.m_position = prevPosition;
 
-			// --- 2. Slerpを用いた滑らかな回転 ---
-			if (m_currentVelocity.LengthSq() > 0.001f)
+			// --- Slerpを用いた滑らかな回転 ---
+			if (m_currentVelocity.LengthSq() > 0.1f) // 微小な押し出しでガタつかないための閾値
 			{
 				Vector3 velocityDir = m_currentVelocity;
 				velocityDir.y = 0.0f; // Y軸は無視する
 				velocityDir.Normalize();
 
+				// 今進んでいる方向（速度ベクトル）を目標の回転とする
 				Quaternion targetRotation = m_transform.m_rotation;
 				targetRotation.SetRotationYFromDirectionXZ(velocityDir);
 
-				// m_transform.m_rotation自身を更新する
+				// 現在の回転から目標の回転へ Slerp で徐々に補間する（滑らかに振り向く）
 				m_transform.m_rotation.Slerp(m_turnSpeed * deltaTime, m_transform.m_rotation, targetRotation);
 			}
 
@@ -121,6 +122,8 @@ namespace app
 			, m_moveSpeed(0.0f)
 			, m_isDash(false)
 			, m_prevPositionY(0.0f)
+			, m_currentVelocity(Vector3::Zero)
+			, m_speedMultiplier(1.0f)
 		{}
 	}
 }
