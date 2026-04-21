@@ -88,6 +88,17 @@ namespace app
 				m_isSwimming = isSwimming;
 			}
 
+			/**
+			 * @brief 物理挙動パラメータの設定
+			 * @details プレイヤーとエネミーで個別の数値を設定するために使用します
+			 */
+			inline void SetPhysicsParams(float acceleration, float friction, float turnSpeed)
+			{
+				m_acceleration = acceleration;
+				m_friction = friction;
+				m_turnSpeed = turnSpeed;
+			}
+
 
 		public:
 			/**
@@ -179,6 +190,18 @@ namespace app
 			bool m_isSwimming;
 			/** 前フレームのY座標（水面を抜けた瞬間の判定に使用） */
 			float m_prevPositionY;
+
+
+		protected:
+			/** 現在の移動速度ベクトル（慣性用） */
+			Vector3 m_currentVelocity = Vector3::Zero;
+
+			/** 加速度（目標速度への到達の早さ） */
+			float m_acceleration = 10.0f;
+			/** 摩擦係数（入力がないときの減速の早さ） */
+			float m_friction = 5.0f;
+			/** 旋回速度（Slerpによる回転の滑らかさ） */
+			float m_turnSpeed = 8.0f;
 		};
 
 	}

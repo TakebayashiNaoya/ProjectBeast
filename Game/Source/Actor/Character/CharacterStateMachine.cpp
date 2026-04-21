@@ -21,47 +21,62 @@ namespace app
 
 		void CharacterStateMachine::Move()
 		{
-			// 移動方向を正規化して移動ベクトルを計算
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
-			const Vector3 moveVector = m_moveDirection * m_moveSpeed * deltaTime;
+
+			// --- 1. 慣性と摩擦の計算 ---
+			if (m_moveDirection.LengthSq() > FLT_EPSILON)
+			{
+				// 入力がある場合：目標速度に向かって加速
+				Vector3 targetVelocity = m_moveDirection * m_moveSpeed;
+
+				// m_currentVelocity自身を更新する
+				m_currentVelocity.Lerp(m_acceleration * deltaTime, m_currentVelocity, targetVelocity);
+			}
+			else
+			{
+				// 入力がない場合：摩擦で徐々に減速
+				m_currentVelocity.Lerp(m_friction * deltaTime, m_currentVelocity, Vector3::Zero);
+			}
+
+			// 実際の移動量を計算
+			const Vector3 moveVector = m_currentVelocity * deltaTime;
 			Vector3 nextPosition = m_transform.m_position + moveVector;
 
+			// --- 波面処理・重力切り替え（既存のまま） ---
 			const float currentY = m_transform.m_position.y;
-
-			// 現在のXZ座標における波面Yをバイリニア補間で取得する
 			const float waveY = CalcCurrentWaveY();
 
-			// 波面の高さをキャラクターコントローラーに毎フレーム渡す
-			// これにより落下処理で波面より下に潜らないようにする
 			m_ownerCharacter->GetCharacterController()->SetSeaLevel(waveY);
 
-			// 水中にいる間は重力の切り替えを行わず、波面追従に任せる
-			// 水から出た瞬間（前フレームは水中、今フレームは水上）のみ垂直速度をリセットして重力に戻す
 			if (!IsInWater())
 			{
 				m_ownerCharacter->GetCharacterController()->SetGravity(GRAVITY);
-
 				if (m_prevPositionY < waveY)
 				{
 					m_ownerCharacter->GetCharacterController()->SetVerticalVelocity(0.0f);
 				}
 			}
-
-			// 前フレームのY座標を保存
 			m_prevPositionY = currentY;
 
+			// --- キャラクターコントローラーによるコリジョン解決 ---
 			Vector3 prevPosition = m_ownerCharacter->GetCharacterController()->Execute(nextPosition, 1.0f / 60.0f);
 			m_transform.m_position = prevPosition;
 
-			// 移動入力がある場合のみ回転を更新する
-			if (m_moveDirection.LengthSq() > FLT_EPSILON)
+			// --- 2. Slerpを用いた滑らかな回転 ---
+			if (m_currentVelocity.LengthSq() > 0.001f)
 			{
-				Quaternion rotation = m_transform.m_rotation;
-				rotation.SetRotationYFromDirectionXZ(m_moveDirection);
-				m_transform.m_rotation = rotation;
+				Vector3 velocityDir = m_currentVelocity;
+				velocityDir.y = 0.0f; // Y軸は無視する
+				velocityDir.Normalize();
+
+				Quaternion targetRotation = m_transform.m_rotation;
+				targetRotation.SetRotationYFromDirectionXZ(velocityDir);
+
+				// m_transform.m_rotation自身を更新する
+				m_transform.m_rotation.Slerp(m_turnSpeed * deltaTime, m_transform.m_rotation, targetRotation);
 			}
 
-			// 地面コライダーがなく、かつ泳いでいない場合は波面Yに追従させる
+			// --- 既存の波面追従処理 ---
 			if (!IsOnGround() && !m_isSwimming)
 			{
 				const float posY = m_transform.m_position.y;
