@@ -210,9 +210,9 @@ namespace app
 				float waveScroll = 0.0f;	/** 波のスクロール値（頂点移動用） */
 				float textureScroll = 0.0f;	/** テクスチャのスクロール値（模様流れ用） */
 				float wave1Amplitude = 5.0f;	/** 波①の振幅 */
-				float wave1Frequency = 0.025f;	/** 波①の空間周波数 */
+				float wave1Frequency = 0.05f;	/** 波①の空間周波数 */
 				float wave2Amplitude = 2.0f;	/** 波②の振幅 */
-				float wave2Frequency = 0.06f;	/** 波②の空間周波数 */
+				float wave2Frequency = 0.12f;	/** 波②の空間周波数 */
 			};
 
 
