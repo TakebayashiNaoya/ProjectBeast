@@ -65,9 +65,9 @@ namespace app
 			};
 
 			/** グリッドの1辺の長さ（ワールド単位） */
-			static constexpr float GRID_SIZE = 5000.0f;
-			/** グリッドの分割数（N×N） */
-			static constexpr int   GRID_DIVISION = 512;
+			static constexpr float GRID_SIZE = 12500.0f;
+			/** グリッドの分割数（N×N）。GRID_SIZEに比例させて頂点密度を維持する */
+			static constexpr int   GRID_DIVISION = 1280;
 
 
 		public:
@@ -210,9 +210,9 @@ namespace app
 				float waveScroll = 0.0f;	/** 波のスクロール値（頂点移動用） */
 				float textureScroll = 0.0f;	/** テクスチャのスクロール値（模様流れ用） */
 				float wave1Amplitude = 5.0f;	/** 波①の振幅 */
-				float wave1Frequency = 0.05f;	/** 波①の空間周波数 */
+				float wave1Frequency = 0.025f;	/** 波①の空間周波数 */
 				float wave2Amplitude = 2.0f;	/** 波②の振幅 */
-				float wave2Frequency = 0.12f;	/** 波②の空間周波数 */
+				float wave2Frequency = 0.06f;	/** 波②の空間周波数 */
 			};
 
 
@@ -298,7 +298,7 @@ namespace app
 			OceanMesh           m_oceanMesh;					/** 海のグリッドメッシュ */
 			OceanConstantBuffer m_constantBuffer;				/** 定数バッファ */
 			Vector3             m_position = g_vec3Zero;		/** 位置 */
-			Vector3             m_scale = g_vec3One * 5.0f;		/** スケール */
+			Vector3             m_scale = g_vec3One;			/** スケール */
 			Quaternion          m_rotation = Quaternion::Identity;	/** 回転 */
 			float               m_waveSpeed = 1.5f;			/** 波のスクロール速度 */
 			float               m_textureSpeed = 0.03f;			/** テクスチャのスクロール速度 */
