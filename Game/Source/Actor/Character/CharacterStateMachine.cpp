@@ -69,7 +69,12 @@ namespace app
 			m_transform.m_position = prevPosition;
 
 			// --- Slerpを用いた滑らかな回転 ---
-			if (m_currentVelocity.LengthSq() > 0.1f) // 微小な押し出しでガタつかないための閾値
+
+			// ★追加：回転を許可する速度のしきい値（マジックナンバーを排除）
+			constexpr float ROTATE_VELOCITY_THRESHOLD_SQ = 0.1f;
+
+
+			if (m_currentVelocity.LengthSq() > ROTATE_VELOCITY_THRESHOLD_SQ) // 微小な押し出しでガタつかないための閾値
 			{
 				Vector3 velocityDir = m_currentVelocity;
 				velocityDir.y = 0.0f; // Y軸は無視する
@@ -129,10 +134,14 @@ namespace app
 			, m_ownerCharacter(ownerCharacter)
 			, m_moveDirection(Vector3::Zero)
 			, m_moveSpeed(0.0f)
-			, m_currentVelocity(Vector3::Zero)
 			, m_speedMultiplier(1.0f)
 			, m_isDash(false)
+			, m_isSwimming(false)
 			, m_prevPositionY(0.0f)
+			, m_currentVelocity(Vector3::Zero)
+			, m_acceleration(10.0f)
+			, m_friction(5.0f)
+			, m_turnSpeed(8.0f)
 		{}
 	}
 }

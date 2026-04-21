@@ -258,7 +258,10 @@ namespace app
 						// 一瞬で向くのではなく、Slerpでゆっくり振り向かせる
 						constexpr float TURN_SPEED_TO_DADDY = 6.0f; // ★ 6.0f に名前を付ける
 						float deltaTime = g_gameTime->GetFrameDeltaTime();
-						currentRot.Slerp(TURN_SPEED_TO_DADDY * deltaTime, currentRot, targetRot);
+
+						// 追加修正：フレーム落ち時に t > 1.0 になって回転が破綻するのを防ぐ
+						float slerpFactor = min(1.0f, TURN_SPEED_TO_DADDY * deltaTime);
+						currentRot.Slerp(slerpFactor, currentRot, targetRot);
 
 						m_owner->SetRotation(currentRot);
 					}
