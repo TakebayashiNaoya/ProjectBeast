@@ -20,6 +20,8 @@ namespace app
 			constexpr float SEA_LEVEL = 0.0f;
 			/** 海面付近のしきい値（ゆらゆら中にSwimmingStateを維持するための余裕） */
 			constexpr float SEA_SURFACE_THRESHOLD = 1.0f;
+			/** 泳ぎ中のY座標オフセット（波に埋まらないよう浮かせる） */
+			constexpr float SWIM_Y_OFFSET = 5.0f;
 		}
 
 		/**
@@ -86,6 +88,14 @@ namespace app
 			inline void SetIsSwimming(const bool isSwimming)
 			{
 				m_isSwimming = isSwimming;
+			}
+			/**
+			 * @brief 泳ぎ中かどうかを取得
+			 * @return 泳ぎ中かどうか
+			 */
+			inline bool IsSwimming() const
+			{
+				return m_isSwimming;
 			}
 
 

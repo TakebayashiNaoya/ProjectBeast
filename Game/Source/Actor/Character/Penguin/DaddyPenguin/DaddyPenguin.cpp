@@ -59,6 +59,16 @@ namespace app
 			m_stateMachine->Update();
 
 			PenguinBase::Update();
+
+			/** 泳ぎ中はモデルの描画位置のみY座標をオフセットする */
+			/** 物理・ステート判定には影響を与えない */
+			if (m_stateMachine->IsSwimming() && m_modelReady)
+			{
+				Vector3 renderPos = m_transform.m_position;
+				renderPos.y += SWIM_Y_OFFSET;
+				m_modelRender.SetTRS(renderPos, m_transform.m_rotation, m_transform.m_scale);
+				m_modelRender.Update();
+			}
 		}
 
 
