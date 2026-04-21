@@ -23,19 +23,25 @@ namespace app
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
+			// Lerpの割合の最大値を定数化してマジックナンバーを防ぐ
+			constexpr float MAX_LERP_FACTOR = 1.0f;
+
 			// --- 慣性と摩擦の計算 ---
 			if (m_moveDirection.LengthSq() > FLT_EPSILON)
 			{
-				// アナログスティックの倒し具合(m_speedMultiplier)を考慮した目標速度
 				Vector3 targetVelocity = m_moveDirection * (m_moveSpeed * m_speedMultiplier);
 
-				// m_currentVelocity自身を目標速度に向かって加速させる
-				m_currentVelocity.Lerp(m_acceleration * deltaTime, m_currentVelocity, targetVelocity);
+				// ★修正：1.0f の代わりに MAX_LERP_FACTOR を使う
+				float lerpFactor = min(MAX_LERP_FACTOR, m_acceleration * deltaTime);
+
+				m_currentVelocity.Lerp(lerpFactor, m_currentVelocity, targetVelocity);
 			}
 			else
 			{
-				// 入力がない場合は、摩擦係数を使って徐々に速度をゼロに近づける（滑りながら止まる）
-				m_currentVelocity.Lerp(m_friction * deltaTime, m_currentVelocity, Vector3::Zero);
+				// ★修正：こちらも同様
+				float lerpFactor = min(MAX_LERP_FACTOR, m_friction * deltaTime);
+
+				m_currentVelocity.Lerp(lerpFactor, m_currentVelocity, Vector3::Zero);
 			}
 
 			// 実際の移動量を計算
@@ -73,8 +79,11 @@ namespace app
 				Quaternion targetRotation = m_transform.m_rotation;
 				targetRotation.SetRotationYFromDirectionXZ(velocityDir);
 
+				// ★修正：Slerpの割合も、先ほど作った MAX_LERP_FACTOR (1.0f) を超えないように制限する
+				float slerpFactor = min(MAX_LERP_FACTOR, m_turnSpeed * deltaTime);
+
 				// 現在の回転から目標の回転へ Slerp で徐々に補間する（滑らかに振り向く）
-				m_transform.m_rotation.Slerp(m_turnSpeed * deltaTime, m_transform.m_rotation, targetRotation);
+				m_transform.m_rotation.Slerp(slerpFactor, m_transform.m_rotation, targetRotation);
 			}
 
 			// --- 既存の波面追従処理 ---
@@ -120,10 +129,10 @@ namespace app
 			, m_ownerCharacter(ownerCharacter)
 			, m_moveDirection(Vector3::Zero)
 			, m_moveSpeed(0.0f)
-			, m_isDash(false)
-			, m_prevPositionY(0.0f)
 			, m_currentVelocity(Vector3::Zero)
 			, m_speedMultiplier(1.0f)
+			, m_isDash(false)
+			, m_prevPositionY(0.0f)
 		{}
 	}
 }

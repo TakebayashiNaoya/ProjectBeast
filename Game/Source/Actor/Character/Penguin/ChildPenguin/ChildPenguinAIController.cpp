@@ -214,9 +214,9 @@ namespace app
 			/**
 			 * 移動方向（常に正規化済みベクトルを渡す）
 			 *
-			 * Move() は moveDirection * moveSpeed で移動量を計算するため、
-			 * moveDirection のスケールを変えると速度が変わってしまう。
-			 * 速度の調整は SetMoveSpeed() 経由のみで行う。
+			 * Move() は moveDirection * (moveSpeed * speedMultiplier) で目標速度を計算するため、
+			 * moveDirection のスケール（長さ）を変えると本来の速度設定が崩れてしまう。
+			 * 基本速度の調整は SetMoveSpeed()、目標手前での減速やブレーキは SetSpeedMultiplier() 経由で行う。
 			 */
 			const Vector3 moveDirection = CalculateDirectionToTarget(targetPos);
 
@@ -256,8 +256,9 @@ namespace app
 						targetRot.SetRotationYFromDirectionXZ(dirToDaddy);
 
 						// 一瞬で向くのではなく、Slerpでゆっくり振り向かせる
+						constexpr float TURN_SPEED_TO_DADDY = 6.0f; // ★ 6.0f に名前を付ける
 						float deltaTime = g_gameTime->GetFrameDeltaTime();
-						currentRot.Slerp(6.0f * deltaTime, currentRot, targetRot);
+						currentRot.Slerp(TURN_SPEED_TO_DADDY * deltaTime, currentRot, targetRot);
 
 						m_owner->SetRotation(currentRot);
 					}

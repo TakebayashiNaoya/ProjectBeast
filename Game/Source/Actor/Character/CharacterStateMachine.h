@@ -106,7 +106,10 @@ namespace app
 			 */
 			inline void SetSpeedMultiplier(const float multiplier)
 			{
-				m_speedMultiplier = multiplier;
+				// ★修正：渡された値が 0.0f ～ 1.0f の範囲をはみ出さないように制限する
+				if (multiplier < 0.0f) { m_speedMultiplier = 0.0f; }
+				else if (multiplier > 1.0f) { m_speedMultiplier = 1.0f; }
+				else { m_speedMultiplier = multiplier; }
 			}
 
 
