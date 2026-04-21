@@ -35,9 +35,9 @@ namespace app
 			// これにより落下処理で波面より下に潜らないようにする
 			m_ownerCharacter->GetCharacterController()->SetSeaLevel(waveY);
 
-			// 水中にいる間は重力の切り替えを行わず、波面追従に任せる
+			// 水中にいる間・泳ぎ中は重力の切り替えを行わず、波面追従に任せる
 			// 水から出た瞬間（前フレームは水中、今フレームは水上）のみ垂直速度をリセットして重力に戻す
-			if (!IsInWater())
+			if (!m_isSwimming && !IsInWater())
 			{
 				m_ownerCharacter->GetCharacterController()->SetGravity(GRAVITY);
 

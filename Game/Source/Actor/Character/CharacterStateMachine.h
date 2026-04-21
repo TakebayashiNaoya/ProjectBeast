@@ -13,7 +13,6 @@ namespace app
 {
 	namespace actor
 	{
-
 		namespace
 		{
 			/** 海面の基準高さ */
@@ -23,6 +22,7 @@ namespace app
 			/** 泳ぎ中のY座標オフセット（波に埋まらないよう浮かせる） */
 			constexpr float SWIM_Y_OFFSET = 5.0f;
 		}
+
 
 		/**
 		 * @brief キャラクターのステートマシン
@@ -176,12 +176,10 @@ namespace app
 			/** キャラクターのオーナー */
 			CharacterBase* m_ownerCharacter;
 
-
 			/** 移動方向 */
 			Vector3 m_moveDirection;
 			/** 移動速度 */
 			float m_moveSpeed;
-
 
 			/** ダッシュしているかどうか */
 			bool m_isDash;
@@ -190,6 +188,5 @@ namespace app
 			/** 前フレームのY座標（水面を抜けた瞬間の判定に使用） */
 			float m_prevPositionY;
 		};
-
 	}
 }
