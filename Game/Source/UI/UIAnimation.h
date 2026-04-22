@@ -453,7 +453,6 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
-				NotifyFinished();
 			}
 		};
 
@@ -474,7 +473,6 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
-				NotifyFinished();
 			}
 		};
 
@@ -495,7 +493,6 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
-				NotifyFinished();
 			}
 		};
 
@@ -516,7 +513,6 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
-				NotifyFinished();
 			}
 		};
 
@@ -537,7 +533,6 @@ namespace app
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
-				NotifyFinished();
 			}
 		};
 	}

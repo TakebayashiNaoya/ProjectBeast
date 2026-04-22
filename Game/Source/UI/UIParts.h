@@ -226,6 +226,100 @@ namespace app
 
 
 		/**
+		 * @brief 円形のゲージUI
+		 */
+		class UICircleGauge : public UIBase
+		{
+		public:
+			UICircleGauge();
+			~UICircleGauge();
+
+			virtual void Update()override;
+			virtual void Render(RenderContext& rc)override;
+
+
+			/**
+			 * @brief 初期化
+			 * @param assetName アセット名
+			 * @param width 横
+			 * @param height 縦
+			 * @param position 座標
+			 * @param scale 大きさ
+			 * @param rotation 回転
+			 * @param pivot 基底軸
+			 * @param gaugeColor ゲージ部分の色
+			 * @param bgColor リング部分の色
+			 * @param innerRadius ゲージの内径
+			 * @param outerRadius ゲージの外径
+			 */
+			void Initialize(
+					const char* assetName
+				,	const float width
+				,	const float height
+				,	const Vector3& position
+				,	const Vector3& scale
+				,	const Quaternion& rotation
+				,	const Vector2& pivot
+				,	const Vector4& gaugeColor
+				,	const Vector4& bgColor
+				,	const float innerRadius
+				,	const float outerRadius
+			);
+
+
+			// ------------------------------------------
+			// GaugeRender固有のパラメーター
+			// -----------------------------------------
+
+
+			/**
+			 * @brief 0.0f～1.0fでゲージを設定
+			 * @param progress ゲージの進行度
+			 */
+			void SetProgress(float progress) { m_gaugeRender.SetProgress(progress); }
+			/**
+			 * @brief ゲージの開始と終了の割合を設定
+			 * @param startProgress ゲージの開始の割合
+			 * @param endProgress ゲージの終了の割合
+			 */
+			void SetProgressRange(float startProgress, float endProgress) { m_gaugeRender.SetProgressRange(startProgress, endProgress); }
+			/**
+			 * @brief ゲージの内径と外径を設定
+			 * @param innerRadius 内径
+			 * @param outerRadius 外径
+			 */
+			void SetRadius(float innerRadius, float outerRadius) { m_gaugeRender.SetRadius(innerRadius, outerRadius); }
+			/**
+			 * @brief ゲージの太さを設定
+			 * @param radius ゲージの半径
+			 * @param thickness ゲージの太さ
+			 */
+			void SetThickness(float radius, float thickness) { m_gaugeRender.SetThickness(radius, thickness); }
+			/**
+			 * @brief ゲージの回転角度(単位:ラジアン)を設定
+			 * @param rotationAngle 回転角度(単位:ラジアン)
+			 */
+			void SetRotationAngle(float rotationAngle) { m_gaugeRender.SetRotationAngle(rotationAngle); }
+			/**
+			 * @brief ゲージの色を設定
+			 * @param color 色
+			 */
+			void SetGaugeColor(const Vector4& color) { m_gaugeRender.SetMulColor(color); }
+			/**
+			 * @brief リング部分の色を設定
+			 * @param color 色
+			 */
+			void SetBgColor(const Vector4& color) { m_gaugeRender.SetBgColor(color); }
+
+
+		private:
+			/** 円形ゲージ専用のスプライト */
+			nsBeastEngine::GaugeRender m_gaugeRender;
+		};
+
+
+
+		/**
 		 * @brief UIアイコン
 		 */
 		class UIIcon : public UIImage
@@ -349,8 +443,8 @@ namespace app
 
 
 		// ============================================
-// UI桁表示(スコア表示などで使用)
-// ============================================
+        // UI桁表示(スコア表示などで使用)
+        // ============================================
 		class UIDigit : public UIBase
 		{
 		private:
@@ -452,6 +546,7 @@ namespace app
 			friend class UIGauge;
 			friend class UIIcon;
 			friend class UIButton;
+			friend class UICircleGauge;
 
 
 		public:

@@ -52,7 +52,6 @@ namespace app
 			 */
 			template<typename T>
 			T* GetMenu() { return dynamic_cast<T*>(m_menu.get()); }
-			//T* GetMenu() { return dynamic_cast<T*>(m_menu.get()); }
 			
 
 		private:

@@ -192,6 +192,63 @@ namespace app
 		/********************************/
 
 
+		UICircleGauge::UICircleGauge()
+		{}
+
+
+		UICircleGauge::~UICircleGauge()
+		{}
+
+
+		void UICircleGauge::Update()
+		{
+			UpdateAnimation();
+			m_transform.UpdateTransform();
+			m_gaugeRender.SetPosition(m_transform.m_localTransform.m_position);
+			m_gaugeRender.SetScale(m_transform.m_localTransform.m_scale);
+			m_gaugeRender.SetRotation(m_transform.m_localTransform.m_rotation);
+			m_gaugeRender.SetPivot(m_pivot);
+			m_gaugeRender.SetGaugeColor(m_color);
+			m_gaugeRender.Update();
+		}
+
+
+		void UICircleGauge::Initialize(const char* assetName , const float width, const float height, const Vector3 & position, const Vector3 & scale, const Quaternion & rotation, const Vector2& pivot, const Vector4 & gaugeColor, const Vector4& bgColor,float innerRadius,float outerRadius)
+		{
+			m_transform.m_localTransform.m_position = position;
+			m_transform.m_localTransform.m_scale = scale;
+			m_transform.m_localTransform.m_rotation = rotation;
+			m_color = gaugeColor;
+			m_pivot = pivot;
+
+
+			m_gaugeRender.Init(assetName,width, height);
+			m_gaugeRender.SetPosition(position);
+			m_gaugeRender.SetScale(scale);
+			m_gaugeRender.SetRotation(rotation);
+			m_gaugeRender.SetPivot(pivot);
+			m_gaugeRender.SetGaugeColor(gaugeColor);
+			m_gaugeRender.SetBgColor(bgColor);
+			m_gaugeRender.SetRadius(innerRadius, outerRadius);
+			m_gaugeRender.Update();
+		}
+
+
+		void UICircleGauge::Render(RenderContext & rc)
+		{
+			if (m_isDraw) {
+				m_gaugeRender.Draw(rc);
+			}
+		}
+
+
+
+
+
+
+		/********************************/
+
+
 		UIDigit::UIDigit()
 		{}
 
