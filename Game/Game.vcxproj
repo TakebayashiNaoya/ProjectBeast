@@ -430,6 +430,8 @@
     <ClInclude Include="Source\UI\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\TutorialMenu.h" />
     <ClInclude Include="Source\UI\UIAnimation.h" />
+    <ClInclude Include="Source\UI\UIAnimationFactory.h" />
+    <ClInclude Include="Source\UI\UIAnimationParameter.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />

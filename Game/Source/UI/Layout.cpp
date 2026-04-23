@@ -207,7 +207,7 @@ namespace app
 		{
 			m_menu->Update();
 
-#ifdef APP_ENEBLE_LAYOUT_HOTRELOAD
+#ifdef APP_ENABLE_LAYOUT_HOTRELOAD
 			/** ホットリロードチェック */
 			struct stat st;
 			if (stat(m_filePath.c_str(), &st) == 0)

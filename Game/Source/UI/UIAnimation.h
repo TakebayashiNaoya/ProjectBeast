@@ -25,7 +25,7 @@ namespace app
 		class UIAnimationBase
 		{
 		public:
-			UIAnimationBase() : m_ui(nullptr),m_timeSec(0.0f),m_isFinished(false){}
+			UIAnimationBase() : m_ui(nullptr),m_timeSec(0.0f){}
 			~UIAnimationBase(){}
 
 
@@ -42,27 +42,9 @@ namespace app
 			 * @param ui UIBaseのポインタ
 			 */
 			void SetUI(UIBase* ui) { m_ui = ui; }
-
-			/**
-			 * @brief フィニッシュが呼ばれた時のコールバックを設定。
-			 */
-			void SetOnFinished(std::function<void()> callBack) 
-			{
-				m_onFinished = std::move(callBack);
-			}
 			
 
 		protected:
-			/**
-			 * @brief アニメーション更新の最後に呼ばれる
-			 */
-			void NotifyFinished()
-			{
-				m_isFinished = true;
-				if (m_onFinished)m_onFinished();
-			}
-
-
 			/** UIBaseのポインタ */
 			UIBase* m_ui;
 			/** 秒数 */
@@ -71,13 +53,6 @@ namespace app
 			app::util::EasingType m_type = app::util::EasingType::Linear;
 			/** 片道 */
 			app::util::LoopMode m_loopMode = app::util::LoopMode::Once;
-
-
-		private:
-			/** フィニッシュが呼ばれた時のコールバック */
-			bool m_isFinished;
-			/** ファンクション変数 */
-			std::function<void()>m_onFinished;
 		};
 
 
@@ -97,11 +72,10 @@ namespace app
 			{
 				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
-				// 再生中かつ停止に変わった瞬間が終了のタイミング。
-				if (wasPlaying && !m_curve.IsPlaying())
+				// 再生中 OR 停止に変わった瞬間が終了のタイミング。
+				if (wasPlaying || !m_curve.IsPlaying())
 				{
-					NotifyFinished();
+					m_applyFunc(m_curve.GetCurrentValue());
 				}
 			}
 
@@ -190,11 +164,10 @@ namespace app
 			{
 				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
 				// 再生中かつ停止に変わった瞬間が終了のタイミング。
 				if (wasPlaying && !m_curve.IsPlaying())
 				{
-					NotifyFinished();
+					m_applyFunc(m_curve.GetCurrentValue());
 				}
 			}
 
@@ -275,10 +248,9 @@ namespace app
 			{
 				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
 				if (wasPlaying && !m_curve.IsPlaying())
 				{
-					NotifyFinished();
+					m_applyFunc(m_curve.GetCurrentValue());
 				}
 			}
 
@@ -364,10 +336,9 @@ namespace app
 			{
 				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
 				if (wasPlaying && !m_curve.IsPlaying())
 				{
-					NotifyFinished();
+					m_applyFunc(m_curve.GetCurrentValue());
 				}
 			}
 
@@ -534,6 +505,185 @@ namespace app
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
 			}
+		};
+
+
+
+		/***********************************************************/
+
+
+		/**
+		 * @brief シーケンス内の1ステップ(構造体)
+		 * @param animationKey 再生するアニメーションのキー
+		 * @param delayBefore このステップ開始前の待機時間(秒)
+		 * @param m_onStart 開始時コールバック
+		 * @param m_onComplete 終了時コールバック
+		 * @detail シーケンスアニメーションで使用する構造体。
+		 */
+		struct UIAnimationStep
+		{
+			uint32_t animationKey;
+			float delayBefore = 0.0f;
+			std::function<void()>onStart;
+			std::function<void()>onComplete;
+		};
+
+
+		class UIAnimationSequence
+		{
+		private:
+			/** アニメーションを再生する順番を管理するためのステップのリスト */
+			std::vector<UIAnimationStep>m_steps;
+			/** 現在再生しているステップのインデックス */
+			int m_currentIndex;
+			/** シーケンスが再生中かどうか */
+			bool m_isPlaying;
+			/** ステップ開始前の待機時間(秒) */
+			float m_delayTimer;
+			/** ステップ開始前の待機時間が経過したかどうか */
+			bool m_waitingDelay;
+
+			/** UIBaseのポインタ */
+			UIBase* m_target;
+			/** シーケンス全体の完了時のコールバック */
+			std::function<void()>m_onSequenceComplete;
+
+
+		public:
+			UIAnimationSequence() : m_currentIndex(-1),m_isPlaying(false),m_delayTimer(0.0f),m_waitingDelay(false),m_target(nullptr){}
+			~UIAnimationSequence(){}
+
+			/**
+			 * @brief ステップを追加
+			 * @param animKey 再生するアニメーションのキー
+			 * @param delayBefore このステップ開始前の待機時間(秒)
+			 */
+			UIAnimationSequence& Add(uint32_t animKey, float delayBefore = 0.0f)
+			{
+				UIAnimationStep step;
+				step.animationKey = animKey;
+				step.delayBefore = delayBefore;
+				m_steps.push_back(step);
+				return *this;
+			}
+
+
+			/**
+			 * @brief コールバック付きのステップを追加
+			 * @param animKey 再生するアニメーションのキー
+			 * @param delayBefore このステップ開始前
+			 * @param onStart ステップ開始時のコールバック
+			 * @param onComplete ステップ終了時のコールバック
+			 */
+			UIAnimationSequence& Add(
+				uint32_t animKey
+				, float delayBefore
+				, std::function<void()>onStart
+				, std::function<void()>onComplete = nullptr
+			)
+			{
+				UIAnimationStep step;
+				step.animationKey = animKey;
+				step.delayBefore = delayBefore;
+				step.onStart = std::move(onStart);
+				step.onComplete = std::move(onComplete);
+				m_steps.push_back(step);
+				return *this;
+			}
+
+
+			/**
+			 * @brief シーケンス全体の完了コールバック
+			 * @param callback シーケンス全体の完了時のコールバック
+			 * @return UIAnimationSequence& 自身の参照
+			 */
+			UIAnimationSequence& OnComplete(std::function<void()> callback)
+			{
+				m_onSequenceComplete = std::move(callback);
+				return *this;
+			}
+
+
+			/**
+			 * @brief 再生開始
+			 * @param target シーケンスを再生するUIBaseのポインタ
+			 * @detail targetに対して、Addで追加した順番でアニメーション
+			 */
+			void Play(UIBase* target)
+			{
+				if (m_steps.empty())return;
+				m_target = target;
+				m_currentIndex = -1;
+				m_isPlaying = true;
+				AdvanceToNext();
+			}
+
+
+			/**
+			 * @brief 停止処理
+			 * @detail シーケンスを停止し、状態をリセットします。
+			 */
+			void Stop()
+			{
+				m_isPlaying = false;
+				m_currentIndex = -1;
+				m_waitingDelay = false;
+			}
+
+
+			/**
+			 * @brief 毎フレーム更新処理
+			 * @param deltaTime 前のフレームからの経過時間(秒)
+			 */
+			void Update(float deltaTime);
+
+			/**
+			 * @brief シーケンスが再生中かどうか
+			 * @return bool シーケンスが再生中か
+			 */
+			bool IsPlaying()const { return m_isPlaying; }
+
+			/**
+			 * @brief ステップをクリア
+			 * @detail シーケンス内の全てのステップをクリアし、シーケンスを停止します。
+			 */
+			void Clear()
+			{
+				m_steps.clear();
+				Stop();
+			}
+
+
+		private:
+			/**
+			 * @brief 次のステップに進む
+			 */
+			void AdvanceToNext()
+			{
+				m_currentIndex++;
+				if (m_currentIndex >= static_cast<int>(m_steps.size()))
+				{
+					// 全ステップ完了。
+					m_isPlaying = false;
+					if (m_onSequenceComplete)m_onSequenceComplete();
+					return;
+				}
+
+
+				const auto& step = m_steps[m_currentIndex];
+				if (step.delayBefore > 0.0f)
+				{
+					m_delayTimer = step.delayBefore;
+					m_waitingDelay = true;
+				}
+				else
+				{
+					StartCurrentStep();
+				}
+			}
+
+
+			void StartCurrentStep();
 		};
 	}
 }

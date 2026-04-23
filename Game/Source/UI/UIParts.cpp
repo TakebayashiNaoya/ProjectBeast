@@ -203,12 +203,12 @@ namespace app
 		void UICircleGauge::Update()
 		{
 			UpdateAnimation();
+			m_gaugeRender.SetGaugeColor(m_color);
 			m_transform.UpdateTransform();
 			m_gaugeRender.SetPosition(m_transform.m_localTransform.m_position);
 			m_gaugeRender.SetScale(m_transform.m_localTransform.m_scale);
 			m_gaugeRender.SetRotation(m_transform.m_localTransform.m_rotation);
 			m_gaugeRender.SetPivot(m_pivot);
-			m_gaugeRender.SetGaugeColor(m_color);
 			m_gaugeRender.Update();
 		}
 

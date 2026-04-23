@@ -4,12 +4,12 @@
  * @author 忽那
  */
 #pragma once
-#include "Source/UI/Menu.h"
+#include "Menu.h"
 #include "Json/json.hpp"
 
 
 #ifdef APP_DEBUG
-	#define APP_ENEBLE_LAYOUT_HOTRELOAD
+	#define APP_ENABLE_LAYOUT_HOTRELOAD
 #endif
 
 
@@ -49,15 +49,17 @@ namespace app
 			/**
 			 * @brief MenuBaseを取得
 			 * @return MenuBaseのポインタを取得
+			 * @datil
+			 * Menuの内容を使う時毎回dynamic_castするのは面倒なので、GetMenu<具象クラス>()で直接具象クラスのポインタを取得できるようにする
 			 */
 			template<typename T>
 			T* GetMenu() { return dynamic_cast<T*>(m_menu.get()); }
 			
 
 		private:
-#ifdef APP_ENEBLE_LAYOUT_HOTRELOAD
+#ifdef APP_ENABLE_LAYOUT_HOTRELOAD
 			time_t m_lastUpdateTime = 0;
-#endif //APP_ENEBLE_LAYOUT_HOTRELOAD
+#endif //APP_ENABLE_LAYOUT_HOTRELOAD
 
 			std::string m_filePath = "";
 			std::unique_ptr<MenuBase>m_menu = nullptr;
