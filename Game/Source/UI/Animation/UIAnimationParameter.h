@@ -36,8 +36,8 @@ namespace app
 			Vector2 endV2 = Vector2::Zero;
 			Vector3 startV3 = Vector3::Zero;
 			Vector3 endV3 = Vector3::Zero;
-			Vector4 startV4 = Vector4::Zero;
-			Vector4 endV4 = Vector4::Zero;
+			Vector4 startV4 = Vector4::White;
+			Vector4 endV4 = Vector4::White;
 
 			float duration = 0.0f;
 			app::util::EasingType easingType = app::util::EasingType::Linear;
@@ -48,7 +48,7 @@ namespace app
 		 * @brief UIアニメーション情報の管理クラス
 		 * @detail JSONファイルから読み込み、ホットリロードを可能にする
 		 */
-		class UIAnimationParameter
+		class UIAnimationParameter : public Noncopyable
 		{
 		private:
 			std::string m_filePath;

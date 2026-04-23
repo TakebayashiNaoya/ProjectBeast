@@ -4,7 +4,8 @@
  * @author 忽那
  */
 #pragma once
-#include "Menu.h"
+#include "Source/UI/Menu.h"
+#include "Source/UI/Layout.h"
 
 
 namespace app
@@ -17,7 +18,7 @@ namespace app
 
 		public:
 			PBWakingUpTimerMenu();
-			~PBWakingUpTimerMenu() = default;
+			virtual ~PBWakingUpTimerMenu();
 
 			void Update()override;
 			void InitializeLogic()override;
@@ -49,6 +50,9 @@ namespace app
 
 
 		private:
+			/** シロクマの起床タイマーレイアウト */
+			std::unique_ptr<Layout>m_pbTimerLayout; 
+
 			/** 現在のタイマー値（外部から毎フレーム設定される） */
 			float m_currentPBTime = 0.0f;
 

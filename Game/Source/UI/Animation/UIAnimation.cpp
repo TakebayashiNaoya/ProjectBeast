@@ -5,7 +5,7 @@
  */
 #include "stdafx.h"
 #include "UIAnimation.h"
-#include "Source/UI/UIParts.h"
+#include "Source/UI/Parts/UIParts.h"
 
 
 namespace app

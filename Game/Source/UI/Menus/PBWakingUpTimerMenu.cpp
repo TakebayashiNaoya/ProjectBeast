@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "PBWakingUpTimerMenu.h"
+#include "Source/Core/ParameterManager.h"
 #include "Source/Util/CRC32.h"
 
 
@@ -14,14 +15,14 @@ namespace app
 	{
 		namespace
 		{
-
-
 			// 30~20の間で色が変わるタイマーの値(緑色)。
 			constexpr float TIMER_FIRST_VALUE = 30.0f;
 			// 20~10の間で色が変わるタイマーの値(黄色)。
 			constexpr float TIMER_SECOND_VALUE = 20.0f;
 			// 10未満で色が変わるタイマーの値(赤色)。
 			constexpr float TIMER_THIRD_VALUE = 10.0f;
+			// タイマーの値が0以下の値。
+			constexpr float TIMER_END_VALUE = 0.0f;
 
 			// タイマーの色(緑色)。
 			const Vector4 GREEN_COLOR = { 0.0f, 0.8f,0.0f,1.0f };
@@ -56,6 +57,12 @@ namespace app
 			, m_isDraw(false)
 			, m_isYellowPlayed(false)
 			, m_isRedPlayed(false)
+		{
+			//core::ParameterManager::Get()->LoadParameter<>
+		}
+
+
+		PBWakingUpTimerMenu::~PBWakingUpTimerMenu()
 		{}
 
 
@@ -77,8 +84,11 @@ namespace app
 				return;
 			}
 
-			// 時計回りに回転させるサークルゲージの処理を呼び出す。
-			CircleTimer();
+			auto* canvas = GetCanvas();
+			if (canvas) {
+				// 時計回りに回転させるサークルゲージの処理を呼び出す。
+				CircleTimer();
+			}
 
 			// UIDigitを取得。
 			auto* digitA = GetUI<UIDigit>(Hash32("PBTimerDigitA"));
@@ -173,9 +183,9 @@ namespace app
 			});
 
 
-			cirGaugeA->AddAnimation(Hash32("greenLerpAnim"), std::move(greenLerpAnim));
-			cirGaugeA->AddAnimation(Hash32("yellowLerpAnim"), std::move(yellowLerpAnim));
 			cirGaugeA->AddAnimation(Hash32("redAnim"), std::move(redAnim));
+			cirGaugeA->AddAnimation(Hash32("yellowLerpAnim"), std::move(yellowLerpAnim));
+			cirGaugeA->AddAnimation(Hash32("greenLerpAnim"), std::move(greenLerpAnim));
 			
 			// 最初に登録されたアニメーションがnullptrかつyellowLerpフラグがfalseの時、次のアニメーションを登録させる。
 			//if (cirGaugeA->FindAnimation(Hash32("greenLerpAnim")) == nullptr && !m_isYellowPlayed)
@@ -200,11 +210,13 @@ namespace app
 
 
 			// 現在のタイマーが30秒から20秒の間には、緑色から黄色に変化させるアニメーションを再生する。
-			if (m_currentPBTime >= TIMER_FIRST_VALUE && m_currentPBTime < TIMER_SECOND_VALUE)
+			if (m_currentPBTime == TIMER_FIRST_VALUE && m_currentPBTime >= TIMER_SECOND_VALUE)
 			{
 				// まだ再生されていないならば
 				if (!m_isYellowPlayed)
 				{
+					// サークルゲージAに緑色から黄色に変化させるアニメーションを検索。
+					cirGaugeA->FindAnimation(Hash32("greenLerpAnim"));
 					// 最初に登録されたアニメーションを再生する。
 					cirGaugeA->PlayAnimation();
 					cirGaugeA->SetGaugeColor(GREEN_COLOR * t);
@@ -213,30 +225,30 @@ namespace app
 				}
 			}
 			// 現在のタイマーが20から10秒の間は、黄色から赤色に変化させるアニメーションを再生する。
-			else if (m_currentPBTime <= TIMER_SECOND_VALUE && m_currentPBTime >= TIMER_THIRD_VALUE)
+			else if (m_currentPBTime == TIMER_SECOND_VALUE && m_currentPBTime >= TIMER_THIRD_VALUE)
 			{
-				// サークルゲージAに緑から黄色に変化させるアニメーションを削除。
-				cirGaugeA->RemoveAnimation(Hash32("greenLerpAnim"));
-				// nullptrを代入して、アニメーションが削除されたことを示す。
-				greenLerpAnim = nullptr;
-				// サークルゲージAに黄色から赤色に変化させるアニメーションを探す。
-				cirGaugeA->FindAnimation(Hash32("yellowLerpAnim")), std::move(yellowLerpAnim);
 				// lerpAnimationがtrueで、フラグがfalseの時、アニメーションを再生する。
 				if (m_isYellowPlayed && !m_isRedPlayed)
 				{
+					// サークルゲージAに緑から黄色に変化させるアニメーションを削除。
+					cirGaugeA->RemoveAnimation(Hash32("greenLerpAnim"));
+					// nullptrを代入して、アニメーションが削除されたことを示す。
+					greenLerpAnim = nullptr;
+					// サークルゲージAに黄色から赤色に変化させるアニメーションを探す。
+					cirGaugeA->FindAnimation(Hash32("yellowLerpAnim"));
 					// 登録されたアニメーションを再生する。
 					cirGaugeA->PlayAnimation();
-					cirGaugeA->SetGaugeColor(YELLOW_COLOR * t2);
+					cirGaugeA->SetGaugeColor(YELLOW_COLOR);
 					cirGaugeA->SetBgColor(YELLOW_COLOR * SKELTON_VALUE);
 					m_isRedPlayed = true;
 				}
 			}
-			// 10秒未満は、赤色にする(固定色)。
-			else
+			// 10~0秒の間は、赤色のアニメーションを再生する。
+			else if(m_currentPBTime <= TIMER_THIRD_VALUE && m_currentPBTime >= TIMER_END_VALUE)
 			{
 				cirGaugeA->RemoveAnimation(Hash32("yellowLerpAnim"));
 				yellowLerpAnim = nullptr;
-				cirGaugeA->AddAnimation(Hash32("redAnim"), std::move(redAnim));
+				cirGaugeA->FindAnimation(Hash32("redAnim"));
 				cirGaugeA->PlayAnimation();
 				cirGaugeA->SetGaugeColor(RED_COLOR);
 				cirGaugeA->SetBgColor(RED_COLOR * SKELTON_VALUE);

@@ -6,7 +6,7 @@
  */
 #pragma once
 #include "UIAnimation.h"
-#include "UIParts.h"
+#include "Source/UI/Parts/UIParts.h"
 #include "UIAnimationParameter.h"
 
 
@@ -74,7 +74,7 @@ namespace app
 			 * @param anim 適用先のアニメーション
 			 * @param def アニメーションの定義
 			 */
-			static void ApplyParameter(UIVector2Animation* anim, const UIAnimationDef& def)
+			static void ApplyParameter(UIVector2Animation* anim, UIAnimationDef& def)
 			{
 				anim->SetParameter(def.startV2, def.endV2, def.duration, def.easingType, def.loopMode);
 			}
@@ -85,7 +85,7 @@ namespace app
 			 * @pram anim 適用先のアニメーション
 			 * @param def アニメーションの定義
 			 */
-			static void ApplyParameter(UIVector3Animation* anim, const UIAnimationDef& def)
+			static void ApplyParameter(UIVector3Animation* anim, UIAnimationDef& def)
 			{
 				anim->SetParameter(def.startV3, def.endV3, def.duration, def.easingType, def.loopMode);
 			}
@@ -96,7 +96,7 @@ namespace app
 			 * @param anim 適用先のアニメーション
 			 * @param def アニメーションの定義
 			 */
-			static void ApplyParameter(UIVector4Animation* anim, const UIAnimationDef& def)
+			static void ApplyParameter(UIVector4Animation* anim, UIAnimationDef& def)
 			{
 				anim->SetParameter(def.startV4, def.endV4, def.duration, def.easingType, def.loopMode);
 			}

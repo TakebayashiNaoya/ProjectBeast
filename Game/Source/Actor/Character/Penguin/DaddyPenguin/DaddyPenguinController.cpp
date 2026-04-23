@@ -10,7 +10,7 @@
 #include "DaddyPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
-#include "Source/UI/IglooPromptMenu.h"
+#include "Source/UI/Menus/IglooPromptMenu.h"
 #include <algorithm> // std::min用
 
 

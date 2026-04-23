@@ -4,7 +4,7 @@
  * @author 忽那
  */
 #pragma once
-#include "Source/UI/UIParts.h"
+#include "Source/UI/Parts/UIParts.h"
 
 
 namespace app
@@ -113,10 +113,9 @@ namespace app
 			/** 
 			 * @brief UIのロジック初期化処理
 			 * @brief ここに「ボタンが押された時の処理」等を書く
+			 * @brief 純粋仮想関数。MenuBaseを継承したクラスは必ずこの関数を実装する必要がある。
 			 */
-			virtual void InitializeLogic()
-			{
-			}
+			virtual void InitializeLogic(){}
 
 
 		protected:
