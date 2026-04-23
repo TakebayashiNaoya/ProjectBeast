@@ -98,6 +98,7 @@ void InitializeUIParts(T* parts, const nlohmann::json& item)
 void InitializeUIParts(app::ui::UICircleGauge* gauge, const nlohmann::json& item)
 {
 	const std::string asset = item["asset"].get<std::string>();
+	const std::string fx = item["fx"].get<std::string>();
 	const float w = item["width"].get<float>();
 	const float h = item["height"].get<float>();
 	const Vector3 position = ParseVector3(item["position"]);
@@ -110,7 +111,7 @@ void InitializeUIParts(app::ui::UICircleGauge* gauge, const nlohmann::json& item
 	const float outerRadius = item["outerRadius"].get<float>();
 
 
-	gauge->Initialize(asset.c_str(), w, h, position, scale, rotation, pivot, gaugeColor, bgColor, innerRadius, outerRadius);
+	gauge->Initialize(asset.c_str(),fx.c_str(), w, h, position, scale, rotation, pivot, gaugeColor, bgColor, innerRadius, outerRadius);
 	gauge->m_transform.m_localTransform.m_position = position;
 	gauge->m_transform.m_localTransform.m_scale = scale;
 	gauge->m_transform.m_localTransform.m_rotation = rotation;

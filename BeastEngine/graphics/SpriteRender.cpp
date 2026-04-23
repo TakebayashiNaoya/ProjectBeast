@@ -58,13 +58,13 @@ namespace nsBeastEngine
 	}
 
 
-	void GaugeRender::Init(const char* filePath, float w, float h)
+	void GaugeRender::Init(const char* filePath,const char* fxName, float w, float h)
 	{
 		SpriteInitData initData;
 		/** DDSのファイルの指定 */
 		initData.m_ddsFilePath[0] = filePath;
 		/** シェーダーのファイルパスの指定 */
-		initData.m_fxFilePath = "Assets/shader/CircleGauge.fx";
+		initData.m_fxFilePath = fxName;
 		/** スプライトのサイズの指定 */
 		initData.m_width = static_cast<UINT>(w);
 		initData.m_height = static_cast<UINT>(h);

@@ -241,6 +241,7 @@ namespace app
 			/**
 			 * @brief 初期化
 			 * @param assetName アセット名
+			 * @param fxName シェーダー名
 			 * @param width 横
 			 * @param height 縦
 			 * @param position 座標
@@ -254,6 +255,7 @@ namespace app
 			 */
 			void Initialize(
 					const char* assetName
+				,	const char* fxName
 				,	const float width
 				,	const float height
 				,	const Vector3& position

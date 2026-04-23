@@ -201,10 +201,11 @@ namespace nsBeastEngine
 		/**
 		 * @brief 初期化
 		 * @param filePath　		画像ファイルのパス
+		 * @param fxName		　　シェーダーの名前
 		 * @param w				　　画像の横幅のサイズ
 		 * @param h				　　画像の縦幅のサイズ
 		 */
-		void Init(const char* filePath, float w, float h);
+		void Init(const char* filePath,const char* fxName, float w, float h);
 
 		/**
 		 * @brief 位置の設定

@@ -213,7 +213,7 @@ namespace app
 		}
 
 
-		void UICircleGauge::Initialize(const char* assetName , const float width, const float height, const Vector3 & position, const Vector3 & scale, const Quaternion & rotation, const Vector2& pivot, const Vector4 & gaugeColor, const Vector4& bgColor,float innerRadius,float outerRadius)
+		void UICircleGauge::Initialize(const char* assetName ,const char* fxName, const float width, const float height, const Vector3 & position, const Vector3 & scale, const Quaternion & rotation, const Vector2& pivot, const Vector4 & gaugeColor, const Vector4& bgColor,float innerRadius,float outerRadius)
 		{
 			m_transform.m_localTransform.m_position = position;
 			m_transform.m_localTransform.m_scale = scale;
@@ -221,8 +221,8 @@ namespace app
 			m_color = gaugeColor;
 			m_pivot = pivot;
 
-
-			m_gaugeRender.Init(assetName,width, height);
+			// Init関数にassetNameとfxNameを渡すように変更。
+			m_gaugeRender.Init(assetName,fxName,width, height);
 			m_gaugeRender.SetPosition(position);
 			m_gaugeRender.SetScale(scale);
 			m_gaugeRender.SetRotation(rotation);
