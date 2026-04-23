@@ -13,6 +13,7 @@ enum class EnEffectKind : uint8_t
 	Kind = 0,
 	DaddyPenguinCommand = Kind,
 	EnemyAttack,
+	Whirlpool,
 	Max,
 	None = Max,
 };
@@ -31,6 +32,7 @@ struct EffectInformation
 static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Max)] =
 {
 	EffectInformation(u"Assets/effect/DaddyPenguinCommand.efk"),
-	EffectInformation(u"Assets/effect/enemy/EnemyAttack.efk")
+	EffectInformation(u"Assets/effect/enemy/EnemyAttack.efk"),
+	EffectInformation(u"Assets/effect/whirlpool/Whirlpool.efk")
 };
 

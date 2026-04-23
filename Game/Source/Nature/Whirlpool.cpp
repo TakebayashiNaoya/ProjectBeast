@@ -9,6 +9,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -25,7 +26,7 @@ namespace app
 			/** 渦潮の最小スケール */
 			const Vector3 MIN_SCALE = Vector3(0.0f, 1.0f, 0.0f);
 
-			constexpr float WHIRLPOOL_Y_OFFSET = 5.0f;	/** ワールドの海面から渦潮メッシュの頂点が浮いている高さ（ワールド単位） */
+			constexpr float WHIRLPOOL_Y_OFFSET = 4.0f;	/** ワールドの海面から渦潮メッシュの頂点が浮いている高さ（ワールド単位） */
 
 			/**
 			 * @brief パラメーターを取得するヘルパー関数
@@ -35,6 +36,9 @@ namespace app
 			{
 				return core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
 			}
+
+			/** エフェクトの基準スケール（渦潮が最大サイズのときのスケール） */
+			const Vector3 EFFECT_SCALE = Vector3(1.0f, 1.0f, 1.0f);
 		}
 
 
@@ -89,13 +93,19 @@ namespace app
 			m_state = EnWhirlpoolState::Bigger;
 			m_scaleBigger.Play();
 
+			// 引き寄せシステムを開始する
 			m_whirlpoolPowerSystem->StartWrapper();
+
+			// Bigger開始と同時にエフェクトを再生する
+			PlayWhirlpoolEffect();
 		}
 
 
 		void Whirlpool::Update()
 		{
 			StateMachine();
+			// エフェクトのスケールを渦潮のスケールに合わせて更新する
+			UpdateWhirlpoolEffectScale();
 			m_whirlpoolPowerSystem->UpdateWrapper();
 		}
 
@@ -152,6 +162,7 @@ namespace app
 			, m_index(0)
 			, m_indexCount(0)
 			, m_maxScaleXZ(2.0f)
+			, m_effectHandle(INVALID_EFFECT_HANDLE)
 			, m_vs(nullptr)
 			, m_ps(nullptr)
 		{}
@@ -201,6 +212,8 @@ namespace app
 
 				if (!m_scaleSmaller.IsPlaying())
 				{
+					// Smaller完了時にエフェクトを停止する
+					StopWhirlpoolEffect();
 					m_state = EnWhirlpoolState::None;
 				}
 
@@ -213,6 +226,44 @@ namespace app
 			default:
 				break;
 			}
+		}
+
+
+		void Whirlpool::PlayWhirlpoolEffect()
+		{
+			m_effectHandle = EffectManager::Get().PlayEffect(
+				EnEffectKind::Whirlpool,
+				m_transform.m_position,
+				Quaternion::Identity,
+				EFFECT_SCALE
+			);
+		}
+
+
+		void Whirlpool::StopWhirlpoolEffect()
+		{
+			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;
+
+			EffectManager::Get().StopEffect(m_effectHandle);
+			m_effectHandle = INVALID_EFFECT_HANDLE;
+		}
+
+
+		void Whirlpool::UpdateWhirlpoolEffectScale()
+		{
+			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;
+
+			auto* effect = EffectManager::Get().FindEffect(m_effectHandle);
+			if (effect == nullptr)
+			{
+				// エフェクトが自己削除済みの場合はハンドルを無効化する
+				m_effectHandle = INVALID_EFFECT_HANDLE;
+				return;
+			}
+
+			// 渦潮のXZスケール比率（0.0〜1.0）をエフェクトスケールに反映する
+			const float ratio = (m_maxScaleXZ > 0.0f) ? (m_transform.m_scale.x / m_maxScaleXZ) : 1.0f;
+			effect->SetScale(EFFECT_SCALE * ratio);
 		}
 
 
@@ -423,21 +474,12 @@ namespace app
 			psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 			psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 			psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-			psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-			psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 			psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			psoDesc.NumRenderTargets = 1;
+			psoDesc.RTVFormats[0] = colorBufferFormat[0];
 			psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 			psoDesc.SampleDesc.Count = 1;
-
-			// カラーバッファのフォーマットを設定する
-			int numRenderTargets = 0;
-			for (int i = 0; i < MAX_RENDERING_TARGET; ++i)
-			{
-				if (colorBufferFormat[i] == DXGI_FORMAT_UNKNOWN) break;
-				psoDesc.RTVFormats[i] = colorBufferFormat[i];
-				numRenderTargets++;
-			}
-			psoDesc.NumRenderTargets = numRenderTargets;
 
 			m_pipelineState.Init(psoDesc);
 		}
@@ -445,16 +487,9 @@ namespace app
 
 		void Whirlpool::InitDescriptorHeap()
 		{
-			// CBV：b0（共通）、b1（渦潮）の2枠
-			// SRV：t0（アルベド）の1枠
-			m_descriptorHeap.ResizeConstantBuffer(2);
-			m_descriptorHeap.ResizeShaderResource(1);
-			m_descriptorHeap.ResizeUnorderAccessResource(1);
-
 			m_descriptorHeap.RegistConstantBuffer(0, m_commonConstantBuffer);
 			m_descriptorHeap.RegistConstantBuffer(1, m_whirlpoolConstantBuffer);
 			m_descriptorHeap.RegistShaderResource(0, m_albedoMap);
-
 			m_descriptorHeap.Commit();
 		}
 
@@ -462,25 +497,18 @@ namespace app
 		void Whirlpool::UpdateVertexHeights()
 		{
 			const Ocean* ocean = Ocean::GetInstance();
+			if (ocean == nullptr) return;
 
 			for (auto& v : m_vertices)
 			{
-				// ローカル座標にスケールを乗算してワールド座標に変換してサンプリングする
-				const float worldX = m_transform.m_position.x + v.pos.x * m_transform.m_scale.x;
-				const float worldZ = m_transform.m_position.z + v.pos.z * m_transform.m_scale.z;
+				// 頂点のワールド座標を算出する（スケールと平行移動のみ。回転は常にIdentityなので省略）
+				const float worldX = v.pos.x * m_transform.m_scale.x + m_transform.m_position.x;
+				const float worldZ = v.pos.z * m_transform.m_scale.z + m_transform.m_position.z;
 
-				if (ocean != nullptr)
-				{
-					// 波面のYをローカル座標系に変換する（ワールドY - 渦潮の基準Y）
-					v.pos.y = ocean->SampleWaveHeight(worldX, worldZ) + WHIRLPOOL_Y_OFFSET;
-				}
-				else
-				{
-					v.pos.y = 0.0f;
-				}
+				// Oceanの波面高さを取得してY座標に反映する
+				v.pos.y = ocean->SampleWaveHeight(worldX, worldZ) + WHIRLPOOL_Y_OFFSET;
 			}
 
-			// 更新した頂点データをGPUにアップロードする
 			m_vertexBuffer.Copy(m_vertices.data());
 		}
 	}

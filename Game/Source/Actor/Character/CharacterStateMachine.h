@@ -13,14 +13,16 @@ namespace app
 {
 	namespace actor
 	{
-
 		namespace
 		{
 			/** 海面の基準高さ */
 			constexpr float SEA_LEVEL = 0.0f;
 			/** 海面付近のしきい値（ゆらゆら中にSwimmingStateを維持するための余裕） */
 			constexpr float SEA_SURFACE_THRESHOLD = 1.0f;
+			/** 泳ぎ中のY座標オフセット（波に埋まらないよう浮かせる） */
+			constexpr float SWIM_Y_OFFSET = 5.0f;
 		}
+
 
 		/**
 		 * @brief キャラクターのステートマシン
@@ -86,6 +88,48 @@ namespace app
 			inline void SetIsSwimming(const bool isSwimming)
 			{
 				m_isSwimming = isSwimming;
+			}
+			/**
+			 * @brief 泳ぎ中かどうかを取得
+			 * @return 泳ぎ中かどうか
+			 */
+			inline bool IsSwimming() const
+			{
+				return m_isSwimming;
+			}
+
+			/**
+			 * @brief 物理挙動パラメータの設定
+			 * @details プレイヤーとエネミーで個別の数値を設定するために使用します
+			 */
+			inline void SetPhysicsParams(float acceleration, float friction, float turnSpeed)
+			{
+				m_acceleration = acceleration;
+				m_friction = friction;
+				m_turnSpeed = turnSpeed;
+			}
+
+
+			/**
+			 * @brief 移動速度の倍率を設定
+			 * @param multiplier 倍率 (0.0f ~ 1.0f)
+			 */
+			inline void SetSpeedMultiplier(const float multiplier)
+			{
+				// ★修正：渡された値が 0.0f ～ 1.0f の範囲をはみ出さないように制限する
+				if (multiplier < 0.0f) { m_speedMultiplier = 0.0f; }
+				else if (multiplier > 1.0f) { m_speedMultiplier = 1.0f; }
+				else { m_speedMultiplier = multiplier; }
+			}
+
+
+			/**
+			 * @brief 現在の物理移動速度（慣性）を取得
+			 * @return 現在の速度ベクトル
+			 */
+			inline const Vector3& GetCurrentVelocity() const
+			{
+				return m_currentVelocity;
 			}
 
 
@@ -166,12 +210,13 @@ namespace app
 			/** キャラクターのオーナー */
 			CharacterBase* m_ownerCharacter;
 
-
 			/** 移動方向 */
 			Vector3 m_moveDirection;
 			/** 移動速度 */
 			float m_moveSpeed;
 
+			/** 移動速度の倍率（減速・アナログスティック用：0.0f ~ 1.0f） */
+			float m_speedMultiplier;
 
 			/** ダッシュしているかどうか */
 			bool m_isDash;
@@ -179,7 +224,18 @@ namespace app
 			bool m_isSwimming;
 			/** 前フレームのY座標（水面を抜けた瞬間の判定に使用） */
 			float m_prevPositionY;
-		};
 
+
+		protected:
+			/** 現在の移動速度ベクトル（慣性用） */
+			Vector3 m_currentVelocity = Vector3::Zero;
+
+			/** 加速度（目標速度への到達の早さ） */
+			float m_acceleration;
+			/** 摩擦係数（入力がないときの減速の早さ） */
+			float m_friction;
+			/** 旋回速度（Slerpによる回転の滑らかさ） */
+			float m_turnSpeed;
+		};
 	}
 }
