@@ -17,7 +17,6 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
-#include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Util/CRC32.h"
