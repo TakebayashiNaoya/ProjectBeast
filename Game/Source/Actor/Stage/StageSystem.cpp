@@ -385,14 +385,14 @@ namespace app
 
 				// 4. かまくら破壊時のエフェクト再生
 				// ※ 登録名が EnEffectKind::IglooBreak の場合。環境に合わせて調整してください。
-				/*
+
 				EffectManager::Get().PlayEffect(
 					EnEffectKind::IglooBreak,
 					iglooPos,
 					Quaternion::Identity,
-					Vector3(4.0f, 4.0f, 4.0f) // かまくらの大きさに合わせて調整
+					Vector3(30.0f, 30.0f, 30.0f) // かまくらの大きさに合わせて調整
 				);
-				*/
+
 
 
 				// 指定したキー（例: "igloo_01"）だけをピンポイントで消去します。
