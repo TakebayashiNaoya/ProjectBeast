@@ -217,7 +217,7 @@ namespace app
 			 * @brief 索敵目標座標のセッター
 			 */
 			void SetSearchTargetPos(const Vector3& pos) { m_searchTargetPos = pos; }
-      
+
 			/**
 			 * @brief 追跡（チェイス）状態かどうかを設定
 			 */
@@ -227,6 +227,16 @@ namespace app
 			 * @return Chase中なら true
 			 */
 			bool IsChasing() const { return m_isChasing; }
+
+
+			/**
+			 * @brief　攻撃して叩きつけたかどうかを設定
+			 */
+			void SetAttackImpact(bool isImpact) { m_isAttackImpact = isImpact; }
+			/**
+			 * @brief 攻撃して叩きつけたかどうかを取得
+			 */
+			bool IsAttackImpact() const { return m_isAttackImpact; }
 
 
 		public:
@@ -314,6 +324,9 @@ namespace app
 
 			/** 追跡（チェイス）中かどうか */
 			bool m_isChasing = false;
+
+			/** エネミーが攻撃して叩きつけたかどうか */
+			bool m_isAttackImpact = false;
 
 			/** 起床ゲージ（満タン=完全に眠っている、0=起きる） */
 			float m_wakeUpGauge = 0.0f;

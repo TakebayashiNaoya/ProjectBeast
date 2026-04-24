@@ -5,6 +5,8 @@
  */
 #include "stdafx.h"
 #include "IStage.h"
+#include "Source/Effect/EffectManager.h"
+#include "Source/Sound/SoundManager.h"
 #include "Source/Util/JsonConverter.h"
 #include "StageSystem.h"
 #include <unordered_set>
@@ -362,6 +364,66 @@ namespace app
 			}
 
 			return nearest->GetTransform().m_rotation;
+		}
+
+
+		void StageSystem::BreakIgloo(const std::string& key)
+		{
+			auto it = m_objectMap.find(key);
+			if (it != m_objectMap.end())
+			{
+				// 1. 当たり判定をオフにする（物理的な破壊）
+				it->second->SetIsNeedCollision(false);
+				// 姿を消す（非表示にする）
+				it->second->SetIsVisible(false);
+
+				// 2. かまくらの中心座標を取得（演出用）
+				Vector3 iglooPos = it->second->GetTransform().m_position;
+
+				// 3. かまくら破壊時のサウンド再生
+				SoundManager::Get().PlaySE(enSoundKind_IglooBreak);
+
+				// 4. かまくら破壊時のエフェクト再生
+				// ※ 登録名が EnEffectKind::IglooBreak の場合。環境に合わせて調整してください。
+
+				const Vector3 effectScale(30.0f, 30.0f, 30.0f); // かまくらの大きさに合わせて調整
+
+				EffectManager::Get().PlayEffect(
+					EnEffectKind::IglooBreak,
+					iglooPos,
+					Quaternion::Identity,
+					effectScale // かまくらの大きさに合わせて調整
+				);
+
+
+
+				// 指定したキー（例: "igloo_01"）だけをピンポイントで消去します。
+				m_objectMap.erase(it);
+			}
+		}
+
+		std::string StageSystem::GetNearestIglooKey(const Vector3& from) const
+		{
+			std::string nearestKey = "";
+			float minDistSq = FLT_MAX;
+
+			for (const auto& obj : m_objectMap)
+			{
+				// キー名が "igloo" で始まるオブジェクトのみ対象とする
+				if (obj.first.find(IGLOO_KEY_PREFIX) != 0) continue;
+
+				const Vector3& pos = obj.second->GetTransform().m_position;
+				const Vector3 diff = pos - from;
+				const float distSq = diff.LengthSq();
+
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					nearestKey = obj.first;
+				}
+			}
+
+			return nearestKey;
 		}
 
 

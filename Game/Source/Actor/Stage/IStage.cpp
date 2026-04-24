@@ -53,6 +53,7 @@ namespace app
 		void IStageObject::Render(RenderContext& rc)
 		{
 			if (!m_isModelLoaded) return;
+			if (!m_isVisible) return;
 			m_modelRender.Draw(rc);
 		}
 
