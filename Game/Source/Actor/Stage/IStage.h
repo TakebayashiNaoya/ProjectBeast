@@ -56,13 +56,13 @@ namespace app
 			 * @brief 表示状態を設定する
 			 * @param isVisible 表示する場合はtrue
 			 */
-			void SetVisible(const bool isVisible) { m_isVisible = isVisible; }
+			void SetIsVisible(const bool isVisible) { m_isVisible = isVisible; }
 
 			/**
 			 * @brief 表示状態を取得する
 			 * @return 表示状態
 			 */
-			bool GetVisible() const { return m_isVisible; }
+			bool IsVisible() const { return m_isVisible; }
 
 		private:
 			/** 物理判定が必要かどうか */

@@ -323,12 +323,17 @@ namespace app
 				Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
 				Vector3 insidePos = iglooPos;
 
+				constexpr float IGLOO_INSIDE_CIRCLE = 360.0f;
+				constexpr float IGLOO_INSIDE_RADIUS = 60.0f; // かまくらの中に収まる半径
+
 				// 一列に並ぶのを防ぐため、浮動小数点で円形にばらけさせる
 				auto& engine = GetRandomEngine();
-				std::uniform_real_distribution<float> angleDist(0.0f, 360.0f);
-				std::uniform_real_distribution<float> radiusDist(0.0f, 60.0f); // かまくらの中に収まる半径
+				std::uniform_real_distribution<float> angleDist(0.0f, IGLOO_INSIDE_CIRCLE);
+				std::uniform_real_distribution<float> radiusDist(0.0f, IGLOO_INSIDE_RADIUS);
 
-				float angleRad = angleDist(engine) * (Math::PI / 180.0f);
+				constexpr float IGLOO_INSIDE_HALF_CIRCLE = 180.0f;
+
+				float angleRad = angleDist(engine) * (Math::PI / IGLOO_INSIDE_HALF_CIRCLE);
 				float r = radiusDist(engine);
 
 				insidePos.x += r * cosf(angleRad);
@@ -398,17 +403,20 @@ namespace app
 			m_isInsideIgloo = false;
 			m_owner->SetInsideIgloo(false);
 
+			constexpr float EJECT_OFFSET_RANGE = 60.0f; // かまくらの中心から弾き出される範囲（半径）
+			constexpr float EJECT_UP_OFFSET = 50.0f; // 弾き出される際の上方向のオフセット
+
 			// 2. 弾き出される座標をランダムに散らす
 			// かまくらの中心(iglooPos)を基準に、周囲にランダムに配置します
 			auto& engine = GetRandomEngine();
-			std::uniform_real_distribution<float> offsetDist(-60.0f, 60.0f);
+			std::uniform_real_distribution<float> offsetDist(-EJECT_OFFSET_RANGE, EJECT_OFFSET_RANGE);
 
 			Vector3 spawnPos = iglooPos;
 			spawnPos.x += offsetDist(engine);
 			spawnPos.z += offsetDist(engine);
 
 			// 少し上空から落とすことで、弾き飛ばされた感を演出します
-			spawnPos.y += 50.0f;
+			//spawnPos.y +=EJECT_UP_OFFSET;
 
 			// 3. キャラクターコントローラーとステートマシン両方をワープ
 			m_owner->GetCharacterController()->SetPosition(spawnPos);

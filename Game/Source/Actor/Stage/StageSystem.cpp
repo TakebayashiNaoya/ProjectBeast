@@ -375,7 +375,7 @@ namespace app
 				// 1. 当たり判定をオフにする（物理的な破壊）
 				it->second->SetIsNeedCollision(false);
 				// 姿を消す（非表示にする）
-				it->second->SetVisible(false);
+				it->second->SetIsVisible(false);
 
 				// 2. かまくらの中心座標を取得（演出用）
 				Vector3 iglooPos = it->second->GetTransform().m_position;
@@ -386,11 +386,13 @@ namespace app
 				// 4. かまくら破壊時のエフェクト再生
 				// ※ 登録名が EnEffectKind::IglooBreak の場合。環境に合わせて調整してください。
 
+				const Vector3 effectScale(30.0f, 30.0f, 30.0f); // かまくらの大きさに合わせて調整
+
 				EffectManager::Get().PlayEffect(
 					EnEffectKind::IglooBreak,
 					iglooPos,
 					Quaternion::Identity,
-					Vector3(30.0f, 30.0f, 30.0f) // かまくらの大きさに合わせて調整
+					Vector3(effectScale) // かまくらの大きさに合わせて調整
 				);
 
 

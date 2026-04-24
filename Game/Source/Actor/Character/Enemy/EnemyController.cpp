@@ -603,12 +603,13 @@ namespace app
 
 				// 一定距離で攻撃
 				float attackDist = 80.0f;
+				const float iglooAttackDist = 240.0f;
 				// ターゲットがかまくらの中にいるかチェック
 				const auto& insidePenguins = app::actor::IglooManager::GetInstance().GetInsidePenguins();
 				if (std::find(insidePenguins.begin(), insidePenguins.end(), enemy->m_foundPenguin) != insidePenguins.end())
 				{
 					// ★ 重要：かまくらの上に登らないよう、壁の手前で攻撃モーションに入る距離
-					attackDist = 240.0f;
+					attackDist = iglooAttackDist;
 				}
 
 				if (distSq <= attackDist * attackDist)
@@ -751,7 +752,7 @@ namespace app
 			// =======================================================
 			// ★ IStateから「今叩きつけた！」という合図が来た瞬間だけ実行
 			// =======================================================
-			if (sm->GetIsAttackImpact())
+			if (sm->IsAttackImpact())
 			{
 				// 二重実行防止のため、すぐに合図をリセット
 				sm->SetAttackImpact(false);

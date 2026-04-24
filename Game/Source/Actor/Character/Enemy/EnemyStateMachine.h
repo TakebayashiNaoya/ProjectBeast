@@ -236,7 +236,7 @@ namespace app
 			/**
 			 * @brief 攻撃して叩きつけたかどうかを取得
 			 */
-			bool GetIsAttackImpact() const { return m_isAttackImpact; }
+			bool IsAttackImpact() const { return m_isAttackImpact; }
 
 
 		public:

@@ -354,8 +354,6 @@ namespace app
 		namespace
 		{
 			const float ATTACK_IMPACT_TIME = 0.5f;
-
-			const float IGLOO_BREAK_RANGE = 1000.0f;
 		}
 
 
