@@ -392,7 +392,7 @@ namespace app
 					EnEffectKind::IglooBreak,
 					iglooPos,
 					Quaternion::Identity,
-					Vector3(effectScale) // かまくらの大きさに合わせて調整
+					effectScale // かまくらの大きさに合わせて調整
 				);
 
 
