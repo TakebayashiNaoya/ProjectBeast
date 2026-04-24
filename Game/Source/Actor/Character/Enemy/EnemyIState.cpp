@@ -15,6 +15,9 @@
 #include "Source/Sound/SoundManager.h"
 #include <algorithm>
 
+#include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Manager/IglooManager.h"
+
 
 namespace app
 {
@@ -351,6 +354,8 @@ namespace app
 		namespace
 		{
 			const float ATTACK_IMPACT_TIME = 0.5f;
+
+			const float IGLOO_BREAK_RANGE = 1000.0f;
 		}
 
 
@@ -405,6 +410,8 @@ namespace app
 
 				SoundManager::Get().PlaySE(enSoundKind_EnemyAttack);
 
+				m_owner->SetAttackImpact(true);
+
 				// 発生済みフラグを立てる（何度も呼ばれないようにする）
 				m_hasFiredEffect = true;
 			}
@@ -412,7 +419,9 @@ namespace app
 
 
 		void EnemyAttackState::Exit()
-		{}
+		{
+			m_owner->SetAttackImpact(false);
+		}
 
 
 		EnemyAttackState::EnemyAttackState(EnemyStateMachine* owner)

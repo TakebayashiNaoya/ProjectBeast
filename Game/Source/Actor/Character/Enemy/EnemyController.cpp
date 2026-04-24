@@ -17,6 +17,8 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Manager/IglooManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Util/CRC32.h"
 
@@ -601,8 +603,16 @@ namespace app
 				float distSq = diff.LengthSq();
 
 				// 一定距離で攻撃
-				const float ATTACK_DIST = 80.0f;
-				if (distSq <= ATTACK_DIST * ATTACK_DIST)
+				float attackDist = 80.0f;
+				// ターゲットがかまくらの中にいるかチェック
+				const auto& insidePenguins = app::actor::IglooManager::GetInstance().GetInsidePenguins();
+				if (std::find(insidePenguins.begin(), insidePenguins.end(), enemy->m_foundPenguin) != insidePenguins.end())
+				{
+					// ★ 重要：かまくらの上に登らないよう、壁の手前で攻撃モーションに入る距離
+					attackDist = 200.0f;
+				}
+
+				if (distSq <= attackDist * attackDist)
 				{
 					return enEnemyState_Attack;
 				}
@@ -720,31 +730,146 @@ namespace app
 		/** 攻撃 */
 		void EnemyController::EnterAttack(EnemyController* enemy)
 		{
+			//auto* sm = enemy->m_target->GetEnemyStateMachine();
+
+			//sm->SetActionButtonX(true);
+			//sm->SetIsNearPenguin(true);
+
+			//// 子ペンギンにダメージを与える。体力が1なので即死する。
+			//if (enemy->m_foundPenguin != nullptr)
+			//{
+			//	enemy->m_foundPenguin->GetStateMachine()->Damage();
+			//	// ダングリングポインタ防止のためnullptrにリセットする。
+			//	enemy->m_foundPenguin = nullptr;
+			//}
+
+			//// 満腹処理
+			//enemy->m_eatCount++;
+			//if (enemy->m_eatCount >= enemy->m_maxEatCount)
+			//{
+			//	enemy->m_isFull = true;
+			//}
+
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
 
+			// 足を止めて攻撃フラグを立てる
+			sm->SetStickLAmount(0.0f);
+			sm->SetMoveVector(Vector3::Zero);
 			sm->SetActionButtonX(true);
 			sm->SetIsNearPenguin(true);
 
-			// 子ペンギンにダメージを与える。体力が1なので即死する。
+			// =======================================================
+			// 攻撃開始時点での状態を「記憶」する
+			// =======================================================
+			enemy->m_isTargetInsideIglooAtStart = false;
+			enemy->m_targetIglooKeyAtStart = "";
+
 			if (enemy->m_foundPenguin != nullptr)
 			{
-				enemy->m_foundPenguin->GetStateMachine()->Damage();
-				// ダングリングポインタ防止のためnullptrにリセットする。
-				enemy->m_foundPenguin = nullptr;
+				// ターゲットがかまくらの中にいるかチェック
+				const auto& insidePenguins = app::actor::IglooManager::GetInstance().GetInsidePenguins();
+				if (std::find(insidePenguins.begin(), insidePenguins.end(), enemy->m_foundPenguin) != insidePenguins.end())
+				{
+					enemy->m_isTargetInsideIglooAtStart = true;
+
+					// 壊すべきかまくらを特定して名前を覚えておく
+					Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+					enemy->m_targetIglooKeyAtStart = StageSystem::GetInstance()->GetNearestIglooKey(enemyPos);
+				}
 			}
 
-			// 満腹処理
-			enemy->m_eatCount++;
-			if (enemy->m_eatCount >= enemy->m_maxEatCount)
-			{
-				enemy->m_isFull = true;
-			}
+
+			//// =======================================================
+			//// ★ ここに追加：ターゲットがかまくらに逃げ込んでいるなら破壊！
+			//// =======================================================
+			//if (isTargetInsideIgloo)
+			//{
+			//	// エネミーの現在位置から一番近いかまくらを探す
+			//	Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			//	std::string targetIglooKey = StageSystem::GetInstance()->GetNearestIglooKey(enemyPos);
+
+			//	if (!targetIglooKey.empty())
+			//	{
+			//		Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition(targetIglooKey);
+			//		Vector3 diffToIgloo = iglooPos - enemyPos;
+			//		diffToIgloo.y = 0.0f;
+
+			//		// 距離判定 (モデルの中心点ズレを考慮して広めに1500.0f)
+			//		if (diffToIgloo.Length() < 1500.0f)
+			//		{
+			//			// かまくらを完全削除し、中身を弾き出す
+			//			StageSystem::GetInstance()->BreakIgloo(targetIglooKey);
+			//			IglooManager::GetInstance().EjectAllPenguins(iglooPos);
+			//		}
+			//	}
+			//}
+
+
+			//if (enemy->m_foundPenguin != nullptr)
+			//{
+			//	if (!isTargetInsideIgloo)
+			//	{
+			//		// かまくらに隠れていない場合のみ即死＆満腹カウントを進める
+			//		enemy->m_foundPenguin->GetStateMachine()->Damage();
+
+			//		enemy->m_eatCount++;
+			//		if (enemy->m_eatCount >= enemy->m_maxEatCount)
+			//		{
+			//			enemy->m_isFull = true;
+			//		}
+			//	}
+
+			//	// ダメージの有無にかかわらず、攻撃したら必ずターゲットを空にする
+			//	enemy->m_foundPenguin = nullptr;
+			//}
 		}
 
 
 		void EnemyController::UpdateAttack(EnemyController* enemy)
 		{
+			//// =======================================================
+			//// ★ ここに追加：ターゲットがかまくらに逃げ込んでいるなら破壊！
+			//// =======================================================
+			//if (isTargetInsideIgloo)
+			//{
+			//	// エネミーの現在位置から一番近いかまくらを探す
+			//	Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
+			//	std::string targetIglooKey = StageSystem::GetInstance()->GetNearestIglooKey(enemyPos);
 
+			//	if (!targetIglooKey.empty())
+			//	{
+			//		Vector3 iglooPos = StageSystem::GetInstance()->GetObjectPosition(targetIglooKey);
+			//		Vector3 diffToIgloo = iglooPos - enemyPos;
+			//		diffToIgloo.y = 0.0f;
+
+			//		// 距離判定 (モデルの中心点ズレを考慮して広めに1500.0f)
+			//		if (diffToIgloo.Length() < 1500.0f)
+			//		{
+			//			// かまくらを完全削除し、中身を弾き出す
+			//			StageSystem::GetInstance()->BreakIgloo(targetIglooKey);
+			//			IglooManager::GetInstance().EjectAllPenguins(iglooPos);
+			//		}
+			//	}
+			//}
+
+
+			//if (enemy->m_foundPenguin != nullptr)
+			//{
+			//	if (!isTargetInsideIgloo)
+			//	{
+			//		// かまくらに隠れていない場合のみ即死＆満腹カウントを進める
+			//		enemy->m_foundPenguin->GetStateMachine()->Damage();
+
+			//		enemy->m_eatCount++;
+			//		if (enemy->m_eatCount >= enemy->m_maxEatCount)
+			//		{
+			//			enemy->m_isFull = true;
+			//		}
+			//	}
+
+			//	// ダメージの有無にかかわらず、攻撃したら必ずターゲットを空にする
+			//	enemy->m_foundPenguin = nullptr;
+			//}
 		}
 
 

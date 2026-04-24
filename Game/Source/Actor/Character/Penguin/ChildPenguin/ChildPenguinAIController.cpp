@@ -311,15 +311,17 @@ namespace app
 			Vector3 dirToTarget = m_iglooTargetPos - myPos;
 			dirToTarget.y = 0.0f;
 
+			// 定数化して判定を明確にする
+			constexpr float ENTER_DISTANCE = 150.0f;
+
 			// 青い円に十分近づいたらワープ発動
-			if (dirToTarget.Length() < 150.0f)
+			if (dirToTarget.Length() < ENTER_DISTANCE)
 			{
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 
 				// 子ペンギンの現在位置を基準に最も近いイグルーの中心座標を取得
 				Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
 				Vector3 insidePos = iglooPos;
-				insidePos.y += 0.0f;
 
 				// 一列に並ぶのを防ぐため、浮動小数点で円形にばらけさせる
 				auto& engine = GetRandomEngine();
@@ -349,6 +351,15 @@ namespace app
 				}
 
 				m_isInsideIgloo = true;
+
+
+				// =========================================================
+				// ★ かまくらマネージャーにこの子ペンギンを格納（登録）する！
+				// =========================================================
+				IglooManager::GetInstance().AddPenguin(m_owner);
+
+				// マネージャーに入室完了を報告（イベント終了判定用）
+				ChildPenguinManager::GetInstance()->FinishEnterIglooOne();
 			}
 			else
 			{
@@ -378,6 +389,37 @@ namespace app
 			m_owner->GetCharacterController()->SetPosition(spawnPos);
 			m_stateMachine->SetPosition(spawnPos);
 		}
+
+
+		void ChildPenguinAIController::ForceEjectFromIgloo(const Vector3& iglooPos)
+		{
+			// 1. 各種イベントフラグを強制解除（通常のAI処理に戻すため）
+			m_isEnterIglooMode = false;
+			m_isInsideIgloo = false;
+			m_owner->SetInsideIgloo(false);
+
+			// 2. 弾き出される座標をランダムに散らす
+			// かまくらの中心(iglooPos)を基準に、周囲にランダムに配置します
+			auto& engine = GetRandomEngine();
+			std::uniform_real_distribution<float> offsetDist(-60.0f, 60.0f);
+
+			Vector3 spawnPos = iglooPos;
+			spawnPos.x += offsetDist(engine);
+			spawnPos.z += offsetDist(engine);
+
+			// 少し上空から落とすことで、弾き飛ばされた感を演出します
+			spawnPos.y += 50.0f;
+
+			// 3. キャラクターコントローラーとステートマシン両方をワープ
+			m_owner->GetCharacterController()->SetPosition(spawnPos);
+			m_owner->GetCharacterController()->RequestTeleport(); // ワープを確定
+			m_stateMachine->SetPosition(spawnPos);
+
+			// 4. 強制的に空中に放り出された判定にするため、入力をゼロにする
+			// （これによって自動的にジャンプ・落下ステート等へ遷移します）
+			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+		}
+
 
 
 		/**************************************************************/

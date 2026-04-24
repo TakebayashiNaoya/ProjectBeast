@@ -121,6 +121,15 @@ namespace app
 			 */
 			virtual const PenguinStatus* GetPenguinStatus() const override;
 
+			/**
+			 * @brief 親ペンギンのポインタを取得
+			 * @return 親ペンギンのポインタ
+			 */
+			DaddyPenguin* GetOwnerDaddyPenguin() const
+			{
+				return m_ownerDaddyPenguin;
+			}
+
 
 			/** ステートの変更先を取得する */
 			virtual core::IState* GetChangeState() override;
