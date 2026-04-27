@@ -123,10 +123,19 @@ float4 PSMain( PSInput In ) : SV_Target0
 		gaugeMask = step(g_startProgress, normalizedAngle) // start ~ 1.0 の部分
 				  * step(normalizedAngle, g_endProgress);  // 0.0 ~ 1.0 の部分
 	}
+	else
+	{
+		// 折り返しケース。(OR判定)
+		gaugeMask=max(
+			step(g_startProgress,normalizedAngle),
+			step(normalizedAngle,g_endProgress)
+		);
+	}
 
 	// 色を選んで最終出力を行う
 	// ゲージ色か背景色かを最後に決める
-	float4 color = lerp(g_bgColor, g_gaugeColor, gaugeMask);
+	float4 color = lerp(g_gaugeColor,g_bgColor,gaugeMask);
+	//float4 color = lerp(g_bgColor, g_gaugeColor, gaugeMask);
 	// gaugeMask = 0 → g_bgColor(背景色)
 	// gaugeMask = 1 → g_gaugeColor(ゲージ色)
 	color.a *= ringMask; // 円環エッジをフェードアウト(アンチエイリアス)

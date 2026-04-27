@@ -14,7 +14,7 @@ namespace app
 {
 	namespace ui
 	{
-		class UIAniamtionFactory
+		class UIAnimationFactory
 		{
 		public:
 			/**
@@ -45,7 +45,7 @@ namespace app
 			 * UIAnimationFactory::AttachParameter<UIColorAnimation>(gauge,Hash32("FadeIn"));
 			 */
 			template<typename T>
-			static bool AttachParameter(UIBase* target, uint32_t key)
+			static bool Attach(UIBase* target, uint32_t key)
 			{
 				if (!target)return false;
 
@@ -74,9 +74,12 @@ namespace app
 			 * @param anim 適用先のアニメーション
 			 * @param def アニメーションの定義
 			 */
-			static void ApplyParameter(UIVector2Animation* anim, UIAnimationDef& def)
+			static void ApplyParameter(UIVector2Animation* anim, const UIAnimationDef& def)
 			{
-				anim->SetParameter(def.startV2, def.endV2, def.duration, def.easingType, def.loopMode);
+				Vector2 start = def.startV2;
+				Vector2 end = def.endV2;
+				anim->SetParameter(start, end, def.duration, def.easingType, def.loopMode);
+				//anim->SetParameter(def.startV2, def.endV2, def.duration, def.easingType, def.loopMode);
 			}
 
 
@@ -85,9 +88,12 @@ namespace app
 			 * @pram anim 適用先のアニメーション
 			 * @param def アニメーションの定義
 			 */
-			static void ApplyParameter(UIVector3Animation* anim, UIAnimationDef& def)
+			static void ApplyParameter(UIVector3Animation* anim, const UIAnimationDef& def)
 			{
-				anim->SetParameter(def.startV3, def.endV3, def.duration, def.easingType, def.loopMode);
+				Vector3 start = def.startV3;
+				Vector3 end = def.endV3;
+				anim->SetParameter(start, end, def.duration, def.easingType, def.loopMode);
+				//anim->SetParameter(def.startV3, def.endV3, def.duration, def.easingType, def.loopMode);
 			}
 
 
@@ -96,9 +102,12 @@ namespace app
 			 * @param anim 適用先のアニメーション
 			 * @param def アニメーションの定義
 			 */
-			static void ApplyParameter(UIVector4Animation* anim, UIAnimationDef& def)
+			static void ApplyParameter(UIVector4Animation* anim, const UIAnimationDef& def)
 			{
-				anim->SetParameter(def.startV4, def.endV4, def.duration, def.easingType, def.loopMode);
+				Vector4 start = def.startV4;
+				Vector4 end = def.endV4;
+				anim->SetParameter(start, end, def.duration, def.easingType, def.loopMode);
+				//anim->SetParameter(def.startV4, def.endV4, def.duration, def.easingType, def.loopMode);
 			}
 		};
 	}

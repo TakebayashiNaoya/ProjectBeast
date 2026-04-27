@@ -1,0 +1,14 @@
+[
+    {
+        "comment":"シロクマの起床タイマー専用のステータス",
+        "timerFirstValue":30,
+        "timerSecondValue":20,
+        "timserThirdValue":10,
+        "timerFourthValue":0,
+        "offsetValueY":220,
+        "offsetValueX":20,
+        "greenColor":[ 0, 0.8, 0, 1],
+        "yellowColor":[ 1, 1, 0, 1],
+        "redColor":[ 1, 0, 0, 1]
+    }
+]

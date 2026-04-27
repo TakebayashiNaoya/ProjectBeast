@@ -307,8 +307,8 @@ namespace app
 			 * @param color 色
 			 */
 			void SetGaugeColor(const Vector4& color) { m_gaugeRender.SetMulColor(color); }
-
-			void SetMulColor(const Vector4& color) { m_gaugeRender.SetGaugeColor(color); }
+			
+			//void SetGaugeColor(const Vector4& color) { m_gaugeRender.SetGaugeColor(color); }
 			/**
 			 * @brief リング部分の色を設定
 			 * @param color 色

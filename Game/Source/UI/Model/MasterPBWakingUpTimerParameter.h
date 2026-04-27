@@ -17,7 +17,7 @@ namespace app
 		 */
 		struct MasterPBWakingUpTimerParameter : public core::IMasterParameter
 		{
-			appParameter(MasterPBWakingUpTimerParameter);
+			appParameter(MasterPBWakingUpTimerParameter); 
 #if defined(APP_PARAM_HOT_RELOAD)
 			void Load(const nlohmann::json& j)override
 			{
@@ -25,11 +25,15 @@ namespace app
 			}
 #endif
 			/** JSONから受け取る変数群 */
-			float m_timerFirstValue;
-			float m_timerSecondValue;
-			float m_timserThirdValue;
-			float m_timerFourthValue;
-			float m_offsetValue;
+			float timerFirstValue;
+			float timerSecondValue;
+			float timserThirdValue;
+			float timerFourthValue;
+			float offsetValueY;
+			float offsetValueX;
+			Vector4 greenColor;
+			Vector4 yellowColor;
+			Vector4 redColor;
 		};
 	}
 }

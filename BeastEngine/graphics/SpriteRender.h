@@ -179,7 +179,7 @@ namespace nsBeastEngine
 			float endProgress;
 			float innerRadius;
 			float outerRadius;
-			float rotaionAngle;
+			float rotationAngle;
 			float padding0;
 			float padding1;
 			float padding2;
@@ -358,12 +358,12 @@ namespace nsBeastEngine
 		 * @details
 		 * デフォルトは -PI / 2(12時が開始位置)
 		 */
-		void SetRotationAngle(float angle){ m_gaugeCb.rotaionAngle = angle; }
+		void SetRotationAngle(float angle){ m_gaugeCb.rotationAngle = angle; }
 		/**
 		 * @brief 回転オフセットを取得
 		 * @return 回転角度(ラジアン)
 		 */
-		float GetRotationAngle()const { return m_gaugeCb.rotaionAngle; }
+		float GetRotationAngle()const { return m_gaugeCb.rotationAngle; }
 
 		/**
 		 * @brief ゲージ部分の色を設定

@@ -70,6 +70,9 @@
     <Filter Include="Source\UI\Menus">
       <UniqueIdentifier>{30944312-e965-4979-af2e-1c87a106f0b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\Model">
+      <UniqueIdentifier>{0e5929f2-76bf-4cb2-813d-5ec9f0196b29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -313,9 +316,6 @@
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Menus\PBWakingUpTimerStatus.cpp">
-      <Filter>Source\UI\Menus</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Menus\RemainingChildMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -366,6 +366,21 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Parts\UIParts.cpp">
       <Filter>Source\UI\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\PBWakingUpTimerStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\MasterPBWakingUpTimerParameter.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\UIStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\UIAnimationStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\PBWakingUpTimerAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -609,9 +624,6 @@
     <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Menus\PBWakingUpTimerStatus.h">
-      <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Menus\RemainingChildMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
@@ -668,6 +680,24 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Parts\UIParts.h">
       <Filter>Source\UI\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\UIStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\UIAnimationStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UIAnimationTypes.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

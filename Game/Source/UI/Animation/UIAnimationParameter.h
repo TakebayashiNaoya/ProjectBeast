@@ -26,6 +26,7 @@ namespace app
 		{
 			uint32_t key;
 
+			// 値の種類。
 			enum class ValueType { Float, Vector2, Vector3, Vector4 };
 			ValueType valueType = ValueType::Float;
 

@@ -277,7 +277,7 @@ namespace app
 
 
 			/** UIアニメーションの情報を設定 */
-			void SetParameter(Vector3& start, Vector3& end, float timeSec, app::util::EasingType type, app::util::LoopMode loopMode)
+			void SetParameter(Vector3 start, Vector3 end, float timeSec, app::util::EasingType type, app::util::LoopMode loopMode)
 			{
 				m_start = start;
 				m_end = end;
@@ -365,7 +365,7 @@ namespace app
 
 
 			/** UIアニメーションの情報を設定 */
-			void SetParameter(Vector4& start, Vector4& end, float timeSec, app::util::EasingType type, app::util::LoopMode loopMode)
+			void SetParameter(Vector4 start, Vector4 end, float timeSec, app::util::EasingType type, app::util::LoopMode loopMode)
 			{
 				m_start = start;
 				m_end = end;

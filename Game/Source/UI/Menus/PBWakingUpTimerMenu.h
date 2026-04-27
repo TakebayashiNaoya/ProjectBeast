@@ -5,7 +5,8 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include "Source/UI/Layout.h"
+#include "Source/UI/Model/PBWakingUpTimerStatus.h"
+#include "Source/UI/Model/PBWakingUpTimerAnimStatus.h"
 
 
 namespace app
@@ -48,13 +49,23 @@ namespace app
 			 */
 			inline void SetDraw(bool isDraw) { m_isDraw = isDraw; }
 
+			/**
+			 * @brief リセット漏れを防ぐ
+			 */
+			void ResetTimer();
+
 
 		private:
-			/** シロクマの起床タイマーレイアウト */
-			std::unique_ptr<Layout>m_pbTimerLayout; 
+			/** シロクマの起床タイマー専用のアニメーションステータス */
+			std::unique_ptr<PBWakingUpTimerAnimStatus>m_pbAnimStatus;
+			/** シロクマの起床タイマー専用のステータス */
+			std::unique_ptr<PBWakingUpTimerStatus>m_pbTimerStatus;
 
 			/** 現在のタイマー値（外部から毎フレーム設定される） */
 			float m_currentPBTime = 0.0f;
+
+			/** 最初から緑から黄色になるフラグ */
+			bool m_isGreenPlayed;
 
 			/** 黄色になる瞬間のフラグ */
 			bool m_isYellowPlayed;

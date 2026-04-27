@@ -1,0 +1,44 @@
+{
+    "animations":[
+      {
+        "comment":"シロクマの起床タイマーアニメーション(緑→黄：30=20秒)",
+        "key":"greenLerpAnim",
+        "valueType":"Vector4",
+        "startValue":{"x":0.0,"y":0.8,"z":0.0,"w":1.0},
+        "endValue":{"x":1.0,"y":1.0,"z":0.0,"w":1.0},
+        "duration":10,
+        "easing":"Linear",
+        "loop":"Once"
+      },
+      {
+        "comment":"シロクマの起床タイマーアニメーション(黄→赤：20=10秒)",
+        "key":"yellowLerpAnim",
+        "valueType":"Vector4",
+        "startValue":{"x":1.0,"y":1.0,"z":0.0,"w":1.0},
+        "endValue":{"x":1.0,"y":0.0,"z":0.0,"w":1.0},
+        "duration":11,
+        "easing":"Linear",
+        "loop":"Once"
+      },
+      {
+        "comment":"シロクマの起床タイマーアニメーション(赤 : 10=0秒)",
+        "key":"redAnim",
+        "valueType":"Vector4",
+        "startValue":{"x":1.0,"y":0.0,"z":0.0,"w":1.0},
+        "endValue":{"x":1.0,"y":0.0,"z":0.0,"w":1.0},
+        "duration":10,
+        "easing":"Linear",
+        "loop":"Once"
+      },
+      {
+        "comment":"シロクマの起床タイマーの長針",
+        "key":"rotationAnim",
+        "valueType":"Vector4",
+        "startValue":{ "x":0.0, "y":0.0, "z":0.0, "w":0.0 },
+        "endValue":{"x":0.0, "y":0.0, "z":1.0, "w":0.0},
+        "duration":30,
+        "easing":"Linear",
+        "loop":"Once"
+      }
+    ]
+}
