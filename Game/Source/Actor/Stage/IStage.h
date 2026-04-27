@@ -52,6 +52,18 @@ namespace app
 			 */
 			void SetIsNeedCollision(const bool needCollision) { m_IsNeedCollision = needCollision; }
 
+			/**
+			 * @brief 表示状態を設定する
+			 * @param isVisible 表示する場合はtrue
+			 */
+			void SetIsVisible(const bool isVisible) { m_isVisible = isVisible; }
+
+			/**
+			 * @brief 表示状態を取得する
+			 * @return 表示状態
+			 */
+			bool IsVisible() const { return m_isVisible; }
+
 		private:
 			/** 物理判定が必要かどうか */
 			bool m_IsNeedCollision;
@@ -67,6 +79,10 @@ namespace app
 			std::string m_pendingModelPath;
 			/** TKM非同期ローダー */
 			nsBeastEngine::TkmModelLoader m_tkmLoader;
+
+
+		private:
+			bool m_isVisible = true;
 		};
 	}
 }

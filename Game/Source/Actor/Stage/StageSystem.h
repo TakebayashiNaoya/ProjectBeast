@@ -132,6 +132,20 @@ namespace app
 			Quaternion GetNearestIglooRotation(const Vector3& from) const;
 
 
+			/**
+			 * @brief 指定したかまくら（イグルー）を破壊（無効化）する
+			 * @param key かまくらのオブジェクトキー
+			 */
+			void BreakIgloo(const std::string& key);
+
+			/**
+			 * @brief from に最も近いイグルーのキー（名前）を返す
+			 * @param from 基準座標（シロクマの攻撃着弾点など）
+			 * @return 最近傍イグルーのキー。該当なしの場合は空文字列
+			 */
+			std::string GetNearestIglooKey(const Vector3& from) const;
+
+
 
 		private:
 			/** シングルトンインスタンス */

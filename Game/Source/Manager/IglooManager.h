@@ -11,6 +11,7 @@ namespace app
 	namespace actor
 	{
 		class ChildPenguin;
+		class DaddyPenguin;
 
 		class IglooManager {
 		public:
@@ -47,6 +48,16 @@ namespace app
 			// 中にいるペンギンのリストを取得
 			const std::vector<ChildPenguin*>& GetInsidePenguins() const { return m_insidePenguinList; }
 
+			/** かまくらが壊れた時に呼ばれる処理 */
+			void EjectAllPenguins(const Vector3& iglooPosition);
+
+			// =================================================
+			// ★ 追加：親ペンギンの出入りを管理する
+			// =================================================
+			void SetInsideDaddy(DaddyPenguin* daddy) { m_insideDaddy = daddy; }
+			DaddyPenguin* GetInsideDaddy() const { return m_insideDaddy; }
+
+
 		private:
 			IglooManager() = default;
 			~IglooManager() = default;
@@ -56,6 +67,8 @@ namespace app
 			static IglooManager* m_instance;
 
 			std::vector<ChildPenguin*> m_insidePenguinList;
+
+			DaddyPenguin* m_insideDaddy = nullptr;
 		};
 	}
 }

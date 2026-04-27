@@ -239,6 +239,9 @@ namespace app
 			float m_attackTimer;
 			float m_attackDuration;
 			bool m_isAttacking;
+			bool m_isTargetInsideIglooAtStart = false; // 攻撃開始時にターゲットが中にいたか
+			std::string m_targetIglooKeyAtStart = "";  // 狙っているかまくらのキー
+
 
 			/** スタック検出：前回チェック時の座標 */
 			Vector3 m_lastCheckPosition = Vector3::Zero;
