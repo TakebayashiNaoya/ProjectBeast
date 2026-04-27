@@ -16,6 +16,7 @@
 #include "Source/Camera/LoseCamera.h"
 #include "Source/Camera/WinCamera.h"
 #include "Source/Effect/EffectManager.h"
+#include "Source/Manager/IglooManager.h"
 #include "Source/Sound/SoundManager.h"
 
 
@@ -260,22 +261,45 @@ namespace app
 
 		void DaddyPenguinInsideIglooState::Enter()
 		{
+			//m_owner->PlayAnimation(EnPenguinAnimationID::IdleStanding);
+
+			//// 現在地を基準に最も近いイグルーの座標と回転を取得
+			//const Vector3 myPos = m_owner->GetTransform().m_position;
+			//Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
+			//Quaternion iglooRot = StageSystem::GetInstance()->GetNearestIglooRotation(myPos);
+			//Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
+			//iglooRot.Apply(forwardVec);
+
+			//// コントローラーと同じ距離（青い円の中心）
+			//Vector3 interactPos = iglooPos + (forwardVec * 150.0f);
+
+			//// =========================================================
+			//// ★ ここで「引数1つ」で呼ぶのが大正解です！
+			//ChildPenguinManager::GetInstance()->StartIglooEvent(interactPos);
+			//// =========================================================
+
+
+
+			// 1. 中での待機アニメーションを再生
 			m_owner->PlayAnimation(EnPenguinAnimationID::IdleStanding);
 
-			// 現在地を基準に最も近いイグルーの座標と回転を取得
+			// 2. シロクマに壊された時に一緒に弾き出されるよう、IglooManagerに登録
+			// ※ m_owner から DaddyPenguin のポインタを取得して渡します
+			// （もし以下の行でコンパイルエラーが出る場合は、環境に合わせて親ペンギンのポインタ取得関数に書き換えてください）
+			DaddyPenguin* daddy = m_owner->GetOwnerDaddyPenguin();
+			IglooManager::GetInstance().SetInsideDaddy(daddy);
+
+			// ★ 修正：親が中に入った後に、子ペンギンたちを呼び寄せる（元の安全な状態）
+			// 入り口の座標を再計算して渡します
 			const Vector3 myPos = m_owner->GetTransform().m_position;
 			Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
 			Quaternion iglooRot = StageSystem::GetInstance()->GetNearestIglooRotation(myPos);
 			Vector3 forwardVec = Vector3(-1.0f, 0.0f, 0.0f);
 			iglooRot.Apply(forwardVec);
+			Vector3 entrancePos = iglooPos + (forwardVec * 150.0f);
 
-			// コントローラーと同じ距離（青い円の中心）
-			Vector3 interactPos = iglooPos + (forwardVec * 150.0f);
-
-			// =========================================================
-			// ★ ここで「引数1つ」で呼ぶのが大正解です！
-			ChildPenguinManager::GetInstance()->StartIglooEvent(interactPos);
-			// =========================================================
+			// 子供たちに合図を出す
+			ChildPenguinManager::GetInstance()->StartIglooEvent(entrancePos);
 		}
 
 
@@ -309,6 +333,8 @@ namespace app
 		void DaddyPenguinInsideIglooState::Exit()
 		{
 			m_owner->SetIsInsideIgloo(false);
+
+			IglooManager::GetInstance().ClearPenguins();
 		}
 
 

@@ -42,6 +42,7 @@ namespace app
 		enSoundKind_CountDown,
 		enSoundKind_GameStart,
 		enSoundKind_ResultCheck,
+		enSoundKind_IglooBreak,
 
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
@@ -100,6 +101,7 @@ namespace app
 		SoundInformation("Assets/sound/SE/AS_259345_ピッ＿ゲームなどセレクト音.wav"),
 		SoundInformation("Assets/sound/SE/AS_879314_パンッ！スターターピストル（単発）.wav"),
 		SoundInformation("Assets/sound/SE/result/AS_120845_【鉛筆01-04（直線）】.wav"),
+		SoundInformation("Assets/sound/SE/igloo/iglooBreak.wav"),
 
 
 		//BGM

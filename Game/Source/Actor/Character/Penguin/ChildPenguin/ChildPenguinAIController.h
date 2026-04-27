@@ -65,6 +65,13 @@ namespace app
 			void EndEnterIglooEvent(const Vector3& exitPos);
 
 
+			/**
+			 * @brief かまくらが壊された時の強制排出処理（★ 追加）
+			 * @param iglooPos 壊されたかまくらの中心座標
+			 */
+			void ForceEjectFromIgloo(const Vector3& iglooPos);
+
+
 		protected:
 			/**
 			 * @brief DaddyPenguinへの方向ベクトルを計算

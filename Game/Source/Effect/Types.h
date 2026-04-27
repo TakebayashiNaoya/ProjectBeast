@@ -14,6 +14,7 @@ enum class EnEffectKind : uint8_t
 	DaddyPenguinCommand = Kind,
 	EnemyAttack,
 	Whirlpool,
+	IglooBreak,
 	Max,
 	None = Max,
 };
@@ -33,6 +34,7 @@ static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Ma
 {
 	EffectInformation(u"Assets/effect/DaddyPenguinCommand.efk"),
 	EffectInformation(u"Assets/effect/enemy/EnemyAttack.efk"),
-	EffectInformation(u"Assets/effect/whirlpool/Whirlpool.efk")
+	EffectInformation(u"Assets/effect/whirlpool/Whirlpool.efk"),
+	EffectInformation(u"Assets/effect/stage/igloo/IglooBreak.efk"),
 };
 

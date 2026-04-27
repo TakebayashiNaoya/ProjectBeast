@@ -108,6 +108,8 @@ namespace app
 
 		void ChildPenguin::Start()
 		{
+			/** スケールを初期化 */
+			m_transform.m_scale = CHILD_PENGUIN_SCALE;
 			PenguinBase::Start();
 		}
 
