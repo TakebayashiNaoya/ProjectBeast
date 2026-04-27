@@ -34,9 +34,8 @@ namespace nsBeastEngine
 			, padding0(0.0f)
 			, m_color(Vector3::Zero)
 			, padding1(0.0f)
-			//, m_LVP(Matrix::Identity)
-		{
-		}
+			, m_LVP(Matrix::Identity)
+		{}
 
 		/**
 		 * @brief ディレクションライトの方向の設定
@@ -77,14 +76,15 @@ namespace nsBeastEngine
 			SetColor({ x,y,z });
 		}
 
-		/**
-		 * @brief ライトビュープロジェクション行列の設定
-		 * @param LVP ライトビュープロジェクション行列
-		 */
-		void UpdateLVP(const Matrix LVP)
-		{
-			//m_LVP = LVP;
-		}
+		///**
+		// * @brief ライトビュープロジェクション行列の設定
+		// * @param LVP ライトビュープロジェクション行列
+		// * @note シャドウマップの生成に使用される行列を設定する
+		// */
+		//void UpdateLVP(const Matrix LVP)
+		//{
+		//	m_LVP = LVP;
+		//}
 	};
 
 
@@ -116,8 +116,7 @@ namespace nsBeastEngine
 			, m_range(0.0f)
 			, m_positionInView(Vector3::Zero)
 			, padding(0.0f)
-		{
-		}
+		{}
 
 		/**
 		 * @brief 位置の設定
@@ -186,6 +185,9 @@ namespace nsBeastEngine
 	/*******************************************************/
 
 
+	/**
+	 * @brief スポットライトの構造体
+	 */
 	struct SSpotLight
 	{
 		Vector3 m_position;			/** 位置 */
@@ -210,8 +212,7 @@ namespace nsBeastEngine
 			, m_angle(0.0f)
 			, m_positionInView(Vector3::Zero)
 			, padding(0.0f)
-		{
-		}
+		{}
 
 		/**
 		 * @brief 位置の設定
@@ -331,8 +332,7 @@ namespace nsBeastEngine
 			, m_skyColor(Vector3::Zero)
 			, padding1(0.0f)
 			, m_groundNormal(Vector3::Up)
-		{
-		}
+		{}
 
 		/**
 		 * @brief 地面の色の設定
@@ -404,26 +404,30 @@ namespace nsBeastEngine
 	 */
 	struct Light
 	{
-		SDirectionLight		m_drectionLight;				/** シーンディレクションライト */
-		SPointLight			m_pointLight[MAX_POINT_LIGHT];	/** ポイントライト */
-		SSpotLight			m_spotLight[MAX_SPOT_LIGHT];	/** スポットライト */
-		SHemisphereLight	m_hemisphereLight;				/** 半球ライト */
-		int					m_usedPointLightCount;			/** ポイントライトの使用数 */
-		Vector3				m_cameraPosition;				/** カメラの座標 */
-		int					m_usedSpotLightCount;			/** スポットライトの使用数 */
-		Vector3				m_ambientLightColor;			/** 環境光の色 */
+		SDirectionLight		m_directionLight;				// ディレクションライト
+		// 現在未使用（実装時に有効化）						
+		//SPointLight		m_pointLight[MAX_POINT_LIGHT];	// ポイントライト
+		//SSpotLight		m_spotLight[MAX_SPOT_LIGHT];	// スポットライト
+		//SHemisphereLight	m_hemisphereLight;				// 半球ライト
+		//int				m_usedPointLightCount;			// 使用中のポイントライトの数
+		//int				m_usedSpotLightCount;			// 使用中のスポットライトの数
+		Vector3				m_cameraPosition;				// カメラの位置
+		float				padding0;						// パディング（16バイトアラインメントのため）
+		Vector3				m_ambientLightColor;			// 環境光の色
+		float				padding1;						// パディング（16バイトアラインメントのため）
+		Matrix				m_mViewProjInv;					// カメラのビュープロジェクション行列の逆行列
 
 
 		/**
 		 * @brief コンストラクタ
 		 */
 		Light()
-			: /*m_usedPointLightCount(0)
-			, */m_cameraPosition(Vector3::Zero)
-			, m_usedSpotLightCount(0)
+			: m_cameraPosition(Vector3::Zero)
+			, padding0(0.0f)
 			, m_ambientLightColor(Vector3::Zero)
-		{
-		}
+			, padding1(0.0f)
+			, m_mViewProjInv(Matrix::Identity)
+		{}
 
 		/**
 		 * @brief カメラの位置の設定
@@ -477,7 +481,7 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief ディレクションライトの位置の設定
-		 * @param pos ディクションライトの位置
+		 * @param pos ディレクションライトの位置
 		 */
 		void SetLightPos(const Vector3& pos)
 		{
@@ -485,38 +489,17 @@ namespace nsBeastEngine
 		}
 
 		/**
-		 * @brief ディレクションライトの位置の設定
-		 * @param x x座標
-		 * @param y y座標
-		 * @param z z座標
+		 * @brief ディレクションライトの位置をリセットする
 		 */
-		void RemoveLightPos() {
+		void RemoveLightPos()
+		{
 			m_lightPosition = Vector3::Zero;
 		}
 
 		/**
-		 * @brief 新規ポイントライトを登録
-		 * @return 登録されたポイントライトのポインタ。登録できなかった場合はnullptr。
+		 * @brief ライトの取得
+		 * @return ライト
 		 */
-		SPointLight* NewPointLight();
-
-		/**
-		 * @brief 新規スポットライトを登録
-		 * @return 登録されたスポットライトのポインタ。登録できなかった場合はnullptr。
-		 */
-		SSpotLight* NewSpotLight();
-
-		/**
-		 * @brief 半球ライトの取得
-		 */
-		 //SHemisphereLight* GetHemisphereLight()
-		 //{
-		 //	return &m_light.m_hemisphereLight;
-		 //}
-
-		 /**
-		  * @brief ライトの取得
-		  */
 		Light* GetLight()
 		{
 			return &m_light;
@@ -529,8 +512,23 @@ namespace nsBeastEngine
 		{
 			static Matrix m;
 			return m;
-			//return m_light.m_drectionLight.m_LVP;
+			//return m_light.m_directionLight.m_LVP;
 		}
+
+		// 現在未使用（実装時に有効化）
+		///**
+		// * @brief ポイントライトの生成
+		// */
+		//SPointLight* NewPointLight();
+		///**
+		// * @brief スポットライトの生成
+		// */
+		//SSpotLight* NewSpotLight();
+		///**
+		// * @brief 半球ライトの取得
+		// * @return 半球ライト
+		// */
+		//SHemisphereLight* GetHemisphereLight() { return &m_light.m_hemisphereLight; }
 
 
 	public:
@@ -543,9 +541,11 @@ namespace nsBeastEngine
 	private:
 		/** ディレクションライトの位置 */
 		Vector3 m_lightPosition = Vector3::Zero;
-		/** 未使用のポイントライトのキュー */
-		std::deque< SPointLight* > m_unusePointLightQueue;
-		/** 未使用のスポットライトのキュー */
-		std::deque< SSpotLight* > m_unuseSpotLightQueue;
+
+		//// 現在未使用（実装時に有効化）
+		///** 使用されていないポイントライトのキュー */
+		//std::deque<SPointLight*> m_unusePointLightQueue;
+		///** 使用されていないスポットライトのキュー */
+		//std::deque<SSpotLight*> m_unuseSpotLightQueue;
 	};
 };

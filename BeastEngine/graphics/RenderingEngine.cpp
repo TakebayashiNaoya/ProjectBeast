@@ -23,12 +23,84 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Init()
 	{
+		// メインレンダリングターゲットの初期化
 		InitMainRenderTarget();
+
+		// Gバッファの初期化
+		InitGBuffer();
+
+		// ディファードライティング用のスプライトの初期化
+		InitDefferedLightingSprite();
+
+		// メインレンダリングターゲットの内容をフレームバッファにコピーするためのスプライトの初期化
 		InitCopyMainRenderTargetToFrameBufferSprite();
-		// m_shadowMapRender.Init(); // ★一時コメントアウト
-		// m_postEffect.Init(m_mainRenderTarget); // ★一時コメントアウト
+
+		// m_shadowMapRender.Init();
+		// m_postEffect.Init(m_mainRenderTarget);
+
+		// 2D描画用のレンダリングターゲットの初期化
 		Init2DRenderTarget();
+
 		m_sceneLight.Init();
+	}
+
+
+	void RenderingEngine::InitGBuffer()
+	{
+		// アルベドカラー用のターゲットを作成
+		m_gBuffer[enGBuffer_Albedo].Create(
+			g_graphicsEngine->GetFrameBufferWidth(),
+			g_graphicsEngine->GetFrameBufferHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_D32_FLOAT
+		);
+
+		//法線用のターゲットを作成
+		m_gBuffer[enGBuffer_Normal].Create(
+			g_graphicsEngine->GetFrameBufferWidth(),
+			g_graphicsEngine->GetFrameBufferHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			DXGI_FORMAT_UNKNOWN
+		);
+
+		//スペキュラカラー用のターゲットを作成
+		m_gBuffer[enGBuffer_Specular].Create(
+			g_graphicsEngine->GetFrameBufferWidth(),
+			g_graphicsEngine->GetFrameBufferHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			DXGI_FORMAT_UNKNOWN
+		);
+	}
+
+
+	void RenderingEngine::InitDefferedLightingSprite()
+	{
+		BeginGPUEvent("DefferedLightingSprite");
+		//ディファードライティングを行うためのスプライトを初期化
+		SpriteInitData spriteInitData;
+		spriteInitData.m_width = FRAME_BUFFER_W;
+		spriteInitData.m_height = FRAME_BUFFER_H;
+
+		// ディファードライティングで使用するテクスチャを設定
+		spriteInitData.m_textures[enGBuffer_Albedo] = &m_gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
+		spriteInitData.m_textures[enGBuffer_Normal] = &m_gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
+		spriteInitData.m_textures[enGBuffer_Specular] = &m_gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
+		//spriteInitData.m_textures[enGBufferShadow] = &m_shadow.GetShadowTarget().GetRenderTargetTexture();
+
+
+		spriteInitData.m_fxFilePath = "Assets/shader/deferredLighting.fx";
+
+		spriteInitData.m_expandConstantBuffer = m_sceneLight.GetLight();
+		spriteInitData.m_expandConstantBufferSize = sizeof(Light);
+
+		// ディファードレンダリング用のスプライトを初期化
+		m_diferredLightingSprite.Init(spriteInitData);
 	}
 
 
@@ -40,9 +112,18 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
 	{
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-		rc.ClearRenderTargetView(m_mainRenderTarget);
-		RenderToShadowMap(rc);
+		//rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+		//rc.ClearRenderTargetView(m_mainRenderTarget);
+		//RenderToShadowMap(rc);
+
+		// G-Bufferへの描画処理
+		RenderToGBuffer(rc);
+
+		// ディファードライティングの描画処理
+		DeferredLighting(rc);
+
+		// フォワードレンダリングの描画処理
+		ForwardRendering(rc);
 
 		// 自然オブジェクトを描画する（モデルより先に描画）
 		for (auto* obj : m_natureObjects)
@@ -50,16 +131,20 @@ namespace nsBeastEngine
 			obj->Render(rc);
 		}
 
-		for (auto model : m_registerModels)
-		{
-			model->Draw(rc);
-		}
+		// m_postEffect.Render(rc, m_mainRenderTarget);
 
-		// m_postEffect.Render(rc, m_mainRenderTarget); // ★一時コメントアウト
+		// エフェクトを描画
 		EffectEngine::GetInstance()->Draw();
+
+		// 2D描画処理
 		Render2D(rc);
+
+		// メインレンダリングターゲットの内容をフレームバッファにコピー
 		CopyMainRenderTargetToFrameBufferSprite(rc);
-		m_registerModels.clear();
+
+		// 描画オブジェクトのリストをクリア
+		m_deferredModelList.clear();
+		m_forwardModelList.clear();
 		m_renderObjects.clear();
 	}
 
@@ -108,11 +193,77 @@ namespace nsBeastEngine
 	{
 		// BeginGPUEvent("RenderShadowmap");
 
-		// m_shadowMapRender.Render(rc, m_renderObjects); // ★一時コメントアウト
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+		// m_shadowMapRender.Render(rc, m_renderObjects);
+		// rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		// rc.SetRenderTargetAndViewport(m_mainRenderTarget);
 
 		// EndGPUEvent();
+	}
+
+
+	void RenderingEngine::RenderToGBuffer(RenderContext& rc)
+	{
+		BeginGPUEvent("RenderToGBuffer");
+		// レンダリングターゲットをG-Bufferに変更して書き込む
+		RenderTarget* rts[] = {
+			&m_gBuffer[enGBuffer_Albedo]   // 0番目のレンダリングターゲット
+			,&m_gBuffer[enGBuffer_Normal]   // 1番目のレンダリングターゲット
+			,&m_gBuffer[enGBuffer_Specular] // 2番目のレンダリングターゲット
+		};
+
+		// まず、レンダリングターゲットとして設定できるようになるまで待つ
+		rc.WaitUntilToPossibleSetRenderTargets(ARRAYSIZE(rts), rts);
+
+		// レンダリングターゲットを設定
+		rc.SetRenderTargets(ARRAYSIZE(rts), rts);
+
+		// レンダリングターゲットをクリア
+		rc.ClearRenderTargetViews(ARRAYSIZE(rts), rts);
+
+		// まとめてモデルレンダーを描画
+		for (auto& MobjData : m_deferredModelList)
+		{
+			MobjData->OnDraw(rc);
+		}
+
+		// レンダリングターゲットへの書き込み待ち
+		rc.WaitUntilFinishDrawingToRenderTargets(ARRAYSIZE(rts), rts);
+	}
+
+
+	void RenderingEngine::DeferredLighting(RenderContext& rc)
+	{
+		//GetSceneLight().SetEyePos(g_camera3D->GetPosition());
+		// カメラの逆行列を定数バッファにセット
+		//GetSceneLight().SetCameraViewProjInv(g_camera3D->GetViewProjectionMatrixInv());
+
+		// レンダリング先をメインレンダリングターゲットにする
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+		// G-Bufferの内容を元にしてディファードライティング
+		m_diferredLightingSprite.Draw(rc);
+
+		// メインレンダリングターゲットへの書き込み終了待ち
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+	}
+
+
+	void RenderingEngine::ForwardRendering(RenderContext& rc)
+	{
+		// レンダリング先をメインレンダリングターゲットにする
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		rc.SetRenderTarget(
+			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
+			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
+		);
+
+		// フォワードレンダリングで描画するオブジェクトを描画
+		for (auto& renderObj : m_forwardModelList) {
+			renderObj->OnDraw(rc);
+		}
+
+		// メインレンダリングターゲットへの書き込み終了待ち
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 	}
 
 
@@ -137,16 +288,13 @@ namespace nsBeastEngine
 
 	void RenderingEngine::InitMainRenderTarget()
 	{
-		float clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-
 		m_mainRenderTarget.Create(
 			g_graphicsEngine->GetFrameBufferWidth(),
 			g_graphicsEngine->GetFrameBufferHeight(),
 			1,
 			1,
 			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			DXGI_FORMAT_D32_FLOAT,
-			clearColor
+			DXGI_FORMAT_D32_FLOAT
 		);
 	}
 

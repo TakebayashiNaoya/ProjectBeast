@@ -13,7 +13,7 @@ namespace nsBeastEngine
 		: m_pointLight(nullptr)
 	{
 		/** ポイントライトを取得 */
-		m_pointLight = g_sceneLight->NewPointLight();
+		//m_pointLight = g_sceneLight->NewPointLight();
 	}
 
 

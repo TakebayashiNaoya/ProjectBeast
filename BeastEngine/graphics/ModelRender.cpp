@@ -48,6 +48,9 @@ namespace nsBeastEngine
 
 		// モデル初期化
 		m_model.Init(modelInitData);
+
+		// GBuffer描画用のモデルを初期化
+		InitRenderToGBufferModel(modelInitData);
 	}
 
 
@@ -81,6 +84,9 @@ namespace nsBeastEngine
 		// モデル初期化
 		m_model.Init(modelInitData);
 
+		// GBuffer描画用のモデルを初期化
+		InitRenderToGBufferModel(modelInitData);
+
 		// アニメーション初期化
 		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr) {
 			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
@@ -88,16 +94,27 @@ namespace nsBeastEngine
 	}
 
 
-	void ModelRender::InitOcean(ModelInitData& initData, const char* tkmFilePath)
+	void ModelRender::InitRenderToGBufferModel(const ModelInitData& baseInitData)
 	{
-		m_isFowardRender = true;
-		m_enableReflection[ReflectLayer::enOcean] = false;
+		ModelInitData gBufferInitData = baseInitData;
 
-		initData.m_colorBufferFormat[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		m_frowardRenderModel.Init(initData);
-		m_frowardRenderModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
-		//InitModelOnZprepass(tkmFilePath, enModelUpAxisZ);
-		//InitInstancingDraw(1);
+		// GBuffer書き込み用シェーダーに差し替える
+		gBufferInitData.m_fxFilePath = "Assets/shader/RenderToGBuffer.fx";
+
+		// エントリーポイントを明示的に設定する
+		gBufferInitData.m_vsEntryPointFunc = "VSMain";
+		gBufferInitData.m_vsSkinEntryPointFunc = "VSMainSkin";
+
+		// シャドウは現在未実装のためPSMainを使用
+		// シャドウ実装時はPSMainShadowRecieverに切り替える
+		gBufferInitData.m_psEntryPointFunc = "PSMain";
+
+		// GBufferのカラーバッファフォーマットを設定する
+		gBufferInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// アルベド
+		gBufferInitData.m_colorBufferFormat[1] = DXGI_FORMAT_R8G8B8A8_UNORM;		// 法線
+		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R8G8B8A8_UNORM;		// スペキュラ
+
+		m_renderToGBufferModel.Init(gBufferInitData);
 	}
 
 
@@ -184,7 +201,7 @@ namespace nsBeastEngine
 		modelInitData.m_vsSkinEntryPointFunc = "VSMain";
 		/** アニメーションがある場合 */
 		if (m_animationClips != nullptr) {
-			modelInitData.m_vsSkinEntryPointFunc = "VSSkinMain";
+			modelInitData.m_vsSkinEntryPointFunc = "VSMainSkin";
 		}
 	}
 
@@ -192,6 +209,7 @@ namespace nsBeastEngine
 	void ModelRender::UpdateWorldMatrixInModes()
 	{
 		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_renderToGBufferModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 	}
 
@@ -213,12 +231,35 @@ namespace nsBeastEngine
 
 	void ModelRender::Draw(RenderContext& rc)
 	{
-		if (m_isFowardRender) {
-			g_renderingEngine->RegisterModel(&m_frowardRenderModel);
+		if (!m_visible) return;
+
+		// Note:インスタンシング描画は現状使わない
+		//if (m_isEnableInstancingDraw) {
+		//	m_worldMatrixArraySB.Update(m_worldMatrixArray.get());
+		//}
+
+		if (!m_isFowardRender) {
+			//ディファードレンダリングで描画するなら
+			g_renderingEngine->AddDeferredModelList(this);
 		}
 		else {
-			g_renderingEngine->RegisterModel(&m_model);
+			//フォワードレンダリングで描画するなら
+			g_renderingEngine->AddForwardModelList(this);
 		}
-		g_renderingEngine->AddRenderObject(this);
+	}
+
+
+	void ModelRender::OnDraw(RenderContext& rc)
+	{
+		/** 描画が有効でない場合は処理しない */
+		if (!m_visible) return;
+
+		/** フォワードレンダリング用のモデルが有効な場合はそちらを描画し、そうでない場合は通常のモデルを描画する */
+		if (m_isFowardRender) {
+			m_frowardRenderModel.Draw(rc, m_maxInstance);
+		}
+		else {
+			m_renderToGBufferModel.Draw(rc, m_maxInstance);
+		}
 	}
 }

@@ -123,13 +123,6 @@ namespace nsBeastEngine
 			int numAnimationClips = 0
 		);
 
-		/**
-		 * @brief 海の初期化用関数
-		 * @param initData		モデルの初期化データ
-		 * @param tkmFilePath	tkmファイルのファイルパス
-		 */
-		void InitOcean(ModelInitData& initData, const char* tkmFilePath);
-
 		void InitModelOnZprepass(const char* tkmFilePath, EnModelUpAxis modelUpAxis, bool isSkyCube);
 
 		/**
@@ -147,6 +140,8 @@ namespace nsBeastEngine
 		 * @param rc レンダリングコンテキスト
 		 */
 		void Draw(RenderContext& rc);
+
+		void OnDraw(RenderContext& rc);
 
 		/**
 		 * @brief アニメーションイベントリスナーの登録
@@ -199,6 +194,12 @@ namespace nsBeastEngine
 		);
 
 		/**
+		 * @brief GBuffer描画用モデルの初期化
+		 * @param baseInitData m_modelの初期化データをベースに使用する
+		 */
+		void InitRenderToGBufferModel(const ModelInitData& baseInitData);
+
+		/**
 		 * @brief シェーダーのエントリーポイントの設定
 		 * @param modelInitData モデルの初期化データ
 		 */
@@ -244,6 +245,10 @@ namespace nsBeastEngine
 		std::map<ReflectLayer, bool> m_enableReflection;
 		/** フォワードレンダリングで描画されるモデル */
 		Model m_frowardRenderModel;
+		/** Gバッファに描画されるモデル */
+		Model m_renderToGBufferModel;
+		/** 描画するかどうか */
+		bool  m_visible = true;
 		/** インスタンシング描画が有効か */
 		bool m_isEnableInstancingDraw = false;
 		/** ワールド行列の配列のストラクチャードバッファ */

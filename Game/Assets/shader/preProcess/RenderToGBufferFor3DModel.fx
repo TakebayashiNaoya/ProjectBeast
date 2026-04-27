@@ -99,8 +99,9 @@ SPSOut PSMainCore( SPSIn psIn, int isShadowReciever)
 
     psOut.albedo.w = psIn.pos.z;
     // 法線を出力
-    psOut.normal.xyz = GetNormalFromNormalMap( 
-        psIn.normal, psIn.tangent, psIn.biNormal, psIn.uv ) ;
+    // 法線を0~1の範囲にエンコードして出力
+    float3 encodedNormal = GetNormalFromNormalMap(psIn.normal, psIn.tangent, psIn.biNormal, psIn.uv);
+    psOut.normal.xyz = (encodedNormal + 1.0f) * 0.5f;
     psOut.normal.w = 1.0f;
     // メタリックスムースを出力。
     psOut.metaricShadowSmooth = g_spacular.Sample(g_sampler, psIn.uv);

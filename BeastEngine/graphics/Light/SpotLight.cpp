@@ -11,7 +11,7 @@ namespace nsBeastEngine
 	SpotLight::SpotLight()
 		:m_spotLight(nullptr)
 	{
-		m_spotLight = g_sceneLight->NewSpotLight();
+		//m_spotLight = g_sceneLight->NewSpotLight();
 	}
 
 
