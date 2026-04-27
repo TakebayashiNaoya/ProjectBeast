@@ -47,6 +47,9 @@ namespace app
 			/** 初期ステートの設定 */
 			m_currentState = FindState(PenguinIdleState::ID());
 			m_currentState->Enter();
+
+			/** スケールを初期化 */
+			m_transform.m_scale = CHILD_PENGUIN_SCALE;
 		}
 
 
