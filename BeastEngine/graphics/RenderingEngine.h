@@ -145,12 +145,6 @@ namespace nsBeastEngine
 
 	private:
 		/**
-		 * @brief シャドウマップへの描画処理
-		 * @param rc レンダリングコンテキスト
-		 */
-		void RenderToShadowMap(RenderContext& rc);
-
-		/**
 		 * @brief GBufferへの描画処理
 		 * @param rc レンダリングコンテキスト
 		 */

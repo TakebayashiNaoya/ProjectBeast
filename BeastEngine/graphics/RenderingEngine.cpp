@@ -35,13 +35,72 @@ namespace nsBeastEngine
 		// メインレンダリングターゲットの内容をフレームバッファにコピーするためのスプライトの初期化
 		InitCopyMainRenderTargetToFrameBufferSprite();
 
-		// m_shadowMapRender.Init();
-		// m_postEffect.Init(m_mainRenderTarget);
-
 		// 2D描画用のレンダリングターゲットの初期化
 		Init2DRenderTarget();
 
 		m_sceneLight.Init();
+	}
+
+
+	void RenderingEngine::Update()
+	{
+		g_sceneLight->Update();
+	}
+
+
+	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
+	{
+		// G-Bufferへの描画処理
+		RenderToGBuffer(rc);
+
+		// ディファードライティングの描画処理
+		DeferredLighting(rc);
+
+		// フォワードレンダリングの描画処理
+		ForwardRendering(rc);
+
+		// 自然オブジェクトを描画する
+		// GBufferに書き込まれた深度値を引き継ぐため、DSVはm_gBuffer[enGBuffer_Albedo]を使用する
+		// ForwardRenderingと同じDSVを使うことで、ステージ・キャラクターとの深度関係が正しく保たれる
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		rc.SetRenderTarget(
+			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
+			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
+		);
+		for (auto* obj : m_natureObjects)
+		{
+			obj->Render(rc);
+		}
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+
+		// m_postEffect.Render(rc, m_mainRenderTarget);
+
+		// エフェクトを描画
+		EffectEngine::GetInstance()->Draw();
+
+		// 2D描画処理
+		Render2D(rc);
+
+		// メインレンダリングターゲットの内容をフレームバッファにコピー
+		CopyMainRenderTargetToFrameBufferSprite(rc);
+
+		// 描画オブジェクトのリストをクリア
+		m_deferredModelList.clear();
+		m_forwardModelList.clear();
+		m_renderObjects.clear();
+	}
+
+
+	void RenderingEngine::InitMainRenderTarget()
+	{
+		m_mainRenderTarget.Create(
+			g_graphicsEngine->GetFrameBufferWidth(),
+			g_graphicsEngine->GetFrameBufferHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_D32_FLOAT
+		);
 	}
 
 
@@ -103,59 +162,6 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::Update()
-	{
-		g_sceneLight->Update();
-	}
-
-
-	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
-	{
-		//rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-		//rc.ClearRenderTargetView(m_mainRenderTarget);
-		//RenderToShadowMap(rc);
-
-		// G-Bufferへの描画処理
-		RenderToGBuffer(rc);
-
-		// ディファードライティングの描画処理
-		DeferredLighting(rc);
-
-		// フォワードレンダリングの描画処理
-		ForwardRendering(rc);
-
-		// 自然オブジェクトを描画する
-		// GBufferに書き込まれた深度値を引き継ぐため、DSVはm_gBuffer[enGBuffer_Albedo]を使用する
-		// ForwardRenderingと同じDSVを使うことで、ステージ・キャラクターとの深度関係が正しく保たれる
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-		rc.SetRenderTarget(
-			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
-			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
-		);
-		for (auto* obj : m_natureObjects)
-		{
-			obj->Render(rc);
-		}
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
-
-		// m_postEffect.Render(rc, m_mainRenderTarget);
-
-		// エフェクトを描画
-		EffectEngine::GetInstance()->Draw();
-
-		// 2D描画処理
-		Render2D(rc);
-
-		// メインレンダリングターゲットの内容をフレームバッファにコピー
-		CopyMainRenderTargetToFrameBufferSprite(rc);
-
-		// 描画オブジェクトのリストをクリア
-		m_deferredModelList.clear();
-		m_forwardModelList.clear();
-		m_renderObjects.clear();
-	}
-
-
 	void RenderingEngine::InitCopyMainRenderTargetToFrameBufferSprite()
 	{
 		nsK2EngineLow::SpriteInitData spriteInitData;
@@ -171,39 +177,38 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::CopyMainRenderTargetToFrameBufferSprite(nsK2EngineLow::RenderContext& rc)
+	void RenderingEngine::Init2DRenderTarget()
 	{
-		// BeginGPUEvent("CopyMainRenderTargetToFrameBuffer");
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-		rc.SetRenderTarget(
-			g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
-			g_graphicsEngine->GetCurrentFrameBuffuerDSV()
+		m_2DRenderTarget.Create(
+			g_graphicsEngine->GetFrameBufferWidth(),
+			g_graphicsEngine->GetFrameBufferHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			DXGI_FORMAT_UNKNOWN,
+			clearColor
 		);
 
-		D3D12_VIEWPORT viewport;
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.Width = static_cast<FLOAT>(g_graphicsEngine->GetFrameBufferWidth());
-		viewport.Height = static_cast<FLOAT>(g_graphicsEngine->GetFrameBufferHeight());
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
+		nsK2EngineLow::SpriteInitData spriteInitData;
 
-		rc.SetViewportAndScissor(viewport);
-		m_copyMainRtToFrameBufferSprite.Draw(rc);
+		spriteInitData.m_textures[0] = &m_2DRenderTarget.GetRenderTargetTexture();
+		spriteInitData.m_width = m_mainRenderTarget.GetWidth();
+		spriteInitData.m_height = m_mainRenderTarget.GetHeight();
+		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
+		spriteInitData.m_vsEntryPointFunc = "VSMain";
+		spriteInitData.m_psEntryPoinFunc = "PSMain";
+		spriteInitData.m_alphaBlendMode = AlphaBlendMode_None;
+		spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
 
-		// EndGPUEvent();
-	}
+		m_2DSprite.Init(spriteInitData);
 
+		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
+		spriteInitData.m_width = m_2DRenderTarget.GetWidth();
+		spriteInitData.m_height = m_2DRenderTarget.GetHeight();
 
-	void RenderingEngine::RenderToShadowMap(nsK2EngineLow::RenderContext& rc)
-	{
-		// BeginGPUEvent("RenderShadowmap");
-
-		// m_shadowMapRender.Render(rc, m_renderObjects);
-		// rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-		// rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-
-		// EndGPUEvent();
+		m_mainSprite.Init(spriteInitData);
 	}
 
 
@@ -239,10 +244,6 @@ namespace nsBeastEngine
 
 	void RenderingEngine::DeferredLighting(RenderContext& rc)
 	{
-		//GetSceneLight().SetEyePos(g_camera3D->GetPosition());
-		// カメラの逆行列を定数バッファにセット
-		//GetSceneLight().SetCameraViewProjInv(g_camera3D->GetViewProjectionMatrixInv());
-
 		// レンダリング先をメインレンダリングターゲットにする
 		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
 		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
@@ -292,50 +293,26 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::InitMainRenderTarget()
+	void RenderingEngine::CopyMainRenderTargetToFrameBufferSprite(nsK2EngineLow::RenderContext& rc)
 	{
-		m_mainRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
-			1,
-			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			DXGI_FORMAT_D32_FLOAT
-		);
-	}
+		// BeginGPUEvent("CopyMainRenderTargetToFrameBuffer");
 
-
-	void RenderingEngine::Init2DRenderTarget()
-	{
-		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-		m_2DRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
-			1,
-			1,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			DXGI_FORMAT_UNKNOWN,
-			clearColor
+		rc.SetRenderTarget(
+			g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
+			g_graphicsEngine->GetCurrentFrameBuffuerDSV()
 		);
 
-		nsK2EngineLow::SpriteInitData spriteInitData;
+		D3D12_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = static_cast<FLOAT>(g_graphicsEngine->GetFrameBufferWidth());
+		viewport.Height = static_cast<FLOAT>(g_graphicsEngine->GetFrameBufferHeight());
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
 
-		spriteInitData.m_textures[0] = &m_2DRenderTarget.GetRenderTargetTexture();
-		spriteInitData.m_width = m_mainRenderTarget.GetWidth();
-		spriteInitData.m_height = m_mainRenderTarget.GetHeight();
-		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
-		spriteInitData.m_vsEntryPointFunc = "VSMain";
-		spriteInitData.m_psEntryPoinFunc = "PSMain";
-		spriteInitData.m_alphaBlendMode = AlphaBlendMode_None;
-		spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
+		rc.SetViewportAndScissor(viewport);
+		m_copyMainRtToFrameBufferSprite.Draw(rc);
 
-		m_2DSprite.Init(spriteInitData);
-
-		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
-		spriteInitData.m_width = m_2DRenderTarget.GetWidth();
-		spriteInitData.m_height = m_2DRenderTarget.GetHeight();
-
-		m_mainSprite.Init(spriteInitData);
+		// EndGPUEvent();
 	}
 }

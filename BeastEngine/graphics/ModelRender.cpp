@@ -126,53 +126,6 @@ namespace nsBeastEngine
 	}
 
 
-	void ModelRender::InitModelOnZprepass(const char* tkmFilePath, EnModelUpAxis modelUpAxis, bool isSkyCube)
-	{
-		ModelInitData modelInitData;
-		modelInitData.m_tkmFilePath = tkmFilePath;
-		modelInitData.m_fxFilePath = "Assets/shader/ZPrepass.fx";
-		modelInitData.m_modelUpAxis = modelUpAxis;
-
-		// ノンスキンメッシュ用の頂点シェーダーのエントリーポイントを指定する。
-		modelInitData.m_vsEntryPointFunc = "VSMain";
-
-		// アニメーションがあるならVSSkinMainを指定。
-		if (m_animationClips != nullptr)
-		{
-			// スケルトンを指定する。
-			modelInitData.m_skeleton = &m_skeleton;
-
-			if (m_isEnableInstancingDraw) {
-				modelInitData.m_vsSkinEntryPointFunc = "VSSkinInstancingMain";
-			}
-			else {
-				modelInitData.m_vsSkinEntryPointFunc = "VSSkinMain";
-			}
-		}
-		else
-		{
-			if (m_isEnableInstancingDraw) {
-				modelInitData.m_vsEntryPointFunc = "VSInstancingMain";
-			}
-			else {
-				modelInitData.m_vsEntryPointFunc = "VSMain";
-			}
-		}
-
-		if (isSkyCube) {
-			modelInitData.m_psEntryPointFunc = "PSSkyCubeMain";
-		}
-
-		modelInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		if (m_isEnableInstancingDraw) {
-			// インスタンシング描画を行う場合は、拡張SRVにインスタンシング描画用のデータを設定する。
-			modelInitData.m_expandShaderResoruceView[0] = &m_worldMatrixArraySB;
-		}
-
-		m_zprepassModel.Init(modelInitData);
-	}
-
-
 	void ModelRender::OnRenderShadowMap(RenderContext& rc)
 	{
 		m_shadowModels.Draw(rc);

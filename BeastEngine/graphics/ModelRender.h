@@ -134,15 +134,6 @@ namespace nsBeastEngine
 		);
 
 		/**
-		 * @brief 海の初期化用関数
-		 * @param initData		モデルの初期化データ
-		 * @param tkmFilePath	tkmファイルのファイルパス
-		 */
-		void InitOcean(ModelInitData& initData, const char* tkmFilePath);
-
-		void InitModelOnZprepass(const char* tkmFilePath, EnModelUpAxis modelUpAxis, bool isSkyCube);
-
-		/**
 		 * @brief アニメーションの再生
 		 * @param animNo			アニメーションクリップの番号
 		 * @param interpolateTime	補完時間(単位：秒)
@@ -158,6 +149,12 @@ namespace nsBeastEngine
 		 */
 		void Draw(RenderContext& rc);
 
+		/**
+		 * @brief RenderingEngineから呼ばれる実際の描画処理
+		 * @details フォワードの場合はm_frowardRenderModel、
+		 *          ディファードの場合はm_renderToGBufferModelを描画する
+		 * @param rc レンダリングコンテキスト
+		 */
 		void OnDraw(RenderContext& rc);
 
 		/**
@@ -197,16 +194,6 @@ namespace nsBeastEngine
 		void InitAnimation(
 			AnimationClip* animtionClips,
 			int numAnimationClips,
-			EnModelUpAxis enModelUpAxis
-		);
-
-		/**
-		 * @brief アニメーション頂点バッファの初期化用関数
-		 * @param tkmFilePath	ファイルパス
-		 * @param enModelUpAxis	モデルの上方向
-		 */
-		void InitComputeAnimatoinVertexBuffer(
-			const char* tkmFilePath,
 			EnModelUpAxis enModelUpAxis
 		);
 
