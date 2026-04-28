@@ -82,11 +82,8 @@ namespace app
 		}
 
 
-		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld, const SWaveConstantBuffer& waveCb)
+		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld)
 		{
-			// コンピュートシェーダーをディスパッチして波高さキャッシュを更新する
-			DispatchWaveCS(rc, waveCb);
-
 			// 共通定数バッファを更新する（b0）
 			SCommonConstantBuffer cb;
 			cb.mWorld = mWorld;
@@ -509,6 +506,26 @@ namespace app
 				}
 			}
 
+			//------------------------------------------------------------
+			// CS専用コマンドアロケータ・コマンドリストを作成する
+			// グラフィクスrcとは独立して実行するために専用のものを使用する
+			//------------------------------------------------------------
+			{
+				device->CreateCommandAllocator(
+					D3D12_COMMAND_LIST_TYPE_DIRECT,
+					IID_PPV_ARGS(m_csCommandAllocator.GetAddressOf())
+				);
+				device->CreateCommandList(
+					0,
+					D3D12_COMMAND_LIST_TYPE_DIRECT,
+					m_csCommandAllocator.Get(),
+					nullptr,
+					IID_PPV_ARGS(m_csCommandList.GetAddressOf())
+				);
+				// 作成直後はオープン状態なので閉じておく
+				m_csCommandList->Close();
+			}
+
 			// フェンスを作成する（GPU完了待ち用）
 			device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_fence.GetAddressOf()));
 			m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -516,52 +533,67 @@ namespace app
 		}
 
 
-		void OceanMesh::DispatchWaveCS(RenderContext& rc, const SWaveConstantBuffer& waveCb)
+		void OceanMesh::DispatchWaveCS(const SWaveConstantBuffer& waveCb)
 		{
 			// CS用定数バッファをCPUから更新する（永続Mapにコピー）
 			memcpy(m_csCbMapped, &waveCb, sizeof(SWaveConstantBuffer));
 
-			rc.SetDescriptorHeap(m_csDescHeap.Get());
-			rc.SetComputeRootSignature(m_csRootSignature.Get());
-			rc.SetPipelineState(m_csPipelineState.Get());
+			// 専用コマンドアロケータ・コマンドリストをリセットして記録開始
+			m_csCommandAllocator->Reset();
+			m_csCommandList->Reset(m_csCommandAllocator.Get(), nullptr);
+
+			// ディスクリプタヒープをセットする
+			ID3D12DescriptorHeap* heaps[] = { m_csDescHeap.Get() };
+			m_csCommandList->SetDescriptorHeaps(1, heaps);
+
+			// ルートシグネチャとパイプラインステートをセットする
+			m_csCommandList->SetComputeRootSignature(m_csRootSignature.Get());
+			m_csCommandList->SetPipelineState(m_csPipelineState.Get());
 
 			D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle =
 				m_csDescHeap->GetGPUDescriptorHandleForHeapStart();
 
 			// テーブル0: CBV(b0)
-			rc.SetComputeRootDescriptorTable(0, gpuHandle);
+			m_csCommandList->SetComputeRootDescriptorTable(0, gpuHandle);
 
 			// テーブル1: UAV(u0)
 			gpuHandle.ptr += m_csDescriptorSize;
-			rc.SetComputeRootDescriptorTable(1, gpuHandle);
+			m_csCommandList->SetComputeRootDescriptorTable(1, gpuHandle);
 
 			// グループ数：(GRID_DIVISION+1)頂点を8スレッド単位でカバーする
 			const UINT groupCount = (GRID_DIVISION + 1 + 7) / 8;
-			rc.Dispatch(groupCount, groupCount, 1);
+			m_csCommandList->Dispatch(groupCount, groupCount, 1);
 
 			// UAV書き込み完了を保証するバリアを張る
 			auto uavBarrier = CD3DX12_RESOURCE_BARRIER::UAV(m_uavBuffer.Get());
-			rc.ResourceBarrier(uavBarrier);
+			m_csCommandList->ResourceBarrier(1, &uavBarrier);
 
 			// UAVバッファをCOPY_SOURCEに遷移させてReadbackにコピーする
-			rc.TransitionResourceState(
+			auto toCopySrc = CD3DX12_RESOURCE_BARRIER::Transition(
 				m_uavBuffer.Get(),
 				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 				D3D12_RESOURCE_STATE_COPY_SOURCE
 			);
+			m_csCommandList->ResourceBarrier(1, &toCopySrc);
 
-			rc.CopyResource(m_readbackBuffer.Get(), m_uavBuffer.Get());
+			m_csCommandList->CopyResource(m_readbackBuffer.Get(), m_uavBuffer.Get());
 
 			// UAVバッファを元のステートに戻す
-			rc.TransitionResourceState(
+			auto toUav = CD3DX12_RESOURCE_BARRIER::Transition(
 				m_uavBuffer.Get(),
 				D3D12_RESOURCE_STATE_COPY_SOURCE,
 				D3D12_RESOURCE_STATE_UNORDERED_ACCESS
 			);
+			m_csCommandList->ResourceBarrier(1, &toUav);
+
+			// コマンドリストを閉じてコマンドキューにサブミットする
+			m_csCommandList->Close();
+			ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
+			ID3D12CommandList* cmdLists[] = { m_csCommandList.Get() };
+			commandQueue->ExecuteCommandLists(1, cmdLists);
 
 			// フェンスをシグナルしてGPUの完了を待つ
 			m_fenceValue++;
-			ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
 			commandQueue->Signal(m_fence.Get(), m_fenceValue);
 
 			if (m_fence->GetCompletedValue() < m_fenceValue)
@@ -634,12 +666,18 @@ namespace app
 		{
 			m_constantBuffer.light = *g_sceneLight->GetLight();
 			UpdateWaveOffset();
+
+			// コンピュートシェーダーをグラフィクスrcとは独立して実行し、
+			// 波高さキャッシュをCPUに書き出す
+			m_oceanMesh.DispatchWaveCS(BuildWaveCb());
 		}
 
 
 		void Ocean::Render(RenderContext& rc)
 		{
-			m_oceanMesh.Draw(rc, CalcWorldMatrix(), BuildWaveCb());
+			// DispatchWaveCS()はUpdate()で完了済みのため、
+			// ここでは純粋に描画コマンドのみを発行する
+			m_oceanMesh.Draw(rc, CalcWorldMatrix());
 		}
 
 

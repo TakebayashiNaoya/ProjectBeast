@@ -29,7 +29,7 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief 位置の設定
-		 *@param pos 位置
+		 * @param pos 位置
 		 */
 		inline void SetPosition(const Vector3& pos) { m_position = pos; }
 		/**
@@ -67,12 +67,22 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief モデルの全マテリアルに乗算カラーを設定する
+		 * @details ディファード描画用の m_renderToGBufferModel にも同時に適用する
 		 * @param mulColor 乗算カラー (RGBA, 1.0f=変更なし)
 		 */
 		inline void SetMulColor(const Vector4& mulColor)
 		{
 			m_model.SetMulColor(mulColor);
+			m_renderToGBufferModel.SetMulColor(mulColor);
 		}
+
+		/**
+		 * @brief フォワードレンダリングで描画するかどうかを設定する
+		 * @details SkyCubeなど、GBufferを経由せず直接フォワードで描画したいモデルに使用する。
+		 *          trueにした場合は m_frowardRenderModel が描画に使用される。
+		 * @param isForward trueならフォワード、falseならディファード
+		 */
+		inline void SetForwardRendering(const bool isForward) { m_isFowardRender = isForward; }
 
 		/**
 		 * @brief アニメーションが再生中か
@@ -111,9 +121,9 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief 事前ロード済みのデータから初期化する
-		 * @param initData     完成済みのModelInitData（tkmパスやシェーダ設定などを含む）
-		 * @param skeleton     外部でロード済みのスケルトン（不要ならnullptr）
-		 * @param animationeClips 外部でロード済みのアニメーションクリップ配列（不要ならnullptr）
+		 * @param initData			完成済みのModelInitData（tkmパスやシェーダ設定などを含む）
+		 * @param skeleton			外部でロード済みのスケルトン（不要ならnullptr）
+		 * @param animationeClips	外部でロード済みのアニメーションクリップ配列（不要ならnullptr）
 		 * @param numAnimationClips クリップ数
 		 */
 		void InitFromLoaded(
@@ -122,6 +132,13 @@ namespace nsBeastEngine
 			AnimationClip* animationeClips = nullptr,
 			int numAnimationClips = 0
 		);
+
+		/**
+		 * @brief 海の初期化用関数
+		 * @param initData		モデルの初期化データ
+		 * @param tkmFilePath	tkmファイルのファイルパス
+		 */
+		void InitOcean(ModelInitData& initData, const char* tkmFilePath);
 
 		void InitModelOnZprepass(const char* tkmFilePath, EnModelUpAxis modelUpAxis, bool isSkyCube);
 
@@ -185,7 +202,7 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief アニメーション頂点バッファの初期化用関数
-		 * @param tkmFilePath		ファイルパス
+		 * @param tkmFilePath	ファイルパス
 		 * @param enModelUpAxis	モデルの上方向
 		 */
 		void InitComputeAnimatoinVertexBuffer(

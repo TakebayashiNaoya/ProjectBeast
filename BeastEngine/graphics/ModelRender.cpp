@@ -84,8 +84,16 @@ namespace nsBeastEngine
 		// モデル初期化
 		m_model.Init(modelInitData);
 
-		// GBuffer描画用のモデルを初期化
-		InitRenderToGBufferModel(modelInitData);
+		if (m_isFowardRender)
+		{
+			// フォワードレンダリング用のモデルを初期化する
+			m_frowardRenderModel.Init(modelInitData);
+		}
+		else
+		{
+			// GBuffer描画用のモデルを初期化する
+			InitRenderToGBufferModel(modelInitData);
+		}
 
 		// アニメーション初期化
 		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr) {
@@ -125,13 +133,13 @@ namespace nsBeastEngine
 		modelInitData.m_fxFilePath = "Assets/shader/ZPrepass.fx";
 		modelInitData.m_modelUpAxis = modelUpAxis;
 
-		//ノンスキンメッシュ用の頂点シェーダーのエントリーポイントを指定する。
+		// ノンスキンメッシュ用の頂点シェーダーのエントリーポイントを指定する。
 		modelInitData.m_vsEntryPointFunc = "VSMain";
 
-		//アニメーションがあるならVSSkinMainを指定。
+		// アニメーションがあるならVSSkinMainを指定。
 		if (m_animationClips != nullptr)
 		{
-			//スケルトンを指定する。
+			// スケルトンを指定する。
 			modelInitData.m_skeleton = &m_skeleton;
 
 			if (m_isEnableInstancingDraw) {
@@ -140,7 +148,6 @@ namespace nsBeastEngine
 			else {
 				modelInitData.m_vsSkinEntryPointFunc = "VSSkinMain";
 			}
-
 		}
 		else
 		{
@@ -177,7 +184,7 @@ namespace nsBeastEngine
 		/** 一旦tkmのファイルパスを受け取る */
 		std::string skeletonFilePath = filePath;
 		/** パスの中に.tkmが何文字目にあるか探す */
-		int pos = (int)skeletonFilePath.find(".tkm");
+		int pos = static_cast<int>(skeletonFilePath.find(".tkm"));
 		/** .tkmを.tksに置き換える */
 		skeletonFilePath.replace(pos, 4, ".tks");
 		/** char型に変換してInit */
@@ -210,6 +217,7 @@ namespace nsBeastEngine
 	{
 		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_renderToGBufferModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_frowardRenderModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 	}
 
@@ -239,11 +247,11 @@ namespace nsBeastEngine
 		//}
 
 		if (!m_isFowardRender) {
-			//ディファードレンダリングで描画するなら
+			// ディファードレンダリングで描画するなら
 			g_renderingEngine->AddDeferredModelList(this);
 		}
 		else {
-			//フォワードレンダリングで描画するなら
+			// フォワードレンダリングで描画するなら
 			g_renderingEngine->AddForwardModelList(this);
 		}
 	}

@@ -57,7 +57,7 @@ namespace nsBeastEngine
 			DXGI_FORMAT_D32_FLOAT
 		);
 
-		//法線用のターゲットを作成
+		// 法線用のターゲットを作成
 		m_gBuffer[enGBuffer_Normal].Create(
 			g_graphicsEngine->GetFrameBufferWidth(),
 			g_graphicsEngine->GetFrameBufferHeight(),
@@ -67,7 +67,7 @@ namespace nsBeastEngine
 			DXGI_FORMAT_UNKNOWN
 		);
 
-		//スペキュラカラー用のターゲットを作成
+		// スペキュラカラー用のターゲットを作成
 		m_gBuffer[enGBuffer_Specular].Create(
 			g_graphicsEngine->GetFrameBufferWidth(),
 			g_graphicsEngine->GetFrameBufferHeight(),
@@ -82,7 +82,7 @@ namespace nsBeastEngine
 	void RenderingEngine::InitDefferedLightingSprite()
 	{
 		BeginGPUEvent("DefferedLightingSprite");
-		//ディファードライティングを行うためのスプライトを初期化
+		// ディファードライティングを行うためのスプライトを初期化
 		SpriteInitData spriteInitData;
 		spriteInitData.m_width = FRAME_BUFFER_W;
 		spriteInitData.m_height = FRAME_BUFFER_H;
@@ -92,7 +92,6 @@ namespace nsBeastEngine
 		spriteInitData.m_textures[enGBuffer_Normal] = &m_gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
 		spriteInitData.m_textures[enGBuffer_Specular] = &m_gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
 		//spriteInitData.m_textures[enGBufferShadow] = &m_shadow.GetShadowTarget().GetRenderTargetTexture();
-
 
 		spriteInitData.m_fxFilePath = "Assets/shader/deferredLighting.fx";
 
@@ -125,11 +124,19 @@ namespace nsBeastEngine
 		// フォワードレンダリングの描画処理
 		ForwardRendering(rc);
 
-		// 自然オブジェクトを描画する（モデルより先に描画）
+		// 自然オブジェクトを描画する
+		// GBufferに書き込まれた深度値を引き継ぐため、DSVはm_gBuffer[enGBuffer_Albedo]を使用する
+		// ForwardRenderingと同じDSVを使うことで、ステージ・キャラクターとの深度関係が正しく保たれる
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		rc.SetRenderTarget(
+			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
+			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
+		);
 		for (auto* obj : m_natureObjects)
 		{
 			obj->Render(rc);
 		}
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 
 		// m_postEffect.Render(rc, m_mainRenderTarget);
 
@@ -186,7 +193,6 @@ namespace nsBeastEngine
 
 		// EndGPUEvent();
 	}
-
 
 
 	void RenderingEngine::RenderToShadowMap(nsK2EngineLow::RenderContext& rc)

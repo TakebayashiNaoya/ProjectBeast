@@ -99,13 +99,21 @@ namespace app
 			);
 
 			/**
+			 * @brief コンピュートシェーダーを独立実行して波高さキャッシュを更新する
+			 * @details グラフィクスコマンドリスト（rc）とは独立した専用コマンドリストで
+			 *          実行するため、描画パスを汚染しない。Ocean::Update()から呼ぶこと。
+			 * @param waveCb コンピュートシェーダー用定数バッファ
+			 */
+			void DispatchWaveCS(const SWaveConstantBuffer& waveCb);
+
+			/**
 			 * @brief 描画
-			 * @details 冒頭でコンピュートシェーダーをディスパッチし、Readbackしてキャッシュを更新してから通常描画を行う
+			 * @details DispatchWaveCS()はUpdate()で完了済みであることを前提とする。
+			 *          描画コマンドのみを発行する。
 			 * @param rc		描画コンテキスト
 			 * @param mWorld	ワールド行列
-			 * @param waveCb	コンピュートシェーダー用定数バッファ
 			 */
-			void Draw(RenderContext& rc, const Matrix& mWorld, const SWaveConstantBuffer& waveCb);
+			void Draw(RenderContext& rc, const Matrix& mWorld);
 
 			/**
 			 * @brief 拡張定数バッファを更新する
@@ -139,7 +147,6 @@ namespace app
 			void InitPipelineState(const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat);
 			void InitDescriptorHeap();
 			void InitComputeShader();
-			void DispatchWaveCS(RenderContext& rc, const SWaveConstantBuffer& waveCb);
 
 
 		private:
@@ -154,15 +161,15 @@ namespace app
 			IndexBuffer    m_indexBuffer;				/** インデックスバッファ */
 			int            m_indexCount = 0;			/** インデックスの数 */
 
-			Shader* m_vs = nullptr;				/** 頂点シェーダー */
-			Shader* m_ps = nullptr;				/** ピクセルシェーダー */
+			Shader* m_vs = nullptr;						/** 頂点シェーダー */
+			Shader* m_ps = nullptr;						/** ピクセルシェーダー */
 
 			RootSignature  m_rootSignature;				/** 描画用ルートシグネチャ */
 			PipelineState  m_pipelineState;				/** 描画用パイプラインステート */
 
 			ConstantBuffer m_commonConstantBuffer;		/** 共通定数バッファ（b0） */
 			ConstantBuffer m_expandConstantBuffer;		/** 拡張定数バッファ（b1） */
-			void* m_expandData = nullptr;		/** 拡張定数バッファに転送するデータへのポインタ */
+			void* m_expandData = nullptr;				/** 拡張定数バッファに転送するデータへのポインタ */
 
 			DescriptorHeap m_descriptorHeap;			/** ディスクリプタヒープ */
 
@@ -188,6 +195,10 @@ namespace app
 			Microsoft::WRL::ComPtr<ID3D12Fence> m_fence;
 			HANDLE m_fenceEvent = nullptr;
 			UINT64 m_fenceValue = 0;
+			/** CS専用コマンドアロケータ（グラフィクスrcと独立して実行するために使用） */
+			Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_csCommandAllocator;
+			/** CS専用コマンドリスト（グラフィクスrcと独立して実行するために使用） */
+			Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_csCommandList;
 		};
 
 
@@ -207,8 +218,8 @@ namespace app
 			{
 				Light light;					/** ライト */
 				float baseReflectance = 0.0f;	/** 基本反射率 */
-				float waveScroll = 0.0f;	/** 波のスクロール値（頂点移動用） */
-				float textureScroll = 0.0f;	/** テクスチャのスクロール値（模様流れ用） */
+				float waveScroll = 0.0f;		/** 波のスクロール値（頂点移動用） */
+				float textureScroll = 0.0f;		/** テクスチャのスクロール値（模様流れ用） */
 				float wave1Amplitude = 5.0f;	/** 波①の振幅 */
 				float wave1Frequency = 0.025f;	/** 波①の空間周波数 */
 				float wave2Amplitude = 2.0f;	/** 波②の振幅 */
@@ -225,6 +236,7 @@ namespace app
 
 			/**
 			 * @brief 更新処理
+			 * @details コンピュートシェーダーをここで独立実行する
 			 */
 			void Update();
 
@@ -295,13 +307,13 @@ namespace app
 
 
 		private:
-			OceanMesh           m_oceanMesh;					/** 海のグリッドメッシュ */
-			OceanConstantBuffer m_constantBuffer;				/** 定数バッファ */
-			Vector3             m_position = g_vec3Zero;		/** 位置 */
-			Vector3             m_scale = g_vec3One;			/** スケール */
-			Quaternion          m_rotation = Quaternion::Identity;	/** 回転 */
-			float               m_waveSpeed = 1.5f;			/** 波のスクロール速度 */
-			float               m_textureSpeed = 0.03f;			/** テクスチャのスクロール速度 */
+			OceanMesh           m_oceanMesh;								/** 海のグリッドメッシュ */
+			OceanConstantBuffer m_constantBuffer;							/** 定数バッファ */
+			Vector3             m_position = g_vec3Zero;					/** 位置 */
+			Vector3             m_scale = g_vec3One;						/** スケール */
+			Quaternion          m_rotation = Quaternion::Identity;			/** 回転 */
+			float               m_waveSpeed = 1.5f;						/** 波のスクロール速度 */
+			float               m_textureSpeed = 0.03f;					/** テクスチャのスクロール速度 */
 
 
 		public:

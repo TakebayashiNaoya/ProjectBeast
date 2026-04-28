@@ -33,7 +33,7 @@ namespace app
 			 * @brief 描画処理
 			 * @param rc レンダリングコンテキスト
 			 */
-			void Render(RenderContext& rc);
+			void Render(RenderContext& rc) override;
 
 
 		private:
