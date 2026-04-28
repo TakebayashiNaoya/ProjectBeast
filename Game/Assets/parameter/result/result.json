@@ -1,9 +1,64 @@
 {
-    "canvas":{
-        "elements":[
+    "canvas": {
+        "elements": [
             {
-                "type":"UIDigit",
-                "name":"ResultTimeDigit",
+                "type": "UIIcon",
+                "name": "ResultBackGround",
+                "asset": "Assets/spriteData/Scene/NorthPole.DDS",
+                "width": 1920,
+                "height": 1080,
+                "position": [0, 0, 0],
+                "scale": [1, 1, 1],
+                "rotation": 0,
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "type": "UIIcon",
+                "name": "ClearTimeText",
+                "asset": "Assets/spriteData/UI/TextSprite/Result/ClearTimeUI.DDS",
+                "width": 480,
+                "height": 270,
+                "position": [-365, 320, 0],
+                "scale": [1, 1, 1],
+                "rotation": 0,
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "type": "UIIcon",
+                "name": "RescueText",
+                "asset": "Assets/spriteData/UI/TextSprite/Result/RescueUI.DDS",
+                "width": 480,
+                "height": 270,
+                "position": [290, 320, 0],
+                "scale": [1, 1, 1],
+                "rotation": 0,
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TotalText",
+                "asset": "Assets/spriteData/UI/TextSprite/Result/TotalUI.DDS",
+                "width": 640,
+                "height": 360,
+                "position": [0, -275, 0],
+                "scale": [1, 1, 1],
+                "rotation": 0,
+                "color": [255, 255, 255, 255]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleBackText",
+                "asset": "Assets/spriteData/UI/TextSprite/Result/TitleBack_2.DDS",
+                "width": 640,
+                "height": 360,
+                "position": [500, -375, 0],
+                "scale": [1, 1, 1],
+                "rotation": 0,
+                "color": [255, 255, 255, 0]
+            },
+            {
+                "type": "UIDigit",
+                "name": "ResultTimeDigit",
                 "asset": "Assets/spriteData/UI/Number/White",
                 "digit": 3,
                 "number": 0,
@@ -21,7 +76,7 @@
                 "number": 0,
                 "width": 64.0,
                 "height": 80.0,
-                "position": [325.0, 280.0, 0.0],
+                "position": [375.0, 280.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
                 "rotation": 0.0
             }
