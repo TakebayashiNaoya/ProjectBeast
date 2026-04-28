@@ -26,20 +26,31 @@ namespace app
 			, m_timerThirdValue(0.0f)
 			, m_timerFourthValue(0.0f)
 			, m_offsetValueY(0.0f)
-			, m_offsetValueX(0.0f)
-			, m_greenColor(Vector4::White)
-			, m_yellowColor(Vector4::White)
-			, m_redColor(Vector4::White)
+			, m_ratioProgress(0.0f)
+			, m_degreeValue(0.0f)
+			, m_degreeMaxValue(0.0f)
+			, m_initialPosZ(0.0f)
+			, m_resetValue(0.0f)
+			, m_offsetPosY(0.0f)
+			, m_arrowPivot(Vector2::Zero)
+			, m_skeltonColor(Vector4::White)
 		{
 			// JSONファイルからパラメーターを読み込む。
 			core::ParameterManager::Get()->LoadParameter<MasterPBWakingUpTimerParameter>(JSON_PATH, [](const nlohmann::json& j, MasterPBWakingUpTimerParameter& parameter)
 				{
 					parameter.timerFirstValue = j["timerFirstValue"].get<float>();
 					parameter.timerSecondValue = j["timerSecondValue"].get<float>();
-					parameter.timserThirdValue = j["timserThirdValue"].get<float>();
+					parameter.timerThirdValue = j["timerThirdValue"].get<float>();
 					parameter.timerFourthValue = j["timerFourthValue"].get<float>();
 					parameter.offsetValueY = j["offsetValueY"].get<float>();
-					parameter.offsetValueX = j["offsetValueX"].get<float>();
+					parameter.ratioProgress = j[ "ratioProgress" ].get<float>();
+					parameter.degreeValue = j["degreeValue"].get<float>();
+					parameter.degreeMaxValue = j["degreeMaxValue"].get<float>();
+					parameter.initialPosZ = j[ "initialPosZ" ].get<float>();
+					parameter.resetValue = j[ "resetValue" ].get<float>();
+					parameter.offsetPosY = j[ "offsetPosY" ].get<float>();
+					parameter.arrowPivot = util::JsonConverter::ToVector2(j["arrowPivot"]);
+					parameter.skeltonColor = util::JsonConverter::ToVector4(j["skeltonColor"]);
 				});
 		}
 
@@ -55,13 +66,17 @@ namespace app
 			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterPBWakingUpTimerParameter>();
 			m_timerFirstValue = parameter->timerFirstValue;
 			m_timerSecondValue = parameter->timerSecondValue;
-			m_timerThirdValue = parameter->timserThirdValue;
+			m_timerThirdValue = parameter->timerThirdValue;
 			m_timerFourthValue = parameter->timerFourthValue;
 			m_offsetValueY = parameter->offsetValueY;
-			m_offsetValueX = parameter->offsetValueX;
-			m_greenColor = parameter->greenColor;
-			m_yellowColor = parameter->yellowColor;
-			m_redColor = parameter->redColor;
+			m_ratioProgress = parameter->ratioProgress;
+			m_degreeValue = parameter->degreeValue;
+			m_degreeMaxValue = parameter->degreeMaxValue;
+			m_initialPosZ = parameter->initialPosZ;
+			m_resetValue = parameter->resetValue;
+			m_offsetPosY = parameter->offsetPosY;
+			m_arrowPivot = parameter->arrowPivot;
+			m_skeltonColor = parameter->skeltonColor;
 		}
 		
 		

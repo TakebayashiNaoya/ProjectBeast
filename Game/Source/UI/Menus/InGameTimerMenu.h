@@ -87,7 +87,7 @@ namespace app
 
 		private:
 			/** 現在のタイム（BattleManagerから通知されてセットされる） */
-			float m_currentTime = 0.0f;
+			float m_currentTime;
 
 			/** 点滅させる秒数 */
 			float m_blinkTime;

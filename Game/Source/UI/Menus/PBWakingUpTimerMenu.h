@@ -21,8 +21,8 @@ namespace app
 			PBWakingUpTimerMenu();
 			virtual ~PBWakingUpTimerMenu();
 
-			void Update()override;
-			void InitializeLogic()override;
+			void Update() override;
+			void InitializeLogic() override;
 
 
 		public:
@@ -49,17 +49,12 @@ namespace app
 			 */
 			inline void SetDraw(bool isDraw) { m_isDraw = isDraw; }
 
-			/**
-			 * @brief リセット漏れを防ぐ
-			 */
-			void ResetTimer();
-
 
 		private:
 			/** シロクマの起床タイマー専用のアニメーションステータス */
-			std::unique_ptr<PBWakingUpTimerAnimStatus>m_pbAnimStatus;
+			std::unique_ptr<PBWakingUpTimerAnimStatus> m_pbAnimStatus;
 			/** シロクマの起床タイマー専用のステータス */
-			std::unique_ptr<PBWakingUpTimerStatus>m_pbTimerStatus;
+			std::unique_ptr<PBWakingUpTimerStatus> m_pbTimerStatus;
 
 			/** 現在のタイマー値（外部から毎フレーム設定される） */
 			float m_currentPBTime = 0.0f;

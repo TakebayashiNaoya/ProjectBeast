@@ -27,13 +27,17 @@ namespace app
 			/** JSONから受け取る変数群 */
 			float timerFirstValue;
 			float timerSecondValue;
-			float timserThirdValue;
+			float timerThirdValue;
 			float timerFourthValue;
 			float offsetValueY;
-			float offsetValueX;
-			Vector4 greenColor;
-			Vector4 yellowColor;
-			Vector4 redColor;
+			float ratioProgress;
+			float degreeValue;
+			float degreeMaxValue;
+			float initialPosZ;
+			float resetValue;
+			float offsetPosY;
+			Vector2 arrowPivot;
+			Vector4 skeltonColor;
 		};
 	}
 }

@@ -18,7 +18,7 @@ namespace app
 		{
 		public:
 			PBWakingUpTimerStatus();
-			~PBWakingUpTimerStatus()override;
+			~PBWakingUpTimerStatus() override;
 
 			/*
 			 * @brief セットアップUI
@@ -37,11 +37,15 @@ namespace app
 			float GetTimerThirdValue()const { return m_timerThirdValue; }
 			float GetTimerFourthValue()const { return m_timerFourthValue; }
 			float GetOffsetValueY()const { return m_offsetValueY; }
-			float GetOffsetValueX()const { return m_offsetValueX; }
+			float GetRatioProgress()const { return m_ratioProgress; }
+			float GetDegreeValue()const { return m_degreeValue; }
+			float GetDegreeMaxValue()const { return m_degreeMaxValue; }
+			float GetInitialPosZ()const { return m_initialPosZ; }
+			float GetResetValue()const { return m_resetValue; }
+			float GetOffsetPosY()const { return m_offsetPosY; }
 
-			const Vector4& GetGreenColor()const { return m_greenColor; }
-			const Vector4& GetYellowColor()const { return m_yellowColor; }
-			const Vector4& GetRedColor()const { return m_redColor; }
+			const Vector2& GetArrowPivot()const { return m_arrowPivot; }
+			const Vector4& GetSkeltonColor()const { return m_skeltonColor; }
 
 
 		private:
@@ -51,10 +55,14 @@ namespace app
 			float m_timerThirdValue;
 			float m_timerFourthValue;
 			float m_offsetValueY;
-			float m_offsetValueX;
-			Vector4 m_greenColor;
-			Vector4 m_yellowColor;
-			Vector4 m_redColor;
+			float m_degreeValue;
+			float m_ratioProgress;
+			float m_degreeMaxValue;
+			float m_initialPosZ;
+			float m_resetValue;
+			float m_offsetPosY;
+			Vector2 m_arrowPivot;
+			Vector4 m_skeltonColor;
 		};
 	}
 }

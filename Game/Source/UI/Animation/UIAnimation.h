@@ -6,6 +6,7 @@
 #pragma once
 #include "Source/Util/Curve.h"
 
+
 namespace app
 {
 	namespace ui
@@ -81,21 +82,21 @@ namespace app
 
 
 			/** 再生 */
-			void PlayAnimation()override
+			void PlayAnimation() override
 			{
 				m_curve.Play();
 			}
 
 
 			/** 停止 */
-			void StopAnimation()override
+			void StopAnimation() override
 			{
 				m_curve.Stop();
 			}
 
 
 			/** 再生中か */
-			bool IsPlayAnimation()override
+			bool IsPlayAnimation() override
 			{
 				return m_curve.IsPlaying();
 			}
@@ -173,21 +174,21 @@ namespace app
 
 
 			/** 再生 */
-			void PlayAnimation()override
+			void PlayAnimation() override
 			{
 				m_curve.Play();
 			}
 
 
 			/** 停止 */
-			void StopAnimation()override
+			void StopAnimation() override
 			{
 				m_curve.Stop();
 			}
 
 
 			/** 再生中か */
-			bool IsPlayAnimation()override
+			bool IsPlayAnimation() override
 			{
 				return m_curve.IsPlaying();
 			}
@@ -256,21 +257,21 @@ namespace app
 
 			
 			/** 再生 */
-			void PlayAnimation()override
+			void PlayAnimation() override
 			{
 				m_curve.Play();
 			}
 
 
 			/** 停止 */
-			void StopAnimation()override
+			void StopAnimation() override
 			{
 				m_curve.Stop();
 			}
 
 
 			/** 再生中か */
-			bool IsPlayAnimation()override
+			bool IsPlayAnimation() override
 			{
 				return m_curve.IsPlaying();
 			}
@@ -332,7 +333,7 @@ namespace app
 
 
 			/** 更新処理 */
-			void Update()override
+			void Update() override
 			{
 				bool wasPlaying = m_curve.IsPlaying();
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
@@ -344,21 +345,21 @@ namespace app
 
 
 			/** 再生 */
-			void PlayAnimation()override
+			void PlayAnimation() override
 			{
 				m_curve.Play();
 			}
 
 
 			/** 停止 */
-			void StopAnimation()override
+			void StopAnimation() override
 			{
 				m_curve.Stop();
 			}
 
 
 			/** 再生中か */
-			bool IsPlayAnimation()override
+			bool IsPlayAnimation() override
 			{
 				return m_curve.IsPlaying();
 			}
@@ -420,7 +421,7 @@ namespace app
 
 
 			/** 更新処理 */
-			void Update()override
+			void Update() override
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
@@ -440,7 +441,7 @@ namespace app
 
 
 			/** 更新処理 */
-			void Update()override
+			void Update() override
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
@@ -460,7 +461,7 @@ namespace app
 
 
 			/** 更新処理 */
-			void Update()override
+			void Update() override
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
@@ -480,7 +481,7 @@ namespace app
 
 
 			/** 更新処理 */
-			void Update()override
+			void Update() override
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
@@ -500,7 +501,7 @@ namespace app
 
 
 			/** 更新処理 */
-			void Update()override
+			void Update() override
 			{
 				m_curve.Update(g_gameTime->GetFrameDeltaTime());
 				m_applyFunc(m_curve.GetCurrentValue());
@@ -533,7 +534,7 @@ namespace app
 		{
 		private:
 			/** アニメーションを再生する順番を管理するためのステップのリスト */
-			std::vector<UIAnimationStep>m_steps;
+			std::vector<UIAnimationStep> m_steps;
 			/** 現在再生しているステップのインデックス */
 			int m_currentIndex;
 			/** シーケンスが再生中かどうか */

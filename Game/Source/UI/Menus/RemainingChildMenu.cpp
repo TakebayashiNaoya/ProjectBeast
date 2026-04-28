@@ -13,6 +13,8 @@ namespace app
 	namespace ui
 	{
 		RemainingChildMenu::RemainingChildMenu()
+			: m_childNum(0)
+			, m_totalNum(0)
 		{}
 
 

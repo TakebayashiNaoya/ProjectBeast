@@ -73,6 +73,7 @@ namespace app
 			: m_digit(nullptr)
 		{}
 
+
 		TimerDigit::~TimerDigit()
 		{}
 
@@ -95,6 +96,7 @@ namespace app
 				m_digit->SetNumber(value);
 			}
 		}
+
 
 
 

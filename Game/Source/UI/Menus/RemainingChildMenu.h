@@ -16,8 +16,8 @@ namespace app
 		public:
 			RemainingChildMenu();
 
-			void Update()override;
-			void InitializeLogic()override;
+			void Update() override;
+			void InitializeLogic() override;
 
 
 		public:
@@ -27,9 +27,9 @@ namespace app
 
 		private:
 			/** 集めたペンギン数 */
-			int m_childNum = 0;
+			int m_childNum;
 			/** ステージ上の総ペンギン数 */
-			int m_totalNum = 0;
+			int m_totalNum;
 		};
 	}
 }
