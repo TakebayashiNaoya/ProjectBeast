@@ -1,5 +1,7 @@
-/*!
+/*
+ * @file CircleGauge.fx
  * @brief 円形ゲージシェーダー
+ * @author 忽那
  */
 
 
@@ -26,9 +28,9 @@ cbuffer Gaugecb : register(b1)
 	float g_innerRadius;   // 内径(UV座標)
 	float g_outerRadius;   // 外径(UV座標)
 	float g_rotationAngle; // 回転オフセット(ラジアン)
-	float m_padding0;      // アライメント用(空き)
-	float m_padding1;      // アライメント用(空き)
-	float m_padding2;      // アライメント用(空き)
+	float g_padding0;      // アライメント用(空き)
+	float g_padding1;      // アライメント用(空き)
+	float g_padding2;      // アライメント用(空き)
 	float4 g_gaugeColor;   // ゲージの色
 	float4 g_bgColor;      // 背景の色 RGBA
 }
@@ -47,8 +49,8 @@ struct PSInput{
 	float2 uv  : TEXCOORD0;   // UV座標(そのまま)
 };
 
-
-Texture2D<float4> colorTexture : register(t0);	//�J���[�e�N�X�`���B
+/** カラーテクスチャ */
+Texture2D<float4> colorTexture : register(t0);
 sampler Sampler : register(s0);
 
 /** 頂点シェーダー : 「どこに表示するか」を決めるもの */
@@ -135,7 +137,6 @@ float4 PSMain( PSInput In ) : SV_Target0
 	// 色を選んで最終出力を行う
 	// ゲージ色か背景色かを最後に決める
 	float4 color = lerp(g_gaugeColor,g_bgColor,gaugeMask);
-	//float4 color = lerp(g_bgColor, g_gaugeColor, gaugeMask);
 	// gaugeMask = 0 → g_bgColor(背景色)
 	// gaugeMask = 1 → g_gaugeColor(ゲージ色)
 	color.a *= ringMask; // 円環エッジをフェードアウト(アンチエイリアス)

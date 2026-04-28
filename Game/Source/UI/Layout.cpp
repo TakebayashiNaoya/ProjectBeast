@@ -24,7 +24,7 @@ namespace
 	{
 		if (utf8Str.empty())return std::wstring();
 		/** @brief UTF-8をUnicode(UTF-16)に変換*/
-		int size_needed = MultiByteToWideChar(CP_UTF8, 0, &utf8Str[0], (int)utf8Str.size(), NULL, 0);
+		int size_needed = MultiByteToWideChar(CP_UTF8, 0, &utf8Str[0], static_cast<int>(utf8Str.size()), NULL, 0);
 		std::wstring wstrTo(size_needed, 0);
 		MultiByteToWideChar(CP_UTF8, 0, &utf8Str[0], (int)utf8Str.size(), &wstrTo[0], size_needed);
 		return wstrTo;

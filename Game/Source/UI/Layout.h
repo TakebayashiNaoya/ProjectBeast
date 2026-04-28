@@ -49,15 +49,7 @@ namespace app
 			/**
 			 * @brief MenuBaseを取得
 			 * @return MenuBaseのポインタを取得
-			 * @datil
-			 * Menuの内容を使う時毎回dynamic_castするのは面倒なので、GetMenu<具象クラス>()で直接具象クラスのポインタを取得できるようにする(修正版)
-			 */
-			//MenuBase* GetMenu() { return m_menu.get(); }
-
-			/**
-			 * @brief MenuBaseを取得
-			 * @return MenuBaseのポインタを取得
-			 * @datil
+			 * @details
 			 * Menuの内容を使う時毎回dynamic_castするのは面倒なので、GetMenu<具象クラス>()で直接具象クラスのポインタを取得できるようにする
 			 */
 			template<typename T>
@@ -70,7 +62,7 @@ namespace app
 #endif //APP_ENABLE_LAYOUT_HOTRELOAD
 
 			std::string m_filePath = "";
-			std::unique_ptr<MenuBase>m_menu = nullptr;
+			std::unique_ptr<MenuBase> m_menu = nullptr;
 
 
 		private:

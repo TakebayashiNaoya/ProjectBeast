@@ -3,7 +3,7 @@
         "comment":"シロクマの起床タイマー専用のステータス",
         "timerFirstValue":30,
         "timerSecondValue":20,
-        "timserThirdValue":10,
+        "timerThirdValue":10,
         "timerFourthValue":0,
         "offsetValueY":220,
         "offsetValueX":20,

@@ -24,7 +24,6 @@ namespace app
 			MenuBase(){}
 			virtual ~MenuBase() { Clear(); }
 
-
 			/** 更新処理 */
 			virtual void Update()
 			{
@@ -33,7 +32,6 @@ namespace app
 					m_canvas->Update();
 				}
 			}
-
 
 			/** 描画機能処理 */
 			virtual void Render(RenderContext& rc)
@@ -52,13 +50,11 @@ namespace app
 			 */
 			void SetCanvas(UICanvas* canvas) { m_canvas.reset(canvas); }
 			
-			
 			/**
 			 * @brief キャンバスを取得
 			 * @return キャンバスのポインタを取得
 			 */
 			UICanvas* GetCanvas() { return m_canvas.get(); }
-
 
 			/** 
 			 * @brief UIを登録
@@ -70,7 +66,6 @@ namespace app
 				m_uiMap.emplace(key, ui);
 			}
 
-
 			/**
 			 * @brief UIの登録解除
 			 * @param key キー
@@ -79,7 +74,6 @@ namespace app
 			{
 				m_uiMap.erase(key);
 			}
-
 
 			/**
 			 * @brief UIの取得
@@ -95,20 +89,17 @@ namespace app
 				return nullptr;
 			}
 
-
 			/** UIが存在するかどうか */
 			bool HasUI(const uint32_t& key)const
 			{
 				return m_uiMap.count(key) > 0;
 			}
 
-
 			/** UIの消去(クリア) */
 			void Clear()
 			{
 				m_uiMap.clear();
 			}
-
 
 			/** 
 			 * @brief UIのロジック初期化処理
@@ -120,9 +111,9 @@ namespace app
 
 		protected:
 			/** UICanvasを生成 */
-			std::unique_ptr<UICanvas>m_canvas = nullptr;
+			std::unique_ptr<UICanvas> m_canvas = nullptr;
 			/** キーと値の保持 */
-			std::unordered_map<uint32_t, UIBase*>m_uiMap;
+			std::unordered_map<uint32_t, UIBase*> m_uiMap;
 		};
 	}
 }

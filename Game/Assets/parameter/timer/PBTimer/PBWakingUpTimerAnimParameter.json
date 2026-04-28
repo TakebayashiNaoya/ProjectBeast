@@ -11,7 +11,7 @@
         "loop":"Once"
       },
       {
-        "comment":"シロクマの起床タイマーアニメーション(黄→赤：20=10秒)",
+        "comment":"シロクマの起床タイマーアニメーション(黄→赤：20=9秒)",
         "key":"yellowLerpAnim",
         "valueType":"Vector4",
         "startValue":{"x":1.0,"y":1.0,"z":0.0,"w":1.0},
@@ -21,7 +21,7 @@
         "loop":"Once"
       },
       {
-        "comment":"シロクマの起床タイマーアニメーション(赤 : 10=0秒)",
+        "comment":"シロクマの起床タイマーアニメーション(赤 : 9=0秒)",
         "key":"redAnim",
         "valueType":"Vector4",
         "startValue":{"x":1.0,"y":0.0,"z":0.0,"w":1.0},
