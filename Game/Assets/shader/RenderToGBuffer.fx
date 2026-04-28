@@ -1,77 +1,76 @@
 // モデル用の定数バッファー
 cbuffer ModelCb : register(b0)
 {
-    float4x4 mWorld;
-    float4x4 mView;
-    float4x4 mProj;
+    float4x4 mWorld;    // ワールド行列
+    float4x4 mView;     // ビュー行列
+    float4x4 mProj;     // プロジェクション行列
 };
 
 //スキニング用の頂点データをひとまとめ。
 struct SSkinVSIn
 {
-    int4 Indices : BLENDINDICES0;
-    float4 Weights : BLENDWEIGHT0;
+    int4   Indices : BLENDINDICES0;     // 影響するボーンの番号（最大4本）
+    float4 Weights : BLENDWEIGHT0;      // 各ボーンの影響度（合計1.0になる）
 };
 
-// 頂点シェーダーへの入力
-struct SVSIn
+// 頂点シェーダーへの入力（1頂点のデータ）
+struct SVSIn  
 {
-    float4 pos : POSITION;
-    float3 normal : NORMAL;
-    float3 tangent : TANGENT;
-    float3 biNormal : BINORMAL;
-    float2 uv : TEXCOORD0;
-    SSkinVSIn skinVert; //スキン用のデータ。
-    uint instanceID : SV_InstanceID;
-
+    float4 pos      : POSITION;      // 頂点の座標（モデル座標系）
+    float3 normal   : NORMAL;        // 頂点の法線ベクトル
+    float3 tangent  : TANGENT;       // 接ベクトル（法線マップ用）
+    float3 biNormal : BINORMAL;      // 従ベクトル（法線マップ用）
+    float2 uv       : TEXCOORD0;     // UV座標（テクスチャのどこを使うか）
+    SSkinVSIn skinVert;              // スキニング用データ
+    uint instanceID : SV_InstanceID; // インスタンシング描画時のID
 };
 
-//ピクセルシェーダーへの入力
-struct SPSIn
+// ピクセルシェーダーへの入力（頂点シェーダーの出力がここに来る）
+struct SPSIn  
 {
-    float4 pos : SV_POSITION; //座標。
-    float3 normal : NORMAL;
-    float3 tangent : TANGENT;
-    float3 biNormal : BINORMAL;
-    float2 uv : TEXCOORD0;
-    float3 worldPos : TEXCOORD1;
+    float4 pos      : SV_POSITION;   // スクリーン座標系に変換済みの座標
+    float3 normal   : NORMAL;        // ワールド空間に変換済みの法線
+    float3 tangent  : TANGENT;       // ワールド空間に変換済みの接ベクトル
+    float3 biNormal : BINORMAL;      // ワールド空間に変換済みの従ベクトル
+    float2 uv       : TEXCOORD0;     // UV座標（そのまま引き継ぐ）
+    float3 worldPos : TEXCOORD1;     // ワールド座標（ライティング計算用）
 };
 
-// ピクセルシェーダーからの出力
-struct SPSOut
+// ピクセルシェーダーからの出力（GBufferに書き込まれる）
+struct SPSOut  
 {
-    float4 albedo : SV_Target0; // アルベド
-    float4 normal : SV_Target1; // 法線
-    float specPow : SV_Target2; // スペキュラ強度
+    float4 albedo  : SV_Target0;  // アルベド（色） → GBuffer[0]に書き込み
+    float4 normal  : SV_Target1;  // 法線           → GBuffer[1]に書き込み
+    float  specPow : SV_Target2;  // スペキュラ強度  → GBuffer[2]に書き込み
 };
 
 //シェーダーリソース
-Texture2D<float4> g_albedo : register(t0); //アルベドマップ
-Texture2D<float4> g_normalMap : register(t1); //法線マップにアクセスするための変数。
-Texture2D<float4> g_specularMap : register(t2); //スペキュラマップにアクセスするための変数。
-StructuredBuffer<float4x4> g_boneMatrix : register(t3); //ボーン行列。
-StructuredBuffer<float4x4> g_worldMatrixArray : register(t10); //ワールド行列の配列。インスタンシング描画の際に有効。
-
-
-//サンプラーステート
-sampler g_sampler : register(s0);
+Texture2D<float4> g_albedo      : register(t0);  // アルベドマップ（モデルの色テクスチャ）
+Texture2D<float4> g_normalMap   : register(t1);  // 法線マップ（凹凸情報）
+Texture2D<float4> g_specularMap : register(t2);  // スペキュラマップ（光沢情報）
+StructuredBuffer<float4x4> g_boneMatrix       : register(t3);   // ボーン行列（スキニング用）
+StructuredBuffer<float4x4> g_worldMatrixArray : register(t10);  // インスタンス用ワールド行列
+sampler g_sampler : register(s0);  // サンプラー（テクスチャをどう読むかの設定）
 
 float3 CalcNormal(SPSIn psIn);
 
 //スキン行列を計算する。
 float4x4 CalcSkinMatrix(SSkinVSIn skinVert)
 {
-    float4x4 skinning = 0;
-    float w = 0.0f;
-	[unroll]
+    float4x4 skinning = 0;   // 結果行列（ゼロ初期化）
+    float w = 0.0f;          // ウェイトの合計（正規化確認用）
+
+    [unroll]  // ループを展開してGPU最適化
     for (int i = 0; i < 3; i++)
     {
+        // ボーン行列 × ウェイト を加算していく（加重平均）
         skinning += g_boneMatrix[skinVert.Indices[i]] * skinVert.Weights[i];
-        w += skinVert.Weights[i];
+        w += skinVert.Weights[i];  // ウェイト合計を積算
     }
-    
+
+    // 4本目のウェイトは「1.0 - 残り3本の合計」で求める（精度節約のため）
     skinning += g_boneMatrix[skinVert.Indices[3]] * (1.0f - w);
-	
+
     return skinning;
 }
 
@@ -159,7 +158,7 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
 
         
     psOut.normal.xyz = CalcNormal(psIn);
-    psOut.normal.xyz = normalize(psOut.normal.xyz);
+    //psOut.normal.xyz = normalize(psOut.normal.xyz);
 
     
     
@@ -195,16 +194,19 @@ SPSOut PSMain(SPSIn psIn) : SV_Target0
 // 法線マップから法線を計算する関数
 float3 CalcNormal(SPSIn psIn)
 {
-    // 法線マップからタンジェントスペースの法線をサンプリングする
     float3 normalMap = g_normalMap.Sample(g_sampler, psIn.uv).xyz;
+
+    // sRGB で読み込まれているので、リニア→sRGB 変換で元の値に戻す
+    normalMap = pow(normalMap, 1.0f / 2.2f);
+
     normalMap = (normalMap - 0.5f) * 2.0f;
-    
-    float3 normal = float3(1.0f, 1.0f, 1.0f);
 
-    // タンジェントスペースの法線をワールドスペースに変換する
-    normal = (psIn.tangent * normalMap.x) + (psIn.biNormal * normalMap.y) + (psIn.normal * normalMap.z);
+    float3 normal;
+    normal = (psIn.tangent * normalMap.x) 
+           + (psIn.biNormal * normalMap.y) 
+           + (psIn.normal * normalMap.z);
 
-    //// 出力は0～1に丸められてしまいマイナスの値が失われてしまうので-1～1を0～1に変換する
+    normal = normalize(normal);
     normal = (normal / 2.0f) + 0.5f;
 
     return normal;
