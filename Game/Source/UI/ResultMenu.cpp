@@ -15,7 +15,7 @@ namespace
 	// ---------------------------------------------------------
 	// 色設定（フォントカラー）
 	// ---------------------------------------------------------
-	const Vector4 COLOR_DIGIT_TIME_SCORE = { 0.0f, 0.8f, 1.0f, 1.0f }; // シアン（例）
+	const Vector4 COLOR_DIGIT_TIME_SCORE = { 0.0f, 0.3f, 1.0f, 1.0f }; // シアン（例）
 	const Vector4 COLOR_DIGIT_TOTAL = { 1.0f, 1.0f, 0.0f, 1.0f }; // 黄色
 
 	// アニメーション用タイマー
@@ -26,16 +26,19 @@ namespace
 
 	// アチーブメント動的UI生成用のベース座標とオフセット（※動的生成のためここに定義）
 	const Vector3 ACHIEVE_START_POS = { -200.0f, 150.0f, 0.0f };
-	constexpr float ACHIEVE_OFFSET_X_CHECK = -70.0f;
-	constexpr float ACHIEVE_OFFSET_X_NAME = 250.0f;
+	constexpr float ACHIEVE_OFFSET_X_CHECK = -90.0f;
+	constexpr float ACHIEVE_OFFSET_X_NAME = 280.0f;
+	constexpr float ACHIEVE_OFFSET_X_BACK = 210.0f;
 	constexpr float ACHIEVE_OFFSET_Y = -80.0f;
 
 	constexpr float ACHIEVE_NAME_W = 570.0f;
-	constexpr float ACHIEVE_NAME_H = 50.0f;
-	constexpr float ACHIEVE_BOX_W = 40.0f;
-	constexpr float ACHIEVE_BOX_H = 40.0f;
-	constexpr float ACHIEVE_CHECK_W = 90.0f;
-	constexpr float ACHIEVE_CHECK_H = 90.0f;
+	constexpr float ACHIEVE_NAME_H = 40.0f;
+	constexpr float ACHIEVE_BACK_W = 530.0f;
+	constexpr float ACHIEVE_BACK_H = 120.0f;
+	constexpr float ACHIEVE_BOX_W = 60.0f;
+	constexpr float ACHIEVE_BOX_H = 60.0f;
+	constexpr float ACHIEVE_CHECK_W = 60.0f;
+	constexpr float ACHIEVE_CHECK_H = 60.0f;
 
 	// 合計スコア動的生成用
 	constexpr float TOTAL_DIGIT_W = 80.0f;
@@ -237,14 +240,32 @@ namespace app
 				currentIconPos.x += ACHIEVE_OFFSET_X_CHECK;
 				currentIconPos.y = commonY;
 
+
 				Vector3 currentNamePos = ACHIEVE_START_POS;
 				currentNamePos.x += ACHIEVE_OFFSET_X_NAME;
 				currentNamePos.y = commonY;
 
+
+				Vector3 currentBackPos = ACHIEVE_START_POS;
+				currentBackPos.x += ACHIEVE_OFFSET_X_BACK;
+				currentBackPos.y = commonY;
+
+
+
+				std::string achieveBackKeyName = "AchieveBack_" + std::to_string(i);
+				uint32_t achieveBackKey = Hash32(achieveBackKeyName.c_str());
+				canvas->CreateUI<UIIcon>(achieveBackKey);
+				auto* achieveBack = canvas->FindUI<UIIcon>(achieveBackKey);
+				if (achieveBack)
+				{
+					achieveBack->Initialize("Assets/spriteData/UI/Achievement/achievementBack.DDS", ACHIEVE_BACK_W, ACHIEVE_BACK_H, currentBackPos, Vector3::One, Quaternion::Identity, Vector4::White);
+					achieveBack->m_isDraw = true;
+				}
+
+
 				std::string nameAssetPath = "Assets/spriteData/UI/Achievement/AchieveName_/" + achieve->GetSpriteName() + ".DDS";
 				std::string nameKeyName = "AchieveName_" + std::to_string(i);
 				uint32_t nameKey = Hash32(nameKeyName.c_str());
-
 				canvas->CreateUI<UIIcon>(nameKey);
 				auto* nameIcon = canvas->FindUI<UIIcon>(nameKey);
 				if (nameIcon)
@@ -252,6 +273,7 @@ namespace app
 					nameIcon->Initialize(nameAssetPath.c_str(), ACHIEVE_NAME_W, ACHIEVE_NAME_H, currentNamePos, Vector3::One, Quaternion::Identity, Vector4::White);
 					nameIcon->m_isDraw = true;
 				}
+
 
 				std::string checkBoxKeyName = "AchieveCheckBox_" + std::to_string(i);
 				uint32_t checkBoxKey = Hash32(checkBoxKeyName.c_str());
@@ -262,6 +284,8 @@ namespace app
 					checkBoxIcon->Initialize("Assets/spriteData/UI/Achievement/checkBox.DDS", ACHIEVE_BOX_W, ACHIEVE_BOX_H, currentIconPos, Vector3::One, Quaternion::Identity, Vector4::White);
 					checkBoxIcon->m_isDraw = true;
 				}
+
+
 
 				if (achieve->IsAchieved())
 				{

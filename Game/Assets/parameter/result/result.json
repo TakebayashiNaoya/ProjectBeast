@@ -18,7 +18,7 @@
                 "asset": "Assets/spriteData/UI/TextSprite/Result/ClearTimeUI.DDS",
                 "width": 480,
                 "height": 270,
-                "position": [-365, 320, 0],
+                "position": [-310, 320, 0],
                 "scale": [1, 1, 1],
                 "rotation": 0,
                 "color": [255, 255, 255, 255]
@@ -29,7 +29,7 @@
                 "asset": "Assets/spriteData/UI/TextSprite/Result/RescueUI.DDS",
                 "width": 480,
                 "height": 270,
-                "position": [290, 320, 0],
+                "position": [320, 320, 0],
                 "scale": [1, 1, 1],
                 "rotation": 0,
                 "color": [255, 255, 255, 255]
@@ -54,7 +54,7 @@
                 "position": [500, -375, 0],
                 "scale": [1, 1, 1],
                 "rotation": 0,
-                "color": [255, 255, 255, 0]
+                "color": [255, 255, 255, 255]
             },
             {
                 "type": "UIDigit",
@@ -64,7 +64,7 @@
                 "number": 0,
                 "width": 64.0,
                 "height": 80.0,
-                "position": [-250.0, 280.0, 0.0],
+                "position": [-260.0, 280.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
                 "rotation": 0.0
             },
@@ -76,7 +76,7 @@
                 "number": 0,
                 "width": 64.0,
                 "height": 80.0,
-                "position": [375.0, 280.0, 0.0],
+                "position": [320.0, 280.0, 0.0],
                 "scale": [1.0, 1.0, 1.0],
                 "rotation": 0.0
             }
