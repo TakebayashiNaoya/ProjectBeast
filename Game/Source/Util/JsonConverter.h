@@ -103,6 +103,18 @@ namespace app
 				return json.get<std::string>();
 			}
 			/**
+			 * @brief jsonからVector2を読み込む
+			 * @param json読み込むjsonファイル
+			 * @return 読み込んだVector2
+			 */
+			static inline Vector2 ToVector2(const nlohmann::json& json)
+			{
+				return Vector2(
+					json[0].get<float>(),
+					json[1].get<float>()
+				);
+			}
+			/**
 			 * @brief jsonからVector3を読み込む
 			 * @param json 読み込むjsonファイル
 			 * @return 読み込んだVector3
@@ -113,6 +125,20 @@ namespace app
 					json[0].get<float>(),
 					json[1].get<float>(),
 					json[2].get<float>()
+				);
+			}
+			/**
+			 * @brief jsonからVector4を読み込む
+			 * @param json 読み込むjsonファイル	
+			 * @return 読み込んだVector4
+			 */
+			static inline Vector4 ToVector4(const nlohmann::json& json)
+			{
+				return Vector4(
+					json[0].get<float>(),
+					json[1].get<float>(),
+					json[2].get<float>(),
+					json[3].get<float>()
 				);
 			}
 			/**

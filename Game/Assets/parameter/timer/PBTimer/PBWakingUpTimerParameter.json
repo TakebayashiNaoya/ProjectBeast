@@ -1,0 +1,18 @@
+[
+    {
+        "comment":"シロクマの起床タイマー専用のステータス",
+        "timerFirstValue":30,
+        "timerSecondValue":20,
+        "timerThirdValue":10,
+        "timerFourthValue":0,
+        "offsetValueY":220,
+        "ratioProgress":1,
+        "degreeValue":30,
+        "degreeMaxValue":360,
+        "initialPosZ":0,
+        "resetValue":0,
+        "offsetPosY":225,
+        "arrowPivot":[ 0.3, 0],
+        "skeltonColor":[ 0, 0, 0, 0.4]
+    }
+]

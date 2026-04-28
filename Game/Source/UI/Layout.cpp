@@ -10,6 +10,7 @@
 #include <Windows.h>
 #include "Source/Util/CRC32.h"
 
+
 namespace
 {
 	/** カラーに使う用の値 */
@@ -23,7 +24,7 @@ namespace
 	{
 		if (utf8Str.empty())return std::wstring();
 		/** @brief UTF-8をUnicode(UTF-16)に変換*/
-		int size_needed = MultiByteToWideChar(CP_UTF8, 0, &utf8Str[0], (int)utf8Str.size(), NULL, 0);
+		int size_needed = MultiByteToWideChar(CP_UTF8, 0, &utf8Str[0], static_cast<int>(utf8Str.size()), NULL, 0);
 		std::wstring wstrTo(size_needed, 0);
 		MultiByteToWideChar(CP_UTF8, 0, &utf8Str[0], (int)utf8Str.size(), &wstrTo[0], size_needed);
 		return wstrTo;
@@ -91,6 +92,31 @@ template<typename T>
 void InitializeUIParts(T* parts, const nlohmann::json& item)
 {
 	K2_ASSERT(false, "未実装\n");
+}
+
+
+void InitializeUIParts(app::ui::UICircleGauge* gauge, const nlohmann::json& item)
+{
+	const std::string asset = item["asset"].get<std::string>();
+	const std::string fx = item["fx"].get<std::string>();
+	const float w = item["width"].get<float>();
+	const float h = item["height"].get<float>();
+	const Vector3 position = ParseVector3(item["position"]);
+	const Vector3 scale = ParseVector3(item["scale"]);
+	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
+	const Vector2 pivot = ParseVector2(item["pivot"]);
+	const Vector4 gaugeColor = ParseColor(item["gaugeColor"]);
+	const Vector4 bgColor = ParseColor(item["bgColor"]);
+	const float innerRadius = item["innerRadius"].get<float>();
+	const float outerRadius = item["outerRadius"].get<float>();
+
+
+	gauge->Initialize(asset.c_str(),fx.c_str(), w, h, position, scale, rotation, pivot, gaugeColor, bgColor, innerRadius, outerRadius);
+	gauge->m_transform.m_localTransform.m_position = position;
+	gauge->m_transform.m_localTransform.m_scale = scale;
+	gauge->m_transform.m_localTransform.m_rotation = rotation;
+	gauge->m_color = gaugeColor;
+	gauge->m_pivot = pivot;
 }
 
 
@@ -182,7 +208,7 @@ namespace app
 		{
 			m_menu->Update();
 
-#ifdef APP_ENEBLE_LAYOUT_HOTRELOAD
+#ifdef APP_ENABLE_LAYOUT_HOTRELOAD
 			/** ホットリロードチェック */
 			struct stat st;
 			if (stat(m_filePath.c_str(), &st) == 0)
@@ -268,6 +294,13 @@ namespace app
 				auto* digit = canvas->FindUI<UIDigit>(key);
 				InitializeUIParts(digit, item);
 				return digit;
+			}
+			if (type == "UICircleGauge")
+			{
+				canvas->CreateUI<UICircleGauge>(key);
+				auto* cirGauge = canvas->FindUI<UICircleGauge>(key);
+				InitializeUIParts(cirGauge, item);
+				return cirGauge;
 			}
 			return nullptr;
 		}
