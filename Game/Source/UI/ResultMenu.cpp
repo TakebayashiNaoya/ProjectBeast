@@ -81,6 +81,8 @@ namespace app
 
 			auto* timeDigit = GetUI<UIDigit>(Hash32("ResultTimeDigit"));
 			auto* scoreDigit = GetUI<UIDigit>(Hash32("ResultScoreDigit"));
+			auto* titleBackText = GetUI<UIIcon>(Hash32("TitleBackText"));
+
 
 			if (timeDigit)
 			{
@@ -91,6 +93,10 @@ namespace app
 			{
 				scoreDigit->SetNumber(m_collectedPenguin);
 				scoreDigit->m_isDraw = true;
+			}
+			if (titleBackText)
+			{
+				titleBackText->m_isDraw = false;
 			}
 
 			SetupAchievementUI();
@@ -204,8 +210,7 @@ namespace app
 					auto* titleBackText = GetUI<UIIcon>(Hash32("TitleBackText"));
 					if (titleBackText)
 					{
-						// JSONで非表示(アルファ0)にしていたものを表示(アルファ1)にする
-						titleBackText->m_color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+						titleBackText->m_isDraw = true;
 					}
 					m_titleButtonShown = true;
 				}
