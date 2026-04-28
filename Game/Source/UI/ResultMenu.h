@@ -6,6 +6,7 @@
 #pragma once
 #include "Menu.h"
 #include "Source/Achivement/AchievementManager.h"
+#include "Source/Sound/SoundManager.h"
 #include "UIParts.h"
 
 
@@ -42,6 +43,8 @@ namespace app
 			int m_collectedPenguin;
 			float m_totalScore;
 			std::vector<app::achievement::AchievementBase*> m_allAchievementList;
+
+			app::SEHandle m_drumRollHandle;
 
 		private:
 			std::vector<UIIcon*> m_checkIconList; // 達成済みチェックアイコン（表示順）

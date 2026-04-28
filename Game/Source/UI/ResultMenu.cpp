@@ -20,9 +20,9 @@ namespace
 
 	// アニメーション用タイマー
 	constexpr float CHECK_REVEAL_DELAY = 1.0f;
-	constexpr float CHECK_REVEAL_INTERVAL = 0.5f;
-	constexpr float TOTAL_REVEAL_DELAY = 0.5f;
-	constexpr float TITLE_BUTTON_DELAY = 0.5f;
+	constexpr float CHECK_REVEAL_INTERVAL = 1.0f;
+	constexpr float TOTAL_REVEAL_DELAY = 1.0f;
+	constexpr float TITLE_BUTTON_DELAY = 1.5f;
 
 	// アチーブメント動的UI生成用のベース座標とオフセット（※動的生成のためここに定義）
 	const Vector3 ACHIEVE_START_POS = { -200.0f, 150.0f, 0.0f };
@@ -64,6 +64,7 @@ namespace app
 			, m_postCheckTimer(0.0f)
 			, m_totalScoreShown(false)
 			, m_titleButtonShown(false)
+			, m_drumRollHandle(app::INVALID_SE_HANDLE)
 		{}
 
 
@@ -103,6 +104,9 @@ namespace app
 			}
 
 			SetupAchievementUI();
+
+			m_drumRollHandle = SoundManager::Get().PlaySE(enSoundKind_DrumRoll, false);
+
 		}
 
 
@@ -143,7 +147,7 @@ namespace app
 					if (m_checkRevealTimer >= threshold)
 					{
 						m_checkIconList[m_checkRevealIndex]->SetIsDraw(true);
-						SoundManager::Get().PlaySE(enSoundKind_ResultCheck);
+						SoundManager::Get().PlaySE(enSoundKind_ResultStamp);
 						m_checkRevealIndex++;
 					}
 				}
@@ -191,6 +195,14 @@ namespace app
 							m_totalDigit->m_isDraw = true;
 						}
 					}
+
+					if (m_drumRollHandle != app::INVALID_SE_HANDLE)
+					{
+						SoundManager::Get().StopSE(m_drumRollHandle);
+						m_drumRollHandle = app::INVALID_SE_HANDLE; // 停止後は無効値に戻しておく
+					}
+
+					SoundManager::Get().PlaySE(enSoundKind_Cymbals);
 					m_totalScoreShown = true;
 					m_postCheckTimer = 0.0f;
 				}
@@ -200,6 +212,7 @@ namespace app
 			// フェーズ3：Aボタンガイドを表示（JSONで用意したTitleBackTextのアルファを上げる）
 			if (!m_titleButtonShown)
 			{
+
 				if (m_totalDigit)
 				{
 					m_totalDigit->m_color = COLOR_DIGIT_TOTAL;
