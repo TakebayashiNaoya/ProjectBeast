@@ -4,7 +4,7 @@
  * @author 忽那
  */
 #pragma once
-#include "Source/UI/UIParts.h"
+#include "Source/UI/Parts/UIParts.h"
 
 
 namespace app
@@ -24,7 +24,6 @@ namespace app
 			MenuBase(){}
 			virtual ~MenuBase() { Clear(); }
 
-
 			/** 更新処理 */
 			virtual void Update()
 			{
@@ -33,7 +32,6 @@ namespace app
 					m_canvas->Update();
 				}
 			}
-
 
 			/** 描画機能処理 */
 			virtual void Render(RenderContext& rc)
@@ -52,13 +50,11 @@ namespace app
 			 */
 			void SetCanvas(UICanvas* canvas) { m_canvas.reset(canvas); }
 			
-			
 			/**
 			 * @brief キャンバスを取得
 			 * @return キャンバスのポインタを取得
 			 */
 			UICanvas* GetCanvas() { return m_canvas.get(); }
-
 
 			/** 
 			 * @brief UIを登録
@@ -70,7 +66,6 @@ namespace app
 				m_uiMap.emplace(key, ui);
 			}
 
-
 			/**
 			 * @brief UIの登録解除
 			 * @param key キー
@@ -79,7 +74,6 @@ namespace app
 			{
 				m_uiMap.erase(key);
 			}
-
 
 			/**
 			 * @brief UIの取得
@@ -95,13 +89,11 @@ namespace app
 				return nullptr;
 			}
 
-
 			/** UIが存在するかどうか */
 			bool HasUI(const uint32_t& key)const
 			{
 				return m_uiMap.count(key) > 0;
 			}
-
 
 			/** UIの消去(クリア) */
 			void Clear()
@@ -109,21 +101,19 @@ namespace app
 				m_uiMap.clear();
 			}
 
-
 			/** 
 			 * @brief UIのロジック初期化処理
 			 * @brief ここに「ボタンが押された時の処理」等を書く
+			 * @brief 純粋仮想関数。MenuBaseを継承したクラスは必ずこの関数を実装する必要がある。
 			 */
-			virtual void InitializeLogic()
-			{
-			}
+			virtual void InitializeLogic(){}
 
 
 		protected:
 			/** UICanvasを生成 */
-			std::unique_ptr<UICanvas>m_canvas = nullptr;
+			std::unique_ptr<UICanvas> m_canvas = nullptr;
 			/** キーと値の保持 */
-			std::unordered_map<uint32_t, UIBase*>m_uiMap;
+			std::unordered_map<uint32_t, UIBase*> m_uiMap;
 		};
 	}
 }

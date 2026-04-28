@@ -8,10 +8,10 @@
 #include "InGameScene.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Layout.h"
-#include "Source/UI/SoundOptionMenu.h"
-#include "Source/UI/TutorialMenu.h"
+#include "Source/UI/Menus/SoundOptionMenu.h"
+#include "Source/UI/Menus/TutorialMenu.h"
 #include "TitleScene.h"
-#include "Source/UI/TitleEventMenu.h"
+#include "Source/UI/Menus/TitleEventMenu.h"
 
 
 namespace app

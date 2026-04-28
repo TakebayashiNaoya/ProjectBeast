@@ -32,11 +32,11 @@
 
 #include "Source/Achivement/AchievementManager.h"
 
-#include "Source/UI/CountDownMenu.h"
-#include "Source/UI/FinishMenu.h"
-#include "Source/UI/PauseScreenMenu.h"
-#include "Source/UI/SoundOptionMenu.h"
-#include "Source/UI/TutorialMenu.h"
+#include "Source/UI/Menus/CountDownMenu.h"
+#include "Source/UI/Menus/FinishMenu.h"
+#include "Source/UI/Menus/PauseScreenMenu.h"
+#include "Source/UI/Menus/SoundOptionMenu.h"
+#include "Source/UI/Menus/TutorialMenu.h"
 
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"

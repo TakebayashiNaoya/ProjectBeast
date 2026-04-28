@@ -5,7 +5,7 @@
  */
 #include "stdafx.h"
 #include "FinishMenu.h"
-#include "Source/UI/UIAnimation.h"
+#include "Source/UI/Animation/UIAnimation.h"
 #include "Source/Util/CRC32.h"
 
 
