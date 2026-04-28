@@ -14,6 +14,7 @@ namespace nsBeastEngine
 	 */
 	enum EnSkyCubeType
 	{
+		enSkyCubeType_Clear,		/** 快晴 */
 		enSkyCubeType_Day,			/** 昼間 */
 		enSkyCubeType_Night,		/** 夜間 */
 		enSkyCubeType_Snow,			/** 雪山 */
