@@ -20,6 +20,14 @@ namespace app
 				EnCountDownType type;
 			};
 
+			const Vector4 START_COLOR_VALUE = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+			const Vector4 END_COLOR_VALUE = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+			const Vector3 START_SCALE_VALUE = Vector3::Zero;
+			const Vector3 END_SCALE_VALUE = Vector3(1.5f, 1.5f, 1.5f);
+			constexpr float ANIM_FIRST = 0.2f;
+			constexpr float ANIM_SECOND = 1.0f;
+			constexpr float ANIM_THIRD = 1.0f;
+
 			
 			// 割るだけの値。
 			constexpr float TIME_VALUE = 10.0f;
@@ -238,11 +246,11 @@ namespace app
 
 						// アニメーションのパラメーターを設定。
 						// 最初は大きさが変わらない。
-						Vector3 startScale(0.0f, 0.0f, 0.0f);
+						Vector3 startScale(START_SCALE_VALUE);
 						// 最終的な大きさ。
-						Vector3 endScale(1.5f, 1.5f, 1.5f);
+						Vector3 endScale(END_SCALE_VALUE);
 						// 間隔。
-						float duration = 0.2f;;
+						float duration = ANIM_FIRST;
 
 						// アニメーションの設定。
 						scaleAnim->SetParameter(
@@ -259,9 +267,9 @@ namespace app
 						// フェードアウトするアニメーションを作成。
 						auto colorAnim = std::make_unique<UIColorAnimation>();
 
-						Vector4 startColor(1.0f, 1.0f, 1.0f, 1.0f);
-						Vector4 endColor(1.0f, 1.0f, 1.0f, 0.0f);
-						float durationColor = 1.0f;
+						Vector4 startColor(START_COLOR_VALUE);
+						Vector4 endColor(END_COLOR_VALUE);
+						float durationColor = ANIM_FIRST;
 
 						// アニメーションの設定。
 						colorAnim->SetParameter(
@@ -280,9 +288,9 @@ namespace app
 					{
 						// シーンのフェードを使わないで、UIAnimationだけでフェードを行う。
 						auto colorAnim = std::make_unique<UIColorAnimation>();
-						Vector4 startColor(1.0f, 1.0f, 1.0f, 1.0f);
-						Vector4 endColor(1.0f, 1.0f, 1.0f, 0.0f);
-						float durationColor = 1.0f;
+						Vector4 startColor(START_COLOR_VALUE);
+						Vector4 endColor(END_COLOR_VALUE);
+						float durationColor = ANIM_THIRD;
 
 						// アニメーションの設定。
 						colorAnim->SetParameter(

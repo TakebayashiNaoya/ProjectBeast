@@ -20,6 +20,13 @@ namespace app
 				EnInGameTimerType type;
 			};
 
+			// マジックナンバー対策。
+			const Vector4 BLINK_TEXT_COLOR = { 20.0f, 0.0f, 0.0f, 1.0f };
+			const Vector4 CLOCK_ROT_COLOR = { 1.0f, 0.0f, 0.0f, 1.0f };
+			const Vector3 CLOCK_SCALE_MAX = { 1.2f, 1.2f, 1.2f };
+			constexpr float CLOCK_SCALE_DURATION = 0.5f;
+
+
 			// タイムが現在のタイム以下の時点滅させる闘値。
 			constexpr float BLINK_THRESHOLD = 31.0f;
 			// 点滅の間隔。
@@ -113,9 +120,7 @@ namespace app
 			, m_isBlinkAnimationPlaying(false)
 			, m_isRotAnimationPlaying(false)
 			, m_isScaleAnimPlaying(false)
-		{
-			/** BattleManagerへの登録はInGameUIManagerのlambdaが担うため、ここでは行わない */
-		}
+		{}
 
 
 		void InGameTimerMenu::Update()
@@ -208,7 +213,7 @@ namespace app
 				if(!m_isBlinkAnimationPlaying)
 				{
 					Vector4 startColor = Vector4::White;
-					Vector4 endColor(20.0f, 0.0f, 0.0f, 1.0f);
+					Vector4 endColor(BLINK_TEXT_COLOR);
 					// 各Digitにカラーアニメーションを登録して再生させる。
 					auto SetColorAnim = [&](UIDigit* digit)
 						{
@@ -301,7 +306,7 @@ namespace app
 					clock->PlayAnimation();
 
 					// アニメーション再生中は赤色に固定させる。
-					const Vector4 redColor(1.0f, 0.0f, 0.0f, 1.0f);
+					const Vector4 redColor(CLOCK_ROT_COLOR);
 					clock->m_color = redColor;
 					m_isRotAnimationPlaying = true;
 				}
@@ -315,8 +320,8 @@ namespace app
 							if (icon == nullptr)return;
 
 							Vector3 startScale = Vector3::One;
-							Vector3 endScale(1.2f, 1.2f, 1.2f);
-							float scaleDuration = 0.5f;
+							Vector3 endScale(CLOCK_SCALE_MAX);
+							float scaleDuration = CLOCK_SCALE_DURATION;
 							auto scaleAnim = std::make_unique<UIScaleAnimation>();
 							scaleAnim->SetParameter(
 								startScale
