@@ -9,7 +9,7 @@
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
 #include "Source/Sound/SoundManager.h"
-#include "Source/UI/UIParts.h" 
+#include "Source/UI/Parts/UIParts.h" 
 #include "Source/Util/CRC32.h" 
 #include "TitleScene.h"
 
