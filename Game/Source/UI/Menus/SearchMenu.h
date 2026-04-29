@@ -16,26 +16,9 @@ namespace app
 		{
 			CanFind,
 			CanNotFind,
+			//CanFindFrame,
+			//CanNotFindFrame,
 			Max
-		};
-
-
-		class SearchIcon
-		{
-		public:
-			SearchIcon(EnSearchType type);
-			~SearchIcon();
-			void Update();
-			void SetUIIcon(UIIcon* icon);
-			void SetIsDraw(bool isDraw)
-			{
-				m_icon->m_isDraw = isDraw;
-			}
-
-
-		private:
-			UIIcon* m_icon;
-			EnSearchType m_type;
 		};
 
 
@@ -53,6 +36,12 @@ namespace app
 			 */
 			void Searching();
 			
+			/**
+			 * @brief アイコンとフレームの描画のオンオフをまとめる用
+			 * @param isDraw アイコンとフレームの描画の設定
+			 */
+			void SetAllIconActive(bool isDraw);
+
 			/**
 			 * @brief タイプの取得
 			 * @return m_currentType タイプの取得
@@ -92,9 +81,9 @@ namespace app
 			actor::Enemy* m_enemy;
 			EnSearchType m_currentType;
 
-			using Icon = std::unique_ptr<SearchIcon>;
-			using Key = uint32_t;
-			std::unordered_map<Key, Icon>m_searchIconMap;
+			//using Icon = std::unique_ptr<SearchIcon>;
+			//using Key = uint32_t;
+			//std::unordered_map<Key, Icon>m_searchIconMap;
 		};
 	}
 }

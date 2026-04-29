@@ -3,14 +3,36 @@
         "elements":[
             {
                 "type":"UIIcon",
+                "name":"canSearchFrame",
+                "asset":"Assets/spriteData/UI/TextSprite/PBSearch/ExclamationFrameIcon.dds",
+                "width":180,
+                "height":160,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"canNotSearchFrame",
+                "asset":"Assets/spriteData/UI/TextSprite/PBSearch/QuestionFrameIcon.dds",
+                "width":160,
+                "height":160,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
                 "name":"canSearchIcon",
                 "asset":"Assets/spriteData/UI/TextSprite/PBSearch/SearchIconExclamationmark.dds",
                 "width":150,
-                "height":150,
-                "position":[0,0,0],
-                "scale":[1,1,1],
+                "height":160,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
@@ -18,10 +40,10 @@
                 "asset":"Assets/spriteData/UI/TextSprite/PBSearch/SearchIconQuestionmark.dds",
                 "width":150,
                 "height":150,
-                "position":[0,0,0],
-                "scale":[1,1,1],
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[ 255, 255, 255, 255]
             }
         ]
     }
