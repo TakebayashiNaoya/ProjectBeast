@@ -19,6 +19,9 @@ namespace
 	constexpr float SCORE_TIME_DIVISOR = 100.0f; // タイムボーナス計算用の除数
 	constexpr float SCORE_BASE_MULTIPLIER = 100.0f; // 救出数の基本スコア倍率
 	constexpr float SCENE_WAIT_TIME = 3.0f;   // 次シーンへの遷移待機秒数
+
+	constexpr int   MIN_ACHIEVE_MULTIPLIER = 1;    // アチーブメント未達成時の最低倍率
+	constexpr float BASE_TIME_MULTIPLIER = 1.0f; // タイム倍率の基礎値（1.0倍）
 }
 
 
@@ -48,7 +51,7 @@ namespace app
 
 	bool ResultScene::Start()
 	{
-		m_clearTime = 65.0f;
+		m_clearTime = s_clearTime;
 		m_collectedPenguin = s_collectedPenguin;
 
 		if (auto* am = app::achievement::AchievementManager::GetInstance())
@@ -123,8 +126,8 @@ namespace app
 			}
 		}
 
-		int achieveMultiplier = (achievedCount > 0) ? achievedCount : 1;
-		float timeMultiplier = 1.0f + (m_clearTime / SCORE_TIME_DIVISOR);
+		int achieveMultiplier = (achievedCount > 0) ? achievedCount : MIN_ACHIEVE_MULTIPLIER;
+		float timeMultiplier = BASE_TIME_MULTIPLIER + (m_clearTime / SCORE_TIME_DIVISOR);
 		float baseScore = static_cast<float>(m_collectedPenguin) * SCORE_BASE_MULTIPLIER;
 
 		m_totalScore = baseScore * static_cast<float>(achieveMultiplier) * timeMultiplier;

@@ -40,7 +40,7 @@
                 "asset": "Assets/spriteData/UI/TextSprite/Result/TotalUI.DDS",
                 "width": 640,
                 "height": 360,
-                "position": [15, -275, 0],
+                "position": [13, -275, 0],
                 "scale": [1, 1, 1],
                 "rotation": 0,
                 "color": [255, 255, 255, 255]
@@ -51,7 +51,7 @@
                 "asset": "Assets/spriteData/UI/TextSprite/Result/TitleBack_2.DDS",
                 "width": 640,
                 "height": 360,
-                "position": [500, -375, 0],
+                "position": [570, -375, 0],
                 "scale": [1, 1, 1],
                 "rotation": 0,
                 "color": [255, 255, 255, 255]

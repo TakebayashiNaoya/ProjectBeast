@@ -62,6 +62,15 @@ namespace
 	constexpr float TOTAL_DIGIT_H = 100.0f;
 	constexpr float TOTAL_DIGIT_CENTER_X = 0.0f;
 	constexpr float TOTAL_DIGIT_Y = -300.0f;
+
+	// ---------------------------------------------------------
+	// 内部計算用定数（マジックナンバー排除用）
+	// ---------------------------------------------------------
+	constexpr int   SECONDS_PER_MINUTE = 60;   // 1分間の秒数
+	constexpr int   SECONDS_DIGIT_COUNT = 2;    // 秒の表示桁数（常に2桁）
+	constexpr int   DECIMAL_BASE = 10;   // 10進数計算の基数
+	constexpr float CENTER_DIVISOR = 2.0f; // 中央揃え用の分割値
+	constexpr float HALF_OFFSET_RATIO = 0.5f; // UI配置用の半幅オフセット
 }
 
 
@@ -115,7 +124,7 @@ namespace app
 				int tmp = number;
 				while (tmp > 0)
 				{
-					tmp /= 10;
+					tmp /= DECIMAL_BASE;
 					digitCount++;
 				}
 				return digitCount;
@@ -125,22 +134,22 @@ namespace app
 			// クリアタイムの動的生成（M:SS形式）
 			// ---------------------------------------------------------
 			int totalSec = static_cast<int>(m_clearTime);
-			int minutes = totalSec / 60;
-			int seconds = totalSec % 60;
+			int minutes = totalSec / SECONDS_PER_MINUTE;
+			int seconds = totalSec % SECONDS_PER_MINUTE;
 
 			int minutesDigitCount = GetDigitCount(minutes);
 			// 秒は常に「06」のように2桁で表示するため、digitCountは 2 固定
 
 			// 「分」「コロン」「秒」を合わせた全体の幅を計算
-			float totalW = (minutesDigitCount * TOP_DIGIT_W) + TIME_COLON_W + (2 * TOP_DIGIT_W);
+			float totalW = (minutesDigitCount * TOP_DIGIT_W) + TIME_COLON_W + (SECONDS_DIGIT_COUNT * TOP_DIGIT_W);
 
 			// 全体が中央揃えになるための「左端」のX座標
-			float leftX = TIME_DIGIT_CENTER_X - (totalW / 2.0f);
+			float leftX = TIME_DIGIT_CENTER_X - (totalW / CENTER_DIVISOR);
 
 			// 各パーツの中心X座標を計算（UIDigitは一番右の桁を基準に配置される仕様に合わせる）
-			float minutesBaseX = leftX + (minutesDigitCount - 0.5f) * TOP_DIGIT_W;
-			float colonCenterX = leftX + (minutesDigitCount * TOP_DIGIT_W) + (TIME_COLON_W / 2.0f);
-			float secondsBaseX = leftX + totalW - (TOP_DIGIT_W / 2.0f);
+			float minutesBaseX = leftX + (minutesDigitCount - HALF_OFFSET_RATIO) * TOP_DIGIT_W;
+			float colonCenterX = leftX + (minutesDigitCount * TOP_DIGIT_W) + (TIME_COLON_W / CENTER_DIVISOR);
+			float secondsBaseX = leftX + totalW - (TOP_DIGIT_W / CENTER_DIVISOR);
 
 			// ①「分」の生成
 			uint32_t minKey = Hash32("ResultTimeMinDigit");
@@ -182,7 +191,7 @@ namespace app
 			{
 				secDigit->Initialize(
 					"Assets/spriteData/UI/Number/White",
-					2, seconds, // 常に2桁を指定することで勝手に0埋めされます
+					SECONDS_DIGIT_COUNT, seconds, // 常に2桁を指定することで勝手に0埋めされます
 					TOP_DIGIT_W, TOP_DIGIT_H,
 					Vector3(secondsBaseX, TOP_DIGIT_Y, 0.0f),
 					Vector3::One, Quaternion::Identity
@@ -199,7 +208,7 @@ namespace app
 			if (scoreDigit)
 			{
 				int digitCount = GetDigitCount(m_collectedPenguin);
-				float baseX = SCORE_DIGIT_CENTER_X + static_cast<float>(digitCount - 1) * TOP_DIGIT_W / 2.0f;
+				float baseX = SCORE_DIGIT_CENTER_X + static_cast<float>(digitCount - 1) * TOP_DIGIT_W / CENTER_DIVISOR;
 
 				scoreDigit->Initialize(
 					"Assets/spriteData/UI/Number/White",
@@ -234,7 +243,7 @@ namespace app
 				if (minDigit)
 				{
 					minDigit->m_color = COLOR_DIGIT_TIME_SCORE;
-					minDigit->SetNumber(totalSec / 60);
+					minDigit->SetNumber(totalSec / SECONDS_PER_MINUTE);
 				}
 				if (colonIcon)
 				{
@@ -243,7 +252,7 @@ namespace app
 				if (secDigit)
 				{
 					secDigit->m_color = COLOR_DIGIT_TIME_SCORE;
-					secDigit->SetNumber(totalSec % 60);
+					secDigit->SetNumber(totalSec % SECONDS_PER_MINUTE);
 				}
 
 				if (scoreDigit)
@@ -305,11 +314,11 @@ namespace app
 							int tmp = score;
 							while (tmp > 0)
 							{
-								tmp /= 10;
+								tmp /= DECIMAL_BASE;
 								digitCount++;
 							}
 
-							float baseX = TOTAL_DIGIT_CENTER_X + static_cast<float>(digitCount - 1) * TOTAL_DIGIT_W / 2.0f;
+							float baseX = TOTAL_DIGIT_CENTER_X + static_cast<float>(digitCount - 1) * TOTAL_DIGIT_W / CENTER_DIVISOR;
 
 							m_totalDigit->Initialize(
 								"Assets/spriteData/UI/Number/White",
