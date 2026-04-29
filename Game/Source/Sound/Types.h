@@ -32,6 +32,7 @@ namespace app
 		enSoundKind_PenguinWaterIn,
 		enSoundKind_PenguinWaterOut,
 
+		/** 敵のSE */
 		enSoundKind_EnemyStep,
 		enSoundKind_EnemyRoar,
 		enSoundKind_EnemyGrowl,
@@ -41,7 +42,9 @@ namespace app
 		enSoundKind_Whistle,
 		enSoundKind_CountDown,
 		enSoundKind_GameStart,
-		enSoundKind_ResultCheck,
+		enSoundKind_ResultStamp,
+		enSoundKind_DrumRoll,
+		enSoundKind_Cymbals,
 		enSoundKind_IglooBreak,
 
 		/** SEの設定はここまで */
@@ -100,7 +103,9 @@ namespace app
 		SoundInformation("Assets/sound/SE/AS_53089_警官のホイッスルを2回吹く.wav"),
 		SoundInformation("Assets/sound/SE/AS_259345_ピッ＿ゲームなどセレクト音.wav"),
 		SoundInformation("Assets/sound/SE/AS_879314_パンッ！スターターピストル（単発）.wav"),
-		SoundInformation("Assets/sound/SE/result/AS_120845_【鉛筆01-04（直線）】.wav"),
+		SoundInformation("Assets/sound/SE/result/stamp.wav"),
+		SoundInformation("Assets/sound/SE/result/drumRoll.wav"),
+		SoundInformation("Assets/sound/SE/result/cymbals.wav"),
 		SoundInformation("Assets/sound/SE/igloo/iglooBreak.wav"),
 
 
