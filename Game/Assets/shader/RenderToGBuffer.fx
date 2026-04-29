@@ -104,7 +104,7 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
     }
 
     psIn.pos = mul(m, vsIn.pos); // モデルの頂点をワールド座標系に変換
-    psIn.worldPos = psIn.pos;
+    psIn.worldPos = psIn.pos.xyz; // ワールド座標を保持する（射影変換前に取得すること）
     float4 viewPos = mul(mView, psIn.pos); // ワールド座標系からカメラ座標系に変換
     psIn.pos = mul(mProj, viewPos); // カメラ座標系からスクリーン座標系に変換
 
@@ -165,7 +165,7 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
     clip(psOut.albedo.a - 0.2f); // ピクセルキル
     psOut.albedo.w = psIn.pos.z / psIn.pos.w;
 
-    psOut.normal.xyz = CalcNormal(psIn);
+    psOut.normal.xyz = normalize(CalcNormal(psIn));
 
     psOut.specPow = g_specularMap.Sample(g_sampler, psIn.uv); // スペキュラ強度はとりあえず1.0fで固定。
 

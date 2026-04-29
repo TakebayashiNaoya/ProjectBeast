@@ -85,7 +85,6 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief 自然オブジェクトを登録する
-		 * @details 登録されたオブジェクトはExecute()内でモデルより先に描画される
 		 * @param obj 登録する自然オブジェクト
 		 */
 		void RegisterNatureObject(INatureObject* obj)
@@ -125,7 +124,7 @@ namespace nsBeastEngine
 		/**
 		 * @brief ディファードシェーディングを行うためのスプライトの初期化
 		 */
-		void InitDefferedLightingSprite();
+		void InitDeferredLightingSprite();
 
 		/**
 		 * @brief メインレンダリングターゲットのカラーバッファの内容を
@@ -179,35 +178,33 @@ namespace nsBeastEngine
 		/** GBufferに入れるレンダリングターゲットの役割 */
 		enum EnGBuffer
 		{
-			enGBuffer_Albedo,      /** アルベド		*/
+			enGBuffer_Albedo = 0,  /** アルベド		*/
 			enGBuffer_Normal,      /** 法線			*/
 			enGBuffer_Specular,    /** スペキュラ   */
-			enGBuffer_Shadow,      /** シャドウ		*/
 			enGBuffer_Num,         /** G-Bufferの数 */
 		};
 		/** GBuffer用のレンダリングターゲット */
 		std::array<RenderTarget, enGBuffer_Num> m_gBuffer;
 
-		/** ディファードライティング用のスプライト */
-		Sprite			m_diferredLightingSprite;
-		/** メインレンダリングターゲットをフレームバッファにコピーするためのスプライト */
-		Sprite			m_copyMainRtToFrameBufferSprite;
 		/** シーンライト */
 		SceneLight		m_sceneLight;
+		/** ディファードライティング用のスプライト */
+		Sprite			m_deferredLightingSprite;
+		/** メインレンダリングターゲットをフレームバッファにコピーするためのスプライト */
+		Sprite			m_copyMainRtToFrameBufferSprite;
 		/** メインレンダリングターゲット */
 		RenderTarget	m_mainRenderTarget;
 		/** 2D描画用のレンダーターゲット */
 		RenderTarget	m_2DRenderTarget;
 		/** 2D合成用のスプライト */
 		Sprite			m_2DSprite;
-
+		/** 3D描画結果のスプライト */
 		Sprite			m_mainSprite;
 
 		/** ディファードモデルリスト */
 		std::vector<ModelRender*> m_deferredModelList;
 		/** フォワードモデルリスト */
 		std::vector<ModelRender*> m_forwardModelList;
-
 		/** 描画するオブジェクトの予約リスト */
 		std::vector<IRenderer*> m_renderObjects;
 		/** 自然オブジェクトのリスト（Ocean・WhirlpoolManagerなど） */

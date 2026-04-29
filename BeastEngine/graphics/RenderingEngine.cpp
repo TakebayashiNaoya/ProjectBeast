@@ -30,7 +30,7 @@ namespace nsBeastEngine
 		InitGBuffer();
 
 		// ディファードライティング用のスプライトの初期化
-		InitDefferedLightingSprite();
+		InitDeferredLightingSprite();
 
 		// メインレンダリングターゲットの内容をフレームバッファにコピーするためのスプライトの初期化
 		InitCopyMainRenderTargetToFrameBufferSprite();
@@ -72,8 +72,6 @@ namespace nsBeastEngine
 			obj->Render(rc);
 		}
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
-
-		// m_postEffect.Render(rc, m_mainRenderTarget);
 
 		// エフェクトを描画
 		EffectEngine::GetInstance()->Draw();
@@ -138,9 +136,8 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::InitDefferedLightingSprite()
+	void RenderingEngine::InitDeferredLightingSprite()
 	{
-		BeginGPUEvent("DefferedLightingSprite");
 		// ディファードライティングを行うためのスプライトを初期化
 		SpriteInitData spriteInitData;
 		spriteInitData.m_width = FRAME_BUFFER_W;
@@ -152,13 +149,13 @@ namespace nsBeastEngine
 		spriteInitData.m_textures[enGBuffer_Specular] = &m_gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
 		//spriteInitData.m_textures[enGBufferShadow] = &m_shadow.GetShadowTarget().GetRenderTargetTexture();
 
-		spriteInitData.m_fxFilePath = "Assets/shader/deferredLighting.fx";
+		spriteInitData.m_fxFilePath = "Assets/shader/DeferredLighting.fx";
 
 		spriteInitData.m_expandConstantBuffer = m_sceneLight.GetLight();
 		spriteInitData.m_expandConstantBufferSize = sizeof(Light);
 
 		// ディファードレンダリング用のスプライトを初期化
-		m_diferredLightingSprite.Init(spriteInitData);
+		m_deferredLightingSprite.Init(spriteInitData);
 	}
 
 
@@ -248,7 +245,7 @@ namespace nsBeastEngine
 		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
 		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
 		// G-Bufferの内容を元にしてディファードライティング
-		m_diferredLightingSprite.Draw(rc);
+		m_deferredLightingSprite.Draw(rc);
 
 		// メインレンダリングターゲットへの書き込み終了待ち
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
