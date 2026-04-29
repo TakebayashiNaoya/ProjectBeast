@@ -19,6 +19,7 @@ namespace nsBeastEngine
 		, m_isChanged(false)
 		, m_type(enSkyCubeType_Day)
 	{
+		m_textureFilePaths[enSkyCubeType_Clear] = L"Assets/modelData/preset/skyCubeMapClear.dds";
 		m_textureFilePaths[enSkyCubeType_Day] = L"Assets/modelData/preset/skyCubeMap.dds";
 		m_textureFilePaths[enSkyCubeType_Night] = L"Assets/modelData/preset/skyCubeMapNight.dds";
 		m_textureFilePaths[enSkyCubeType_Snow] = L"Assets/modelData/preset/skyCubeMapSnow.dds";
