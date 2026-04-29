@@ -4,6 +4,7 @@
  * @author 立山
  */
 #include "stdafx.h"
+
 #include "ResultMenu.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/Util/CRC32.h"
@@ -26,19 +27,35 @@ namespace
 
 	// アチーブメント動的UI生成用のベース座標とオフセット（※動的生成のためここに定義）
 	const Vector3 ACHIEVE_START_POS = { -200.0f, 150.0f, 0.0f };
-	constexpr float ACHIEVE_OFFSET_X_CHECK = -90.0f;
-	constexpr float ACHIEVE_OFFSET_X_NAME = 280.0f;
+	constexpr float ACHIEVE_OFFSET_X_CHECK = -250.0f;
+	constexpr float ACHIEVE_OFFSET_X_NAME = 210.0f;
 	constexpr float ACHIEVE_OFFSET_X_BACK = 210.0f;
 	constexpr float ACHIEVE_OFFSET_Y = -80.0f;
 
+	constexpr float ACHIEVE_NAME_OFFSETS_X[] = {
+		300.0f, // 0番目: 子ペンギンを50匹以上集めた
+		300.0f, // 1番目: 2頭以上のシロクマに追われた
+		270.0f, // 2番目: 3頭のシロクマそれぞれに追われた
+		300.0f  // 3番目: 眠っているシロクマを起こした
+	};
+
 	constexpr float ACHIEVE_NAME_W = 570.0f;
 	constexpr float ACHIEVE_NAME_H = 40.0f;
-	constexpr float ACHIEVE_BACK_W = 530.0f;
+	constexpr float ACHIEVE_BACK_W = 780.0f;
 	constexpr float ACHIEVE_BACK_H = 120.0f;
 	constexpr float ACHIEVE_BOX_W = 60.0f;
 	constexpr float ACHIEVE_BOX_H = 60.0f;
 	constexpr float ACHIEVE_CHECK_W = 60.0f;
 	constexpr float ACHIEVE_CHECK_H = 60.0f;
+
+	//上部スコア動的生成用
+	constexpr float TOP_DIGIT_W = 64.0f;
+	constexpr float TOP_DIGIT_H = 80.0f;
+	constexpr float TIME_COLON_W = 15.0f;
+	constexpr float TIME_COLON_H = 50.0f;
+	constexpr float TIME_DIGIT_CENTER_X = -320.0f;  // クリアタイムの基準X
+	constexpr float SCORE_DIGIT_CENTER_X = 320.0f;  // 助けた数の基準X
+	constexpr float TOP_DIGIT_Y = 280.0f;           // 共通のY座標
 
 	// 合計スコア動的生成用
 	constexpr float TOTAL_DIGIT_W = 80.0f;
@@ -83,47 +100,157 @@ namespace app
 			m_totalScore = totalScore;
 			m_allAchievementList = achievements;
 
-			auto* timeDigit = GetUI<UIDigit>(Hash32("ResultTimeDigit"));
-			auto* scoreDigit = GetUI<UIDigit>(Hash32("ResultScoreDigit"));
+			auto* canvas = GetCanvas();
+			if (!canvas) return;
+
+			// タイトルへ戻るテキストは非表示にしておく
 			auto* titleBackText = GetUI<UIIcon>(Hash32("TitleBackText"));
+			if (titleBackText) titleBackText->m_isDraw = false;
 
+			// ---------------------------------------------------------
+			// 桁数を計算するローカル関数（変更）
+			// ---------------------------------------------------------
+			auto GetDigitCount = [](int number) {
+				int digitCount = (number == 0) ? 1 : 0;
+				int tmp = number;
+				while (tmp > 0)
+				{
+					tmp /= 10;
+					digitCount++;
+				}
+				return digitCount;
+				};
 
-			if (timeDigit)
+			// ---------------------------------------------------------
+			// クリアタイムの動的生成（M:SS形式）
+			// ---------------------------------------------------------
+			int totalSec = static_cast<int>(m_clearTime);
+			int minutes = totalSec / 60;
+			int seconds = totalSec % 60;
+
+			int minutesDigitCount = GetDigitCount(minutes);
+			// 秒は常に「06」のように2桁で表示するため、digitCountは 2 固定
+
+			// 「分」「コロン」「秒」を合わせた全体の幅を計算
+			float totalW = (minutesDigitCount * TOP_DIGIT_W) + TIME_COLON_W + (2 * TOP_DIGIT_W);
+
+			// 全体が中央揃えになるための「左端」のX座標
+			float leftX = TIME_DIGIT_CENTER_X - (totalW / 2.0f);
+
+			// 各パーツの中心X座標を計算（UIDigitは一番右の桁を基準に配置される仕様に合わせる）
+			float minutesBaseX = leftX + (minutesDigitCount - 0.5f) * TOP_DIGIT_W;
+			float colonCenterX = leftX + (minutesDigitCount * TOP_DIGIT_W) + (TIME_COLON_W / 2.0f);
+			float secondsBaseX = leftX + totalW - (TOP_DIGIT_W / 2.0f);
+
+			// ①「分」の生成
+			uint32_t minKey = Hash32("ResultTimeMinDigit");
+			canvas->CreateUI<UIDigit>(minKey);
+			auto* minDigit = canvas->FindUI<UIDigit>(minKey);
+			if (minDigit)
 			{
-				timeDigit->SetNumber(static_cast<int>(m_clearTime));
-				timeDigit->m_isDraw = true;
+				minDigit->Initialize(
+					"Assets/spriteData/UI/Number/White",
+					minutesDigitCount, minutes,
+					TOP_DIGIT_W, TOP_DIGIT_H,
+					Vector3(minutesBaseX, TOP_DIGIT_Y, 0.0f),
+					Vector3::One, Quaternion::Identity
+				);
+				minDigit->m_isDraw = true;
 			}
+
+			// ②「コロン」の生成
+			uint32_t colonKey = Hash32("ResultTimeColonIcon");
+			canvas->CreateUI<UIIcon>(colonKey);
+			auto* colonIcon = canvas->FindUI<UIIcon>(colonKey);
+			if (colonIcon)
+			{
+				// ★ここを見つかったClone.ddsのパスに変更します！
+				colonIcon->Initialize(
+					"Assets/spriteData/UI/Icon/InGameTimerIcon/Clone.dds",
+					TIME_COLON_W, TIME_COLON_H,
+					Vector3(colonCenterX, TOP_DIGIT_Y, 0.0f),
+					Vector3::One, Quaternion::Identity, Vector4::White
+				);
+				colonIcon->m_isDraw = true;
+			}
+
+			// ③「秒」の生成
+			uint32_t secKey = Hash32("ResultTimeSecDigit");
+			canvas->CreateUI<UIDigit>(secKey);
+			auto* secDigit = canvas->FindUI<UIDigit>(secKey);
+			if (secDigit)
+			{
+				secDigit->Initialize(
+					"Assets/spriteData/UI/Number/White",
+					2, seconds, // 常に2桁を指定することで勝手に0埋めされます
+					TOP_DIGIT_W, TOP_DIGIT_H,
+					Vector3(secondsBaseX, TOP_DIGIT_Y, 0.0f),
+					Vector3::One, Quaternion::Identity
+				);
+				secDigit->m_isDraw = true;
+			}
+
+			// ---------------------------------------------------------
+			// 助けた数の動的生成
+			// ---------------------------------------------------------
+			uint32_t scoreKey = Hash32("ResultScoreDigit");
+			canvas->CreateUI<UIDigit>(scoreKey);
+			auto* scoreDigit = canvas->FindUI<UIDigit>(scoreKey);
 			if (scoreDigit)
 			{
-				scoreDigit->SetNumber(m_collectedPenguin);
+				int digitCount = GetDigitCount(m_collectedPenguin);
+				float baseX = SCORE_DIGIT_CENTER_X + static_cast<float>(digitCount - 1) * TOP_DIGIT_W / 2.0f;
+
+				scoreDigit->Initialize(
+					"Assets/spriteData/UI/Number/White",
+					digitCount, m_collectedPenguin, // ← 固定の 3 ではなく digitCount を渡す！
+					TOP_DIGIT_W, TOP_DIGIT_H,
+					Vector3(baseX, TOP_DIGIT_Y, 0.0f),
+					Vector3::One, Quaternion::Identity
+				);
 				scoreDigit->m_isDraw = true;
-			}
-			if (titleBackText)
-			{
-				titleBackText->m_isDraw = false;
 			}
 
 			SetupAchievementUI();
 
 			m_drumRollHandle = SoundManager::Get().PlaySE(enSoundKind_DrumRoll, false);
-
 		}
 
 
 		void ResultMenu::Update()
 		{
-			auto* timeDigit = GetUI<UIDigit>(Hash32("ResultTimeDigit"));
-			auto* scoreDigit = GetUI<UIDigit>(Hash32("ResultScoreDigit"));
+			auto* canvas = GetCanvas();
+			if (canvas)
+			{
+				// 変更箇所：分割した3つのパーツと助けた数を取得
+				auto* minDigit = canvas->FindUI<UIDigit>(Hash32("ResultTimeMinDigit"));
+				auto* colonIcon = canvas->FindUI<UIIcon>(Hash32("ResultTimeColonIcon"));
+				auto* secDigit = canvas->FindUI<UIDigit>(Hash32("ResultTimeSecDigit"));
 
-			if (timeDigit)
-			{
-				timeDigit->m_color = COLOR_DIGIT_TIME_SCORE;
-				timeDigit->SetNumber(static_cast<int>(m_clearTime));
-			}
-			if (scoreDigit)
-			{
-				scoreDigit->m_color = COLOR_DIGIT_TIME_SCORE;
-				scoreDigit->SetNumber(m_collectedPenguin);
+				auto* scoreDigit = canvas->FindUI<UIDigit>(Hash32("ResultScoreDigit"));
+
+				int totalSec = static_cast<int>(m_clearTime);
+
+				if (minDigit)
+				{
+					minDigit->m_color = COLOR_DIGIT_TIME_SCORE;
+					minDigit->SetNumber(totalSec / 60);
+				}
+				if (colonIcon)
+				{
+					colonIcon->m_color = COLOR_DIGIT_TIME_SCORE;
+				}
+				if (secDigit)
+				{
+					secDigit->m_color = COLOR_DIGIT_TIME_SCORE;
+					secDigit->SetNumber(totalSec % 60);
+				}
+
+				if (scoreDigit)
+				{
+					scoreDigit->m_color = COLOR_DIGIT_TIME_SCORE;
+					scoreDigit->SetNumber(m_collectedPenguin);
+				}
 			}
 
 			UpdateRevealSequence();
@@ -255,7 +382,13 @@ namespace app
 
 
 				Vector3 currentNamePos = ACHIEVE_START_POS;
-				currentNamePos.x += ACHIEVE_OFFSET_X_NAME;
+				float offsetX = ACHIEVE_OFFSET_X_NAME; // デフォルト値を入れておく
+				// 配列の範囲内なら、配列に設定した個別のX座標を使う
+				if (i < std::size(ACHIEVE_NAME_OFFSETS_X))
+				{
+					offsetX = ACHIEVE_NAME_OFFSETS_X[i];
+				}
+				currentNamePos.x += offsetX;
 				currentNamePos.y = commonY;
 
 

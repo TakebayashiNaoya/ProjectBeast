@@ -48,7 +48,7 @@ namespace app
 
 	bool ResultScene::Start()
 	{
-		m_clearTime = s_clearTime;
+		m_clearTime = 65.0f;
 		m_collectedPenguin = s_collectedPenguin;
 
 		if (auto* am = app::achievement::AchievementManager::GetInstance())
