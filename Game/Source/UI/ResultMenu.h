@@ -7,7 +7,7 @@
 #include "Menu.h"
 #include "Source/Achivement/AchievementManager.h"
 #include "Source/Sound/SoundManager.h"
-#include "UIParts.h"
+#include "Source/UI/Parts/UIParts.h"
 
 
 namespace app
