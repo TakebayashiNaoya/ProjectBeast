@@ -17,10 +17,12 @@ namespace app
 	}
 
 
+	/**
+	 * @brief リザルトシーンを管理するクラス
+	 */
 	class ResultScene : public IScene
 	{
 		appScene(ResultScene);
-
 
 	public:
 		ResultScene();
@@ -28,13 +30,11 @@ namespace app
 
 		bool Start() override;
 		void Update() override;
-		void PauseUpdate()override;
+		void PauseUpdate() override;
 		void Render(RenderContext& rc) override;
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
-
-	public:
 		// InGameScene から遷移前に呼ぶ
 		static void SetResult(float clearTime, int collectedPenguin)
 		{
@@ -44,7 +44,7 @@ namespace app
 
 
 	private:
-		// ★追加：スコア計算とアチーブメントUI構築
+		// スコア計算とアチーブメントUI構築
 		void CalcTotalScore();
 
 

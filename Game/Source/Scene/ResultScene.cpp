@@ -13,7 +13,6 @@
 #include "TitleScene.h"
 
 
-
 namespace
 {
 	constexpr float SCORE_TIME_DIVISOR = 100.0f; // タイムボーナス計算用の除数

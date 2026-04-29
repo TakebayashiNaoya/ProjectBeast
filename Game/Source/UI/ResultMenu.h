@@ -14,14 +14,17 @@ namespace app
 {
 	namespace ui
 	{
+		/**
+		 * @brief リザルト画面の動的処理クラス
+		 */
 		class ResultMenu :public MenuBase
 		{
 		public:
 			ResultMenu();
 			~ResultMenu();
 
-			void Update()override;
-			void InitializeLogic()override;
+			void Update() override;
+			void InitializeLogic() override;
 
 
 			// シーンからスコアやクリア時間などのデータを受け取り、初期化する
@@ -46,7 +49,6 @@ namespace app
 
 			app::SEHandle m_drumRollHandle;
 
-		private:
 			std::vector<UIIcon*> m_checkIconList; // 達成済みチェックアイコン（表示順）
 			UIDigit* m_totalDigit;                // トータルスコア表示用
 
@@ -58,7 +60,6 @@ namespace app
 			float m_postCheckTimer;
 			bool  m_totalScoreShown;
 			bool  m_titleButtonShown;
-
 		};
 	}
 }
