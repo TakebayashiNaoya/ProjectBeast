@@ -74,6 +74,7 @@ namespace nsBeastEngine
 		{
 			m_model.SetMulColor(mulColor);
 			m_renderToGBufferModel.SetMulColor(mulColor);
+			m_forwardRenderModel.SetMulColor(mulColor);
 		}
 
 		/**
@@ -82,7 +83,7 @@ namespace nsBeastEngine
 		 *          trueにした場合は m_frowardRenderModel が描画に使用される。
 		 * @param isForward trueならフォワード、falseならディファード
 		 */
-		inline void SetForwardRendering(const bool isForward) { m_isFowardRender = isForward; }
+		inline void SetForwardRendering(const bool isForward) { m_isForwardRender = isForward; }
 
 		/**
 		 * @brief アニメーションが再生中か
@@ -244,20 +245,12 @@ namespace nsBeastEngine
 		float			m_animationSpeed;
 
 		/** フォワードレンダリングで描画するか */
-		bool m_isFowardRender = false;
-		/** 反射で映りこむかどうか */
-		std::map<ReflectLayer, bool> m_enableReflection;
+		bool m_isForwardRender = false;
 		/** フォワードレンダリングで描画されるモデル */
-		Model m_frowardRenderModel;
+		Model m_forwardRenderModel;
 		/** Gバッファに描画されるモデル */
 		Model m_renderToGBufferModel;
 		/** 描画するかどうか */
 		bool  m_visible = true;
-		/** インスタンシング描画が有効か */
-		bool m_isEnableInstancingDraw = false;
-		/** ワールド行列の配列のストラクチャードバッファ */
-		StructuredBuffer m_worldMatrixArraySB;
-		/** ZPrepassで描画されるモデル */
-		Model m_zprepassModel;
 	};
 }

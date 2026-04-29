@@ -67,10 +67,14 @@ namespace nsBeastEngine
 			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
 			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
 		);
+
+		BeginGPUEvent("NatureObjects");
 		for (auto* obj : m_natureObjects)
 		{
 			obj->Render(rc);
 		}
+		EndGPUEvent();
+
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 
 		// エフェクトを描画
@@ -212,6 +216,7 @@ namespace nsBeastEngine
 	void RenderingEngine::RenderToGBuffer(RenderContext& rc)
 	{
 		BeginGPUEvent("RenderToGBuffer");
+
 		// レンダリングターゲットをG-Bufferに変更して書き込む
 		RenderTarget* rts[] = {
 			&m_gBuffer[enGBuffer_Albedo]   // 0番目のレンダリングターゲット
@@ -236,11 +241,15 @@ namespace nsBeastEngine
 
 		// レンダリングターゲットへの書き込み待ち
 		rc.WaitUntilFinishDrawingToRenderTargets(ARRAYSIZE(rts), rts);
+
+		EndGPUEvent();
 	}
 
 
 	void RenderingEngine::DeferredLighting(RenderContext& rc)
 	{
+		BeginGPUEvent("DeferredLighting");
+
 		// レンダリング先をメインレンダリングターゲットにする
 		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
 		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
@@ -249,11 +258,15 @@ namespace nsBeastEngine
 
 		// メインレンダリングターゲットへの書き込み終了待ち
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+
+		EndGPUEvent();
 	}
 
 
 	void RenderingEngine::ForwardRendering(RenderContext& rc)
 	{
+		BeginGPUEvent("ForwardRendering");
+
 		// レンダリング先をメインレンダリングターゲットにする
 		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
 		rc.SetRenderTarget(
@@ -268,11 +281,15 @@ namespace nsBeastEngine
 
 		// メインレンダリングターゲットへの書き込み終了待ち
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+
+		EndGPUEvent();
 	}
 
 
 	void RenderingEngine::Render2D(nsK2EngineLow::RenderContext& rc)
 	{
+		BeginGPUEvent("Render2D");
+
 		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);
 		rc.SetRenderTargetAndViewport(m_2DRenderTarget);
 		rc.ClearRenderTargetView(m_2DRenderTarget);
@@ -287,12 +304,14 @@ namespace nsBeastEngine
 		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
 		m_2DSprite.Draw(rc);
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+
+		EndGPUEvent();
 	}
 
 
 	void RenderingEngine::CopyMainRenderTargetToFrameBufferSprite(nsK2EngineLow::RenderContext& rc)
 	{
-		// BeginGPUEvent("CopyMainRenderTargetToFrameBuffer");
+		BeginGPUEvent("CopyMainRenderTargetToFrameBuffer");
 
 		rc.SetRenderTarget(
 			g_graphicsEngine->GetCurrentFrameBuffuerRTV(),
@@ -310,6 +329,6 @@ namespace nsBeastEngine
 		rc.SetViewportAndScissor(viewport);
 		m_copyMainRtToFrameBufferSprite.Draw(rc);
 
-		// EndGPUEvent();
+		EndGPUEvent();
 	}
 }

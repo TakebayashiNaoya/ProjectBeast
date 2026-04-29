@@ -49,8 +49,12 @@ namespace nsBeastEngine
 		// モデル初期化
 		m_model.Init(modelInitData);
 
-		// GBuffer描画用のモデルを初期化
-		InitRenderToGBufferModel(modelInitData);
+		if (m_isForwardRender) {
+			m_forwardRenderModel.Init(modelInitData);
+		}
+		else {
+			InitRenderToGBufferModel(modelInitData);
+		}
 	}
 
 
@@ -84,10 +88,10 @@ namespace nsBeastEngine
 		// モデル初期化
 		m_model.Init(modelInitData);
 
-		if (m_isFowardRender)
+		if (m_isForwardRender)
 		{
 			// フォワードレンダリング用のモデルを初期化する
-			m_frowardRenderModel.Init(modelInitData);
+			m_forwardRenderModel.Init(modelInitData);
 		}
 		else
 		{
@@ -170,7 +174,7 @@ namespace nsBeastEngine
 	{
 		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_renderToGBufferModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
-		m_frowardRenderModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_forwardRenderModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 	}
 
@@ -194,12 +198,7 @@ namespace nsBeastEngine
 	{
 		if (!m_visible) return;
 
-		// Note:インスタンシング描画は現状使わない
-		//if (m_isEnableInstancingDraw) {
-		//	m_worldMatrixArraySB.Update(m_worldMatrixArray.get());
-		//}
-
-		if (!m_isFowardRender) {
+		if (!m_isForwardRender) {
 			// ディファードレンダリングで描画するなら
 			g_renderingEngine->AddDeferredModelList(this);
 		}
@@ -216,8 +215,8 @@ namespace nsBeastEngine
 		if (!m_visible) return;
 
 		/** フォワードレンダリング用のモデルが有効な場合はそちらを描画し、そうでない場合は通常のモデルを描画する */
-		if (m_isFowardRender) {
-			m_frowardRenderModel.Draw(rc, m_maxInstance);
+		if (m_isForwardRender) {
+			m_forwardRenderModel.Draw(rc, m_maxInstance);
 		}
 		else {
 			m_renderToGBufferModel.Draw(rc, m_maxInstance);
