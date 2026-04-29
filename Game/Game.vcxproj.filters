@@ -61,6 +61,18 @@
     <Filter Include="Source\Nature">
       <UniqueIdentifier>{b6ca2941-3d62-46dc-a3a0-425d9f251aaf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\Parts">
+      <UniqueIdentifier>{6688680a-f2a0-456e-8b43-c4e3bf2b07a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Animation">
+      <UniqueIdentifier>{f5985fd0-9809-47c3-9b73-7ba13e9b0744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Menus">
+      <UniqueIdentifier>{30944312-e965-4979-af2e-1c87a106f0b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Model">
+      <UniqueIdentifier>{0e5929f2-76bf-4cb2-813d-5ec9f0196b29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -93,9 +105,6 @@
     <ClCompile Include="Source\Scene\SceneManager.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\UIAnimation.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\system\system.cpp">
       <Filter>Source\system</Filter>
     </ClCompile>
@@ -116,9 +125,6 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp">
       <Filter>Source\Actor\Stage</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\UIParts.cpp">
-      <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\Menu.cpp">
       <Filter>Source\UI</Filter>
@@ -184,9 +190,6 @@
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyManager.cpp">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\SoundOptionMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.cpp">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
     </ClCompile>
@@ -217,9 +220,6 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinAnimationData.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\PauseScreenMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Actor\ActorStateMachine.cpp">
       <Filter>Source\Actor</Filter>
     </ClCompile>
@@ -235,9 +235,6 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStateMachine.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\CountDownMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Application.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -246,9 +243,6 @@
     </ClCompile>
     <ClCompile Include="Source\Effect\EffectManager.cpp">
       <Filter>Source\Effect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\InGameTimerMenu.cpp">
-      <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Camera\CameraCommon.cpp">
       <Filter>Source\Camera</Filter>
@@ -268,15 +262,6 @@
     <ClCompile Include="Source\Camera\LoseCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\EventMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\PBWakingUpTimerMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\SearchMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
@@ -288,9 +273,6 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\HPBarMenu.cpp">
-      <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.cpp">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
@@ -307,41 +289,17 @@
     <ClCompile Include="Source\Manager\TimeManager.cpp">
       <Filter>Source\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\FinishMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\RemainingChildMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\EnemySleepingMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Manager\InGameUImanager.cpp">
       <Filter>Source\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\TitleEventMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Manager\IglooManager.cpp">
       <Filter>Source\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\IglooPromptMenu.cpp">
-      <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\TutorialMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\InGameAchievementMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\MiniMapMenu.cpp">
-      <Filter>Source\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Nature\Ocean.cpp">
       <Filter>Source\Nature</Filter>
@@ -357,6 +315,75 @@
     </ClCompile>
     <ClCompile Include="Source\UI\ResultMenu.cpp">
       <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\RemainingChildMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\SearchMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\SoundOptionMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\TitleEventMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\TutorialMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\CountDownMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\EnemySleepingMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\EventMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\FinishMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\HPBarMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\IglooPromptMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\InGameAchievementMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\InGameTimerMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\MiniMapMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Animation\UIAnimation.cpp">
+      <Filter>Source\UI\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Parts\UIParts.cpp">
+      <Filter>Source\UI\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\PBWakingUpTimerStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\MasterPBWakingUpTimerParameter.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\UIStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\UIAnimationStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\PBWakingUpTimerAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -389,9 +416,6 @@
     <ClInclude Include="Source\Scene\SceneManager.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\UIAnimation.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\system\system.h">
       <Filter>Source\system</Filter>
     </ClInclude>
@@ -412,9 +436,6 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Stage\StageSystem.h">
       <Filter>Source\Actor\Stage</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\UIParts.h">
-      <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Menu.h">
       <Filter>Source\UI</Filter>
@@ -489,9 +510,6 @@
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyManager.h">
       <Filter>Source\Actor\Character\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\SoundOptionMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.h">
       <Filter>Source\Actor\Character\penguin\daddyPernguin</Filter>
     </ClInclude>
@@ -522,9 +540,6 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinAnimationData.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\PauseScreenMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Actor\ActorStateMachine.h">
       <Filter>Source\Actor</Filter>
     </ClInclude>
@@ -537,9 +552,6 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\CountDownMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Application.h">
       <Filter>Source</Filter>
     </ClInclude>
@@ -551,9 +563,6 @@
     </ClInclude>
     <ClInclude Include="Source\Effect\Types.h">
       <Filter>Source\Effect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\InGameTimerMenu.h">
-      <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Camera\CameraCommon.h">
       <Filter>Source\Camera</Filter>
@@ -573,15 +582,6 @@
     <ClInclude Include="Source\Camera\LoseCamera.h">
       <Filter>Source\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\EventMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\PBWakingUpTimerMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\SearchMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
@@ -597,38 +597,17 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\HPBarMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\EnemySleepingMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Manager\InGameUImanager.h">
       <Filter>Source\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\TitleEventMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Manager\IglooManager.h">
       <Filter>Source\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\IglooPromptMenu.h">
-      <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\TutorialMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\InGameAchievementMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\MiniMapMenu.h">
-      <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Nature\WhirlpoolPowerSystem.h">
       <Filter>Source\Nature</Filter>
@@ -647,6 +626,84 @@
     </ClInclude>
     <ClInclude Include="Source\UI\ResultMenu.h">
       <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\RemainingChildMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\SearchMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\SoundOptionMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\TitleEventMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\TutorialMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\CountDownMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\EnemySleepingMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\EventMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\FinishMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\HPBarMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\IglooPromptMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\InGameAchievementMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\InGameTimerMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\MiniMapMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\PauseScreenMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Animation\UIAnimation.h">
+      <Filter>Source\UI\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Animation\UIAnimationFactory.h">
+      <Filter>Source\UI\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Animation\UIAnimationParameter.h">
+      <Filter>Source\UI\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Parts\UIParts.h">
+      <Filter>Source\UI\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\UIStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\UIAnimationStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UIAnimationTypes.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -667,12 +724,6 @@
     </ClInclude>
     <ClInclude Include="Source\Manager\TimeManager.h">
       <Filter>Source\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\FinishMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\RemainingChildMenu.h">
-      <Filter>Source\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

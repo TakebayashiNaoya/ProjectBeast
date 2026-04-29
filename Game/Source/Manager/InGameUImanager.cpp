@@ -16,21 +16,21 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
 
-#include "Source/UI/CountDownMenu.h"
-#include "Source/UI/EnemySleepingMenu.h"
-#include "Source/UI/FinishMenu.h"
-#include "Source/UI/IglooPromptMenu.h"
-#include "Source/UI/InGameAchievementMenu.h"
-#include "Source/UI/InGameTimerMenu.h"
+#include "Source/UI/Menus/CountDownMenu.h"
+#include "Source/UI/Menus/EnemySleepingMenu.h"
+#include "Source/UI/Menus/FinishMenu.h"
+#include "Source/UI/Menus/IglooPromptMenu.h"
+#include "Source/UI/Menus/InGameAchievementMenu.h"
+#include "Source/UI/Menus/InGameTimerMenu.h"
 #include "Source/UI/Layout.h"
-#include "Source/UI/PauseScreenMenu.h"
-#include "Source/UI/PBWakingUpTimerMenu.h"
-#include "Source/UI/MiniMapMenu.h"
-#include "Source/UI/RemainingChildMenu.h"
-#include "Source/UI/SearchMenu.h"
-#include "Source/UI/SoundOptionMenu.h"
-#include "Source/UI/TutorialMenu.h"
-#include "Source/UI/TitleEventMenu.h"
+#include "Source/UI/Menus/PauseScreenMenu.h"
+#include "Source/UI/Menus/PBWakingUpTimerMenu.h"
+#include "Source/UI/Menus/MiniMapMenu.h"
+#include "Source/UI/Menus/RemainingChildMenu.h"
+#include "Source/UI/Menus/SearchMenu.h"
+#include "Source/UI/Menus/SoundOptionMenu.h"
+#include "Source/UI/Menus/TutorialMenu.h"
+#include "Source/UI/Menus/TitleEventMenu.h"
 
 
 namespace app
@@ -128,7 +128,7 @@ namespace app
 
 		m_pbWakingUpTimerLayout = new ui::Layout();
 		m_pbWakingUpTimerLayout->Initialize<ui::PBWakingUpTimerMenu>(
-			"Assets/parameter/timer/PBWakingUpTimer.json"
+			"Assets/parameter/timer/PBTimer/PBWakingUpTimer.json"
 		);
 		m_pbWakingUpTimerMenu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
 		if (m_pbWakingUpTimerMenu)

@@ -32,17 +32,17 @@
 
 #include "Source/Achivement/AchievementManager.h"
 
-#include "Source/UI/CountDownMenu.h"
-#include "Source/UI/FinishMenu.h"
-#include "Source/UI/PauseScreenMenu.h"
-#include "Source/UI/SoundOptionMenu.h"
-#include "Source/UI/TutorialMenu.h"
+#include "Source/UI/Menus/CountDownMenu.h"
+#include "Source/UI/Menus/FinishMenu.h"
+#include "Source/UI/Menus/PauseScreenMenu.h"
+#include "Source/UI/Menus/SoundOptionMenu.h"
+#include "Source/UI/Menus/TutorialMenu.h"
 
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
 
-#include "Source/Nature/WhirlpoolManager.h"
 #include "Source/Nature/Ocean.h"
+#include "Source/Nature/WhirlpoolManager.h"
 #include <random>
 
 
@@ -232,7 +232,7 @@ namespace app
 			 * NOTE:SkyCubeは後で生み出す場所を変えるかもしれない。
 			 */
 			m_skyCube = NewGO<SkyCube>(0);
-			m_skyCube->SetType(enSkyCubeType_Day);
+			m_skyCube->SetType(enSkyCubeType_Clear);
 			m_skyCube->SetScale(Vector3(700.0f, 600.0f, 700.0f));
 			m_skyCube->SetLuminance(0.8f);
 
