@@ -8,6 +8,7 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/UI/Model/SearchStatus.h"
+#include "Source/Util/CRC32.h"
 
 
 namespace app
