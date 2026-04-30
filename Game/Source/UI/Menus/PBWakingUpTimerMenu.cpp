@@ -20,7 +20,6 @@ namespace app
 			, m_isGreenPlayed(false)
 			, m_isYellowPlayed(false)
 			, m_isRedPlayed(false)
-			, m_enemy(nullptr)
 		{
 			// シロクマ専用UIAnimationStatusを生成。
 			m_pbAnimStatus = std::make_unique<PBWakingUpTimerAnimStatus>();
@@ -41,9 +40,6 @@ namespace app
 
 		void PBWakingUpTimerMenu::Update()
 		{
-			// シロクマが存在しない場合は処理を中断。
-			if (!m_enemy) return;
-
 			// 全てのUIを非表示にする。
 			if (!m_isDraw)
 			{
