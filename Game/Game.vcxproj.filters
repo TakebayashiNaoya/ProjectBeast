@@ -385,6 +385,12 @@
     <ClCompile Include="Source\UI\Model\PBWakingUpTimerAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Model\SearchParameter.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\SearchStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -704,6 +710,12 @@
     </ClInclude>
     <ClInclude Include="Source\UIAnimationTypes.h">
       <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\SearchParameter.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\SearchStatus.h">
+      <Filter>Source\UI\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

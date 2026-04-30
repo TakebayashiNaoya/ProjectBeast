@@ -109,7 +109,15 @@ namespace app
 			template <typename T>
 			void UnloadParameter()
 			{
-				m_parameterMap.erase(T::ID());
+				// 確保済みのパラメーターがあれば解放。
+				auto it = m_parameterMap.find(T::ID());
+				if (it != m_parameterMap.end()){
+					auto& paramters = it->second;
+					for (auto* p : parameters) {
+						delete p;
+					}
+					m_parameterMap.erase(it);
+				}
 			}
 
 

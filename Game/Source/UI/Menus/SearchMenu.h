@@ -12,32 +12,8 @@ namespace app
 {
 	namespace ui
 	{
-		enum class EnSearchType : uint8_t
-		{
-			CanFind,
-			CanNotFind,
-			Max
-		};
-
-
-		class SearchIcon
-		{
-		public:
-			SearchIcon(EnSearchType type);
-			~SearchIcon();
-			void Update();
-			void SetUIIcon(UIIcon* icon);
-			void SetIsDraw(bool isDraw)
-			{
-				m_icon->m_isDraw = isDraw;
-			}
-
-
-		private:
-			UIIcon* m_icon;
-			EnSearchType m_type;
-		};
-
+		/** 前方宣言 */
+		class SearchStatus;
 
 		class SearchMenu : public MenuBase
 		{
@@ -54,10 +30,11 @@ namespace app
 			void Searching();
 			
 			/**
-			 * @brief タイプの取得
-			 * @return m_currentType タイプの取得
+			 * @brief アイコンとフレームの描画のオンオフをまとめる用
+			 * @param isDraw アイコンとフレームの描画の設定
 			 */
-			EnSearchType GetType()const { return m_currentType; }
+			void SetAllIconActive(bool isDraw);
+
 			/**
 			 * @brief アクティブの取得
 			 * @return m_isActive アクティブの取得
@@ -86,15 +63,11 @@ namespace app
 
 
 		private:
+			/** シロクマの索敵・追跡のステータスをunique_ptrで所有する */
+			std::unique_ptr<SearchStatus> m_searchStatus;
+			actor::Enemy* m_enemy;
 			bool m_isActive;
 			bool m_canFind;
-
-			actor::Enemy* m_enemy;
-			EnSearchType m_currentType;
-
-			using Icon = std::unique_ptr<SearchIcon>;
-			using Key = uint32_t;
-			std::unordered_map<Key, Icon>m_searchIconMap;
 		};
 	}
 }
