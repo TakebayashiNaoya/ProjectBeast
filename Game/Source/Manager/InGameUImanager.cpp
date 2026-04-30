@@ -16,21 +16,21 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
 
+#include "Source/UI/Layout.h"
 #include "Source/UI/Menus/CountDownMenu.h"
 #include "Source/UI/Menus/EnemySleepingMenu.h"
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
 #include "Source/UI/Menus/InGameAchievementMenu.h"
 #include "Source/UI/Menus/InGameTimerMenu.h"
-#include "Source/UI/Layout.h"
+#include "Source/UI/Menus/MiniMapMenu.h"
 #include "Source/UI/Menus/PauseScreenMenu.h"
 #include "Source/UI/Menus/PBWakingUpTimerMenu.h"
-#include "Source/UI/Menus/MiniMapMenu.h"
 #include "Source/UI/Menus/RemainingChildMenu.h"
 #include "Source/UI/Menus/SearchMenu.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
-#include "Source/UI/Menus/TutorialMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
+#include "Source/UI/Menus/TutorialMenu.h"
 
 
 namespace app
@@ -337,7 +337,6 @@ namespace app
 		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);
 		if (m_timerLayout)           m_timerLayout->Render(rc);
 		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
-		if (m_achievementLayout)     m_achievementLayout->Render(rc);
 	}
 
 
@@ -351,6 +350,7 @@ namespace app
 	void InGameUIManager::RenderPause(RenderContext& rc)
 	{
 		if (m_pauseLayout) m_pauseLayout->Render(rc);
+		if (m_achievementLayout)     m_achievementLayout->Render(rc);
 	}
 
 
