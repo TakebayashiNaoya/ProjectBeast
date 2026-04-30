@@ -313,6 +313,9 @@
     <ClCompile Include="Source\Nature\WhirlpoolPowerSystem.cpp">
       <Filter>Source\Nature</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\ResultMenu.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -626,6 +629,9 @@
     </ClInclude>
     <ClInclude Include="Source\Nature\WhirlpoolParameter.h">
       <Filter>Source\Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\ResultMenu.h">
+      <Filter>Source\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h">
       <Filter>Source\UI\Menus</Filter>
