@@ -33,6 +33,15 @@ namespace app
 
 		void SearchMenu::Update()
 		{
+			// インゲーム内で一瞬だけ表示されるバグを防ぐ。
+			if (!m_isDraw)
+			{
+				// アイコンとフレームを全て非表示にする。
+				SetAllIconActive(false);
+				MenuBase::Update();
+				return;
+			}
+
 			// 敵の情報が無い場合は処理を行わない。
 			if (!m_enemy) return;
 
@@ -41,7 +50,7 @@ namespace app
 			Searching();
 
 			// キャンバスの更新。
-			SearchClass::Update();
+			MenuBase::Update();
 		}
 
 

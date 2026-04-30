@@ -13,10 +13,10 @@ namespace app
 {
 	namespace ui
 	{
+		class Enemy;
+
 		class PBWakingUpTimerMenu : public MenuBase
 		{
-			using PBWakingUpTimerClass = MenuBase;
-
 		public:
 			PBWakingUpTimerMenu();
 			virtual ~PBWakingUpTimerMenu();
@@ -47,7 +47,7 @@ namespace app
 			 * @brief 描画するかどうかを設定する
 			 * @param isDraw 描画するか
 			 */
-			inline void SetDraw(bool isDraw) { m_isDraw = isDraw; }
+			void SetDraw(const bool isDraw) { m_isDraw = isDraw; }
 
 
 		private:
@@ -56,8 +56,11 @@ namespace app
 			/** シロクマの起床タイマー専用のステータス */
 			std::unique_ptr<PBWakingUpTimerStatus> m_pbTimerStatus;
 
+			/** Enemyのポインタ */
+			Enemy* m_enemy;
+
 			/** 現在のタイマー値（外部から毎フレーム設定される） */
-			float m_currentPBTime = 0.0f;
+			float m_currentPBTime;
 
 			/** 最初から緑から黄色になるフラグ */
 			bool m_isGreenPlayed;
@@ -69,10 +72,10 @@ namespace app
 			bool m_isRedPlayed;
 
 			/** 表示対象エネミーのワールド座標 */
-			Vector3 m_targetPosition = Vector3::Zero;
+			Vector3 m_targetPosition;
 
 			/** 描画するかどうか */
-			bool m_isDraw = false;
+			bool m_isDraw;
 		};
 	}
 }
