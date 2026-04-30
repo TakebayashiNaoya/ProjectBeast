@@ -7,7 +7,6 @@
 #include "PBWakingUpTimerMenu.h"
 #include "Source/UI/Model/PBWakingUpTimerAnimStatus.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
-#include "Source/Actor/Character/Enemy/Enemy.h"
 
 
 namespace app
