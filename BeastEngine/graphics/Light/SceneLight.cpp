@@ -9,65 +9,6 @@
 
 namespace nsBeastEngine
 {
-	SPointLight* SceneLight::NewPointLight()
-	{
-		///** ライトの数が上限に達していたら作らない */
-		//if (m_light.m_usedPointLightCount >= MAX_POINT_LIGHT) return nullptr;
-
-		///** 昇順でライトを登録 */
-		//for (int i = 0; i <= MAX_POINT_LIGHT; i++)
-		//{
-		//	/** 使用されていないライトがあったら使用中にして登録する */
-		//	if (m_light.m_pointLight[i].m_isUsed == false)
-		//	{
-		//		/* ライトを使用中にする */
-		//		m_light.m_pointLight[i].SetIsUsed();
-		//		/* ライトの数を増やす */
-		//		m_light.m_usedPointLightCount++;
-		//		/** 使用中にしたポイントライトのアドレスを返す */
-		//		return &m_light.m_pointLight[i];
-		//	}
-		//}
-		return nullptr;
-	}
-
-
-	SSpotLight* SceneLight::NewSpotLight()
-	{
-		///** ライトの数が上限に達していたら作らない */
-		//if (m_light.m_usedSpotLightCount >= MAX_SPOT_LIGHT) return nullptr;
-
-		///** 昇順でライトを登録 */
-		//for (int i = 0; i <= MAX_SPOT_LIGHT; i++)
-		//{
-		//	/** 使用されていないライトがあったら使用中にして登録する */
-		//	if (m_light.m_spotLight[i].m_isUsed == false)
-		//	{
-		//		/* ライトを使用中にする */
-		//		m_light.m_spotLight[i].SetIsUsed();
-		//		/* ライトの数を増やす */
-		//		m_light.m_usedSpotLightCount++;
-		//		/** 使用中にしたスポットライトのアドレスを返す */
-		//		return &m_light.m_spotLight[i];
-		//	}
-		//}
-		return nullptr;
-	}
-
-
-	void SceneLight::Init()
-	{
-		/** ディレクションライトの設定 */
-		m_light.m_drectionLight.SetDirection(1.0f, -1.0f, 1.0f);
-		m_light.m_drectionLight.SetColor(1.7f, 1.7f, 1.7f);
-		/** カメラの位置の登録 */
-		m_light.m_cameraPosition = g_camera3D->GetPosition();
-		//m_light.m_drectionLight.m_LVP = g_camera3D->GetViewProjectionMatrix();
-		/** 環境光の設定 */
-		m_light.SetAmbientLight(0.5f, 0.5f, 0.5f);
-	}
-
-
 	void SPointLight::Update()
 	{
 		m_positionInView = m_position;
@@ -82,11 +23,30 @@ namespace nsBeastEngine
 	}
 
 
+	void SceneLight::Init()
+	{
+		/** ディレクションライトの設定 */
+		m_light.m_directionLight.SetDirection(1.0f, -1.0f, 1.0f);
+		m_light.m_directionLight.SetColor(1.0f, 1.0f, 1.0f);
+		/** カメラの位置の登録 */
+		m_light.m_cameraPosition = g_camera3D->GetPosition();
+		//m_light.m_directionLight.m_LVP = g_camera3D->GetViewProjectionMatrix();
+		/** 環境光の設定 */
+		m_light.SetAmbientLight(0.5f, 0.5f, 0.5f);
+	}
+
+
 	void SceneLight::Update()
 	{
+		/** カメラの位置を更新する */
+		m_light.m_cameraPosition = g_camera3D->GetPosition();
+
+		/** カメラのビュープロジェクション行列の逆行列を更新する */
+		m_light.m_mViewProjInv = g_camera3D->GetViewProjectionMatrixInv();
+
 		/** ライトをカメラと見立てたビュー行列を計算する */
 		Vector3 lightPosition = m_lightPosition;
-		Vector3 lightTarget = m_light.m_drectionLight.m_direction + lightPosition;
+		Vector3 lightTarget = m_light.m_directionLight.m_direction + lightPosition;
 		Matrix viewMatrix;
 		viewMatrix.MakeLookAt(lightPosition, lightTarget, Vector3::Up);
 
@@ -96,8 +56,58 @@ namespace nsBeastEngine
 		Matrix projMatrix;
 		projMatrix.MakeOrthoProjectionMatrix(4000, 4000, shadowNear, shadowFar);
 
-		Matrix LVP;
-		LVP = viewMatrix * projMatrix;
-		m_light.m_drectionLight.UpdateLVP(LVP);
+		/**
+		 * ライトビュープロジェクション行列を更新する
+		 * シャドウマップを描画する際に使用される
+		 */
+		 //Matrix LVP;
+		 //LVP = viewMatrix * projMatrix;
+		 //m_light.m_directionLight.UpdateLVP(LVP);
 	}
+
+
+	//SPointLight* SceneLight::NewPointLight()
+	//{
+	//	/** ライトの数が上限に達していたら作らない */
+	//	if (m_light.m_usedPointLightCount >= MAX_POINT_LIGHT) return nullptr;
+
+	//	/** 昇順でライトを登録 */
+	//	for (int i = 0; i <= MAX_POINT_LIGHT; i++)
+	//	{
+	//		/** 使用されていないライトがあったら使用中にして登録する */
+	//		if (m_light.m_pointLight[i].m_isUsed == false)
+	//		{
+	//			/* ライトを使用中にする */
+	//			m_light.m_pointLight[i].SetIsUsed();
+	//			/* ライトの数を増やす */
+	//			m_light.m_usedPointLightCount++;
+	//			/** 使用中にしたポイントライトのアドレスを返す */
+	//			return &m_light.m_pointLight[i];
+	//		}
+	//	}
+	//	return nullptr;
+	//}
+
+
+	//SSpotLight* SceneLight::NewSpotLight()
+	//{
+	//	/** ライトの数が上限に達していたら作らない */
+	//	if (m_light.m_usedSpotLightCount >= MAX_SPOT_LIGHT) return nullptr;
+
+	//	/** 昇順でライトを登録 */
+	//	for (int i = 0; i <= MAX_SPOT_LIGHT; i++)
+	//	{
+	//		/** 使用されていないライトがあったら使用中にして登録する */
+	//		if (m_light.m_spotLight[i].m_isUsed == false)
+	//		{
+	//			/* ライトを使用中にする */
+	//			m_light.m_spotLight[i].SetIsUsed();
+	//			/* ライトの数を増やす */
+	//			m_light.m_usedSpotLightCount++;
+	//			/** 使用中にしたスポットライトのアドレスを返す */
+	//			return &m_light.m_spotLight[i];
+	//		}
+	//	}
+	//	return nullptr;
+	//}
 }
