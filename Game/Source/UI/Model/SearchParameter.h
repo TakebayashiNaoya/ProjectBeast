@@ -11,6 +11,10 @@ namespace app
 {
 	namespace ui
 	{
+		/**
+		 * @brief シロクマの索敵・追跡に使用するパラメータ群です。
+		 * @note JSON から読み込まれるマスターパラメータです。
+		 */
 		struct SearchParameter : public core::IMasterParameter
 		{
 			appParameter(SearchParameter);
