@@ -52,9 +52,9 @@ struct SPSOut
 };
 
 // シェーダーリソース
-Texture2D<float4> g_albedo      : register(t0);   // アルベドマップ（モデルの色テクスチャ）
-Texture2D<float4> g_normalMap   : register(t1);   // 法線マップ（凹凸情報）
-Texture2D<float4> g_specularMap : register(t2);   // スペキュラマップ（光沢情報）
+Texture2D<float4> g_albedo                    : register(t0);   // アルベドマップ（モデルの色テクスチャ）
+Texture2D<float4> g_normalMap                 : register(t1);   // 法線マップ（凹凸情報）
+Texture2D<float4> g_metallicSmoothMap         : register(t2);   // メタリックスムースマップ（金属度とスムースNESS）
 StructuredBuffer<float4x4> g_boneMatrix       : register(t3);   // ボーン行列（スキニング用）
 StructuredBuffer<float4x4> g_worldMatrixArray : register(t10);  // インスタンス用ワールド行列
 sampler g_sampler : register(s0);  // サンプラー（テクスチャをどう読むかの設定）
@@ -95,7 +95,8 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
     {
         if (isEnableInstancingDraw)
         {
-            m = g_worldMatrixArray[vsIn.instanceID]; // インスタンスIDに対応するワールド行列を取得。
+            // インスタンスIDに対応するワールド行列を取得。
+            m = g_worldMatrixArray[vsIn.instanceID]; 
         }
         else
         {
@@ -103,10 +104,10 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
         }
     }
 
-    psIn.pos = mul(m, vsIn.pos); // モデルの頂点をワールド座標系に変換
-    psIn.worldPos = psIn.pos.xyz; // ワールド座標を保持する（射影変換前に取得すること）
+    psIn.pos       = mul(m, vsIn.pos);     // モデルの頂点をワールド座標系に変換
+    psIn.worldPos  = psIn.pos.xyz;         // ワールド座標を保持する（射影変換前に取得すること）
     float4 viewPos = mul(mView, psIn.pos); // ワールド座標系からカメラ座標系に変換
-    psIn.pos = mul(mProj, viewPos); // カメラ座標系からスクリーン座標系に変換
+    psIn.pos       = mul(mProj, viewPos);  // カメラ座標系からスクリーン座標系に変換
 
     // 法線、接ベクトル、従ベクトルをワールド空間に変換する。
     // 平行移動を無視するために、3x3行列に変換してから乗算する。
@@ -167,7 +168,9 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
 
     psOut.normal.xyz = normalize(CalcNormal(psIn));
 
-    psOut.specPow = g_specularMap.Sample(g_sampler, psIn.uv); // スペキュラ強度はとりあえず1.0fで固定。
+    // メタリックスムースマップをサンプリングしてPBRパラメータを出力
+    // r = metallic、a = smooth
+    psOut.specPow = g_metallicSmoothMap.Sample(g_sampler, psIn.uv);
 
     // シャドウレシーバーかどうかを判定するフラグをw成分に格納する。
     // 法線マップのｗは使わないので、ここに格納する。
@@ -194,8 +197,10 @@ SPSOut PSMain(SPSIn psIn) : SV_Target0
     return PSMainCore(psIn, false);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // 関数
+///////////////////////////////////////////////////////////////////////////////
 
 // 法線マップから法線を計算する関数
 float3 CalcNormal(SPSIn psIn)

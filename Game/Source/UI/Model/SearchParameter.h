@@ -27,6 +27,7 @@ namespace app
 			float offsetValueY;
 			float dotValue;
 			float iconPosX;
+			float iconPosY;
 			float iconPosZ;
 			Vector3 offsetA;
 			Vector3 offsetB;
