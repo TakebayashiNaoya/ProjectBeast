@@ -112,7 +112,7 @@ namespace app
 				// 確保済みのパラメーターがあれば解放。
 				auto it = m_parameterMap.find(T::ID());
 				if (it != m_parameterMap.end()){
-					auto& paramters = it->second;
+					auto& parameters = it->second;
 					for (auto* p : parameters) {
 						delete p;
 					}

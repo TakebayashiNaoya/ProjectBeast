@@ -17,12 +17,11 @@ namespace app
 
 		class SearchMenu : public MenuBase
 		{
-			using SearchClass = MenuBase;
 		public:
 			SearchMenu();
 			~SearchMenu();
-			void Update()override;
-			void InitializeLogic()override;
+			void Update() override;
+			void InitializeLogic() override;
 			
 			/**
 			 * @brief 見つけているか見つけていないかの内部的処理をまとめる用
@@ -61,13 +60,20 @@ namespace app
 			 */
 			inline bool CanFind()const { return m_canFind; }
 
+			/**
+			 * @brief 描画の設定
+			 * @param isDraw 描画フラグ
+			 */
+			void SetDraw(const bool isDraw) { m_isDraw = isDraw; }
+
 
 		private:
 			/** シロクマの索敵・追跡のステータスをunique_ptrで所有する */
 			std::unique_ptr<SearchStatus> m_searchStatus;
-			actor::Enemy* m_enemy;
-			bool m_isActive;
-			bool m_canFind;
+			actor::Enemy* m_enemy = nullptr;
+			bool m_isDraw = false;
+			bool m_isActive = false;
+			bool m_canFind = false;
 		};
 	}
 }
