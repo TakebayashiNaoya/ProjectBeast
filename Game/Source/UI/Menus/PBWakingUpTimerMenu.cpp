@@ -18,10 +18,10 @@ namespace app
 			: m_currentPBTime(0.0f)
 			, m_targetPosition(Vector3::Zero)
 			, m_isDraw(false)
-			, m_enemy(nullptr)
 			, m_isGreenPlayed(false)
 			, m_isYellowPlayed(false)
 			, m_isRedPlayed(false)
+			, m_enemy(nullptr)
 		{
 			// シロクマ専用UIAnimationStatusを生成。
 			m_pbAnimStatus = std::make_unique<PBWakingUpTimerAnimStatus>();
