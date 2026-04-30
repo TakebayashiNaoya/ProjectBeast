@@ -12,15 +12,8 @@ namespace app
 {
 	namespace ui
 	{
-		enum class EnSearchType : uint8_t
-		{
-			CanFind,
-			CanNotFind,
-			//CanFindFrame,
-			//CanNotFindFrame,
-			Max
-		};
-
+		/** 前方宣言 */
+		class SearchStatus;
 
 		class SearchMenu : public MenuBase
 		{
@@ -42,11 +35,6 @@ namespace app
 			 */
 			void SetAllIconActive(bool isDraw);
 
-			/**
-			 * @brief タイプの取得
-			 * @return m_currentType タイプの取得
-			 */
-			EnSearchType GetType()const { return m_currentType; }
 			/**
 			 * @brief アクティブの取得
 			 * @return m_isActive アクティブの取得
@@ -75,15 +63,11 @@ namespace app
 
 
 		private:
+			/** シロクマの追跡・索敵のステータスの生ポインタ */
+			std::unique_ptr<SearchStatus> m_searchStatus;
+			actor::Enemy* m_enemy;
 			bool m_isActive;
 			bool m_canFind;
-
-			actor::Enemy* m_enemy;
-			EnSearchType m_currentType;
-
-			//using Icon = std::unique_ptr<SearchIcon>;
-			//using Key = uint32_t;
-			//std::unordered_map<Key, Icon>m_searchIconMap;
 		};
 	}
 }

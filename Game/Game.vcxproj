@@ -323,6 +323,8 @@
     <ClCompile Include="Source\UI\Model\MasterPBWakingUpTimerParameter.cpp" />
     <ClCompile Include="Source\UI\Model\PBWakingUpTimerAnimStatus.cpp" />
     <ClCompile Include="Source\UI\Model\PBWakingUpTimerStatus.cpp" />
+    <ClCompile Include="Source\UI\Model\SearchParameter.cpp" />
+    <ClCompile Include="Source\UI\Model\SearchStatus.cpp" />
     <ClCompile Include="Source\UI\Model\UIAnimationStatus.cpp" />
     <ClCompile Include="Source\UI\Model\UIStatus.cpp" />
     <ClCompile Include="Source\UI\Parts\UIParts.cpp" />
@@ -441,6 +443,8 @@
     <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h" />
+    <ClInclude Include="Source\UI\Model\SearchParameter.h" />
+    <ClInclude Include="Source\UI\Model\SearchStatus.h" />
     <ClInclude Include="Source\UI\Model\UIAnimationStatus.h" />
     <ClInclude Include="Source\UI\Model\UIStatus.h" />
     <ClInclude Include="Source\UI\Parts\UIParts.h" />

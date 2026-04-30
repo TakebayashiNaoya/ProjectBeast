@@ -1,0 +1,12 @@
+[
+    {
+        "comment":"シロクマの追跡・索敵に関するパラメーター",
+        "offsetValueY":150,
+        "dotValue":0,
+        "iconPosY":0,
+        "iconPosX":0,
+        "iconPosZ":0,
+        "offsetA":[ -2.0, 18.0, 0.0],
+        "offsetB":[ 0.0, 15.0, 0.0]
+    }
+]

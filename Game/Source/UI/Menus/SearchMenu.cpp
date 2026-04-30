@@ -7,7 +7,7 @@
 #include "SearchMenu.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
-#include "Source/Util/CRC32.h"
+#include "Source/UI/Model/SearchStatus.h"
 
 
 namespace app
@@ -16,21 +16,6 @@ namespace app
 	{
 		namespace
 		{
-			// シロクマの頭上のアイコンのオフセット値。
-			constexpr float POLAR_BEAR_OFFSET_Y = 150.0f;
-
-			// 内積が0の値。
-			constexpr float DOT_ZERO = 0.0f;
-
-			// アイコンの初期X座標。
-			constexpr float INITIAL_ICON_POS_X = 0.0f;
-			// アイコンの初期Z座標。
-			constexpr float INITIAL_ICON_POS_Z = 0.0f;
-
-			// フレームAのオフセット値。
-			const Vector3 FRAME_A_OFFSET = Vector3(-2.0f, 18.0f, 0.0f);
-			// フレームBのオフセット値。
-			const Vector3 FRAME_B_OFFSET = Vector3(0.0f, 15.0f, 0.0f);
 			// アイコンとフレームの合計数。
 			constexpr int SEARCH_SIZE = 4;
 		}
@@ -38,10 +23,14 @@ namespace app
 		
 		SearchMenu::SearchMenu()
 			: m_enemy(nullptr)
-			, m_currentType(EnSearchType::CanFind)
 			, m_isActive(false)
 			, m_canFind(false)
-		{}
+		{
+			// シロクマ追跡・索敵専用ステータスを生成。
+			m_searchStatus = std::make_unique<SearchStatus>();
+			// シロクマ追跡・索敵専用のセットアップUIを呼び出す。
+			m_searchStatus->SetUpUI();
+		}
 
 
 		SearchMenu::~SearchMenu()
@@ -51,7 +40,7 @@ namespace app
 		void SearchMenu::Update()
 		{
 			// 敵の情報が無い場合は処理を行わない。
-			if (!m_enemy)return;
+			if (!m_enemy) return;
 
 
 			// 子ペンギンを見つけたアクティブ、子ペンギンを見失った非アクティブ。
@@ -80,7 +69,7 @@ namespace app
 				// シロクマの座標を取得。
 				Vector3 enemyPos = m_enemy->GetTransform().m_position;
 				// ワールド座標でシロクマの頭上の座標を計算した後に、スクリーン空間に変換する。
-				Vector3 iconWorldPos = enemyPos + Vector3(INITIAL_ICON_POS_X, POLAR_BEAR_OFFSET_Y, INITIAL_ICON_POS_Z);
+				Vector3 iconWorldPos = enemyPos + Vector3(m_searchStatus->GetIconPosX(), m_searchStatus->GetOffsetValueY(), m_searchStatus->GetIconPosZ());
 				
 				// カメラの座標を取得。
 				Vector3 cameraPos = g_camera3D->GetPosition();
@@ -88,7 +77,7 @@ namespace app
 				Vector3 toEnemy = enemyPos - cameraPos;
 				
 				// 内積が0以下の時は、全てのUIIconを非表示。
-				if (g_camera3D->GetForward().Dot(toEnemy) <= DOT_ZERO)
+				if (g_camera3D->GetForward().Dot(toEnemy) <= m_searchStatus->GetDotValue())
 				{
 					// シロクマがカメラの後ろにいる場合は、全てのアイコンを非表示にする。
 					SetAllIconActive(false);
@@ -111,23 +100,23 @@ namespace app
 			bool canDraw = m_isActive && isChasing;
 
 			if (canFindIcon) canFindIcon->m_isDraw = canDraw;
-			if (frameA)frameA->m_isDraw = canDraw;
+			if (frameA) frameA->m_isDraw = canDraw;
 
 			if (canDraw)
 			{
-				if (canFindIcon)canFindIcon->m_transform.m_localTransform.m_position = iconPos;
-				if (frameA)frameA->m_transform.m_localTransform.m_position = iconPos + FRAME_A_OFFSET;
+				if (canFindIcon) canFindIcon->m_transform.m_localTransform.m_position = iconPos;
+				if (frameA) frameA->m_transform.m_localTransform.m_position = iconPos + m_searchStatus->GetOffsetA();
 			}
 			// 索敵状態のアイコンとフレームの描画設定。
 			bool canNotDraw = m_isActive && isSearching;
 
-			if (canNotFindIcon)canNotFindIcon->m_isDraw = canNotDraw;
-			if (frameB)frameB->m_isDraw = canNotDraw;
+			if (canNotFindIcon) canNotFindIcon->m_isDraw = canNotDraw;
+			if (frameB) frameB->m_isDraw = canNotDraw;
 			
 			if (canNotDraw)
 			{
-				if (canNotFindIcon)canNotFindIcon->m_transform.m_localTransform.m_position = iconPos;
-				if (frameB)frameB->m_transform.m_localTransform.m_position = iconPos + FRAME_B_OFFSET;
+				if (canNotFindIcon) canNotFindIcon->m_transform.m_localTransform.m_position = iconPos;
+				if (frameB) frameB->m_transform.m_localTransform.m_position = iconPos + m_searchStatus->GetOffsetB();
 			}
 		}
 
@@ -151,5 +140,5 @@ namespace app
 			// ゲームが開始段階であれば、アイコンとフレームは全て非表示にする。
 			SetAllIconActive(false);
 		}
-	}
-}
+	} // namespace ui
+} // namespace app
