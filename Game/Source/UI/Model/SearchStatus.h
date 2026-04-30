@@ -11,6 +11,9 @@ namespace app
 {
 	namespace ui
 	{
+		/**
+		 * @brief PB追跡・索敵のUI用ステータスを管理するクラス
+		 */
 		class SearchStatus : public UIStatus
 		{
 		public:
