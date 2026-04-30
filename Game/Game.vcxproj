@@ -304,6 +304,7 @@
     <ClCompile Include="Source\UI\Animation\UIAnimation.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
+    <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\CountDownMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\EnemySleepingMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\EventMenu.cpp" />
@@ -321,6 +322,7 @@
     <ClCompile Include="Source\UI\Menus\SoundOptionMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\TitleEventMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\TutorialMenu.cpp" />
+    <ClCompile Include="Source\UI\Model\AchievementAnimStatus.cpp" />
     <ClCompile Include="Source\UI\Model\MasterPBWakingUpTimerParameter.cpp" />
     <ClCompile Include="Source\UI\Model\PBWakingUpTimerAnimStatus.cpp" />
     <ClCompile Include="Source\UI\Model\PBWakingUpTimerStatus.cpp" />
@@ -425,6 +427,7 @@
     <ClInclude Include="Source\UI\Animation\UIAnimationParameter.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
+    <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h" />
     <ClInclude Include="Source\UI\Menus\CountDownMenu.h" />
     <ClInclude Include="Source\UI\Menus\EnemySleepingMenu.h" />
     <ClInclude Include="Source\UI\Menus\EventMenu.h" />
@@ -442,6 +445,7 @@
     <ClInclude Include="Source\UI\Menus\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
+    <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h" />

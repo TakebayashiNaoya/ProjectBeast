@@ -20,6 +20,12 @@ namespace app
 
 
 			constexpr uint32_t PB_NEEDLE_ROT_ANIM_KEY = Hash32("rotationAnim");
+
+
+			/** アチーブメント通知用のUIAnimationKey */
+			constexpr uint32_t ACHIEVE_FADE_IN_ANIM_KEY = Hash32("fadeInAnim");
+			constexpr uint32_t ACHIEVE_STAMP_ANIM_KEY = Hash32("stampAnim");
+			constexpr uint32_t ACHIEVE_FADE_OUT_ANIM_KEY = Hash32("fadeOutAnim");
 		}
 	}
 }
