@@ -8,7 +8,7 @@
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
 #include "Source/Sound/SoundManager.h"
-#include "Source/UI/ResultMenu.h"
+#include "Source/UI/Menus/ResultMenu.h"
 #include "Source/UI/Parts/UIParts.h" 
 #include "Source/Util/CRC32.h" 
 #include "TitleScene.h"

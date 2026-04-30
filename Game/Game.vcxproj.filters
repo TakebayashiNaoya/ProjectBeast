@@ -313,9 +313,6 @@
     <ClCompile Include="Source\Nature\WhirlpoolPowerSystem.cpp">
       <Filter>Source\Nature</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\ResultMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -390,6 +387,9 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Model\SearchStatus.cpp">
       <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\ResultMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -630,9 +630,6 @@
     <ClInclude Include="Source\Nature\WhirlpoolParameter.h">
       <Filter>Source\Nature</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\ResultMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
@@ -716,6 +713,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Model\SearchStatus.h">
       <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\ResultMenu.h">
+      <Filter>Source\UI\Menus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
