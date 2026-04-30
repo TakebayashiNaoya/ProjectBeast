@@ -33,6 +33,7 @@ namespace app
 					param.offsetValueY = j["offsetValueY"].get<float>();
 					param.dotValue = j["dotValue"].get<float>();
 					param.iconPosX = j["iconPosX"].get<float>();
+					param.iconPosY = j["iconPosY"].get<float>();
 					param.iconPosZ = j["iconPosZ"].get<float>();
 					param.offsetA = util::JsonConverter::ToVector3(j["offsetA"]);
 					param.offsetB = util::JsonConverter::ToVector3(j["offsetB"]);
