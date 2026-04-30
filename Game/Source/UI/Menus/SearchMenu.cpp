@@ -33,6 +33,26 @@ namespace app
 
 		void SearchMenu::Update()
 		{
+			// インゲーム内で一瞬だけ表示されるバグを防ぐ。
+			if (!m_isDraw)
+			{
+				// アイコンとフレームを全て非表示にする。
+				auto* canFindIcon = GetUI<UIIcon>(Hash32("canSearchIcon"));
+				if (canFindIcon) canFindIcon->m_isDraw = false;
+
+				auto* canNotFindIcon = GetUI<UIIcon>(Hash32("canNotSearchIcon"));
+				if (canNotFindIcon) canNotFindIcon->m_isDraw = false;
+
+				auto* frameA = GetUI<UIIcon>(Hash32("canSearchFrame"));
+				if (frameA) frameA->m_isDraw = false;
+
+				auto* frameB = GetUI<UIIcon>(Hash32("canNotSearchFrame"));
+				if (frameB) frameB->m_isDraw = false;
+				
+				MenuBase::Update();
+				return;
+			}
+
 			// 敵の情報が無い場合は処理を行わない。
 			if (!m_enemy) return;
 
@@ -41,7 +61,7 @@ namespace app
 			Searching();
 
 			// キャンバスの更新。
-			SearchClass::Update();
+			MenuBase::Update();
 		}
 
 

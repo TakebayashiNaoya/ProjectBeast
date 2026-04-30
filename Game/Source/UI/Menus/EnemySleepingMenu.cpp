@@ -48,6 +48,10 @@ namespace app
 
 
 		EnemySleepingMenu::EnemySleepingMenu()
+			: m_targetPosition(Vector3::Zero)
+			, m_sleepingRate(0.0f)
+			, m_isDraw(false)
+			, m_isStartAnimationPlayed(false)
 		{}
 
 

@@ -7,6 +7,7 @@
 #include "PBWakingUpTimerMenu.h"
 #include "Source/UI/Model/PBWakingUpTimerAnimStatus.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
 
 
 namespace app
@@ -17,6 +18,7 @@ namespace app
 			: m_currentPBTime(0.0f)
 			, m_targetPosition(Vector3::Zero)
 			, m_isDraw(false)
+			, m_enemy(nullptr)
 			, m_isGreenPlayed(false)
 			, m_isYellowPlayed(false)
 			, m_isRedPlayed(false)
@@ -40,27 +42,31 @@ namespace app
 
 		void PBWakingUpTimerMenu::Update()
 		{
+			// シロクマが存在しない場合は処理を中断。
+			if (!m_enemy) return;
+
 			// 全てのUIを非表示にする。
 			if (!m_isDraw)
 			{
 				auto* cirGaugeA = GetUI<UICircleGauge>(Hash32("PBTimerCircleGaugeA"));
-				if (cirGaugeA)cirGaugeA->m_isDraw = false;
+				if (cirGaugeA) cirGaugeA->m_isDraw = false;
 				
 				auto* cirGaugeB = GetUI<UICircleGauge>(Hash32("PBTimerCircleGaugeB"));
 				if(cirGaugeB) cirGaugeB->m_isDraw = false;
 
 				auto* alarmClock = GetUI<UIIcon>(Hash32("PBalarmClock"));
-				if (alarmClock)alarmClock->m_isDraw = false;
+				if (alarmClock) alarmClock->m_isDraw = false;
 
 				auto* longNeedle = GetUI<UIIcon>(Hash32("PBNeedle"));
-				if (longNeedle)longNeedle->m_isDraw = false;
+				if (longNeedle) longNeedle->m_isDraw = false;
 
-				PBWakingUpTimerClass::Update();
+				MenuBase::Update();
 				return;
 			}
 
 			// キャンバスを取得。
 			auto* canvas = GetCanvas();
+
 			// キャンバスがある時、
 			if (canvas) {
 				// 時計回りに回転させるサークルゲージの処理を呼び出す。
@@ -68,7 +74,7 @@ namespace app
 			}
 
 			// MenuBaseの更新処理
-			PBWakingUpTimerClass::Update();
+			MenuBase::Update();
 		}
 
 

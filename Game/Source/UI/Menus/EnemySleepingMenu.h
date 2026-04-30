@@ -16,13 +16,8 @@ namespace app
 		public:
 			EnemySleepingMenu();
 
-			void Update()override;
-			void InitializeLogic()override;
-
-			/**
-			 * @brief 寝ている割合に応じてゲージの色を変える。
-			 */
-			void VisualColor();
+			void Update() override;
+			void InitializeLogic() override;
 
 
 		public:
@@ -32,10 +27,10 @@ namespace app
 
 
 		private:
-			Vector3 m_targetPosition = Vector3::Zero;
-			float m_sleepingRate = 0.0f;
-			bool m_isDraw = false;
-			bool m_isStartAnimationPlayed = false;
+			Vector3 m_targetPosition;
+			float m_sleepingRate;
+			bool m_isDraw;
+			bool m_isStartAnimationPlayed;
 		};
 	}
 }
