@@ -203,10 +203,6 @@ namespace app
 				info.number = 0;
 			}
 
-			// アイコンに適用させるisDraw。
-			//bool iconIsDraw = false;
-
-
 			for (auto* child : childPenMgr)
 			{
 				// 子ペンギン以外は描画させない。
@@ -386,24 +382,6 @@ namespace app
 					if (childIcon) childIcon->m_isDraw = false;
 				}
 			}
-
-			//auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
-			//if (daddyIcon) daddyIcon->m_isDraw = false;
-
-			//auto* blueIcon = GetUI<UIIcon>(Hash32("childBlueIcon0"));
-			//if (blueIcon) blueIcon->m_isDraw = false;
-
-			//auto* orangeIcon = GetUI<UIIcon>(Hash32("childOrangeIcon0"));
-			//if (orangeIcon) orangeIcon->m_isDraw = false;
-
-			//auto* pinkIcon = GetUI<UIIcon>(Hash32("childPinkIcon0"));
-			//if (pinkIcon) pinkIcon->m_isDraw = false;
-
-			//auto* yellowIcon = GetUI<UIIcon>(Hash32("childYellowIcon0"));
-			//if (yellowIcon) yellowIcon->m_isDraw = false;
-
-			//auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon0"));
-			//if (greenIcon) greenIcon->m_isDraw = false;
 
 			for (auto& key : POLAR_BEAR_ICON_KEYS)
 			{
