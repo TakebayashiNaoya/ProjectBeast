@@ -13,14 +13,7 @@
 namespace app
 {
 	namespace ui
-	{
-		namespace
-		{
-			// アイコンとフレームの合計数。
-			constexpr int SEARCH_SIZE = 4;
-		}
-
-		
+	{	
 		SearchMenu::SearchMenu()
 			: m_enemy(nullptr)
 			, m_isActive(false)
@@ -140,5 +133,5 @@ namespace app
 			// ゲームが開始段階であれば、アイコンとフレームは全て非表示にする。
 			SetAllIconActive(false);
 		}
-	} // namespace ui
-} // namespace app
+	}
+}

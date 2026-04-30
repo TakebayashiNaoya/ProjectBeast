@@ -63,7 +63,7 @@ namespace app
 
 
 		private:
-			/** シロクマの追跡・索敵のステータスの生ポインタ */
+			/** シロクマの索敵・追跡のステータスをunique_ptrで所有する */
 			std::unique_ptr<SearchStatus> m_searchStatus;
 			actor::Enemy* m_enemy;
 			bool m_isActive;

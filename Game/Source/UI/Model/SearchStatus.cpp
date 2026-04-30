@@ -15,6 +15,7 @@ namespace app
 	{
 		namespace
 		{
+			// JSONファイルパス。
 			const char* JSON_PATH = "Assets/parameter/search/SearchParameter.json";
 		}
 
@@ -22,7 +23,6 @@ namespace app
 		SearchStatus::SearchStatus()
 			: m_offsetValueY(0.0f)
 			, m_dotValue(0.0f)
-			, m_iconPosY(0.0f)
 			, m_iconPosX(0.0f)
 			, m_iconPosZ(0.0f)
 			, m_offsetA(Vector3::Zero)
@@ -32,7 +32,6 @@ namespace app
 				{
 					param.offsetValueY = j["offsetValueY"].get<float>();
 					param.dotValue = j["dotValue"].get<float>();
-					param.iconPosY = j["iconPosY"].get<float>();
 					param.iconPosX = j["iconPosX"].get<float>();
 					param.iconPosZ = j["iconPosZ"].get<float>();
 					param.offsetA = util::JsonConverter::ToVector3(j["offsetA"]);
@@ -49,10 +48,9 @@ namespace app
 		
 		void SearchStatus::SetUpUI()
 		{
-			const auto& param = core::ParameterManager::Get()->GetParameter<SearchParameter>();
+			const auto* param = core::ParameterManager::Get()->GetParameter<SearchParameter>();
 			m_offsetValueY = param->offsetValueY;
 			m_dotValue = param->dotValue;
-			m_iconPosY = param->iconPosY;
 			m_iconPosX = param->iconPosX;
 			m_iconPosZ = param->iconPosZ;
 			m_offsetA = param->offsetA;
