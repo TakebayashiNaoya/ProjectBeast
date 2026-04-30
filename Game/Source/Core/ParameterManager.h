@@ -116,7 +116,7 @@ namespace app
 					for (auto* p : parameters) {
 						delete p;
 					}
-					m_parameterMap.erase(T::ID());
+					m_parameterMap.erase(it);
 				}
 			}
 
