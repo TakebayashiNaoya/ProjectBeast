@@ -73,6 +73,9 @@
     <Filter Include="Source\UI\Model">
       <UniqueIdentifier>{0e5929f2-76bf-4cb2-813d-5ec9f0196b29}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Graphics">
+      <UniqueIdentifier>{c89d2eb9-7128-4e66-b594-03a88d645758}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -393,6 +396,12 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp">
       <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\PBRParameter.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\PBRStatus.cpp">
+      <Filter>Source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -725,6 +734,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Model\MiniMapParameter.h">
       <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\PBRStatus.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\PBRParameter.h">
+      <Filter>Source\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

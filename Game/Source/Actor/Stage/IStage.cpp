@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "IStage.h"
+#include "Source/Graphics/PBRStatus.h"
 
 
 namespace app
@@ -28,6 +29,11 @@ namespace app
 					nsK2EngineLow::ModelInitData initData;
 					m_tkmLoader.Finalize(initData);
 					// ステージはスケルトン・アニメーション不要なのでnullptr
+					// pbrNameが指定されている場合はPBR補正パラメータを設定する
+					if (!m_pbrName.empty())
+					{
+						m_modelRender.SetPBRParam(graphics::PBRStatus::Get()->GetPBRParam(m_pbrName));
+					}
 					m_modelRender.Init(m_pendingModelPath.c_str());
 					m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 					m_modelRender.Update();
@@ -57,10 +63,12 @@ namespace app
 			m_modelRender.Draw(rc);
 		}
 
-		void IStageObject::Init(const char* fileName)
+
+		void IStageObject::Init(const char* fileName, const std::string& pbrName)
 		{
 			m_isModelLoaded = false;
 			m_pendingModelPath = fileName;
+			m_pbrName = pbrName;
 			m_tkmLoader.Reset();
 
 			// TKMファイルを非同期ロードリクエスト

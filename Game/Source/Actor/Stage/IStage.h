@@ -35,16 +35,16 @@ namespace app
 		public:
 			/**
 			 * @brief モデルレンダーを初期化
-			 * @param fileName アセットファイルパス
+			 * @param fileName  アセットファイルパス
+			 * @param pbrName   PBRParameter.jsonの"name"キー（空文字の場合はデフォルト値を使用）
 			 */
-			void Init(const char* fileName);
+			void Init(const char* fileName, const std::string& pbrName = "");
 
 			/**
 			 * @brief モデルと物理コリジョンのロードが完了しているか
 			 * @return 完了していればtrue
 			 */
 			bool IsLoaded() const { return m_isModelLoaded; }
-
 
 			/**
 			 * @brief 物理判定が必要かどうかを設定
@@ -68,7 +68,6 @@ namespace app
 			/** 物理判定が必要かどうか */
 			bool m_IsNeedCollision;
 			/** 物理静的オブジェクト */
-			//PhysicsStaticObject m_physicsStaticObject;
 			nsBeastEngine::nsCollision::PhysicalBody m_physicalObj;
 
 
@@ -79,6 +78,8 @@ namespace app
 			std::string m_pendingModelPath;
 			/** TKM非同期ローダー */
 			nsBeastEngine::TkmModelLoader m_tkmLoader;
+			/** PBRParameter.jsonの"name"キー（空文字の場合はデフォルト値を使用） */
+			std::string m_pbrName;
 
 
 		private:
@@ -86,4 +87,3 @@ namespace app
 		};
 	}
 }
-
