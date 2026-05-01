@@ -391,6 +391,9 @@
     <ClCompile Include="Source\UI\Model\SearchStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -715,6 +718,12 @@
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Model\SearchStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MiniMapStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MiniMapParameter.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
   </ItemGroup>
