@@ -5,9 +5,9 @@
                 "type":"UIIcon",
                 "name":"MiniMapIcon",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/MiniMap.dds",
-                "width":350,
-                "height":350,
-                "position":[ -560, 220, 0],
+                "width":233,
+                "height":233,
+                "position":[ -570, 280, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
@@ -114,7 +114,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[  0, 102, 153, 255]
+                "color":[ 0, 102, 153, 255]
             },
             {
                 "type":"UIIcon",
@@ -127,7 +127,7 @@
                 "rotation":0,
                 "color":[ 0, 102, 153, 255]
             },
-            {  
+            {
                 "type":"UIIcon",
                 "name":"childBlueIcon9",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
@@ -248,8 +248,6 @@
                 "rotation":0,
                 "color":[ 0, 102, 153, 255]
             },
-            
-            
 
 
             {
@@ -317,7 +315,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon6",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -327,7 +326,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon7",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -337,7 +337,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon8",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -347,7 +348,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon9",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -357,7 +359,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon10",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -367,7 +370,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon11",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -377,7 +381,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon12",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -387,7 +392,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon13",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -397,7 +403,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon14",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -407,7 +414,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon15",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -417,7 +425,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon16",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -427,7 +436,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon17",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -437,7 +447,8 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 165, 0, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon18",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -446,8 +457,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[  255, 165, 0, 255]
-            },{
+                "color":[ 255, 165, 0, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childOrangeIcon19",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
@@ -462,6 +474,228 @@
 
             {
                 "type":"UIIcon",
+                "name":"childPinkIcon0",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon1",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon2",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon3",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon4",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon5",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon6",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon7",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon8",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon9",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon10",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon11",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon12",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon13",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon14",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon15",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon16",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon17",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon18",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"childPinkIcon19",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 182, 193, 255]
+            },
+
+
+            {
+                "type":"UIIcon",
                 "name":"childYellowIcon0",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
                 "width":20,
@@ -469,9 +703,8 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
-            },
-            {
+                "color":[ 255, 220, 0, 255]
+            },{
                 "type":"UIIcon",
                 "name":"childYellowIcon1",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
@@ -480,9 +713,8 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
-            },
-            {
+                "color":[ 255, 220, 0, 255]
+            },{
                 "type":"UIIcon",
                 "name":"childYellowIcon2",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
@@ -511,7 +743,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
+                "color":[ 255, 220, 0, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon5",
@@ -521,7 +753,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
+                "color":[ 255, 220, 0, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon6",
@@ -531,7 +763,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
+                "color":[ 255, 220, 0, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon7",
@@ -541,7 +773,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
+                "color":[ 255, 220, 0, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon8",
@@ -551,7 +783,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
+                "color":[ 255, 220, 0, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon9",
@@ -561,7 +793,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255, 220, 0, 255]
+                "color":[ 255, 220, 0, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon10",
@@ -663,213 +895,8 @@
                 "rotation":0,
                 "color":[ 255, 220, 0, 255]
             },
-            
 
-            {
-                "type":"UIIcon",
-                "name":"childPinkIcon0",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },
-            {
-                "type":"UIIcon",
-                "name":"childPinkIcon1",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon2",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon3",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon4",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon5",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon6",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon7",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon8",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon9",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon10",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon11",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon12",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon13",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon14",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon15",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon16",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon17",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon18",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },{
-                "type":"UIIcon",
-                "name":"childPinkIcon19",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 247, 155, 185, 255]
-            },
-            
-            
-            
+
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon0",
@@ -879,7 +906,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
+                "color":[ 100, 200, 100, 255]
             },
             {
                 "type":"UIIcon",
@@ -890,8 +917,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon2",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -900,8 +928,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon3",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -910,8 +939,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon4",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -920,8 +950,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon5",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -930,8 +961,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon6",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -940,8 +972,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon7",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -950,8 +983,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon8",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -960,8 +994,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon9",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -970,8 +1005,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon10",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -980,8 +1016,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon11",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -990,8 +1027,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon12",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1000,8 +1038,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon13",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1010,8 +1049,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon14",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1020,8 +1060,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon15",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1030,8 +1071,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon16",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1040,8 +1082,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon17",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1050,8 +1093,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon18",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1060,8 +1104,9 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
-            },{
+                "color":[ 100, 200, 100, 255]
+            },
+            {
                 "type":"UIIcon",
                 "name":"childGreenIcon19",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
@@ -1070,35 +1115,36 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 152, 251, 152, 255]
+                "color":[ 100, 200, 100, 255]
             },
-
 
 
             {
                 "type":"UIIcon",
                 "name":"bearIcon0",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PolarBearIcon.dds",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearIcon.dds",
                 "width":20,
                 "height":20,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"bearIcon1",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PolarBearIcon.dds",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearIcon.dds",
                 "width":20,
                 "height":20,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
-            },{
+            },
+            {
                 "type":"UIIcon",
                 "name":"bearIcon2",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PolarBearIcon.dds",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearIcon.dds",
                 "width":20,
                 "height":20,
                 "position":[ 0, 0, 0],

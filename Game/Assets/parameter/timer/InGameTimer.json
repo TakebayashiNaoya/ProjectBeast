@@ -93,6 +93,19 @@
 
             {
                 "type":"UIIcon",
+                "name":"ButtonBackgroundIcon",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/MiniMap.dds",
+                "width":350,
+                "height":270,
+                "position":[ 605, -300, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,120]
+            },
+
+
+            {
+                "type":"UIIcon",
                 "name":"AbuttonIcon",
                 "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_a.dds",
                 "width":60,
