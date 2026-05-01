@@ -67,7 +67,7 @@ namespace app
 
 		private:
 			UIAnimationParameter() {}
-			~UIAnimationParameter(){}
+			~UIAnimationParameter() {}
 
 
 		public:
@@ -150,7 +150,7 @@ namespace app
 			bool ParseFile()
 			{
 				std::string jsonText;
-				if (!ReloadFileToString(m_filePath, jsonText)){
+				if (!ReloadFileToString(m_filePath, jsonText)) {
 					return false;
 				}
 
@@ -159,11 +159,11 @@ namespace app
 				try {
 					root = nlohmann::json::parse(jsonText);
 				}
-				catch (...){
+				catch (...) {
 					return false;
 				}
 
-				m_defMap.clear();
+				//m_defMap.clear();
 
 				// "animations"配列を走査。
 				if (!root.contains("animations") || !root["animations"].is_array())
