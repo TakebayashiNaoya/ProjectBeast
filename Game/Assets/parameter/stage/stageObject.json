@@ -7,7 +7,8 @@
         "isNeedCollision" : true,
         "position" : [0, 1000, 0],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [0.32, 2, 0.32]
+        "scale" : [0.32, 2, 0.32],
+        "pbrName" : "wall"
       },
       {
         "objectName" : "bearHome_1",
@@ -39,7 +40,8 @@
         "isNeedCollision" : true,
         "position" : [-550, 80, 3000],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [4, 4, 4]
+        "scale" : [4, 4, 4],
+        "pbrName" : "igloo"
       },
       {
         "objectName" : "igloo02",
@@ -47,7 +49,8 @@
         "isNeedCollision" : true,
         "position" : [2200, 230, 1380],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [4, 4, 4]
+        "scale" : [4, 4, 4],
+        "pbrName" : "igloo"
       },
       {
         "objectName" : "igloo03",
@@ -55,7 +58,8 @@
         "isNeedCollision" : true,
         "position" : [2000, 170, -3000],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [4, 4, 4]
+        "scale" : [4, 4, 4],
+        "pbrName" : "igloo"
       },
       {
         "objectName" : "Ground01",
@@ -63,7 +67,8 @@
         "isNeedCollision" : true,
         "position" : [-630, 0, 3000],
         "rotationDeg" : [0, 160, 0],
-        "scale" : [2, 4, 6]
+        "scale" : [2, 4, 6],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground02",
@@ -71,7 +76,8 @@
         "isNeedCollision" : true,
         "position" : [0, 0, 0],
         "rotationDeg" : [0, -10, 0],
-        "scale" : [6, 4, 7]
+        "scale" : [6, 4, 7],
+        "pbrName" : "ground"
       }, 
       {
         "objectName" : "Ground03",
@@ -79,7 +85,8 @@
         "isNeedCollision" : true,
         "position" : [2000, 0, 0],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [4, 4, 6]
+        "scale" : [4, 4, 6],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground04",
@@ -87,7 +94,8 @@
         "isNeedCollision" : true,
         "position" : [800, 0, -2200],
         "rotationDeg" : [0, 90, 0],
-        "scale" : [4, 4, 4]
+        "scale" : [4, 4, 4],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground05",
@@ -95,7 +103,8 @@
         "isNeedCollision" : true,
         "position" : [1400, 0, -1300],
         "rotationDeg" : [0, 70, 0],
-        "scale" : [4, 4, 4]
+        "scale" : [4, 4, 4],
+        "pbrName" : "ground"
       },      
       {
         "objectName" : "Ground06",
@@ -103,7 +112,8 @@
         "isNeedCollision" : true,
         "position" : [1400, 0, -1300],
         "rotationDeg" : [0, 70, 0],
-        "scale" : [4, 4, 4]
+        "scale" : [4, 4, 4],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground07",
@@ -111,7 +121,8 @@
         "isNeedCollision" : true,
         "position" : [2600, 0, -1900],
         "rotationDeg" : [0, 40, 0],
-        "scale" : [6, 3, 6]
+        "scale" : [6, 3, 6],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground08",
@@ -119,7 +130,8 @@
         "isNeedCollision" : true,
         "position" : [2300, 0, 1500],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [7, 4, 7]
+        "scale" : [7, 4, 7],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground09",
@@ -127,7 +139,8 @@
         "isNeedCollision" : true,
         "position" : [-2110, 0, 1110],
         "rotationDeg" : [0, -40, 0],
-        "scale" : [2, 2, 2]
+        "scale" : [2, 2, 2],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground10",
@@ -135,7 +148,8 @@
         "isNeedCollision" : true,
         "position" : [-370, 0, -2700],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [2, 2, 2]
+        "scale" : [2, 2, 2],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground11",
@@ -143,7 +157,8 @@
         "isNeedCollision" : true,
         "position" : [2000, 0, -3000],
         "rotationDeg" : [0, 40, 0],
-        "scale" : [6, 3, 6]
+        "scale" : [6, 3, 6],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground12",
@@ -151,7 +166,8 @@
         "isNeedCollision" : true,
         "position" : [460, 0, 2000],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [4, 4, 6]
+        "scale" : [4, 4, 6],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Ground13",
@@ -159,7 +175,8 @@
         "isNeedCollision" : true,
         "position" : [460, 0, -3000],
         "rotationDeg" : [0, -10, 0],
-        "scale" : [4, 3, 4]
+        "scale" : [4, 3, 4],
+        "pbrName" : "ground"
       },
       {
         "objectName" : "Mountain01",
@@ -167,7 +184,8 @@
         "isNeedCollision" : true,
         "position" : [-1700, -10, -1200],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [5, 5, 5]
+        "scale" : [5, 5, 5],
+        "pbrName" : "ground"
       }
     ] 
   }

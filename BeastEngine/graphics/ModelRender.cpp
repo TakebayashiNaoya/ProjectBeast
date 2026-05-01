@@ -124,7 +124,8 @@ namespace nsBeastEngine
 		// GBufferのカラーバッファフォーマットを設定する
 		gBufferInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// アルベド
 		gBufferInitData.m_colorBufferFormat[1] = DXGI_FORMAT_R8G8B8A8_UNORM;		// 法線
-		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R8G8B8A8_UNORM;		// メタリックスムース
+		// dirLightScale・ambientScaleが1.0を超える値を扱うためR32G32B32A32_FLOATを使用する
+		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// PBRパラメータ
 
 		// PBR補正パラメータをb2に設定する
 		gBufferInitData.m_expandConstantBuffer2 = &m_pbrParam;

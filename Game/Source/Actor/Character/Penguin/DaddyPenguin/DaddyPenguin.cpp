@@ -31,7 +31,6 @@ namespace app
 
 		DaddyPenguin::DaddyPenguin()
 		{
-			m_modelRender.SetPBRParam(graphics::PBRStatus::Get()->GetPBRParam("daddyPenguin"));
 			CharacterBase::Init(MODEL_DATA);
 
 			m_status = std::make_unique<DaddyPenguinStatus>();

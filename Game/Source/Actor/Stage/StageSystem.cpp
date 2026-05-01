@@ -77,13 +77,20 @@ namespace
 	/**
 	 * @brief ステージオブジェクトを初期化する
 	 * @param object ステージオブジェクト
-	 * @param item jsonデータ
+	 * @param item   jsonデータ
 	 */
 	void InitializeStageObject(app::actor::IStageObject* object, const nlohmann::json& item)
 	{
 		const std::string fileName = app::util::JsonConverter::ToString(item["fileName"]);
 
-		object->Init(fileName.c_str());
+		// pbrNameが指定されていればInit時に渡す（なければ空文字でデフォルト値を使用）
+		std::string pbrName = "";
+		if (item.contains("pbrName"))
+		{
+			pbrName = item["pbrName"].get<std::string>();
+		}
+
+		object->Init(fileName.c_str(), pbrName);
 
 		LoadTransform(object, item);
 		object->StartWrapper();
@@ -190,8 +197,6 @@ namespace app
 			// 必要なデータが存在するかチェック
 			if (!j.contains(STAGE_OBJECT_KEY)) return;
 			if (!j[STAGE_OBJECT_KEY].contains(OBJECT_ARRAY_KEY)) return;
-
-
 
 			for (const auto& objData : j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
@@ -402,14 +407,14 @@ namespace app
 			}
 		}
 
+
 		std::string StageSystem::GetNearestIglooKey(const Vector3& from) const
 		{
-			std::string nearestKey = "";
+			std::string nearestKey;
 			float minDistSq = FLT_MAX;
 
 			for (const auto& obj : m_objectMap)
 			{
-				// キー名が "igloo" で始まるオブジェクトのみ対象とする
 				if (obj.first.find(IGLOO_KEY_PREFIX) != 0) continue;
 
 				const Vector3& pos = obj.second->GetTransform().m_position;
@@ -425,8 +430,6 @@ namespace app
 
 			return nearestKey;
 		}
-
-
 		/** インスタンスを初期化 */
 		StageSystem* StageSystem::m_instance = nullptr;
 	}
