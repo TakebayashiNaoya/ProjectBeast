@@ -268,7 +268,7 @@ float3 CalcDirectionLight(
     float3 diffuse = albedo * diffuseFromFresnel * lambertDiffuse;
 
     // Cook-Torranceモデルを利用した鏡面反射率を計算する
-    float3 spec = CookTorranceSpecular(toLight, toEye, normal, smooth)
+    float3 spec = CookTorranceSpecular(toLight, toEye, normal, metallic)
                 * scaledDirLightColor;
 
     // 金属度が高ければ鏡面反射はアルベドカラー、低ければ白

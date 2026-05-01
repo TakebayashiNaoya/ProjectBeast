@@ -110,7 +110,7 @@ namespace nsK2EngineLow {
 				//ディスクリプタヒープにディスクリプタを登録していく。
 				m_descriptorHeap.RegistShaderResource(srvNo, mesh->m_materials[matNo]->GetAlbedoMap());		//アルベドマップ。
 				m_descriptorHeap.RegistShaderResource(srvNo + 1, mesh->m_materials[matNo]->GetNormalMap());		//法線マップ。
-				m_descriptorHeap.RegistShaderResource(srvNo + 2, mesh->m_materials[matNo]->GetSpecularMap());	//スペキュラマップ。
+				m_descriptorHeap.RegistShaderResource(srvNo + 2, mesh->m_materials[matNo]->GetSpecularMap());	//metallic/smooth 用（specular 兼用）マップ。
 				m_descriptorHeap.RegistShaderResource(srvNo + 3, m_boneMatricesStructureBuffer);				//ボーンの構造体バッファ。
 				for (int i = 0; i < MAX_MODEL_EXPAND_SRV; i++) {
 					if (m_expandShaderResourceView[i]) {

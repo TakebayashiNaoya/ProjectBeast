@@ -27,7 +27,7 @@ namespace nsK2EngineLow {
 		void* m_expandConstantBuffer2 = nullptr;								//ユーザー拡張の定数バッファ（b2）。
 		int m_expandConstantBufferSize2 = 0;									//ユーザー拡張の定数バッファのサイズ（b2）。
 		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };	//ユーザー拡張のシェーダーリソースビュー。
-		EnModelUpAxis m_modelUpAxis = enModelUpAxisY;							//モデルの上方向。
+		EnModelUpAxis m_modelUpAxis = enModelUpAxisZ;							//モデルの上方向。
 		std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> m_colorBufferFormat = {
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			DXGI_FORMAT_UNKNOWN,
@@ -159,11 +159,24 @@ namespace nsK2EngineLow {
 			RenderContext& rc,
 			int numInstance = 1
 		);
+		/// <summary>
+		/// 指定されたカメラを使用して描画。
+		/// </summary>
+		/// <param name="rc">レンダリングコンテキスト</param>
+		/// <param name="camera">描画に使用するカメラ</param>
+		/// <param name="numInstance">インスタンスの数</param>
 		void Draw(
 			RenderContext& rc,
 			Camera& camera,
 			int numInstance = 1
 		);
+		/// <summary>
+		/// 指定されたビュー行列と射影行列を使用して描画。
+		/// </summary>
+		/// <param name="rc">レンダリングコンテキスト</param>
+		/// <param name="viewMatrix">ビュー行列</param>
+		/// <param name="projMatrix">射影行列</param>
+		/// <param name="numInstance">インスタンスの数</param>
 		void Draw(
 			RenderContext& rc,
 			const Matrix& viewMatrix,
@@ -178,6 +191,6 @@ namespace nsK2EngineLow {
 		TkmFile* m_tkmFile;								//tkmファイル。
 		Skeleton m_skeleton;							//スケルトン。
 		MeshParts m_meshParts;							//メッシュパーツ。
-		EnModelUpAxis m_modelUpAxis = enModelUpAxisY;	//モデルの上方向。
+		EnModelUpAxis m_modelUpAxis = enModelUpAxisZ;	//モデルの上方向。
 	};
 }
