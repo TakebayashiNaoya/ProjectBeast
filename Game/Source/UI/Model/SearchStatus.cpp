@@ -38,14 +38,14 @@ namespace app
 					param.offsetB = util::JsonConverter::ToVector3(j["offsetB"]);
 				});
 		}
-		
-		
+
+
 		SearchStatus::~SearchStatus()
 		{
 			core::ParameterManager::Get()->UnloadParameter<SearchParameter>();
 		}
-		
-		
+
+
 		void SearchStatus::SetUpUI()
 		{
 			const auto* param = core::ParameterManager::Get()->GetParameter<SearchParameter>();

@@ -11,6 +11,9 @@
 
 namespace
 {
+	const Vector3 TARGET_OFFSET = Vector3(0.0f, 50.0f, 0.0f);	// ターゲットの注視点オフセット（例: ターゲットの頭上50ユニット）
+	constexpr float MAX_VERTICAL_ANGLE = 80.0f;					// 上下の回転の最大角度（例: 80度）
+	constexpr float MIN_VERTICAL_ANGLE = 0.0f;					// 上下の回転の最小角度（例: 0度、地面にめり込まない程度）
 }
 
 
@@ -28,7 +31,7 @@ namespace app
 
 			// 理想のカメラ位置（注視点）を計算：ターゲットの少し上
 			Vector3 targetPosition = m_targetCharacter->GetTransform().m_position;
-			targetPosition.y += 50.0f;
+			targetPosition.Add(TARGET_OFFSET);
 
 			// 右スティックで回転
 			Vector3 rotationVector = Vector3(g_pad[0]->GetRStickXF(), g_pad[0]->GetRStickYF(), 0.0f);
@@ -61,8 +64,8 @@ namespace app
 				float length = nextToVector.Length();
 
 				// 制限したい角度（度数法） ※必要に応じてこの数値を調整してください
-				float maxAngle = Math::DegToRad(80.0f);   // 見下ろしの最大角度
-				float minAngle = Math::DegToRad(-20.0f);  // 見上げの最大角度（地面にめり込まない程度）
+				float maxAngle = Math::DegToRad(MAX_VERTICAL_ANGLE);   // 見下ろしの最大角度
+				float minAngle = Math::DegToRad(MIN_VERTICAL_ANGLE);  // 見上げの最大角度（地面にめり込まない程度）
 
 				float maxY = sinf(maxAngle) * length;
 				float minY = sinf(minAngle) * length;

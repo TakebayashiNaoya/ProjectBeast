@@ -128,13 +128,13 @@ namespace nsBeastEngine
 			DXGI_FORMAT_UNKNOWN
 		);
 
-		// スペキュラカラー用のターゲットを作成
+		// PBRパラメータ用のターゲットを作成
 		m_gBuffer[enGBuffer_Specular].Create(
 			g_graphicsEngine->GetFrameBufferWidth(),
 			g_graphicsEngine->GetFrameBufferHeight(),
 			1,
 			1,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
 			DXGI_FORMAT_UNKNOWN
 		);
 	}

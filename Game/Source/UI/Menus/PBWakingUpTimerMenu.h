@@ -13,8 +13,6 @@ namespace app
 {
 	namespace ui
 	{
-		class Enemy;
-
 		class PBWakingUpTimerMenu : public MenuBase
 		{
 		public:
@@ -55,9 +53,6 @@ namespace app
 			std::unique_ptr<PBWakingUpTimerAnimStatus> m_pbAnimStatus;
 			/** シロクマの起床タイマー専用のステータス */
 			std::unique_ptr<PBWakingUpTimerStatus> m_pbTimerStatus;
-
-			/** Enemyのポインタ */
-			Enemy* m_enemy;
 
 			/** 現在のタイマー値（外部から毎フレーム設定される） */
 			float m_currentPBTime;

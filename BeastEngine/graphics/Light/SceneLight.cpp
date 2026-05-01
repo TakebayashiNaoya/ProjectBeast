@@ -26,13 +26,13 @@ namespace nsBeastEngine
 	void SceneLight::Init()
 	{
 		/** ディレクションライトの設定 */
-		m_light.m_directionLight.SetDirection(1.0f, -1.0f, 1.0f);
-		m_light.m_directionLight.SetColor(1.0f, 1.0f, 1.0f);
+		m_light.m_directionLight.SetDirection(-1.0f, -3.0f, 1.0f);
+		m_light.m_directionLight.SetColor(3.5f, 3.5f, 3.5f);
 		/** カメラの位置の登録 */
 		m_light.m_cameraPosition = g_camera3D->GetPosition();
 		//m_light.m_directionLight.m_LVP = g_camera3D->GetViewProjectionMatrix();
 		/** 環境光の設定 */
-		m_light.SetAmbientLight(0.5f, 0.5f, 0.5f);
+		m_light.SetAmbientLight(0.6f, 0.6f, 0.6f);
 	}
 
 

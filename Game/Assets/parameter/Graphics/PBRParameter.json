@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Dummy",
+    "comment1": "dirLightScale(0.0〜∞): ディレクションライト強度倍率 （直接光が完全に消える（影側と同じ明るさになる）、1.0：デフォルト（SceneLightで設定した色そのまま）、2.0以上：白飛びに注意）",
+    "dirLightScale": 1.0,
+    "comment2": "ambientScale(0.0〜∞): 環境光強度倍率 （0.0：環境光なし（影側が真っ黒になる）、1.0：デフォルト、大きくするほど：影側が明るくなりフラットな見た目に近づく）",
+    "ambientScale": 1.0,
+    "comment3": "metallicOffset(-1.0〜1.0): メタリックオフセット （低いほど：非金属的になり、鏡面反射が白に近づく、0.0：デフォルト、高いほど：金属的な見た目になり、鏡面反射がアルベドカラーに近づく）",
+    "metallicOffset": 0.0,
+    "comment4": "smoothOffset(-1.0〜1.0): スムーズオフセット （低いほど：表面が粗くなり拡散反射が支配的になる（雪・布的）、0.0：デフォルト、高いほど：表面が滑らかになり鏡面反射が鋭くなる（金属・水面的））",
+    "smoothOffset": 0.0
+  },
+  {
+    "name": "wall",
+    "dirLightScale": 0.0,
+    "ambientScale": 2.0,
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
+  },
+  {
+    "name": "igloo",
+    "dirLightScale": 0.5,
+    "ambientScale": 1.5,
+    "metallicOffset": 1.0,
+    "smoothOffset": 1.0
+  },
+  {
+    "name": "ground",
+    "dirLightScale": 1.0,
+    "ambientScale": 1.0,
+    "metallicOffset": -1.0,
+    "smoothOffset": -1.0
+  }
+]

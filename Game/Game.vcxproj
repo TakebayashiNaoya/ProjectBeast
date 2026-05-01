@@ -283,6 +283,8 @@
     <ClCompile Include="Source\Core\StateMachineBase.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
+    <ClCompile Include="Source\Graphics\PBRParameter.cpp" />
+    <ClCompile Include="Source\Graphics\PBRStatus.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
     <ClCompile Include="Source\Manager\IglooManager.cpp" />
     <ClCompile Include="Source\Manager\InGameUImanager.cpp" />
@@ -317,6 +319,7 @@
     <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\RemainingChildMenu.cpp" />
+    <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\SearchMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\SoundOptionMenu.cpp" />
@@ -400,6 +403,8 @@
     <ClInclude Include="Source\Core\Transform.h" />
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
+    <ClInclude Include="Source\Graphics\PBRParameter.h" />
+    <ClInclude Include="Source\Graphics\PBRStatus.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
     <ClInclude Include="Source\Manager\IglooManager.h" />
     <ClInclude Include="Source\Manager\InGameUImanager.h" />
@@ -440,7 +445,7 @@
     <ClInclude Include="Source\UI\Menus\PauseScreenMenu.h" />
     <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h" />
     <ClInclude Include="Source\UI\Menus\RemainingChildMenu.h" />
-    <ClInclude Include="Source\UI\Menus\ResultMenu.h" />
+    <ClInclude Include="Source\UI\ResultMenu.h" />
     <ClInclude Include="Source\UI\Menus\SearchMenu.h" />
     <ClInclude Include="Source\UI\Menus\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
