@@ -17,6 +17,7 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
 
 #include "Source/UI/Layout.h"
+#include "Source/UI/Menus/AchievementNotificationMenu.h"
 #include "Source/UI/Menus/CountDownMenu.h"
 #include "Source/UI/Menus/EnemySleepingMenu.h"
 #include "Source/UI/Menus/FinishMenu.h"
@@ -65,6 +66,7 @@ namespace app
 		delete m_achievementLayout;
 		delete m_miniMapLayout;
 		delete m_titleEventLayout;
+		delete m_achievementNotificationLayout;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -156,6 +158,12 @@ namespace app
 		{
 			m_titleEventMenu->SetDraw(true);
 		}
+
+		m_achievementNotificationLayout = new ui::Layout();
+		m_achievementNotificationLayout->Initialize<ui::AchievementNotificationMenu>(
+			"Assets/parameter/UI/inGameAchievement/AchievementNotify.json"
+		);
+		m_achievementNotificationMenu = m_achievementNotificationLayout->GetMenu<ui::AchievementNotificationMenu>();
 
 		m_iglooPromptLayout = new ui::Layout();
 		m_iglooPromptLayout->Initialize<ui::IglooPromptMenu>(
@@ -305,6 +313,7 @@ namespace app
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Update();
 		if (m_miniMapLayout)         m_miniMapLayout->Update();
 		if (m_achievementLayout)     m_achievementLayout->Update();
+		if (m_achievementNotificationLayout)	m_achievementNotificationLayout->Update();
 	}
 
 
@@ -337,6 +346,7 @@ namespace app
 		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);
 		if (m_timerLayout)           m_timerLayout->Render(rc);
 		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
+		if (m_achievementNotificationLayout) m_achievementNotificationLayout->Render(rc);
 	}
 
 

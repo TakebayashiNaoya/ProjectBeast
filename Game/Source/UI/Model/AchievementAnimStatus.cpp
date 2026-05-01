@@ -21,6 +21,7 @@ namespace app
 		AchievementAnimStatus::AchievementAnimStatus()
 		{
 			UIAnimationParameter::Get().Load(JSON_PATH);
+			SetUpUI();
 		}
 
 
