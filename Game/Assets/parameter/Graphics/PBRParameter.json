@@ -1,0 +1,58 @@
+[
+  {
+    "name": "wall",
+    "dirLightScale": 1.0,
+    "ambientScale": 1.0,
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
+  },
+  {
+    "name": "bearHome",
+    "dirLightScale": 1.0,
+    "ambientScale": 1.0,
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
+  },
+  {
+    "name": "igloo",
+    "dirLightScale": 10.0,
+    "ambientScale": 10.0,
+    "metallicOffset": 10.0,
+    "smoothOffset": 10.0
+  },
+  {
+    "name": "ground",
+    "dirLightScale": 1.0,
+    "ambientScale": 1.0,
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
+  },
+  {
+    "name": "mountain",
+    "dirLightScale": 1.0,
+    "ambientScale": 1.0,
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
+  },
+  {
+    "name": "daddyPenguin",
+    "dirLightScale": 10.0,
+    "ambientScale": 10.0,
+    "metallicOffset": 10.0,
+    "smoothOffset": 10.0
+  },
+  {
+    "name": "childPenguin",
+    "dirLightScale": 1.0,
+    "ambientScale": 1.0,
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
+  },
+  {
+    "name": "enemy",
+    "dirLightScale": 1.0,
+    "ambientScale": 1.0,
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
+  }
+]

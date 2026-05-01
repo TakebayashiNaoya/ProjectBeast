@@ -40,6 +40,8 @@ namespace nsK2EngineLow {
 			initData.m_psEntryPointFunc,
 			initData.m_expandConstantBuffer,
 			initData.m_expandConstantBufferSize,
+			initData.m_expandConstantBuffer2,
+			initData.m_expandConstantBufferSize2,
 			initData.m_expandShaderResoruceView,
 			initData.m_colorBufferFormat,
 			initData.m_alphaBlendMode,
@@ -52,10 +54,13 @@ namespace nsK2EngineLow {
 		m_isInited = true;
 
 	}
+
+
 	void Model::ReInitMaterials(MaterialReInitData& reInitData)
 	{
 		m_meshParts.ReInitMaterials(reInitData);
 	}
+
 
 	Matrix Model::CalcWorldMatrix(Vector3 pos, Quaternion rot, Vector3 scale)
 	{
@@ -71,6 +76,8 @@ namespace nsK2EngineLow {
 		mWorld = mBias * mScale * mRot * mTrans;
 		return mWorld;
 	}
+
+
 	//todo ここも変更する必要あり？？
 	void Model::ChangeAlbedoMap(const char* materialName, Texture& albedoMap)
 	{
@@ -85,6 +92,8 @@ namespace nsK2EngineLow {
 		m_meshParts.CreateDescriptorHeaps();
 
 	}
+
+
 	void Model::Draw(
 		RenderContext& rc,
 		int numInstance
@@ -98,6 +107,8 @@ namespace nsK2EngineLow {
 			numInstance
 		);
 	}
+
+
 	void Model::Draw(
 		RenderContext& rc,
 		Camera& camera,
@@ -111,6 +122,7 @@ namespace nsK2EngineLow {
 			numInstance
 		);
 	}
+
 
 	void Model::Draw(
 		RenderContext& rc,

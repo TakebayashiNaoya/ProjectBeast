@@ -107,7 +107,12 @@ cbuffer LightCB : register(b1)
 
 Texture2D<float4> g_albedoTexture        : register(t0);	// アルベド
 Texture2D<float4> g_normalTexture        : register(t1);	// 法線
-Texture2D<float4> g_metaricSmoothTexture : register(t2);	// メタリックスムース（rにmetallic、aにsmooth）
+// metaricSmoothTexture のレイアウト:
+//   r = metallic
+//   g = dirLightScale（ディレクションライト強度倍率）
+//   b = ambientScale（環境光強度倍率）
+//   a = smooth
+Texture2D<float4> g_metaricSmoothTexture : register(t2);	// メタリックスムース
 
 sampler g_sampler : register(s0);
 
@@ -212,7 +217,7 @@ float CalcDiffuseFromFresnel(float3 N, float3 L, float3 V)
     // 粗さは0.5で固定
     float roughness = 0.5f;
 
-    float energyBias   = lerp(0.0f, 0.5f,       roughness);
+    float energyBias   = lerp(0.0f, 0.5f,         roughness);
     float energyFactor = lerp(1.0f, 1.0f / 1.51f, roughness);
 
     float dotLH = saturate(dot(L, H));
@@ -229,37 +234,54 @@ float CalcDiffuseFromFresnel(float3 N, float3 L, float3 V)
 
 /*!
  * @brief PBRベースのディレクションライトを計算する
- * @param normal    法線
- * @param worldPos  ワールド座標
- * @param albedo    アルベドカラー
- * @param metallic  金属度
- * @param smooth    滑らかさ
+ * @param normal         法線
+ * @param worldPos       ワールド座標
+ * @param albedo         アルベドカラー
+ * @param metallic       金属度
+ * @param smooth         滑らかさ
+ * @param dirLightScale  ディレクションライト強度倍率
+ * @param ambientScale   環境光強度倍率
  */
-float3 CalcDirectionLight(float3 normal, float3 worldPos, float3 albedo, float metallic, float smooth)
+float3 CalcDirectionLight(
+    float3 normal,
+    float3 worldPos,
+    float3 albedo,
+    float  metallic,
+    float  smooth,
+    float  dirLightScale,
+    float  ambientScale)
 {
     float3 toLight = -dirLightDirection;
     float3 toEye   = normalize(cameraPosition - worldPos);
+
+    // 補正済みライトカラーを計算する
+    float3 scaledDirLightColor = dirLightColor * dirLightScale;
 
     // フレネル反射を考慮した拡散反射を計算する
     float diffuseFromFresnel = CalcDiffuseFromFresnel(normal, toLight, toEye);
 
     // 正規化Lambert拡散反射を求める
-    float  NdotL        = saturate(dot(normal, toLight));
-    float3 lambertDiffuse = dirLightColor * NdotL / PI;
+    float  NdotL          = saturate(dot(normal, toLight));
+    float3 lambertDiffuse = scaledDirLightColor * NdotL / PI;
 
     // 最終的な拡散反射光を計算する
     float3 diffuse = albedo * diffuseFromFresnel * lambertDiffuse;
 
     // Cook-Torranceモデルを利用した鏡面反射率を計算する
     float3 spec = CookTorranceSpecular(toLight, toEye, normal, smooth)
-                * dirLightColor;
+                * scaledDirLightColor;
 
     // 金属度が高ければ鏡面反射はアルベドカラー、低ければ白
     spec *= lerp(float3(1.0f, 1.0f, 1.0f), albedo, metallic);
 
     // 滑らかさを使って拡散反射光と鏡面反射光を合成する
     // 滑らかさが高ければ拡散反射は弱くなる
-    return diffuse * (1.0f - smooth) + spec;
+    float3 lig = diffuse * (1.0f - smooth) + spec;
+
+    // 補正済み環境光を加算する
+    lig += ambientLightColor * albedo * ambientScale;
+
+    return lig;
 }
 
 
@@ -290,18 +312,17 @@ float4 PSMain(PSInput In) : SV_Target0
     normal = (normal * 2.0f) - 1.0f;
 
     // G-BufferからPBRパラメータをサンプリング
-    float4 metaricSmooth = g_metaricSmoothTexture.Sample(g_sampler, In.uv);
-    float  metallic      = metaricSmooth.r;
-    float  smooth        = metaricSmooth.a;
+    float4 metaricSmooth  = g_metaricSmoothTexture.Sample(g_sampler, In.uv);
+    float  metallic       = metaricSmooth.r;
+    float  dirLightScale  = metaricSmooth.g;
+    float  ambientScale   = metaricSmooth.b;
+    float  smooth         = metaricSmooth.a;
 
     // ワールド座標を復元
     float3 worldPos = CalcWorldPosFromUVZ(In.uv, albedo.w, mViewProjInv);
 
-    // PBRベースのディレクションライトを計算する
-    float3 lig = CalcDirectionLight(normal, worldPos, albedo.rgb, metallic, smooth);
-
-    // 環境光を加算
-    lig += ambientLightColor * albedo.rgb;
+    // PBRベースのディレクションライトを計算する（補正値込み）
+    float3 lig = CalcDirectionLight(normal, worldPos, albedo.rgb, metallic, smooth, dirLightScale, ambientScale);
 
     // 最終カラー
     float4 finalColor = albedo;

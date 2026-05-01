@@ -7,6 +7,7 @@
 #include "InGameScene.h"
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Graphics/PBRStatus.h"
 
 #include "Source/Sound/SoundManager.h"
 
@@ -81,8 +82,10 @@ namespace app
 		actor::ChildPenguinManager::DestroyInstance();
 		actor::StageSystem::DestroyInstance();
 		nature::WhirlpoolManager::DestroyInstance();
-
 		actor::IglooManager::DestroyInstance();
+
+		/** PBRステータス */
+		graphics::PBRStatus::DestroyInstance();
 
 		DeleteGO(m_skyCube);
 		nature::Ocean::DestroyInstance();
@@ -113,15 +116,16 @@ namespace app
 		BattleManager::CreateInstance();
 		ScoreManager::CreateInstance();
 		TimeManager::CreateInstance();
-
 		app::achievement::AchievementManager::CreateInstance();
 		app::achievement::AchievementManager::GetInstance()->Start();
+
+		/** PBRStatus生成 */
+		graphics::PBRStatus::CreateInstance();
 
 		/** アクター系シングルトン生成 */
 		actor::StageSystem::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
 		actor::EnemyManager::CreateInstance();
-
 		actor::IglooManager::CreateInstance();
 
 		/** UIManager生成（Layoutの生成はDaddyPenguin生成後のInitializeで行う） */

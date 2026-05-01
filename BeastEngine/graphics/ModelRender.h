@@ -9,6 +9,20 @@
 namespace nsBeastEngine
 {
 	/**
+	 * @brief PBR補正パラメータ
+	 * @details モデルごとに個別設定できるPBRライティングの補正値。
+	 *          RenderToGBuffer.fx の PBRParamCb (b2) に渡される。
+	 */
+	struct PBRParam
+	{
+		float m_dirLightScale = 1.0f;  // ディレクションライト強度倍率
+		float m_ambientScale = 1.0f;  // 環境光強度倍率
+		float m_metallicOffset = 0.0f;  // metallicオフセット
+		float m_smoothOffset = 0.0f;  // smoothオフセット
+	};
+
+
+	/**
 	 * @brief モデルレンダー
 	 */
 	class ModelRender : public IRenderer
@@ -76,6 +90,20 @@ namespace nsBeastEngine
 			m_renderToGBufferModel.SetMulColor(mulColor);
 			m_forwardRenderModel.SetMulColor(mulColor);
 		}
+
+		/**
+		 * @brief PBR補正パラメータを設定する
+		 * @details Init呼び出し前に設定すること。
+		 *          RenderToGBuffer.fx の b2 スロットに渡される。
+		 * @param param PBR補正パラメータ
+		 */
+		inline void SetPBRParam(const PBRParam& param) { m_pbrParam = param; }
+
+		/**
+		 * @brief PBR補正パラメータを取得する
+		 * @return PBR補正パラメータ
+		 */
+		inline const PBRParam& GetPBRParam() const { return m_pbrParam; }
 
 		/**
 		 * @brief フォワードレンダリングで描画するかどうかを設定する
@@ -252,5 +280,7 @@ namespace nsBeastEngine
 		Model m_renderToGBufferModel;
 		/** 描画するかどうか */
 		bool  m_visible = true;
+		/** PBR補正パラメータ */
+		PBRParam m_pbrParam;
 	};
 }

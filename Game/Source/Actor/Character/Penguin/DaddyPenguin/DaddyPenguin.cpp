@@ -9,6 +9,7 @@
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Graphics/PBRStatus.h"
 
 
 namespace app
@@ -30,6 +31,7 @@ namespace app
 
 		DaddyPenguin::DaddyPenguin()
 		{
+			m_modelRender.SetPBRParam(graphics::PBRStatus::Get()->GetPBRParam("daddyPenguin"));
 			CharacterBase::Init(MODEL_DATA);
 
 			m_status = std::make_unique<DaddyPenguinStatus>();

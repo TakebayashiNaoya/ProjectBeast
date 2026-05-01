@@ -124,7 +124,11 @@ namespace nsBeastEngine
 		// GBufferのカラーバッファフォーマットを設定する
 		gBufferInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// アルベド
 		gBufferInitData.m_colorBufferFormat[1] = DXGI_FORMAT_R8G8B8A8_UNORM;		// 法線
-		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R8G8B8A8_UNORM;		// スペキュラ
+		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R8G8B8A8_UNORM;		// メタリックスムース
+
+		// PBR補正パラメータをb2に設定する
+		gBufferInitData.m_expandConstantBuffer2 = &m_pbrParam;
+		gBufferInitData.m_expandConstantBufferSize2 = sizeof(PBRParam);
 
 		m_renderToGBufferModel.Init(gBufferInitData);
 	}

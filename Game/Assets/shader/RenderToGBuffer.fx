@@ -44,20 +44,35 @@ struct SPSIn
 };
 
 // ピクセルシェーダーからの出力（GBufferに書き込まれる）
+// metaricSmoothMap のレイアウト:
+//   r = metallic
+//   g = dirLightScale（ディレクションライト強度倍率）
+//   b = ambientScale（環境光強度倍率）
+//   a = smooth
 struct SPSOut
 {
-    float4 albedo  : SV_Target0;  // アルベド（色） → GBuffer[0]に書き込み
-    float4 normal  : SV_Target1;  // 法線           → GBuffer[1]に書き込み
-    float  specPow : SV_Target2;  // スペキュラ強度  → GBuffer[2]に書き込み
+    float4 albedo           : SV_Target0;  // アルベド（色）  → GBuffer[0]に書き込み
+    float4 normal           : SV_Target1;  // 法線            → GBuffer[1]に書き込み
+    float4 metaricSmoothMap : SV_Target2;  // PBRパラメータ   → GBuffer[2]に書き込み
 };
 
 // シェーダーリソース
-Texture2D<float4> g_albedo                    : register(t0);   // アルベドマップ（モデルの色テクスチャ）
-Texture2D<float4> g_normalMap                 : register(t1);   // 法線マップ（凹凸情報）
-Texture2D<float4> g_metallicSmoothMap         : register(t2);   // メタリックスムースマップ（金属度とスムースNESS）
-StructuredBuffer<float4x4> g_boneMatrix       : register(t3);   // ボーン行列（スキニング用）
-StructuredBuffer<float4x4> g_worldMatrixArray : register(t10);  // インスタンス用ワールド行列
+Texture2D<float4> g_albedo            : register(t0);    // アルベドマップ（モデルの色テクスチャ）
+Texture2D<float4> g_normalMap         : register(t1);    // 法線マップ（凹凸情報）
+Texture2D<float4> g_metallicSmoothMap : register(t2);    // メタリックスムースマップ（rにmetallic、aにsmooth）
+StructuredBuffer<float4x4> g_boneMatrix       : register(t3);    // ボーン行列（スキニング用）
+StructuredBuffer<float4x4> g_worldMatrixArray : register(t10);   // インスタンス用ワールド行列
 sampler g_sampler : register(s0);  // サンプラー（テクスチャをどう読むかの設定）
+
+// PBR補正パラメータ定数バッファ（b2）
+// C++側 PBRParam（ModelRender.h）と一致させること
+cbuffer PBRParamCb : register(b2)
+{
+    float dirLightScale;   // ディレクションライト強度倍率
+    float ambientScale;    // 環境光強度倍率
+    float metallicOffset;  // metallicオフセット
+    float smoothOffset;    // smoothオフセット
+};
 
 // 関数宣言
 float3 CalcNormal(SPSIn psIn);
@@ -95,8 +110,7 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
     {
         if (isEnableInstancingDraw)
         {
-            // インスタンスIDに対応するワールド行列を取得。
-            m = g_worldMatrixArray[vsIn.instanceID]; 
+            m = g_worldMatrixArray[vsIn.instanceID]; // インスタンスIDに対応するワールド行列を取得。
         }
         else
         {
@@ -104,16 +118,16 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
         }
     }
 
-    psIn.pos       = mul(m, vsIn.pos);     // モデルの頂点をワールド座標系に変換
-    psIn.worldPos  = psIn.pos.xyz;         // ワールド座標を保持する（射影変換前に取得すること）
+    psIn.pos = mul(m, vsIn.pos); // モデルの頂点をワールド座標系に変換
+    psIn.worldPos = psIn.pos.xyz; // ワールド座標を保持する（射影変換前に取得すること）
     float4 viewPos = mul(mView, psIn.pos); // ワールド座標系からカメラ座標系に変換
-    psIn.pos       = mul(mProj, viewPos);  // カメラ座標系からスクリーン座標系に変換
+    psIn.pos = mul(mProj, viewPos); // カメラ座標系からスクリーン座標系に変換
 
     // 法線、接ベクトル、従ベクトルをワールド空間に変換する。
     // 平行移動を無視するために、3x3行列に変換してから乗算する。
     float3x3 m3x3 = (float3x3) m;
-    psIn.normal = normalize(mul(m3x3, vsIn.normal));
-    psIn.tangent = normalize(mul(m3x3, vsIn.tangent));
+    psIn.normal   = normalize(mul(m3x3, vsIn.normal));
+    psIn.tangent  = normalize(mul(m3x3, vsIn.tangent));
     psIn.biNormal = normalize(mul(m3x3, vsIn.biNormal));
 
     psIn.uv = vsIn.uv;
@@ -168,9 +182,18 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
 
     psOut.normal.xyz = normalize(CalcNormal(psIn));
 
-    // メタリックスムースマップをサンプリングしてPBRパラメータを出力
-    // r = metallic、a = smooth
-    psOut.specPow = g_metallicSmoothMap.Sample(g_sampler, psIn.uv);
+    // メタリックスムースマップをサンプリングする
+    float4 metaricSmooth = g_metallicSmoothMap.Sample(g_sampler, psIn.uv);
+
+    // PBRパラメータをGBufferに書き込む
+    // r = metallic（補正値加算）
+    // g = dirLightScale（ライト倍率）
+    // b = ambientScale（環境光倍率）
+    // a = smooth（補正値加算）
+    psOut.metaricSmoothMap.r = saturate(metaricSmooth.r + metallicOffset);
+    psOut.metaricSmoothMap.g = dirLightScale;
+    psOut.metaricSmoothMap.b = ambientScale;
+    psOut.metaricSmoothMap.a = saturate(metaricSmooth.a + smoothOffset);
 
     // シャドウレシーバーかどうかを判定するフラグをw成分に格納する。
     // 法線マップのｗは使わないので、ここに格納する。
@@ -197,10 +220,8 @@ SPSOut PSMain(SPSIn psIn) : SV_Target0
     return PSMainCore(psIn, false);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // 関数
-///////////////////////////////////////////////////////////////////////////////
 
 // 法線マップから法線を計算する関数
 float3 CalcNormal(SPSIn psIn)
