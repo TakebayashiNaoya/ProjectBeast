@@ -6,6 +6,7 @@
 #pragma once
 #include "Source/UI/Menu.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
+#include "Source/UI/Model/MiniMapStatus.h"
 
 
 namespace app
@@ -27,7 +28,7 @@ namespace app
 			 * @brief 描画の設定。
 			 * @param isDraw 描画するかどうかのフラグ
 			 */
-			inline void SetDraw(bool isDraw) { m_isDraw = isDraw; }
+			void SetDraw(const bool isDraw) { m_isDraw = isDraw; }
 
 			/**
 			 * @brief ワールド座標系をマップ座標系に変換する
@@ -64,6 +65,8 @@ namespace app
 
 
 		private:
+			/** ミニマップのステータスをunique_ptrで所有 */
+			std::unique_ptr<MiniMapStatus> m_miniMapStatus;
 			/** UIを表示するかのフラグ */
 			bool m_isDraw;
 			/** 親ペンギンのポインタ */

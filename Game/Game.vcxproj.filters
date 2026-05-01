@@ -394,6 +394,9 @@
     <ClCompile Include="Source\UI\Model\SearchStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Graphics\PBRParameter.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
@@ -724,6 +727,12 @@
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Model\SearchStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MiniMapStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MiniMapParameter.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\PBRStatus.h">

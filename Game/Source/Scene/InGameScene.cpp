@@ -336,6 +336,9 @@ namespace app
 			{
 				m_gamePhase = GamePhase::Playing;
 				BattleManager::GetInstance().SetIsActive(true);
+
+				// カウントダウン終了 → プレイ中のUIに切り替える。
+				m_uiManager->UpdatePlaying();
 			}
 			break;
 		}

@@ -33,6 +33,16 @@ namespace app
 
 		void SearchMenu::Update()
 		{
+			// インゲーム内で一瞬だけ表示されるバグを防ぐ。
+			if (!m_isDraw)
+			{
+				// アイコンとフレームを全て非表示にする。
+				SetAllIconActive(false);
+
+				MenuBase::Update();
+				return;
+			}
+
 			// 敵の情報が無い場合は処理を行わない。
 			if (!m_enemy) return;
 
@@ -41,7 +51,7 @@ namespace app
 			Searching();
 
 			// キャンバスの更新。
-			SearchClass::Update();
+			MenuBase::Update();
 		}
 
 
@@ -93,13 +103,16 @@ namespace app
 			// 追跡状態のアイコンとフレームの描画設定。
 			bool canDraw = m_isActive && isChasing;
 
+			const Vector3 offsetA = m_searchStatus->GetOffsetA();
+			const Vector3 offsetB = m_searchStatus->GetOffsetB();
+
 			if (canFindIcon) canFindIcon->m_isDraw = canDraw;
 			if (frameA) frameA->m_isDraw = canDraw;
 
 			if (canDraw)
 			{
 				if (canFindIcon) canFindIcon->m_transform.m_localTransform.m_position = iconPos;
-				if (frameA) frameA->m_transform.m_localTransform.m_position = iconPos + m_searchStatus->GetOffsetA();
+				if (frameA) frameA->m_transform.m_localTransform.m_position = iconPos + offsetA;
 			}
 			// 索敵状態のアイコンとフレームの描画設定。
 			bool canNotDraw = m_isActive && isSearching;
@@ -110,7 +123,7 @@ namespace app
 			if (canNotDraw)
 			{
 				if (canNotFindIcon) canNotFindIcon->m_transform.m_localTransform.m_position = iconPos;
-				if (frameB) frameB->m_transform.m_localTransform.m_position = iconPos + m_searchStatus->GetOffsetB();
+				if (frameB) frameB->m_transform.m_localTransform.m_position = iconPos + offsetB;
 			}
 		}
 

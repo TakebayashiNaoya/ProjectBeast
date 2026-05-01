@@ -9,7 +9,6 @@
 #include "Source/Actor/Character/penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
-#include "Source/Util/CRC32.h"
 
 
 namespace app
@@ -21,14 +20,14 @@ namespace app
 			// シロクマのアイコンの数。
 			constexpr uint32_t BEAR_ICON_SIZE = 3;
 			// シロクマのアイコンキー。
-			constexpr uint32_t POLAR_BEAR_ICON_KEYS[BEAR_ICON_SIZE] =
+			constexpr std::array<uint32_t, BEAR_ICON_SIZE> POLAR_BEAR_ICON_KEYS =
 			{
-					{ Hash32("bearIcon0")}
-				,	{ Hash32("bearIcon1")}
-				,	{ Hash32("bearIcon2")}
+					Hash32("bearIcon0")
+				,	Hash32("bearIcon1")
+				,	Hash32("bearIcon2")
 			};
 
-
+			
 			// 文字列型のアイコンキー。
 			using IconKey = std::string;
 
@@ -66,13 +65,6 @@ namespace app
 				,	{ "childYellowIcon", 0 }  // 3: Yellow (やんちゃ)
 				,	{ "childGreenIcon",  0 }  // 4: Green  (世話焼き)
 			};
-
-			// マップの中心ワールド座標。
-			const Vector3 MAP_CENTER_POS = Vector3(-560.0f, 220.0f, 0.0f);
-			// マップの半径。
-			constexpr float MAP_RADIUS = 175.0f;
-			// アイコンがマップに表示される距離の限界値。
-			constexpr float MAP_LIMITE_DISTANCE = 150.0f;
 		}
 
 
@@ -83,6 +75,12 @@ namespace app
 			// 子ペンギンとエネミーのマネージャーのインスタンスをコンストラクタで取得しておく。
 			app::actor::ChildPenguinManager::GetInstance();
 			app::actor::EnemyManager::GetInstance();
+			
+			// ミニマップ専用ステータスを生成する。
+			m_miniMapStatus = std::make_unique<MiniMapStatus>();
+
+			// ミニマップ専用のセットアップUIを呼び出す。
+			m_miniMapStatus->SetUpUI();
 		}
 
 
@@ -92,33 +90,43 @@ namespace app
 
 		void MiniMapMenu::Update()
 		{
-			// ミニマップのアイコンの描画。
-			auto* miniMapIcon = GetUI<UIIcon>(Hash32("MiniMapIcon"));
-			if (miniMapIcon) miniMapIcon->m_isDraw = m_isDraw;
-
-			auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
-			if (daddyIcon) daddyIcon->m_isDraw = m_isDraw;
-
-			auto* blueIcon = GetUI<UIIcon>(Hash32("childBlueIcon"));
-			if (blueIcon) blueIcon->m_isDraw = m_isDraw;
-
-			auto* orangeIcon = GetUI<UIIcon>(Hash32("childOrangeIcon"));
-			if (orangeIcon) orangeIcon->m_isDraw = m_isDraw;
-
-			auto* pinkIcon = GetUI<UIIcon>(Hash32("childPinkIcon"));
-			if (pinkIcon) pinkIcon->m_isDraw = m_isDraw;
-
-			auto* yellowIcon = GetUI<UIIcon>(Hash32("childYellowIcon"));
-			if (yellowIcon) yellowIcon->m_isDraw = m_isDraw;
-
-			auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon"));
-			if (greenIcon) greenIcon->m_isDraw = m_isDraw;
-
-			for (auto key : POLAR_BEAR_ICON_KEYS)
+			// ミニマップを表示しないときは、全てのアイコンを非表示にする。
+			if (!m_isDraw)
 			{
-				auto* bearIcon = GetUI<UIIcon>(key);
-				if (bearIcon) bearIcon->m_isDraw = m_isDraw;
+				// ミニマップのアイコンの描画。
+				auto* miniMapIcon = GetUI<UIIcon>(Hash32("MiniMapIcon"));
+				if (miniMapIcon) miniMapIcon->m_isDraw = false;
+
+				auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
+				if (daddyIcon) daddyIcon->m_isDraw = false;
+
+				// 子ペンギンのアイコンを全て非表示にする。
+				for (const auto& info : MINIMAP_ICON_KEYS)
+				{
+					// アイコンの数だけループして、全てのアイコンを非表示。
+					for (uint8_t i = 0; i < CHILD_PEN_TYPE_ICON; ++i)
+					{
+						IconKey key = info.key + std::to_string(i);
+						auto* childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
+						if (childIcon) childIcon->m_isDraw = false;
+					}
+				}
+
+				// シロクマのアイコンを全て非表示にする。
+				for (auto key : POLAR_BEAR_ICON_KEYS)
+				{
+					auto* bearIcon = GetUI<UIIcon>(key);
+					if (bearIcon) bearIcon->m_isDraw = false;
+				}
+
+				MenuBase::Update();
+				return;
 			}
+
+			// ミニマップのアイコンを表示する。
+			auto* miniMapIcon = GetUI<UIIcon>(Hash32("MiniMapIcon"));
+			if (miniMapIcon) miniMapIcon->m_isDraw = true;
+
 
 			// 親ペンギンのが存在する時に、親ペンギン、子ペンギン、シロクマのアイコンをマップに表示する。
 			if (m_daddyPenguin)
@@ -140,7 +148,11 @@ namespace app
 
 			Vector3 diff = worldPos - worldCenterPos;
 
-			if (diff.LengthSq() >= MAP_LIMITE_DISTANCE * MAP_LIMITE_DISTANCE)
+			// あらかじめ距離の上限を計算しておく。
+			const float dis = m_miniMapStatus->GetLimitDistance();
+			const float disSq = std::pow(dis, 2.0f);
+
+			if (diff.LengthSq() >= disSq)
 			{
 				return false;
 			}
@@ -155,11 +167,20 @@ namespace app
 			rot.Apply(diff);
 
 			diff.Normalize();
+			
+			// マップの大きさと距離の限界値から、回転させた差分をマップ座標に変換するための倍率を計算する。
+			const float mapRadius = m_miniMapStatus->GetRadius();
+			const float mapLimitDis = m_miniMapStatus->GetLimitDistance();
+
 			// マップの大きさ / 距離の限界値。
-			diff *= length * MAP_RADIUS / MAP_LIMITE_DISTANCE;
+			diff *= length * mapRadius / mapLimitDis;
+
+			// あらかじめマップの中心座標を取得して、回転させた差分を計算する。
+			Vector3 mapCenterPos = m_miniMapStatus->GetMapCenterPos();
+			mapCenterPos = Vector3(mapCenterPos.x + diff.x, mapCenterPos.y + diff.z, 0.0f);
 
 			// マップの中心座標 + 回転させた差分。
-			mapPos = Vector3(MAP_CENTER_POS.x + diff.x, MAP_CENTER_POS.y + diff.z, 0.0f);
+			mapPos = mapCenterPos;
 			return true;
 		}
 
@@ -182,14 +203,12 @@ namespace app
 				info.number = 0;
 			}
 
-			// アイコンに適用させるisDraw。
-			bool iconIsDraw = m_isDraw;
-
-
 			for (auto* child : childPenMgr)
 			{
+				// 子ペンギン以外は描画させない。
 				if (!child) continue;
 
+				// ワールド座標をマップ座標に変換する座標を用意。
 				Vector3 daddyPos = m_daddyPenguin->GetTransform().m_position;
 				Vector3 childPos = child->GetTransform().m_position;
 				Vector3 mapPos = Vector3::Zero;
@@ -205,6 +224,7 @@ namespace app
 					switch (type)
 					{
 					// タイプごとのアイコンは20個までとする。
+					// まじめ。
 					case app::actor::EnChildPenguinType::Serious:
 					{
 						MiniMapInfo& info = MINIMAP_ICON_KEYS[static_cast<uint8_t>(EnChildPenType::Blue)];
@@ -214,6 +234,8 @@ namespace app
 						childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
 						break;
 					}
+
+					// 甘えん坊。
 					case app::actor::EnChildPenguinType::Clingy:
 					{
 						MiniMapInfo& info = MINIMAP_ICON_KEYS[static_cast<uint8_t>(EnChildPenType::Pink)];
@@ -223,6 +245,8 @@ namespace app
 						childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
 						break;
 					}
+
+					// やんちゃ。
 					case app::actor::EnChildPenguinType::Naughty:
 					{
 						MiniMapInfo& info = MINIMAP_ICON_KEYS[static_cast<uint8_t>(EnChildPenType::Yellow)];
@@ -230,9 +254,10 @@ namespace app
 						uint8_t index = info.number++;
 						IconKey key = info.key + std::to_string(index);
  						childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
-						iconIsDraw = false;
 						break;
 					}
+
+					// おっちょこちょい。
 					case app::actor::EnChildPenguinType::Clumsy:
 					{
 						MiniMapInfo& info = MINIMAP_ICON_KEYS[static_cast<uint8_t>(EnChildPenType::Orange)];
@@ -242,6 +267,8 @@ namespace app
 						childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
 						break;
 					}
+
+					// 世話焼き。
 					case app::actor::EnChildPenguinType::Caring:
 					{
 						MiniMapInfo& info = MINIMAP_ICON_KEYS[static_cast<uint8_t>(EnChildPenType::Green)];
@@ -258,8 +285,10 @@ namespace app
 					}
 					};
 
+					// アイコンがnullptrの時は、描画させない。
 					if (childIcon == nullptr) continue;
 
+					// アイコンの描画フラグと座標を更新する。
 					childIcon->m_isDraw = m_isDraw;
 					childIcon->m_transform.m_localTransform.m_position = mapPos;
 				}
@@ -275,7 +304,7 @@ namespace app
 			{
 				daddyIcon->m_isDraw = m_isDraw;
 				// マップの中心に親ペンギンのアイコンを表示(固定表示)。
-				daddyIcon->m_transform.m_localTransform.m_position = MAP_CENTER_POS;
+				daddyIcon->m_transform.m_localTransform.m_position = m_miniMapStatus->GetMapCenterPos();
 			}
 		}
 
@@ -284,6 +313,7 @@ namespace app
 		{
 			// エネミーのリストを取得。
 			const auto& enemis = app::actor::EnemyManager::GetInstance()->GetEnemies();				
+			
 			// シロクマのアイコンのインデックス(要素数)。
 			int bearIconIndex = 0;
 
@@ -291,12 +321,10 @@ namespace app
 			for (auto* enemy : enemis)
 			{
 				// シロクマ以外は描画させない。
-				if (!enemy)continue;
-				// シロクマのアイコン数を超えたら描画しない。
-				if (bearIconIndex >= static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS)))break;
+				if (!enemy) continue;
 				
-				// アイコンの描画フラグ。
-				bool isBearDraw = m_isDraw;
+				// シロクマのアイコン数を超えたら描画しない。
+				if (bearIconIndex >= static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS))) return;
 
 				// シロクマのアイコンを取得。
 				auto* bearIcon = GetUI<UIIcon>(POLAR_BEAR_ICON_KEYS[bearIconIndex]);
@@ -318,12 +346,12 @@ namespace app
 					// 座標更新。
 					bearIcon->m_transform.m_localTransform.m_position = mapPos;
 					// ミニマップの範囲内は表示。
-					bearIcon->m_isDraw = isBearDraw;
+					bearIcon->m_isDraw = true;
 				}
 				else
 				{
 					// ミニマップの範囲外は非表示。
-					bearIcon->m_isDraw = !isBearDraw;
+					bearIcon->m_isDraw = false;
 				}
 
 				// シロクマのアイコンの要素数を超えないようにインデックスを増加させる。
@@ -334,7 +362,7 @@ namespace app
 			for (uint32_t i = bearIconIndex; i < BEAR_ICON_SIZE; i++)
 			{
 				auto* bearIcon = GetUI<UIIcon>(POLAR_BEAR_ICON_KEYS[i]);
-				if (bearIcon) bearIcon->m_isDraw = false;
+				if (bearIcon) bearIcon->m_isDraw = !m_isDraw;
 			}
 		}
 
@@ -343,30 +371,22 @@ namespace app
 		{
 			// 初期は非表示。
 			auto* miniMapIcon = GetUI<UIIcon>(Hash32("MiniMapIcon"));
-			if (miniMapIcon) miniMapIcon->m_isDraw = !m_isDraw;
+			if (miniMapIcon) miniMapIcon->m_isDraw = false;
 
-			auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
-			if (daddyIcon) daddyIcon->m_isDraw = !m_isDraw;
+			for(const auto& info : MINIMAP_ICON_KEYS)
+			{
+				for (uint8_t i = 0; i < CHILD_PEN_TYPE_ICON; ++i)
+				{
+					IconKey key = info.key + std::to_string(i);
+					auto* childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
+					if (childIcon) childIcon->m_isDraw = false;
+				}
+			}
 
-			auto* blueIcon = GetUI<UIIcon>(Hash32("childBlueIcon"));
-			if (blueIcon) blueIcon->m_isDraw = !m_isDraw;
-
-			auto* orangeIcon = GetUI<UIIcon>(Hash32("childOrangeIcon"));
-			if (orangeIcon) orangeIcon->m_isDraw = !m_isDraw;
-
-			auto* pinkIcon = GetUI<UIIcon>(Hash32("childPinkIcon"));
-			if (pinkIcon) pinkIcon->m_isDraw = !m_isDraw;
-
-			auto* yellowIcon = GetUI<UIIcon>(Hash32("childYellowIcon"));
-			if (yellowIcon) yellowIcon->m_isDraw = !m_isDraw;
-
-			auto* greenIcon = GetUI<UIIcon>(Hash32("childGreenIcon"));
-			if (greenIcon) greenIcon->m_isDraw = !m_isDraw;
-
-			for (auto key : POLAR_BEAR_ICON_KEYS)
+			for (auto& key : POLAR_BEAR_ICON_KEYS)
 			{
 				auto* polarBear = GetUI<UIIcon>(key);
-				if (polarBear) polarBear->m_isDraw = !m_isDraw;
+				if (polarBear) polarBear->m_isDraw = false;
 			}
 		}
 	}

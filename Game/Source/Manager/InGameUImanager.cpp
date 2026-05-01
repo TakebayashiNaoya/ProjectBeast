@@ -133,7 +133,7 @@ namespace app
 		m_pbWakingUpTimerMenu = m_pbWakingUpTimerLayout->GetMenu<ui::PBWakingUpTimerMenu>();
 		if (m_pbWakingUpTimerMenu)
 		{
-			m_pbWakingUpTimerMenu->SetDraw(true);
+			m_pbWakingUpTimerMenu->SetDraw(false);
 		}
 
 		m_miniMapLayout = new ui::Layout();
@@ -197,6 +197,7 @@ namespace app
 		{
 			menu->SetEnemy(enemy);
 			menu->SetIsActive(true);
+			menu->SetDraw(true);
 		}
 
 		m_searchLayouts.push_back(layout);
