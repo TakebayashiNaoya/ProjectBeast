@@ -744,6 +744,18 @@
     <ClInclude Include="Source\Graphics\PBRParameter.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Source\MiniMapStatus.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MiniMapParameter.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\PBRStatus.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\PBRParameter.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
