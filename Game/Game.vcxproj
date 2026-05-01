@@ -445,7 +445,7 @@
     <ClInclude Include="Source\UI\Menus\PauseScreenMenu.h" />
     <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h" />
     <ClInclude Include="Source\UI\Menus\RemainingChildMenu.h" />
-    <ClInclude Include="Source\UI\ResultMenu.h" />
+    <ClInclude Include="Source\UI\Menus\ResultMenu.h" />
     <ClInclude Include="Source\UI\Menus\SearchMenu.h" />
     <ClInclude Include="Source\UI\Menus\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
