@@ -1,8 +1,8 @@
 [
     {
         "comment":"ミニマップのパラメーター",
-        "radius":175,
+        "radius":117,
         "limitDis":150,
-        "centerPos":[ -560, 220, 0]
+        "centerPos":[ -570, 280, 0]
     }
 ]
