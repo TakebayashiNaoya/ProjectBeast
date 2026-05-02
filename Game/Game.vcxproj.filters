@@ -316,9 +316,6 @@
     <ClCompile Include="Source\Nature\WhirlpoolPowerSystem.cpp">
       <Filter>Source\Nature</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\ResultMenu.cpp">
-      <Filter>Source\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -402,6 +399,15 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\PBRStatus.cpp">
       <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\ResultMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\AchievementAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -642,9 +648,6 @@
     <ClInclude Include="Source\Nature\WhirlpoolParameter.h">
       <Filter>Source\Nature</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\ResultMenu.h">
-      <Filter>Source\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
@@ -729,17 +732,30 @@
     <ClInclude Include="Source\UI\Model\SearchStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Model\MiniMapStatus.h">
-      <Filter>Source\UI\Model</Filter>
+    <ClInclude Include="Source\Graphics\PBRStatus.h">
+      <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Model\MiniMapParameter.h">
-      <Filter>Source\UI\Model</Filter>
+    <ClInclude Include="Source\Graphics\PBRParameter.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MiniMapStatus.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MiniMapParameter.h">
+      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\PBRStatus.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\PBRParameter.h">
       <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\ResultMenu.h" />
+    <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h">
+      <Filter>Source\UI\Menus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,32 @@
+{
+  "animations": [
+    {
+      "comment": "アチーブメントをフェードインさせる",
+      "key": "fadeInAnim",
+      "valueType": "Vector3",
+      "startValue": { "x": 0.0, "y": 100.0, "z": 0.0 },
+      "endValue": { "x": 100.0, "y": 100.0, "z": 0.0 },
+      "duration": 1.0,
+      "easing": "EaseOut",
+      "loop": "Once"
+    },
+    {
+      "key": "stampAnim",
+      "valueType": "Vector3",
+      "startValue": { "x": 2.0, "y": 2.0, "z": 1.0 },
+      "endValue": { "x": 1.0, "y": 1.0, "z": 1.0 },
+      "duration": 2.0,
+      "easing": "EaseIn",
+      "loop": "Once"
+    },
+    {
+      "key": "fadeOutAnim",
+      "valueType": "Vector3",
+      "startValue": { "x": 100.0, "y": 100.0, "z": 0.0 },
+      "endValue": { "x": 0.0, "y": 100.0, "z": 0.0 }, 
+      "duration": 1.0,
+      "easing": "EaseIn",
+      "loop": "Once"
+    }
+  ]
+}
