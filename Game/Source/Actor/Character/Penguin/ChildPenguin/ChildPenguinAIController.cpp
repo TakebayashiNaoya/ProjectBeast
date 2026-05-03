@@ -30,6 +30,22 @@ namespace app
 		namespace
 		{
 			/**
+			 * @brief ヒステリシス幅
+			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
+			 *          m_stopDistance より小さい値にすること。
+			 */
+			constexpr float HYSTERESIS = 5.0f;
+
+			/**
+			 * @brief 停止判定で共通利用する速度の閾値（速度の二乗で比較）
+			 * @details Walk → Stop 遷移と BuildInputToTarget() 冒頭の強制 Stop 判定の
+			 *          両方でこの定数を参照する。
+			 *          lerpの慣性が残っているうちは Stop に入らず Walk を維持し、
+			 *          停止アニメ中も滑り続ける問題を防ぐ。
+			 */
+			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 1.0f;
+
+			/**
 			 * @brief 乱数エンジン（起動時に一度だけシード初期化）
 			 */
 			std::mt19937& GetRandomEngine()

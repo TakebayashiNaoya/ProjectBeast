@@ -58,8 +58,6 @@ namespace app
 			std::unique_ptr<DaddyPenguinStateMachine> m_stateMachine;
 			/** プレイヤーコントローラー */
 			std::unique_ptr<DaddyPenguinController> m_controller;
-			/** スライド中の地形傾斜に合わせたモデル描画用回転（補間済み） */
-			Quaternion m_slideModelRotation;
 		};
 	}
 }

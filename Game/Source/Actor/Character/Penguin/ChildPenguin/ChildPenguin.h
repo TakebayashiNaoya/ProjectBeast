@@ -104,8 +104,6 @@ namespace app
 			Vector4 m_typeColor = Vector4::One;
 			/** カラー適用済みフラグ（モデルロード完了後に一度だけ適用） */
 			bool m_colorApplied = false;
-			/** スライド中の地形傾斜に合わせたモデル描画用回転（補間済み） */
-			Quaternion m_slideModelRotation;
 
 			bool m_isInsideIgloo = false;
 			Vector3 m_iglooFixedPos;  // 固定座標
