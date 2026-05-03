@@ -179,25 +179,20 @@ namespace app
 
 			/** 現在の移動フェーズ */
 			MovePhase m_movePhase = MovePhase::Stop;
-
-			/**
-			 * @brief ヒステリシス幅
-			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
-			 *          m_stopDistance より小さい値にすること。
-			 */
-			static constexpr float HYSTERESIS = 5.0f;
 		};
 
 
 
 
-		/**************************************************************/
+		/***********************************************
+		 * 派生クラス
+		 ***********************************************/
 
 
-		/**
-		 * @brief まじめタイプの子ペンギンAI
-		 * @details 追従命令→ついてくる、待機命令→その場待機
-		 */
+		 /**
+		  * @brief まじめタイプの子ペンギンAI
+		  * @details 追従命令→ついてくる、待機命令→その場待機
+		  */
 		class SeriousChildPenguinAI : public ChildPenguinAIController
 		{
 		public:

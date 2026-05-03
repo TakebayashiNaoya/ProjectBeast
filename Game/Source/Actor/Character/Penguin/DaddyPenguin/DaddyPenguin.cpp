@@ -9,13 +9,14 @@
 #include "DaddyPenguinStateMachine.h"
 #include "DaddyPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Physics/Physics.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-
 		namespace
 		{
 			const ModelData MODEL_DATA =
@@ -68,7 +69,12 @@ namespace app
 				renderPos.y += SWIM_Y_OFFSET;
 				m_modelRender.SetTRS(renderPos, m_transform.m_rotation, m_transform.m_scale);
 				m_modelRender.Update();
+				return;
 			}
+
+			/** スライド中は地形の法線に沿ってモデルを傾ける */
+			/** 物理・ステート判定には影響を与えない */
+			UpdateSlideTilt();
 		}
 
 

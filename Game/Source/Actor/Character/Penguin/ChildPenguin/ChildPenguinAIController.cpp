@@ -30,6 +30,22 @@ namespace app
 		namespace
 		{
 			/**
+			 * @brief ヒステリシス幅
+			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
+			 *          m_stopDistance より小さい値にすること。
+			 */
+			constexpr float HYSTERESIS = 5.0f;
+
+			/**
+			 * @brief 停止判定で共通利用する速度の閾値（速度の二乗で比較）
+			 * @details Walk → Stop 遷移と BuildInputToTarget() 冒頭の強制 Stop 判定の
+			 *          両方でこの定数を参照する。
+			 *          lerpの慣性が残っているうちは Stop に入らず Walk を維持し、
+			 *          停止アニメ中も滑り続ける問題を防ぐ。
+			 */
+			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 1.0f;
+
+			/**
 			 * @brief 乱数エンジン（起動時に一度だけシード初期化）
 			 */
 			std::mt19937& GetRandomEngine()
@@ -180,9 +196,11 @@ namespace app
 
 			/**
 			 * ヒステリシスと「目標到達までステートを維持する」処理を考慮したフェーズ遷移
-			 * * 上げる : 設定された距離（m_walkDistance, m_runDistance）を超えたらすぐに上げる
-			 * 下げる : 一度 Run や Slide になったら、途中の距離では減速せず、
-			 * 所定の陣形位置（m_stopDistance付近）に到達して初めて Walk に一気に戻す
+			 * 上げる : 設定された距離（m_walkDistance, m_runDistance）を超えたらすぐに上げる
+			 * 下げる : 一度 Run や Slide になったら m_walkDistance まで距離が縮まったら Walk に戻し、
+			 *          Walk から m_stopDistance 以内かつ速度がほぼゼロになったら Stop に落とす。
+			 *          これにより Slide → Walk → Stop の3段階を確実に踏み、
+			 *          lerpの慣性が残ったままオーバーシュートしても Walk に留まって再減速できる。
 			 */
 			switch (m_movePhase)
 			{
@@ -195,19 +213,28 @@ namespace app
 			case MovePhase::Walk:
 				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
 				else if (distToTarget > m_walkDistance) { m_movePhase = MovePhase::Run; }
-				else if (distToTarget <= m_stopDistance) { m_movePhase = MovePhase::Stop; }
+				else if (distToTarget <= m_stopDistance)
+				{
+					// lerpの慣性が残っている間は Stop に入らず Walk を維持する。
+					// 慣性が残ったまま Stop になるとアニメーションが止まっても滑り続けるため。
+					const Vector3& currentVel = m_stateMachine->GetCurrentVelocity();
+					if (currentVel.LengthSq() < STOP_VELOCITY_THRESHOLD_SQ)
+					{
+						m_movePhase = MovePhase::Stop;
+					}
+				}
 				break;
 
 			case MovePhase::Run:
 				/** さらに離されたら Slide へ上げる */
 				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
-				/** 途中の m_walkDistance では減速せず、所定の位置（m_stopDistance）まで来たら Walk に一気に戻す */
-				else if (distToTarget <= m_stopDistance) { m_movePhase = MovePhase::Walk; }
+				/** m_walkDistance 以内に入ったら Walk へ戻し、そこから Stop へ段階的に落とす */
+				else if (distToTarget <= m_walkDistance) { m_movePhase = MovePhase::Walk; }
 				break;
 
 			case MovePhase::Slide:
-				/** 所定の位置（m_stopDistance）まで Slide を維持し、到着したら Walk に一気に戻す */
-				if (distToTarget <= m_stopDistance) { m_movePhase = MovePhase::Walk; }
+				/** m_walkDistance 以内に入ったら Walk へ戻し、そこから Stop へ段階的に落とす */
+				if (distToTarget <= m_walkDistance) { m_movePhase = MovePhase::Walk; }
 				break;
 			}
 

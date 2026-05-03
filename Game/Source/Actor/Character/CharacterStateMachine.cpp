@@ -67,7 +67,7 @@ namespace app
 			m_prevPositionY = currentY;
 
 			// --- キャラクターコントローラーによるコリジョン解決 ---
-			Vector3 prevPosition = m_ownerCharacter->GetCharacterController()->Execute(nextPosition, 1.0f / 60.0f);
+			Vector3 prevPosition = m_ownerCharacter->GetCharacterController()->Execute(nextPosition, deltaTime);
 			m_transform.m_position = prevPosition;
 
 			// --- Slerpを用いた滑らかな回転 ---

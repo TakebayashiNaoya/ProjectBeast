@@ -28,7 +28,7 @@ namespace app
 			constexpr float ANIM_SECOND = 1.0f;
 			constexpr float ANIM_THIRD = 1.0f;
 
-			
+
 			// 割るだけの値。
 			constexpr float TIME_VALUE = 10.0f;
 			// カウントダウンの時間の変化の値。
@@ -64,13 +64,11 @@ namespace app
 		CountDownIcon::CountDownIcon(EnCountDownType type)
 			: m_icon(nullptr)
 			, m_type(type)
-		{
-		}
+		{}
 
 
 		CountDownIcon::~CountDownIcon()
-		{
-		}
+		{}
 
 
 		void CountDownIcon::Update()
@@ -82,16 +80,16 @@ namespace app
 		}
 
 
-		void CountDownIcon::SetUIIcon(UIIcon * icon)
+		void CountDownIcon::SetUIIcon(UIIcon* icon)
 		{
 			m_icon = icon;
 			K2_ASSERT(m_icon != nullptr, "登録失敗です。");
 		}
 
-		
 
-		
-		
+
+
+
 		/********************************************/
 
 
@@ -102,8 +100,7 @@ namespace app
 			, m_countDownFinishedFlag(false)
 			, m_isDelayStart(false)
 			, m_delayTime(0.0f)
-		{
-		}
+		{}
 
 
 		void CountDownMenu::Update()
@@ -154,7 +151,7 @@ namespace app
 				// カウントダウンアイコンの更新。
 				icon.second->Update();
 			}
-			
+
 			// 状態が切り替わった瞬間に
 			if (previewType != m_currentCountType && m_currentCountType != EnCountDownType::None)
 			{
@@ -203,7 +200,7 @@ namespace app
 
 		EnCountDownType CountDownMenu::GetCurrentCountType()
 		{
-           if (!m_countDownStartFlag)
+			if (!m_countDownStartFlag)
 			{
 				return EnCountDownType::None;
 			}
@@ -254,11 +251,11 @@ namespace app
 
 						// アニメーションの設定。
 						scaleAnim->SetParameter(
-								startScale
-							,	endScale
-							,	duration
-							,	util::EasingType::Linear
-							,	util::LoopMode::Once
+							startScale
+							, endScale
+							, duration
+							, util::EasingType::Linear
+							, util::LoopMode::Once
 						);
 
 						// GOアイコンにアニメーションを登録。
@@ -269,15 +266,15 @@ namespace app
 
 						Vector4 startColor(START_COLOR_VALUE);
 						Vector4 endColor(END_COLOR_VALUE);
-						float durationColor = ANIM_FIRST;
+						float durationColor = ANIM_THIRD;
 
 						// アニメーションの設定。
 						colorAnim->SetParameter(
-								startColor
-							,	endColor
-							,	durationColor
-							,	util::EasingType::Linear
-							,	util::LoopMode::Once
+							startColor
+							, endColor
+							, durationColor
+							, util::EasingType::Linear
+							, util::LoopMode::Once
 						);
 
 						// GOアイコンにアニメーションを登録。
@@ -294,11 +291,11 @@ namespace app
 
 						// アニメーションの設定。
 						colorAnim->SetParameter(
-								startColor
-							,	endColor
-							,	durationColor
-							,	util::EasingType::Linear
-							,	util::LoopMode::Once
+							startColor
+							, endColor
+							, durationColor
+							, util::EasingType::Linear
+							, util::LoopMode::Once
 						);
 						// 3,2,1のアイコンにアニメーションを登録。
 						icon->AddAnimation(Hash32("ColorAnimation"), std::move(colorAnim));

@@ -76,7 +76,6 @@ namespace app
 		public:
 			void SetIglooFixedPos(const Vector3& pos) { m_iglooFixedPos = pos; }
 
-
 			void SetInsideIgloo(bool isInside) { m_isInsideIgloo = isInside; }
 			bool IsInsideIgloo() const { return m_isInsideIgloo; }
 
@@ -105,7 +104,6 @@ namespace app
 			Vector4 m_typeColor = Vector4::One;
 			/** カラー適用済みフラグ（モデルロード完了後に一度だけ適用） */
 			bool m_colorApplied = false;
-
 
 			bool m_isInsideIgloo = false;
 			Vector3 m_iglooFixedPos;  // 固定座標
