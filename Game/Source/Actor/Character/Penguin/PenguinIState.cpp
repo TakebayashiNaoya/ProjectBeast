@@ -370,9 +370,6 @@ namespace app
 			m_owner->SetIsSwimming(true);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
 
-			// 海に入ったので波追従モードをONにする
-			m_owner->GetOwnerPenguinBase()->SetWaveFollowMode(true);
-
 			if (m_seHandle == -1)
 			{
 				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
@@ -399,9 +396,6 @@ namespace app
 		{
 			m_owner->SetIsSwimming(false);
 			SoundManager* sound = &SoundManager::Get();
-
-			// 陸に上がるので波追従モードをOFFにし、地面の高さに戻す
-			m_owner->GetOwnerPenguinBase()->SetWaveFollowMode(false);
 
 			if (m_seHandle != -1)
 			{

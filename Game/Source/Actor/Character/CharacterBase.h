@@ -67,11 +67,6 @@ namespace app
 			 * @detail カウントダウン中など、描画は必要だが動かしたくない場合に使用
 			 */
 			void UpdateModelOnly();
-			/**
-			 * @brief 波に追従するかどうかのスイッチを切り替える
-			 * @param enable 波追従モードにするかどうか
-			 */
-			void SetWaveFollowMode(bool enable) { m_isWaveFollowMode = enable; }
 
 
 		public:
@@ -111,11 +106,6 @@ namespace app
 			int m_clipNum = 0;
 			/** モデルの上方向 */
 			EnModelUpAxis m_upAxis = enModelUpAxisZ;
-
-			/** モデル描画用の滑らかなY座標 */
-			float m_renderPosY = -9999.0f;
-			/** 波追従モードかどうかのフラグ */
-			bool m_isWaveFollowMode = false;
 		};
 	}
 }
