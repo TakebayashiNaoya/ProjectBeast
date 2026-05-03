@@ -186,18 +186,27 @@ namespace app
 			 *          m_stopDistance より小さい値にすること。
 			 */
 			static constexpr float HYSTERESIS = 5.0f;
+
+			/**
+			 * @brief Walk → Stop 遷移を許可する速度の閾値（速度の二乗で比較）
+			 * @details lerpの慣性が残っているうちは Stop に入らず Walk を維持する。
+			 *          これにより停止アニメ中も滑り続ける問題を防ぐ。
+			 */
+			static constexpr float STOP_VELOCITY_THRESHOLD_SQ = 1.0f;
 		};
 
 
 
 
-		/**************************************************************/
+		/***********************************************
+		 * 派生クラス
+		 ***********************************************/
 
 
-		/**
-		 * @brief まじめタイプの子ペンギンAI
-		 * @details 追従命令→ついてくる、待機命令→その場待機
-		 */
+		 /**
+		  * @brief まじめタイプの子ペンギンAI
+		  * @details 追従命令→ついてくる、待機命令→その場待機
+		  */
 		class SeriousChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
