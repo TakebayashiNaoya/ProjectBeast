@@ -136,6 +136,10 @@ namespace app
 			const Vector3& daddyPos = ChildPenguinManager::GetInstance()->GetDaddyPosition();
 			Vector3 direction = daddyPos - childPos;
 			direction.y = 0.0f;
+			if (direction.LengthSq() < FLT_EPSILON)
+			{
+				return Vector3::Zero;  // 呼び出し側の LengthSq チェックで弾かれる
+			}
 			direction.Normalize();
 			return direction;
 		}
@@ -156,6 +160,10 @@ namespace app
 			const Vector3& childPos = m_owner->GetTransform().m_position;
 			Vector3 direction = targetPos - childPos;
 			direction.y = 0.0f;
+			if (direction.LengthSq() < FLT_EPSILON)
+			{
+				return Vector3::Zero;
+			}
 			direction.Normalize();
 			return direction;
 		}
@@ -172,6 +180,13 @@ namespace app
 
 		void ChildPenguinAIController::BuildInput()
 		{
+			// SlideEnd アニメーション中は入力をゼロにして自然に滑り止まるのを待つ
+			if (m_stateMachine->IsEqualCurrentState(PenguinSlideEndState::ID()))
+			{
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
 			const Vector3 targetPos = m_owner->GetFormationTargetPosition();
 			BuildInputToTarget(targetPos);
 		}
@@ -205,10 +220,12 @@ namespace app
 			switch (m_movePhase)
 			{
 			case MovePhase::Stop:
+			{
 				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
 				else if (distToTarget > m_walkDistance) { m_movePhase = MovePhase::Run; }
 				else if (distToTarget > m_stopDistance + HYSTERESIS) { m_movePhase = MovePhase::Walk; }
 				break;
+			}
 
 			case MovePhase::Walk:
 				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
@@ -217,11 +234,11 @@ namespace app
 				{
 					// lerpの慣性が残っている間は Stop に入らず Walk を維持する。
 					// 慣性が残ったまま Stop になるとアニメーションが止まっても滑り続けるため。
-					const Vector3& currentVel = m_stateMachine->GetCurrentVelocity();
-					if (currentVel.LengthSq() < STOP_VELOCITY_THRESHOLD_SQ)
-					{
-						m_movePhase = MovePhase::Stop;
-					}
+					//const Vector3& currentVel = m_stateMachine->GetCurrentVelocity();
+					//if (currentVel.LengthSq() < STOP_VELOCITY_THRESHOLD_SQ)
+					//{
+					m_movePhase = MovePhase::Stop;
+					//}
 				}
 				break;
 
@@ -268,36 +285,10 @@ namespace app
 			switch (m_movePhase)
 			{
 			case MovePhase::Stop:
-			{
 				/** 停止 */
-				// フェーズがStopになれば、入力がゼロになるためアニメーションもピタッと止まる
+				// 目標座標の近くで自然に止まるため、向きの調整は不要
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
-
-				// --- 止まった後の整列処理 ---
-				// 慣性が落ちてほぼ完全に止まったら、親（Daddy）の方向を向く
-				const Vector3& currentVel = m_stateMachine->GetCurrentVelocity();
-				if (currentVel.LengthSq() < 1.0f)
-				{
-					Vector3 dirToDaddy = CalculateDirectionToDaddy();
-					if (dirToDaddy.LengthSq() > 0.001f)
-					{
-						Quaternion currentRot = m_owner->GetTransform().m_rotation;
-						Quaternion targetRot;
-						targetRot.SetRotationYFromDirectionXZ(dirToDaddy);
-
-						// 一瞬で向くのではなく、Slerpでゆっくり振り向かせる
-						constexpr float TURN_SPEED_TO_DADDY = 6.0f; // ★ 6.0f に名前を付ける
-						float deltaTime = g_gameTime->GetFrameDeltaTime();
-
-						// 追加修正：フレーム落ち時に t > 1.0 になって回転が破綻するのを防ぐ
-						float slerpFactor = min(1.0f, TURN_SPEED_TO_DADDY * deltaTime);
-						currentRot.Slerp(slerpFactor, currentRot, targetRot);
-
-						m_owner->SetRotation(currentRot);
-					}
-				}
 				break;
-			}
 
 			case MovePhase::Walk:
 				/** 歩き：isSneak=true, isDash=false, isSlide=false */

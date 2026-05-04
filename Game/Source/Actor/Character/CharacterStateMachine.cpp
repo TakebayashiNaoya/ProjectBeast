@@ -72,24 +72,21 @@ namespace app
 
 			// --- Slerpを用いた滑らかな回転 ---
 
-			// ★追加：回転を許可する速度のしきい値（マジックナンバーを排除）
-			constexpr float ROTATE_VELOCITY_THRESHOLD_SQ = 0.1f;
-
-
-			if (m_currentVelocity.LengthSq() > ROTATE_VELOCITY_THRESHOLD_SQ) // 微小な押し出しでガタつかないための閾値
+			// 入力がある間だけ回転を更新する。
+			// 慣性で滑っている減速中（入力ゼロ）は更新しないことで、
+			// 停止までの間に速度ベクトルの向きがブレて高速回転するのを防ぐ。
+			// また、回転方向は速度ではなく入力方向（m_moveDirection）を使う。
+			// 速度は慣性で遅れるため向きがブレやすいが、入力方向は安定しているため。
+			if (m_moveDirection.LengthSq() > FLT_EPSILON)
 			{
-				Vector3 velocityDir = m_currentVelocity;
-				velocityDir.y = 0.0f; // Y軸は無視する
-				velocityDir.Normalize();
+				Vector3 inputDir = m_moveDirection;
+				inputDir.y = 0.0f;      // Y成分の混入を保険として除去
+				inputDir.Normalize();
 
-				// 今進んでいる方向（速度ベクトル）を目標の回転とする
 				Quaternion targetRotation = m_transform.m_rotation;
-				targetRotation.SetRotationYFromDirectionXZ(velocityDir);
+				targetRotation.SetRotationYFromDirectionXZ(inputDir);
 
-				// ★修正：Slerpの割合も、先ほど作った MAX_LERP_FACTOR (1.0f) を超えないように制限する
 				float slerpFactor = min(MAX_LERP_FACTOR, m_turnSpeed * deltaTime);
-
-				// 現在の回転から目標の回転へ Slerp で徐々に補間する（滑らかに振り向く）
 				m_transform.m_rotation.Slerp(slerpFactor, m_transform.m_rotation, targetRotation);
 			}
 
