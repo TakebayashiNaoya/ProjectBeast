@@ -206,7 +206,12 @@ namespace app
 			}
 
 			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);
-			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinJump, false);
+
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr || ChildPenguinManager::GetInstance()->IsAudible(child))
+			{
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinJump, false);
+			}
 		}
 
 
@@ -253,7 +258,9 @@ namespace app
 
 
 		void PenguinSlideStartState::Exit()
-		{}
+		{
+			//m_owner->ResetVelocity();
+		}
 
 
 		PenguinSlideStartState::PenguinSlideStartState(PenguinStateMachine* owner)

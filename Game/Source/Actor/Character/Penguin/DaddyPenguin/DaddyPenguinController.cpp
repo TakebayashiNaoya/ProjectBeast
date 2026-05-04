@@ -8,6 +8,7 @@
 #include "DaddyPenguinController.h"
 #include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
@@ -167,8 +168,18 @@ namespace app
 			// =========================================================
 			// ステートマシンへ一括入力
 			// =========================================================
-			// 共通のアクション入力
-			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, isJump, isSlide);
+
+			// SlideEnd アニメーション中はプレイヤー入力を無視し、
+			// 自然に滑り止まるのを待つ
+			if (m_stateMachine->IsEqualCurrentState(PenguinSlideEndState::ID()))
+			{
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+			}
+			else
+			{
+				// 共通のアクション入力
+				m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, isJump, isSlide);
+			}
 
 			// 親ペンギン固有の入力
 			m_stateMachine->SetIsCommandToggle(isCommandToggle);
