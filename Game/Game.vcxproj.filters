@@ -732,7 +732,9 @@
     <ClInclude Include="Source\Graphics\PBRParameter.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Menus\ResultMenu.h" />
+    <ClInclude Include="Source\UI\Menus\ResultMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
