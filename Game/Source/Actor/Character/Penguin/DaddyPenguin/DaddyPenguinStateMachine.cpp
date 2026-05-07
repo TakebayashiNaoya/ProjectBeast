@@ -40,8 +40,6 @@ namespace app
 
 			// Daddy固有のステートの追加
 			AddState<DaddyPenguinCommandShoutState>(this);
-			AddState<DaddyPenguinWinState>(this);
-			AddState<DaddyPenguinLoseState>(this);
 			AddState<DaddyPenguinEnterIglooState>(this);
 			AddState<DaddyPenguinInsideIglooState>(this);
 
@@ -98,10 +96,6 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::CheckSystemState()
 		{
-			if (IsEqualCurrentState(DaddyPenguinWinState::ID())) return FindState(DaddyPenguinWinState::ID());
-			if (m_isWin) return FindState(DaddyPenguinWinState::ID());
-			if (IsEqualCurrentState(DaddyPenguinLoseState::ID())) return FindState(DaddyPenguinLoseState::ID());
-			if (m_isLose) return FindState(DaddyPenguinLoseState::ID());
 
 			/** 1. 死ぬアニメーションが流れていたら死亡中ステートを返し、
 					アニメーションが終わったら死亡ステートを返す */
