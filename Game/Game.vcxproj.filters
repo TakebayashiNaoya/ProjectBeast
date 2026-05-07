@@ -259,12 +259,6 @@
     <ClCompile Include="Source\Camera\CameraSteering.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Camera\WinCamera.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Camera\LoseCamera.cpp">
-      <Filter>Source\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
@@ -600,12 +594,6 @@
     <ClInclude Include="Source\Camera\CameraSteering.h">
       <Filter>Source\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Camera\WinCamera.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera\LoseCamera.h">
-      <Filter>Source\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
@@ -737,12 +725,6 @@
     </ClInclude>
     <ClInclude Include="Source\Graphics\PBRParameter.h">
       <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\MiniMapStatus.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\MiniMapParameter.h">
-      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\PBRStatus.h">
       <Filter>Source\Graphics</Filter>

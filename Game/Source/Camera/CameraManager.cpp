@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "CameraManager.h"
-#include "WinCamera.h"
 
 
 namespace app
