@@ -187,9 +187,11 @@
     <ClInclude Include="Resource\AnimationClipResource.h">
       <Filter>Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Resource\SkeletonResource.h" />
     <ClInclude Include="Nature\INatureObject.h">
       <Filter>Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\SkeletonResource.h">
+      <Filter>Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
