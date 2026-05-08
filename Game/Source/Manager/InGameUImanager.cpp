@@ -19,6 +19,7 @@
 #include "Source/UI/Layout.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
 #include "Source/UI/Menus/CountDownMenu.h"
+#include "Source/UI/Menus/CPReactionSystem.h"
 #include "Source/UI/Menus/EnemySleepingMenu.h"
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
@@ -70,6 +71,7 @@ namespace app
 		delete m_miniMapLayout;
 		delete m_titleEventLayout;
 		delete m_achievementNotificationLayout;
+		delete m_cpReactionSystem;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -192,6 +194,9 @@ namespace app
 			"Assets/parameter/UI/inGameAchievement/InGameAchievement.json"
 		);
 		m_achievementMenu = m_achievementLayout->GetMenu<ui::InGameAchievementMenu>();
+
+		m_cpReactionSystem = new ui::CPReactionSystem();
+		m_cpReactionSystem->Initialize();
 
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);
@@ -318,6 +323,7 @@ namespace app
 		if (m_miniMapLayout)         m_miniMapLayout->Update();
 		if (m_achievementLayout)     m_achievementLayout->Update();
 		if (m_achievementNotificationLayout)	m_achievementNotificationLayout->Update();
+		if (m_cpReactionSystem) m_cpReactionSystem->Update();
 	}
 
 
@@ -351,6 +357,7 @@ namespace app
 		if (m_timerLayout)           m_timerLayout->Render(rc);
 		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
 		if (m_achievementNotificationLayout) m_achievementNotificationLayout->Render(rc);
+		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
 	}
 
 

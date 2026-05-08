@@ -13,6 +13,9 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Manager/IglooManager.h"
+#include "Source/Manager/InGameUIManager.h"
+#include "Source/UI/Menus/CPReactionMenu.h"
+#include "Source/UI/Menus/CPReactionSystem.h"
 #include <random>
 
 
@@ -244,6 +247,7 @@ namespace app
 			if (it == m_followers.end()) {
 				m_followers.push_back(penguin);
 				ScoreManager::GetInstance().AddCollectedCount();
+				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Happy);
 			}
 			/** メンバーが増えたので次フレームで再ソート・再割り当てが走る */
 		}
@@ -256,6 +260,7 @@ namespace app
 			if (it != m_followers.end()) {
 				m_followers.erase(it);
 				ScoreManager::GetInstance().SubCollectedCount();
+				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Trouble);
 			}
 			/** メンバーが減ったので外側の子が内側に詰める処理が次フレームで自然に行われる */
 		}

@@ -33,6 +33,8 @@ namespace app
 		class MiniMapMenu;
 		class TitleEventMenu;
 		class AchievementNotificationMenu;
+
+		class CPReactionSystem;
 	}
 
 
@@ -123,6 +125,8 @@ namespace app
 		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionMenu; }
 		/** @brief チュートリアルMenuを取得 */
 		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
+		/** @brief 残り子ペンギンMenuを取得 */
+		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem; }
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
@@ -159,6 +163,9 @@ namespace app
 		ui::Layout* m_titleEventLayout = nullptr;
 		ui::Layout* m_achievementNotificationLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
+
+
+		ui::CPReactionSystem* m_cpReactionSystem = nullptr;
 
 
 		//------------------------------------------------------------

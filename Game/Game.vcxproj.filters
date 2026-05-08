@@ -403,6 +403,12 @@
     <ClCompile Include="Source\UI\Model\AchievementAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Menus\CPReactionSystem.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\CPReactionMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\Model\CPReactionStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
@@ -748,6 +754,12 @@
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\CPReactionMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\CPReactionSystem.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Model\CPReactionStatus.h">

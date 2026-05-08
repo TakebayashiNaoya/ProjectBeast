@@ -306,6 +306,8 @@
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\CountDownMenu.cpp" />
+    <ClCompile Include="Source\UI\Menus\CPReactionMenu.cpp" />
+    <ClCompile Include="Source\UI\Menus\CPReactionSystem.cpp" />
     <ClCompile Include="Source\UI\Menus\EnemySleepingMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\EventMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\FinishMenu.cpp" />
@@ -433,6 +435,8 @@
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h" />
     <ClInclude Include="Source\UI\Menus\CountDownMenu.h" />
+    <ClInclude Include="Source\UI\Menus\CPReactionMenu.h" />
+    <ClInclude Include="Source\UI\Menus\CPReactionSystem.h" />
     <ClInclude Include="Source\UI\Menus\EnemySleepingMenu.h" />
     <ClInclude Include="Source\UI\Menus\EventMenu.h" />
     <ClInclude Include="Source\UI\Menus\FinishMenu.h" />
