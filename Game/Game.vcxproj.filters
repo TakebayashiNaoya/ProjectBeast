@@ -403,6 +403,15 @@
     <ClCompile Include="Source\UI\Model\AchievementAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Model\CPReactionStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\MasterCPReactionParameter.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\CPReactionAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -740,6 +749,15 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h">
       <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\CPReactionStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MasterCPReactionParameter.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

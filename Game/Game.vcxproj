@@ -317,6 +317,9 @@
     <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\RemainingChildMenu.cpp" />
+    <ClCompile Include="Source\UI\Model\CPReactionAnimStatus.cpp" />
+    <ClCompile Include="Source\UI\Model\CPReactionStatus.cpp" />
+    <ClCompile Include="Source\UI\Model\MasterCPReactionParameter.cpp" />
     <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\SearchMenu.cpp" />
@@ -447,6 +450,9 @@
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
     <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h" />
+    <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h" />
+    <ClInclude Include="Source\UI\Model\CPReactionStatus.h" />
+    <ClInclude Include="Source\UI\Model\MasterCPReactionParameter.h" />
     <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h" />
