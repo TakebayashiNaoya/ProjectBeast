@@ -1,0 +1,14 @@
+{
+    "animations" : [
+        {
+            "comment" : "リアクションを揺らす",
+            "key" : "swayAnimation",
+            "valueType" : "FLOAT",
+            "startValue" : -10,
+            "endValue" : 10,
+            "duration" : 1.5,
+            "easing" : "EaseInOut",
+            "loop" : "PingPong"
+        }
+    ]
+}
