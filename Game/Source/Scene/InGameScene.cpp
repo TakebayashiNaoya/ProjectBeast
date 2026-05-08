@@ -74,7 +74,7 @@ namespace app
 		nsBeastEngine::nsCollision::PhysicsWorld::Get().DisableDrawDebugWireFrame();
 #endif
 		/** UIManager（デストラクタでBattleManagerのfunctionもリセットされる） */
-		delete m_uiManager;
+		InGameUIManager::DestroyInstance();
 
 		/** アクター */
 		delete m_daddyPenguin;
@@ -129,7 +129,7 @@ namespace app
 		actor::IglooManager::CreateInstance();
 
 		/** UIManager生成（Layoutの生成はDaddyPenguin生成後のInitializeで行う） */
-		m_uiManager = new InGameUIManager();
+		InGameUIManager::CreateInstance();
 
 		/** ロードフェーズ開始 */
 		m_loadPhase = LoadPhase::Stage;
@@ -172,7 +172,7 @@ namespace app
 			m_daddyPenguin->StartWrapper();
 
 			/** DaddyPenguin生成後にUIManagerを初期化（睡眠クマ探索のキャプチャに使用） */
-			m_uiManager->Initialize(m_daddyPenguin);
+			InGameUIManager::GetInstance()->Initialize(m_daddyPenguin);
 
 			m_loadPhase = LoadPhase::Children;
 			break;
@@ -209,7 +209,7 @@ namespace app
 			/** エネミー1体につき探索UIを1つ生成 */
 			for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())
 			{
-				m_uiManager->AddSearchLayout(enemy);
+				InGameUIManager::GetInstance()->AddSearchLayout(enemy);
 			}
 
 			m_loadPhase = LoadPhase::Camera;
@@ -249,9 +249,9 @@ namespace app
 			m_loadPhase = LoadPhase::Done;
 
 			/** ロード完了 → カウントダウン開始 */
-			if (m_uiManager->GetCountDownMenu())
+			if (InGameUIManager::GetInstance()->GetCountDownMenu())
 			{
-				m_uiManager->GetCountDownMenu()->SetIsDelay(true);
+				InGameUIManager::GetInstance()->GetCountDownMenu()->SetIsDelay(true);
 				SoundManager::Get().PlayBGM(enSoundKind_InGame);
 			}
 			break;
@@ -301,10 +301,12 @@ namespace app
 			actor::EnemyManager::GetInstance()->UpdateModelOnly();
 
 			/** カウントダウン UI 更新 */
-			m_uiManager->UpdateCountDown();
+			auto* uiMngr = InGameUIManager::GetInstance();
+
+			uiMngr->UpdateCountDown();
 
 			/** カウントダウン中のSE制御 */
-			auto* countDownMenu = m_uiManager->GetCountDownMenu();
+			auto* countDownMenu = uiMngr->GetCountDownMenu();
 			if (countDownMenu)
 			{
 				ui::EnCountDownType currentType = countDownMenu->GetCurrentCountType();
@@ -338,7 +340,7 @@ namespace app
 				BattleManager::GetInstance().SetIsActive(true);
 
 				// カウントダウン終了 → プレイ中のUIに切り替える。
-				m_uiManager->UpdatePlaying();
+				InGameUIManager::GetInstance()->UpdatePlaying();
 			}
 			break;
 		}
@@ -359,7 +361,8 @@ namespace app
 			actor::EnemyManager::GetInstance()->Update();
 
 			/** インゲームUI 更新 */
-			m_uiManager->UpdatePlaying();
+			auto* uiMngr = InGameUIManager::GetInstance();
+			uiMngr->UpdatePlaying();
 
 			BattleManager::GetInstance().Update();
 			TimeManager::GetInstance().Update();
@@ -373,7 +376,7 @@ namespace app
 			if (BattleManager::GetInstance().GetBattleState() != BattleManager::EnBattleState::Playing)
 			{
 				/** FINISH 演出開始 */
-				auto* finishMenu = m_uiManager->GetFinishMenu();
+				auto* finishMenu = uiMngr->GetFinishMenu();
 				if (finishMenu) finishMenu->StartFinish();
 
 				m_gamePhase = GamePhase::Finishing;
@@ -387,7 +390,8 @@ namespace app
 		case GamePhase::Finishing:
 		{
 			/** FINISH UI 更新 */
-			m_uiManager->UpdateFinishing();
+			auto* uiMngr = InGameUIManager::GetInstance();
+			uiMngr->UpdateFinishing();
 
 			/** ホイッスルは演出開始時に1回だけ鳴らす */
 			if (!m_isWhistlePlayed)
@@ -397,7 +401,7 @@ namespace app
 			}
 
 			/** 演出終了 → リザルトへ */
-			auto* finishMenu = m_uiManager->GetFinishMenu();
+			auto* finishMenu = uiMngr->GetFinishMenu();
 			if (finishMenu && finishMenu->IsFinished())
 			{
 				SoundManager::Get().StopBGM();
@@ -429,7 +433,8 @@ namespace app
 			//------------------------------------------------------------
 		case PauseState::Pause:
 		{
-			auto* pauseMenu = m_uiManager->GetPauseMenu();
+			auto* uiMngr = InGameUIManager::GetInstance();
+			auto* pauseMenu = uiMngr->GetPauseMenu();
 			if (!pauseMenu) break;
 
 			pauseMenu->Update();
@@ -453,7 +458,7 @@ namespace app
 			else if (pauseMenu->IsRule())
 			{
 				pauseMenu->IsRule(false);
-				auto* tutorialMenu = m_uiManager->GetTutorialMenu();
+				auto* tutorialMenu = uiMngr->GetTutorialMenu();
 				if (tutorialMenu)
 				{
 					tutorialMenu->SetClosed(false);
@@ -478,7 +483,8 @@ namespace app
 		//------------------------------------------------------------
 		case PauseState::SoundOption:
 		{
-			auto* soundOptionMenu = m_uiManager->GetSoundOptionMenu();
+			auto* uiMngr = InGameUIManager::GetInstance();
+			auto* soundOptionMenu = uiMngr->GetSoundOptionMenu();
 			if (soundOptionMenu)
 			{
 				soundOptionMenu->Update();
@@ -497,7 +503,8 @@ namespace app
 		//------------------------------------------------------------
 		case PauseState::Tutorial:
 		{
-			auto* tutorialMenu = m_uiManager->GetTutorialMenu();
+			auto* uiMngr = InGameUIManager::GetInstance();
+			auto* tutorialMenu = uiMngr->GetTutorialMenu();
 			if (tutorialMenu)
 			{
 				tutorialMenu->Update();
@@ -526,16 +533,17 @@ namespace app
 		/** ポーズ中の描画 */
 		if (SceneManager::GetInstance()->IsPause())
 		{
+			auto* uiMngr = InGameUIManager::GetInstance();
 			switch (m_pauseState)
 			{
 			case PauseState::Pause:
-				m_uiManager->RenderPause(rc);
+				uiMngr->RenderPause(rc);
 				break;
 			case PauseState::SoundOption:
-				m_uiManager->RenderSoundOption(rc);
+				uiMngr->RenderSoundOption(rc);
 				break;
 			case PauseState::Tutorial:
-				m_uiManager->RenderTutorial(rc);
+				uiMngr->RenderTutorial(rc);
 				break;
 			}
 			return;
@@ -544,16 +552,17 @@ namespace app
 		/** UI 描画（ポーズ中はここに来ない） */
 		if (m_loadPhase == LoadPhase::Done)
 		{
+			auto* uiMngr = InGameUIManager::GetInstance();
 			switch (m_gamePhase)
 			{
 			case GamePhase::CountDown:
-				m_uiManager->RenderCountDown(rc);
+				uiMngr->RenderCountDown(rc);
 				break;
 			case GamePhase::Playing:
-				m_uiManager->RenderPlaying(rc);
+				uiMngr->RenderPlaying(rc);
 				break;
 			case GamePhase::Finishing:
-				m_uiManager->RenderFinishing(rc);
+				uiMngr->RenderFinishing(rc);
 				break;
 			}
 		}

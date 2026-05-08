@@ -44,10 +44,12 @@ namespace app
 	 */
 	class InGameUIManager
 	{
-	public:
+	private:
 		InGameUIManager();
 		~InGameUIManager();
 
+
+	public:
 		/**
 		 * @brief 初期化
 		 * @detail Layoutの生成とBattleManagerへの配線を行う
@@ -177,5 +179,36 @@ namespace app
 		ui::TitleEventMenu* m_titleEventMenu = nullptr;
 		ui::AchievementNotificationMenu* m_achievementNotificationMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
+
+
+		//============================================//
+		// シングルトン関連
+		//============================================//
+	public:
+		/** @brief インスタンスを生成する */
+		static void CreateInstance()
+		{
+			if (m_instance) return;
+			m_instance = new InGameUIManager();
+		}
+
+
+		/** @brief インスタンスを取得する */
+		static InGameUIManager* GetInstance()
+		{
+			return m_instance;
+		}
+
+
+		/** @brief インスタンスを破棄する */
+		static void DestroyInstance()
+		{
+			delete m_instance;
+			m_instance = nullptr;
+		}
+
+
+	private:
+		static InGameUIManager* m_instance;
 	};
 }

@@ -43,6 +43,9 @@ namespace app
 	}
 
 
+	InGameUIManager* InGameUIManager::m_instance = nullptr;
+
+
 	InGameUIManager::InGameUIManager()
 	{}
 
