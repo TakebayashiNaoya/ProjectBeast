@@ -36,7 +36,7 @@ namespace app
 			 * @param worldPos マップに表示したいオブジェクトのワールド座標。
 			 * @param mapPos 変換した後のマップ座標。
 			 */
-			bool worldPosConverterToMapPos(
+			bool WorldPosConverterToMapPos(
 					Vector3 worldCenterPos
 				,	Vector3 worldPos
 				,	Vector3& mapPos
@@ -56,6 +56,21 @@ namespace app
 			 * @brief シロクマのアイコンをマップに表示する用
 			 */
 			void MapPolarBear();
+
+			/**
+			 * @brief 渦潮のアイコンをマップに表示する用
+			 */
+			void MapWhirlpool();
+
+			/**
+			 * @brief イグルーのアイコンをマップに表示する用
+			 */
+			void MapIgloo();
+
+			/**
+			 * @brief シロクマの巣のアイコンをマップに表示する用
+			 */
+			void MapPolarBearNest();
 
 			/**
 			 * @brief 親ペンギンのポインタを設定。

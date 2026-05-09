@@ -14,1108 +14,1292 @@
             },
 
 
-            {
-                "type":"UIIcon",
-                "name":"DaddyIcon",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/RedIcon.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 10, 10, 255]
-            },
-
-
 
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon0",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon1",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
-            },
+                "color":[ 255, 255, 255, 255]},
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon2",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon3",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon4",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon5",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon6",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon7",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon8",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon9",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon10",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon11",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon12",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[  0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon13",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon14",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon15",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[  0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon16",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[  0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon17",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon18",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childBlueIcon19",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BlueChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 102, 153, 255]
+                "color":[ 255, 255, 255, 255]
             },
 
 
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon0",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon1",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon2",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon3",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon4",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon5",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon6",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon7",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon8",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon9",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon10",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon11",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon12",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon13",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon14",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon15",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon16",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon17",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon18",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childOrangeIcon19",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/OrangeChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 165, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
 
 
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon0",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon1",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon2",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon3",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon4",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon5",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon6",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon7",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon8",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon9",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon10",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon11",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon12",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon13",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon14",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon15",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon16",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon17",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon18",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childPinkIcon19",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PinkIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/PingChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 182, 193, 255]
+                "color":[ 255, 255, 255, 255]
             },
 
 
             {
                 "type":"UIIcon",
                 "name":"childYellowIcon0",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon1",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon2",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon3",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon4",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon5",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon6",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon7",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon8",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon9",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon10",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon11",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon12",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon13",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon14",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon15",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon16",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon17",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon18",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },{
                 "type":"UIIcon",
                 "name":"childYellowIcon19",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/YellowChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 220, 0, 255]
+                "color":[ 255, 255, 255, 255]
             },
 
 
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon0",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon1",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon2",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon3",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon4",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon5",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon6",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon7",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon8",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon9",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon10",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon11",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon12",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon13",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon14",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon15",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon16",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon17",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon18",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
-                "width":20,
-                "height":20,
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"childGreenIcon19",
-                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenIcon.dds",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/GreenChilPen.dds",
+                "width":10,
+                "height":10,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon0",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon1",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon2",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon3",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon4",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon5",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon6",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon7",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon8",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"WhirlpoolIcon9",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/WhirlpoolIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            
+            
+            {
+                "type":"UIIcon",
+                "name":"IglooIcon0",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/IglooIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"IglooIcon1",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/IglooIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"IglooIcon2",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/IglooIcon.dds",
+                "width":25,
+                "height":25,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"PBNestIcon0",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearNest.dds",
                 "width":20,
                 "height":20,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 100, 200, 100, 255]
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"PBNestIcon1",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearNest.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"PBNestIcon2",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearNest.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+
+
+            {
+                "type":"UIIcon",
+                "name":"DaddyIcon",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/DaddyPen.dds",
+                "width":20,
+                "height":20,
+                "position":[ 0, 0, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
             },
 
 
@@ -1123,8 +1307,8 @@
                 "type":"UIIcon",
                 "name":"bearIcon0",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearIcon.dds",
-                "width":20,
-                "height":20,
+                "width":25,
+                "height":25,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -1134,8 +1318,8 @@
                 "type":"UIIcon",
                 "name":"bearIcon1",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearIcon.dds",
-                "width":20,
-                "height":20,
+                "width":25,
+                "height":25,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -1145,8 +1329,8 @@
                 "type":"UIIcon",
                 "name":"bearIcon2",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/BearIcon.dds",
-                "width":20,
-                "height":20,
+                "width":25,
+                "height":25,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
