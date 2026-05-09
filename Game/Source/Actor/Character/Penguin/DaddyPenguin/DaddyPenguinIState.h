@@ -71,54 +71,6 @@ namespace app
 		/****************************************/
 
 
-		class DaddyPenguinWinState : public DaddyPenguinIState
-		{
-			appState(DaddyPenguinWinState);
-		public:
-			// IStateの仮想関数のオーバーライド
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-
-		public:
-			DaddyPenguinWinState(DaddyPenguinStateMachine* owner);
-			~DaddyPenguinWinState() override = default;
-		};
-
-
-
-
-		/****************************************/
-
-
-
-		class DaddyPenguinLoseState : public DaddyPenguinIState
-		{
-			appState(DaddyPenguinLoseState);
-		public:
-			// IStateの仮想関数のオーバーライド
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-
-		public:
-			DaddyPenguinLoseState(DaddyPenguinStateMachine* owner);
-			~DaddyPenguinLoseState() override = default;
-
-
-		private:
-			/** 演出用タイマー */
-			float m_timer = 0.0f;
-		};
-
-
-
-
-		/****************************************/
-
-
 		/**
 		 * @brief 親ペンギンのかまくらイベントステート
 		 */
