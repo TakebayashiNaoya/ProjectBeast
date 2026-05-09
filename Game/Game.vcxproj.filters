@@ -403,6 +403,9 @@
     <ClCompile Include="Source\UI\Model\AchievementAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Menus\InGameButtonMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -739,6 +742,9 @@
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\InGameButtonMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
   </ItemGroup>

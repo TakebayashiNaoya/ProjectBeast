@@ -33,6 +33,7 @@ namespace app
 		class MiniMapMenu;
 		class TitleEventMenu;
 		class AchievementNotificationMenu;
+		class InGameButtonMenu;
 	}
 
 
@@ -156,6 +157,7 @@ namespace app
 		ui::Layout* m_miniMapLayout = nullptr;
 		ui::Layout* m_titleEventLayout = nullptr;
 		ui::Layout* m_achievementNotificationLayout = nullptr;
+		ui::Layout* m_inGameButtonLayout = nullptr;
 		std::vector<ui::Layout*> m_searchLayouts;
 
 
@@ -176,6 +178,7 @@ namespace app
 		ui::MiniMapMenu* m_miniMapMenu = nullptr;
 		ui::TitleEventMenu* m_titleEventMenu = nullptr;
 		ui::AchievementNotificationMenu* m_achievementNotificationMenu = nullptr;
+		ui::InGameButtonMenu* m_inGameButtonMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
 	};
 }
