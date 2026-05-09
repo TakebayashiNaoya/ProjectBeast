@@ -16,9 +16,27 @@ namespace nsBeastEngine
 	struct PBRParam
 	{
 		float m_dirLightScale = 1.0f;  // ディレクションライト強度倍率
-		float m_ambientScale = 1.0f;  // 環境光強度倍率
-		float m_metallicOffset = 0.0f;  // metallicオフセット
-		float m_smoothOffset = 0.0f;  // smoothオフセット
+		float m_ambientScale = 1.0f;   // 環境光強度倍率
+		float m_metallicOffset = 0.0f; // metallicオフセット
+		float m_smoothOffset = 0.0f;   // smoothオフセット
+	};
+
+	/**
+	 * @brief ディザリングCB（b3）のプレースホルダー
+	 * @details
+	 *   InitRenderToGBufferModel時にb3のConstantBufferを確保するために使用する。
+	 *   実際のデータはOcclusionDitherManager::Register時に
+	 *   SetExpandConstantBuffer3()でSDitherCbのポインタに差し替えられる。
+	 *   SDitherCbと同じサイズにすること。
+	 */
+	struct SDitherCbPlaceholder
+	{
+		Vector3 cameraWorldPos = Vector3::Zero;
+		float   cylinderRadius = 0.0f;
+		Vector3 targetWorldPos = Vector3::Zero;
+		float   depthBias = 0.0f;
+		float   ditherStrength = 0.0f;
+		float   pad[3] = { 0.0f, 0.0f, 0.0f };
 	};
 
 
@@ -53,6 +71,12 @@ namespace nsBeastEngine
 		 * @param z z座標
 		 */
 		inline void SetPosition(const float& x, const float& y, const float& z) { m_position = Vector3(x, y, z); }
+
+		/**
+		 * @brief 位置の取得
+		 * @return 位置
+		 */
+		inline const Vector3& GetPosition() const { return m_position; }
 
 		/**
 		 * @brief 回転の設定
@@ -108,7 +132,7 @@ namespace nsBeastEngine
 		/**
 		 * @brief フォワードレンダリングで描画するかどうかを設定する
 		 * @details SkyCubeなど、GBufferを経由せず直接フォワードで描画したいモデルに使用する。
-		 *          trueにした場合は m_frowardRenderModel が描画に使用される。
+		 *          trueにした場合は m_forwardRenderModel が描画に使用される。
 		 * @param isForward trueならフォワード、falseならディファード
 		 */
 		inline void SetForwardRendering(const bool isForward) { m_isForwardRender = isForward; }
@@ -118,6 +142,27 @@ namespace nsBeastEngine
 		 * @return 再生中ならtrue
 		 */
 		inline bool IsPlayingAnimation() const { return m_animation.IsPlaying(); }
+
+		/**
+		 * @brief ユーザー拡張の定数バッファ（b2）のデータポインタをInit後に差し替える
+		 * @details
+		 *   GBufferモデルはb2をPBRParamで使用しているため、
+		 *   m_modelとm_forwardRenderModelのみに設定する。
+		 * @param data 新しいデータポインタ
+		 * @param size データのサイズ（バイト単位）
+		 */
+		void SetExpandConstantBuffer2(void* data, int size);
+
+		/**
+		 * @brief ユーザー拡張の定数バッファ（b3）のデータポインタをInit後に差し替える
+		 * @details
+		 *   OcclusionDitherManagerからRegister時に呼ばれる。
+		 *   GBufferパス（m_renderToGBufferModel）のb3にDitherCbをセットする。
+		 *   次のDraw()からdataの中身が自動でGPUに転送される。
+		 * @param data 新しいデータポインタ
+		 * @param size データのサイズ（バイト単位）
+		 */
+		void SetExpandConstantBuffer3(void* data, int size);
 
 
 	public:
@@ -180,7 +225,7 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief RenderingEngineから呼ばれる実際の描画処理
-		 * @details フォワードの場合はm_frowardRenderModel、
+		 * @details フォワードの場合はm_forwardRenderModel、
 		 *          ディファードの場合はm_renderToGBufferModelを描画する
 		 * @param rc レンダリングコンテキスト
 		 */
@@ -273,14 +318,22 @@ namespace nsBeastEngine
 		float			m_animationSpeed;
 
 		/** フォワードレンダリングで描画するか */
-		bool m_isForwardRender = false;
+		bool		m_isForwardRender = false;
 		/** フォワードレンダリングで描画されるモデル */
-		Model m_forwardRenderModel;
+		Model		m_forwardRenderModel;
 		/** Gバッファに描画されるモデル */
-		Model m_renderToGBufferModel;
+		Model		m_renderToGBufferModel;
 		/** 描画するかどうか */
-		bool  m_visible = true;
+		bool		m_visible = true;
 		/** PBR補正パラメータ */
-		PBRParam m_pbrParam;
+		PBRParam	m_pbrParam;
+		/**
+		 * @brief ディザリングCB（b3）のプレースホルダー
+		 * @details
+		 *   InitRenderToGBufferModel時にb3のConstantBufferを確保するために使用する。
+		 *   OcclusionDitherManager::Register後はSetExpandConstantBuffer3()で
+		 *   実際のSDitherCbのポインタに差し替えられる。
+		 */
+		SDitherCbPlaceholder m_ditherCbPlaceholder;
 	};
 }

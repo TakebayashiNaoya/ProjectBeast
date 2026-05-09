@@ -9,6 +9,19 @@
 
 namespace nsBeastEngine
 {
+	void ModelRender::SetExpandConstantBuffer2(void* data, int size)
+	{
+		// GBufferモデルはb2をPBRParamで使用しているため設定しない
+		m_model.SetExpandData2(data);
+		m_forwardRenderModel.SetExpandData2(data);
+	}
+
+	void ModelRender::SetExpandConstantBuffer3(void* data, int size)
+	{
+		// GBufferパスのディザリングはb3を使用する
+		m_renderToGBufferModel.SetExpandData3(data);
+	}
+
 	void ModelRender::Init(
 		const char* filePath,
 		AnimationClip* animationClips,
@@ -130,6 +143,11 @@ namespace nsBeastEngine
 		// PBR補正パラメータをb2に設定する
 		gBufferInitData.m_expandConstantBuffer2 = &m_pbrParam;
 		gBufferInitData.m_expandConstantBufferSize2 = sizeof(PBRParam);
+
+		// ディザリングCB（b3）のプレースホルダーを設定する
+		// OcclusionDitherManager::Register後にSetExpandConstantBuffer3()で実際のCBに差し替えられる
+		gBufferInitData.m_expandConstantBuffer3 = &m_ditherCbPlaceholder;
+		gBufferInitData.m_expandConstantBufferSize3 = sizeof(SDitherCbPlaceholder);
 
 		m_renderToGBufferModel.Init(gBufferInitData);
 	}

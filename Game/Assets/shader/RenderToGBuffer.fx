@@ -40,7 +40,7 @@ struct SPSIn
     float3 tangent  : TANGENT;       // ワールド空間に変換済みの接ベクトル
     float3 biNormal : BINORMAL;      // ワールド空間に変換済みの従ベクトル
     float2 uv       : TEXCOORD0;     // UV座標（そのまま引き継ぐ）
-    float3 worldPos : TEXCOORD1;     // ワールド座標（ライティング計算用）
+    float3 worldPos : TEXCOORD1;     // ワールド座標（ライティング計算・ディザリング判定用）
 };
 
 // ピクセルシェーダーからの出力（GBufferに書き込まれる）
@@ -72,6 +72,28 @@ cbuffer PBRParamCb : register(b2)
     float ambientScale;    // 環境光強度倍率
     float metallicOffset;  // metallicオフセット
     float smoothOffset;    // smoothオフセット
+};
+
+// ディザリング用の定数バッファ（b3）
+// C++側 SDitherCb（OcclusionDitherManager.h）と一致させること
+cbuffer DitherCb : register(b3)
+{
+    float3 cameraWorldPos;  // カメラのワールド座標
+    float  cylinderRadius;  // 円柱判定の半径（ワールド空間単位）
+    float3 targetWorldPos;  // プレイヤーのワールド座標
+    float  depthBias;       // 前後判定のオフセット
+    float  ditherStrength;  // ディザリング強度（0.0f=オフ, 0.5f=50%透過, 1.0f=最大）
+    float3 ditherPad;       // パディング
+};
+
+// Bayer 4x4 ディザリングパターン
+// 値が小さいほど先に消える。
+static const int g_bayerPattern[4][4] =
+{
+    {  0, 32,  8, 40 },
+    { 48, 16, 56, 24 },
+    { 12, 44,  4, 36 },
+    { 60, 28, 52, 20 },
 };
 
 // 関数宣言
@@ -171,6 +193,71 @@ SPSIn VSSkinInstancingMain(SVSIn vsIn)
 // モデル用のピクセルシェーダーのエントリーポイント
 SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
 {
+    // ディザリング強度が0より大きい場合のみ判定する
+    if (ditherStrength > 0.0f)
+    {
+        // カメラからターゲット（プレイヤー）へのベクトルと長さを求める
+        float3 camToTarget    = targetWorldPos - cameraWorldPos;
+        float  camToTargetLen = length(camToTarget);
+
+        // ターゲットが非常に近い場合はゼロ除算を避けるためスキップする
+        if (camToTargetLen > 0.001f)
+        {
+            // カメラからターゲットへの正規化済み方向ベクトル
+            float3 camToTargetDir = camToTarget / camToTargetLen;
+
+            // カメラからフラグメントへのベクトル
+            float3 camToFrag = psIn.worldPos - cameraWorldPos;
+
+            // フラグメントを視線方向に射影した長さを求める
+            // これはフラグメントがカメラからどれだけ「前方」にあるかを示す
+            float projLen = dot(camToFrag, camToTargetDir);
+
+            // ① フラグメントがカメラとターゲットの間にあるか判定する
+            // depthBiasはカメラ側の余裕（プレイヤーのモデルのめり込み防止）
+            bool isBetween = (projLen >= depthBias) && (projLen < camToTargetLen);
+
+            if (isBetween)
+            {
+                // ② 視線（カメラ→ターゲット方向）の円錐内にあるか判定する
+                // 視線からフラグメントへの最短距離 = |camToFrag × camToTargetDir|
+                // camToTargetDirは正規化済みなので分母は1
+                float3 crossVec  = cross(camToFrag, camToTargetDir);
+                float  distToRay = length(crossVec);
+
+                // 円錐の外側半径：カメラに近いほど小さく、ターゲットに近いほど広がる
+                float t         = projLen / camToTargetLen;
+                float outerCone = cylinderRadius * t;
+                // 内側半径：外側の70%をフェード開始点とする
+                // 70〜100%の範囲でsmoothstepによるグラデーションをかける
+                float innerCone = outerCone * 0.7f;
+
+                // 外側の円錐を超えていたらディザリングしない
+                if (distToRay < outerCone)
+                {
+                    // ③ distToRayをinnerCone〜outerConeでsmoothstepして不透明度alphaを求める
+                    // distToRay < innerCone → alpha = 0.0f（最大透過）
+                    // distToRay > outerCone → alpha = 1.0f（不透明）
+                    // その間は滑らかに補間する
+                    float alpha = smoothstep(innerCone, outerCone, distToRay);
+
+                    // ditherStrengthで全体の透過量をスケールする
+                    // clip(alpha - threshold) で threshold > alpha のピクセルを破棄する
+                    // ditherStrengthが小さいほど全体的に透けにくくなる
+                    int x = (int)fmod(psIn.pos.x, 4.0f);
+                    int y = (int)fmod(psIn.pos.y, 4.0f);
+                    float bayerValue = (float)g_bayerPattern[y][x] / 64.0f;
+
+                    // threshold = ditherStrength * (1.0f - alpha) とすることで
+                    // 中心付近（alpha=0）はditherStrength相当の透過率になり
+                    // 外縁付近（alpha=1）はthreshold=0で破棄されなくなる
+                    float threshold = ditherStrength * (1.0f - alpha);
+                    clip(bayerValue - threshold);
+                }
+            }
+        }
+    }
+
     // GBufferに出力
     SPSOut psOut;
 

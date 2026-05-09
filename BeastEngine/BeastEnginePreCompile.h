@@ -34,6 +34,7 @@ using namespace nsK2EngineLow;
 #include "Graphics/light/HemisphereLight.h"
 #include "Graphics/light/SpotLight.h"
 #include "Graphics/light/PointLight.h"
+#include "Graphics/OcclusionDitherManager.h"
 
 #include "graphics/effect/EffectEmitter.h"
 

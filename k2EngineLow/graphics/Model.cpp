@@ -42,6 +42,8 @@ namespace nsK2EngineLow {
 			initData.m_expandConstantBufferSize,
 			initData.m_expandConstantBuffer2,
 			initData.m_expandConstantBufferSize2,
+			initData.m_expandConstantBuffer3,
+			initData.m_expandConstantBufferSize3,
 			initData.m_expandShaderResoruceView,
 			initData.m_colorBufferFormat,
 			initData.m_alphaBlendMode,

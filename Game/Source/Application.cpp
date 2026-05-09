@@ -14,6 +14,7 @@ namespace app
 	Application::Application()
 	{
 		nsBeastEngine::nsCollision::PhysicsWorld::Initialize();
+		nsBeastEngine::OcclusionDitherManager::Initialize();
 		camera::CameraManager::CreateInstance();
 		core::ParameterManager::CreateInstance();
 		core::Fade::Create();
@@ -35,6 +36,7 @@ namespace app
 		core::ParameterManager::DestroyInstance();
 		core::Fade::Delete();
 		nsBeastEngine::nsCollision::PhysicsWorld::Finalize();
+		nsBeastEngine::OcclusionDitherManager::Get().Finalize();
 	}
 
 

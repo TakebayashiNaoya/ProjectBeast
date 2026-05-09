@@ -30,6 +30,8 @@ namespace nsK2EngineLow {
 		int expandDataSize,
 		void* expandData2,
 		int expandDataSize2,
+		void* expandData3,
+		int expandDataSize3,
 		const std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV>& expandShaderResourceView,
 		const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
 		AlphaBlendMode alphaBlendMode,
@@ -70,6 +72,11 @@ namespace nsK2EngineLow {
 		if (expandData2) {
 			m_expandConstantBuffer2.Init(expandDataSize2, nullptr);
 			m_expandData2 = expandData2;
+		}
+		//ユーザー用の定数バッファを作成（b3）。
+		if (expandData3) {
+			m_expandConstantBuffer3.Init(expandDataSize3, nullptr);
+			m_expandData3 = expandData3;
 		}
 		for (int i = 0; i < MAX_MODEL_EXPAND_SRV; i++) {
 			m_expandShaderResourceView[i] = expandShaderResourceView[i];
@@ -124,6 +131,9 @@ namespace nsK2EngineLow {
 				}
 				if (m_expandConstantBuffer2.IsValid()) {
 					m_descriptorHeap.RegistConstantBuffer(cbNo + 2, m_expandConstantBuffer2);
+				}
+				if (m_expandConstantBuffer3.IsValid()) {
+					m_descriptorHeap.RegistConstantBuffer(cbNo + 3, m_expandConstantBuffer3);
 				}
 				cbNo += NUM_CBV_ONE_MATERIAL;
 			}
@@ -255,6 +265,9 @@ namespace nsK2EngineLow {
 		}
 		if (m_expandData2) {
 			m_expandConstantBuffer2.CopyToVRAM(m_expandData2);
+		}
+		if (m_expandData3) {
+			m_expandConstantBuffer3.CopyToVRAM(m_expandData3);
 		}
 		if (m_boneMatricesStructureBuffer.IsInited()) {
 			//ボーン行列を更新する。

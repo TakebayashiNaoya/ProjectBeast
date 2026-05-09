@@ -41,12 +41,6 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// tkmファイルから初期化
 		/// </summary>
-		/// <param name="tkmFile">tkmファイル。</param>
-		/// /// <param name="fxFilePath">fxファイルのファイルパス</param>
-		/// <param name="vsEntryPointFunc">頂点シェーダーのエントリーポイントの関数名</param>
-		/// <param name="vsSkinEntryPointFunc">スキンありマテリアル用の頂点シェーダーのエントリーポイントの関数名</param>
-		/// <param name="psEntryPointFunc">ピクセルシェーダーのエントリーポイントの関数名</param>
-		/// <param name="colorBufferFormat">このモデルがレンダリングされるカラーバッファのフォーマット</param>
 		void InitFromTkmFile(
 			const TkmFile& tkmFile,
 			const char* fxFilePath,
@@ -57,6 +51,8 @@ namespace nsK2EngineLow {
 			int expandDataSize,
 			void* expandData2,
 			int expandDataSize2,
+			void* expandData3,
+			int expandDataSize3,
 			const std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV>& expandShaderResourceView,
 			const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
 			AlphaBlendMode alphaBlendMode,
@@ -67,11 +63,6 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// 描画。
 		/// </summary>
-		/// <param name="rc">レンダリングコンテキスト</param>
-		/// <param name="mWorld">ワールド行列</param>
-		/// <param name="mView">ビュー行列</param>
-		/// <param name="mProj">プロジェクション行列</param>
-		/// <param name="numInstance">インスタンスの数</param>
 		void Draw(
 			RenderContext& rc,
 			const Matrix& mWorld,
@@ -81,12 +72,10 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// スケルトンを関連付ける。
 		/// </summary>
-		/// <param name="skeleton">スケルトン</param>
 		void BindSkeleton(Skeleton& skeleton);
 		/// <summary>
 		/// メッシュに対して問い合わせを行う。
 		/// </summary>
-		/// <param name="queryFunc">クエリ関数</param>
 		void QueryMeshs(std::function<void(const SMesh& mesh)> queryFunc)
 		{
 			for (const auto& mesh : m_meshs) {
@@ -102,10 +91,29 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// モデルの乗算カラーを設定する。
 		/// </summary>
-		/// <param name="mulColor">乗算カラー</param>
 		void SetMulColor(const Vector4& mulColor)
 		{
 			m_mulColor = mulColor;
+		}
+		/// <summary>
+		/// ユーザー拡張の定数バッファ（b2）のデータポインタを差し替える。
+		/// NOTE: Init後にOcclusionDitherManagerからDraw前に呼ばれる。
+		///       ConstantBufferの実体はInitFromTkmFile時に生成済みのため、
+		///       ポインタを差し替えるだけで次のDraw()から自動転送される。
+		/// </summary>
+		void SetExpandData2(void* data)
+		{
+			m_expandData2 = data;
+		}
+		/// <summary>
+		/// ユーザー拡張の定数バッファ（b3）のデータポインタを差し替える。
+		/// NOTE: Init後にOcclusionDitherManagerからDraw前に呼ばれる。
+		///       ConstantBufferの実体はInitFromTkmFile時に生成済みのため、
+		///       ポインタを差し替えるだけで次のDraw()から自動転送される。
+		/// </summary>
+		void SetExpandData3(void* data)
+		{
+			m_expandData3 = data;
 		}
 		/// <summary>
 		/// ディスクリプタヒープを作成。
@@ -119,13 +127,6 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// tkmメッシュからメッシュを作成。
 		/// </summary>
-		/// <param name="mesh">メッシュ</param>
-		/// <param name="meshNo">メッシュ番号</param>
-		/// <param name="fxFilePath">fxファイルのファイルパス</param>
-		/// <param name="vsEntryPointFunc">頂点シェーダーのエントリーポイントの関数名</param>
-		/// <param name="vsSkinEntryPointFunc">スキンありマテリアル用の頂点シェーダーのエントリーポイントの関数名</param>
-		/// <param name="psEntryPointFunc">ピクセルシェーダーのエントリーポイントの関数名</param>
-		/// <param name="colorBufferFormat">このモデルがレンダリングされるカラーバッファのフォーマット</param>
 		void CreateMeshFromTkmMesh(
 			const TkmFile::SMesh& mesh,
 			int meshNo,
@@ -147,14 +148,11 @@ namespace nsK2EngineLow {
 		const int EXPAND_SRV_REG__START_NO = 10;
 		//1つのマテリアルで使用されるSRVの数。
 		const int NUM_SRV_ONE_MATERIAL = EXPAND_SRV_REG__START_NO + MAX_MODEL_EXPAND_SRV;
-		//1つのマテリアルで使用されるCBVの数。
-		const int NUM_CBV_ONE_MATERIAL = 3;
+		//1つのマテリアルで使用されるCBVの数（b0, b1, b2, b3の4つ）。
+		const int NUM_CBV_ONE_MATERIAL = 4;
 		/// <summary>
 		/// 定数バッファ。
 		/// </summary>
-		/// <remarks>
-		/// この構造体を変更すると、SimpleModel.fxのCBを変更するように。
-		/// </remarks>
 		struct SConstantBuffer {
 			Matrix mWorld;		//ワールド行列。
 			Matrix mView;		//ビュー行列。
@@ -164,14 +162,15 @@ namespace nsK2EngineLow {
 		ConstantBuffer m_commonConstantBuffer;					//メッシュ共通の定数バッファ。
 		ConstantBuffer m_expandConstantBuffer;					//ユーザー用の定数バッファ（b1）
 		ConstantBuffer m_expandConstantBuffer2;					//ユーザー用の定数バッファ（b2）
+		ConstantBuffer m_expandConstantBuffer3;					//ユーザー用の定数バッファ（b3）
 		Vector4 m_mulColor = Vector4::One;						//モデルの乗算カラー(b1にセット)。
 		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResourceView = { nullptr };	//ユーザーシェーダーリソースビュー。
 		StructuredBuffer m_boneMatricesStructureBuffer;	//ボーン行列の構造体バッファ。
 		std::vector< SMesh* > m_meshs;						//メッシュ。
-		//std::vector< DescriptorHeap > m_descriptorHeap;	//ディスクリプタヒープ。
 		DescriptorHeap m_descriptorHeap;					//ディスクリプタヒープ。
 		Skeleton* m_skeleton = nullptr;						//スケルトン。
 		void* m_expandData = nullptr;						//ユーザーデータ（b1）。
 		void* m_expandData2 = nullptr;						//ユーザーデータ（b2）。
+		void* m_expandData3 = nullptr;						//ユーザーデータ（b3）。
 	};
 }
