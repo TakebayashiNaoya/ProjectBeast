@@ -134,14 +134,7 @@ namespace app
 
 
 		MiniMapMenu::~MiniMapMenu()
-		{
-			// 各インスタンスを破棄する。
-			app::actor::ChildPenguinManager::DestroyInstance();
-			app::actor::EnemyManager::DestroyInstance();
-			app::actor::StageSystem::DestroyInstance();
-			app::actor::IglooManager::DestroyInstance();
-			app::nature::WhirlpoolManager::DestroyInstance();
-		}
+		{}
 
 
 		void MiniMapMenu::Update()
@@ -228,14 +221,14 @@ namespace app
 			worldPos.y = 0.0f;
 
 			Vector3 diff = worldPos - worldCenterPos;
-			const float diffLenghSq = diff.LengthSq();
+			const float diffLengthSq = diff.LengthSq();
 
 			// あらかじめ距離の上限を計算しておく。
 			const float dis = m_miniMapStatus->GetLimitDistance();
 			const float disSq = std::pow(dis, 2.0f);
 
 			// ワールド座標の差分の長さの二乗が距離の上限の二乗ならば、マップに表示しない。
-			if (diffLenghSq >= disSq)
+			if (diffLengthSq >= disSq)
 			{
 				return false;
 			}
@@ -280,7 +273,7 @@ namespace app
 				{
 					IconKey key = info.key + std::to_string(i);
 					UIIcon* icon = GetUI<UIIcon>(Hash32(key.c_str()));
-					if (icon)icon->m_isDraw = false;
+					if (icon) icon->m_isDraw = false;
 				}
 				// アイコンの数を0にして、indexの値がおかしくならないようにさせる。
 				info.number = 0;
@@ -397,9 +390,6 @@ namespace app
 			// エネミーのリストを取得。
 			const auto& enemis = app::actor::EnemyManager::GetInstance()->GetEnemies();				
 			
-			// エネミーの座標のリストを取得。
-			//const auto enemisPos = app::actor::EnemyManager::GetInstance()->GetPositionList();
-			
 			// シロクマのアイコンのインデックス(要素数)。
 			int bearIconIndex = 0;
 
@@ -453,23 +443,23 @@ namespace app
 		void MiniMapMenu::MapWhirlpool()
 		{
 			// 渦潮のインスタンスを取得する。
-			auto* whirlpools = app::nature::WhirlpoolManager::GetInstance();
+			auto* whirlpoolMgr = app::nature::WhirlpoolManager::GetInstance();
 
 			// 渦潮アイコンのインデックス。
 			uint32_t objIndex = 0;
 
 			// 渦潮が存在しないときは、処理を中断する。
-			if (!whirlpools) return;
+			if (!whirlpoolMgr) return;
 
 			// 渦潮のマネージャーからForEachで全ての渦潮をループさせる。
-			whirlpools->ForEach([&](app::nature::Whirlpool* whirlpool)
+			whirlpoolMgr->ForEach([&](app::nature::Whirlpool* whirlpool)
 			{
 				// 渦潮のアイコン数を超えたら、描画させない。
 				if (objIndex >= WHIRLPOOL_ICON_SIZE) return;
 				
 				// 渦潮のアイコンが存在しないときは、インデックスを増加させる。
-				auto* whirlpools = GetUI<UIIcon>(WHIRLPOOL_ICON_KEYS[objIndex]);
-				if (!whirlpools) {
+				auto* whirlpoolIcon = GetUI<UIIcon>(WHIRLPOOL_ICON_KEYS[objIndex]);
+				if (!whirlpoolIcon) {
 					objIndex++;
 					return;
 				}
@@ -509,8 +499,8 @@ namespace app
 			// 使われなかったアイコンを非表示にする。
 			for (uint32_t i = objIndex; i < WHIRLPOOL_ICON_SIZE; i++)
 			{
-				auto* whirlpools = GetUI<UIIcon>(WHIRLPOOL_ICON_KEYS[i]);
-				if (whirlpools) whirlpools->m_isDraw = false;
+				auto* whirlpoolIcon = GetUI<UIIcon>(WHIRLPOOL_ICON_KEYS[i]);
+				if (whirlpoolIcon) whirlpoolIcon->m_isDraw = false;
 			}
 		}
 
@@ -646,6 +636,9 @@ namespace app
 			// 初期は非表示。
 			auto* miniMapIcon = GetUI<UIIcon>(Hash32("MiniMapIcon"));
 			if (miniMapIcon) miniMapIcon->m_isDraw = false;
+
+			auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
+			if (daddyIcon) daddyIcon->m_isDraw = false;
 
 			for (const auto& key : WHIRLPOOL_ICON_KEYS)
 			{
