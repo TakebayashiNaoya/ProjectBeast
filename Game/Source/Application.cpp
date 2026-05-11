@@ -36,7 +36,7 @@ namespace app
 		core::ParameterManager::DestroyInstance();
 		core::Fade::Delete();
 		nsBeastEngine::nsCollision::PhysicsWorld::Finalize();
-		nsBeastEngine::OcclusionDitherManager::Get().Finalize();
+		nsBeastEngine::OcclusionDitherManager::Finalize();
 	}
 
 

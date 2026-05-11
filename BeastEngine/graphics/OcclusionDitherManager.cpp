@@ -21,20 +21,26 @@ namespace nsBeastEngine
 
 	void OcclusionDitherManager::Register(ModelRender* modelRender, float ditherStrength, float cylinderRadius)
 	{
-		if (modelRender == nullptr)
-		{
-			return;
-		}
+		if (modelRender == nullptr) { return; }
 
-		// SetPlayerTarget()が先に呼ばれていた場合はリストに追加しない
-		if (modelRender == m_playerModelRender)
+		// SetPlayerTarget()で登録済みのModelRenderは遮蔽対象リストに追加しない
+		if (modelRender == m_playerModelRender) { return; }
+
+		// 同一ModelRenderの二重登録を防ぐ
+		// 既に登録済みであれば強度・半径を上書きして早期returnする
+		for (auto& entry : m_entries)
 		{
-			return;
+			if (entry.modelRender == modelRender)
+			{
+				entry.cb.ditherStrength = ditherStrength;
+				entry.cb.cylinderRadius = cylinderRadius;
+				return;
+			}
 		}
 
 		// DitherEntryを生成する
 		// std::listはpush_back後も既存要素のアドレスが不変であることが保証されている
-		m_entries.push_back(DitherEntry());
+		m_entries.emplace_back();
 		DitherEntry& entry = m_entries.back();
 		entry.modelRender = modelRender;
 		entry.cb.ditherStrength = ditherStrength;
@@ -43,7 +49,7 @@ namespace nsBeastEngine
 		// cbのポインタをModelRenderのb3にセットする
 		// GBufferパスのRenderToGBuffer.fxがb3でDitherCbを参照する
 		// ModelRenderのDraw()のたびに自動でGPUに転送される
-		modelRender->SetExpandConstantBuffer3(&entry.cb, sizeof(SDitherCb));
+		modelRender->SetExpandConstantBuffer3(&entry.cb);
 	}
 
 
@@ -58,10 +64,10 @@ namespace nsBeastEngine
 
 	void OcclusionDitherManager::SetPlayerTarget(ModelRender* modelRender)
 	{
-		if (modelRender == nullptr)
-		{
-			return;
-		}
+		if (modelRender == nullptr) { return; }
+
+		// 同一ターゲットの再設定時はリスト走査しない
+		if (m_playerModelRender == modelRender) { return; }
 
 		m_playerModelRender = modelRender;
 

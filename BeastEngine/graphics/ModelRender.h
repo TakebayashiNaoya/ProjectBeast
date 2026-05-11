@@ -165,9 +165,8 @@ namespace nsBeastEngine
 		 *   GBufferモデルはb2をPBRParamで使用しているため、
 		 *   m_modelとm_forwardRenderModelのみに設定する。
 		 * @param data 新しいデータポインタ
-		 * @param size データのサイズ（バイト単位）
 		 */
-		void SetExpandConstantBuffer2(void* data, int size);
+		void SetExpandConstantBuffer2(void* data);
 
 		/**
 		 * @brief ユーザー拡張の定数バッファ（b3）のデータポインタをInit後に差し替える
@@ -175,10 +174,10 @@ namespace nsBeastEngine
 		 *   OcclusionDitherManagerからRegister時に呼ばれる。
 		 *   GBufferパス（m_renderToGBufferModel）のb3にDitherCbをセットする。
 		 *   次のDraw()からdataの中身が自動でGPUに転送される。
-		 * @param data 新しいデータポインタ
-		 * @param size データのサイズ（バイト単位）
+		 *   渡すデータはSDitherCbPlaceholderと同サイズであること。
+		 * @param data 新しいデータポインタ（SDitherCb*を渡すこと）
 		 */
-		void SetExpandConstantBuffer3(void* data, int size);
+		void SetExpandConstantBuffer3(void* data);
 
 		/**
 		 * @brief モデル単位のディザリング透過率を設定する

@@ -9,14 +9,14 @@
 
 namespace nsBeastEngine
 {
-	void ModelRender::SetExpandConstantBuffer2(void* data, int size)
+	void ModelRender::SetExpandConstantBuffer2(void* data)
 	{
 		// GBufferモデルはb2をPBRParamで使用しているため設定しない
 		m_model.SetExpandData2(data);
 		m_forwardRenderModel.SetExpandData2(data);
 	}
 
-	void ModelRender::SetExpandConstantBuffer3(void* data, int size)
+	void ModelRender::SetExpandConstantBuffer3(void* data)
 	{
 		// GBufferパスのディザリングはb3を使用する
 		m_renderToGBufferModel.SetExpandData3(data);
