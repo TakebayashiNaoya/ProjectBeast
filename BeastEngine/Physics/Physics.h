@@ -136,7 +136,6 @@ namespace nsBeastEngine
 
 
 
-
 			/**
 			 * ========================================================================
 			 * ConvexSweep(形状キャスト)
@@ -155,6 +154,27 @@ namespace nsBeastEngine
 			/** 自由度の高いSweepTest */
 			void ConvexSweepTest(const ICollider& collider, const Vector3& start, const Vector3& end, btCollisionWorld::ConvexResultCallback& resultCallback, btScalar allowedCcdPenetration = 0.0f) const;
 			void ConvexSweepTest(const btConvexShape* m_shape, const Vector3& start, const Vector3& end, btCollisionWorld::ConvexResultCallback& resultCallback, btScalar allowedCcdPenetration = 0.0f) const;
+
+			/**
+			 * 全ヒットを取得するSweepTest
+			 * @details
+			 *   カメラとプレイヤーの間にある全ての遮蔽物を取得するために使用する。
+			 *   ClosestではなくAllHitsで動作するため、複数オブジェクトが検出される。
+			 * @param shape          スイープに使用するConvex形状
+			 * @param start          開始座標
+			 * @param end            終了座標
+			 * @param results        ヒット結果を格納するベクター（複数ヒットが格納される）
+			 * @param filterMask     衝突判定を行うレイヤーマスク（ビット演算）
+			 * @param filterCallback さらに細かい除外条件を指定するラムダ式（trueを返すとヒット対象）
+			 */
+			void ConvexSweepTestAll(
+				const btConvexShape* shape,
+				const Vector3& start,
+				const Vector3& end,
+				std::vector<SweepHit>& results,
+				uint32_t filterMask = ALL_COLLISION_ATTRIBUTE_MASK,
+				std::function<bool(const btCollisionObject&)> filterCallback = nullptr
+			) const;
 
 
 			// ========================================================================
@@ -195,22 +215,22 @@ namespace nsBeastEngine
 			 * シングルト関連
 			 */
 		private:
-			static PhysicsWorld* instance_;
+			static PhysicsWorld* instance;
 
 
 		public:
 			static void Initialize()
 			{
-				if (instance_ == nullptr) {
-					instance_ = new PhysicsWorld();
+				if (instance == nullptr) {
+					instance = new PhysicsWorld();
 				}
 			}
-			static PhysicsWorld& Get() { return *instance_; }
+			static PhysicsWorld& Get() { return *instance; }
 			static void Finalize()
 			{
-				if (instance_) {
-					delete instance_;
-					instance_ = nullptr;
+				if (instance) {
+					delete instance;
+					instance = nullptr;
 				}
 			}
 		};

@@ -388,9 +388,6 @@
     <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\PBRParameter.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\PBRStatus.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>

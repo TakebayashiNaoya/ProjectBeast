@@ -1,5 +1,5 @@
 ﻿/**
- * @file SpriteRender.cpp
+ * @file FontRender.cpp
  * @brief フォントレンダーの実装
  * @author 竹林尚哉
  */
