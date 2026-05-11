@@ -192,6 +192,34 @@ namespace nsBeastEngine
 			m_modelDitherCb.modelDitherAlpha = alpha;
 		}
 
+		/**
+		 * @brief フラスタムカリングの有効/無効を設定する
+		 * @details
+		 *   デフォルトはtrue（有効）。
+		 *   常に描画が必要なオブジェクトはfalseに設定する。
+		 * @param enabled trueでカリング有効、falseで常に描画
+		 */
+		inline void SetCullingEnabled(const bool enabled) { m_isCullingEnabled = enabled; }
+
+		/**
+		 * @brief フラスタムカリングが有効か取得する
+		 * @return カリング有効ならtrue
+		 */
+		inline bool IsCullingEnabled() const { return m_isCullingEnabled; }
+
+		/**
+		 * @brief ワールド空間AABBの最小点を取得する
+		 * @details RenderingEngineのカリング判定で参照される。
+		 * @return ワールド空間AABBの最小点
+		 */
+		inline const Vector3& GetWorldAABBMin() const { return m_worldAABBMin; }
+
+		/**
+		 * @brief ワールド空間AABBの最大点を取得する
+		 * @return ワールド空間AABBの最大点
+		 */
+		inline const Vector3& GetWorldAABBMax() const { return m_worldAABBMax; }
+
 
 	public:
 		ModelRender()
@@ -316,6 +344,21 @@ namespace nsBeastEngine
 		 */
 		void UpdateWorldMatrixInModes();
 
+		/**
+		 * @brief tkmファイルの頂点からローカルAABBを計算する
+		 * @details Init時に1回だけ呼ばれる。スケルトンなしモデルで使用する。
+		 * @param filePath tkmファイルパス
+		 */
+		void CalcLocalAABBFromTkm(const char* filePath);
+
+		/**
+		 * @brief ワールド空間AABBを更新する
+		 * @details Update()の末尾で毎フレーム呼ばれる。
+		 *          スケルトンありの場合はボーン位置から、
+		 *          なしの場合はローカルAABBをワールド変換して構築する。
+		 */
+		void UpdateWorldAABB();
+
 
 	private:
 		/** 位置 */
@@ -371,5 +414,35 @@ namespace nsBeastEngine
 		 *   OcclusionDitherManager（b3）とは独立して動作する。
 		 */
 		SModelDitherCb m_modelDitherCb;
+		/**
+		 * @brief ローカル空間AABB（Init時に計算・以降不変）
+		 * @details スケルトンなしモデルのカリング判定の基準として使用する。
+		 */
+		AABB		m_localAABB;
+		/**
+		 * @brief ワールド空間AABBの最小点（毎フレーム更新）
+		 * @details RenderingEngineのカリング判定で参照される。
+		 */
+		Vector3		m_worldAABBMin = Vector3::Zero;
+		/**
+		 * @brief ワールド空間AABBの最大点（毎フレーム更新）
+		 * @details RenderingEngineのカリング判定で参照される。
+		 */
+		Vector3		m_worldAABBMax = Vector3::Zero;
+		/**
+		 * @brief フラスタムカリング有効フラグ
+		 * @details falseにすると常に描画される。デフォルトはtrue。
+		 */
+		bool		m_isCullingEnabled = true;
+		/**
+		 * @brief スケルトンを持つか（ボーンAABB更新の分岐用）
+		 * @details Init時にスケルトンが有効な場合にtrueが設定される。
+		 */
+		bool		m_hasSkeleton = false;
+		/**
+		 * @brief ボーンAABBの安全マージン（ワールド単位）
+		 * @details アニメーション中にボーン位置がAABBを超えないよう余裕を持たせる。
+		 */
+		static constexpr float BONE_AABB_MARGIN = 20.0f;
 	};
 }

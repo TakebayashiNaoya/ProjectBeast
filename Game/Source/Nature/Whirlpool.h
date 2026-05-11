@@ -34,6 +34,9 @@ namespace app
 				None = Num
 			};
 
+			/** メッシュの半径（ワールド単位）。フラスタムカリングの球半径計算に使用する */
+			static constexpr float MESH_RADIUS = 1000.0f;
+
 
 		private:
 			/**
@@ -179,9 +182,8 @@ namespace app
 			 * @brief グリッドの分割設定
 			 * @details これらの値を変更することで頂点密度を調整できる
 			 */
-			static constexpr int   NUM_RINGS = 8;			/** リング数（中心から外周までの分割数） */
-			static constexpr int   NUM_SEGMENTS = 32;		/** 円周方向の分割数 */
-			static constexpr float MESH_RADIUS = 1000.0f;	/** メッシュの半径（ワールド単位） */
+			static constexpr int   NUM_RINGS = 8;		/** リング数（中心から外周までの分割数） */
+			static constexpr int   NUM_SEGMENTS = 32;	/** 円周方向の分割数 */
 
 			/** 頂点データ（CPU側キャッシュ・毎フレーム更新） */
 			std::vector<WhirlpoolVertex> m_vertices;

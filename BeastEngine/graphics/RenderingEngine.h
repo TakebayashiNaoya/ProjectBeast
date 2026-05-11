@@ -7,6 +7,7 @@
 #include "MyRenderer.h"
 #include "Graphics/Light/SceneLight.h"
 #include "Nature/INatureObject.h"
+#include "geometry/Frustum.h"
 
 
 namespace nsBeastEngine
@@ -49,6 +50,14 @@ namespace nsBeastEngine
 		 * @return シーンライト
 		 */
 		SceneLight& GetSceneLight() { return m_sceneLight; }
+
+		/**
+		 * @brief フラスタムを取得する
+		 * @details WhirlpoolManagerなど、RenderingEngine外部から
+		 *          カリング判定を行う場合に使用する。
+		 * @return フラスタムの参照
+		 */
+		const Frustum& GetFrustum() const { return m_frustum; }
 
 
 		//============================================//
@@ -209,5 +218,8 @@ namespace nsBeastEngine
 		std::vector<IRenderer*> m_renderObjects;
 		/** 自然オブジェクトのリスト（Ocean・WhirlpoolManagerなど） */
 		std::vector<INatureObject*> m_natureObjects;
+
+		/** フラスタム（視錐台）カリング用 */
+		Frustum m_frustum;
 	};
 }
