@@ -149,6 +149,11 @@ namespace nsBeastEngine
 		gBufferInitData.m_expandConstantBuffer3 = &m_ditherCbPlaceholder;
 		gBufferInitData.m_expandConstantBufferSize3 = sizeof(SDitherCbPlaceholder);
 
+		// モデル単位ディザリングCB（b4）を設定する
+		// SetDitherAlpha()でmodelDitherAlphaを更新すると次のDraw()でGPUに自動転送される
+		gBufferInitData.m_expandConstantBuffer4 = &m_modelDitherCb;
+		gBufferInitData.m_expandConstantBufferSize4 = sizeof(SModelDitherCb);
+
 		m_renderToGBufferModel.Init(gBufferInitData);
 	}
 
@@ -177,7 +182,7 @@ namespace nsBeastEngine
 		m_animationClips = animtionClips;
 		m_numAnimationClips = numAnimationClips;
 		if (m_animationClips != nullptr && m_skeletonRef != nullptr) {
-			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
+			m_animation.Init(*m_skeletonRef, m_animationClips, m_numAnimationClips);
 		}
 	}
 

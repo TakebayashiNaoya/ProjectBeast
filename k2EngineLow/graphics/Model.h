@@ -28,6 +28,8 @@ namespace nsK2EngineLow {
 		int m_expandConstantBufferSize2 = 0;									//ユーザー拡張の定数バッファのサイズ（b2）。
 		void* m_expandConstantBuffer3 = nullptr;								//ユーザー拡張の定数バッファ（b3）。
 		int m_expandConstantBufferSize3 = 0;									//ユーザー拡張の定数バッファのサイズ（b3）。
+		void* m_expandConstantBuffer4 = nullptr;								//ユーザー拡張の定数バッファ（b4）。
+		int m_expandConstantBufferSize4 = 0;									//ユーザー拡張の定数バッファのサイズ（b4）。
 		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };	//ユーザー拡張のシェーダーリソースビュー。
 		EnModelUpAxis m_modelUpAxis = enModelUpAxisZ;							//モデルの上方向。
 		std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> m_colorBufferFormat = {
@@ -146,6 +148,16 @@ namespace nsK2EngineLow {
 		void SetExpandData3(void* data)
 		{
 			m_meshParts.SetExpandData3(data);
+		}
+		/// <summary>
+		/// ユーザー拡張の定数バッファ（b4）のデータポインタをInit後に差し替える。
+		/// NOTE: ModelRender::SetDitherAlpha()経由で呼ばれる。
+		///       次のDraw()からdataの中身が自動でGPUに転送される。
+		/// </summary>
+		/// <param name="data">新しいデータポインタ</param>
+		void SetExpandData4(void* data)
+		{
+			m_meshParts.SetExpandData4(data);
 		}
 		/// <summary>
 		/// TKMファイルを取得。

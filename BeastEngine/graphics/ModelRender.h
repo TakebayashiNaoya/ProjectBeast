@@ -39,6 +39,22 @@ namespace nsBeastEngine
 		float   pad[3] = { 0.0f, 0.0f, 0.0f };
 	};
 
+	/**
+	 * @brief モデル単位ディザリング用の定数バッファ（b4）
+	 * @details
+	 *   RenderToGBuffer.fx の cbuffer ModelDitherCb : register(b4) に対応する。
+	 *   OcclusionDitherManager（b3）によるカメラ遮蔽ディザリングとは独立して動作する。
+	 *   SetDitherAlpha()で更新し、次のDraw()でGPUに自動転送される。
+	 *   16バイト境界を合わせるためにパディングを含む。
+	 */
+	struct SModelDitherCb
+	{
+		/** モデル単位の透過率（0.0f=オフ, 1.0f=完全消去） */
+		float modelDitherAlpha = 0.0f;
+		/** パディング（16バイト境界用） */
+		float pad[3] = { 0.0f, 0.0f, 0.0f };
+	};
+
 
 	/**
 	 * @brief モデルレンダー
@@ -163,6 +179,19 @@ namespace nsBeastEngine
 		 * @param size データのサイズ（バイト単位）
 		 */
 		void SetExpandConstantBuffer3(void* data, int size);
+
+		/**
+		 * @brief モデル単位のディザリング透過率を設定する
+		 * @details
+		 *   カメラ遮蔽ディザリング（OcclusionDitherManager/b3）とは独立して動作する。
+		 *   GBufferパス（m_renderToGBufferModel）のb4（ModelDitherCb）を更新する。
+		 *   Init呼び出し後にいつでも設定可能。次のDraw()からGPUに自動転送される。
+		 * @param alpha 透過率（0.0f=オフ, 1.0f=完全消去）
+		 */
+		inline void SetDitherAlpha(const float alpha)
+		{
+			m_modelDitherCb.modelDitherAlpha = alpha;
+		}
 
 
 	public:
@@ -335,5 +364,13 @@ namespace nsBeastEngine
 		 *   実際のSDitherCbのポインタに差し替えられる。
 		 */
 		SDitherCbPlaceholder m_ditherCbPlaceholder;
+		/**
+		 * @brief モデル単位ディザリングCB（b4）
+		 * @details
+		 *   InitRenderToGBufferModel時にb4のConstantBufferを確保し、常にこの実体を参照する。
+		 *   SetDitherAlpha()でmodelDitherAlphaを更新すると次のDraw()でGPUに転送される。
+		 *   OcclusionDitherManager（b3）とは独立して動作する。
+		 */
+		SModelDitherCb m_modelDitherCb;
 	};
 }

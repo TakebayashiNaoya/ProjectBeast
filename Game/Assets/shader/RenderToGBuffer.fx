@@ -86,6 +86,15 @@ cbuffer DitherCb : register(b3)
     float3 ditherPad;       // パディング
 };
 
+// モデル単位ディザリング用の定数バッファ（b4）
+// C++側 SModelDitherCb（ModelRender.h）と一致させること
+// OcclusionDitherManager（b3）によるカメラ遮蔽ディザリングとは独立して動作する
+cbuffer ModelDitherCb : register(b4)
+{
+    float  modelDitherAlpha;  // モデル単位の透過率（0.0f=オフ, 1.0f=完全消去）
+    float3 modelDitherPad;    // パディング
+};
+
 // Bayer 4x4 ディザリングパターン
 // 値が小さいほど先に消える。
 static const int g_bayerPattern[4][4] =
@@ -256,6 +265,16 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
                 }
             }
         }
+    }
+
+    // モデル単位ディザリング判定（b4）
+    // ditherStrength（カメラ遮蔽）とは独立して動作する
+    if (modelDitherAlpha > 0.0f)
+    {
+        int x = (int)fmod(psIn.pos.x, 4.0f);
+        int y = (int)fmod(psIn.pos.y, 4.0f);
+        float bayerValue = (float)g_bayerPattern[y][x] / 64.0f;
+        clip(bayerValue - modelDitherAlpha);
     }
 
     // GBufferに出力

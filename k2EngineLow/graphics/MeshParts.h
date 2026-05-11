@@ -53,6 +53,8 @@ namespace nsK2EngineLow {
 			int expandDataSize2,
 			void* expandData3,
 			int expandDataSize3,
+			void* expandData4,
+			int expandDataSize4,
 			const std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV>& expandShaderResourceView,
 			const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
 			AlphaBlendMode alphaBlendMode,
@@ -116,6 +118,16 @@ namespace nsK2EngineLow {
 			m_expandData3 = data;
 		}
 		/// <summary>
+		/// ユーザー拡張の定数バッファ（b4）のデータポインタを差し替える。
+		/// NOTE: Init後にModelRender::SetDitherAlpha()経由で呼ばれる。
+		///       ConstantBufferの実体はInitFromTkmFile時に生成済みのため、
+		///       ポインタを差し替えるだけで次のDraw()から自動転送される。
+		/// </summary>
+		void SetExpandData4(void* data)
+		{
+			m_expandData4 = data;
+		}
+		/// <summary>
 		/// ディスクリプタヒープを作成。
 		/// </summary>
 		void CreateDescriptorHeaps();
@@ -148,8 +160,8 @@ namespace nsK2EngineLow {
 		const int EXPAND_SRV_REG__START_NO = 10;
 		//1つのマテリアルで使用されるSRVの数。
 		const int NUM_SRV_ONE_MATERIAL = EXPAND_SRV_REG__START_NO + MAX_MODEL_EXPAND_SRV;
-		//1つのマテリアルで使用されるCBVの数（b0, b1, b2, b3の4つ）。
-		const int NUM_CBV_ONE_MATERIAL = 4;
+		//1つのマテリアルで使用されるCBVの数（b0, b1, b2, b3, b4の5つ）。
+		const int NUM_CBV_ONE_MATERIAL = 5;
 		/// <summary>
 		/// 定数バッファ。
 		/// </summary>
@@ -163,6 +175,7 @@ namespace nsK2EngineLow {
 		ConstantBuffer m_expandConstantBuffer;					//ユーザー用の定数バッファ（b1）
 		ConstantBuffer m_expandConstantBuffer2;					//ユーザー用の定数バッファ（b2）
 		ConstantBuffer m_expandConstantBuffer3;					//ユーザー用の定数バッファ（b3）
+		ConstantBuffer m_expandConstantBuffer4;					//ユーザー用の定数バッファ（b4）
 		Vector4 m_mulColor = Vector4::One;						//モデルの乗算カラー(b1にセット)。
 		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResourceView = { nullptr };	//ユーザーシェーダーリソースビュー。
 		StructuredBuffer m_boneMatricesStructureBuffer;	//ボーン行列の構造体バッファ。
@@ -172,5 +185,6 @@ namespace nsK2EngineLow {
 		void* m_expandData = nullptr;						//ユーザーデータ（b1）。
 		void* m_expandData2 = nullptr;						//ユーザーデータ（b2）。
 		void* m_expandData3 = nullptr;						//ユーザーデータ（b3）。
+		void* m_expandData4 = nullptr;						//ユーザーデータ（b4）。
 	};
 }
