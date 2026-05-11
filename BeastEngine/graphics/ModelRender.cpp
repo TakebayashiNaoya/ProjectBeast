@@ -222,14 +222,25 @@ namespace nsBeastEngine
 
 	void ModelRender::CalcLocalAABBFromTkm(const char* filePath)
 	{
-		if (filePath == nullptr) { return; }
+		if (filePath == nullptr)
+		{
+			// ファイルパスがない場合はカリングを無効化する
+			m_isCullingEnabled = false;
+			return;
+		}
 
 		// バンクからtkmファイルを取得する
 		const TkmFile* tkmFile = g_engine->GetTkmFileFromBank(filePath);
-		if (tkmFile == nullptr) { return; }
+		if (tkmFile == nullptr)
+		{
+			// tkmファイルが取得できない場合はカリングを無効化する
+			m_isCullingEnabled = false;
+			return;
+		}
 
 		Vector3 vMin(FLT_MAX, FLT_MAX, FLT_MAX);
 		Vector3 vMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		bool hasVertex = false;
 
 		// 全メッシュの全頂点を走査してAABBを計算する
 		tkmFile->QueryMeshParts([&](const TkmFile::SMesh& mesh)
@@ -243,8 +254,17 @@ namespace nsBeastEngine
 					vMax.x = max(vMax.x, vertex.pos.x);
 					vMax.y = max(vMax.y, vertex.pos.y);
 					vMax.z = max(vMax.z, vertex.pos.z);
+
+					hasVertex = true;
 				}
 			});
+
+		if (!hasVertex)
+		{
+			// 頂点が1つも存在しない場合はカリングを無効化する
+			m_isCullingEnabled = false;
+			return;
+		}
 
 		m_localAABB.Init(vMax, vMin);
 	}
@@ -254,20 +274,21 @@ namespace nsBeastEngine
 	{
 		if (m_hasSkeleton && m_skeletonRef != nullptr && m_skeletonRef->IsInited())
 		{
-			// スケルトンあり: ボーン行列の平行移動成分からワールドAABBを構築する
-			const int     numBones = m_skeletonRef->GetNumBones();
-			const Matrix* boneMatrices = m_skeletonRef->GetBoneMatricesTopAddress();
+			// スケルトンあり: 各ボーンのワールド行列の平行移動成分からAABBを構築する
+			// GetBone(i)->GetWorldMatrix() はボーン自身のワールド座標を持つ行列であり、
+			// GetBoneMatricesTopAddress() のスキニング行列（invBindPose * worldMatrix）とは異なる
+			const int numBones = m_skeletonRef->GetNumBones();
 
 			Vector3 vMin(FLT_MAX, FLT_MAX, FLT_MAX);
 			Vector3 vMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 			for (int i = 0; i < numBones; i++)
 			{
-				// 行列の第4行（m[3]）が平行移動成分（ワールド座標）
+				// v[3] がワールド行列の平行移動成分（ボーンのワールド座標）
 				const Vector3 bonePos(
-					boneMatrices[i].m[3][0],
-					boneMatrices[i].m[3][1],
-					boneMatrices[i].m[3][2]
+					m_skeletonRef->GetBone(i)->GetWorldMatrix().v[3].x,
+					m_skeletonRef->GetBone(i)->GetWorldMatrix().v[3].y,
+					m_skeletonRef->GetBone(i)->GetWorldMatrix().v[3].z
 				);
 
 				vMin.x = min(vMin.x, bonePos.x);

@@ -7,7 +7,7 @@
 #include "MyRenderer.h"
 #include "Graphics/Light/SceneLight.h"
 #include "Nature/INatureObject.h"
-#include "geometry/Frustum.h"
+#include "Geometry/Frustum.h"
 
 
 namespace nsBeastEngine

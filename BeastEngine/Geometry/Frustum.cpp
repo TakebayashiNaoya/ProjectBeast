@@ -4,7 +4,7 @@
  * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
-#include "geometry/Frustum.h"
+#include "Geometry/Frustum.h"
 
 
 namespace nsBeastEngine
