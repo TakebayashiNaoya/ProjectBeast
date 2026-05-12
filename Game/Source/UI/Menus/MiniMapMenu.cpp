@@ -304,7 +304,7 @@ namespace app
 				const float angle = (atan2(forward.x, forward.z));
 
 				Quaternion qrot;
-				// Z軸回転のを適用。
+				// Z軸回転を適用。
 				qrot.SetRotationZ(angle);
 				// 各アイコンに回転を適用させる。
 				miniMapIcon->m_transform.m_localTransform.m_rotation = qrot;
@@ -363,7 +363,7 @@ namespace app
 			}
 
 			// 使われなかったアイコンを非表示にする。
-			for (uint32_t i = index; i < BEAR_NEST_ICON_SIZE; index++)
+			for (uint32_t i = index; i < BEAR_NEST_ICON_SIZE; i++)
 			{
 				auto* bearNestIcon = GetUI<UIIcon>(BEAR_NEST_ICON_KEYS[index]);
 				if (bearNestIcon) bearNestIcon->m_isDraw = false;
