@@ -373,10 +373,10 @@ namespace app
 
 		namespace
 		{
-			const Vector3 EFFECT_SCALE = { 6.0f, 6.0f, 6.0f };
+			const Vector3 EFFECT_SCALE = { 6.0f, 4.0f, 6.0f };
 			constexpr float EFFECT_OFFSET_FORWARD = 30.0f;
 			constexpr float EFFECT_OFFSET_Y = 5.0f;
-			constexpr float SPLASH_EFFECT_INTERVAL = 1.0f;// 泳ぎエフェクトの再生間隔
+			constexpr float SPLASH_EFFECT_INTERVAL = 0.8f;// 泳ぎエフェクトの再生間隔
 		}
 
 
