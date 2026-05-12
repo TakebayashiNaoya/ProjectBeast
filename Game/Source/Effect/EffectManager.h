@@ -83,6 +83,14 @@ namespace app
 
 
 		/**
+		 * @brief 再生中のエフェクトの座標を更新する
+		 * @param handle エフェクトのハンドル
+		 * @param position 新しい座標
+		 */
+		void SetEffectPosition(const EffectHandle handle, const Vector3& position);
+
+
+		/**
 		 * シングルトン用
 		 */
 	public:

@@ -238,6 +238,10 @@ namespace app
 		public:
 			PenguinSwimmingState(PenguinStateMachine* owner);
 			~PenguinSwimmingState() override = default;
+
+		private:
+			int m_splashEffectHandle;
+			float m_splashEffectTimer;
 		};
 
 

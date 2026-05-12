@@ -10,6 +10,7 @@
 #include "PenguinStatus.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Effect/EffectManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Sound/SoundManager.h"
 
@@ -370,6 +371,15 @@ namespace app
 		/****************************************/
 
 
+		namespace
+		{
+			const Vector3 EFFECT_SCALE = { 6.0f, 6.0f, 6.0f };
+			constexpr float EFFECT_OFFSET_FORWARD = 30.0f;
+			constexpr float EFFECT_OFFSET_Y = 5.0f;
+			constexpr float SPLASH_EFFECT_INTERVAL = 1.0f;// 泳ぎエフェクトの再生間隔
+		}
+
+
 		void PenguinSwimmingState::Enter()
 		{
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSwimSpeed();
@@ -381,6 +391,9 @@ namespace app
 			{
 				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
 			}
+
+			m_splashEffectHandle = -1;
+			m_splashEffectTimer = 0.0f;
 		}
 
 
@@ -395,6 +408,66 @@ namespace app
 					m_seHandle = sound->PlaySE(enSoundKind::enSoundKind_PenguinSwimming, true);
 				}
 			}
+
+			// 慣性を含む現在の実際の速度を取得
+			const Vector3& velocity = m_owner->GetCurrentVelocity();
+
+			bool isMoving = (velocity.LengthSq() > 0.1f);
+
+			if (isMoving)
+			{
+				Vector3 effectPosition = m_owner->GetTransform().m_position;
+				Quaternion rot = m_owner->GetTransform().m_rotation;
+				Vector3 forward = Vector3::AxisZ;
+
+				rot.Apply(forward);
+				if (forward.LengthSq() > 0.001f)
+				{
+					forward.Normalize();
+				}
+
+				effectPosition += forward * EFFECT_OFFSET_FORWARD;
+				//effectPosition.y += EFFECT_OFFSET_Y;
+
+				if (m_splashEffectHandle != -1)
+				{
+					m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+					if (m_splashEffectTimer > SPLASH_EFFECT_INTERVAL)
+					{
+						EffectManager::Get().StopEffect(m_splashEffectHandle);
+
+						m_splashEffectHandle = -1; // タイマーが一定時間を超えたらエフェクトをリセットして再生可能にする
+					}
+				}
+				if (m_splashEffectHandle == -1)
+				{
+					// まだエフェクトが出ていなければ再生してハンドルを保存
+					m_splashEffectHandle = EffectManager::Get().PlayEffect(
+						EnEffectKind::SwimSplash,
+						effectPosition,
+						Quaternion::Identity,
+						EFFECT_SCALE
+					);
+					m_splashEffectTimer = 0.0f;
+				}
+				else
+				{
+					// 既にエフェクトが出ているなら、ペンギンの位置に合わせて座標を更新（追従）
+					EffectManager::Get().SetEffectPosition(m_splashEffectHandle, effectPosition);
+				}
+			}
+			else
+			{
+				// 止まっているときはエフェクトを消す
+				if (m_splashEffectHandle != -1)
+				{
+					EffectManager::Get().StopEffect(m_splashEffectHandle);
+					m_splashEffectHandle = -1;
+					m_splashEffectTimer = 0.0f;
+				}
+			}
+
 			m_owner->Move();
 		}
 
@@ -413,11 +486,19 @@ namespace app
 					sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
 				}
 			}
+
+			if (m_splashEffectHandle != -1)
+			{
+				EffectManager::Get().StopEffect(m_splashEffectHandle);
+				m_splashEffectHandle = -1;
+			}
 		}
 
 
 		PenguinSwimmingState::PenguinSwimmingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
+			, m_splashEffectHandle(-1)
+			, m_splashEffectTimer(0.0f)
 		{}
 
 

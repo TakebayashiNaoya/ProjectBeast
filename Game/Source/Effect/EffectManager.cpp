@@ -87,4 +87,14 @@ namespace app
 			m_effectList.erase(it);
 		}
 	}
+
+
+	void EffectManager::SetEffectPosition(const EffectHandle handle, const Vector3& position)
+	{
+		auto* effect = FindEffect(handle);
+		if (effect == nullptr) {
+			return;
+		}
+		effect->SetPosition(position);
+	}
 }
