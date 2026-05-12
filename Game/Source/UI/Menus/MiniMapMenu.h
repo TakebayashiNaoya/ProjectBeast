@@ -43,6 +43,26 @@ namespace app
 			);
 
 			/**
+			 * @brief マップのフレームアイコンをカメラの向きに併せて回転する用
+			 */
+			void MapFrameRotation();
+			
+			/**
+			 * @brief シロクマの巣のアイコンをマップに表示する用
+			 */
+			void MapPolarBearNest();
+
+			/**
+			 * @brief 渦潮のアイコンをマップに表示する用
+			 */
+			void MapWhirlpool();
+
+			/**
+			 * @brief イグルーのアイコンをマップに表示する用
+			 */
+			void MapIgloo();
+
+			/**
 			 * @brief 子ペンギンのアイコンをマップに表示する用
 			 */
 			void MapChildPen();
