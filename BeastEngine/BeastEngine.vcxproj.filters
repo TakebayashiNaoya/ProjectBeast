@@ -87,6 +87,9 @@
     <ClCompile Include="Graphics\OcclusionDitherManager.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry\Frustum.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -199,6 +202,9 @@
     <ClInclude Include="Graphics\OcclusionDitherManager.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\Frustum.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -215,6 +221,9 @@
     </Filter>
     <Filter Include="Resource">
       <UniqueIdentifier>{72e20d92-4345-4646-9155-7f21c180bf74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{48b81929-6c7d-4d80-8678-a2056befa55b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

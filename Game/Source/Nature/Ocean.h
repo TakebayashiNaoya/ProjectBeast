@@ -67,7 +67,7 @@ namespace app
 			/** グリッドの1辺の長さ（ワールド単位） */
 			static constexpr float GRID_SIZE = 12500.0f;
 			/** グリッドの分割数（N×N）。GRID_SIZEに比例させて頂点密度を維持する */
-			static constexpr int   GRID_DIVISION = 1280;
+			static constexpr int   GRID_DIVISION = 128;
 
 
 		public:

@@ -7,12 +7,23 @@
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/MiniMap.dds",
                 "width":233,
                 "height":233,
-                "position":[ -570, 280, 0],
+                "position":[ -573, 280, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
             },
 
+            {
+                "type":"UIIcon",
+                "name":"MiniMapFrameIcon",
+                "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/MiniMapFrameIcon.dds",
+                "width":280,
+                "height":280,
+                "position":[ -573, 280, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
 
 
             {
@@ -311,7 +322,7 @@
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 255, 165, 0, 255]
             },
             {
                 "type":"UIIcon",
@@ -1223,7 +1234,7 @@
                 "name":"IglooIcon0",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/IglooIcon.dds",
                 "width":25,
-                "height":25,
+                "height":20,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -1234,7 +1245,7 @@
                 "name":"IglooIcon1",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/IglooIcon.dds",
                 "width":25,
-                "height":25,
+                "height":20,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -1245,7 +1256,7 @@
                 "name":"IglooIcon2",
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/IglooIcon.dds",
                 "width":25,
-                "height":25,
+                "height":20,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,

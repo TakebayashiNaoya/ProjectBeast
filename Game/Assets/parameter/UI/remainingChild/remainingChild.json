@@ -3,11 +3,22 @@
         "elements":[
             {
                 "type":"UIIcon",
+                "name":"BgIcon",
+                "asset":"Assets/spriteData/UI/Icon/BgIcon.dds",
+                "width":330,
+                "height":78,
+                "position":[ -578, 85, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 0, 0, 0, 150]
+            },
+            {
+                "type":"UIIcon",
                 "name":"ChildPenguinIcon",
                 "asset":"Assets/spriteData/UI/Icon/ChildPenguinIcon.dds",
-                "width":43,
-                "height":43,
-                "position":[ -720, 100, 0],
+                "width":40,
+                "height":40,
+                "position":[ -700, 85, 0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -18,9 +29,9 @@
                 "asset":"Assets/spriteData/UI/Number/White",
                 "digit": 3,
                 "number": 100,
-                "width":40,
-                "height":40,
-                "position":[-630,100,0],
+                "width":30,
+                "height":30,
+                "position":[-619,85,0],
                 "scale":[1,1,1],
                 "rotation":0
             },
@@ -28,9 +39,9 @@
                 "type":"UIIcon",
                 "name":"SlashIcon",
                 "asset":"Assets/spriteData/UI/Icon/SlashIcon.dds",
-                "width":33,
-                "height":57,
-                "position":[-575,100,0],
+                "width":30,
+                "height":45,
+                "position":[-575,85,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -41,9 +52,9 @@
                 "asset":"Assets/spriteData/UI/Number/White",
                 "digit": 3,
                 "number": 100,
-                "width":40,
-                "height":40,
-                "position":[-450,100,0],
+                "width":30,
+                "height":30,
+                "position":[-490,85,0],
                 "scale":[1,1,1],
                 "rotation":0
             }
