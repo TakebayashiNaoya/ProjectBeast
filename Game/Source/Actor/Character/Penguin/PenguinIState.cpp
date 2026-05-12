@@ -36,7 +36,7 @@ namespace app
 
 			constexpr float MIN_SPEED = 0.1f; // 泳ぎエフェクトのスケールを決めるための最低速度
 
-			constexpr float MAX_SPEED = 10.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
+			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
 
 			constexpr float FORWARD_LENGTH_NORMALIZE_SQ = 0.0001f; // 前方ベクトルの正規化を行うかどうかの閾値の二乗
 

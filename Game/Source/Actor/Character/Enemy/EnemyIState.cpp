@@ -51,7 +51,7 @@ namespace app
 
 			constexpr float MIN_SPEED = 0.1f; // 泳ぎエフェクトのスケールを決めるための最低速度
 
-			constexpr float MAX_SPEED = 10.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
+			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
 
 			constexpr float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
 
