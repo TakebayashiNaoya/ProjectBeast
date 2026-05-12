@@ -19,10 +19,34 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			const Vector3 SPLASH_EFFECT_SCALE = { 7.0f, 5.0f, 7.0f };
+
+			constexpr float EFFECT_OFFSET_FORWARD = 30.0f;
+			constexpr float EFFECT_OFFSET_Y = 5.0f;
+
+			constexpr float SPLASH_EFFECT_INTERVAL = 0.2f;// 泳ぎエフェクトの再生間隔
+
+			constexpr float MIN_MOVE_VELOCITY_SQ = 0.1f; // 泳ぎエフェクトを出すための最低速度の二乗
+
+			constexpr float MIN_SPLASH_SCALE_RATIO = 0.5f; // 泳ぎエフェクトの最小スケールの割合（速度が遅いときにエフェクトを小さくするため）
+
+			constexpr float MAX_SPLASH_SCALE_RATIO = 1.0f; // 泳ぎエフェクトの最大スケールの割合（速度が速いときにエフェクトを大きくするため）
+
+			constexpr float MIN_SPEED = 0.1f; // 泳ぎエフェクトのスケールを決めるための最低速度
+
+			constexpr float MAX_SPEED = 10.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
+
+			constexpr float FORWARD_LENGTH_NORMALIZE_SQ = 0.0001f; // 前方ベクトルの正規化を行うかどうかの閾値の二乗
+
+			constexpr uint32_t INVALID_SE_HANDLE = static_cast<uint32_t>(-1); // SEのハンドルの無効値
+		}
+
 
 		PenguinIState::PenguinIState(PenguinStateMachine* owner)
 			: m_owner(owner)
-			, m_seHandle(-1)
+			, m_seHandle(INVALID_SE_HANDLE)
 		{}
 
 
@@ -64,14 +88,14 @@ namespace app
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveWalk);
 
-			soundHandle = static_cast<uint32_t>(-1);
+			m_soundHandle = INVALID_SE_HANDLE;
 
 			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
 			if (child == nullptr
 				|| ChildPenguinManager::GetInstance()->IsAudible(child))
 			{
-				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
+				m_soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
 			}
 		}
 
@@ -93,26 +117,26 @@ namespace app
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
 			/** soundHandle が有効値かどうかだけで再生中を判定する */
 			/** （FindSE は PlaySE のリクエスト方式により Enter 直後は nullptr を返すため使用しない） */
-			const bool isPlaying = (soundHandle != static_cast<uint32_t>(-1));
+			const bool isPlaying = (m_soundHandle != INVALID_SE_HANDLE);
 
 			if (isAudible && !isPlaying)
 			{
 				/** 可聴対象になったのでSEを開始する */
-				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
+				m_soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSneak, true);
 			}
 			else if (!isAudible && isPlaying)
 			{
 				/** 可聴対象から外れたのでSEを停止する */
-				SoundManager::Get().StopSE(soundHandle);
-				soundHandle = static_cast<uint32_t>(-1);
+				SoundManager::Get().StopSE(m_soundHandle);
+				m_soundHandle = INVALID_SE_HANDLE;
 			}
 		}
 
 
 		void PenguinSneakState::Exit()
 		{
-			SoundManager::Get().StopSE(soundHandle);
-			soundHandle = static_cast<uint32_t>(-1);
+			SoundManager::Get().StopSE(m_soundHandle);
+			m_soundHandle = INVALID_SE_HANDLE;
 		}
 
 
@@ -132,14 +156,14 @@ namespace app
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveRun);
 
-			soundHandle = static_cast<uint32_t>(-1);
+			m_soundHandle = INVALID_SE_HANDLE;
 
 			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
 			if (child == nullptr
 				|| ChildPenguinManager::GetInstance()->IsAudible(child))
 			{
-				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
+				m_soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
 			}
 		}
 
@@ -160,26 +184,26 @@ namespace app
 
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
 			/** soundHandle が有効値かどうかだけで再生中を判定する */
-			const bool isPlaying = (soundHandle != static_cast<uint32_t>(-1));
+			const bool isPlaying = (m_soundHandle != INVALID_SE_HANDLE);
 
 			if (isAudible && !isPlaying)
 			{
 				/** 可聴対象になったのでSEを開始する */
-				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
+				m_soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinDash, true);
 			}
 			else if (!isAudible && isPlaying)
 			{
 				/** 可聴対象から外れたのでSEを停止する */
-				SoundManager::Get().StopSE(soundHandle);
-				soundHandle = static_cast<uint32_t>(-1);
+				SoundManager::Get().StopSE(m_soundHandle);
+				m_soundHandle = INVALID_SE_HANDLE;
 			}
 		}
 
 
 		void PenguinRunState::Exit()
 		{
-			SoundManager::Get().StopSE(soundHandle);
-			soundHandle = static_cast<uint32_t>(-1);
+			SoundManager::Get().StopSE(m_soundHandle);
+			m_soundHandle = INVALID_SE_HANDLE;
 		}
 
 
@@ -280,14 +304,14 @@ namespace app
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Sliding);
 
-			soundHandle = static_cast<uint32_t>(-1);
+			m_soundHandle = INVALID_SE_HANDLE;
 
 			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
 			if (child == nullptr
 				|| ChildPenguinManager::GetInstance()->IsAudible(child))
 			{
-				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
+				m_soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
 			}
 		}
 
@@ -308,26 +332,26 @@ namespace app
 
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
 			/** soundHandle が有効値かどうかだけで再生中を判定する */
-			const bool isPlaying = (soundHandle != static_cast<uint32_t>(-1));
+			const bool isPlaying = (m_soundHandle != INVALID_SE_HANDLE);
 
 			if (isAudible && !isPlaying)
 			{
 				/** 可聴対象になったのでSEを開始する */
-				soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
+				m_soundHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinSlide, true);
 			}
 			else if (!isAudible && isPlaying)
 			{
 				/** 可聴対象から外れたのでSEを停止する */
-				SoundManager::Get().StopSE(soundHandle);
-				soundHandle = static_cast<uint32_t>(-1);
+				SoundManager::Get().StopSE(m_soundHandle);
+				m_soundHandle = INVALID_SE_HANDLE;
 			}
 		}
 
 
 		void PenguinSlidingState::Exit()
 		{
-			SoundManager::Get().StopSE(soundHandle);
-			soundHandle = static_cast<uint32_t>(-1);
+			SoundManager::Get().StopSE(m_soundHandle);
+			m_soundHandle = INVALID_SE_HANDLE;
 		}
 
 
@@ -371,23 +395,6 @@ namespace app
 		/****************************************/
 
 
-		namespace
-		{
-			const Vector3 EFFECT_SCALE = { 7.0f, 5.0f, 7.0f };
-
-			constexpr float EFFECT_OFFSET_FORWARD = 30.0f;
-			constexpr float EFFECT_OFFSET_Y = 5.0f;
-
-			constexpr float SPLASH_EFFECT_INTERVAL = 0.2f;// 泳ぎエフェクトの再生間隔
-
-			constexpr float MIN_MOVE_VELOCITY_SQ = 0.1f; // 泳ぎエフェクトを出すための最低速度の二乗
-
-			constexpr float MIN_SPLASH_SCALE_RATIO = 0.5f; // 泳ぎエフェクトの最小スケールの割合（速度が遅いときにエフェクトを小さくするため）
-
-			constexpr float MAX_SPLASH_SCALE_RATIO = 1.0f; // 泳ぎエフェクトの最大スケールの割合（速度が速いときにエフェクトを大きくするため）
-		}
-
-
 		void PenguinSwimmingState::Enter()
 		{
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSwimSpeed();
@@ -395,12 +402,11 @@ namespace app
 			m_owner->SetIsSwimming(true);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
 
-			if (m_seHandle == -1)
+			if (m_seHandle == INVALID_SE_HANDLE)
 			{
 				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
 			}
 
-			//m_splashEffectHandle = -1;
 			m_splashEffectTimer = 0.0f;
 		}
 
@@ -408,7 +414,7 @@ namespace app
 		void PenguinSwimmingState::Update()
 		{
 			SoundManager* sound = &SoundManager::Get();
-			if (m_seHandle != -1)
+			if (m_seHandle != INVALID_SE_HANDLE)
 			{
 				auto* se = sound->FindSE(m_seHandle);
 				if (se && se->IsPlaying()) {
@@ -421,11 +427,11 @@ namespace app
 			const Vector3& velocity = m_owner->GetCurrentVelocity();
 			float currentSpeed = velocity.Length();
 
-			float maxSpeed = max(0.1f, m_owner->GetPenguinStatus()->GetSwimSpeed());
-			float speedRatio = min(1.0f, currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
+			float maxSpeed = max(MIN_SPEED, m_owner->GetPenguinStatus()->GetSwimSpeed());
+			float speedRatio = min(MAX_SPEED, currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
 
 			float scaleMultiplier = MIN_SPLASH_SCALE_RATIO + ((MAX_SPLASH_SCALE_RATIO - MIN_SPLASH_SCALE_RATIO) * speedRatio);
-			Vector3 currentScale = EFFECT_SCALE * scaleMultiplier;
+			Vector3 currentScale = SPLASH_EFFECT_SCALE * scaleMultiplier;
 
 			bool isMoving = (velocity.LengthSq() > MIN_MOVE_VELOCITY_SQ);
 
@@ -436,46 +442,12 @@ namespace app
 				Vector3 forward = Vector3::AxisZ;
 
 				rot.Apply(forward);
-				if (forward.LengthSq() > 0.001f)
+				if (forward.LengthSq() > FORWARD_LENGTH_NORMALIZE_SQ)
 				{
 					forward.Normalize();
 				}
 
 				effectPosition += forward * EFFECT_OFFSET_FORWARD;
-				//effectPosition.y += EFFECT_OFFSET_Y;
-
-			//	if (m_splashEffectHandle != -1)
-			//	{
-			//		m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
-
-			//		if (m_splashEffectTimer > SPLASH_EFFECT_INTERVAL)
-			//		{
-			//			EffectManager::Get().StopEffect(m_splashEffectHandle);
-
-			//			m_splashEffectHandle = -1; // タイマーが一定時間を超えたらエフェクトをリセットして再生可能にする
-			//		}
-			//	}
-			//	if (m_splashEffectHandle == -1)
-			//	{
-			//		// まだエフェクトが出ていなければ再生してハンドルを保存
-			//		m_splashEffectHandle = EffectManager::Get().PlayEffect(
-			//			EnEffectKind::SwimSplash,
-			//			effectPosition,
-			//			Quaternion::Identity,
-			//			currentScale
-			//		);
-			//		m_splashEffectTimer = 0.0f;
-			//	}
-			//}
-			//else
-			//{
-			//	// 止まっているときはエフェクトを消す
-			//	if (m_splashEffectHandle != -1)
-			//	{
-			//		EffectManager::Get().StopEffect(m_splashEffectHandle);
-			//		m_splashEffectHandle = -1;
-			//		m_splashEffectTimer = 0.0f;
-			//	}
 
 				m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
 
@@ -506,12 +478,12 @@ namespace app
 			m_owner->SetIsSwimming(false);
 			SoundManager* sound = &SoundManager::Get();
 
-			if (m_seHandle != -1)
+			if (m_seHandle != INVALID_SE_HANDLE)
 			{
 				auto* se = sound->FindSE(m_seHandle);
 				if (se && se->IsPlaying()) {
 					sound->StopSE(m_seHandle);
-					m_seHandle = -1;
+					m_seHandle = INVALID_SE_HANDLE;
 					sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
 				}
 			}

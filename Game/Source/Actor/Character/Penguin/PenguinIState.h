@@ -85,7 +85,7 @@ namespace app
 
 
 		private:
-			uint32_t soundHandle = -1;
+			uint32_t m_soundHandle = -1;
 		};
 
 
@@ -113,7 +113,7 @@ namespace app
 
 
 		private:
-			uint32_t soundHandle = -1;
+			uint32_t m_soundHandle = -1;
 		};
 
 
@@ -189,7 +189,7 @@ namespace app
 
 
 		private:
-			uint32_t soundHandle = -1;
+			uint32_t m_soundHandle = -1;
 		};
 
 
