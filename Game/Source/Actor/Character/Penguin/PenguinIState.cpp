@@ -373,10 +373,18 @@ namespace app
 
 		namespace
 		{
-			const Vector3 EFFECT_SCALE = { 6.0f, 4.0f, 6.0f };
+			const Vector3 EFFECT_SCALE = { 7.0f, 5.0f, 7.0f };
+
 			constexpr float EFFECT_OFFSET_FORWARD = 30.0f;
 			constexpr float EFFECT_OFFSET_Y = 5.0f;
-			constexpr float SPLASH_EFFECT_INTERVAL = 0.8f;// 泳ぎエフェクトの再生間隔
+
+			constexpr float SPLASH_EFFECT_INTERVAL = 0.2f;// 泳ぎエフェクトの再生間隔
+
+			constexpr float MIN_MOVE_VELOCITY_SQ = 0.1f; // 泳ぎエフェクトを出すための最低速度の二乗
+
+			constexpr float MIN_SPLASH_SCALE_RATIO = 0.5f; // 泳ぎエフェクトの最小スケールの割合（速度が遅いときにエフェクトを小さくするため）
+
+			constexpr float MAX_SPLASH_SCALE_RATIO = 1.0f; // 泳ぎエフェクトの最大スケールの割合（速度が速いときにエフェクトを大きくするため）
 		}
 
 
@@ -392,7 +400,7 @@ namespace app
 				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
 			}
 
-			m_splashEffectHandle = -1;
+			//m_splashEffectHandle = -1;
 			m_splashEffectTimer = 0.0f;
 		}
 
@@ -411,8 +419,15 @@ namespace app
 
 			// 慣性を含む現在の実際の速度を取得
 			const Vector3& velocity = m_owner->GetCurrentVelocity();
+			float currentSpeed = velocity.Length();
 
-			bool isMoving = (velocity.LengthSq() > 0.1f);
+			float maxSpeed = max(0.1f, m_owner->GetPenguinStatus()->GetSwimSpeed());
+			float speedRatio = min(1.0f, currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
+
+			float scaleMultiplier = MIN_SPLASH_SCALE_RATIO + ((MAX_SPLASH_SCALE_RATIO - MIN_SPLASH_SCALE_RATIO) * speedRatio);
+			Vector3 currentScale = EFFECT_SCALE * scaleMultiplier;
+
+			bool isMoving = (velocity.LengthSq() > MIN_MOVE_VELOCITY_SQ);
 
 			if (isMoving)
 			{
@@ -429,43 +444,57 @@ namespace app
 				effectPosition += forward * EFFECT_OFFSET_FORWARD;
 				//effectPosition.y += EFFECT_OFFSET_Y;
 
-				if (m_splashEffectHandle != -1)
-				{
-					m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
+			//	if (m_splashEffectHandle != -1)
+			//	{
+			//		m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
 
-					if (m_splashEffectTimer > SPLASH_EFFECT_INTERVAL)
-					{
-						EffectManager::Get().StopEffect(m_splashEffectHandle);
+			//		if (m_splashEffectTimer > SPLASH_EFFECT_INTERVAL)
+			//		{
+			//			EffectManager::Get().StopEffect(m_splashEffectHandle);
 
-						m_splashEffectHandle = -1; // タイマーが一定時間を超えたらエフェクトをリセットして再生可能にする
-					}
-				}
-				if (m_splashEffectHandle == -1)
+			//			m_splashEffectHandle = -1; // タイマーが一定時間を超えたらエフェクトをリセットして再生可能にする
+			//		}
+			//	}
+			//	if (m_splashEffectHandle == -1)
+			//	{
+			//		// まだエフェクトが出ていなければ再生してハンドルを保存
+			//		m_splashEffectHandle = EffectManager::Get().PlayEffect(
+			//			EnEffectKind::SwimSplash,
+			//			effectPosition,
+			//			Quaternion::Identity,
+			//			currentScale
+			//		);
+			//		m_splashEffectTimer = 0.0f;
+			//	}
+			//}
+			//else
+			//{
+			//	// 止まっているときはエフェクトを消す
+			//	if (m_splashEffectHandle != -1)
+			//	{
+			//		EffectManager::Get().StopEffect(m_splashEffectHandle);
+			//		m_splashEffectHandle = -1;
+			//		m_splashEffectTimer = 0.0f;
+			//	}
+
+				m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+				// 一定間隔（0.1fなど）ごとに、古いものは消さずに新しいエフェクトを発生させる
+				if (m_splashEffectTimer > SPLASH_EFFECT_INTERVAL)
 				{
-					// まだエフェクトが出ていなければ再生してハンドルを保存
-					m_splashEffectHandle = EffectManager::Get().PlayEffect(
+					EffectManager::Get().PlayEffect(
 						EnEffectKind::SwimSplash,
 						effectPosition,
 						Quaternion::Identity,
-						EFFECT_SCALE
+						currentScale
 					);
-					m_splashEffectTimer = 0.0f;
-				}
-				else
-				{
-					// 既にエフェクトが出ているなら、ペンギンの位置に合わせて座標を更新（追従）
-					EffectManager::Get().SetEffectPosition(m_splashEffectHandle, effectPosition);
+					m_splashEffectTimer = 0.0f; // タイマーだけリセット
 				}
 			}
 			else
 			{
-				// 止まっているときはエフェクトを消す
-				if (m_splashEffectHandle != -1)
-				{
-					EffectManager::Get().StopEffect(m_splashEffectHandle);
-					m_splashEffectHandle = -1;
-					m_splashEffectTimer = 0.0f;
-				}
+				// 止まっているときも、すでに出た泡は自然に消えるのを待つため、ここでは何もしない
+				m_splashEffectTimer = SPLASH_EFFECT_INTERVAL; // 次に動き出した時にすぐ出るようにタイマーを満タンにしておく
 			}
 
 			m_owner->Move();
@@ -486,18 +515,11 @@ namespace app
 					sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
 				}
 			}
-
-			if (m_splashEffectHandle != -1)
-			{
-				EffectManager::Get().StopEffect(m_splashEffectHandle);
-				m_splashEffectHandle = -1;
-			}
 		}
 
 
 		PenguinSwimmingState::PenguinSwimmingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
-			, m_splashEffectHandle(-1)
 			, m_splashEffectTimer(0.0f)
 		{}
 

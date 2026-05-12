@@ -314,12 +314,28 @@ namespace app
 		/************************************/
 
 
+		namespace
+		{
+			const Vector3 EFFECT_SCALE = { 20.0f, 18.0f, 20.0f };
+
+			constexpr float SPLASH_EFFECT_INTERVAL = 0.2f;// 泳ぎエフェクトの再生間隔
+
+			constexpr float MIN_MOVE_VELOCITY_SQ = 0.1f; // 泳ぎエフェクトを出すための最低速度の二乗
+
+			constexpr float MIN_SPLASH_SCALE_RATIO = 0.5f; // 泳ぎエフェクトの最小スケールの割合（速度が遅いときにエフェクトを小さくするため）
+
+			constexpr float MAX_SPLASH_SCALE_RATIO = 1.0f; // 泳ぎエフェクトの最大スケールの割合（速度が速いときにエフェクトを大きくするため）
+		}
+
+
 		void EnemySwimState::Enter()
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetSwimSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->SetIsSwimming(true);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
+
+			m_splashEffectTimer = 0.0f;
 		}
 
 
@@ -329,6 +345,39 @@ namespace app
 			{
 				return;
 			}
+
+			const Vector3& velocity = m_owner->GetCurrentVelocity();
+			float currentSpeed = velocity.Length();
+
+			float maxSpeed = max(0.1f, m_owner->GetStickLAmount());
+			float speedRatio = min(1.0f, currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
+
+			float scaleMultiplier = MIN_SPLASH_SCALE_RATIO + ((MAX_SPLASH_SCALE_RATIO - MIN_SPLASH_SCALE_RATIO) * speedRatio);
+			Vector3 currentScale = EFFECT_SCALE * scaleMultiplier;
+
+			bool isMoving = (velocity.LengthSq() > MIN_MOVE_VELOCITY_SQ);
+
+			if (isMoving)
+			{
+				Vector3 effectPosition = m_owner->GetPosition();
+
+				m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+				if (m_splashEffectTimer >= SPLASH_EFFECT_INTERVAL)
+				{
+					EffectManager::Get().PlayEffect(
+						EnEffectKind::SwimSplash,
+						effectPosition,
+						Quaternion::Identity,
+						currentScale
+					);
+				}
+			}
+			else
+			{
+				m_splashEffectTimer = SPLASH_EFFECT_INTERVAL;
+			}
+
 			m_owner->Move();
 		}
 
@@ -341,6 +390,7 @@ namespace app
 
 		EnemySwimState::EnemySwimState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
+			, m_splashEffectTimer(0.0f)
 		{
 
 		}

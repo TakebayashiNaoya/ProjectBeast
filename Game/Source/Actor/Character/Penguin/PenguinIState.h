@@ -240,7 +240,6 @@ namespace app
 			~PenguinSwimmingState() override = default;
 
 		private:
-			int m_splashEffectHandle;
 			float m_splashEffectTimer;
 		};
 
