@@ -24,7 +24,6 @@ namespace app
 			const Vector3 SPLASH_EFFECT_SCALE = { 7.0f, 5.0f, 7.0f };
 
 			constexpr float EFFECT_OFFSET_FORWARD = 30.0f;
-			constexpr float EFFECT_OFFSET_Y = 5.0f;
 
 			constexpr float SPLASH_EFFECT_INTERVAL = 0.2f;// 泳ぎエフェクトの再生間隔
 
@@ -39,8 +38,6 @@ namespace app
 			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
 
 			constexpr float FORWARD_LENGTH_NORMALIZE_SQ = 0.0001f; // 前方ベクトルの正規化を行うかどうかの閾値の二乗
-
-			constexpr uint32_t INVALID_SE_HANDLE = static_cast<uint32_t>(-1); // SEのハンドルの無効値
 		}
 
 
@@ -88,7 +85,7 @@ namespace app
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveWalk);
 
-			m_soundHandle = INVALID_SE_HANDLE;
+			m_soundHandle = app::INVALID_SE_HANDLE;
 
 			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
@@ -117,7 +114,7 @@ namespace app
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
 			/** soundHandle が有効値かどうかだけで再生中を判定する */
 			/** （FindSE は PlaySE のリクエスト方式により Enter 直後は nullptr を返すため使用しない） */
-			const bool isPlaying = (m_soundHandle != INVALID_SE_HANDLE);
+			const bool isPlaying = (m_soundHandle != app::INVALID_SE_HANDLE);
 
 			if (isAudible && !isPlaying)
 			{
@@ -128,7 +125,7 @@ namespace app
 			{
 				/** 可聴対象から外れたのでSEを停止する */
 				SoundManager::Get().StopSE(m_soundHandle);
-				m_soundHandle = INVALID_SE_HANDLE;
+				m_soundHandle = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -136,7 +133,7 @@ namespace app
 		void PenguinSneakState::Exit()
 		{
 			SoundManager::Get().StopSE(m_soundHandle);
-			m_soundHandle = INVALID_SE_HANDLE;
+			m_soundHandle = app::INVALID_SE_HANDLE;
 		}
 
 
@@ -184,7 +181,7 @@ namespace app
 
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
 			/** soundHandle が有効値かどうかだけで再生中を判定する */
-			const bool isPlaying = (m_soundHandle != INVALID_SE_HANDLE);
+			const bool isPlaying = (m_soundHandle != app::INVALID_SE_HANDLE);
 
 			if (isAudible && !isPlaying)
 			{
@@ -195,7 +192,7 @@ namespace app
 			{
 				/** 可聴対象から外れたのでSEを停止する */
 				SoundManager::Get().StopSE(m_soundHandle);
-				m_soundHandle = INVALID_SE_HANDLE;
+				m_soundHandle = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -203,7 +200,7 @@ namespace app
 		void PenguinRunState::Exit()
 		{
 			SoundManager::Get().StopSE(m_soundHandle);
-			m_soundHandle = INVALID_SE_HANDLE;
+			m_soundHandle = app::INVALID_SE_HANDLE;
 		}
 
 
@@ -304,7 +301,7 @@ namespace app
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Sliding);
 
-			m_soundHandle = INVALID_SE_HANDLE;
+			m_soundHandle = app::INVALID_SE_HANDLE;
 
 			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
@@ -332,7 +329,7 @@ namespace app
 
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
 			/** soundHandle が有効値かどうかだけで再生中を判定する */
-			const bool isPlaying = (m_soundHandle != INVALID_SE_HANDLE);
+			const bool isPlaying = (m_soundHandle != app::INVALID_SE_HANDLE);
 
 			if (isAudible && !isPlaying)
 			{
@@ -343,7 +340,7 @@ namespace app
 			{
 				/** 可聴対象から外れたのでSEを停止する */
 				SoundManager::Get().StopSE(m_soundHandle);
-				m_soundHandle = INVALID_SE_HANDLE;
+				m_soundHandle = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -351,7 +348,7 @@ namespace app
 		void PenguinSlidingState::Exit()
 		{
 			SoundManager::Get().StopSE(m_soundHandle);
-			m_soundHandle = INVALID_SE_HANDLE;
+			m_soundHandle = app::INVALID_SE_HANDLE;
 		}
 
 
@@ -402,7 +399,7 @@ namespace app
 			m_owner->SetIsSwimming(true);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
 
-			if (m_seHandle == INVALID_SE_HANDLE)
+			if (m_seHandle == app::INVALID_SE_HANDLE)
 			{
 				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
 			}
@@ -414,7 +411,7 @@ namespace app
 		void PenguinSwimmingState::Update()
 		{
 			SoundManager* sound = &SoundManager::Get();
-			if (m_seHandle != INVALID_SE_HANDLE)
+			if (m_seHandle != app::INVALID_SE_HANDLE)
 			{
 				auto* se = sound->FindSE(m_seHandle);
 				if (se && se->IsPlaying()) {
@@ -478,12 +475,12 @@ namespace app
 			m_owner->SetIsSwimming(false);
 			SoundManager* sound = &SoundManager::Get();
 
-			if (m_seHandle != INVALID_SE_HANDLE)
+			if (m_seHandle != app::INVALID_SE_HANDLE)
 			{
 				auto* se = sound->FindSE(m_seHandle);
 				if (se && se->IsPlaying()) {
 					sound->StopSE(m_seHandle);
-					m_seHandle = INVALID_SE_HANDLE;
+					m_seHandle = app::INVALID_SE_HANDLE;
 					sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
 				}
 			}

@@ -41,21 +41,19 @@ namespace app
 
 			constexpr float FORWARD_LENGTH_NORMALIZE_SQ = 0.0001f; // 前方ベクトルの正規化を行うかどうかの閾値の二乗
 
-			constexpr float STHICK_AMOUNT_THRESHOLD = 0.0001f; // 入力量がこの値以上のときに移動する
+			constexpr float STICK_AMOUNT_THRESHOLD = 0.0001f; // 入力量がこの値以上のときに移動する
 
 			constexpr float STUN_DURATION = 2.0f; // スタンの持続時間
 
-			constexpr int SERCH_RAND_RATE = 30; // 索敵状態に入るときのランダム率
+			constexpr int SEARCH_RAND_RATE = 30; // 索敵状態に入るときのランダム率
 
-			constexpr int SERCE_RAND_MAX = 100; // 索敵状態に入るときのランダム率の最大値
+			constexpr int SAERCE_RAND_MAX = 100; // 索敵状態に入るときのランダム率の最大値
 
 			constexpr float MIN_SPEED = 0.1f; // 泳ぎエフェクトのスケールを決めるための最低速度
 
 			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
 
 			constexpr float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
-
-			constexpr int INVALID_SE_HANDLE = -1;
 		}
 
 
@@ -166,7 +164,7 @@ namespace app
 			{
 				m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
 			}
-			if (rand() % SERCE_RAND_MAX < SERCH_RAND_RATE)
+			if (rand() % SAERCE_RAND_MAX < SEARCH_RAND_RATE)
 			{
 				SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
 			}
@@ -185,10 +183,10 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 
-			if (m_stepSE != INVALID_SE_HANDLE)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = INVALID_SE_HANDLE;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -217,7 +215,7 @@ namespace app
 				m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
 			}
 
-			if (m_stepSE == INVALID_SE_HANDLE)
+			if (m_stepSE == app::INVALID_SE_HANDLE)
 			{
 				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true, false);
 			}
@@ -231,7 +229,7 @@ namespace app
 			}
 			m_owner->Move();
 
-			if (m_stepSE == INVALID_SE_HANDLE)
+			if (m_stepSE == app::INVALID_SE_HANDLE)
 			{
 				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 			}
@@ -252,10 +250,10 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 
-			if (m_stepSE != INVALID_SE_HANDLE)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = INVALID_SE_HANDLE;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -291,7 +289,7 @@ namespace app
 
 		void EnemyChaseState::Update()
 		{
-			if (m_owner->GetStickLAmount() < STHICK_AMOUNT_THRESHOLD) {
+			if (m_owner->GetStickLAmount() < STICK_AMOUNT_THRESHOLD) {
 				return;
 			}
 
@@ -302,10 +300,10 @@ namespace app
 		void EnemyChaseState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
-			if (m_stepSE != INVALID_SE_HANDLE)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = INVALID_SE_HANDLE;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -363,7 +361,7 @@ namespace app
 
 		void EnemySwimState::Update()
 		{
-			if (m_owner->GetStickLAmount() < STHICK_AMOUNT_THRESHOLD)
+			if (m_owner->GetStickLAmount() < STICK_AMOUNT_THRESHOLD)
 			{
 				return;
 			}
@@ -520,7 +518,7 @@ namespace app
 
 		void EnemyReturnHomeState::Update()
 		{
-			if (m_owner->GetStickLAmount() < STHICK_AMOUNT_THRESHOLD) {
+			if (m_owner->GetStickLAmount() < STICK_AMOUNT_THRESHOLD) {
 				return;
 			}
 			m_owner->Move();
@@ -531,10 +529,10 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 
-			if (m_stepSE != INVALID_SE_HANDLE)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = INVALID_SE_HANDLE;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 
