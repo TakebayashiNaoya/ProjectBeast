@@ -32,6 +32,10 @@ namespace app
 				m_modelRender.Init(initData.m_tkmFilePath, m_animationClips.get(), m_clipNum, true, m_upAxis);
 				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 				m_modelRender.Update();
+
+				// ディザリングマネージャーに登録
+				OcclusionDitherManager::Get().Register(&m_modelRender);
+
 				m_modelReady = true;
 
 				m_characterStateMachine->ReEnterCurrentState();
@@ -55,6 +59,8 @@ namespace app
 
 		CharacterBase::~CharacterBase()
 		{
+			OcclusionDitherManager::Get().Unregister(&m_modelRender);
+
 			// PhysicsWorldからRigidBodyを明示的に除去してから破棄する
 			m_characterController.RemoveRigidBoby();
 		}
@@ -89,6 +95,10 @@ namespace app
 				m_modelRender.Init(initData.m_tkmFilePath, m_animationClips.get(), m_clipNum, true, m_upAxis);
 				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 				m_modelRender.Update();
+
+				// ディザリングマネージャーに登録
+				OcclusionDitherManager::Get().Register(&m_modelRender);
+
 				m_modelReady = true;
 
 				// モデルロード完了後に現在のステートのアニメーションを再適用する
@@ -97,32 +107,6 @@ namespace app
 			m_transform.m_position = m_characterStateMachine->GetTransform().m_position;
 			m_transform.m_rotation = m_characterStateMachine->GetTransform().m_rotation;
 			m_transform.m_scale = m_characterStateMachine->GetTransform().m_scale;
-
-			//Vector3 renderPos = m_transform.m_position;
-
-			//// 海クラスを取得
-			//auto* ocean = app::nature::Ocean::GetInstance();
-
-			//// デフォルトの目標は「物理エンジンのY座標（実際の地面の高さ）」にする
-			//float targetY = renderPos.y;
-
-			//// 「波追従モード」がONの時だけ、波の高さを目標にする
-			//if (m_isWaveFollowMode && ocean != nullptr)
-			//{
-			//	targetY = ocean->SampleWaveHeight(renderPos.x, renderPos.z) + SWIM_Y_OFFSET;
-			//}
-
-			//// 初回実行時、または座標が大きくワープした時は、一気に現在地に合わせる
-			//if (m_renderPosY == -9999.0f || std::abs(targetY - m_renderPosY) > 10.0f)
-			//{
-			//	m_renderPosY = targetY;
-			//}
-
-			//// 目標の高さ(targetY)に向かって、毎フレーム 0.2f (20%) ずつ滑らかに近づく
-			//m_renderPosY += (targetY - m_renderPosY) * 0.2f;
-
-			//// 計算された滑らかなY座標を描画用ポジションに適用
-			//renderPos.y = m_renderPosY;
 
 			// モデルの行列を更新
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
@@ -161,7 +145,8 @@ namespace app
 			// tksパス生成
 			std::string tksPath = data.fileName;
 			size_t pos = tksPath.find(".tkm");
-			if (pos != std::string::npos) {
+			if (pos != std::string::npos)
+			{
 				tksPath.replace(pos, 4, ".tks");
 			}
 

@@ -1,5 +1,4 @@
-﻿
-#include "BeastEnginePreCompile.h"
+﻿#include "BeastEnginePreCompile.h"
 #include "Physics.h"
 
 using namespace std;
@@ -76,6 +75,62 @@ namespace nsBeastEngine
 
 
 			/**
+			 * 全ヒットを収集するConvexResultCallback
+			 * ConvexSweepTestAllで使用する。
+			 * ClosestではなくAllHitsで動作し、通過した全オブジェクトを収集する。
+			 */
+			struct AllHitsConvexResultCallback : public btCollisionWorld::ConvexResultCallback
+			{
+				std::function<bool(const btCollisionObject&)> filterCallback;
+				std::vector<SweepHit>& results;
+
+				AllHitsConvexResultCallback(std::vector<SweepHit>& outResults)
+					: results(outResults)
+				{}
+
+				virtual bool needsCollision(btBroadphaseProxy* proxy0) const override
+				{
+					// 標準のグループ/マスク判定
+					bool collides = ConvexResultCallback::needsCollision(proxy0);
+					if (!collides) return false;
+
+					// ユーザー定義のフィルタがあれば実行
+					if (filterCallback) {
+						const btCollisionObject* obj = (const btCollisionObject*)proxy0->m_clientObject;
+						if (!filterCallback(*obj)) {
+							return false;
+						}
+					}
+					return true;
+				}
+
+				virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult& convexResult, bool normalInWorldSpace) override
+				{
+					SweepHit hit;
+					hit.point = ConvertVector3(convexResult.m_hitPointLocal);
+					if (normalInWorldSpace)
+					{
+						hit.normal = ConvertVector3(convexResult.m_hitNormalLocal);
+					}
+					else
+					{
+						// ローカル法線をワールド空間に変換する
+						btVector3 worldNormal = convexResult.m_hitCollisionObject->getWorldTransform().getBasis()
+							* convexResult.m_hitNormalLocal;
+						hit.normal = ConvertVector3(worldNormal);
+					}
+					hit.fraction = convexResult.m_hitFraction;
+					hit.colObject = const_cast<btCollisionObject*>(convexResult.m_hitCollisionObject);
+					hit.ptr = hit.colObject->getUserPointer();
+					results.push_back(hit);
+
+					// 1.0fを返すことで判定を打ち切らず、全ヒットを収集し続ける
+					return 1.0f;
+				}
+			};
+
+
+			/**
 			 * ContactCallback
 			 */
 			struct MyContactResultCallback : public btCollisionWorld::ContactResultCallback
@@ -100,12 +155,12 @@ namespace nsBeastEngine
 		 */
 
 
-		PhysicsWorld* PhysicsWorld::instance_ = nullptr;
+		PhysicsWorld* PhysicsWorld::instance = nullptr;
 
 
 		PhysicsWorld::PhysicsWorld()
 		{
-			//K2_ASSERT(instance_ == nullptr, "PhysicsWorldのインスタンスを複数作ることはできません。");
+			//K2_ASSERT(m_instance == nullptr, "PhysicsWorldのインスタンスを複数作ることはできません。");
 			Setup();
 		}
 
@@ -298,6 +353,32 @@ namespace nsBeastEngine
 			endTrans.setOrigin(ConvertVector3(end));
 
 			dynamicWorld_->convexSweepTest(m_shape, startTrans, endTrans, resultCallback, allowedCcdPenetration);
+		}
+
+
+		void PhysicsWorld::ConvexSweepTestAll(
+			const btConvexShape* shape,
+			const Vector3& start,
+			const Vector3& end,
+			std::vector<SweepHit>& results,
+			uint32_t filterMask,
+			std::function<bool(const btCollisionObject&)> filterCallback
+		) const
+		{
+			btTransform startTrans, endTrans;
+			startTrans.setIdentity();
+			endTrans.setIdentity();
+
+			startTrans.setOrigin(ConvertVector3(start));
+			endTrans.setOrigin(ConvertVector3(end));
+
+			// 全ヒット収集コールバックを使用する
+			AllHitsConvexResultCallback cb(results);
+			cb.m_collisionFilterGroup = -1;
+			cb.m_collisionFilterMask = filterMask;
+			cb.filterCallback = filterCallback;
+
+			dynamicWorld_->convexSweepTest(shape, startTrans, endTrans, cb);
 		}
 
 

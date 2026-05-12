@@ -20,7 +20,7 @@ namespace app
 		{
 		public:
 			IStageObject() = default;
-			virtual ~IStageObject() = default;
+			virtual ~IStageObject();
 
 
 		protected:

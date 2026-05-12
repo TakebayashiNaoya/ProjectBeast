@@ -58,26 +58,6 @@ namespace app
 			void MapPolarBear();
 
 			/**
-			 * @brief 渦潮のアイコンをマップに表示する用
-			 */
-			void MapWhirlpool();
-
-			/**
-			 * @brief イグルーのアイコンをマップに表示する用
-			 */
-			void MapIgloo();
-
-			/**
-			 * @brief シロクマの巣のアイコンをマップに表示する用
-			 */
-			void MapPolarBearNest();
-
-			/**
-			 * @brief マップのフレームアイコンをカメラの向きに合わせて回転させる用
-			 */
-			void MapFrameRotation();
-
-			/**
 			 * @brief 親ペンギンのポインタを設定。
 			 * @param daddy 親ペンギンのポインタ。
 			 */
