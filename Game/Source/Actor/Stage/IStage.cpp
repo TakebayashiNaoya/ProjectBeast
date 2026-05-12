@@ -12,6 +12,13 @@ namespace app
 {
 	namespace actor
 	{
+		IStageObject::~IStageObject()
+		{
+			// ディザリングマネージャーから登録解除
+			OcclusionDitherManager::Get().Unregister(&m_modelRender);
+		}
+
+
 		void IStageObject::Start()
 		{
 			/** 物理判定を作成 */
@@ -38,12 +45,16 @@ namespace app
 					m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 					m_modelRender.Update();
 
-					if (m_IsNeedCollision) {
+					if (m_IsNeedCollision)
+					{
 						m_physicalObj.CreateFromModel(
 							m_modelRender.GetModel(),
 							m_modelRender.GetModel().GetWorldMatrix(),
 							nsBeastEngine::nsCollision::CollisionAttribute::Ground
 						);
+
+						// ディザリングマネージャーに登録
+						OcclusionDitherManager::Get().Register(&m_modelRender);
 					}
 
 					m_isModelLoaded = true;

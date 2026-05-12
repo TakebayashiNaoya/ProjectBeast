@@ -9,6 +9,19 @@
 
 namespace nsBeastEngine
 {
+	void ModelRender::SetExpandConstantBuffer2(void* data)
+	{
+		// GBufferモデルはb2をPBRParamで使用しているため設定しない
+		m_model.SetExpandData2(data);
+		m_forwardRenderModel.SetExpandData2(data);
+	}
+
+	void ModelRender::SetExpandConstantBuffer3(void* data)
+	{
+		// GBufferパスのディザリングはb3を使用する
+		m_renderToGBufferModel.SetExpandData3(data);
+	}
+
 	void ModelRender::Init(
 		const char* filePath,
 		AnimationClip* animationClips,
@@ -131,6 +144,16 @@ namespace nsBeastEngine
 		gBufferInitData.m_expandConstantBuffer2 = &m_pbrParam;
 		gBufferInitData.m_expandConstantBufferSize2 = sizeof(PBRParam);
 
+		// ディザリングCB（b3）のプレースホルダーを設定する
+		// OcclusionDitherManager::Register後にSetExpandConstantBuffer3()で実際のCBに差し替えられる
+		gBufferInitData.m_expandConstantBuffer3 = &m_ditherCbPlaceholder;
+		gBufferInitData.m_expandConstantBufferSize3 = sizeof(SDitherCbPlaceholder);
+
+		// モデル単位ディザリングCB（b4）を設定する
+		// SetDitherAlpha()でmodelDitherAlphaを更新すると次のDraw()でGPUに自動転送される
+		gBufferInitData.m_expandConstantBuffer4 = &m_modelDitherCb;
+		gBufferInitData.m_expandConstantBufferSize4 = sizeof(SModelDitherCb);
+
 		m_renderToGBufferModel.Init(gBufferInitData);
 	}
 
@@ -159,7 +182,7 @@ namespace nsBeastEngine
 		m_animationClips = animtionClips;
 		m_numAnimationClips = numAnimationClips;
 		if (m_animationClips != nullptr && m_skeletonRef != nullptr) {
-			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
+			m_animation.Init(*m_skeletonRef, m_animationClips, m_numAnimationClips);
 		}
 	}
 

@@ -26,6 +26,10 @@ namespace nsK2EngineLow {
 		int m_expandConstantBufferSize = 0;										//ユーザー拡張の定数バッファのサイズ（b1）。
 		void* m_expandConstantBuffer2 = nullptr;								//ユーザー拡張の定数バッファ（b2）。
 		int m_expandConstantBufferSize2 = 0;									//ユーザー拡張の定数バッファのサイズ（b2）。
+		void* m_expandConstantBuffer3 = nullptr;								//ユーザー拡張の定数バッファ（b3）。
+		int m_expandConstantBufferSize3 = 0;									//ユーザー拡張の定数バッファのサイズ（b3）。
+		void* m_expandConstantBuffer4 = nullptr;								//ユーザー拡張の定数バッファ（b4）。
+		int m_expandConstantBufferSize4 = 0;									//ユーザー拡張の定数バッファのサイズ（b4）。
 		std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV> m_expandShaderResoruceView = { nullptr };	//ユーザー拡張のシェーダーリソースビュー。
 		EnModelUpAxis m_modelUpAxis = enModelUpAxisZ;							//モデルの上方向。
 		std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> m_colorBufferFormat = {
@@ -126,9 +130,39 @@ namespace nsK2EngineLow {
 			m_meshParts.SetMulColor(mulColor);
 		}
 		/// <summary>
+		/// ユーザー拡張の定数バッファ（b2）のデータポインタをInit後に差し替える。
+		/// NOTE: OcclusionDitherManagerからRegister時に呼ばれる。
+		///       次のDraw()からdataの中身が自動でGPUに転送される。
+		/// </summary>
+		/// <param name="data">新しいデータポインタ</param>
+		void SetExpandData2(void* data)
+		{
+			m_meshParts.SetExpandData2(data);
+		}
+		/// <summary>
+		/// ユーザー拡張の定数バッファ（b3）のデータポインタをInit後に差し替える。
+		/// NOTE: OcclusionDitherManagerからRegister時に呼ばれる。
+		///       次のDraw()からdataの中身が自動でGPUに転送される。
+		/// </summary>
+		/// <param name="data">新しいデータポインタ</param>
+		void SetExpandData3(void* data)
+		{
+			m_meshParts.SetExpandData3(data);
+		}
+		/// <summary>
+		/// ユーザー拡張の定数バッファ（b4）のデータポインタをInit後に差し替える。
+		/// NOTE: ModelRender::SetDitherAlpha()経由で呼ばれる。
+		///       次のDraw()からdataの中身が自動でGPUに転送される。
+		/// </summary>
+		/// <param name="data">新しいデータポインタ</param>
+		void SetExpandData4(void* data)
+		{
+			m_meshParts.SetExpandData4(data);
+		}
+		/// <summary>
 		/// TKMファイルを取得。
 		/// </summary>
-		/// <returns></returns>
+		/// <returns> TKMファイル</returns>
 		const TkmFile& GetTkmFile() const
 		{
 			return *m_tkmFile;
@@ -136,7 +170,7 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// 初期化されているか調べる。
 		/// </summary>
-		/// <returns></returns>
+		/// <returns> 初期化されているならtrue</returns>
 		bool IsInited() const
 		{
 			return m_isInited;

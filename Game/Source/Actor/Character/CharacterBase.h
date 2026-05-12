@@ -63,6 +63,12 @@ namespace app
 			 */
 			inline nsBeastEngine::nsCollision::CharacterController* GetCharacterController() { return &m_characterController; }
 			/**
+			 * @brief モデルレンダーを取得する
+			 * @details InGameSceneからOcclusionDitherManager::SetPlayerTarget()に渡すために使用する。
+			 * @return モデルレンダーへの参照
+			 */
+			nsBeastEngine::ModelRender& GetModelRender() { return m_modelRender; }
+			/**
 			 * @brief モデルの行列更新のみ行う（AI・ステートマシンは動かさない）
 			 * @detail カウントダウン中など、描画は必要だが動かしたくない場合に使用
 			 */

@@ -31,6 +31,7 @@
     <ClCompile Include="Graphics\Light\SceneLight.cpp" />
     <ClCompile Include="graphics\Light\SpotLight.cpp" />
     <ClCompile Include="graphics\ModelRender.cpp" />
+    <ClCompile Include="Graphics\OcclusionDitherManager.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
     <ClCompile Include="Nature\SkyCube.cpp" />
@@ -65,6 +66,7 @@
     <ClInclude Include="graphics\Light\SpotLight.h" />
     <ClInclude Include="graphics\ModelRender.h" />
     <ClInclude Include="graphics\MyRenderer.h" />
+    <ClInclude Include="Graphics\OcclusionDitherManager.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
     <ClInclude Include="Nature\INatureObject.h" />

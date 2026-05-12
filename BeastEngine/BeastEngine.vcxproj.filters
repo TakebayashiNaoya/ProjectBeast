@@ -84,6 +84,9 @@
     <ClCompile Include="Resource\AnimationClipResource.cpp">
       <Filter>Resource</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\OcclusionDitherManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -192,6 +195,9 @@
     </ClInclude>
     <ClInclude Include="Resource\SkeletonResource.h">
       <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\OcclusionDitherManager.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

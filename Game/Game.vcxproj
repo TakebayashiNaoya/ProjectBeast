@@ -281,7 +281,6 @@
     <ClCompile Include="Source\Core\StateMachineBase.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
-    <ClCompile Include="Source\Graphics\PBRParameter.cpp" />
     <ClCompile Include="Source\Graphics\PBRStatus.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
     <ClCompile Include="Source\Manager\IglooManager.cpp" />
