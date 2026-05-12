@@ -158,8 +158,20 @@ namespace app
 
 		void WhirlpoolManager::Render(RenderContext& rc)
 		{
+			const nsBeastEngine::Frustum& frustum = g_renderingEngine->GetFrustum();
+
 			ForEach([&](Whirlpool* whirlpool)
 				{
+					// 球判定で視錐台外の渦潮をスキップする
+					// 中心座標はトランスフォームの位置、半径はメッシュ半径×最大スケールXZで近似する
+					const Vector3& center = whirlpool->GetTransform().m_position;
+					const float    radius = whirlpool->GetMaxScaleXZ() * Whirlpool::MESH_RADIUS;
+
+					if (!frustum.IsIntersectSphere(center, radius))
+					{
+						return;
+					}
+
 					whirlpool->RenderWrapper(rc);
 				});
 		}

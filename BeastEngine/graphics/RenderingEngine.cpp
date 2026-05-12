@@ -50,6 +50,11 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
 	{
+		// ビュープロジェクション行列からフラスタム（視錐台）を更新する
+		Matrix viewProjMatrix;
+		viewProjMatrix.Multiply(g_camera3D->GetViewMatrix(), g_camera3D->GetProjectionMatrix());
+		m_frustum.Update(viewProjMatrix);
+
 		// G-Bufferへの描画処理
 		RenderToGBuffer(rc);
 
@@ -151,7 +156,6 @@ namespace nsBeastEngine
 		spriteInitData.m_textures[enGBuffer_Albedo] = &m_gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
 		spriteInitData.m_textures[enGBuffer_Normal] = &m_gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
 		spriteInitData.m_textures[enGBuffer_Specular] = &m_gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
-		//spriteInitData.m_textures[enGBufferShadow] = &m_shadow.GetShadowTarget().GetRenderTargetTexture();
 
 		spriteInitData.m_fxFilePath = "Assets/shader/DeferredLighting.fx";
 
@@ -219,7 +223,7 @@ namespace nsBeastEngine
 
 		// レンダリングターゲットをG-Bufferに変更して書き込む
 		RenderTarget* rts[] = {
-			&m_gBuffer[enGBuffer_Albedo]   // 0番目のレンダリングターゲット
+			&m_gBuffer[enGBuffer_Albedo]    // 0番目のレンダリングターゲット
 			,&m_gBuffer[enGBuffer_Normal]   // 1番目のレンダリングターゲット
 			,&m_gBuffer[enGBuffer_Specular] // 2番目のレンダリングターゲット
 		};
@@ -233,9 +237,14 @@ namespace nsBeastEngine
 		// レンダリングターゲットをクリア
 		rc.ClearRenderTargetViews(ARRAYSIZE(rts), rts);
 
-		// まとめてモデルレンダーを描画
+		// フラスタムカリングで視錐台内のモデルのみ描画する
 		for (auto& MobjData : m_deferredModelList)
 		{
+			if (MobjData->IsCullingEnabled() &&
+				!m_frustum.IsIntersectAABBWorld(MobjData->GetWorldAABBMin(), MobjData->GetWorldAABBMax()))
+			{
+				continue;
+			}
 			MobjData->OnDraw(rc);
 		}
 
@@ -274,8 +283,14 @@ namespace nsBeastEngine
 			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
 		);
 
-		// フォワードレンダリングで描画するオブジェクトを描画
-		for (auto& renderObj : m_forwardModelList) {
+		// フラスタムカリングで視錐台内のモデルのみ描画する
+		for (auto& renderObj : m_forwardModelList)
+		{
+			if (renderObj->IsCullingEnabled() &&
+				!m_frustum.IsIntersectAABBWorld(renderObj->GetWorldAABBMin(), renderObj->GetWorldAABBMax()))
+			{
+				continue;
+			}
 			renderObj->OnDraw(rc);
 		}
 
