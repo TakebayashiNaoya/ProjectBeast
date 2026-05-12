@@ -450,6 +450,8 @@
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
     <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h" />
+    <ClInclude Include="Source\UI\Model\MiniMapParameter.h" />
+    <ClInclude Include="Source\UI\Model\MiniMapStatus.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h" />
     <ClInclude Include="Source\UI\Model\SearchParameter.h" />

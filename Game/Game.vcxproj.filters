@@ -747,6 +747,12 @@
     <ClInclude Include="Source\UI\Menus\InGameButtonMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\Model\MiniMapParameter.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\MiniMapStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
