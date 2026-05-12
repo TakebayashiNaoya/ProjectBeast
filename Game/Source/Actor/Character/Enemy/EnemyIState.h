@@ -215,6 +215,10 @@ namespace app
 		public:
 			EnemySwimState(EnemyStateMachine* owner);
 			~EnemySwimState() override = default;
+
+
+		private:
+			float m_splashEffectTimer;
 		};
 
 
