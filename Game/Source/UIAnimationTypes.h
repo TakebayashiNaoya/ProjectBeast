@@ -28,6 +28,15 @@ namespace app
 			constexpr uint32_t ACHIEVE_FADE_OUT_ANIM_KEY = Hash32("fadeOutAnim");
 
 
+			/** 救助数のUIAnimationKey */
+			constexpr uint32_t RESCUE_REMAIN_SCALE_UP_ANIM_KEY = Hash32("rScaleUpAnim");
+			constexpr uint32_t RESCUE_REMAIN_SCALE_DOWN_ANIM_KEY = Hash32("rScaleDownAnim");
+			constexpr uint32_t RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY = Hash32("rTlanslateUpAnim");
+			constexpr uint32_t RESCUE_REMAIN_TLANSLATE_DOWN_ANIM_KEY = Hash32("rTlanslateDownAnim");
+			constexpr uint32_t RESCUE_TOTAL_SCALE_DOWN_ANIM_KEY = Hash32("tScaleDownAnim");
+			constexpr uint32_t RESCUE_TOTAL_TLANSLATE_DOWN_ANIM_KEY = Hash32("tTlanslateDownAnim");
+
+
 			constexpr uint32_t CPREACTION_SWAY_ANIM_KEY = Hash32("swayAnimation");
 		}
 	}
