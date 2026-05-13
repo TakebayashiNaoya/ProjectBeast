@@ -1,0 +1,39 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type" : "UIIcon",
+                "name" : "speechBubble",
+                "asset" : "Assets/spriteData/UI/Icon/CPReaction/SpeechBubble.dds",
+                "width" : 130,
+                "height" : 130,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "troubleReaction",
+                "asset" : "Assets/spriteData/UI/Icon/CPReaction/TroubleReaction.dds",
+                "width" : 70,
+                "height" : 70,
+                "position" : [0, 0, 0],
+                "scale" : [0.6, 0.6, 0.6],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "happyReaction",
+                "asset" : "Assets/spriteData/UI/Icon/CPReaction/HappyReaction.dds",
+                "width" : 70,
+                "height" : 70,
+                "position" : [0, 0, 0],
+                "scale" : [0.6, 0.6, 0.6],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            }
+        ]
+    }
+}

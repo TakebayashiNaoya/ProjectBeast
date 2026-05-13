@@ -19,6 +19,7 @@
 #include "Source/UI/Layout.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
 #include "Source/UI/Menus/CountDownMenu.h"
+#include "Source/UI/Menus/CPReactionSystem.h"
 #include "Source/UI/Menus/EnemySleepingMenu.h"
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
@@ -42,6 +43,9 @@ namespace app
 		/** 睡眠中クマの探索半径 */
 		constexpr float SLEEPING_ENEMY_SEARCH_RANGE = 1000.0f;
 	}
+
+
+	InGameUIManager* InGameUIManager::m_instance = nullptr;
 
 
 	InGameUIManager::InGameUIManager()
@@ -69,6 +73,7 @@ namespace app
 		delete m_titleEventLayout;
 		delete m_achievementNotificationLayout;
 		delete m_inGameButtonLayout;
+		delete m_cpReactionSystem;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -198,6 +203,9 @@ namespace app
 		);
 		m_inGameButtonMenu = m_inGameButtonLayout->GetMenu<ui::InGameButtonMenu>();
 
+		m_cpReactionSystem = new ui::CPReactionSystem();
+		m_cpReactionSystem->Initialize();
+
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);
 	}
@@ -317,6 +325,7 @@ namespace app
 			if (layout) layout->Update();
 		}
 
+		if (m_cpReactionSystem) m_cpReactionSystem->Update();
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Update();
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Update();
@@ -351,6 +360,7 @@ namespace app
 		}
 
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Render(rc);
+		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Render(rc);
 		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);

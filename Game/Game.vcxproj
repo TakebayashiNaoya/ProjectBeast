@@ -305,6 +305,8 @@
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\CountDownMenu.cpp" />
+    <ClCompile Include="Source\UI\Menus\CPReactionMenu.cpp" />
+    <ClCompile Include="Source\UI\Menus\CPReactionSystem.cpp" />
     <ClCompile Include="Source\UI\Menus\EnemySleepingMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\EventMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\FinishMenu.cpp" />
@@ -317,6 +319,9 @@
     <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\RemainingChildMenu.cpp" />
+    <ClCompile Include="Source\UI\Model\CPReactionAnimStatus.cpp" />
+    <ClCompile Include="Source\UI\Model\CPReactionStatus.cpp" />
+    <ClCompile Include="Source\UI\Model\MasterCPReactionParameter.cpp" />
     <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\SearchMenu.cpp" />
@@ -430,6 +435,8 @@
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h" />
     <ClInclude Include="Source\UI\Menus\CountDownMenu.h" />
+    <ClInclude Include="Source\UI\Menus\CPReactionMenu.h" />
+    <ClInclude Include="Source\UI\Menus\CPReactionSystem.h" />
     <ClInclude Include="Source\UI\Menus\EnemySleepingMenu.h" />
     <ClInclude Include="Source\UI\Menus\EventMenu.h" />
     <ClInclude Include="Source\UI\Menus\FinishMenu.h" />
@@ -448,6 +455,9 @@
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
     <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h" />
+    <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h" />
+    <ClInclude Include="Source\UI\Model\CPReactionStatus.h" />
+    <ClInclude Include="Source\UI\Model\MasterCPReactionParameter.h" />
     <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h" />
     <ClInclude Include="Source\UI\Model\MiniMapParameter.h" />
     <ClInclude Include="Source\UI\Model\MiniMapStatus.h" />

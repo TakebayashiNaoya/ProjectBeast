@@ -1,0 +1,10 @@
+[
+  {
+    "comment": "子ペンギンのリアクションに使用するアイコンのパラメーター",
+    "swayTime" : 3.0,
+    "iconOffsetY" : 150,
+    "speechBubbleOffset" : [-100, 0, 0],
+    "troubleReactionOffset" : [-95, 10, 0],
+    "happyReactionOffset" : [-95, 10, 0]
+  }
+]

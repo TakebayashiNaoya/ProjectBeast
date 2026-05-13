@@ -34,6 +34,8 @@ namespace app
 		class TitleEventMenu;
 		class AchievementNotificationMenu;
 		class InGameButtonMenu;
+
+		class CPReactionSystem;
 	}
 
 
@@ -45,10 +47,12 @@ namespace app
 	 */
 	class InGameUIManager
 	{
-	public:
+	private:
 		InGameUIManager();
 		~InGameUIManager();
 
+
+	public:
 		/**
 		 * @brief 初期化
 		 * @detail Layoutの生成とBattleManagerへの配線を行う
@@ -122,6 +126,8 @@ namespace app
 		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionMenu; }
 		/** @brief チュートリアルMenuを取得 */
 		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
+		/** @brief 子ペンギンリアクションシステムを取得 */
+		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem; }
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
@@ -161,6 +167,9 @@ namespace app
 		std::vector<ui::Layout*> m_searchLayouts;
 
 
+		ui::CPReactionSystem* m_cpReactionSystem = nullptr;
+
+
 		//------------------------------------------------------------
 		// Menu（Layoutから取得したポインタ。所有権はLayoutが持つ）
 		//------------------------------------------------------------
@@ -180,5 +189,36 @@ namespace app
 		ui::AchievementNotificationMenu* m_achievementNotificationMenu = nullptr;
 		ui::InGameButtonMenu* m_inGameButtonMenu = nullptr;
 		std::vector<ui::SearchMenu*> m_searchMenus;
+
+
+		//============================================//
+		// シングルトン関連
+		//============================================//
+	public:
+		/** @brief インスタンスを生成する */
+		static void CreateInstance()
+		{
+			if (m_instance) return;
+			m_instance = new InGameUIManager();
+		}
+
+
+		/** @brief インスタンスを取得する */
+		static InGameUIManager* GetInstance()
+		{
+			return m_instance;
+		}
+
+
+		/** @brief インスタンスを破棄する */
+		static void DestroyInstance()
+		{
+			delete m_instance;
+			m_instance = nullptr;
+		}
+
+
+	private:
+		static InGameUIManager* m_instance;
 	};
 }
