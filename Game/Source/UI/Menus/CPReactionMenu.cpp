@@ -47,6 +47,9 @@ namespace app
 			, m_happyReaction(nullptr)
 			, m_type(EnReactionType::None)
 			, m_timer(0.0f)
+			, m_isPlayAnimation(false)
+			, m_status(nullptr)
+			, m_animStatus(nullptr)
 		{}
 
 
@@ -67,7 +70,6 @@ namespace app
 		{
 			m_animStatus.reset();
 			m_animStatus = std::make_unique<CPReactionAnimStatus>();
-			m_animStatus->SetUpUI();
 
 			// アイコンのポインタを取得
 			m_speechBubble = GetUI<UIIcon>(Hash32("speechBubble"));

@@ -17,7 +17,7 @@ namespace app
 	{
 		void CPReactionSystem::SetTarget(actor::ChildPenguin* childPenguin, const EnReactionType type)
 		{
-			auto* menu = SeachTargettableMenu();
+			auto* menu = SearchTargettableMenu();
 			menu->SetTarget(childPenguin);
 			menu->PlayUIAnimation(type);
 		}
@@ -80,7 +80,7 @@ namespace app
 		}
 
 
-		CPReactionMenu* CPReactionSystem::SeachTargettableMenu()
+		CPReactionMenu* CPReactionSystem::SearchTargettableMenu()
 		{
 			// リアクションしていないメニューを探す
 			for (auto* menu : m_reactionMenus)

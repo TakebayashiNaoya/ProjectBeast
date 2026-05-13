@@ -69,7 +69,7 @@ namespace app
 			 * @brief ターゲットの子ペンギンに対応するリアクションMenuを探索して返す
 			 * @return 対象の子ペンギンに対応するリアクションMenuのポインタ。
 			 */
-			CPReactionMenu* SeachTargettableMenu();
+			CPReactionMenu* SearchTargettableMenu();
 
 
 		private:

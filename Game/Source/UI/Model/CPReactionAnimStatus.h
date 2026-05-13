@@ -14,10 +14,11 @@ namespace app
 	namespace ui
 	{
 		/**
-		 * @biref CPReactionのステータス
+		 * @brief CPReactionのステータス
 		 */
 		class CPReactionAnimStatus : public UIAnimationStatus
 		{
+		public:
 			/** JSONから読み込むときの構造体のAnimデータ */
 			struct AnimData
 			{

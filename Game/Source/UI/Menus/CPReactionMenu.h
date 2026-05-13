@@ -111,7 +111,6 @@ namespace app
 			 */
 			void PositionUpdate();
 			/**
-			/**
 			 * @brief リアクションの描画フラグを更新する
 			 */
 			void DrawFlagUpdate();
