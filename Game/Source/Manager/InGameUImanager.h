@@ -126,7 +126,7 @@ namespace app
 		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionMenu; }
 		/** @brief チュートリアルMenuを取得 */
 		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
-		/** @brief 残り子ペンギンMenuを取得 */
+		/** @brief 子ペンギンリアクションシステムを取得 */
 		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem; }
 
 		/**

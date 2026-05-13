@@ -1,6 +1,6 @@
 ﻿/**
  * @file MasterCPReactionParameter.h
- * @biref CPReactionのパラメーター管理クラス
+ * @brief CPReactionのパラメーター管理クラス
  * @author 藤谷
  */
 #pragma once

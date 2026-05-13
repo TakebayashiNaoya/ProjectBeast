@@ -1,6 +1,6 @@
 ﻿/**
  * @file CPReactionStatus.h
- * @biref CPReactionのステータス
+ * @brief CPReactionのステータス
  * @author 藤谷
  */
 #pragma once

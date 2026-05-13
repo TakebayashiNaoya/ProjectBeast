@@ -1,6 +1,6 @@
 ﻿/**
  * @file CPReactionAnimStatus.h
- * @biref CPReactionのアニメーションステータス
+ * @brief CPReactionのアニメーションステータス
  * @author 藤谷
  */
 #pragma once
