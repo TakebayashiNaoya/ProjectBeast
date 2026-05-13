@@ -9,6 +9,21 @@
 
 namespace nsBeastEngine
 {
+	void ModelRender::SetExpandConstantBuffer2(void* data)
+	{
+		// GBufferモデルはb2をPBRParamで使用しているため設定しない
+		m_model.SetExpandData2(data);
+		m_forwardRenderModel.SetExpandData2(data);
+	}
+
+
+	void ModelRender::SetExpandConstantBuffer3(void* data)
+	{
+		// GBufferパスのディザリングはb3を使用する
+		m_renderToGBufferModel.SetExpandData3(data);
+	}
+
+
 	void ModelRender::Init(
 		const char* filePath,
 		AnimationClip* animationClips,
@@ -55,6 +70,12 @@ namespace nsBeastEngine
 		else {
 			InitRenderToGBufferModel(modelInitData);
 		}
+
+		// スケルトンを持つか記録する
+		m_hasSkeleton = m_skeletonRef->IsInited();
+
+		// ローカルAABBをtkmから計算する（スケルトンなしの場合に使用）
+		CalcLocalAABBFromTkm(filePath);
 	}
 
 
@@ -103,6 +124,12 @@ namespace nsBeastEngine
 		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr) {
 			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
 		}
+
+		// スケルトンを持つか記録する
+		m_hasSkeleton = (m_skeletonRef != nullptr) && m_skeletonRef->IsInited();
+
+		// ローカルAABBをtkmから計算する（スケルトンなしの場合に使用）
+		CalcLocalAABBFromTkm(initData.m_tkmFilePath);
 	}
 
 
@@ -118,18 +145,27 @@ namespace nsBeastEngine
 		gBufferInitData.m_vsSkinEntryPointFunc = "VSMainSkin";
 
 		// シャドウは現在未実装のためPSMainを使用
-		// シャドウ実装時はPSMainShadowRecieverに切り替える
 		gBufferInitData.m_psEntryPointFunc = "PSMain";
 
 		// GBufferのカラーバッファフォーマットを設定する
-		gBufferInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// アルベド
-		gBufferInitData.m_colorBufferFormat[1] = DXGI_FORMAT_R8G8B8A8_UNORM;		// 法線
+		gBufferInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;  // アルベド
+		gBufferInitData.m_colorBufferFormat[1] = DXGI_FORMAT_R8G8B8A8_UNORM;      // 法線
 		// dirLightScale・ambientScaleが1.0を超える値を扱うためR32G32B32A32_FLOATを使用する
-		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// PBRパラメータ
+		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;  // PBRパラメータ
 
 		// PBR補正パラメータをb2に設定する
 		gBufferInitData.m_expandConstantBuffer2 = &m_pbrParam;
 		gBufferInitData.m_expandConstantBufferSize2 = sizeof(PBRParam);
+
+		// ディザリングCB（b3）のプレースホルダーを設定する
+		// OcclusionDitherManager::Register後にSetExpandConstantBuffer3()で実際のCBに差し替えられる
+		gBufferInitData.m_expandConstantBuffer3 = &m_ditherCbPlaceholder;
+		gBufferInitData.m_expandConstantBufferSize3 = sizeof(SDitherCbPlaceholder);
+
+		// モデル単位ディザリングCB（b4）を設定する
+		// SetDitherAlpha()でmodelDitherAlphaを更新すると次のDraw()でGPUに自動転送される
+		gBufferInitData.m_expandConstantBuffer4 = &m_modelDitherCb;
+		gBufferInitData.m_expandConstantBufferSize4 = sizeof(SModelDitherCb);
 
 		m_renderToGBufferModel.Init(gBufferInitData);
 	}
@@ -159,7 +195,7 @@ namespace nsBeastEngine
 		m_animationClips = animtionClips;
 		m_numAnimationClips = numAnimationClips;
 		if (m_animationClips != nullptr && m_skeletonRef != nullptr) {
-			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
+			m_animation.Init(*m_skeletonRef, m_animationClips, m_numAnimationClips);
 		}
 	}
 
@@ -184,6 +220,124 @@ namespace nsBeastEngine
 	}
 
 
+	void ModelRender::CalcLocalAABBFromTkm(const char* filePath)
+	{
+		if (filePath == nullptr)
+		{
+			// ファイルパスがない場合はカリングを無効化する
+			m_isCullingEnabled = false;
+			return;
+		}
+
+		// バンクからtkmファイルを取得する
+		const TkmFile* tkmFile = g_engine->GetTkmFileFromBank(filePath);
+		if (tkmFile == nullptr)
+		{
+			// tkmファイルが取得できない場合はカリングを無効化する
+			m_isCullingEnabled = false;
+			return;
+		}
+
+		Vector3 vMin(FLT_MAX, FLT_MAX, FLT_MAX);
+		Vector3 vMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		bool hasVertex = false;
+
+		// 全メッシュの全頂点を走査してAABBを計算する
+		tkmFile->QueryMeshParts([&](const TkmFile::SMesh& mesh)
+			{
+				for (const auto& vertex : mesh.vertexBuffer)
+				{
+					vMin.x = min(vMin.x, vertex.pos.x);
+					vMin.y = min(vMin.y, vertex.pos.y);
+					vMin.z = min(vMin.z, vertex.pos.z);
+
+					vMax.x = max(vMax.x, vertex.pos.x);
+					vMax.y = max(vMax.y, vertex.pos.y);
+					vMax.z = max(vMax.z, vertex.pos.z);
+
+					hasVertex = true;
+				}
+			});
+
+		if (!hasVertex)
+		{
+			// 頂点が1つも存在しない場合はカリングを無効化する
+			m_isCullingEnabled = false;
+			return;
+		}
+
+		m_localAABB.Init(vMax, vMin);
+	}
+
+
+	void ModelRender::UpdateWorldAABB()
+	{
+		if (m_hasSkeleton && m_skeletonRef != nullptr && m_skeletonRef->IsInited())
+		{
+			// スケルトンあり: 各ボーンのワールド行列の平行移動成分からAABBを構築する
+			// GetBone(i)->GetWorldMatrix() はボーン自身のワールド座標を持つ行列であり、
+			// GetBoneMatricesTopAddress() のスキニング行列（invBindPose * worldMatrix）とは異なる
+			const int numBones = m_skeletonRef->GetNumBones();
+
+			Vector3 vMin(FLT_MAX, FLT_MAX, FLT_MAX);
+			Vector3 vMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+			for (int i = 0; i < numBones; i++)
+			{
+				// v[3] がワールド行列の平行移動成分（ボーンのワールド座標）
+				const Vector3 bonePos(
+					m_skeletonRef->GetBone(i)->GetWorldMatrix().v[3].x,
+					m_skeletonRef->GetBone(i)->GetWorldMatrix().v[3].y,
+					m_skeletonRef->GetBone(i)->GetWorldMatrix().v[3].z
+				);
+
+				vMin.x = min(vMin.x, bonePos.x);
+				vMin.y = min(vMin.y, bonePos.y);
+				vMin.z = min(vMin.z, bonePos.z);
+
+				vMax.x = max(vMax.x, bonePos.x);
+				vMax.y = max(vMax.y, bonePos.y);
+				vMax.z = max(vMax.z, bonePos.z);
+			}
+
+			// アニメーションで頂点がボーン位置より外に出る可能性があるため安全マージンを加算する
+			vMin.x -= BONE_AABB_MARGIN;
+			vMin.y -= BONE_AABB_MARGIN;
+			vMin.z -= BONE_AABB_MARGIN;
+
+			vMax.x += BONE_AABB_MARGIN;
+			vMax.y += BONE_AABB_MARGIN;
+			vMax.z += BONE_AABB_MARGIN;
+
+			m_worldAABBMin = vMin;
+			m_worldAABBMax = vMax;
+		}
+		else
+		{
+			// スケルトンなし: ローカルAABBの8頂点をワールド行列で変換して包含AABBを求める
+			Vector3 worldVertices[8];
+			m_localAABB.CalcVertexPositions(worldVertices, m_model.GetWorldMatrix());
+
+			Vector3 vMin(FLT_MAX, FLT_MAX, FLT_MAX);
+			Vector3 vMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+			for (int i = 0; i < 8; i++)
+			{
+				vMin.x = min(vMin.x, worldVertices[i].x);
+				vMin.y = min(vMin.y, worldVertices[i].y);
+				vMin.z = min(vMin.z, worldVertices[i].z);
+
+				vMax.x = max(vMax.x, worldVertices[i].x);
+				vMax.y = max(vMax.y, worldVertices[i].y);
+				vMax.z = max(vMax.z, worldVertices[i].z);
+			}
+
+			m_worldAABBMin = vMin;
+			m_worldAABBMax = vMax;
+		}
+	}
+
+
 	void ModelRender::Update()
 	{
 		/** モデルのワールド行列を更新する */
@@ -196,6 +350,9 @@ namespace nsBeastEngine
 
 		/** アニメーションを進める */
 		m_animation.Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);
+
+		/** ワールドAABBを更新する */
+		UpdateWorldAABB();
 	}
 
 

@@ -16,9 +16,43 @@ namespace nsBeastEngine
 	struct PBRParam
 	{
 		float m_dirLightScale = 1.0f;  // ディレクションライト強度倍率
-		float m_ambientScale = 1.0f;  // 環境光強度倍率
-		float m_metallicOffset = 0.0f;  // metallicオフセット
-		float m_smoothOffset = 0.0f;  // smoothオフセット
+		float m_ambientScale = 1.0f;   // 環境光強度倍率
+		float m_metallicOffset = 0.0f; // metallicオフセット
+		float m_smoothOffset = 0.0f;   // smoothオフセット
+	};
+
+	/**
+	 * @brief ディザリングCB（b3）のプレースホルダー
+	 * @details
+	 *   InitRenderToGBufferModel時にb3のConstantBufferを確保するために使用する。
+	 *   実際のデータはOcclusionDitherManager::Register時に
+	 *   SetExpandConstantBuffer3()でSDitherCbのポインタに差し替えられる。
+	 *   SDitherCbと同じサイズにすること。
+	 */
+	struct SDitherCbPlaceholder
+	{
+		Vector3 cameraWorldPos = Vector3::Zero;
+		float   cylinderRadius = 0.0f;
+		Vector3 targetWorldPos = Vector3::Zero;
+		float   depthBias = 0.0f;
+		float   ditherStrength = 0.0f;
+		float   pad[3] = { 0.0f, 0.0f, 0.0f };
+	};
+
+	/**
+	 * @brief モデル単位ディザリング用の定数バッファ（b4）
+	 * @details
+	 *   RenderToGBuffer.fx の cbuffer ModelDitherCb : register(b4) に対応する。
+	 *   OcclusionDitherManager（b3）によるカメラ遮蔽ディザリングとは独立して動作する。
+	 *   SetDitherAlpha()で更新し、次のDraw()でGPUに自動転送される。
+	 *   16バイト境界を合わせるためにパディングを含む。
+	 */
+	struct SModelDitherCb
+	{
+		/** モデル単位の透過率（0.0f=オフ, 1.0f=完全消去） */
+		float modelDitherAlpha = 0.0f;
+		/** パディング（16バイト境界用） */
+		float pad[3] = { 0.0f, 0.0f, 0.0f };
 	};
 
 
@@ -53,6 +87,12 @@ namespace nsBeastEngine
 		 * @param z z座標
 		 */
 		inline void SetPosition(const float& x, const float& y, const float& z) { m_position = Vector3(x, y, z); }
+
+		/**
+		 * @brief 位置の取得
+		 * @return 位置
+		 */
+		inline const Vector3& GetPosition() const { return m_position; }
 
 		/**
 		 * @brief 回転の設定
@@ -108,7 +148,7 @@ namespace nsBeastEngine
 		/**
 		 * @brief フォワードレンダリングで描画するかどうかを設定する
 		 * @details SkyCubeなど、GBufferを経由せず直接フォワードで描画したいモデルに使用する。
-		 *          trueにした場合は m_frowardRenderModel が描画に使用される。
+		 *          trueにした場合は m_forwardRenderModel が描画に使用される。
 		 * @param isForward trueならフォワード、falseならディファード
 		 */
 		inline void SetForwardRendering(const bool isForward) { m_isForwardRender = isForward; }
@@ -118,6 +158,67 @@ namespace nsBeastEngine
 		 * @return 再生中ならtrue
 		 */
 		inline bool IsPlayingAnimation() const { return m_animation.IsPlaying(); }
+
+		/**
+		 * @brief ユーザー拡張の定数バッファ（b2）のデータポインタをInit後に差し替える
+		 * @details
+		 *   GBufferモデルはb2をPBRParamで使用しているため、
+		 *   m_modelとm_forwardRenderModelのみに設定する。
+		 * @param data 新しいデータポインタ
+		 */
+		void SetExpandConstantBuffer2(void* data);
+
+		/**
+		 * @brief ユーザー拡張の定数バッファ（b3）のデータポインタをInit後に差し替える
+		 * @details
+		 *   OcclusionDitherManagerからRegister時に呼ばれる。
+		 *   GBufferパス（m_renderToGBufferModel）のb3にDitherCbをセットする。
+		 *   次のDraw()からdataの中身が自動でGPUに転送される。
+		 *   渡すデータはSDitherCbPlaceholderと同サイズであること。
+		 * @param data 新しいデータポインタ（SDitherCb*を渡すこと）
+		 */
+		void SetExpandConstantBuffer3(void* data);
+
+		/**
+		 * @brief モデル単位のディザリング透過率を設定する
+		 * @details
+		 *   カメラ遮蔽ディザリング（OcclusionDitherManager/b3）とは独立して動作する。
+		 *   GBufferパス（m_renderToGBufferModel）のb4（ModelDitherCb）を更新する。
+		 *   Init呼び出し後にいつでも設定可能。次のDraw()からGPUに自動転送される。
+		 * @param alpha 透過率（0.0f=オフ, 1.0f=完全消去）
+		 */
+		inline void SetDitherAlpha(const float alpha)
+		{
+			m_modelDitherCb.modelDitherAlpha = alpha;
+		}
+
+		/**
+		 * @brief フラスタムカリングの有効/無効を設定する
+		 * @details
+		 *   デフォルトはtrue（有効）。
+		 *   常に描画が必要なオブジェクトはfalseに設定する。
+		 * @param enabled trueでカリング有効、falseで常に描画
+		 */
+		inline void SetCullingEnabled(const bool enabled) { m_isCullingEnabled = enabled; }
+
+		/**
+		 * @brief フラスタムカリングが有効か取得する
+		 * @return カリング有効ならtrue
+		 */
+		inline bool IsCullingEnabled() const { return m_isCullingEnabled; }
+
+		/**
+		 * @brief ワールド空間AABBの最小点を取得する
+		 * @details RenderingEngineのカリング判定で参照される。
+		 * @return ワールド空間AABBの最小点
+		 */
+		inline const Vector3& GetWorldAABBMin() const { return m_worldAABBMin; }
+
+		/**
+		 * @brief ワールド空間AABBの最大点を取得する
+		 * @return ワールド空間AABBの最大点
+		 */
+		inline const Vector3& GetWorldAABBMax() const { return m_worldAABBMax; }
 
 
 	public:
@@ -180,7 +281,7 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief RenderingEngineから呼ばれる実際の描画処理
-		 * @details フォワードの場合はm_frowardRenderModel、
+		 * @details フォワードの場合はm_forwardRenderModel、
 		 *          ディファードの場合はm_renderToGBufferModelを描画する
 		 * @param rc レンダリングコンテキスト
 		 */
@@ -243,6 +344,21 @@ namespace nsBeastEngine
 		 */
 		void UpdateWorldMatrixInModes();
 
+		/**
+		 * @brief tkmファイルの頂点からローカルAABBを計算する
+		 * @details Init時に1回だけ呼ばれる。スケルトンなしモデルで使用する。
+		 * @param filePath tkmファイルパス
+		 */
+		void CalcLocalAABBFromTkm(const char* filePath);
+
+		/**
+		 * @brief ワールド空間AABBを更新する
+		 * @details Update()の末尾で毎フレーム呼ばれる。
+		 *          スケルトンありの場合はボーン位置から、
+		 *          なしの場合はローカルAABBをワールド変換して構築する。
+		 */
+		void UpdateWorldAABB();
+
 
 	private:
 		/** 位置 */
@@ -273,14 +389,60 @@ namespace nsBeastEngine
 		float			m_animationSpeed;
 
 		/** フォワードレンダリングで描画するか */
-		bool m_isForwardRender = false;
+		bool		m_isForwardRender = false;
 		/** フォワードレンダリングで描画されるモデル */
-		Model m_forwardRenderModel;
+		Model		m_forwardRenderModel;
 		/** Gバッファに描画されるモデル */
-		Model m_renderToGBufferModel;
+		Model		m_renderToGBufferModel;
 		/** 描画するかどうか */
-		bool  m_visible = true;
+		bool		m_visible = true;
 		/** PBR補正パラメータ */
-		PBRParam m_pbrParam;
+		PBRParam	m_pbrParam;
+		/**
+		 * @brief ディザリングCB（b3）のプレースホルダー
+		 * @details
+		 *   InitRenderToGBufferModel時にb3のConstantBufferを確保するために使用する。
+		 *   OcclusionDitherManager::Register後はSetExpandConstantBuffer3()で
+		 *   実際のSDitherCbのポインタに差し替えられる。
+		 */
+		SDitherCbPlaceholder m_ditherCbPlaceholder;
+		/**
+		 * @brief モデル単位ディザリングCB（b4）
+		 * @details
+		 *   InitRenderToGBufferModel時にb4のConstantBufferを確保し、常にこの実体を参照する。
+		 *   SetDitherAlpha()でmodelDitherAlphaを更新すると次のDraw()でGPUに転送される。
+		 *   OcclusionDitherManager（b3）とは独立して動作する。
+		 */
+		SModelDitherCb m_modelDitherCb;
+		/**
+		 * @brief ローカル空間AABB（Init時に計算・以降不変）
+		 * @details スケルトンなしモデルのカリング判定の基準として使用する。
+		 */
+		AABB		m_localAABB;
+		/**
+		 * @brief ワールド空間AABBの最小点（毎フレーム更新）
+		 * @details RenderingEngineのカリング判定で参照される。
+		 */
+		Vector3		m_worldAABBMin = Vector3::Zero;
+		/**
+		 * @brief ワールド空間AABBの最大点（毎フレーム更新）
+		 * @details RenderingEngineのカリング判定で参照される。
+		 */
+		Vector3		m_worldAABBMax = Vector3::Zero;
+		/**
+		 * @brief フラスタムカリング有効フラグ
+		 * @details falseにすると常に描画される。デフォルトはtrue。
+		 */
+		bool		m_isCullingEnabled = true;
+		/**
+		 * @brief スケルトンを持つか（ボーンAABB更新の分岐用）
+		 * @details Init時にスケルトンが有効な場合にtrueが設定される。
+		 */
+		bool		m_hasSkeleton = false;
+		/**
+		 * @brief ボーンAABBの安全マージン（ワールド単位）
+		 * @details アニメーション中にボーン位置がAABBを超えないよう余裕を持たせる。
+		 */
+		static constexpr float BONE_AABB_MARGIN = 20.0f;
 	};
 }

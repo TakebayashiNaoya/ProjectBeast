@@ -25,12 +25,14 @@
     <ClCompile Include="BeastEnginePreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Geometry\Frustum.cpp" />
     <ClCompile Include="Graphics\FontRender.cpp" />
     <ClCompile Include="graphics\Light\HemisphereLight.cpp" />
     <ClCompile Include="graphics\Light\PointLight.cpp" />
     <ClCompile Include="Graphics\Light\SceneLight.cpp" />
     <ClCompile Include="graphics\Light\SpotLight.cpp" />
     <ClCompile Include="graphics\ModelRender.cpp" />
+    <ClCompile Include="Graphics\OcclusionDitherManager.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
     <ClCompile Include="Nature\SkyCube.cpp" />
@@ -56,6 +58,7 @@
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
+    <ClInclude Include="Geometry\Frustum.h" />
     <ClInclude Include="Graphics\FontRender.h" />
     <ClInclude Include="graphics\GraphicsEnums.h" />
     <ClInclude Include="graphics\IRenderer.h" />
@@ -65,6 +68,7 @@
     <ClInclude Include="graphics\Light\SpotLight.h" />
     <ClInclude Include="graphics\ModelRender.h" />
     <ClInclude Include="graphics\MyRenderer.h" />
+    <ClInclude Include="Graphics\OcclusionDitherManager.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
     <ClInclude Include="Nature\INatureObject.h" />

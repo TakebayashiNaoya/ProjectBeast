@@ -41,7 +41,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//////////////////////////////////////
 	// 初期化を行うコードを書くのはここまで！！！
 	//////////////////////////////////////
-	nsBeastEngine::nsCollision::PhysicsWorld::Initialize();
 
 #ifdef DEBUG
 	nsBeastEngine::nsCollision::PhysicsWorld::Get().EnableDrawDebugWireFrame();

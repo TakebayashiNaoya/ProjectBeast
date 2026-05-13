@@ -30,6 +30,10 @@ namespace nsK2EngineLow {
 		int expandDataSize,
 		void* expandData2,
 		int expandDataSize2,
+		void* expandData3,
+		int expandDataSize3,
+		void* expandData4,
+		int expandDataSize4,
 		const std::array<IShaderResource*, MAX_MODEL_EXPAND_SRV>& expandShaderResourceView,
 		const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET>& colorBufferFormat,
 		AlphaBlendMode alphaBlendMode,
@@ -70,6 +74,16 @@ namespace nsK2EngineLow {
 		if (expandData2) {
 			m_expandConstantBuffer2.Init(expandDataSize2, nullptr);
 			m_expandData2 = expandData2;
+		}
+		//ユーザー用の定数バッファを作成（b3）。
+		if (expandData3) {
+			m_expandConstantBuffer3.Init(expandDataSize3, nullptr);
+			m_expandData3 = expandData3;
+		}
+		//ユーザー用の定数バッファを作成（b4）。
+		if (expandData4) {
+			m_expandConstantBuffer4.Init(expandDataSize4, nullptr);
+			m_expandData4 = expandData4;
 		}
 		for (int i = 0; i < MAX_MODEL_EXPAND_SRV; i++) {
 			m_expandShaderResourceView[i] = expandShaderResourceView[i];
@@ -125,6 +139,12 @@ namespace nsK2EngineLow {
 				if (m_expandConstantBuffer2.IsValid()) {
 					m_descriptorHeap.RegistConstantBuffer(cbNo + 2, m_expandConstantBuffer2);
 				}
+				if (m_expandConstantBuffer3.IsValid()) {
+					m_descriptorHeap.RegistConstantBuffer(cbNo + 3, m_expandConstantBuffer3);
+				}
+				if (m_expandConstantBuffer4.IsValid()) {
+					m_descriptorHeap.RegistConstantBuffer(cbNo + 4, m_expandConstantBuffer4);
+				}
 				cbNo += NUM_CBV_ONE_MATERIAL;
 			}
 		}
@@ -145,7 +165,7 @@ namespace nsK2EngineLow {
 		D3D12_CULL_MODE cullMode
 	) {
 		//1. 頂点バッファを作成。
-		int numVertex = (int)tkmMesh.vertexBuffer.size();
+		int numVertex = static_cast<int>(tkmMesh.vertexBuffer.size());
 		int vertexStride = sizeof(TkmFile::SVertex);
 		auto mesh = new SMesh;
 		mesh->skinFlags.reserve(tkmMesh.materials.size());
@@ -255,6 +275,12 @@ namespace nsK2EngineLow {
 		}
 		if (m_expandData2) {
 			m_expandConstantBuffer2.CopyToVRAM(m_expandData2);
+		}
+		if (m_expandData3) {
+			m_expandConstantBuffer3.CopyToVRAM(m_expandData3);
+		}
+		if (m_expandData4) {
+			m_expandConstantBuffer4.CopyToVRAM(m_expandData4);
 		}
 		if (m_boneMatricesStructureBuffer.IsInited()) {
 			//ボーン行列を更新する。

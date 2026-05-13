@@ -1,5 +1,5 @@
 ﻿/**
- * @file SpriteRender.h
+ * @file FontRender.h
  * @brief フォントレンダークラス
  * @author 竹林尚哉
  */
@@ -98,8 +98,7 @@ namespace nsBeastEngine
 			, m_pivot(Sprite::DEFAULT_PIVOT)
 			, m_text(L"")
 			, m_color(Vector4::White)
-		{
-		}
+		{}
 		~FontRender() = default;
 
 		/**

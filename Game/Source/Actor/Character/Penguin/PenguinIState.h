@@ -85,7 +85,7 @@ namespace app
 
 
 		private:
-			uint32_t soundHandle = -1;
+			uint32_t m_soundHandle = -1;
 		};
 
 
@@ -113,7 +113,7 @@ namespace app
 
 
 		private:
-			uint32_t soundHandle = -1;
+			uint32_t m_soundHandle = -1;
 		};
 
 
@@ -189,7 +189,7 @@ namespace app
 
 
 		private:
-			uint32_t soundHandle = -1;
+			uint32_t m_soundHandle = -1;
 		};
 
 
@@ -238,6 +238,9 @@ namespace app
 		public:
 			PenguinSwimmingState(PenguinStateMachine* owner);
 			~PenguinSwimmingState() override = default;
+
+		private:
+			float m_splashEffectTimer;
 		};
 
 

@@ -26,6 +26,9 @@ namespace app
 			auto* slashIcon = GetUI<UIIcon>(Hash32("SlashIcon"));
 			if (slashIcon) slashIcon->m_isDraw = true;
 
+			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
+			if (bgIcon) bgIcon->m_isDraw = true;
+
 			// 残り子ペンギンの数更新
 			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
 			if (digit) {
@@ -47,12 +50,15 @@ namespace app
 
 		void RemainingChildMenu::InitializeLogic()
 		{
-			// 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのため）
+			// 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのwため）
 			auto* icon = GetUI<UIIcon>(Hash32("ChildPenguinIcon"));
 			if (icon) icon->m_isDraw = false;
 
 			auto* slashIcon = GetUI<UIIcon>(Hash32("SlashIcon"));
 			if (slashIcon) slashIcon->m_isDraw = false;
+
+			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
+			if (bgIcon) bgIcon->m_isDraw = false;
 
 			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
 			if (digit) digit->m_isDraw = false;

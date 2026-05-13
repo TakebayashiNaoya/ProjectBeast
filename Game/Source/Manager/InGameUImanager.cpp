@@ -24,6 +24,7 @@
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
 #include "Source/UI/Menus/InGameAchievementMenu.h"
+#include "Source/UI/Menus/InGameButtonMenu.h"
 #include "Source/UI/Menus/InGameTimerMenu.h"
 #include "Source/UI/Menus/MiniMapMenu.h"
 #include "Source/UI/Menus/PauseScreenMenu.h"
@@ -71,6 +72,7 @@ namespace app
 		delete m_miniMapLayout;
 		delete m_titleEventLayout;
 		delete m_achievementNotificationLayout;
+		delete m_inGameButtonLayout;
 		delete m_cpReactionSystem;
 
 		for (auto* layout : m_searchLayouts)
@@ -194,6 +196,12 @@ namespace app
 			"Assets/parameter/UI/inGameAchievement/InGameAchievement.json"
 		);
 		m_achievementMenu = m_achievementLayout->GetMenu<ui::InGameAchievementMenu>();
+
+		m_inGameButtonLayout = new ui::Layout();
+		m_inGameButtonLayout->Initialize<ui::InGameButtonMenu>(
+			"Assets/parameter/UI/inGameButton/InGameButton.json"
+		);
+		m_inGameButtonMenu = m_inGameButtonLayout->GetMenu<ui::InGameButtonMenu>();
 
 		m_cpReactionSystem = new ui::CPReactionSystem();
 		m_cpReactionSystem->Initialize();
@@ -324,6 +332,7 @@ namespace app
 		if (m_miniMapLayout)         m_miniMapLayout->Update();
 		if (m_achievementLayout)     m_achievementLayout->Update();
 		if (m_achievementNotificationLayout)	m_achievementNotificationLayout->Update();
+		if (m_inGameButtonLayout) m_inGameButtonLayout->Update();
 	}
 
 
@@ -358,6 +367,7 @@ namespace app
 		if (m_timerLayout)           m_timerLayout->Render(rc);
 		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
 		if (m_achievementNotificationLayout) m_achievementNotificationLayout->Render(rc);
+		if (m_inGameButtonLayout) m_inGameButtonLayout->Render(rc);
 	}
 
 

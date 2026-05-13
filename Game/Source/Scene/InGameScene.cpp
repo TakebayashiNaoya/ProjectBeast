@@ -171,7 +171,13 @@ namespace app
 			m_daddyPenguin->SetPosition(Vector3(0.0f, 27.3f, 0.0f));
 			m_daddyPenguin->StartWrapper();
 
-			/** DaddyPenguin生成後にUIManagerを初期化（睡眠クマ探索のキャプチャに使用） */
+			// DaddyPenguinをディザリングのプレイヤーターゲットとして登録する
+			// DaddyPenguinのモデルはデプス描画の対象になり、遮蔽対象リストには含まれない
+			nsBeastEngine::OcclusionDitherManager::Get().SetPlayerTarget(
+				&m_daddyPenguin->GetModelRender()
+			);
+
+			// DaddyPenguin生成後にUIManagerを初期化（睡眠クマ探索のキャプチャに使用）
 			InGameUIManager::GetInstance()->Initialize(m_daddyPenguin);
 
 			m_loadPhase = LoadPhase::Children;
@@ -270,13 +276,19 @@ namespace app
 	void InGameScene::UpdateGamePhase()
 	{
 		/** カメラは常に更新 */
-		auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(camera::GameCamera::ID());
+		auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+			camera::GameCamera::ID()
+		);
 		if (gameCamera)
 		{
 			camera::CameraData data = gameCamera->GetCameraData();
 			m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
 			gameCamera->SetState(data);
 		}
+
+		/** ディザリングマネージャーは毎フレーム更新して、カメラとプレイヤーの位置を反映させる */
+		OcclusionDitherManager::Get().SetPlayerTarget(&m_daddyPenguin->GetModelRender());
+		OcclusionDitherManager::Get().Update();
 
 		/** ステージは常に更新 */
 		actor::StageSystem::GetInstance()->Update();

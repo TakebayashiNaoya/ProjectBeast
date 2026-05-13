@@ -23,6 +23,40 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			const Vector3 SPLASH_EFFECT_SCALE = { 20.0f, 18.0f, 20.0f };
+
+			const Vector3 ATTACK_EFFECT_SCALE = { 5.0f, 5.0f, 5.0f };
+
+			constexpr float SPLASH_EFFECT_INTERVAL = 0.2f;// 泳ぎエフェクトの再生間隔
+
+			constexpr float MIN_MOVE_VELOCITY_SQ = 0.1f; // 泳ぎエフェクトを出すための最低速度の二乗
+
+			constexpr float MIN_SPLASH_SCALE_RATIO = 0.5f; // 泳ぎエフェクトの最小スケールの割合（速度が遅いときにエフェクトを小さくするため）
+
+			constexpr float MAX_SPLASH_SCALE_RATIO = 1.0f; // 泳ぎエフェクトの最大スケールの割合（速度が速いときにエフェクトを大きくするため）
+
+			const float ATTACK_IMPACT_TIME = 0.5f;
+
+			constexpr float FORWARD_LENGTH_NORMALIZE_SQ = 0.0001f; // 前方ベクトルの正規化を行うかどうかの閾値の二乗
+
+			constexpr float STICK_AMOUNT_THRESHOLD = 0.0001f; // 入力量がこの値以上のときに移動する
+
+			constexpr float STUN_DURATION = 2.0f; // スタンの持続時間
+
+			constexpr int SEARCH_RAND_RATE = 30; // 索敵状態に入るときのランダム率
+
+			constexpr int SAERCE_RAND_MAX = 100; // 索敵状態に入るときのランダム率の最大値
+
+			constexpr float MIN_SPEED = 0.1f; // 泳ぎエフェクトのスケールを決めるための最低速度
+
+			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
+
+			constexpr float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
+		}
+
+
 		EnemyIState::EnemyIState(EnemyStateMachine* owner)
 			: m_owner(owner)
 		{}
@@ -55,7 +89,6 @@ namespace app
 			// 音の検知処理
 			Vector3 loudestPos;
 			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
-			const float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
 
 			if (totalNoise >= SEARCH_THRESHOLD)
 			{
@@ -86,7 +119,7 @@ namespace app
 			m_owner->PlayAnimation(EnEnemyAnimationType::Stun);
 			m_owner->SetStickLAmount(0.0f); // 動かない
 
-			m_stunTimer = 2.0f;
+			m_stunTimer = STUN_DURATION;
 		}
 
 
@@ -100,10 +133,12 @@ namespace app
 			}
 		}
 
+
 		void EnemyStunState::Exit()
 		{
 			m_owner->SetStun(false);
 		}
+
 
 		EnemyStunState::EnemyStunState(EnemyStateMachine* owner)
 			:EnemyIState(owner),
@@ -129,7 +164,7 @@ namespace app
 			{
 				m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
 			}
-			if (rand() % 100 < 30)
+			if (rand() % SAERCE_RAND_MAX < SEARCH_RAND_RATE)
 			{
 				SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
 			}
@@ -148,10 +183,10 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 
-			if (m_stepSE != -1)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = -1;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -180,7 +215,7 @@ namespace app
 				m_owner->PlayAnimation(EnEnemyAnimationType::Walk);
 			}
 
-			if (m_stepSE == -1)
+			if (m_stepSE == app::INVALID_SE_HANDLE)
 			{
 				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true, false);
 			}
@@ -194,7 +229,7 @@ namespace app
 			}
 			m_owner->Move();
 
-			if (m_stepSE == -1)
+			if (m_stepSE == app::INVALID_SE_HANDLE)
 			{
 				m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 			}
@@ -202,7 +237,6 @@ namespace app
 			// 音の検知処理
 			Vector3 loudestPos;
 			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
-			const float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
 
 			if (totalNoise >= SEARCH_THRESHOLD)
 			{
@@ -216,10 +250,10 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 
-			if (m_stepSE != -1)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = -1;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -255,7 +289,7 @@ namespace app
 
 		void EnemyChaseState::Update()
 		{
-			if (m_owner->GetStickLAmount() < 0.0001f) {
+			if (m_owner->GetStickLAmount() < STICK_AMOUNT_THRESHOLD) {
 				return;
 			}
 
@@ -266,10 +300,10 @@ namespace app
 		void EnemyChaseState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
-			if (m_stepSE != -1)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = -1;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 
@@ -320,15 +354,50 @@ namespace app
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->SetIsSwimming(true);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
+
+			m_splashEffectTimer = 0.0f;
 		}
 
 
 		void EnemySwimState::Update()
 		{
-			if (m_owner->GetStickLAmount() < 0.0001f)
+			if (m_owner->GetStickLAmount() < STICK_AMOUNT_THRESHOLD)
 			{
 				return;
 			}
+
+			const Vector3& velocity = m_owner->GetCurrentVelocity();
+			float currentSpeed = velocity.Length();
+
+			float maxSpeed = max(MIN_SPEED, m_owner->GetStickLAmount());
+			float speedRatio = min(MAX_SPEED, currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
+
+			float scaleMultiplier = MIN_SPLASH_SCALE_RATIO + ((MAX_SPLASH_SCALE_RATIO - MIN_SPLASH_SCALE_RATIO) * speedRatio);
+			Vector3 currentScale = SPLASH_EFFECT_SCALE * scaleMultiplier;
+
+			bool isMoving = (velocity.LengthSq() > MIN_MOVE_VELOCITY_SQ);
+
+			if (isMoving)
+			{
+				Vector3 effectPosition = m_owner->GetPosition();
+
+				m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+				if (m_splashEffectTimer >= SPLASH_EFFECT_INTERVAL)
+				{
+					EffectManager::Get().PlayEffect(
+						EnEffectKind::SwimSplash,
+						effectPosition,
+						Quaternion::Identity,
+						currentScale
+					);
+				}
+			}
+			else
+			{
+				m_splashEffectTimer = SPLASH_EFFECT_INTERVAL;
+			}
+
 			m_owner->Move();
 		}
 
@@ -339,8 +408,10 @@ namespace app
 			m_owner->SetIsSwimming(false);
 		}
 
+
 		EnemySwimState::EnemySwimState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
+			, m_splashEffectTimer(0.0f)
 		{
 
 		}
@@ -349,12 +420,6 @@ namespace app
 
 
 		/************************************/
-
-
-		namespace
-		{
-			const float ATTACK_IMPACT_TIME = 0.5f;
-		}
 
 
 		void EnemyAttackState::Enter()
@@ -386,7 +451,7 @@ namespace app
 				Quaternion rot = m_owner->GetTransform().m_rotation;
 				Vector3 forward = Vector3::AxisZ;
 				rot.Apply(forward);
-				if (forward.LengthSq() > 0.001f) {
+				if (forward.LengthSq() > FORWARD_LENGTH_NORMALIZE_SQ) {
 					forward.Normalize();
 				}
 
@@ -403,7 +468,7 @@ namespace app
 					EnEffectKind::EnemyAttack,
 					effectPos,
 					Quaternion::Identity,
-					Vector3(5.0f, 5.0f, 5.0f)
+					ATTACK_EFFECT_SCALE
 				);
 
 				SoundManager::Get().PlaySE(enSoundKind_EnemyAttack);
@@ -453,7 +518,7 @@ namespace app
 
 		void EnemyReturnHomeState::Update()
 		{
-			if (m_owner->GetStickLAmount() < 0.0001f) {
+			if (m_owner->GetStickLAmount() < STICK_AMOUNT_THRESHOLD) {
 				return;
 			}
 			m_owner->Move();
@@ -464,10 +529,10 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 
-			if (m_stepSE != -1)
+			if (m_stepSE != app::INVALID_SE_HANDLE)
 			{
 				app::SoundManager::Get().StopSE(m_stepSE);
-				m_stepSE = -1;
+				m_stepSE = app::INVALID_SE_HANDLE;
 			}
 		}
 

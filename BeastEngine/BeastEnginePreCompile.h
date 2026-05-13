@@ -11,6 +11,7 @@ using namespace nsK2EngineLow;
 #include "Graphics/RenderingEngine.h"
 #include "Graphics/GraphicsEnums.h"
 //#include "geometry/AABB.h"
+#include "Geometry/Frustum.h"
 
 #include "Resource/ResourceManager.h"
 #include "Resource/ModelResource.h"
@@ -34,6 +35,7 @@ using namespace nsK2EngineLow;
 #include "Graphics/light/HemisphereLight.h"
 #include "Graphics/light/SpotLight.h"
 #include "Graphics/light/PointLight.h"
+#include "Graphics/OcclusionDitherManager.h"
 
 #include "graphics/effect/EffectEmitter.h"
 
