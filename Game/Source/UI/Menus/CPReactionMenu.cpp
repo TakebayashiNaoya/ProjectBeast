@@ -159,14 +159,15 @@ namespace app
 			m_troubleReaction->m_isDraw = false;
 			m_happyReaction->m_isDraw = false;
 
+			const auto key = animKey::CPREACTION_SWAY_ANIM_KEY;
 
 			m_troubleReaction->StopAnimation();
+			m_troubleReaction->RemoveAnimation(key);
 			m_happyReaction->StopAnimation();
+			m_happyReaction->RemoveAnimation(key);
 			m_isPlayAnimation = false;
 			m_timer = 0.0f;
-			m_type = EnReactionType::None;
 			m_target = nullptr;
-			PositionUpdate();
 		}
 
 
