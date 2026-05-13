@@ -196,11 +196,9 @@ namespace app
 			if (m_type == EnReactionType::Happy)
 			{
 				m_troubleReaction->StopAnimation();
-				m_happyReaction->UpdateAnimation();
 			}
 			else if (m_type == EnReactionType::Trouble)
 			{
-				m_troubleReaction->UpdateAnimation();
 				m_happyReaction->StopAnimation();
 			}
 
