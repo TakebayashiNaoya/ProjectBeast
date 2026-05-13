@@ -24,8 +24,9 @@ namespace app
 
 
 		CPReactionSystem::CPReactionSystem()
-			: m_reactionLayouts{},
-			m_reactionMenus{}
+			: m_reactionLayouts{}
+			, m_reactionMenus{}
+			, m_reactionStatusParent(nullptr)
 		{}
 
 
@@ -40,6 +41,9 @@ namespace app
 
 		void CPReactionSystem::Initialize()
 		{
+			m_reactionStatusParent = std::make_unique<CPReactionStatus>();
+			m_reactionStatusParent->SetUpUI();
+
 			for (int i = 0; i < MAX_REACTIONS_NUM; ++i)
 			{
 				auto* oldLayout = m_reactionLayouts.at(i);
@@ -53,15 +57,13 @@ namespace app
 
 				m_reactionLayouts.at(i) = layout;
 				m_reactionMenus.at(i) = layout->GetMenu<CPReactionMenu>();
+				m_reactionMenus.at(i)->SetStatus(m_reactionStatusParent.get());
 			}
 		}
 
 
 		void CPReactionSystem::Update()
 		{
-			// 子ペンギンマネージャーを取得
-			auto cm = actor::ChildPenguinManager::GetInstance();
-
 			for (auto layout : m_reactionLayouts)
 			{
 				if (layout) layout->Update();

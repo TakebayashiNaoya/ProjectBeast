@@ -15,6 +15,11 @@ namespace app
 	namespace ui
 	{
 		CPReactionStatus::CPReactionStatus()
+			: m_swayTime(0.0f)
+			, m_iconOffsetY(0.0f)
+			, m_speechBubbleOffset(Vector3::Zero)
+			, m_troubleReactionOffset(Vector3::Zero)
+			, m_happyReactionOffset(Vector3::Zero)
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterCPReactionParameter>("Assets/parameter/UI/cpReaction/CPReactionParameter.json", [](const nlohmann::json& j, MasterCPReactionParameter& parameter)

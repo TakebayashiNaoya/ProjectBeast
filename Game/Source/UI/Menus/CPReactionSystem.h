@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "CPReactionMenu.h"
+#include "Source/UI/Model/CPReactionStatus.h"
 
 
 namespace app
@@ -13,6 +14,7 @@ namespace app
 	{
 		class ChildPenguin;
 	}
+
 
 	namespace ui
 	{
@@ -75,6 +77,8 @@ namespace app
 			std::array<Layout*, MAX_REACTIONS_NUM> m_reactionLayouts;
 			/** リアクションメニューの配列 */
 			std::array<CPReactionMenu*, MAX_REACTIONS_NUM> m_reactionMenus;
+			/** リアクションの親パラメータ */
+			std::unique_ptr<CPReactionStatus> m_reactionStatusParent;
 		};
 	}
 }

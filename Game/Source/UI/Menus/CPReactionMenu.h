@@ -57,6 +57,14 @@ namespace app
 
 		public:
 			/**
+			 * @brief ステータスを設定
+			 * @param status ステータス
+			 */
+			inline void SetStatus(CPReactionStatus* status)
+			{
+				m_status = status;
+			}
+			/**
 			 * @brief ターゲットの子ペンギンを設定
 			 * @param target ターゲットの子ペンギン
 			 */
@@ -124,7 +132,8 @@ namespace app
 
 		private:
 			/** ステータス */
-			std::unique_ptr<CPReactionStatus> m_status;
+			CPReactionStatus* m_status;
+			/** アニメーションステータス */
 			std::unique_ptr<CPReactionAnimStatus> m_animStatus;
 
 			/** ターゲット*/
@@ -132,15 +141,10 @@ namespace app
 
 			/** 吹き出し */
 			UIIcon* m_speechBubble;
-
 			/** 困り */
 			UIIcon* m_troubleReaction;
-
 			/** 喜び */
 			UIIcon* m_happyReaction;
-
-			/** 吹き出し用シーケンス */
-			UIAnimationSequence m_sequence;
 
 			/** リアクションのタイプ */
 			EnReactionType m_type;

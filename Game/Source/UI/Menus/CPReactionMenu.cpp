@@ -65,10 +65,6 @@ namespace app
 
 		void CPReactionMenu::InitializeLogic()
 		{
-			m_status.reset();
-			m_status = std::make_unique<CPReactionStatus>();
-			m_status->SetUpUI();
-
 			m_animStatus.reset();
 			m_animStatus = std::make_unique<CPReactionAnimStatus>();
 			m_animStatus->SetUpUI();
