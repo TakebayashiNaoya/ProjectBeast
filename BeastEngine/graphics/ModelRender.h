@@ -124,7 +124,8 @@ namespace nsBeastEngine
 			// アニメーションの再生速度の最大値
 			constexpr float maxAnimationSpeed = 10.0f;
 
-			m_animationSpeed = std::clamp(speed, minAnimationSpeed, maxAnimationSpeed);
+			m_animationSpeed = std::max<float>(minAnimationSpeed, speed);
+			m_animationSpeed = std::min<float>(maxAnimationSpeed, m_animationSpeed);
 		}
 
 		/**
