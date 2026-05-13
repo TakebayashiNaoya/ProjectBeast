@@ -107,6 +107,13 @@ namespace app
 
 		void CPReactionMenu::DrawFlagUpdate()
 		{
+
+			if (!m_target)
+			{
+				m_type = EnReactionType::None;
+			}
+
+
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			switch (m_type)
@@ -155,6 +162,15 @@ namespace app
 			m_speechBubble->m_isDraw = false;
 			m_troubleReaction->m_isDraw = false;
 			m_happyReaction->m_isDraw = false;
+
+
+			m_troubleReaction->StopAnimation();
+			m_happyReaction->StopAnimation();
+			m_isPlayAnimation = false;
+			m_timer = 0.0f;
+			m_type = EnReactionType::None;
+			m_target = nullptr;
+			PositionUpdate();
 		}
 
 
