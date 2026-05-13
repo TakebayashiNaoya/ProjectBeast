@@ -5,7 +5,7 @@
             "key" : "swayAnimation",
             "valueType" : "FLOAT",
             "startValue" : -10,
-            "endValue" : 10,
+            "endValue" : 30,
             "duration" : 1.5,
             "easing" : "EaseInOut",
             "loop" : "PingPong"
