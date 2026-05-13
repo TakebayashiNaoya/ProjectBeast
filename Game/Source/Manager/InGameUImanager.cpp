@@ -317,13 +317,13 @@ namespace app
 			if (layout) layout->Update();
 		}
 
+		if (m_cpReactionSystem) m_cpReactionSystem->Update();
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Update();
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Update();
 		if (m_miniMapLayout)         m_miniMapLayout->Update();
 		if (m_achievementLayout)     m_achievementLayout->Update();
 		if (m_achievementNotificationLayout)	m_achievementNotificationLayout->Update();
-		if (m_cpReactionSystem) m_cpReactionSystem->Update();
 	}
 
 
@@ -351,13 +351,13 @@ namespace app
 		}
 
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Render(rc);
+		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Render(rc);
 		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);
 		if (m_timerLayout)           m_timerLayout->Render(rc);
 		if (m_remainingChildLayout)  m_remainingChildLayout->Render(rc);
 		if (m_achievementNotificationLayout) m_achievementNotificationLayout->Render(rc);
-		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
 	}
 
 
