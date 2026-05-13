@@ -49,6 +49,7 @@ namespace app
 			/** 再生が終わっているなら削除 */
 			if (!se->IsPlaying()) {
 				eraseSEList.push_back(key);
+				DeleteGO(se);    // 再生を止める
 			}
 		}
 		for (const auto& key : eraseSEList) {
@@ -65,6 +66,7 @@ namespace app
 			/** 再生が終わっているなら削除 */
 			if (!voice->IsPlaying()) {
 				eraseVoiceList.push_back(key);
+				DeleteGO(voice);    // 再生を止める
 			}
 		}
 		for (const auto& key : eraseVoiceList) {

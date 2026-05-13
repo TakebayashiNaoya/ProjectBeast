@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "AchievementNotificationMenu.h"
 #include "Source/Achivement/AchievementManager.h"
+#include "Source/Sound/SoundManager.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
 #include "Source/UIAnimationTypes.h"
 
@@ -155,6 +156,8 @@ namespace app
 				m_isPlaying = true;
 				m_animState = AnimState::FadeIn;
 				m_animTimer = 0.0f;
+
+				app::SoundManager::Get().PlaySE(app::enSoundKind_NoticeAchievement);
 			}
 
 			m_animStatus->Update();
@@ -173,6 +176,7 @@ namespace app
 				case AnimState::FadeIn:
 				{
 					auto* anim = bgIcon ? bgIcon->FindAnimation(animKey::ACHIEVE_FADE_IN_ANIM_KEY) : nullptr;
+
 					if (!anim || !anim->IsPlayAnimation()) {
 						m_animState = AnimState::StampWait; // スタンプ待機へ
 						m_animTimer = 0.0f;
@@ -197,6 +201,7 @@ namespace app
 				{
 					auto* anim = stampIcon ? stampIcon->FindAnimation(animKey::ACHIEVE_STAMP_ANIM_KEY) : nullptr;
 					if (!anim || !anim->IsPlayAnimation()) {
+						app::SoundManager::Get().PlaySE(app::enSoundKind_Stamp); // スタンプSE再生
 						m_animState = AnimState::FadeOutWait; // フェードアウト待機へ
 						m_animTimer = 0.0f;
 					}
@@ -206,6 +211,8 @@ namespace app
 				case AnimState::FadeOutWait:
 					if (m_animTimer >= FADE_OUT_WAIT_DELAY_SEC) {
 						m_animState = AnimState::FadeOut; // フェードアウト中へ
+
+						app::SoundManager::Get().PlaySE(app::enSoundKind_FadeOutAchievement);
 
 						auto attachAndPlayFadeOut = [this](UIIcon* icon, const Vector3& defaultPos) {
 							if (icon) {
