@@ -117,7 +117,15 @@ namespace nsBeastEngine
 		 * @brief アニメーション再生速度の設定
 		 * @param speed 再生速度（1.0f=通常速度）
 		 */
-		inline void SetAnimationSpeed(float speed) { m_animationSpeed = speed; }
+		inline void SetAnimationSpeed(float speed)
+		{
+			// アニメーションの再生速度の最小値
+			constexpr float minAnimationSpeed = 0.1f;
+			// アニメーションの再生速度の最大値
+			constexpr float maxAnimationSpeed = 10.0f;
+
+			m_animationSpeed = std::clamp(speed, minAnimationSpeed, maxAnimationSpeed);
+		}
 
 		/**
 		 * @brief モデルの取得

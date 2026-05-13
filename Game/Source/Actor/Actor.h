@@ -7,20 +7,12 @@
 #include "ActorStatus.h"
 #include "IObject.h"
 #include "Source/Core/Transform.h"
-#include "Source/Util/Curve.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-		namespace
-		{
-			constexpr float MIN_ANIMATION_SPEED = 0.1f; // アニメーションの再生速度の最小値
-			constexpr float MAX_ANIMATION_SPEED = 3.0f; // アニメーションの再生速度の最大値
-		}
-
-
 		/**
 		 * @brief 見た目が存在するオブジェクトの基底クラス
 		 */
@@ -63,11 +55,7 @@ namespace app
 			 * @brief アニメーション再生速度の設定
 			 * @param speed 再生速度（1.0f=通常速度）
 			 */
-			void SetAnimationSpeed(float speed)
-			{
-				speed = std::clamp(speed, MIN_ANIMATION_SPEED, MAX_ANIMATION_SPEED);
-				m_modelRender.SetAnimationSpeed(speed);
-			}
+			void SetAnimationSpeed(float speed) { m_modelRender.SetAnimationSpeed(speed); }
 
 
 		public:
