@@ -13,6 +13,17 @@ namespace app
 {
 	namespace util
 	{
+		const bool JsonConverter::InvalidBool = false;
+		const int JsonConverter::InvalidInt = INT_MAX;
+		const uint32_t JsonConverter::InvalidUInt32 = UINT32_MAX;
+		const float JsonConverter::InvalidFloat = FLT_MAX;
+		const std::string JsonConverter::InvalidString = std::to_string(STRING_NONE);
+		const Vector2 JsonConverter::InvalidVector2 = Vector2(FLT_MAX, FLT_MAX);
+		const Vector3 JsonConverter::InvalidVector3 = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+		const Vector4 JsonConverter::InvalidVector4 = Vector4(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+		const FloatRange JsonConverter::InvalidFloatRange = FloatRange{ FLT_MAX, FLT_MAX };
+
+
 		bool JsonConverter::IsLoadJsonFile(nlohmann::json& json, const std::string& filePath)
 		{
 			// ファイルストリームを開く
@@ -52,7 +63,7 @@ namespace app
 				return json[key].get<bool>();
 			}
 			ERROR_ASSERT;
-			return INVALID_BOOL;
+			return InvalidBool();
 		}
 
 
@@ -63,7 +74,7 @@ namespace app
 				return json[key].get<int>();
 			}
 			ERROR_ASSERT;
-			return INVALID_INT;
+			return InvalidInt;
 		}
 
 
@@ -74,7 +85,7 @@ namespace app
 				return json[key].get<uint32_t>();
 			}
 			ERROR_ASSERT;
-			return INVALID_UINT32;
+			return InvalidUInt32;
 		}
 
 
@@ -85,7 +96,7 @@ namespace app
 				return json[key].get<float>();
 			}
 			ERROR_ASSERT;
-			return INVALID_FLOAT;
+			return InvalidFloat;
 		}
 
 
@@ -96,7 +107,7 @@ namespace app
 				return json[key].get<std::string>();
 			}
 			ERROR_ASSERT;
-			return INVALID_STRING;
+			return InvalidString;
 		}
 
 
@@ -105,7 +116,7 @@ namespace app
 			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 2)
 			{
 				ERROR_ASSERT;
-				return INVALID_VECTOR2;
+				return InvalidVector2;
 			}
 
 			const auto& array = json[key];
@@ -115,7 +126,7 @@ namespace app
 				if (!array[i].is_number())
 				{
 					ERROR_ASSERT;
-					return INVALID_VECTOR2;
+					return InvalidVector2;
 				}
 			}
 
@@ -131,7 +142,7 @@ namespace app
 			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 3)
 			{
 				ERROR_ASSERT;
-				return INVALID_VECTOR3;
+				return InvalidVector3;
 			}
 
 			const auto& array = json[key];
@@ -141,7 +152,7 @@ namespace app
 				if (!array[i].is_number())
 				{
 					ERROR_ASSERT;
-					return INVALID_VECTOR3;
+					return InvalidVector3;
 				}
 			}
 
@@ -158,7 +169,7 @@ namespace app
 			if (!json.is_array() || json.size() != 3)
 			{
 				ERROR_ASSERT;
-				return INVALID_VECTOR3;
+				return InvalidVector3;
 			}
 
 			for (int i = 0; i < 3; i++)
@@ -166,7 +177,7 @@ namespace app
 				if (!json[i].is_number())
 				{
 					ERROR_ASSERT;
-					return INVALID_VECTOR3;
+					return InvalidVector3;
 				}
 			}
 
@@ -183,7 +194,7 @@ namespace app
 			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 4)
 			{
 				ERROR_ASSERT;
-				return INVALID_VECTOR4;
+				return InvalidVector4;
 			}
 
 			const auto& array = json[key];
@@ -193,7 +204,7 @@ namespace app
 				if (!array[i].is_number())
 				{
 					ERROR_ASSERT;
-					return INVALID_VECTOR4;
+					return InvalidVector4;
 				}
 			}
 
@@ -211,7 +222,7 @@ namespace app
 			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 2)
 			{
 				ERROR_ASSERT;
-				return INVALID_FLOAT_RANGE;
+				return InvalidFloatRange;
 			}
 
 			const auto& array = json[key];
@@ -221,7 +232,7 @@ namespace app
 				if (!array[i].is_number())
 				{
 					ERROR_ASSERT;
-					return INVALID_FLOAT_RANGE;
+					return InvalidFloatRange;
 				}
 			}
 

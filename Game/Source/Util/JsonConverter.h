@@ -20,27 +20,33 @@ namespace app
 		};
 
 
-		namespace
-		{
-			// 無効な値を定義
-
-			constexpr bool INVALID_BOOL = false;								// bool型の無効な値はfalseとする
-			constexpr int INVALID_INT = INT_MAX;								// int型の無効な値はINT_MAXとする
-			constexpr uint32_t INVALID_UINT32 = UINT32_MAX;						// uint32_t型の無効な値はUINT32_MAXとする
-			constexpr float INVALID_FLOAT = FLT_MAX;							// float型の無効な値はFLT_MAXとする
-			const std::string INVALID_STRING = std::to_string(STRING_NONE);		// string型の無効な値はSTRING_NONEを文字列化したものとする
-			const Vector2 INVALID_VECTOR2(FLT_MAX, FLT_MAX);					// Vector2型の無効な値は(FLT_MAX, FLT_MAX)とする
-			const Vector3 INVALID_VECTOR3(FLT_MAX, FLT_MAX, FLT_MAX);			// Vector3型の無効な値は(FLT_MAX, FLT_MAX, FLT_MAX)とする
-			const Vector4 INVALID_VECTOR4(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);	// Vector4型の無効な値は(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX)とする
-			const FloatRange INVALID_FLOAT_RANGE{ FLT_MAX, FLT_MAX };			// FloatRange型の無効な値は{FLT_MAX, FLT_MAX}とする
-		}
-
-
 		/**
 		 * @brief jsonファイルの読み込みに使用する関数群
 		 */
 		class JsonConverter
 		{
+		public:
+			/** 無効なbool値を返す関数 */
+			static const bool InvalidBool;
+			/** 無効なint値を返す関数 */
+			static const int InvalidInt;
+			/** 無効なuint32_t値を返す関数 */
+			static const uint32_t InvalidUInt32;
+			/** 無効なfloat値を返す関数 */
+			static const float InvalidFloat;
+			/** 無効なstring値を返す関数 */
+			static const std::string InvalidString;
+			/** 無効なVector2値を返す関数 */
+			static const Vector2 InvalidVector2;
+			/** 無効なVector3値を返す関数 */
+			static const Vector3 InvalidVector3;
+			/** 無効なVector4値を返す関数 */
+			static const Vector4 InvalidVector4;
+			/** 無効なFloatRange値を返す関数 */
+			static const FloatRange InvalidFloatRange;
+
+
+
 		public:
 			/**
 			 * @brief jsonファイルを読み込めたかどうか
