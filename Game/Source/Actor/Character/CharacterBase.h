@@ -86,6 +86,10 @@ namespace app
 			 * @param data モデルデータ
 			 */
 			void Init(const ModelData& data);
+			/**
+			 * @brief モデルの非同期ロードの更新処理
+			 */
+			void ModelLoadUpdate();
 
 
 		protected:
