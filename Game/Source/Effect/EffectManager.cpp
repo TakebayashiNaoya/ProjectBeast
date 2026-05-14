@@ -16,6 +16,8 @@ namespace app
 	{
 		m_effectList.clear();
 
+		EffectEngine::GetInstance()->BeginFrame();
+
 		// サウンドの登録
 		for (int i = 0; i < ARRAYSIZE(effectInformation); ++i) {
 			const auto& info = effectInformation[i];

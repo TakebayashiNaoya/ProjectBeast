@@ -43,7 +43,7 @@ namespace app
 
 			constexpr float SLIDE_END_ANIMATION_SPEED = 2.5f; // スライド終了アニメーションの再生速度
 
-			const Vector3 JUMP_EFFECT_SCALE = { 1.5f, 1.5f, 1.5f }; // ジャンプエフェクトのスケール
+			const Vector3 LANDING_EFFECT_SCALE = { 1.5f, 1.5f, 1.5f }; // 着地エフェクトのスケール
 		}
 
 
@@ -240,13 +240,6 @@ namespace app
 			{
 				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinJump, false);
 			}
-
-			EffectManager::Get().PlayEffect(
-				EnEffectKind::PenguinJump,
-				m_owner->GetTransform().m_position,
-				Quaternion::Identity,
-				JUMP_EFFECT_SCALE
-			);
 		}
 
 
@@ -265,10 +258,10 @@ namespace app
 			);
 
 			EffectManager::Get().PlayEffect(
-				EnEffectKind::PenguinJump,
+				EnEffectKind::PenguinLanding,
 				m_owner->GetTransform().m_position,
 				Quaternion::Identity,
-				JUMP_EFFECT_SCALE
+				LANDING_EFFECT_SCALE
 			);
 		}
 
