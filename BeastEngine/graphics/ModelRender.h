@@ -466,5 +466,11 @@ namespace nsBeastEngine
 		 * @details アニメーション中にボーン位置がAABBを超えないよう余裕を持たせる。
 		 */
 		static constexpr float BONE_AABB_MARGIN = 20.0f;
+
+		/**
+		 * @brief デバッグ用モデル名（調査用・確認後に削除）
+		 * @details WhiteBear など特定モデルのログ絞り込みに使用する
+		 */
+		std::string    m_debugName;
 	};
 }

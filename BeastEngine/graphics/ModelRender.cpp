@@ -105,6 +105,20 @@ namespace nsBeastEngine
 
 		// ローカルAABBをtkmから計算する（スケルトンなしの場合に使用）
 		CalcLocalAABBFromTkm(filePath);
+
+		// 【デバッグ用・確認後に削除】
+		// WhiteBear のみデバッグ名を設定してログを出力する
+		if (filePath && strstr(filePath, "WhiteBear") != nullptr)
+		{
+			m_debugName = "WhiteBear";
+			K2_LOG(
+				"ModelRender::Init: hasSkeleton=%d numBones=%d filePath=%s",
+				m_hasSkeleton ? 1 : 0,
+				(m_skeletonRef != nullptr && m_skeletonRef->IsInited())
+				? m_skeletonRef->GetNumBones() : -1,
+				filePath
+			);
+		}
 	}
 
 
@@ -160,6 +174,25 @@ namespace nsBeastEngine
 
 		// ローカルAABBをtkmから計算する（スケルトンなしの場合に使用）
 		CalcLocalAABBFromTkm(initData.m_tkmFilePath);
+
+		// スケルトンを持つか記録する
+		m_hasSkeleton = (m_skeletonRef != nullptr) && m_skeletonRef->IsInited();
+
+		// ローカルAABBをtkmから計算する（スケルトンなしの場合に使用）
+		CalcLocalAABBFromTkm(initData.m_tkmFilePath);
+
+		// 【デバッグ用・確認後に削除】
+		if (initData.m_tkmFilePath && strstr(initData.m_tkmFilePath, "WhiteBear") != nullptr)
+		{
+			m_debugName = "WhiteBear";
+			K2_LOG(
+				"ModelRender::InitFromLoaded: hasSkeleton=%d numBones=%d filePath=%s",
+				m_hasSkeleton ? 1 : 0,
+				(m_skeletonRef != nullptr && m_skeletonRef->IsInited())
+				? m_skeletonRef->GetNumBones() : -1,
+				initData.m_tkmFilePath
+			);
+		}
 	}
 
 
@@ -314,6 +347,37 @@ namespace nsBeastEngine
 			// GetBoneMatricesTopAddress() のスキニング行列（invBindPose * worldMatrix）とは異なる
 			const int numBones = m_skeletonRef->GetNumBones();
 
+			// 【デバッグ用・確認後に削除】
+			if (m_debugName == "WhiteBear" && numBones > 0)
+			{
+				bool hasNanBone = false;
+				int nanBoneIndex = -1;
+				for (int dbgI = 0; dbgI < numBones; dbgI++)
+				{
+					const float bx = m_skeletonRef->GetBone(dbgI)->GetWorldMatrix().v[3].x;
+					const float by = m_skeletonRef->GetBone(dbgI)->GetWorldMatrix().v[3].y;
+					const float bz = m_skeletonRef->GetBone(dbgI)->GetWorldMatrix().v[3].z;
+					if (std::isnan(bx) || std::isnan(by) || std::isnan(bz))
+					{
+						hasNanBone = true;
+						nanBoneIndex = dbgI;
+						break;
+					}
+				}
+				if (hasNanBone)
+				{
+					K2_LOG(
+						"UpdateWorldAABB: WhiteBear NaN bone index=%d name=%ls localMatrix[0]=(%.3f,%.3f,%.3f,%.3f)",
+						nanBoneIndex,
+						m_skeletonRef->GetBone(nanBoneIndex)->GetName(),
+						m_skeletonRef->GetBone(nanBoneIndex)->GetLocalMatrix().m[0][0],
+						m_skeletonRef->GetBone(nanBoneIndex)->GetLocalMatrix().m[0][1],
+						m_skeletonRef->GetBone(nanBoneIndex)->GetLocalMatrix().m[0][2],
+						m_skeletonRef->GetBone(nanBoneIndex)->GetLocalMatrix().m[0][3]
+					);
+				}
+			}
+
 			Vector3 vMin(FLT_MAX, FLT_MAX, FLT_MAX);
 			Vector3 vMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
@@ -415,6 +479,22 @@ namespace nsBeastEngine
 		if (!m_visible) return;
 
 		const Frustum& frustum = g_renderingEngine->GetFrustum();
+
+		// 【デバッグ用・確認後に削除】
+		if (m_isCullingEnabled && m_debugName == "WhiteBear")
+		{
+			const bool xNan = std::isnan(m_worldAABBMin.x) || std::isnan(m_worldAABBMax.x);
+			const bool yNan = std::isnan(m_worldAABBMin.y) || std::isnan(m_worldAABBMax.y);
+			const bool zNan = std::isnan(m_worldAABBMin.z) || std::isnan(m_worldAABBMax.z);
+			const bool isInFrustum = frustum.IsIntersectAABBWorld(m_worldAABBMin, m_worldAABBMax);
+			K2_LOG(
+				"WhiteBear OnDraw: isInFrustum=%d hasNaN=%d min(%.1f,%.1f,%.1f) max(%.1f,%.1f,%.1f)",
+				isInFrustum ? 1 : 0,
+				(xNan || yNan || zNan) ? 1 : 0,
+				m_worldAABBMin.x, m_worldAABBMin.y, m_worldAABBMin.z,
+				m_worldAABBMax.x, m_worldAABBMax.y, m_worldAABBMax.z
+			);
+		}
 
 		/** フォワードレンダリング用のモデルが有効な場合はそちらを描画し、そうでない場合は通常のモデルを描画する */
 		if (m_isForwardRender)

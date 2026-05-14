@@ -47,6 +47,8 @@ namespace app
 
 		Enemy::Enemy()
 		{
+			Init(ENEMY_MODEL_DATA);
+
 			m_stateMachine = std::make_unique<EnemyStateMachine>(this);
 			m_status = std::make_unique<EnemyStatus>();
 			m_status->Setup();
@@ -58,7 +60,6 @@ namespace app
 
 		void Enemy::Start()
 		{
-			Init(ENEMY_MODEL_DATA);
 			CharacterBase::Start();
 		}
 
@@ -68,6 +69,28 @@ namespace app
 			m_stateMachine->Update();
 
 			CharacterBase::Update();
+
+			// 【デバッグ用・確認後に削除】
+			// NaN発生時にどのステートフラグが立っているか出力する
+			if (m_modelReady)
+			{
+				auto* sm = m_stateMachine.get();
+				const float bx = m_modelRender.GetWorldAABBMin().x;
+				if (std::isnan(bx))
+				{
+					K2_LOG(
+						"Enemy NaN: isStun=%d isAttack=%d isRoar=%d isChasing=%d isSearch=%d isReturn=%d isCoolDown=%d isSwim=%d",
+						sm->IsStun() ? 1 : 0,
+						sm->IsAttack() ? 1 : 0,
+						sm->IsRoar() ? 1 : 0,
+						sm->IsChasing() ? 1 : 0,
+						sm->IsSeach() ? 1 : 0,
+						sm->IsReturnHome() ? 1 : 0,
+						sm->IsCoolDown() ? 1 : 0,
+						sm->IsSwim() ? 1 : 0
+					);
+				}
+			}
 		}
 
 
