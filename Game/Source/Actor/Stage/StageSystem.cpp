@@ -35,11 +35,12 @@ namespace
 	/**
 	 * @brief jsonファイルからQuaternionを変換する
 	 * @param arr json配列
+	 * @param key キー
 	 */
-	Quaternion ToRotation(const nlohmann::json& arr)
+	Quaternion ToRotation(const nlohmann::json& arr, const char* key)
 	{
 		// 回転を度数法で取得
-		Vector3 rotDeg = app::util::JsonConverter::ToVector3(arr);
+		Vector3 rotDeg = app::util::JsonConverter::ToVector3(arr, key);
 		// クォータニオンに変換
 		Quaternion rotX, rotY, rotZ;
 		rotX.SetRotationDegX(rotDeg.x);
@@ -61,10 +62,10 @@ namespace
 	 */
 	void LoadTransform(app::actor::IStageObject* object, const nlohmann::json& json)
 	{
-		const bool isNeedCollision = app::util::JsonConverter::ToBool(json["isNeedCollision"]);
-		const Vector3 position = app::util::JsonConverter::ToVector3(json["position"]);
-		const Quaternion rotation = ToRotation(json["rotationDeg"]);
-		const Vector3 scale = app::util::JsonConverter::ToVector3(json["scale"]);
+		const bool isNeedCollision = app::util::JsonConverter::ToBool(json, "isNeedCollision");
+		const Vector3 position = app::util::JsonConverter::ToVector3(json, "position");
+		const Quaternion rotation = ToRotation(json, "rotationDeg");
+		const Vector3 scale = app::util::JsonConverter::ToVector3(json, "scale");
 
 		object->SetIsNeedCollision(isNeedCollision);
 		object->SetPosition(position);
@@ -81,7 +82,7 @@ namespace
 	 */
 	void InitializeStageObject(app::actor::IStageObject* object, const nlohmann::json& item)
 	{
-		const std::string fileName = app::util::JsonConverter::ToString(item["fileName"]);
+		const std::string fileName = app::util::JsonConverter::ToString(item, "fileName");
 
 		// pbrNameが指定されていればInit時に渡す（なければ空文字でデフォルト値を使用）
 		std::string pbrName = "";
@@ -141,7 +142,7 @@ namespace app
 			for (const auto& objData : json[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const ObjectKey objectKey = app::util::JsonConverter::ToString(objData[OBJECT_NAME]);
+				const ObjectKey objectKey = app::util::JsonConverter::ToString(objData, OBJECT_NAME);
 
 				if (!m_objectMap.empty())
 				{
@@ -180,7 +181,7 @@ namespace app
 			for (const auto& objData : json[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const ObjectKey objectKey = app::util::JsonConverter::ToString(objData[OBJECT_NAME]);
+				const ObjectKey objectKey = app::util::JsonConverter::ToString(objData, OBJECT_NAME);
 				toBeDeleted.erase(objectKey);
 			}
 
@@ -201,7 +202,7 @@ namespace app
 			for (const auto& objData : j[STAGE_OBJECT_KEY][OBJECT_ARRAY_KEY])
 			{
 				// オブジェクトキーを取得
-				const ObjectKey& objKey = app::util::JsonConverter::ToString(objData[OBJECT_NAME]);
+				const ObjectKey& objKey = app::util::JsonConverter::ToString(objData, OBJECT_NAME);
 
 				auto it = m_objectMap.find(objKey);
 				// 既存のものがなければスキップ

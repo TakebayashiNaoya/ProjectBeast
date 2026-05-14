@@ -22,19 +22,14 @@ namespace app
 
 		void AchievementBase::InitAchievementBase(const nlohmann::json& json)
 		{
-			m_name = app::util::JsonConverter::ToString(json["name"]);
-			std::string condition = app::util::JsonConverter::ToString(json["condition"]);
+			m_name = app::util::JsonConverter::ToString(json, "name");
+			std::string condition = app::util::JsonConverter::ToString(json, "condition");
+
 			m_id = Hash32(m_name.c_str());
 
-			if (json.contains("spriteIndex"))
-			{
-				m_index = static_cast<int>(app::util::JsonConverter::ToUInt32(json["spriteIndex"]));
-			}
+			m_index = app::util::JsonConverter::ToInt(json, "spriteIndex");
 
-			if (json.contains("spriteName"))
-			{
-				m_spriteName = app::util::JsonConverter::ToString(json["spriteName"]);
-			}
+			m_spriteName = app::util::JsonConverter::ToString(json, "spriteName");
 		}
 
 
@@ -85,7 +80,7 @@ namespace app
 
 		void CounterAchievement::InitAchievementImpl(const nlohmann::json& json)
 		{
-			m_targetValue = app::util::JsonConverter::ToUInt32(json["targetValue"]);
+			m_targetValue = app::util::JsonConverter::ToUInt32(json, "targetValue");
 		}
 
 
@@ -112,8 +107,8 @@ namespace app
 
 		void LocationAchievement::InitAchievementImpl(const nlohmann::json& json)
 		{
-			m_targetLocation = app::util::JsonConverter::ToVector3(json["targetLocation"]);
-			m_enableDistance = app::util::JsonConverter::ToFloat(json["enableDistance"]);
+			m_targetLocation = app::util::JsonConverter::ToVector3(json, "targetLocation");
+			m_enableDistance = app::util::JsonConverter::ToFloat(json, "enableDistance");
 		}
 
 

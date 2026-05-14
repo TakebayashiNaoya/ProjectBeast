@@ -5,11 +5,11 @@
  */
 #include "stdafx.h"
 #include "AchievementManager.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Actor/Character/Enemy/EnemyManager.h"
-#include "Source/Actor/Character/Enemy/EnemyController.h"
-#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyController.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Util/CRC32.h"
 #include "Source/Util/JsonConverter.h"
 
@@ -84,18 +84,11 @@ namespace app
 				K2_ASSERT(achieveData.contains("type"), "typeが未設定");
 
 				// ★ json ではなく achieveData から取得するように修正
-				std::string type = app::util::JsonConverter::ToString(achieveData["type"]);
-
+				std::string type = app::util::JsonConverter::ToString(achieveData, "type");
 				// conditionやtargetValueが設定されていない場合のエラー回避
-				std::string conditionStr = "";
-				if (achieveData.contains("condition")) {
-					conditionStr = app::util::JsonConverter::ToString(achieveData["condition"]);
-				}
+				std::string conditionStr = app::util::JsonConverter::ToString(achieveData, "condition");
 
-				uint32_t targetValue = 0;
-				if (achieveData.contains("targetValue")) {
-					targetValue = app::util::JsonConverter::ToUInt32(achieveData["targetValue"]);
-				}
+				uint32_t targetValue = app::util::JsonConverter::ToUInt32(achieveData, "targetValue");
 
 				Achieve newAchieve; // std::unique_ptr<AchievementBase> と同義
 
