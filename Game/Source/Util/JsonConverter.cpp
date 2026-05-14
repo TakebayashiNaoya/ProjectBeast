@@ -7,7 +7,7 @@
 #include "JsonConverter.h"
 #include <fstream>
 
-#define ERROR_ASSERT assert(false, "キーが無効です。");
+#define ERROR_ASSERT K2_ASSERT(false, "キーが無効です。");
 
 namespace app
 {
