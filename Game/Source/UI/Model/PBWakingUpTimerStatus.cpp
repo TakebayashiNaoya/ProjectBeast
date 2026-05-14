@@ -4,9 +4,9 @@
  * @author 忽那
  */
 #include "stdafx.h"
+#include "MasterPBWakingUpTimerParameter.h"
 #include "PBWakingUpTimerStatus.h"
 #include "Source/Core/ParameterManager.h"
-#include "MasterPBWakingUpTimerParameter.h"
 
 
 namespace app
@@ -38,19 +38,19 @@ namespace app
 			// JSONファイルからパラメーターを読み込む。
 			core::ParameterManager::Get()->LoadParameter<MasterPBWakingUpTimerParameter>(JSON_PATH, [](const nlohmann::json& j, MasterPBWakingUpTimerParameter& parameter)
 				{
-					parameter.timerFirstValue = j["timerFirstValue"].get<float>();
-					parameter.timerSecondValue = j["timerSecondValue"].get<float>();
-					parameter.timerThirdValue = j["timerThirdValue"].get<float>();
-					parameter.timerFourthValue = j["timerFourthValue"].get<float>();
-					parameter.offsetValueY = j["offsetValueY"].get<float>();
-					parameter.ratioProgress = j[ "ratioProgress" ].get<float>();
-					parameter.degreeValue = j["degreeValue"].get<float>();
-					parameter.degreeMaxValue = j["degreeMaxValue"].get<float>();
-					parameter.initialPosZ = j[ "initialPosZ" ].get<float>();
-					parameter.resetValue = j[ "resetValue" ].get<float>();
-					parameter.offsetPosY = j[ "offsetPosY" ].get<float>();
-					parameter.arrowPivot = util::JsonConverter::ToVector2(j["arrowPivot"]);
-					parameter.skeltonColor = util::JsonConverter::ToVector4(j["skeltonColor"]);
+					parameter.timerFirstValue = util::JsonConverter::ToFloat(j, "timerFirstValue");
+					parameter.timerSecondValue = util::JsonConverter::ToFloat(j, "timerSecondValue");
+					parameter.timerThirdValue = util::JsonConverter::ToFloat(j, "timerThirdValue");
+					parameter.timerFourthValue = util::JsonConverter::ToFloat(j, "timerFourthValue");
+					parameter.offsetValueY = util::JsonConverter::ToFloat(j, "offsetValueY");
+					parameter.ratioProgress = util::JsonConverter::ToFloat(j, "ratioProgress");
+					parameter.degreeValue = util::JsonConverter::ToFloat(j, "degreeValue");
+					parameter.degreeMaxValue = util::JsonConverter::ToFloat(j, "degreeMaxValue");
+					parameter.initialPosZ = util::JsonConverter::ToFloat(j, "initialPosZ");
+					parameter.resetValue = util::JsonConverter::ToFloat(j, "resetValue");
+					parameter.offsetPosY = util::JsonConverter::ToFloat(j, "offsetPosY");
+					parameter.arrowPivot = util::JsonConverter::ToVector2(j, "arrowPivot");
+					parameter.skeltonColor = util::JsonConverter::ToVector4(j, "skeltonColor");
 				});
 		}
 
@@ -59,8 +59,8 @@ namespace app
 		{
 			core::ParameterManager::Get()->UnloadParameter<MasterPBWakingUpTimerParameter>();
 		}
-		
-		
+
+
 		void PBWakingUpTimerStatus::SetUpUI()
 		{
 			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterPBWakingUpTimerParameter>();
@@ -78,8 +78,8 @@ namespace app
 			m_arrowPivot = parameter->arrowPivot;
 			m_skeltonColor = parameter->skeltonColor;
 		}
-		
-		
+
+
 		void PBWakingUpTimerStatus::Update()
 		{
 			SetUpUI();
