@@ -170,11 +170,11 @@ namespace app
 				if (!m_colorApplied)
 				{
 					m_modelRender.SetMulColor(m_typeColor);
-					m_modelRender.Update();
 					m_colorApplied = true;
 				}
 
 
+				// 海にいる子ペンギンはアニメーションを再生させる
 				if (m_stateMachine)
 				{
 					m_stateMachine->Update();
