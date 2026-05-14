@@ -149,6 +149,29 @@ namespace nsBeastEngine
 	}
 
 
+	bool Frustum::IsPointInside(const Vector3& point) const
+	{
+		// 6平面すべての内側にある場合のみ内側と判定する
+		for (int planeNo = 0; planeNo < PLANE_NUM; planeNo++)
+		{
+			const SPlane& plane = m_planes[planeNo];
+
+			const float dist = plane.a * point.x
+				+ plane.b * point.y
+				+ plane.c * point.z
+				+ plane.d;
+
+			// 1平面でも外側にあれば視錐台の外
+			if (dist < 0.0f)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
 	void Frustum::NormalizePlane(SPlane& plane)
 	{
 		const float length = sqrtf(

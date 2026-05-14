@@ -90,6 +90,15 @@
     <ClCompile Include="Geometry\Frustum.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry\TriangleCuller.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\BeastMeshParts.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\BeastModel.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -204,6 +213,15 @@
     </ClInclude>
     <ClInclude Include="Geometry\Frustum.h">
       <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry\TriangleCuller.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\BeastModel.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\BeastMeshParts.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

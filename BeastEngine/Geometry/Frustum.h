@@ -88,6 +88,39 @@ namespace nsBeastEngine
 		 */
 		bool IsIntersectSphere(const Vector3& center, float radius) const;
 
+		/**
+		 * @brief 点が視錐台の内側にあるか判定する
+		 * @details
+		 *   6平面すべての内側（符号付き距離 >= 0）にある場合のみ内側と判定する。
+		 *   TriangleCuller から頂点単位の判定に使用する。
+		 * @param point 判定する点（ワールド座標）
+		 * @return 視錐台の内側にあればtrue
+		 */
+		bool IsPointInside(const Vector3& point) const;
+
+		/**
+		 * @brief 平面の数を取得する
+		 * @return 平面の数（常に6）
+		 */
+		int GetPlaneCount() const { return PLANE_NUM; }
+
+		/**
+		 * @brief 指定インデックスの平面係数を取得する
+		 * @details TriangleCuller の分離軸判定で使用する。
+		 * @param index 平面インデックス（0〜5）
+		 * @param outA  平面法線X成分の出力先
+		 * @param outB  平面法線Y成分の出力先
+		 * @param outC  平面法線Z成分の出力先
+		 * @param outD  平面距離成分の出力先
+		 */
+		void GetPlane(int index, float& outA, float& outB, float& outC, float& outD) const
+		{
+			outA = m_planes[index].a;
+			outB = m_planes[index].b;
+			outC = m_planes[index].c;
+			outD = m_planes[index].d;
+		}
+
 
 	private:
 		/**

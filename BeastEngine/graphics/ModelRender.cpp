@@ -5,22 +5,46 @@
  */
 #include "BeastEnginePreCompile.h"
 #include "ModelRender.h"
+#include "Graphics/BeastModel.h"
 
 
 namespace nsBeastEngine
 {
+	ModelRender::ModelRender()
+		: m_position(Vector3::Zero)
+		, m_scale(Vector3::One)
+		, m_rotation(Quaternion::Identity)
+		, m_animationClips(nullptr)
+		, m_maxInstance(1)
+		, m_numAnimationClips(0)
+		, m_animationSpeed(1.0f)
+		, m_renderToGBufferModel(std::make_unique<BeastModel>())
+		, m_forwardRenderModel(std::make_unique<BeastModel>())
+	{}
+
+	ModelRender::~ModelRender() = default;
+
+
+	void ModelRender::SetMulColor(const Vector4& mulColor)
+	{
+		m_model.SetMulColor(mulColor);
+		m_renderToGBufferModel->SetMulColor(mulColor);
+		m_forwardRenderModel->SetMulColor(mulColor);
+	}
+
+
 	void ModelRender::SetExpandConstantBuffer2(void* data)
 	{
 		// GBufferモデルはb2をPBRParamで使用しているため設定しない
 		m_model.SetExpandData2(data);
-		m_forwardRenderModel.SetExpandData2(data);
+		m_forwardRenderModel->SetExpandData2(data);
 	}
 
 
 	void ModelRender::SetExpandConstantBuffer3(void* data)
 	{
 		// GBufferパスのディザリングはb3を使用する
-		m_renderToGBufferModel.SetExpandData3(data);
+		m_renderToGBufferModel->SetExpandData3(data);
 	}
 
 
@@ -42,15 +66,18 @@ namespace nsBeastEngine
 		modelInitData.m_modelUpAxis = enModelUpAxiz;
 
 		// シェーダー設定
-		if (islighting) {
+		if (islighting)
+		{
 			modelInitData.m_fxFilePath = "Assets/shader/model.fx";
 		}
-		else {
+		else
+		{
 			modelInitData.m_fxFilePath = "Assets/shader/lightOffModel.fx";
 		}
 
 		// アニメーションがある場合はスケルトンを指定
-		if (animationClips != nullptr) {
+		if (animationClips != nullptr)
+		{
 			modelInitData.m_skeleton = &m_skeleton;
 		}
 
@@ -61,13 +88,15 @@ namespace nsBeastEngine
 		modelInitData.m_expandConstantBuffer = g_sceneLight->GetLight();
 		modelInitData.m_expandConstantBufferSize = sizeof(Light);
 
-		// モデル初期化
+		// 影モデル・GetModel()用の k2EngineLow::Model を初期化する
 		m_model.Init(modelInitData);
 
-		if (m_isForwardRender) {
-			m_forwardRenderModel.Init(modelInitData);
+		if (m_isForwardRender)
+		{
+			m_forwardRenderModel->Init(modelInitData);
 		}
-		else {
+		else
+		{
 			InitRenderToGBufferModel(modelInitData);
 		}
 
@@ -89,39 +118,40 @@ namespace nsBeastEngine
 		m_animationClips = animationeClips;
 		m_numAnimationClips = numAnimationClips;
 
-		ModelInitData modelInitData = initData; // コピーしてローカル調整
+		ModelInitData modelInitData = initData;
 
 		// シェーダーのエントリーポイント設定（アニメ有無でスキン用を切替）
 		SetupShaderEntryPointFunc(modelInitData);
 
 		// スケルトンが渡された場合は参照する（コピーしない）
 		m_skeletonRef = skeleton;
-		if (m_skeletonRef != nullptr) {
+		if (m_skeletonRef != nullptr)
+		{
 			modelInitData.m_skeleton = m_skeletonRef;
 		}
 
 		// シーンライトが未設定ならデフォルトを補完
-		if (modelInitData.m_expandConstantBuffer == nullptr) {
+		if (modelInitData.m_expandConstantBuffer == nullptr)
+		{
 			modelInitData.m_expandConstantBuffer = g_sceneLight->GetLight();
 			modelInitData.m_expandConstantBufferSize = sizeof(Light);
 		}
 
-		// モデル初期化
+		// 影モデル・GetModel()用の k2EngineLow::Model を初期化する
 		m_model.Init(modelInitData);
 
 		if (m_isForwardRender)
 		{
-			// フォワードレンダリング用のモデルを初期化する
-			m_forwardRenderModel.Init(modelInitData);
+			m_forwardRenderModel->Init(modelInitData);
 		}
 		else
 		{
-			// GBuffer描画用のモデルを初期化する
 			InitRenderToGBufferModel(modelInitData);
 		}
 
 		// アニメーション初期化
-		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr) {
+		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr)
+		{
 			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
 		}
 
@@ -148,10 +178,10 @@ namespace nsBeastEngine
 		gBufferInitData.m_psEntryPointFunc = "PSMain";
 
 		// GBufferのカラーバッファフォーマットを設定する
-		gBufferInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;  // アルベド
-		gBufferInitData.m_colorBufferFormat[1] = DXGI_FORMAT_R8G8B8A8_UNORM;      // 法線
+		gBufferInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// アルベド
+		gBufferInitData.m_colorBufferFormat[1] = DXGI_FORMAT_R8G8B8A8_UNORM;		// 法線
 		// dirLightScale・ambientScaleが1.0を超える値を扱うためR32G32B32A32_FLOATを使用する
-		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;  // PBRパラメータ
+		gBufferInitData.m_colorBufferFormat[2] = DXGI_FORMAT_R32G32B32A32_FLOAT;	// PBRパラメータ
 
 		// PBR補正パラメータをb2に設定する
 		gBufferInitData.m_expandConstantBuffer2 = &m_pbrParam;
@@ -167,7 +197,7 @@ namespace nsBeastEngine
 		gBufferInitData.m_expandConstantBuffer4 = &m_modelDitherCb;
 		gBufferInitData.m_expandConstantBufferSize4 = sizeof(SModelDitherCb);
 
-		m_renderToGBufferModel.Init(gBufferInitData);
+		m_renderToGBufferModel->Init(gBufferInitData);
 	}
 
 
@@ -190,11 +220,15 @@ namespace nsBeastEngine
 	}
 
 
-	void ModelRender::InitAnimation(AnimationClip* animtionClips, int numAnimationClips, EnModelUpAxis enModelUpAxis)
+	void ModelRender::InitAnimation(
+		AnimationClip* animtionClips,
+		int numAnimationClips,
+		EnModelUpAxis enModelUpAxis)
 	{
 		m_animationClips = animtionClips;
 		m_numAnimationClips = numAnimationClips;
-		if (m_animationClips != nullptr && m_skeletonRef != nullptr) {
+		if (m_animationClips != nullptr && m_skeletonRef != nullptr)
+		{
 			m_animation.Init(*m_skeletonRef, m_animationClips, m_numAnimationClips);
 		}
 	}
@@ -205,7 +239,8 @@ namespace nsBeastEngine
 		modelInitData.m_vsEntryPointFunc = "VSMain";
 		modelInitData.m_vsSkinEntryPointFunc = "VSMain";
 		/** アニメーションがある場合 */
-		if (m_animationClips != nullptr) {
+		if (m_animationClips != nullptr)
+		{
 			modelInitData.m_vsSkinEntryPointFunc = "VSMainSkin";
 		}
 	}
@@ -214,8 +249,8 @@ namespace nsBeastEngine
 	void ModelRender::UpdateWorldMatrixInModes()
 	{
 		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
-		m_renderToGBufferModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
-		m_forwardRenderModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_renderToGBufferModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_forwardRenderModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 	}
 
@@ -344,7 +379,8 @@ namespace nsBeastEngine
 		UpdateWorldMatrixInModes();
 
 		/** スケルトンのボーン行列を更新する */
-		if (m_skeletonRef != nullptr && m_skeletonRef->IsInited()) {
+		if (m_skeletonRef != nullptr && m_skeletonRef->IsInited())
+		{
 			m_skeletonRef->Update(m_model.GetWorldMatrix());
 		}
 
@@ -360,11 +396,13 @@ namespace nsBeastEngine
 	{
 		if (!m_visible) return;
 
-		if (!m_isForwardRender) {
+		if (!m_isForwardRender)
+		{
 			// ディファードレンダリングで描画するなら
 			g_renderingEngine->AddDeferredModelList(this);
 		}
-		else {
+		else
+		{
 			// フォワードレンダリングで描画するなら
 			g_renderingEngine->AddForwardModelList(this);
 		}
@@ -376,12 +414,16 @@ namespace nsBeastEngine
 		/** 描画が有効でない場合は処理しない */
 		if (!m_visible) return;
 
+		const Frustum& frustum = g_renderingEngine->GetFrustum();
+
 		/** フォワードレンダリング用のモデルが有効な場合はそちらを描画し、そうでない場合は通常のモデルを描画する */
-		if (m_isForwardRender) {
-			m_forwardRenderModel.Draw(rc, m_maxInstance);
+		if (m_isForwardRender)
+		{
+			m_forwardRenderModel->Draw(rc, frustum, m_maxInstance);
 		}
-		else {
-			m_renderToGBufferModel.Draw(rc, m_maxInstance);
+		else
+		{
+			m_renderToGBufferModel->Draw(rc, frustum, m_maxInstance);
 		}
 	}
 }
