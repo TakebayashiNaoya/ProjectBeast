@@ -187,7 +187,7 @@ namespace app
 					}
 				}
 
-				// ロード完了済み → 行列のみ更新（AIやステートマシンは動かさない）
+				// ロード完了済み → 行列更新
 				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 				m_modelRender.Update();
 			}
