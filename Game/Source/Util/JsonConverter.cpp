@@ -14,10 +14,10 @@ namespace app
 	namespace util
 	{
 		const bool JsonConverter::InvalidBool = false;
-		const int JsonConverter::InvalidInt = INT_MAX;
-		const uint32_t JsonConverter::InvalidUInt32 = UINT32_MAX;
+		const int JsonConverter::InvalidInt = -1;
+		const uint32_t JsonConverter::InvalidUInt32 = 0;
 		const float JsonConverter::InvalidFloat = FLT_MAX;
-		const std::string JsonConverter::InvalidString = std::to_string(STRING_NONE);
+		const std::string JsonConverter::InvalidString = "";
 		const Vector2 JsonConverter::InvalidVector2 = Vector2(FLT_MAX, FLT_MAX);
 		const Vector3 JsonConverter::InvalidVector3 = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
 		const Vector4 JsonConverter::InvalidVector4 = Vector4(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
