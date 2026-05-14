@@ -12,6 +12,10 @@ namespace
 {
 	// SE再生上限数
 	constexpr uint8_t MAX_SE_PLAY_NUM = 7;
+
+	constexpr float DEFAULT_VOLUME = 0.1f;
+
+	constexpr const char* SOUND_GO_NAME = "se";
 }
 
 
@@ -21,10 +25,10 @@ namespace app
 
 
 	SoundManager::SoundManager()
-		: m_masterVolume(0.1f)
-		, m_bgmVolume(0.1f)
-		, m_seVolume(0.1f)
-		, m_voiceVolume(0.1f)
+		: m_masterVolume(DEFAULT_VOLUME)
+		, m_bgmVolume(DEFAULT_VOLUME)
+		, m_seVolume(DEFAULT_VOLUME)
+		, m_voiceVolume(DEFAULT_VOLUME)
 	{
 		m_seList.clear();
 
@@ -49,6 +53,7 @@ namespace app
 			/** 再生が終わっているなら削除 */
 			if (!se->IsPlaying()) {
 				eraseSEList.push_back(key);
+				DeleteGO(se);    // 再生を止める
 			}
 		}
 		for (const auto& key : eraseSEList) {
@@ -65,6 +70,7 @@ namespace app
 			/** 再生が終わっているなら削除 */
 			if (!voice->IsPlaying()) {
 				eraseVoiceList.push_back(key);
+				DeleteGO(voice);    // 再生を止める
 			}
 		}
 		for (const auto& key : eraseVoiceList) {
@@ -78,7 +84,7 @@ namespace app
 		for (const auto& infoList : m_seInfomationList) {
 			// 優先度の中のリスト
 			for (const auto& info : infoList) {
-				auto* se = NewGO<SoundSource>(0, "se");
+				auto* se = NewGO<SoundSource>(0, SOUND_GO_NAME);
 				se->Init(info.m_kind, info.m_is3D);
 				se->SetVolume(m_masterVolume * m_seVolume);
 				se->Play(info.m_isLoop);
@@ -105,7 +111,7 @@ namespace app
 	void SoundManager::PlayBGM(const int kind)
 	{
 		if (m_bgm == nullptr) {
-			m_bgm = NewGO<SoundSource>(0, "se");
+			m_bgm = NewGO<SoundSource>(0, SOUND_GO_NAME);
 		}
 		else {
 			m_bgm->Stop();
@@ -189,7 +195,7 @@ namespace app
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
 			return INVALID_VOICE_HANDLE;
 		}
-		auto* voice = NewGO<SoundSource>(0, "se");
+		auto* voice = NewGO<SoundSource>(0, SOUND_GO_NAME);
 		voice->Init(kind, is3D);
 		voice->SetVolume(m_masterVolume * m_voiceVolume);
 		voice->Play(isLoop);

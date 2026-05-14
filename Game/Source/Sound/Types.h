@@ -42,10 +42,12 @@ namespace app
 		enSoundKind_Whistle,
 		enSoundKind_CountDown,
 		enSoundKind_GameStart,
-		enSoundKind_ResultStamp,
+		enSoundKind_Stamp,
 		enSoundKind_DrumRoll,
 		enSoundKind_Cymbals,
 		enSoundKind_IglooBreak,
+		enSoundKind_NoticeAchievement,
+		enSoundKind_FadeOutAchievement,
 
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
@@ -107,6 +109,8 @@ namespace app
 		SoundInformation("Assets/sound/SE/result/drumRoll.wav"),
 		SoundInformation("Assets/sound/SE/result/cymbals.wav"),
 		SoundInformation("Assets/sound/SE/igloo/iglooBreak.wav"),
+		SoundInformation("Assets/sound/SE/achievement/noticeAchievement.wav"),
+		SoundInformation("Assets/sound/SE/achievement/fadeOutAchievement.wav"),
 
 
 		//BGM
