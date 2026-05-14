@@ -181,7 +181,7 @@ namespace app
 				if (m_stateMachine)
 				{
 					m_stateMachine->Update();
-					if (m_stateMachine->IsSwimming())
+					if (m_stateMachine->IsSwimming() && m_modelRender.IsPlayingAnimation())
 					{
 						m_modelRender.PlayAnimation(static_cast<int>(EnPenguinAnimationID::MoveSwim));
 					}
