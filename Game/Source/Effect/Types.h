@@ -16,6 +16,7 @@ enum class EnEffectKind : uint8_t
 	Whirlpool,
 	IglooBreak,
 	SwimSplash,
+	PenguinLanding,
 	Max,
 	None = Max,
 };
@@ -38,5 +39,6 @@ static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Ma
 	EffectInformation(u"Assets/effect/whirlpool/Whirlpool.efk"),
 	EffectInformation(u"Assets/effect/stage/igloo/IglooBreak.efk"),
 	EffectInformation(u"Assets/effect/swim/swimSplash.efk"),
+	EffectInformation(u"Assets/effect/penguin/jump/LandingFrost.efk"),
 };
 

@@ -42,6 +42,8 @@ namespace app
 			constexpr float DEFAULT_ANIMATION_SPEED = 1.0f; // アニメーションの再生速度のデフォルト値
 
 			constexpr float SLIDE_END_ANIMATION_SPEED = 2.5f; // スライド終了アニメーションの再生速度
+
+			const Vector3 LANDING_EFFECT_SCALE = { 1.5f, 1.5f, 1.5f }; // 着地エフェクトのスケール
 		}
 
 
@@ -253,6 +255,13 @@ namespace app
 			app::NoiseManager::GetInstance().AddNoise(
 				m_owner->GetTransform().m_position,
 				app::EnNoiseType::Fall
+			);
+
+			EffectManager::Get().PlayEffect(
+				EnEffectKind::PenguinLanding,
+				m_owner->GetTransform().m_position,
+				Quaternion::Identity,
+				LANDING_EFFECT_SCALE
 			);
 		}
 
