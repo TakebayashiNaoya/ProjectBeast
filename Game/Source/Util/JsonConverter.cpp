@@ -63,7 +63,7 @@ namespace app
 				return json[key].get<bool>();
 			}
 			ERROR_ASSERT;
-			return InvalidBool();
+			return InvalidBool;
 		}
 
 
@@ -242,3 +242,4 @@ namespace app
 			};
 		}
 	}
+}

@@ -26,23 +26,23 @@ namespace app
 		class JsonConverter
 		{
 		public:
-			/** 無効なbool値を返す関数 */
+			/** 無効なbool値 */
 			static const bool InvalidBool;
-			/** 無効なint値を返す関数 */
+			/** 無効なint値 */
 			static const int InvalidInt;
-			/** 無効なuint32_t値を返す関数 */
+			/** 無効なuint32_t値 */
 			static const uint32_t InvalidUInt32;
-			/** 無効なfloat値を返す関数 */
+			/** 無効なfloat値 */
 			static const float InvalidFloat;
-			/** 無効なstring値を返す関数 */
+			/** 無効なstring値 */
 			static const std::string InvalidString;
-			/** 無効なVector2値を返す関数 */
+			/** 無効なVector2値 */
 			static const Vector2 InvalidVector2;
-			/** 無効なVector3値を返す関数 */
+			/** 無効なVector3値 */
 			static const Vector3 InvalidVector3;
-			/** 無効なVector4値を返す関数 */
+			/** 無効なVector4値 */
 			static const Vector4 InvalidVector4;
-			/** 無効なFloatRange値を返す関数 */
+			/** 無効なFloatRange値 */
 			static const FloatRange InvalidFloatRange;
 
 
