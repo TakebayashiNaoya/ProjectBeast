@@ -72,7 +72,7 @@ namespace app
 			 * @brief モデルの行列更新のみ行う（AI・ステートマシンは動かさない）
 			 * @detail カウントダウン中など、描画は必要だが動かしたくない場合に使用
 			 */
-			void UpdateModelOnly();
+			virtual void UpdateModelOnly();
 
 
 		public:
@@ -86,6 +86,10 @@ namespace app
 			 * @param data モデルデータ
 			 */
 			void Init(const ModelData& data);
+			/**
+			 * @brief モデルの非同期ロードの更新処理
+			 */
+			void ModelLoadUpdate();
 
 
 		protected:
