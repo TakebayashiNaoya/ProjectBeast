@@ -23,7 +23,6 @@ namespace app
 		void AchievementBase::InitAchievementBase(const nlohmann::json& json)
 		{
 			m_name = app::util::JsonConverter::ToString(json, "name");
-			std::string condition = app::util::JsonConverter::ToString(json, "condition");
 
 			m_id = Hash32(m_name.c_str());
 

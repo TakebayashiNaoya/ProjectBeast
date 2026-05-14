@@ -84,8 +84,9 @@ namespace app
 				K2_ASSERT(achieveData.contains("type"), "typeが未設定");
 
 				// ★ json ではなく achieveData から取得するように修正
+				// type、condition、targetValueを取得
 				std::string type = app::util::JsonConverter::ToString(achieveData, "type");
-				// conditionやtargetValueが設定されていない場合のエラー回避
+
 				std::string conditionStr = app::util::JsonConverter::ToString(achieveData, "condition");
 
 				uint32_t targetValue = app::util::JsonConverter::ToUInt32(achieveData, "targetValue");
