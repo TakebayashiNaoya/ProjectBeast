@@ -7,6 +7,8 @@
 #include "JsonConverter.h"
 #include <fstream>
 
+#define ERROR_ASSERT assert(false, "キーが無効です。");
+
 namespace app
 {
 	namespace util
@@ -49,7 +51,8 @@ namespace app
 			{
 				return json[key].get<bool>();
 			}
-			return false;
+			ERROR_ASSERT;
+			return INVALID_BOOL;
 		}
 
 
@@ -59,7 +62,8 @@ namespace app
 			{
 				return json[key].get<int>();
 			}
-			return INT_MAX;
+			ERROR_ASSERT;
+			return INVALID_INT;
 		}
 
 
@@ -69,7 +73,8 @@ namespace app
 			{
 				return json[key].get<uint32_t>();
 			}
-			return UINT32_MAX;
+			ERROR_ASSERT;
+			return INVALID_UINT32;
 		}
 
 
@@ -79,7 +84,8 @@ namespace app
 			{
 				return json[key].get<float>();
 			}
-			return FLT_MAX;
+			ERROR_ASSERT;
+			return INVALID_FLOAT;
 		}
 
 
@@ -89,26 +95,27 @@ namespace app
 			{
 				return json[key].get<std::string>();
 			}
-			return "";
+			ERROR_ASSERT;
+			return INVALID_STRING;
 		}
 
 
 		Vector2 JsonConverter::ToVector2(const nlohmann::json& json, const char* key)
 		{
-			const Vector2 errorValue(FLT_MAX, FLT_MAX);
+			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 2)
+			{
+				ERROR_ASSERT;
+				return INVALID_VECTOR2;
+			}
 
 			const auto& array = json[key];
-
-			if (!json.contains(key) || !array.is_array() || array.size() != 2)
-			{
-				return errorValue;
-			}
 
 			for (int i = 0; i < 2; i++)
 			{
 				if (!array[i].is_number())
 				{
-					return errorValue;
+					ERROR_ASSERT;
+					return INVALID_VECTOR2;
 				}
 			}
 
@@ -121,19 +128,23 @@ namespace app
 
 		Vector3 JsonConverter::ToVector3(const nlohmann::json& json, const char* key)
 		{
-			const Vector3 errorValue(FLT_MAX, FLT_MAX, FLT_MAX);
-			const auto& array = json[key];
-			if (!json.contains(key) || !array.is_array() || array.size() != 3)
+			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 3)
 			{
-				return errorValue;
+				ERROR_ASSERT;
+				return INVALID_VECTOR3;
 			}
+
+			const auto& array = json[key];
+
 			for (int i = 0; i < 3; i++)
 			{
 				if (!array[i].is_number())
 				{
-					return errorValue;
+					ERROR_ASSERT;
+					return INVALID_VECTOR3;
 				}
 			}
+
 			return Vector3(
 				array[0].get<float>(),
 				array[1].get<float>(),
@@ -144,18 +155,18 @@ namespace app
 
 		Vector3 JsonConverter::ToVector3(const nlohmann::json& json)
 		{
-			const Vector3 errorValue(FLT_MAX, FLT_MAX, FLT_MAX);
-
 			if (!json.is_array() || json.size() != 3)
 			{
-				return errorValue;
+				ERROR_ASSERT;
+				return INVALID_VECTOR3;
 			}
 
 			for (int i = 0; i < 3; i++)
 			{
 				if (!json[i].is_number())
 				{
-					return errorValue;
+					ERROR_ASSERT;
+					return INVALID_VECTOR3;
 				}
 			}
 
@@ -169,20 +180,20 @@ namespace app
 
 		Vector4 JsonConverter::ToVector4(const nlohmann::json& json, const char* key)
 		{
-			const Vector4 errorValue(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 4)
+			{
+				ERROR_ASSERT;
+				return INVALID_VECTOR4;
+			}
 
 			const auto& array = json[key];
-
-			if (!json.contains(key) || !array.is_array() || array.size() != 4)
-			{
-				return errorValue;
-			}
 
 			for (int i = 0; i < 4; i++)
 			{
 				if (!array[i].is_number())
 				{
-					return errorValue;
+					ERROR_ASSERT;
+					return INVALID_VECTOR4;
 				}
 			}
 
@@ -197,20 +208,20 @@ namespace app
 
 		FloatRange JsonConverter::ToFloatRange(const nlohmann::json& json, const char* key)
 		{
-			const FloatRange errorValue{ FLT_MAX, FLT_MAX };
+			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 2)
+			{
+				ERROR_ASSERT;
+				return INVALID_FLOAT_RANGE;
+			}
 
 			const auto& array = json[key];
-
-			if (!json.contains(key) || !array.is_array() || array.size() != 2)
-			{
-				return errorValue;
-			}
 
 			for (int i = 0; i < 2; i++)
 			{
 				if (!array[i].is_number())
 				{
-					return errorValue;
+					ERROR_ASSERT;
+					return INVALID_FLOAT_RANGE;
 				}
 			}
 

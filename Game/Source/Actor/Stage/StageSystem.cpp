@@ -34,7 +34,7 @@ namespace
 
 	/**
 	 * @brief jsonファイルからQuaternionを変換する
-	 * @param arr json配列
+	 * @param arr jsonファイル
 	 * @param key キー
 	 */
 	Quaternion ToRotation(const nlohmann::json& arr, const char* key)
