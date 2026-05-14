@@ -16,6 +16,9 @@ namespace app
 	{
 		m_effectList.clear();
 
+		// ResistEffect() の初回呼び出し時に TextureLoader などの Loader 初期化が
+		// 必要になるため、コンストラクタで一度だけ BeginFrame() を呼んで事前セットアップする。
+		// 毎フレームの BeginFrame() は K2EngineLow 側から呼ばれるが、ここでは登録処理の前提条件を満たす目的で実行している。
 		EffectEngine::GetInstance()->BeginFrame();
 
 		// サウンドの登録
