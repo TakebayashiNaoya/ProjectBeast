@@ -254,6 +254,13 @@ namespace app
 				m_owner->GetTransform().m_position,
 				app::EnNoiseType::Fall
 			);
+
+			EffectManager::Get().PlayEffect(
+				EnEffectKind::PenguinJump,
+				m_owner->GetTransform().m_position,
+				Quaternion::Identity,
+				Vector3(2.0f, 2.0f, 2.0f)
+			);
 		}
 
 
