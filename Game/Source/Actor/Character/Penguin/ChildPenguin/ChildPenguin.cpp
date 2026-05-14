@@ -161,9 +161,12 @@ namespace app
 		}
 
 
-		void ChildPenguin::UpdateModelOnly()
+		void ChildPenguin::UpdateAtCountDownTime()
 		{
-			CharacterBase::UpdateModelOnly();
+			// ロード完了待ち（Update()と同じ処理）
+			ModelLoadUpdate();
+
+
 
 			if (m_modelReady)
 			{
@@ -183,6 +186,10 @@ namespace app
 						m_modelRender.PlayAnimation(static_cast<int>(EnPenguinAnimationID::MoveSwim));
 					}
 				}
+
+				// ロード完了済み → 行列のみ更新（AIやステートマシンは動かさない）
+				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
+				m_modelRender.Update();
 			}
 		}
 	}

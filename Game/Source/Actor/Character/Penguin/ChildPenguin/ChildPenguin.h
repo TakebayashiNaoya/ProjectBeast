@@ -93,10 +93,9 @@ namespace app
 
 		public:
 			/**
-			 * @brief モデルの行列更新のみ行う（AI・ステートマシンは動かさない）
-			 * @detail カウントダウン中など、描画は必要だが動かしたくない場合に使用
+			 * @brief ゲーム開始前のカウントダウン中の更新処理
 			 */
-			void UpdateModelOnly() override final;
+			void UpdateAtCountDownTime();
 
 
 		private:
