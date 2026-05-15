@@ -28,12 +28,22 @@ namespace app
 			constexpr uint32_t ACHIEVE_FADE_OUT_ANIM_KEY = Hash32("fadeOutAnim");
 
 
-			/** 救助数のUIAnimationKey */
-			constexpr uint32_t RESCUE_REMAIN_SCALE_UP_ANIM_KEY = Hash32("rScaleUpAnim");
-			constexpr uint32_t RESCUE_REMAIN_SCALE_DOWN_ANIM_KEY = Hash32("rScaleDownAnim");
+			/** 救助数(子ペンギン)のUIAnimationKey */
 			constexpr uint32_t RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY = Hash32("rTlanslateUpAnim");
 			constexpr uint32_t RESCUE_REMAIN_TLANSLATE_DOWN_ANIM_KEY = Hash32("rTlanslateDownAnim");
-			constexpr uint32_t RESCUE_TOTAL_SCALE_DOWN_ANIM_KEY = Hash32("tScaleDownAnim");
+
+			constexpr uint32_t RESCUE_REMAIN_LITTLE_UP_ANIM_KEY = Hash32("rLittleUpAnim");
+			constexpr uint32_t RESCUE_REMAIN_LITTLE_DOWN_ANIM_KEY = Hash32("rLittleDownAnim");
+
+			constexpr uint32_t RESCUE_REMAIN_SINK_UP_ANIM_KEY = Hash32("rSinkUpAnim");
+			constexpr uint32_t RESCUE_REMAIN_SINK_DOWN_ANIM_KEY = Hash32("rSinkDownAnim");
+
+			constexpr uint32_t RESCUE_TOTAL_LITTLE_UP_ANIM_KEY = Hash32("tLittleUpAnim");
+			constexpr uint32_t RESCUE_TOTAL_LITTLE_DOWN_ANIM_KEY = Hash32("tLittleDownAnim");
+
+			constexpr uint32_t RESCUE_TOTAL_SINK_UP_ANIM_KEY = Hash32("tSinkUpAnim");
+			constexpr uint32_t RESCUE_TOTAL_SINK_DOWN_ANIM_KEY = Hash32("tSinkDownAnim");
+			constexpr uint32_t RESCUE_TOTAL_TLANSLATE_UP_ANIM_KEY = Hash32("tTlanslateUpAnim");
 			constexpr uint32_t RESCUE_TOTAL_TLANSLATE_DOWN_ANIM_KEY = Hash32("tTlanslateDownAnim");
 
 

@@ -1,66 +1,95 @@
 {
     "animations":[
         {
-            "comment":"Remainのスケールアップアニメーション",
-            "key":"rScaleUpAnim",
-            "valueType":"Vector3",
-            "startValue":{ "x":1.0, "y":1.0, "z":1.0 },
-            "endValue":{ "x":1.0, "y":1.4, "z":1.0 },
-            "duration":5.2,
-            "easing":"EaseOut",
-            "loop":"PingPong"
-        },
-        {
-            "comment":"Remainのスケールダウンアニメーション",
-            "key":"rScaleDownAnim",
-            "valueType":"Vector3",
-            "startValue":{ "x":1.0, "y":0.7, "z":1.0 },
-            "endValue":{ "x":1.0, "y":1.0, "z":1.0 },
-            "duration":5.2,
-            "easing":"EaseOut",
-            "loop":"PingPong"
-        },
-        {
-            "comment":"Remainの差分アップアニメーション",
+            "comment":"跳ねさせるアニメーション",
             "key":"rTlanslateUpAnim",
             "valueType":"Vector3",
-            "startValue":{ "x":0, "y":100, "z":0 },
-            "endValue":{ "x":0, "y":0, "z":0 },
-            "duration":5.2,
+            "startValue":{ "x":-619, "y":85, "z":0 },
+            "endValue":{ "x":-619, "y":100, "z":0 },
+            "duration":0.1,
             "easing":"EaseOut",
-            "loop":"PingPong"
+            "loop":"Once"
         },
         {
-            "comment":"Remainの差分ダウンアニメーション",
+            "comment":"跳ねた後に元に戻すアニメーション",
             "key":"rTlanslateDownAnim",
             "valueType":"Vector3",
-            "startValue":{ "x":0, "y":0, "z":0 },
-            "endValue":{ "x":0, "y":-100, "z":0 },
-            "duration":5.2,
-            "easing":"EaseOut",
-            "loop":"PingPong"
+            "startValue":{ "x":-619, "y":100, "z":0 },
+            "endValue":{ "x":-619, "y":85, "z":0 },
+            "duration":0.2,
+            "easing":"EaseIn",
+            "loop":"Once"
         },
-        
-        
+
+
+
         {
-            "comment":"Totalのスケーダウンアニメーション",
-            "key":"tScaleDownAnim",
+            "comment":"沈むアニメーション",
+            "key":"rSinkDownAnim",
             "valueType":"Vector3",
-            "startValue":{ "x":1.0,"y":0.7, "z": 1.0 },
-            "endValue":{ "x":1.0, "y":1.0, "z":1.0 },
-            "duration":5.2,
+            "startValue":{ "x":-619, "y":85, "z":0 },
+            "endValue":{ "x":-619, "y":70, "z":0 },
+            "duration":0.1,
             "easing":"EaseOut",
-            "loop":"PingPong"
+            "loop":"Once"
         },
         {
-            "comment":"Totalの差分ダウンアニメーション",
+            "comment":"沈んだ後に元に戻るアニメーション",
+            "key":"rSinkUpAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-619, "y":70, "z":0 },
+            "endValue":{ "x":-619, "y":85, "z":0 },
+            "duration":0.2,
+            "easing":"EaseIn",
+            "loop":"Once"
+        },
+
+
+
+        {
+            "comment":"沈むアニメーション",
+            "key":"tSinkDownAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-490, "y":85, "z":0 },
+            "endValue":{ "x":-490, "y":70, "z":0 },
+            "duration":0.1,
+            "easing":"EaseOut",
+            "loop":"Once"
+        },
+        {
+            "comment":"沈んだ後に元に戻るアニメーション",
+            "key":"tSinkUpAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-490, "y":70, "z":0 },
+            "endValue":{ "x":-490, "y":85, "z":0 },
+            "duration":0.2,
+            "easing":"EaseIn",
+            "loop":"Once"
+        },
+        
+
+
+
+        
+        {
+            "comment":"跳ねさせるアニメーション",
+            "key":"tTlanslateUpAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-490, "y":85, "z":0 },
+            "endValue":{ "x":-490, "y":100, "z":0 },
+            "duration":0.1,
+            "easing":"EaseOut",
+            "loop":"Once"
+        },
+        {
+            "comment":"跳ねた後に戻すアニメーション",
             "key":"tTlanslateDownAnim",
             "valueType":"Vector3",
-            "startValue":{ "x":0, "y":-100, "z":0 },
-            "endValue":{ "x":0, "y":0, "z":0 },
-            "duration":5.2,
-            "easing":"EaseOut",
-            "loop":"PingPong"
+            "startValue":{ "x":-490, "y":100, "z":0 },
+            "endValue":{ "x":-490, "y":85, "z":0 },
+            "duration":0.2,
+            "easing":"EaseIn",
+            "loop":"Once"
         }
     ]
 }
