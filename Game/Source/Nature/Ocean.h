@@ -46,6 +46,16 @@ namespace app
 				Vector4 mulColor;	/** 乗算カラー */
 			};
 
+			/**
+			 * @brief チャンクAABB構造体
+			 * @details チャンク単位のフラスタムカリング判定に使用する
+			 */
+			struct SChunkAABB
+			{
+				Vector3 min;	/** ワールド空間AABB最小点 */
+				Vector3 max;	/** ワールド空間AABB最大点 */
+			};
+
 
 		public:
 			/**
@@ -68,6 +78,13 @@ namespace app
 			static constexpr float GRID_SIZE = 12500.0f;
 			/** グリッドの分割数（N×N）。GRID_SIZEに比例させて頂点密度を維持する */
 			static constexpr int   GRID_DIVISION = 128;
+			/**
+			 * @brief チャンク分割数のデフォルト値（縦横共通）
+			 * @details GRID_DIVISIONをこの値で均等割りしてチャンクを構成する。
+			 *          constexprではないため再コンパイルなしに変更できる。
+			 *          GRID_DIVISIONの約数を指定すること（例: 4, 8, 16, 32）。
+			 */
+			static const int DEFAULT_CHUNK_DIVISION = 8;
 
 
 		public:
@@ -107,13 +124,31 @@ namespace app
 			void DispatchWaveCS(const SWaveConstantBuffer& waveCb);
 
 			/**
-			 * @brief 描画
+			 * @brief チャンクAABBを波高さキャッシュから構築する
+			 * @details DispatchWaveCS()のReadback完了後に呼ぶこと。
+			 *          各チャンク内の頂点の波高さmin/maxをY範囲として使用する。
+			 * @param maxWaveHeight 波の理論的最大高さ（wave1Amplitude + wave2Amplitude）
+			 */
+			void BuildChunkAABBs(float maxWaveHeight);
+
+			/**
+			 * @brief カリングなしで描画する
 			 * @details DispatchWaveCS()はUpdate()で完了済みであることを前提とする。
 			 *          描画コマンドのみを発行する。
 			 * @param rc		描画コンテキスト
 			 * @param mWorld	ワールド行列
 			 */
 			void Draw(RenderContext& rc, const Matrix& mWorld);
+
+			/**
+			 * @brief チャンク単位のフラスタムカリングを行いながら描画する
+			 * @details DispatchWaveCS()・BuildChunkAABBs()がUpdate()で完了済みであることを前提とする。
+			 *          視錐台と交差するチャンクのインデックスのみをGPUバッファに書き込んで描画する。
+			 * @param rc		描画コンテキスト
+			 * @param mWorld	ワールド行列
+			 * @param frustum	カリングに使用する視錐台
+			 */
+			void Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::Frustum& frustum);
 
 			/**
 			 * @brief 拡張定数バッファを更新する
@@ -148,6 +183,14 @@ namespace app
 			void InitDescriptorHeap();
 			void InitComputeShader();
 
+			/**
+			 * @brief 共通の描画コマンドを発行する
+			 * @details Draw()の共通処理（定数バッファ更新・パイプライン設定・頂点バッファ設定）をまとめる
+			 * @param rc		描画コンテキスト
+			 * @param mWorld	ワールド行列
+			 */
+			void SetupDrawCommands(RenderContext& rc, const Matrix& mWorld);
+
 
 		private:
 			/** グリッド頂点数 */
@@ -158,8 +201,22 @@ namespace app
 			Texture        m_specularMap;				/** スペキュラマップ */
 
 			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
-			IndexBuffer    m_indexBuffer;				/** インデックスバッファ */
-			int            m_indexCount = 0;			/** インデックスの数 */
+			IndexBuffer    m_indexBuffer;				/** 元インデックスバッファ（カリングなし描画用） */
+			IndexBuffer    m_visibleIndexBuffer;		/** 可視インデックスバッファ（カリングあり描画用） */
+			int            m_indexCount = 0;			/** 元インデックスの総数 */
+
+			/** 元インデックス配列（BuildChunkAABBs・カリング描画用CPUキャッシュ） */
+			std::vector<uint32_t> m_srcIndexArray;
+			/** チャンクごとの元インデックス先頭オフセット（m_srcIndexArray内） */
+			std::vector<int>      m_chunkIndexOffsets;
+			/** チャンクごとのインデックス数 */
+			std::vector<int>      m_chunkIndexCounts;
+			/** 毎フレーム更新される可視インデックス配列 */
+			std::vector<uint32_t> m_visibleIndexArray;
+			/** チャンクAABB配列（BuildChunkAABBs()で毎フレーム更新） */
+			std::vector<SChunkAABB> m_chunkAABBs;
+			/** チャンク分割数（縦横共通） */
+			int m_chunkDivision = DEFAULT_CHUNK_DIVISION;
 
 			Shader* m_vs = nullptr;						/** 頂点シェーダー */
 			Shader* m_ps = nullptr;						/** ピクセルシェーダー */
