@@ -36,6 +36,7 @@ namespace app
 		class InGameButtonMenu;
 
 		class CPReactionSystem;
+		class WpWarningSystem;
 	}
 
 
@@ -128,6 +129,8 @@ namespace app
 		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
 		/** @brief 子ペンギンリアクションシステムを取得 */
 		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem; }
+		/** @brief WpWarningSystemを取得 */
+		inline ui::WpWarningSystem* GetWpWarningSystem() const { return m_wpWarningSystem; }
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
@@ -168,6 +171,7 @@ namespace app
 
 
 		ui::CPReactionSystem* m_cpReactionSystem = nullptr;
+		ui::WpWarningSystem* m_wpWarningSystem = nullptr;
 
 
 		//------------------------------------------------------------
