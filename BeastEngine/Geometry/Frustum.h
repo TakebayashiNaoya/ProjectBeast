@@ -47,14 +47,33 @@ namespace nsBeastEngine
 
 
 	public:
+#if defined(_DEBUG)
+		/**
+		 * @brief デバッグ用フラスタム縮小スケール
+		 * @details
+		 *   1.0f のとき通常（画面端 = フラスタム境界）。
+		 *   1.0f より大きくするとプロジェクション行列の
+		 *   XY スケール成分が拡大され、フラスタムの左右・上下平面が
+		 *   画面内側に寄る。境界が画面に映るため動作確認に使用する。
+		 *   確認が終わったら 1.0f に戻すこと。
+		 */
+		static constexpr float DEBUG_FRUSTUM_SHRINK_SCALE = 1.0f;
+#endif
+
+
+	public:
 		/**
 		 * @brief 視錐台を更新する
 		 * @details
 		 *   ビュープロジェクション行列から6平面を抽出する。
 		 *   RenderingEngine::Execute()の先頭で毎フレーム呼ぶこと。
 		 * @param viewProjMatrix ビュープロジェクション行列
+		 * @param screenShrinkScale
+		 *   プロジェクション行列の XY スケールに乗算する係数。
+		 *   1.0f で通常サイズ、大きいほどフラスタムが画面内側に縮小する。
+		 *   デバッグ用途以外では 1.0f を渡すこと。
 		 */
-		void Update(const Matrix& viewProjMatrix);
+		void Update(const Matrix& viewProjMatrix, float screenShrinkScale = 1.0f);
 
 		/**
 		 * @brief AABBが視錐台と交差しているか判定する

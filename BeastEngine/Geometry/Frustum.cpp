@@ -9,11 +9,30 @@
 
 namespace nsBeastEngine
 {
-	void Frustum::Update(const Matrix& viewProjMatrix)
+	void Frustum::Update(const Matrix& viewProjMatrix, float screenShrinkScale)
 	{
 		// Gribb/Hartmann 法でビュープロジェクション行列から6平面を抽出する
 		// 行列の各行を m[row][col] で参照する
-		const float* m = &viewProjMatrix.m[0][0];
+		// screenShrinkScale > 1.0f のとき、プロジェクション行列の XY スケール成分を
+		// 拡大した仮想行列を使用することでフラスタムの左右・上下平面を画面内側に寄せる
+		const float* src = &viewProjMatrix.m[0][0];
+
+		// 行列を一時コピーし、XY スケール成分に screenShrinkScale を乗算する
+		// DirectXMath の Matrix は行優先で格納されているため、
+		// [0][0] が X スケール、[1][1] が Y スケールに相当する
+		float m[16];
+		for (int i = 0; i < 16; i++)
+		{
+			m[i] = src[i];
+		}
+		m[0] *= screenShrinkScale;	// [0][0]: X スケール
+		m[4] *= screenShrinkScale;	// [1][0]: ビュー行列の影響列（左右平面に寄与）
+		m[8] *= screenShrinkScale;	// [2][0]: ビュー行列の影響列（左右平面に寄与）
+		m[12] *= screenShrinkScale;	// [3][0]: 平行移動列（左右平面に寄与）
+		m[1] *= screenShrinkScale;	// [0][1]: Y スケール
+		m[5] *= screenShrinkScale;	// [1][1]: ビュー行列の影響列（上下平面に寄与）
+		m[9] *= screenShrinkScale;	// [2][1]: ビュー行列の影響列（上下平面に寄与）
+		m[13] *= screenShrinkScale;	// [3][1]: 平行移動列（上下平面に寄与）
 
 		// 左平面: col0 + col3
 		m_planes[enPlane_Left].a = m[3] + m[0];
