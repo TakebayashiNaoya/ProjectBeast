@@ -24,11 +24,11 @@ namespace app
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterCPReactionParameter>("Assets/parameter/UI/cpReaction/CPReactionParameter.json", [](const nlohmann::json& j, MasterCPReactionParameter& parameter)
 				{
-					parameter.swayTime = util::JsonConverter::ToFloat(j["swayTime"]);
-					parameter.iconOffsetY = util::JsonConverter::ToFloat(j["iconOffsetY"]);
-					parameter.speechBubbleOffset = util::JsonConverter::ToVector3(j["speechBubbleOffset"]);
-					parameter.troubleReactionOffset = util::JsonConverter::ToVector3(j["troubleReactionOffset"]);
-					parameter.happyReactionOffset = util::JsonConverter::ToVector3(j["happyReactionOffset"]);
+					parameter.swayTime = util::JsonConverter::ToFloat(j, "swayTime");
+					parameter.iconOffsetY = util::JsonConverter::ToFloat(j, "iconOffsetY");
+					parameter.speechBubbleOffset = util::JsonConverter::ToVector3(j, "speechBubbleOffset");
+					parameter.troubleReactionOffset = util::JsonConverter::ToVector3(j, "troubleReactionOffset");
+					parameter.happyReactionOffset = util::JsonConverter::ToVector3(j, "happyReactionOffset");
 				});
 		}
 

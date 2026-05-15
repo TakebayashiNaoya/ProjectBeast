@@ -11,11 +11,11 @@
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "ClumsyChildPenguinStateMachine.h"
+#include "Physics/Physics.h"
 #include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Core/ParameterManager.h"
-#include "Physics/Physics.h"
 
 
 namespace app
@@ -158,6 +158,39 @@ namespace app
 		void ChildPenguin::Render(RenderContext& rc)
 		{
 			PenguinBase::Render(rc);
+		}
+
+
+		void ChildPenguin::UpdateAtCountDownTime()
+		{
+			// ロード完了待ち（Update()と同じ処理）
+			ModelLoadUpdate();
+
+
+
+			if (m_modelReady)
+			{
+				if (!m_colorApplied)
+				{
+					m_modelRender.SetMulColor(m_typeColor);
+					m_colorApplied = true;
+				}
+
+
+				// 海にいる子ペンギンはアニメーションを再生させる
+				if (m_stateMachine)
+				{
+					m_stateMachine->Update();
+					if (m_stateMachine->IsSwimming() && m_modelRender.IsPlayingAnimation())
+					{
+						m_modelRender.PlayAnimation(static_cast<int>(EnPenguinAnimationID::MoveSwim));
+					}
+				}
+
+				// ロード完了済み → 行列更新
+				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
+				m_modelRender.Update();
+			}
 		}
 	}
 }

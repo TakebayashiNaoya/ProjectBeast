@@ -29,6 +29,14 @@ namespace app
 				m_ownerActor->GetModelRender()->PlayAnimation(static_cast<uint8_t>(animationID));
 			}
 			/**
+			 * @brief アニメーションの再生速度の設定
+			 * @param speed 再生速度（1.0f=通常速度）
+			 */
+			inline void SetAnimationSpeed(float speed)
+			{
+				m_ownerActor->SetAnimationSpeed(speed);
+			}
+			/**
 			 * @brief アニメーションが再生中か
 			 * @return 再生中ならtrue
 			 */

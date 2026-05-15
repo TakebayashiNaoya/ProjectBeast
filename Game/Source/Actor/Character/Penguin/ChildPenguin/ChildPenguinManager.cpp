@@ -105,7 +105,7 @@ namespace app
 		{
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
-				cp->UpdateModelOnly();
+				cp->UpdateAtCountDownTime();
 			}
 		}
 

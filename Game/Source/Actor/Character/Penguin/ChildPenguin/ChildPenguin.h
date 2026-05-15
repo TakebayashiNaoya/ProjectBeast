@@ -91,6 +91,13 @@ namespace app
 			void Render(RenderContext& rc) override final;
 
 
+		public:
+			/**
+			 * @brief ゲーム開始前のカウントダウン中の更新処理
+			 */
+			void UpdateAtCountDownTime();
+
+
 		private:
 			/** ステートマシン */
 			std::unique_ptr<ChildPenguinStateMachine> m_stateMachine;

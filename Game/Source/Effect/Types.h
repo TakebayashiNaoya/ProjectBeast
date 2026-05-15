@@ -16,6 +16,7 @@ enum class EnEffectKind : uint8_t
 	Whirlpool,
 	IglooBreak,
 	SwimSplash,
+	PenguinLanding,
 	Max,
 	None = Max,
 };
