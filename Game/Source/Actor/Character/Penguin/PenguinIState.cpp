@@ -44,6 +44,8 @@ namespace app
 			constexpr float SLIDE_END_ANIMATION_SPEED = 2.5f; // スライド終了アニメーションの再生速度
 
 			const Vector3 LANDING_EFFECT_SCALE = { 1.5f, 1.5f, 1.5f }; // 着地エフェクトのスケール
+
+			const Vector3 SLIDE_EFFECT_SCALE = { 1.0f, 1.0f, 1.0f }; // スライドエフェクトのスケール
 		}
 
 
@@ -334,6 +336,13 @@ namespace app
 			app::NoiseManager::GetInstance().AddNoise(
 				m_owner->GetTransform().m_position,
 				app::EnNoiseType::Slide
+			);
+
+			EffectManager::Get().PlayEffect(
+				EnEffectKind::PenguinSlide,
+				m_owner->GetTransform().m_position,
+				Quaternion::Identity,
+				LANDING_EFFECT_SCALE
 			);
 
 			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
