@@ -13,10 +13,6 @@ namespace app
 {
 	namespace actor
 	{
-		/** 前方宣言 */
-		//class ActorStatus;
-
-
 		/**
 		 * @brief 見た目が存在するオブジェクトの基底クラス
 		 */
@@ -55,6 +51,11 @@ namespace app
 			 * @param scale 拡大率
 			 */
 			void SetScale(const Vector3 scale) { m_transform.m_scale = scale; }
+			/**
+			 * @brief アニメーション再生速度の設定
+			 * @param speed 再生速度（1.0f=通常速度）
+			 */
+			void SetAnimationSpeed(float speed) { m_modelRender.SetAnimationSpeed(speed); }
 
 
 		public:

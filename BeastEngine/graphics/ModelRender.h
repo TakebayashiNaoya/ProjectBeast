@@ -114,6 +114,21 @@ namespace nsBeastEngine
 		inline void SetScale(const float& x, const float& y, const float& z) { m_scale = Vector3(x, y, z); }
 
 		/**
+		 * @brief アニメーション再生速度の設定
+		 * @param speed 再生速度（1.0f=通常速度）
+		 */
+		inline void SetAnimationSpeed(float speed)
+		{
+			// アニメーションの再生速度の最小値
+			constexpr float minAnimationSpeed = 0.1f;
+			// アニメーションの再生速度の最大値
+			constexpr float maxAnimationSpeed = 10.0f;
+
+			m_animationSpeed = std::max<float>(minAnimationSpeed, speed);
+			m_animationSpeed = std::min<float>(maxAnimationSpeed, m_animationSpeed);
+		}
+
+		/**
 		 * @brief モデルの取得
 		 * @return モデル
 		 */

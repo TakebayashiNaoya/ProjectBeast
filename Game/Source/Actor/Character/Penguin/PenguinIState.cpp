@@ -38,6 +38,12 @@ namespace app
 			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
 
 			constexpr float FORWARD_LENGTH_NORMALIZE_SQ = 0.0001f; // 前方ベクトルの正規化を行うかどうかの閾値の二乗
+
+			constexpr float DEFAULT_ANIMATION_SPEED = 1.0f; // アニメーションの再生速度のデフォルト値
+
+			constexpr float SLIDE_END_ANIMATION_SPEED = 2.5f; // スライド終了アニメーションの再生速度
+
+			const Vector3 LANDING_EFFECT_SCALE = { 1.5f, 1.5f, 1.5f }; // 着地エフェクトのスケール
 		}
 
 
@@ -250,6 +256,13 @@ namespace app
 				m_owner->GetTransform().m_position,
 				app::EnNoiseType::Fall
 			);
+
+			EffectManager::Get().PlayEffect(
+				EnEffectKind::PenguinLanding,
+				m_owner->GetTransform().m_position,
+				Quaternion::Identity,
+				LANDING_EFFECT_SCALE
+			);
 		}
 
 
@@ -368,6 +381,7 @@ namespace app
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
 			m_owner->PlayAnimation(EnPenguinAnimationID::StandUp);
+			m_owner->SetAnimationSpeed(SLIDE_END_ANIMATION_SPEED);
 		}
 
 
@@ -379,7 +393,9 @@ namespace app
 
 
 		void PenguinSlideEndState::Exit()
-		{}
+		{
+			m_owner->SetAnimationSpeed(DEFAULT_ANIMATION_SPEED);
+		}
 
 
 		PenguinSlideEndState::PenguinSlideEndState(PenguinStateMachine* owner)

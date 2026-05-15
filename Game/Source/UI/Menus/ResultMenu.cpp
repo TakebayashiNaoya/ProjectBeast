@@ -282,7 +282,7 @@ namespace app
 					if (m_checkRevealTimer >= threshold)
 					{
 						m_checkIconList[m_checkRevealIndex]->SetIsDraw(true);
-						SoundManager::Get().PlaySE(enSoundKind_ResultStamp);
+						SoundManager::Get().PlaySE(enSoundKind_Stamp);
 						m_checkRevealIndex++;
 					}
 				}

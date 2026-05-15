@@ -26,6 +26,28 @@ namespace app
 		class JsonConverter
 		{
 		public:
+			/** 無効なbool値 */
+			static const bool InvalidBool;
+			/** 無効なint値 */
+			static const int InvalidInt;
+			/** 無効なuint32_t値 */
+			static const uint32_t InvalidUInt32;
+			/** 無効なfloat値 */
+			static const float InvalidFloat;
+			/** 無効なstring値 */
+			static const std::string InvalidString;
+			/** 無効なVector2値 */
+			static const Vector2 InvalidVector2;
+			/** 無効なVector3値 */
+			static const Vector3 InvalidVector3;
+			/** 無効なVector4値 */
+			static const Vector4 InvalidVector4;
+			/** 無効なFloatRange値 */
+			static const FloatRange InvalidFloatRange;
+
+
+
+		public:
 			/**
 			 * @brief jsonファイルを読み込めたかどうか
 			 * @param json 読み込むjsonファイル
@@ -60,96 +82,81 @@ namespace app
 			/**
 			 * @brief jsonからboolを読み込む
 			 * @param json 読み込むjsonファイル
+			 * @param key 読み込むキー
 			 * @return 読み込んだbool
 			 */
-			static inline bool ToBool(const nlohmann::json& json)
-			{
-				return json.get<bool>();
-			}
+			static bool ToBool(const nlohmann::json& json, const char* key);
+
 			/**
 			 * @brief jsonからintを読み込む
 			 * @param json 読み込むjsonファイル
+			 * @param key 読み込むキー
 			 * @return 読み込んだint
 			 */
-			static inline int ToInt(const nlohmann::json& json)
-			{
-				return json.get<int>();
-			}
+			static int ToInt(const nlohmann::json& json, const char* key);
+
 			/**
 			 * @brief jsonからuint32_tを読み込む
 			 * @param json 読み込むjsonファイル
+			 * @param key 読み込むキー
 			 * @return 読み込んだuint32_t
 			 */
-			static inline uint32_t ToUInt32(const nlohmann::json& json)
-			{
-				return json.get<uint32_t>();
-			}
+			static uint32_t ToUInt32(const nlohmann::json& json, const char* key);
+
 			/**
 			 * @brief jsonからfloatを読み込む
 			 * @param json 読み込むjsonファイル
+			 * @param key 読み込むキー
 			 * @return 読み込んだfloat
 			 */
-			static inline float ToFloat(const nlohmann::json& json)
-			{
-				return json.get<float>();
-			}
+			static float ToFloat(const nlohmann::json& json, const char* key);
+
 			/**
 			 * @brief jsonからstringを読み込む
 			 * @param json 読み込むjsonファイル
+			 * @param key 読み込むキー
 			 * @return 読み込んだstring
 			 */
-			static inline std::string ToString(const nlohmann::json& json)
-			{
-				return json.get<std::string>();
-			}
+			static std::string ToString(const nlohmann::json& json, const char* key);
+
 			/**
 			 * @brief jsonからVector2を読み込む
 			 * @param json読み込むjsonファイル
+			 * @param key 読み込むキー
 			 * @return 読み込んだVector2
 			 */
-			static inline Vector2 ToVector2(const nlohmann::json& json)
-			{
-				return Vector2(
-					json[0].get<float>(),
-					json[1].get<float>()
-				);
-			}
+			static Vector2 ToVector2(const nlohmann::json& json, const char* key);
+
+			/**
+			 * @brief jsonからVector3を読み込む
+			 * @param json 読み込むjsonファイル
+			 * @param key 読み込むキー
+			 * @return 読み込んだVector3
+			 */
+			static Vector3 ToVector3(const nlohmann::json& json, const char* key);
+
 			/**
 			 * @brief jsonからVector3を読み込む
 			 * @param json 読み込むjsonファイル
 			 * @return 読み込んだVector3
 			 */
-			static inline Vector3 ToVector3(const nlohmann::json& json)
-			{
-				return Vector3(
-					json[0].get<float>(),
-					json[1].get<float>(),
-					json[2].get<float>()
-				);
-			}
+			static Vector3 ToVector3(const nlohmann::json& json);
+
 			/**
 			 * @brief jsonからVector4を読み込む
-			 * @param json 読み込むjsonファイル	
+			 * @param json 読み込むjsonファイル
+			 * @param key 読み込むキー
 			 * @return 読み込んだVector4
 			 */
-			static inline Vector4 ToVector4(const nlohmann::json& json)
-			{
-				return Vector4(
-					json[0].get<float>(),
-					json[1].get<float>(),
-					json[2].get<float>(),
-					json[3].get<float>()
-				);
-			}
+			static Vector4 ToVector4(const nlohmann::json& json, const char* key);
+
 			/**
 			 * @brief jsonからFloatRange(Min, Max)を読み込む
 			 * @param json 読み込むjsonファイル(配列を想定)
+			 * @param key 読み込むキー
 			 * @return 読み込んだFloatRange
 			 */
-			static inline FloatRange ToFloatRange(const nlohmann::json& json)
-			{
-				return { json[0].get<float>(), json[1].get<float>() };
-			}
+			static FloatRange ToFloatRange(const nlohmann::json& json, const char* key);
 
 
 		private:

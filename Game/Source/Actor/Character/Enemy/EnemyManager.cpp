@@ -4,12 +4,12 @@
  * @author 竹林
  */
 #include "stdafx.h"
-#include "EnemyManager.h"
 #include "Enemy.h"
 #include "EnemyController.h"
+#include "EnemyManager.h"
 #include "EnemyStateMachine.h"
-#include "Source/Util/JsonConverter.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Util/JsonConverter.h"
 
 
 namespace app
@@ -52,10 +52,10 @@ namespace app
 
 				/** 1. エネミーの生成 */
 				data.enemy = new Enemy();
-				data.enemy->SetPosition(util::JsonConverter::ToVector3(enemyJson["spawnPosition"]));
+				data.enemy->SetPosition(util::JsonConverter::ToVector3(enemyJson, "spawnPosition"));
 
 				/** 2. 巣の座標を設定 */
-				std::string homeName = util::JsonConverter::ToString(enemyJson["nestName"]);
+				std::string homeName = util::JsonConverter::ToString(enemyJson, "nestName");
 				Vector3 homePos = actor::StageSystem::GetInstance()->GetObjectPosition(homeName);
 				data.enemy->SetHomePosition(homePos);
 

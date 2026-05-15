@@ -7,6 +7,7 @@
 #include "EnemyParameter.h"
 #include "EnemyStatus.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Util/JsonConverter.h"
 
 
 namespace app
@@ -18,12 +19,12 @@ namespace app
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterEnemyParameter>("Assets/parameter/character/enemy/EnemyParameter.json", [](const nlohmann::json& j, MasterEnemyParameter& parameter)
 				{
-					parameter.walkSpeed = j["walkSpeed"].get<float>();
-					parameter.runSpeed = j["runSpeed"].get<float>();
-					parameter.radius = j["radius"].get<float>();
-					parameter.height = j["height"].get<float>();
-					parameter.swimSpeed = j["swimSpeed"].get<float>();
-					parameter.maxEat = j["maxEat"].get<int>();
+					parameter.walkSpeed = util::JsonConverter::ToFloat(j, "walkSpeed");
+					parameter.runSpeed = util::JsonConverter::ToFloat(j, "runSpeed");
+					parameter.radius = util::JsonConverter::ToFloat(j, "radius");
+					parameter.height = util::JsonConverter::ToFloat(j, "height");
+					parameter.swimSpeed = util::JsonConverter::ToFloat(j, "swimSpeed");
+					parameter.maxEat = util::JsonConverter::ToInt(j, "maxEat");
 				});
 		}
 
