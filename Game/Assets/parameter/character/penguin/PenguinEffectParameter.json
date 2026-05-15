@@ -13,15 +13,13 @@
         "maxSplashScaleRatio": 1.0,
         "minSpeed": 0.1,
         "maxSpeed": 1.0,
-        "defaultAnimationSpeed": 1.0,
-        "slideEndAnimationSpeed": 2.5,
         "landingEffectScale": {
           "x": 1.5,
           "y": 1.5,
           "z": 1.5
         },
         "slideEffectScale": {
-          "x": 1.0,
+          "x": 2.0,
           "y": 1.0,
           "z": 1.0
         }
