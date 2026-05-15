@@ -172,7 +172,8 @@ namespace app
 						return;
 					}
 
-					whirlpool->RenderWrapper(rc);
+					// 球判定を通過した渦潮に対してトライアングルカリングを適用して描画する
+					whirlpool->Render(rc, frustum);
 				});
 		}
 

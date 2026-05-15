@@ -53,7 +53,14 @@ namespace nsBeastEngine
 		// ビュープロジェクション行列からフラスタム（視錐台）を更新する
 		Matrix viewProjMatrix;
 		viewProjMatrix.Multiply(g_camera3D->GetViewMatrix(), g_camera3D->GetProjectionMatrix());
+
+#if defined(_DEBUG)
+		// デバッグ時はフラスタムを画面内側に縮小して境界を画面上で確認できるようにする
+		// 確認が終わったら Frustum.h の DEBUG_FRUSTUM_SHRINK_SCALE を 1.0f に戻すこと
+		m_frustum.Update(viewProjMatrix, Frustum::DEBUG_FRUSTUM_SHRINK_SCALE);
+#else
 		m_frustum.Update(viewProjMatrix);
+#endif
 
 		// G-Bufferへの描画処理
 		RenderToGBuffer(rc);
