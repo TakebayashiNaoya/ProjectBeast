@@ -177,25 +177,65 @@ namespace app
 			m_visibleIndexArray.clear();
 
 			const int cellsPerChunk = GRID_DIVISION / m_chunkDivision;
+			const float gridHalfSize = GRID_SIZE * 0.5f;
+			const float cellSize = GRID_SIZE / static_cast<float>(GRID_DIVISION);
+			const int numVertsPerRow = GRID_DIVISION + 1;
 
 			for (int chunkZ = 0; chunkZ < m_chunkDivision; chunkZ++)
 			{
 				for (int chunkX = 0; chunkX < m_chunkDivision; chunkX++)
 				{
 					const int chunkIndex = chunkZ * m_chunkDivision + chunkX;
-					const SChunkAABB& aabb = m_chunkAABBs[static_cast<size_t>(chunkIndex)];
+					const SChunkAABB& chunkAABB = m_chunkAABBs[static_cast<size_t>(chunkIndex)];
 
 					// チャンクAABBが視錐台と交差しない場合はスキップする
-					if (!frustum.IsIntersectAABBWorld(aabb.min, aabb.max))
+					if (!frustum.IsIntersectAABBWorld(chunkAABB.min, chunkAABB.max))
 					{
 						continue;
 					}
 
-					// 可視チャンクのインデックスを追加する
-					const int offset = m_chunkIndexOffsets[static_cast<size_t>(chunkIndex)];
-					const int count = m_chunkIndexCounts[static_cast<size_t>(chunkIndex)];
-					const uint32_t* src = m_srcIndexArray.data() + offset;
-					m_visibleIndexArray.insert(m_visibleIndexArray.end(), src, src + count);
+					// 交差チャンクはセル単位でAABB判定し、可視セルのインデックスのみ追加する
+					// セルのY範囲は親チャンクのY範囲をそのまま流用する
+					const int cellXStart = chunkX * cellsPerChunk;
+					const int cellZStart = chunkZ * cellsPerChunk;
+
+					for (int cz = cellZStart; cz < cellZStart + cellsPerChunk; cz++)
+					{
+						for (int cx = cellXStart; cx < cellXStart + cellsPerChunk; cx++)
+						{
+							// セルのXZ範囲をワールド空間で算出する
+							const float cellMinX = -gridHalfSize + cellSize * static_cast<float>(cx);
+							const float cellMinZ = -gridHalfSize + cellSize * static_cast<float>(cz);
+							const float cellMaxX = cellMinX + cellSize;
+							const float cellMaxZ = cellMinZ + cellSize;
+
+							// セルAABBのY範囲は親チャンクのY範囲を流用する
+							const Vector3 cellMin(cellMinX, chunkAABB.min.y, cellMinZ);
+							const Vector3 cellMax(cellMaxX, chunkAABB.max.y, cellMaxZ);
+
+							// セルAABBが視錐台と交差しない場合はスキップする
+							if (!frustum.IsIntersectAABBWorld(cellMin, cellMax))
+							{
+								continue;
+							}
+
+							// 可視セルの三角形インデックスを追加する
+							const int topLeft = cz * numVertsPerRow + cx;
+							const int topRight = cz * numVertsPerRow + cx + 1;
+							const int bottomLeft = (cz + 1) * numVertsPerRow + cx;
+							const int bottomRight = (cz + 1) * numVertsPerRow + cx + 1;
+
+							// 三角形①
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(topLeft));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(bottomLeft));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(topRight));
+
+							// 三角形②
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(topRight));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(bottomLeft));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(bottomRight));
+						}
+					}
 				}
 			}
 
