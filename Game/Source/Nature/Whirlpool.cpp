@@ -11,6 +11,8 @@
 #include "Source/Core/ParameterManager.h"
 #include "Source/Effect/EffectManager.h"
 #include "graphics/effect/BeastEffectEmitter.h"
+#include "Geometry/Frustum.h"
+#include "Geometry/TriangleCuller.h"
 
 
 namespace app
@@ -125,32 +127,68 @@ namespace app
 			mRot.MakeRotationFromQuaternion(m_transform.m_rotation);
 			Matrix mTrans;
 			mTrans.MakeTranslation(m_transform.m_position);
-			Matrix mWorld = mScale * mRot * mTrans;
+			const Matrix mWorld = mScale * mRot * mTrans;
 
-			// 共通定数バッファを更新する（b0）
-			SCommonConstantBuffer commonCb;
-			commonCb.mWorld = mWorld;
-			commonCb.mView = g_camera3D->GetViewMatrix();
-			commonCb.mProj = g_camera3D->GetProjectionMatrix();
-			commonCb.mulColor = Vector4::One;
-			m_commonConstantBuffer.CopyToVRAM(commonCb);
+			SetupDrawCommands(rc, mWorld);
 
-			// 渦潮定数バッファを更新する（b1）
-			SWhirlpoolConstantBuffer whirlpoolCb;
-			whirlpoolCb.uvRotation = m_uvRotation;
-			whirlpoolCb.padding[0] = 0.0f;
-			whirlpoolCb.padding[1] = 0.0f;
-			whirlpoolCb.padding[2] = 0.0f;
-			m_whirlpoolConstantBuffer.CopyToVRAM(whirlpoolCb);
-
-			// 描画コマンドを発行する
-			rc.SetRootSignature(m_rootSignature);
-			rc.SetPipelineState(m_pipelineState);
-			rc.SetDescriptorHeap(m_descriptorHeap);
-			rc.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			rc.SetVertexBuffer(m_vertexBuffer);
+			// カリングなし：元インデックスバッファをそのまま使用する
 			rc.SetIndexBuffer(m_indexBuffer);
 			rc.DrawIndexedInstance(m_indexCount, 1);
+
+			m_whirlpoolPowerSystem->RenderWrapper(rc);
+		}
+
+
+		void Whirlpool::Render(RenderContext& rc, const nsBeastEngine::Frustum& frustum)
+		{
+			if (m_state == EnWhirlpoolState::None) return;
+
+			// 毎フレーム頂点YをOceanの波面に合わせて更新する
+			UpdateVertexHeights();
+
+			// ワールド行列を計算する（スケール × 回転 × 平行移動）
+			Matrix mScale;
+			mScale.MakeScaling(m_transform.m_scale);
+			Matrix mRot;
+			mRot.MakeRotationFromQuaternion(m_transform.m_rotation);
+			Matrix mTrans;
+			mTrans.MakeTranslation(m_transform.m_position);
+			const Matrix mWorld = mScale * mRot * mTrans;
+
+			SetupDrawCommands(rc, mWorld);
+
+			// トライアングルカリング
+			// m_verticesのposをワールド変換してからTriangleCullerに渡す
+			const int numVerts = static_cast<int>(m_vertices.size());
+			std::vector<Vector3> worldPositions(numVerts);
+			for (int i = 0; i < numVerts; ++i)
+			{
+				worldPositions[i] = m_vertices[i].pos;
+				mWorld.Apply(worldPositions[i]);
+			}
+
+			m_visibleIndexArray.clear();
+			const nsBeastEngine::TriangleCuller culler;
+			culler.Cull(
+				worldPositions.data(),
+				numVerts,
+				m_srcIndexArray.data(),
+				static_cast<int>(m_srcIndexArray.size()),
+				frustum,
+				m_visibleIndexArray
+			);
+
+			// 可視インデックスが1つもなければドローコールをスキップする
+			if (m_visibleIndexArray.empty())
+			{
+				m_whirlpoolPowerSystem->RenderWrapper(rc);
+				return;
+			}
+
+			// 可視インデックスをGPUバッファに書き込んでドローコールを発行する
+			m_visibleIndexBuffer.Copy(m_visibleIndexArray.data());
+			rc.SetIndexBuffer(m_visibleIndexBuffer);
+			rc.DrawIndexedInstance(static_cast<int>(m_visibleIndexArray.size()), 1);
 
 			m_whirlpoolPowerSystem->RenderWrapper(rc);
 		}
@@ -175,7 +213,8 @@ namespace app
 			const MasterWhirlpoolParameter* param = GetParam();
 
 			// UV回転を毎フレーム加算する（ピクセルシェーダーでテクスチャが回って見える）
-			const float uvRotationSpeed = (param != nullptr) ? param->uvRotationSpeed : 1.5f;
+			const float uvRotationSpeed = (param != nullptr) ?
+				param->uvRotationSpeed : 1.5f;
 			m_uvRotation += uvRotationSpeed * deltaTime;
 
 			switch (m_state)
@@ -227,44 +266,6 @@ namespace app
 			default:
 				break;
 			}
-		}
-
-
-		void Whirlpool::PlayWhirlpoolEffect()
-		{
-			m_effectHandle = EffectManager::Get().PlayEffect(
-				EnEffectKind::Whirlpool,
-				m_transform.m_position,
-				Quaternion::Identity,
-				EFFECT_SCALE
-			);
-		}
-
-
-		void Whirlpool::StopWhirlpoolEffect()
-		{
-			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;
-
-			EffectManager::Get().StopEffect(m_effectHandle);
-			m_effectHandle = INVALID_EFFECT_HANDLE;
-		}
-
-
-		void Whirlpool::UpdateWhirlpoolEffectScale()
-		{
-			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;
-
-			auto* effect = EffectManager::Get().FindEffect(m_effectHandle);
-			if (effect == nullptr)
-			{
-				// エフェクトが自己削除済みの場合はハンドルを無効化する
-				m_effectHandle = INVALID_EFFECT_HANDLE;
-				return;
-			}
-
-			// 渦潮のXZスケール比率（0.0〜1.0）をエフェクトスケールに反映する
-			const float ratio = (m_maxScaleXZ > 0.0f) ? (m_transform.m_scale.x / m_maxScaleXZ) : 1.0f;
-			effect->SetScale(EFFECT_SCALE * ratio);
 		}
 
 
@@ -333,17 +334,16 @@ namespace app
 			m_vertexBuffer.Copy(m_vertices.data());
 
 			// インデックスを生成する
-			std::vector<uint32_t> indices;
-			indices.reserve(numSegments * 3 + (numRings - 1) * numSegments * 6);
+			m_srcIndexArray.reserve(numSegments * 3 + (numRings - 1) * numSegments * 6);
 
 			// 中心点と最初のリングの三角形を生成する
 			for (int seg = 0; seg < numSegments; ++seg)
 			{
 				const int curr = 1 + seg;
 				const int next = 1 + (seg + 1) % numSegments;
-				indices.push_back(0);
-				indices.push_back(curr);
-				indices.push_back(next);
+				m_srcIndexArray.push_back(0);
+				m_srcIndexArray.push_back(static_cast<uint32_t>(curr));
+				m_srcIndexArray.push_back(static_cast<uint32_t>(next));
 			}
 
 			// 隣接リング間の四角形を三角形2枚に分割して生成する
@@ -357,24 +357,62 @@ namespace app
 					const int nextOuter = 1 + (ring + 1) * numSegments + (seg + 1) % numSegments;
 
 					// 三角形①
-					indices.push_back(curr);
-					indices.push_back(currOuter);
-					indices.push_back(next);
+					m_srcIndexArray.push_back(static_cast<uint32_t>(curr));
+					m_srcIndexArray.push_back(static_cast<uint32_t>(currOuter));
+					m_srcIndexArray.push_back(static_cast<uint32_t>(next));
 
 					// 三角形②
-					indices.push_back(next);
-					indices.push_back(currOuter);
-					indices.push_back(nextOuter);
+					m_srcIndexArray.push_back(static_cast<uint32_t>(next));
+					m_srcIndexArray.push_back(static_cast<uint32_t>(currOuter));
+					m_srcIndexArray.push_back(static_cast<uint32_t>(nextOuter));
 				}
 			}
 
-			// インデックスバッファを初期化する
-			m_indexCount = static_cast<int>(indices.size());
+			m_indexCount = static_cast<int>(m_srcIndexArray.size());
+
+			// 元インデックスバッファ（カリングなし描画用）を初期化する
 			m_indexBuffer.Init(
-				static_cast<int>(sizeof(uint32_t) * indices.size()),
+				static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
 				sizeof(uint32_t)
 			);
-			m_indexBuffer.Copy(indices.data());
+			m_indexBuffer.Copy(m_srcIndexArray.data());
+
+			// 可視インデックスバッファ（カリングあり描画用）を同サイズで確保する
+			// 最大でも全インデックス数と同じサイズになるため、同サイズで確保する
+			m_visibleIndexBuffer.Init(
+				static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
+				sizeof(uint32_t)
+			);
+
+			// 可視インデックス配列を最大サイズで事前確保しておく（毎フレームのアロケーションを避ける）
+			m_visibleIndexArray.reserve(m_srcIndexArray.size());
+		}
+
+
+		void Whirlpool::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld)
+		{
+			// 共通定数バッファを更新する（b0）
+			SCommonConstantBuffer commonCb;
+			commonCb.mWorld = mWorld;
+			commonCb.mView = g_camera3D->GetViewMatrix();
+			commonCb.mProj = g_camera3D->GetProjectionMatrix();
+			commonCb.mulColor = Vector4::One;
+			m_commonConstantBuffer.CopyToVRAM(commonCb);
+
+			// 渦潮定数バッファを更新する（b1）
+			SWhirlpoolConstantBuffer whirlpoolCb;
+			whirlpoolCb.uvRotation = m_uvRotation;
+			whirlpoolCb.padding[0] = 0.0f;
+			whirlpoolCb.padding[1] = 0.0f;
+			whirlpoolCb.padding[2] = 0.0f;
+			m_whirlpoolConstantBuffer.CopyToVRAM(whirlpoolCb);
+
+			// 描画コマンドの共通セットアップを発行する
+			rc.SetRootSignature(m_rootSignature);
+			rc.SetPipelineState(m_pipelineState);
+			rc.SetDescriptorHeap(m_descriptorHeap);
+			rc.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			rc.SetVertexBuffer(m_vertexBuffer);
 		}
 
 
@@ -511,6 +549,45 @@ namespace app
 			}
 
 			m_vertexBuffer.Copy(m_vertices.data());
+		}
+
+
+		void Whirlpool::PlayWhirlpoolEffect()
+		{
+			m_effectHandle = EffectManager::Get().PlayEffect(
+				EnEffectKind::Whirlpool,
+				m_transform.m_position,
+				Quaternion::Identity,
+				EFFECT_SCALE
+			);
+		}
+
+
+		void Whirlpool::StopWhirlpoolEffect()
+		{
+			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;
+
+			EffectManager::Get().StopEffect(m_effectHandle);
+			m_effectHandle = INVALID_EFFECT_HANDLE;
+		}
+
+
+		void Whirlpool::UpdateWhirlpoolEffectScale()
+		{
+			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;
+
+			auto* effect = EffectManager::Get().FindEffect(m_effectHandle);
+			if (effect == nullptr)
+			{
+				// エフェクトが自己削除済みの場合はハンドルを無効化する
+				m_effectHandle = INVALID_EFFECT_HANDLE;
+				return;
+			}
+
+			// 渦潮のXZスケール比率（0.0〜1.0）をエフェクトスケールに反映する
+			const float ratio = (m_maxScaleXZ > 0.0f) ?
+				(m_transform.m_scale.x / m_maxScaleXZ) : 1.0f;
+			effect->SetScale(EFFECT_SCALE * ratio);
 		}
 	}
 }

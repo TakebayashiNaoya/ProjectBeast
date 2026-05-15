@@ -12,6 +12,12 @@
 #include "Source/Effect/EffectManager.h"
 
 
+namespace nsBeastEngine
+{
+	class Frustum;
+}
+
+
 namespace app
 {
 	namespace nature
@@ -113,6 +119,15 @@ namespace app
 			void Start() override;
 			void Update() override;
 			void Render(RenderContext& rc) override;
+			/**
+			 * @brief トライアングルカリングを適用して描画する
+			 * @details
+			 *   視錐台と交差する三角形のインデックスのみをGPUバッファに書き込んで描画する。
+			 *   頂点はUpdateVertexHeights()で毎フレーム更新済みのm_verticesを使用する。
+			 * @param rc      描画コンテキスト
+			 * @param frustum カリングに使用する視錐台
+			 */
+			void Render(RenderContext& rc, const nsBeastEngine::Frustum& frustum);
 
 
 		public:
@@ -176,6 +191,16 @@ namespace app
 			 */
 			void UpdateWhirlpoolEffectScale();
 
+			/**
+			 * @brief 定数バッファを更新して描画コマンドの共通セットアップを行う
+			 * @details
+			 *   Render() の2つのオーバーロードで共通する、定数バッファ更新・
+			 *   パイプライン設定・頂点バッファ設定・UpdateVertexHeights() をまとめる。
+			 * @param rc     描画コンテキスト
+			 * @param mWorld ワールド行列
+			 */
+			void SetupDrawCommands(RenderContext& rc, const Matrix& mWorld);
+
 
 		private:
 			/**
@@ -191,8 +216,14 @@ namespace app
 			Texture        m_albedoMap;					/** アルベドマップ */
 
 			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
-			IndexBuffer    m_indexBuffer;				/** インデックスバッファ */
+			IndexBuffer    m_indexBuffer;				/** 元インデックスバッファ（カリングなし描画用） */
+			IndexBuffer    m_visibleIndexBuffer;		/** 可視インデックスバッファ（カリングあり描画用） */
 			int            m_indexCount = 0;			/** インデックス数 */
+
+			/** 元インデックス配列（CPUキャッシュ・カリング判定用） */
+			std::vector<uint32_t> m_srcIndexArray;
+			/** 毎フレーム更新される可視インデックス配列 */
+			std::vector<uint32_t> m_visibleIndexArray;
 
 			Shader* m_vs = nullptr;						/** 頂点シェーダー */
 			Shader* m_ps = nullptr;						/** ピクセルシェーダー */
