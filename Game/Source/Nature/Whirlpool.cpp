@@ -10,6 +10,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Effect/EffectManager.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 
 
 namespace app

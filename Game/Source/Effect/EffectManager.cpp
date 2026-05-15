@@ -5,6 +5,8 @@
  */
 #include "stdafx.h"
 #include "EffectManager.h"
+#include "graphics/effect/BeastEffectEmitter.h"
+#include "Geometry/Frustum.h"
 
 
 namespace app
@@ -16,7 +18,7 @@ namespace app
 	{
 		m_effectList.clear();
 
-		// サウンドの登録
+		// エフェクトの登録
 		for (int i = 0; i < ARRAYSIZE(effectInformation); ++i) {
 			const auto& info = effectInformation[i];
 			EffectEngine::GetInstance()->ResistEffect(i, info.assetPath);
@@ -28,22 +30,34 @@ namespace app
 	{}
 
 
-	void EffectManager::Update()
+	void EffectManager::Update(const nsBeastEngine::Frustum& frustum)
 	{
-		// 再生が終了したエフェクトをm_effectListから除外する
-		// NOTE: EffectEmitterはIsPlay()がfalseになるとDeleteGO(this)で自己削除される。
-		//       自己削除のタイミングでm_effectListは更新されないため、
-		//       毎フレームここで再生状態を確認し、無効なエントリを除外する。
 		for (auto it = m_effectList.begin(); it != m_effectList.end(); )
 		{
-			if (it->second == nullptr || !it->second->IsPlay())
+			auto* emitter = it->second.emitter;
+
+			// 再生が終了したエフェクトをm_effectListから除外する
+			// NOTE: BeastEffectEmitterはIsExist()がfalseになるとDeleteGO(this)で自己削除される。
+			//       自己削除のタイミングでm_effectListは更新されないため、
+			//       毎フレームここで再生状態を確認し、無効なエントリを除外する。
+			if (emitter == nullptr || !emitter->IsExist())
 			{
 				it = m_effectList.erase(it);
+				continue;
 			}
-			else
-			{
-				++it;
-			}
+
+			// フラスタムカリング判定
+			// エフェクト種別の基準半径にスケールの最大成分を乗算して実効半径を求める
+			const uint8_t kindIndex = static_cast<uint8_t>(it->second.kind);
+			const EffectInformation& info = effectInformation[kindIndex];
+			const Vector3& scale = emitter->GetScale();
+			const float maxScale = max(max(scale.x, scale.y), scale.z);
+			const float boundingRadius = info.baseRadius * maxScale;
+
+			const bool isVisible = frustum.IsIntersectSphere(emitter->GetPosition(), boundingRadius);
+			emitter->SetVisible(isVisible);
+
+			++it;
 		}
 	}
 
@@ -56,14 +70,17 @@ namespace app
 			K2_ASSERT(false, "エフェクトの再生が多いです。\n");
 			return INVALID_EFFECT_HANDLE;
 		}
-		auto* newEffect = NewGO<EffectEmitter>(0);
+		auto* newEffect = NewGO<nsBeastEngine::BeastEffectEmitter>(0);
 		newEffect->Init(static_cast<int>(kind));
 		newEffect->SetPosition(position);
 		newEffect->SetRotation(rotation);
 		newEffect->SetScale(scale);
 		newEffect->Play();
 
-		m_effectList.emplace(m_effectHandleCount, newEffect);
+		EffectEntry entry;
+		entry.emitter = newEffect;
+		entry.kind = kind;
+		m_effectList.emplace(m_effectHandleCount, entry);
 
 		return m_effectHandleCount++;
 	}
@@ -71,11 +88,11 @@ namespace app
 
 	void EffectManager::StopEffect(const EffectHandle handle)
 	{
-		auto* effect = FindEffect(handle);
-		if (effect == nullptr) {
+		auto* emitter = FindEffect(handle);
+		if (emitter == nullptr) {
 			return;
 		}
-		effect->Stop();
+		emitter->Stop();
 	}
 
 

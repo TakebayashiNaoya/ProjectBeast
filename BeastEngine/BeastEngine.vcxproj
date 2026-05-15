@@ -29,6 +29,7 @@
     <ClCompile Include="Geometry\TriangleCuller.cpp" />
     <ClCompile Include="Graphics\BeastMeshParts.cpp" />
     <ClCompile Include="Graphics\BeastModel.cpp" />
+    <ClCompile Include="Graphics\Effect\BeastEffectEmitter.cpp" />
     <ClCompile Include="Graphics\FontRender.cpp" />
     <ClCompile Include="graphics\Light\HemisphereLight.cpp" />
     <ClCompile Include="graphics\Light\PointLight.cpp" />
@@ -65,6 +66,7 @@
     <ClInclude Include="Geometry\TriangleCuller.h" />
     <ClInclude Include="Graphics\BeastMeshParts.h" />
     <ClInclude Include="Graphics\BeastModel.h" />
+    <ClInclude Include="Graphics\Effect\BeastEffectEmitter.h" />
     <ClInclude Include="Graphics\FontRender.h" />
     <ClInclude Include="graphics\GraphicsEnums.h" />
     <ClInclude Include="graphics\IRenderer.h" />
