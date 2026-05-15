@@ -418,6 +418,12 @@
     <ClCompile Include="Source\UI\Model\CPReactionAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectParameter.cpp">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectStatus.cpp">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -779,6 +785,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h">
       <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinEffectStatus.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinEffectParameter.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
