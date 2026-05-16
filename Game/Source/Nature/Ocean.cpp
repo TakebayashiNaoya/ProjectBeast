@@ -79,10 +79,67 @@ namespace app
 
 			InitDescriptorHeap();
 			InitComputeShader();
+
+			// チャンクAABBの配列を事前確保する（BuildChunkAABBs()で毎フレーム上書き）
+			const int numChunks = m_chunkDivision * m_chunkDivision;
+			m_chunkAABBs.resize(static_cast<size_t>(numChunks));
 		}
 
 
-		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld)
+		void OceanMesh::BuildChunkAABBs(float maxWaveHeight)
+		{
+			// GRID_DIVISIONがchunkDivisionで均等割りできることを前提とする
+			const int cellsPerChunk = GRID_DIVISION / m_chunkDivision;
+			const int numVertsPerRow = GRID_DIVISION + 1;
+			const float gridHalfSize = GRID_SIZE * 0.5f;
+			const float cellSize = GRID_SIZE / static_cast<float>(GRID_DIVISION);
+			const float chunkSize = cellSize * static_cast<float>(cellsPerChunk);
+
+			const float* cache = m_waveHeightCache.data();
+
+			for (int chunkZ = 0; chunkZ < m_chunkDivision; chunkZ++)
+			{
+				for (int chunkX = 0; chunkX < m_chunkDivision; chunkX++)
+				{
+					const int chunkIndex = chunkZ * m_chunkDivision + chunkX;
+
+					// チャンクのXZ範囲をワールド空間で算出する
+					const float minX = -gridHalfSize + chunkSize * static_cast<float>(chunkX);
+					const float minZ = -gridHalfSize + chunkSize * static_cast<float>(chunkZ);
+					const float maxX = minX + chunkSize;
+					const float maxZ = minZ + chunkSize;
+
+					// チャンク内の頂点の波高さmin/maxをキャッシュから収集する
+					float minY = FLT_MAX;
+					float maxY = -FLT_MAX;
+
+					const int vertXStart = chunkX * cellsPerChunk;
+					const int vertZStart = chunkZ * cellsPerChunk;
+					const int vertXEnd = vertXStart + cellsPerChunk + 1;
+					const int vertZEnd = vertZStart + cellsPerChunk + 1;
+
+					for (int vz = vertZStart; vz < vertZEnd; vz++)
+					{
+						for (int vx = vertXStart; vx < vertXEnd; vx++)
+						{
+							const float h = cache[vz * numVertsPerRow + vx];
+							if (h < minY) minY = h;
+							if (h > maxY) maxY = h;
+						}
+					}
+
+					// 波高さキャッシュは理論最大値に収まるが、念のためクランプする
+					minY = max(minY, -maxWaveHeight);
+					maxY = min(maxY, maxWaveHeight);
+
+					m_chunkAABBs[static_cast<size_t>(chunkIndex)].min = Vector3(minX, minY, minZ);
+					m_chunkAABBs[static_cast<size_t>(chunkIndex)].max = Vector3(maxX, maxY, maxZ);
+				}
+			}
+		}
+
+
+		void OceanMesh::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld)
 		{
 			// 共通定数バッファを更新する（b0）
 			SCommonConstantBuffer cb;
@@ -101,8 +158,97 @@ namespace app
 			rc.SetDescriptorHeap(m_descriptorHeap);
 			rc.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			rc.SetVertexBuffer(m_vertexBuffer);
+		}
+
+
+		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld)
+		{
+			SetupDrawCommands(rc, mWorld);
 			rc.SetIndexBuffer(m_indexBuffer);
 			rc.DrawIndexedInstance(m_indexCount, 1);
+		}
+
+
+		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::Frustum& frustum)
+		{
+			SetupDrawCommands(rc, mWorld);
+
+			// 可視インデックスを収集する
+			m_visibleIndexArray.clear();
+
+			const int cellsPerChunk = GRID_DIVISION / m_chunkDivision;
+			const float gridHalfSize = GRID_SIZE * 0.5f;
+			const float cellSize = GRID_SIZE / static_cast<float>(GRID_DIVISION);
+			const int numVertsPerRow = GRID_DIVISION + 1;
+
+			for (int chunkZ = 0; chunkZ < m_chunkDivision; chunkZ++)
+			{
+				for (int chunkX = 0; chunkX < m_chunkDivision; chunkX++)
+				{
+					const int chunkIndex = chunkZ * m_chunkDivision + chunkX;
+					const SChunkAABB& chunkAABB = m_chunkAABBs[static_cast<size_t>(chunkIndex)];
+
+					// チャンクAABBが視錐台と交差しない場合はスキップする
+					if (!frustum.IsIntersectAABBWorld(chunkAABB.min, chunkAABB.max))
+					{
+						continue;
+					}
+
+					// 交差チャンクはセル単位でAABB判定し、可視セルのインデックスのみ追加する
+					// セルのY範囲は親チャンクのY範囲をそのまま流用する
+					const int cellXStart = chunkX * cellsPerChunk;
+					const int cellZStart = chunkZ * cellsPerChunk;
+
+					for (int cz = cellZStart; cz < cellZStart + cellsPerChunk; cz++)
+					{
+						for (int cx = cellXStart; cx < cellXStart + cellsPerChunk; cx++)
+						{
+							// セルのXZ範囲をワールド空間で算出する
+							const float cellMinX = -gridHalfSize + cellSize * static_cast<float>(cx);
+							const float cellMinZ = -gridHalfSize + cellSize * static_cast<float>(cz);
+							const float cellMaxX = cellMinX + cellSize;
+							const float cellMaxZ = cellMinZ + cellSize;
+
+							// セルAABBのY範囲は親チャンクのY範囲を流用する
+							const Vector3 cellMin(cellMinX, chunkAABB.min.y, cellMinZ);
+							const Vector3 cellMax(cellMaxX, chunkAABB.max.y, cellMaxZ);
+
+							// セルAABBが視錐台と交差しない場合はスキップする
+							if (!frustum.IsIntersectAABBWorld(cellMin, cellMax))
+							{
+								continue;
+							}
+
+							// 可視セルの三角形インデックスを追加する
+							const int topLeft = cz * numVertsPerRow + cx;
+							const int topRight = cz * numVertsPerRow + cx + 1;
+							const int bottomLeft = (cz + 1) * numVertsPerRow + cx;
+							const int bottomRight = (cz + 1) * numVertsPerRow + cx + 1;
+
+							// 三角形①
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(topLeft));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(bottomLeft));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(topRight));
+
+							// 三角形②
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(topRight));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(bottomLeft));
+							m_visibleIndexArray.push_back(static_cast<uint32_t>(bottomRight));
+						}
+					}
+				}
+			}
+
+			// 可視インデックスが1つもなければドローコールをスキップする
+			if (m_visibleIndexArray.empty())
+			{
+				return;
+			}
+
+			// 可視インデックスをGPUバッファに書き込んでドローコールを発行する
+			m_visibleIndexBuffer.Copy(m_visibleIndexArray.data());
+			rc.SetIndexBuffer(m_visibleIndexBuffer);
+			rc.DrawIndexedInstance(static_cast<int>(m_visibleIndexArray.size()), 1);
 		}
 
 
@@ -114,12 +260,12 @@ namespace app
 			const int   numVertsPerRow = numDivision + 1;
 			const int   numVerts = numVertsPerRow * numVertsPerRow;
 
-			std::vector<OceanVertex> vertices(numVerts);
+			std::vector<OceanVertex> vertices(static_cast<size_t>(numVerts));
 			for (int z = 0; z <= numDivision; ++z)
 			{
 				for (int x = 0; x <= numDivision; ++x)
 				{
-					OceanVertex& v = vertices[z * numVertsPerRow + x];
+					OceanVertex& v = vertices[static_cast<size_t>(z * numVertsPerRow + x)];
 					v.pos = Vector3(
 						-gridHalfSize + cellSize * static_cast<float>(x),
 						0.0f,
@@ -143,36 +289,74 @@ namespace app
 			);
 			m_vertexBuffer.Copy(vertices.data());
 
-			const int numIndices = numDivision * numDivision * 6;
-			std::vector<uint32_t> indices(numIndices);
-			int idx = 0;
-			for (int z = 0; z < numDivision; ++z)
+			// チャンクごとにインデックスを生成し、CPUキャッシュ（m_srcIndexArray）に保存する
+			const int cellsPerChunk = numDivision / m_chunkDivision;
+			const int numChunks = m_chunkDivision * m_chunkDivision;
+			// チャンク1つあたりのインデックス数（セル数 × 三角形2枚 × 3頂点）
+			const int indicesPerChunk = cellsPerChunk * cellsPerChunk * 6;
+			const int totalIndices = numChunks * indicesPerChunk;
+
+			m_srcIndexArray.reserve(static_cast<size_t>(totalIndices));
+			m_chunkIndexOffsets.resize(static_cast<size_t>(numChunks));
+			m_chunkIndexCounts.resize(static_cast<size_t>(numChunks));
+
+			for (int chunkZ = 0; chunkZ < m_chunkDivision; chunkZ++)
 			{
-				for (int x = 0; x < numDivision; ++x)
+				for (int chunkX = 0; chunkX < m_chunkDivision; chunkX++)
 				{
-					const int topLeft = z * numVertsPerRow + x;
-					const int topRight = z * numVertsPerRow + x + 1;
-					const int bottomLeft = (z + 1) * numVertsPerRow + x;
-					const int bottomRight = (z + 1) * numVertsPerRow + x + 1;
+					const int chunkIndex = chunkZ * m_chunkDivision + chunkX;
+					m_chunkIndexOffsets[static_cast<size_t>(chunkIndex)] =
+						static_cast<int>(m_srcIndexArray.size());
 
-					// 三角形①
-					indices[idx++] = topLeft;
-					indices[idx++] = bottomLeft;
-					indices[idx++] = topRight;
+					// チャンク内のセルをループしてインデックスを生成する
+					const int cellXStart = chunkX * cellsPerChunk;
+					const int cellZStart = chunkZ * cellsPerChunk;
 
-					// 三角形②
-					indices[idx++] = topRight;
-					indices[idx++] = bottomLeft;
-					indices[idx++] = bottomRight;
+					for (int cz = cellZStart; cz < cellZStart + cellsPerChunk; cz++)
+					{
+						for (int cx = cellXStart; cx < cellXStart + cellsPerChunk; cx++)
+						{
+							const int topLeft = cz * numVertsPerRow + cx;
+							const int topRight = cz * numVertsPerRow + cx + 1;
+							const int bottomLeft = (cz + 1) * numVertsPerRow + cx;
+							const int bottomRight = (cz + 1) * numVertsPerRow + cx + 1;
+
+							// 三角形①
+							m_srcIndexArray.push_back(static_cast<uint32_t>(topLeft));
+							m_srcIndexArray.push_back(static_cast<uint32_t>(bottomLeft));
+							m_srcIndexArray.push_back(static_cast<uint32_t>(topRight));
+
+							// 三角形②
+							m_srcIndexArray.push_back(static_cast<uint32_t>(topRight));
+							m_srcIndexArray.push_back(static_cast<uint32_t>(bottomLeft));
+							m_srcIndexArray.push_back(static_cast<uint32_t>(bottomRight));
+						}
+					}
+
+					m_chunkIndexCounts[static_cast<size_t>(chunkIndex)] =
+						static_cast<int>(m_srcIndexArray.size())
+						- m_chunkIndexOffsets[static_cast<size_t>(chunkIndex)];
 				}
 			}
 
-			m_indexCount = numIndices;
+			m_indexCount = totalIndices;
+
+			// 元インデックスバッファ（カリングなし描画用）
 			m_indexBuffer.Init(
-				static_cast<int>(sizeof(uint32_t) * indices.size()),
+				static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
 				sizeof(uint32_t)
 			);
-			m_indexBuffer.Copy(indices.data());
+			m_indexBuffer.Copy(m_srcIndexArray.data());
+
+			// 可視インデックスバッファ（カリングあり描画用）
+			// 最大でも全インデックス数と同じサイズになるため、同サイズで確保する
+			m_visibleIndexBuffer.Init(
+				static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
+				sizeof(uint32_t)
+			);
+
+			// 可視インデックス配列を最大サイズで事前確保しておく（毎フレームのアロケーションを避ける）
+			m_visibleIndexArray.reserve(static_cast<size_t>(totalIndices));
 		}
 
 
@@ -337,8 +521,6 @@ namespace app
 				D3D12_ROOT_SIGNATURE_DESC rsDesc = {};
 				rsDesc.NumParameters = 2;
 				rsDesc.pParameters = rootParams;
-				rsDesc.NumStaticSamplers = 0;
-				rsDesc.pStaticSamplers = nullptr;
 				rsDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
 
 				Microsoft::WRL::ComPtr<ID3DBlob> serialized;
@@ -348,7 +530,7 @@ namespace app
 					0,
 					serialized->GetBufferPointer(),
 					serialized->GetBufferSize(),
-					IID_PPV_ARGS(m_csRootSignature.GetAddressOf())
+					IID_PPV_ARGS(&m_csRootSignature)
 				);
 			}
 
@@ -359,256 +541,216 @@ namespace app
 				D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
 				psoDesc.pRootSignature = m_csRootSignature.Get();
 				psoDesc.CS = CD3DX12_SHADER_BYTECODE(m_csShader.GetCompiledBlob());
-				device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(m_csPipelineState.GetAddressOf()));
+				device->CreateComputePipelineState(&psoDesc, IID_PPV_ARGS(&m_csPipelineState));
 			}
 
 			//------------------------------------------------------------
-			// CS用定数バッファを作成する（永続Map）
+			// CS用定数バッファを永続Mapで確保する
 			//------------------------------------------------------------
 			{
-				const UINT64 cbSize = (sizeof(SWaveConstantBuffer) + 255) & ~255;
+				const UINT64 cbSize =
+					(sizeof(SWaveConstantBuffer) + 255) & ~static_cast<UINT64>(255);
 
-				D3D12_HEAP_PROPERTIES heapProps = {};
-				heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-
-				D3D12_RESOURCE_DESC resDesc = {};
-				resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-				resDesc.Width = cbSize;
-				resDesc.Height = 1;
-				resDesc.DepthOrArraySize = 1;
-				resDesc.MipLevels = 1;
-				resDesc.Format = DXGI_FORMAT_UNKNOWN;
-				resDesc.SampleDesc.Count = 1;
-				resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-				resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
+				CD3DX12_HEAP_PROPERTIES heapProps(D3D12_HEAP_TYPE_UPLOAD);
+				CD3DX12_RESOURCE_DESC   resDesc = CD3DX12_RESOURCE_DESC::Buffer(cbSize);
 				device->CreateCommittedResource(
 					&heapProps,
 					D3D12_HEAP_FLAG_NONE,
 					&resDesc,
 					D3D12_RESOURCE_STATE_GENERIC_READ,
 					nullptr,
-					IID_PPV_ARGS(m_csCbResource.GetAddressOf())
+					IID_PPV_ARGS(&m_csCbResource)
 				);
-
-				D3D12_RANGE readRange = { 0, 0 };
-				m_csCbResource->Map(0, &readRange, &m_csCbMapped);
+				m_csCbResource->Map(0, nullptr, &m_csCbMapped);
 			}
 
 			//------------------------------------------------------------
-			// UAVバッファを作成する（GPU書き込み先）
+			// UAVバッファ（GPU書き込み先）とReadbackバッファ（CPU読み出し用）を確保する
 			//------------------------------------------------------------
 			{
-				const UINT64 bufferSize = sizeof(float) * NUM_VERTS;
+				const UINT64 bufSize = static_cast<UINT64>(sizeof(float) * NUM_VERTS);
 
-				D3D12_HEAP_PROPERTIES heapProps = {};
-				heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-
-				D3D12_RESOURCE_DESC resDesc = {};
-				resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-				resDesc.Width = bufferSize;
-				resDesc.Height = 1;
-				resDesc.DepthOrArraySize = 1;
-				resDesc.MipLevels = 1;
-				resDesc.Format = DXGI_FORMAT_UNKNOWN;
-				resDesc.SampleDesc.Count = 1;
-				resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-				resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-
+				CD3DX12_HEAP_PROPERTIES uavHeap(D3D12_HEAP_TYPE_DEFAULT);
+				CD3DX12_RESOURCE_DESC   uavDesc = CD3DX12_RESOURCE_DESC::Buffer(
+					bufSize,
+					D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS
+				);
 				device->CreateCommittedResource(
-					&heapProps,
+					&uavHeap,
 					D3D12_HEAP_FLAG_NONE,
-					&resDesc,
+					&uavDesc,
 					D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
 					nullptr,
-					IID_PPV_ARGS(m_uavBuffer.GetAddressOf())
+					IID_PPV_ARGS(&m_uavBuffer)
 				);
-			}
 
-			//------------------------------------------------------------
-			// Readbackバッファを作成する（CPU読み出し用）
-			//------------------------------------------------------------
-			{
-				const UINT64 bufferSize = sizeof(float) * NUM_VERTS;
-
-				D3D12_HEAP_PROPERTIES heapProps = {};
-				heapProps.Type = D3D12_HEAP_TYPE_READBACK;
-
-				D3D12_RESOURCE_DESC resDesc = {};
-				resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-				resDesc.Width = bufferSize;
-				resDesc.Height = 1;
-				resDesc.DepthOrArraySize = 1;
-				resDesc.MipLevels = 1;
-				resDesc.Format = DXGI_FORMAT_UNKNOWN;
-				resDesc.SampleDesc.Count = 1;
-				resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-				resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
+				CD3DX12_HEAP_PROPERTIES rbHeap(D3D12_HEAP_TYPE_READBACK);
+				CD3DX12_RESOURCE_DESC   rbDesc = CD3DX12_RESOURCE_DESC::Buffer(bufSize);
 				device->CreateCommittedResource(
-					&heapProps,
+					&rbHeap,
 					D3D12_HEAP_FLAG_NONE,
-					&resDesc,
+					&rbDesc,
 					D3D12_RESOURCE_STATE_COPY_DEST,
 					nullptr,
-					IID_PPV_ARGS(m_readbackBuffer.GetAddressOf())
+					IID_PPV_ARGS(&m_readbackBuffer)
 				);
 			}
 
 			//------------------------------------------------------------
-			// CS用ディスクリプタヒープを生DX12 APIで構築する
-			// エントリ0: CBV(b0)、エントリ1: UAV(u0)
+			// CS用ディスクリプタヒープ（CBV + UAV）を構築する
 			//------------------------------------------------------------
 			{
 				D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-				heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 				heapDesc.NumDescriptors = 2;
+				heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 				heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-				device->CreateDescriptorHeap(
-					&heapDesc,
-					IID_PPV_ARGS(m_csDescHeap.GetAddressOf())
-				);
-
+				device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_csDescHeap));
 				m_csDescriptorSize = device->GetDescriptorHandleIncrementSize(
 					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV
 				);
 
-				D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle =
-					m_csDescHeap->GetCPUDescriptorHandleForHeapStart();
-
-				// エントリ0: CBV
+				// CBV（b0）
 				{
-					const UINT64 cbSize = (sizeof(SWaveConstantBuffer) + 255) & ~255;
 					D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 					cbvDesc.BufferLocation = m_csCbResource->GetGPUVirtualAddress();
-					cbvDesc.SizeInBytes = static_cast<UINT>(cbSize);
-					device->CreateConstantBufferView(&cbvDesc, cpuHandle);
+					cbvDesc.SizeInBytes =
+						static_cast<UINT>((sizeof(SWaveConstantBuffer) + 255) & ~255u);
+
+					CD3DX12_CPU_DESCRIPTOR_HANDLE handle(
+						m_csDescHeap->GetCPUDescriptorHandleForHeapStart()
+					);
+					device->CreateConstantBufferView(&cbvDesc, handle);
 				}
 
-				// エントリ1: UAV
-				cpuHandle.ptr += m_csDescriptorSize;
+				// UAV（u0）
 				{
 					D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-					uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 					uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-					uavDesc.Buffer.FirstElement = 0;
+					uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 					uavDesc.Buffer.NumElements = NUM_VERTS;
 					uavDesc.Buffer.StructureByteStride = sizeof(float);
-					uavDesc.Buffer.CounterOffsetInBytes = 0;
-					uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+
+					CD3DX12_CPU_DESCRIPTOR_HANDLE handle(
+						m_csDescHeap->GetCPUDescriptorHandleForHeapStart(),
+						1,
+						m_csDescriptorSize
+					);
 					device->CreateUnorderedAccessView(
-						m_uavBuffer.Get(),
-						nullptr,
-						&uavDesc,
-						cpuHandle
+						m_uavBuffer.Get(), nullptr, &uavDesc, handle
 					);
 				}
 			}
 
 			//------------------------------------------------------------
-			// CS専用コマンドアロケータ・コマンドリストを作成する
-			// グラフィクスrcとは独立して実行するために専用のものを使用する
+			// CS専用コマンドアロケータ・コマンドリストを生成する
 			//------------------------------------------------------------
 			{
 				device->CreateCommandAllocator(
 					D3D12_COMMAND_LIST_TYPE_DIRECT,
-					IID_PPV_ARGS(m_csCommandAllocator.GetAddressOf())
+					IID_PPV_ARGS(&m_csCommandAllocator)
 				);
 				device->CreateCommandList(
 					0,
 					D3D12_COMMAND_LIST_TYPE_DIRECT,
 					m_csCommandAllocator.Get(),
 					nullptr,
-					IID_PPV_ARGS(m_csCommandList.GetAddressOf())
+					IID_PPV_ARGS(&m_csCommandList)
 				);
-				// 作成直後はオープン状態なので閉じておく
 				m_csCommandList->Close();
 			}
 
-			// フェンスを作成する（GPU完了待ち用）
-			device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_fence.GetAddressOf()));
-			m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-			m_fenceValue = 0;
+			//------------------------------------------------------------
+			// GPU完了待ち用フェンスを生成する
+			//------------------------------------------------------------
+			{
+				device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
+				m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+				m_fenceValue = 0;
+			}
 		}
 
 
 		void OceanMesh::DispatchWaveCS(const SWaveConstantBuffer& waveCb)
 		{
-			// CS用定数バッファをCPUから更新する（永続Mapにコピー）
+			// 定数バッファをCPU側で更新する（永続Mapなのでコピーするだけ）
 			memcpy(m_csCbMapped, &waveCb, sizeof(SWaveConstantBuffer));
 
-			// 専用コマンドアロケータ・コマンドリストをリセットして記録開始
+			ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
+
+			//------------------------------------------------------------
+			// コマンドの記録
+			//------------------------------------------------------------
 			m_csCommandAllocator->Reset();
 			m_csCommandList->Reset(m_csCommandAllocator.Get(), nullptr);
 
-			// ディスクリプタヒープをセットする
-			ID3D12DescriptorHeap* heaps[] = { m_csDescHeap.Get() };
-			m_csCommandList->SetDescriptorHeaps(1, heaps);
-
-			// ルートシグネチャとパイプラインステートをセットする
 			m_csCommandList->SetComputeRootSignature(m_csRootSignature.Get());
 			m_csCommandList->SetPipelineState(m_csPipelineState.Get());
 
-			D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle =
-				m_csDescHeap->GetGPUDescriptorHandleForHeapStart();
+			ID3D12DescriptorHeap* heaps[] = { m_csDescHeap.Get() };
+			m_csCommandList->SetDescriptorHeaps(1, heaps);
 
-			// テーブル0: CBV(b0)
-			m_csCommandList->SetComputeRootDescriptorTable(0, gpuHandle);
+			CD3DX12_GPU_DESCRIPTOR_HANDLE cbvHandle(
+				m_csDescHeap->GetGPUDescriptorHandleForHeapStart(), 0, m_csDescriptorSize
+			);
+			CD3DX12_GPU_DESCRIPTOR_HANDLE uavHandle(
+				m_csDescHeap->GetGPUDescriptorHandleForHeapStart(), 1, m_csDescriptorSize
+			);
+			m_csCommandList->SetComputeRootDescriptorTable(0, cbvHandle);
+			m_csCommandList->SetComputeRootDescriptorTable(1, uavHandle);
 
-			// テーブル1: UAV(u0)
-			gpuHandle.ptr += m_csDescriptorSize;
-			m_csCommandList->SetComputeRootDescriptorTable(1, gpuHandle);
-
-			// グループ数：(GRID_DIVISION+1)頂点を8スレッド単位でカバーする
-			const UINT groupCount = (GRID_DIVISION + 1 + 7) / 8;
+			// スレッドグループ: (8, 8, 1) × ディスパッチ (17, 17, 1) で 136×136 スレッドを起動し
+			// numVertsPerRow = 129 分をカバーする（129 ÷ 8 = 16.125 → 切り上げ17）
+			const int numVertsPerRow = GRID_DIVISION + 1;
+			const int groupCount = (numVertsPerRow + 7) / 8;
 			m_csCommandList->Dispatch(groupCount, groupCount, 1);
 
-			// UAV書き込み完了を保証するバリアを張る
-			auto uavBarrier = CD3DX12_RESOURCE_BARRIER::UAV(m_uavBuffer.Get());
-			m_csCommandList->ResourceBarrier(1, &uavBarrier);
-
-			// UAVバッファをCOPY_SOURCEに遷移させてReadbackにコピーする
-			auto toCopySrc = CD3DX12_RESOURCE_BARRIER::Transition(
-				m_uavBuffer.Get(),
-				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
-				D3D12_RESOURCE_STATE_COPY_SOURCE
-			);
-			m_csCommandList->ResourceBarrier(1, &toCopySrc);
+			// UAVバッファをReadbackバッファにコピーする（UAV→COPY_SOURCE状態遷移）
+			{
+				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+					m_uavBuffer.Get(),
+					D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+					D3D12_RESOURCE_STATE_COPY_SOURCE
+				);
+				m_csCommandList->ResourceBarrier(1, &barrier);
+			}
 
 			m_csCommandList->CopyResource(m_readbackBuffer.Get(), m_uavBuffer.Get());
 
-			// UAVバッファを元のステートに戻す
-			auto toUav = CD3DX12_RESOURCE_BARRIER::Transition(
-				m_uavBuffer.Get(),
-				D3D12_RESOURCE_STATE_COPY_SOURCE,
-				D3D12_RESOURCE_STATE_UNORDERED_ACCESS
-			);
-			m_csCommandList->ResourceBarrier(1, &toUav);
+			// UAVバッファを元の状態に戻す
+			{
+				CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+					m_uavBuffer.Get(),
+					D3D12_RESOURCE_STATE_COPY_SOURCE,
+					D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+				);
+				m_csCommandList->ResourceBarrier(1, &barrier);
+			}
 
-			// コマンドリストを閉じてコマンドキューにサブミットする
 			m_csCommandList->Close();
-			ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
-			ID3D12CommandList* cmdLists[] = { m_csCommandList.Get() };
-			commandQueue->ExecuteCommandLists(1, cmdLists);
 
-			// フェンスをシグナルしてGPUの完了を待つ
+			//------------------------------------------------------------
+			// コマンドを実行してGPU完了を待つ
+			//------------------------------------------------------------
+			ID3D12CommandList* lists[] = { m_csCommandList.Get() };
+			commandQueue->ExecuteCommandLists(1, lists);
+
 			m_fenceValue++;
 			commandQueue->Signal(m_fence.Get(), m_fenceValue);
-
 			if (m_fence->GetCompletedValue() < m_fenceValue)
 			{
 				m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent);
 				WaitForSingleObject(m_fenceEvent, INFINITE);
 			}
 
-			// ReadbackバッファをMapしてCPU側キャッシュに書き出す
+			//------------------------------------------------------------
+			// Readbackバッファから波高さキャッシュに読み出す
+			//------------------------------------------------------------
 			{
-				const UINT64 bufferSize = sizeof(float) * NUM_VERTS;
-				D3D12_RANGE readRange = { 0, static_cast<SIZE_T>(bufferSize) };
+				const UINT64 bufSize = static_cast<UINT64>(sizeof(float) * NUM_VERTS);
+				D3D12_RANGE readRange = { 0, bufSize };
 				void* pData = nullptr;
 				m_readbackBuffer->Map(0, &readRange, &pData);
-				memcpy(m_waveHeightCache.data(), pData, bufferSize);
+				memcpy(m_waveHeightCache.data(), pData, bufSize);
 				D3D12_RANGE writeRange = { 0, 0 };
 				m_readbackBuffer->Unmap(0, &writeRange);
 			}
@@ -623,27 +765,14 @@ namespace app
 
 
 		Ocean::~Ocean()
-		{
-			if (g_renderingEngine != nullptr)
-			{
-				g_renderingEngine->UnregisterNatureObject(this);
-			}
-		}
+		{}
 
 
 		void Ocean::Start()
 		{
-			m_constantBuffer.light = *g_sceneLight->GetLight();
-
-			std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> colorBufferFormat = {
+			const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> colorBufferFormat = {
 				DXGI_FORMAT_R32G32B32A32_FLOAT,
-				DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_UNKNOWN
 			};
 
 			m_oceanMesh.Init(
@@ -670,14 +799,21 @@ namespace app
 			// コンピュートシェーダーをグラフィクスrcとは独立して実行し、
 			// 波高さキャッシュをCPUに書き出す
 			m_oceanMesh.DispatchWaveCS(BuildWaveCb());
+
+			// 波高さキャッシュを元にチャンクAABBを更新する
+			// 最大波高さは2つの波の振幅の和（両方が同時に最大値を取った場合）
+			const float maxWaveHeight =
+				m_constantBuffer.wave1Amplitude + m_constantBuffer.wave2Amplitude;
+			m_oceanMesh.BuildChunkAABBs(maxWaveHeight);
 		}
 
 
 		void Ocean::Render(RenderContext& rc)
 		{
-			// DispatchWaveCS()はUpdate()で完了済みのため、
-			// ここでは純粋に描画コマンドのみを発行する
-			m_oceanMesh.Draw(rc, CalcWorldMatrix());
+			// DispatchWaveCS()・BuildChunkAABBs()はUpdate()で完了済みのため、
+			// ここでは描画コマンドのみを発行する
+			const nsBeastEngine::Frustum& frustum = g_renderingEngine->GetFrustum();
+			m_oceanMesh.Draw(rc, CalcWorldMatrix(), frustum);
 		}
 
 

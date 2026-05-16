@@ -22,12 +22,12 @@ namespace nsBeastEngine
 		 * @brief シャドウマップへの描画パスから呼ばれる処理
 		 * @param rc レンダリングコンテキスト
 		 */
-		virtual void OnRenderShadowMap(RenderContext& rc) {}
+		virtual void OnRenderShadowMap(nsK2EngineLow::RenderContext& rc) {}
 
 		/**
 		 * @brief 2D描画パスから呼ばれる処理
 		 * @param rc レンダリングコンテキスト
 		 */
-		virtual void OnRender2D(RenderContext& rc) {}
+		virtual void OnRender2D(nsK2EngineLow::RenderContext& rc) {}
 	};
 }

@@ -47,14 +47,33 @@ namespace nsBeastEngine
 
 
 	public:
+#if defined(_DEBUG)
+		/**
+		 * @brief デバッグ用フラスタム縮小スケール
+		 * @details
+		 *   1.0f のとき通常（画面端 = フラスタム境界）。
+		 *   1.0f より大きくするとプロジェクション行列の
+		 *   XY スケール成分が拡大され、フラスタムの左右・上下平面が
+		 *   画面内側に寄る。境界が画面に映るため動作確認に使用する。
+		 *   確認が終わったら 1.0f に戻すこと。
+		 */
+		static constexpr float DEBUG_FRUSTUM_SHRINK_SCALE = 1.0f;
+#endif
+
+
+	public:
 		/**
 		 * @brief 視錐台を更新する
 		 * @details
 		 *   ビュープロジェクション行列から6平面を抽出する。
 		 *   RenderingEngine::Execute()の先頭で毎フレーム呼ぶこと。
 		 * @param viewProjMatrix ビュープロジェクション行列
+		 * @param screenShrinkScale
+		 *   プロジェクション行列の XY スケールに乗算する係数。
+		 *   1.0f で通常サイズ、大きいほどフラスタムが画面内側に縮小する。
+		 *   デバッグ用途以外では 1.0f を渡すこと。
 		 */
-		void Update(const Matrix& viewProjMatrix);
+		void Update(const Matrix& viewProjMatrix, float screenShrinkScale = 1.0f);
 
 		/**
 		 * @brief AABBが視錐台と交差しているか判定する
@@ -87,6 +106,39 @@ namespace nsBeastEngine
 		 * @return 交差していればtrue
 		 */
 		bool IsIntersectSphere(const Vector3& center, float radius) const;
+
+		/**
+		 * @brief 点が視錐台の内側にあるか判定する
+		 * @details
+		 *   6平面すべての内側（符号付き距離 >= 0）にある場合のみ内側と判定する。
+		 *   TriangleCuller から頂点単位の判定に使用する。
+		 * @param point 判定する点（ワールド座標）
+		 * @return 視錐台の内側にあればtrue
+		 */
+		bool IsPointInside(const Vector3& point) const;
+
+		/**
+		 * @brief 平面の数を取得する
+		 * @return 平面の数（常に6）
+		 */
+		int GetPlaneCount() const { return PLANE_NUM; }
+
+		/**
+		 * @brief 指定インデックスの平面係数を取得する
+		 * @details TriangleCuller の分離軸判定で使用する。
+		 * @param index 平面インデックス（0〜5）
+		 * @param outA  平面法線X成分の出力先
+		 * @param outB  平面法線Y成分の出力先
+		 * @param outC  平面法線Z成分の出力先
+		 * @param outD  平面距離成分の出力先
+		 */
+		void GetPlane(int index, float& outA, float& outB, float& outC, float& outD) const
+		{
+			outA = m_planes[index].a;
+			outB = m_planes[index].b;
+			outC = m_planes[index].c;
+			outD = m_planes[index].d;
+		}
 
 
 	private:

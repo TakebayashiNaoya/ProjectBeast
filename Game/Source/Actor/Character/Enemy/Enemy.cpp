@@ -47,6 +47,8 @@ namespace app
 
 		Enemy::Enemy()
 		{
+			Init(ENEMY_MODEL_DATA);
+
 			m_stateMachine = std::make_unique<EnemyStateMachine>(this);
 			m_status = std::make_unique<EnemyStatus>();
 			m_status->Setup();
@@ -58,7 +60,6 @@ namespace app
 
 		void Enemy::Start()
 		{
-			Init(ENEMY_MODEL_DATA);
 			CharacterBase::Start();
 		}
 

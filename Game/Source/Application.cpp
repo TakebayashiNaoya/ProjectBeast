@@ -46,7 +46,9 @@ namespace app
 		core::ParameterManager::Get()->Update();
 		SceneManager::GetInstance()->Update();
 		SoundManager::Get().Update();
-		EffectManager::Get().Update();
+		// 1フレーム前のフラスタムを使用してエフェクトのカリングを行う
+		// ModelRenderの既存カリングと同じ挙動であり、許容される仕様
+		EffectManager::Get().Update(g_renderingEngine->GetFrustum());
 		core::Fade::Get().Update();
 	}
 
