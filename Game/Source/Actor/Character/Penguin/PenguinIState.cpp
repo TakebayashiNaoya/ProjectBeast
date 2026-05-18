@@ -324,7 +324,7 @@ namespace app
 			);
 
 			auto* effectStatus = m_owner->GetEffectStatus();
-			Vector3 scale = effectStatus->GetSlideEffectScale();
+			Vector3 scale = effectStatus->GetSlideFrostEffectScale();
 
 			const Vector3& velocity = m_owner->GetCurrentVelocity();
 			float currentSpeed = velocity.Length();
@@ -332,8 +332,8 @@ namespace app
 			float maxSpeed = max(effectStatus->GetMinSpeed(), m_owner->GetPenguinStatus()->GetSwimSpeed());
 			float speedRatio = min(effectStatus->GetMaxSpeed(), currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
 
-			float scaleMultiplier = effectStatus->GetMinSplashScaleRatio() + ((effectStatus->GetMaxSplashScaleRatio() - effectStatus->GetMinSplashScaleRatio()) * speedRatio);
-			Vector3 currentScale = effectStatus->GetSplashEffectScale() * scaleMultiplier;
+			float scaleMultiplier = effectStatus->GetMinSlideFrostScaleRatio() + ((effectStatus->GetMaxSlideFrostScaleRatio() - effectStatus->GetMinSlideFrostScaleRatio()) * speedRatio);
+			Vector3 currentScale = scale * scaleMultiplier;
 
 			bool isMoving = (velocity.LengthSq() > effectStatus->GetMinMoveVelocitySq());
 
@@ -357,10 +357,10 @@ namespace app
 				{
 					m_slideEffectTimer = 0.0f;
 					EffectManager::Get().PlayEffect(
-						EnEffectKind::PenguinSlide,
+						EnEffectKind::PenguinSlideFrost,
 						effectPosition,
-						m_owner->GetTransform().m_rotation,
-						scale
+						rot,
+						currentScale
 					);
 				}
 			}

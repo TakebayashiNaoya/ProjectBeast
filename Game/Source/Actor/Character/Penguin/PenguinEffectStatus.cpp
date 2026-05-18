@@ -29,8 +29,10 @@ namespace app
 			, m_minSpeed(0.0f)
 			, m_maxSpeed(0.0f)
 			, m_landingEffectScale(Vector3::One)
-			, m_slideEffectScale(Vector3::One)
+			, m_slideFrostEffectScale(Vector3::One)
 			, m_slideEffectInterval(0.0f)
+			, m_minSlideFrostEffectScaleRatio(0.0f)
+			, m_maxSlideFrostEffectScaleRatio(0.0f)
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterPenguinEffectParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterPenguinEffectParameter& parameter)
@@ -51,11 +53,18 @@ namespace app
 					parameter.landingEffectScale.y = j["landingEffectScale"]["y"].get<float>();
 					parameter.landingEffectScale.z = j["landingEffectScale"]["z"].get<float>();
 
-					parameter.slideEffectScale.x = j["slideEffectScale"]["x"].get<float>();
-					parameter.slideEffectScale.y = j["slideEffectScale"]["y"].get<float>();
-					parameter.slideEffectScale.z = j["slideEffectScale"]["z"].get<float>();
+					parameter.slideFrostEffectScale.x = j["slideFrostEffectScale"]["x"].get<float>();
+					parameter.slideFrostEffectScale.y = j["slideFrostEffectScale"]["y"].get<float>();
+					parameter.slideFrostEffectScale.z = j["slideFrostEffectScale"]["z"].get<float>();
 
 					parameter.slideEffectInterval = j["slideEffectInterval"].get<float>();
+
+					parameter.minSlideFrostEffectScaleRatio = j["minSlideFrostScaleRatio"].get<float>();
+					parameter.maxSlideFrostEffectScaleRatio = j["maxSlideFrostScaleRatio"].get<float>();
+
+					parameter.slideLineEffectScale.x = j["slideLineEffectScale"]["x"].get<float>();
+					parameter.slideLineEffectScale.y = j["slideLineEffectScale"]["y"].get<float>();
+					parameter.slideLineEffectScale.z = j["slideLineEffectScale"]["z"].get<float>();
 				});
 		}
 
@@ -80,8 +89,11 @@ namespace app
 			m_minSpeed = parameter->minSpeed;
 			m_maxSpeed = parameter->maxSpeed;
 			m_landingEffectScale = parameter->landingEffectScale;
-			m_slideEffectScale = parameter->slideEffectScale;
+			m_slideFrostEffectScale = parameter->slideFrostEffectScale;
 			m_slideEffectInterval = parameter->slideEffectInterval;
+			m_minSlideFrostEffectScaleRatio = parameter->minSlideFrostEffectScaleRatio;
+			m_maxSlideFrostEffectScaleRatio = parameter->maxSlideFrostEffectScaleRatio;
+			m_slideLineEffectScale = parameter->slideLineEffectScale;
 		}
 
 

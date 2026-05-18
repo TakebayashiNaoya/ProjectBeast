@@ -53,11 +53,20 @@ namespace app
 			/** 着地エフェクトのスケール */
 			Vector3 landingEffectScale;
 
-			/** スライドエフェクトのスケール */
-			Vector3 slideEffectScale;
+			/** スライドの雪を巻き上げるエフェクトのスケール */
+			Vector3 slideFrostEffectScale;
 
 			/** スライドのエフェクトの再生間隔 */
 			float slideEffectInterval;
+
+			/** スライドフロストエフェクトの最小スケールの割合 */
+			float minSlideFrostEffectScaleRatio;
+
+			/** スライドフロストエフェクトの最大スケールの割合 */
+			float maxSlideFrostEffectScaleRatio;
+
+			/** スライド時の集中線のスケール */
+			Vector3 slideLineEffectScale;
 		};
 	}
 }

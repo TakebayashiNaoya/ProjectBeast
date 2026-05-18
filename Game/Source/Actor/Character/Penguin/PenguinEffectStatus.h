@@ -26,8 +26,11 @@ namespace app
 			inline float GetMinSpeed() const { return m_minSpeed; }
 			inline float GetMaxSpeed() const { return m_maxSpeed; }
 			inline const Vector3& GetLandingEffectScale() const { return m_landingEffectScale; }
-			inline const Vector3& GetSlideEffectScale() const { return m_slideEffectScale; }
+			inline const Vector3& GetSlideFrostEffectScale() const { return m_slideFrostEffectScale; }
 			inline float GetSlideEffectInterval() const { return m_slideEffectInterval; }
+			inline float GetMinSlideFrostScaleRatio() const { return m_minSlideFrostEffectScaleRatio; }
+			inline float GetMaxSlideFrostScaleRatio() const { return m_maxSlideFrostEffectScaleRatio; }
+			inline float GetSlideLineEffectScale() const { return m_slideLineEffectScale.x; }
 
 
 		public:
@@ -51,8 +54,11 @@ namespace app
 			float m_minSpeed;
 			float m_maxSpeed;
 			Vector3 m_landingEffectScale;
-			Vector3 m_slideEffectScale;
+			Vector3 m_slideFrostEffectScale;
 			float m_slideEffectInterval;
+			float m_minSlideFrostEffectScaleRatio;
+			float m_maxSlideFrostEffectScaleRatio;
+			Vector3 m_slideLineEffectScale;
 		};
 	}
 }

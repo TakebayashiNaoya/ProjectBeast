@@ -18,11 +18,18 @@
           "y": 1.5,
           "z": 1.5
         },
-        "slideEffectScale": {
+        "slideFrostEffectScale": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
         },
-        "slideEffectInterval":0.1
+        "slideEffectInterval":0.1,
+        "minSlideFrostScaleRatio": 0.5,
+        "maxSlideFrostScaleRatio": 1.0,
+        "slideLineEffectScale":{
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        }
     }
 ]
