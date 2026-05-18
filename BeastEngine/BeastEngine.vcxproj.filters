@@ -90,6 +90,18 @@
     <ClCompile Include="Geometry\Frustum.cpp">
       <Filter>Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry\TriangleCuller.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\BeastMeshParts.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\BeastModel.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Effect\BeastEffectEmitter.cpp">
+      <Filter>Graphics\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -205,6 +217,18 @@
     <ClInclude Include="Geometry\Frustum.h">
       <Filter>Geometry</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\TriangleCuller.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\BeastModel.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\BeastMeshParts.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Effect\BeastEffectEmitter.h">
+      <Filter>Graphics\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -224,6 +248,9 @@
     </Filter>
     <Filter Include="Geometry">
       <UniqueIdentifier>{48b81929-6c7d-4d80-8678-a2056befa55b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Effect">
+      <UniqueIdentifier>{ef10080f-438e-4682-83cd-5c411c51a3fb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

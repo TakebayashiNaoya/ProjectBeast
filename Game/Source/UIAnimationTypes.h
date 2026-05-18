@@ -40,7 +40,11 @@ namespace app
 
 
 
+			/** CPReaction用のUIAnimationKey */
 			constexpr uint32_t CPREACTION_SWAY_ANIM_KEY = Hash32("swayAnimation");
+
+			/** WpWarning用のUIAnimationKey */
+			constexpr uint32_t WP_GROW_AND_SHRINK_ANIM_KEY = Hash32("growAndShrinkAnimation");
 		}
 	}
 }

@@ -1,0 +1,29 @@
+{
+    "comment" : "渦潮の上に表示する警告UI",
+    "canvas":{
+        "elements":[
+            {
+                "type" : "UIIcon",
+                "name" : "speechBubble",
+                "asset" : "Assets/spriteData/UI/Icon/WpWarning/SpeechBubble.dds",
+                "width" : 130,
+                "height" : 130,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "warning",
+                "asset" : "Assets/spriteData/UI/Icon/WpWarning/Warning.dds",
+                "width" : 70,
+                "height" : 70,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            }
+        ]
+    }
+}

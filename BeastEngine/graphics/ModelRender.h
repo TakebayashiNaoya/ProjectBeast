@@ -8,6 +8,10 @@
 
 namespace nsBeastEngine
 {
+	// BeastModel は前方宣言のみ（cpp でインクルード）
+	class BeastModel;
+	// Frustum は参照でのみ使用するため前方宣言で十分
+	class Frustum;
 	/**
 	 * @brief PBR補正パラメータ
 	 * @details モデルごとに個別設定できるPBRライティングの補正値。
@@ -15,10 +19,10 @@ namespace nsBeastEngine
 	 */
 	struct PBRParam
 	{
-		float m_dirLightScale = 1.0f;  // ディレクションライト強度倍率
-		float m_ambientScale = 1.0f;   // 環境光強度倍率
-		float m_metallicOffset = 0.0f; // metallicオフセット
-		float m_smoothOffset = 0.0f;   // smoothオフセット
+		float m_dirLightScale = 1.0f;	/** ディレクションライト強度倍率 */
+		float m_ambientScale = 1.0f;	/** 環境光強度倍率 */
+		float m_metallicOffset = 0.0f;	/** metallicオフセット */
+		float m_smoothOffset = 0.0f;	/** smoothオフセット */
 	};
 
 	/**
@@ -80,13 +84,17 @@ namespace nsBeastEngine
 		 * @param pos 位置
 		 */
 		inline void SetPosition(const Vector3& pos) { m_position = pos; }
+
 		/**
 		 * @brief 位置の設定
 		 * @param x x座標
 		 * @param y y座標
 		 * @param z z座標
 		 */
-		inline void SetPosition(const float& x, const float& y, const float& z) { m_position = Vector3(x, y, z); }
+		inline void SetPosition(const float& x, const float& y, const float& z)
+		{
+			m_position = Vector3(x, y, z);
+		}
 
 		/**
 		 * @brief 位置の取得
@@ -105,13 +113,17 @@ namespace nsBeastEngine
 		 * @param sca 大きさ
 		 */
 		inline void SetScale(const Vector3& sca) { m_scale = sca; }
+
 		/**
 		 * @brief 大きさの設定
 		 * @param x x方向の大きさ
 		 * @param y y方向の大きさ
 		 * @param z z方向の大きさ
 		 */
-		inline void SetScale(const float& x, const float& y, const float& z) { m_scale = Vector3(x, y, z); }
+		inline void SetScale(const float& x, const float& y, const float& z)
+		{
+			m_scale = Vector3(x, y, z);
+		}
 
 		/**
 		 * @brief アニメーション再生速度の設定
@@ -130,6 +142,7 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief モデルの取得
+		 * @details 影モデルなど k2EngineLow::Model が必要な箇所向けに残す
 		 * @return モデル
 		 */
 		inline Model& GetModel() { return m_model; }
@@ -139,12 +152,7 @@ namespace nsBeastEngine
 		 * @details ディファード描画用の m_renderToGBufferModel にも同時に適用する
 		 * @param mulColor 乗算カラー (RGBA, 1.0f=変更なし)
 		 */
-		inline void SetMulColor(const Vector4& mulColor)
-		{
-			m_model.SetMulColor(mulColor);
-			m_renderToGBufferModel.SetMulColor(mulColor);
-			m_forwardRenderModel.SetMulColor(mulColor);
-		}
+		void SetMulColor(const Vector4& mulColor);
 
 		/**
 		 * @brief PBR補正パラメータを設定する
@@ -178,7 +186,7 @@ namespace nsBeastEngine
 		 * @brief ユーザー拡張の定数バッファ（b2）のデータポインタをInit後に差し替える
 		 * @details
 		 *   GBufferモデルはb2をPBRParamで使用しているため、
-		 *   m_modelとm_forwardRenderModelのみに設定する。
+		 *   m_model と m_forwardRenderModel のみに設定する。
 		 * @param data 新しいデータポインタ
 		 */
 		void SetExpandConstantBuffer2(void* data);
@@ -237,16 +245,8 @@ namespace nsBeastEngine
 
 
 	public:
-		ModelRender()
-			: m_position(Vector3::Zero)
-			, m_scale(Vector3::One)
-			, m_rotation(Quaternion::Identity)
-			, m_animationClips(nullptr)
-			, m_maxInstance(1)
-			, m_numAnimationClips(0)
-			, m_animationSpeed(1.0f)
-		{};
-		~ModelRender() = default;
+		ModelRender();
+		~ModelRender();
 
 		/**
 		 * @brief モデルの初期化用関数
@@ -297,7 +297,8 @@ namespace nsBeastEngine
 		/**
 		 * @brief RenderingEngineから呼ばれる実際の描画処理
 		 * @details フォワードの場合はm_forwardRenderModel、
-		 *          ディファードの場合はm_renderToGBufferModelを描画する
+		 *          ディファードの場合はm_renderToGBufferModelを描画する。
+		 *          どちらもトライアングルカリングを適用する。
 		 * @param rc レンダリングコンテキスト
 		 */
 		void OnDraw(RenderContext& rc);
@@ -377,42 +378,56 @@ namespace nsBeastEngine
 
 	private:
 		/** 位置 */
-		Vector3			m_position;
+		Vector3        m_position;
 		/** 大きさ */
-		Vector3			m_scale;
+		Vector3        m_scale;
 		/** 回転 */
-		Quaternion		m_rotation;
-		/** モデル */
-		Model			m_model;
+		Quaternion     m_rotation;
+
+		/**
+		 * @brief 影モデル・GetModel()用の k2EngineLow::Model
+		 * @details トライアングルカリングは不要なためそのまま使用する
+		 */
+		Model          m_model;
 		/** シャドウマップ用モデル */
-		Model			m_shadowModels;
+		Model          m_shadowModels;
+
+		/**
+		 * @brief GBuffer描画用モデル（BeastModel、前方宣言のためunique_ptrで保持）
+		 * @details トライアングルカリングを OnDraw() 内で適用する
+		 */
+		std::unique_ptr<BeastModel> m_renderToGBufferModel;
+
+		/**
+		 * @brief フォワードレンダリング描画用モデル（BeastModel、前方宣言のためunique_ptrで保持）
+		 * @details トライアングルカリングを OnDraw() 内で適用する
+		 */
+		std::unique_ptr<BeastModel> m_forwardRenderModel;
+
 		/** ボーン（自前保有） */
-		Skeleton		m_skeleton;
+		Skeleton       m_skeleton;
 		/** ボーン参照（外部注入または自前） */
 		Skeleton* m_skeletonRef = nullptr;
 		/** アニメーション */
-		Animation		m_animation;
+		Animation      m_animation;
 		/** アニメーションクリップ */
 		AnimationClip* m_animationClips;
 		/** シャドウマップ用のカメラパラメータを格納する定数バッファ */
-		ConstantBuffer	m_drawShadowMapCameraParamCB;
+		ConstantBuffer m_drawShadowMapCameraParamCB;
 		/** 最大インスタンス数 */
-		int				m_maxInstance;
+		int            m_maxInstance;
 		/** アニメーションクリップの数 */
-		int				m_numAnimationClips;
+		int            m_numAnimationClips;
 		/** アニメーションの再生速度 */
-		float			m_animationSpeed;
+		float          m_animationSpeed;
 
 		/** フォワードレンダリングで描画するか */
-		bool		m_isForwardRender = false;
-		/** フォワードレンダリングで描画されるモデル */
-		Model		m_forwardRenderModel;
-		/** Gバッファに描画されるモデル */
-		Model		m_renderToGBufferModel;
+		bool           m_isForwardRender = false;
 		/** 描画するかどうか */
-		bool		m_visible = true;
+		bool           m_visible = true;
 		/** PBR補正パラメータ */
-		PBRParam	m_pbrParam;
+		PBRParam       m_pbrParam;
+
 		/**
 		 * @brief ディザリングCB（b3）のプレースホルダー
 		 * @details
@@ -421,6 +436,7 @@ namespace nsBeastEngine
 		 *   実際のSDitherCbのポインタに差し替えられる。
 		 */
 		SDitherCbPlaceholder m_ditherCbPlaceholder;
+
 		/**
 		 * @brief モデル単位ディザリングCB（b4）
 		 * @details
@@ -429,35 +445,47 @@ namespace nsBeastEngine
 		 *   OcclusionDitherManager（b3）とは独立して動作する。
 		 */
 		SModelDitherCb m_modelDitherCb;
+
 		/**
 		 * @brief ローカル空間AABB（Init時に計算・以降不変）
 		 * @details スケルトンなしモデルのカリング判定の基準として使用する。
 		 */
-		AABB		m_localAABB;
+		AABB           m_localAABB;
+
 		/**
 		 * @brief ワールド空間AABBの最小点（毎フレーム更新）
 		 * @details RenderingEngineのカリング判定で参照される。
 		 */
-		Vector3		m_worldAABBMin = Vector3::Zero;
+		Vector3        m_worldAABBMin = Vector3::Zero;
+
 		/**
 		 * @brief ワールド空間AABBの最大点（毎フレーム更新）
 		 * @details RenderingEngineのカリング判定で参照される。
 		 */
-		Vector3		m_worldAABBMax = Vector3::Zero;
+		Vector3        m_worldAABBMax = Vector3::Zero;
+
 		/**
 		 * @brief フラスタムカリング有効フラグ
 		 * @details falseにすると常に描画される。デフォルトはtrue。
 		 */
-		bool		m_isCullingEnabled = true;
+		bool           m_isCullingEnabled = true;
+
 		/**
 		 * @brief スケルトンを持つか（ボーンAABB更新の分岐用）
 		 * @details Init時にスケルトンが有効な場合にtrueが設定される。
 		 */
-		bool		m_hasSkeleton = false;
+		bool           m_hasSkeleton = false;
+
 		/**
 		 * @brief ボーンAABBの安全マージン（ワールド単位）
 		 * @details アニメーション中にボーン位置がAABBを超えないよう余裕を持たせる。
 		 */
 		static constexpr float BONE_AABB_MARGIN = 20.0f;
+
+		/**
+		 * @brief デバッグ用モデル名（調査用・確認後に削除）
+		 * @details WhiteBear など特定モデルのログ絞り込みに使用する
+		 */
+		std::string    m_debugName;
 	};
 }

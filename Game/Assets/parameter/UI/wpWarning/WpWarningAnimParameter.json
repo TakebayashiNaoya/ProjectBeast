@@ -1,0 +1,15 @@
+{
+    "comment" : "渦潮の上に表示する警告UIのアニメーションパラメーター",
+    "animations" : [
+        {
+            "comment" : "拡大と縮小を繰り返す",
+            "key" : "growAndShrinkAnimation",
+            "valueType" : "Vector3",
+            "startValue" : {"x" : 1, "y" : 1, "z" : 1},
+            "endValue" : {"x" : 1.5, "y" : 1.5, "z" : 1},
+            "duration" : 1,
+            "easing" : "EaseInOut",
+            "loop" : "PingPong"
+        }
+    ]
+}
