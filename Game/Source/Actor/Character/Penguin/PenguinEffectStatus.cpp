@@ -30,6 +30,7 @@ namespace app
 			, m_maxSpeed(0.0f)
 			, m_landingEffectScale(Vector3::One)
 			, m_slideEffectScale(Vector3::One)
+			, m_slideEffectInterval(0.0f)
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterPenguinEffectParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterPenguinEffectParameter& parameter)
@@ -53,6 +54,8 @@ namespace app
 					parameter.slideEffectScale.x = j["slideEffectScale"]["x"].get<float>();
 					parameter.slideEffectScale.y = j["slideEffectScale"]["y"].get<float>();
 					parameter.slideEffectScale.z = j["slideEffectScale"]["z"].get<float>();
+
+					parameter.slideEffectInterval = j["slideEffectInterval"].get<float>();
 				});
 		}
 
@@ -78,6 +81,7 @@ namespace app
 			m_maxSpeed = parameter->maxSpeed;
 			m_landingEffectScale = parameter->landingEffectScale;
 			m_slideEffectScale = parameter->slideEffectScale;
+			m_slideEffectInterval = parameter->slideEffectInterval;
 		}
 
 

@@ -351,12 +351,22 @@ namespace app
 
 				effectPosition += forward * effectStatus->GetEffectOffsetForward();
 
-				EffectManager::Get().PlayEffect(
-					EnEffectKind::PenguinSlide,
-					effectPosition,
-					Quaternion::Identity,
-					scale
-				);
+				m_slideEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+				if (m_slideEffectTimer >= effectStatus->GetSlideEffectInterval())
+				{
+					m_slideEffectTimer = 0.0f;
+					EffectManager::Get().PlayEffect(
+						EnEffectKind::PenguinSlide,
+						effectPosition,
+						m_owner->GetTransform().m_rotation,
+						scale
+					);
+				}
+			}
+			else
+			{
+				m_slideEffectTimer = effectStatus->GetSlideEffectInterval(); // 停止中はタイマーを満タンにしておく（停止→移動のときにすぐエフェクトが出るようにするため）
 			}
 
 			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
@@ -390,6 +400,7 @@ namespace app
 
 		PenguinSlidingState::PenguinSlidingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
+			, m_slideEffectTimer(0.0f)
 		{}
 
 

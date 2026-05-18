@@ -55,6 +55,9 @@ namespace app
 
 			/** スライドエフェクトのスケール */
 			Vector3 slideEffectScale;
+
+			/** スライドのエフェクトの再生間隔 */
+			float slideEffectInterval;
 		};
 	}
 }

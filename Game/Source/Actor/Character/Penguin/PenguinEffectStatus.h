@@ -27,6 +27,7 @@ namespace app
 			inline float GetMaxSpeed() const { return m_maxSpeed; }
 			inline const Vector3& GetLandingEffectScale() const { return m_landingEffectScale; }
 			inline const Vector3& GetSlideEffectScale() const { return m_slideEffectScale; }
+			inline float GetSlideEffectInterval() const { return m_slideEffectInterval; }
 
 
 		public:
@@ -51,6 +52,7 @@ namespace app
 			float m_maxSpeed;
 			Vector3 m_landingEffectScale;
 			Vector3 m_slideEffectScale;
+			float m_slideEffectInterval;
 		};
 	}
 }
