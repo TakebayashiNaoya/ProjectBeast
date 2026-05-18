@@ -76,6 +76,12 @@
     <Filter Include="Source\Graphics">
       <UniqueIdentifier>{c89d2eb9-7128-4e66-b594-03a88d645758}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\WpWarning">
+      <UniqueIdentifier>{8fe50806-f46e-44b2-9c3c-384aa9f4e29d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\SystemBase">
+      <UniqueIdentifier>{5baf1a1c-6f2f-454d-820e-fe2856b8490a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -417,6 +423,21 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Model\CPReactionAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\WpWarning\WpWarningStatus.cpp">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\WpWarning\MasterWpWarningParameter.cpp">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\WpWarning\WpWarningAnimStatus.cpp">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\WpWarning\WpWarningMenu.cpp">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp">
+      <Filter>Source\UI\WpWarning</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -782,6 +803,24 @@
     </ClInclude>
     <ClInclude Include="Source\Nature\OceanParameter.h">
       <Filter>Source\Nature</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\WpWarningMenu.h">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\WpWarningStatus.h">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\WpWarningSystem.h">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\System\SystemPacket.h">
+      <Filter>Source\UI\SystemBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -34,6 +34,7 @@
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
+#include "Source/UI/WpWarning/WpWarningSystem.h"
 
 
 namespace app
@@ -74,6 +75,7 @@ namespace app
 		delete m_achievementNotificationLayout;
 		delete m_inGameButtonLayout;
 		delete m_cpReactionSystem;
+		delete m_wpWarningSystem;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -206,6 +208,11 @@ namespace app
 		m_cpReactionSystem = new ui::CPReactionSystem();
 		m_cpReactionSystem->Initialize();
 
+
+		m_wpWarningSystem = new ui::WpWarningSystem();
+		m_wpWarningSystem->Initialize();
+		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
+
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);
 	}
@@ -326,6 +333,7 @@ namespace app
 		}
 
 		if (m_cpReactionSystem) m_cpReactionSystem->Update();
+		if (m_wpWarningSystem) m_wpWarningSystem->Update();
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Update();
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Update();
@@ -361,6 +369,7 @@ namespace app
 
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Render(rc);
 		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
+		if (m_wpWarningSystem) m_wpWarningSystem->Render(rc);
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Render(rc);
 		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);
