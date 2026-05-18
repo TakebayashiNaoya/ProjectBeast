@@ -17,16 +17,14 @@ namespace app
 {
 	namespace ui
 	{
-		namespace
-		{
-			/** 描画可能な距離 */
-			constexpr float DRAWABLE_LENGTH = 500.0f;
-		}
+		/** 描画可能な距離 */
+		constexpr float DRAWABLE_LENGTH = 500.0f;
 
 
 		WpWarningSystem::WpWarningSystem()
-			: m_daddyPenguin(nullptr)
+			: m_packets()
 			, m_parentStatus(nullptr)
+			, m_daddyPenguin(nullptr)
 			, m_wpInfos(0)
 		{}
 
@@ -115,7 +113,7 @@ namespace app
 				});
 
 			// 範囲内に存在する渦潮の数が規定よりも多い場合、パケットの数に絞る
-			const int dataNum = std::min<int>(m_wpInfos.size(), PACKET_NUM);
+			const size_t dataNum = std::min<size_t>(m_wpInfos.size(), PACKET_NUM);
 
 			// 距離の近いものを取得
 			std::partial_sort(

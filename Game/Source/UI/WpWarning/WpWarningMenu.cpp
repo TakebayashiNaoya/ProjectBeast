@@ -76,10 +76,11 @@ namespace app
 				m_isDraw = false;
 				for (auto* it : icons)
 				{
+					if (!it) continue;
 					it->m_isDraw = m_isDraw;
 
-					ResetAnimation();
 				}
+				ResetAnimation();
 				return;
 			}
 

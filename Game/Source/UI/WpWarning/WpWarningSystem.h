@@ -20,11 +20,8 @@ namespace app
 
 	namespace ui
 	{
-		namespace
-		{
-			/** パケットの数 */
-			constexpr int PACKET_NUM = 3;
-		}
+		/** パケットの数 */
+		constexpr int PACKET_NUM = 3;
 
 
 		/** 前方宣言 */
