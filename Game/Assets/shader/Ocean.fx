@@ -75,6 +75,10 @@ cbuffer OceanCb : register(b1)
     float wave1Frequency;   // 波①の空間周波数
     float wave2Amplitude;   // 波②の振幅
     float wave2Frequency;   // 波②の空間周波数
+    float specularPower;    // スペキュラのPhong指数（大きいほどハイライトが絞られる）
+    float specularScale;    // スペキュラ強度の倍率（0.0で照り返しを消せる）
+    float ambientScale;     // 海専用アンビエント強度倍率（他オブジェクトに影響しない）
+    float padding0;
 };
 
 ////////////////////////////////////////////////
@@ -88,7 +92,6 @@ sampler           g_sampler     : register(s0);
 ////////////////////////////////////////////////
 // 関数宣言。
 ////////////////////////////////////////////////
-float3 CalcLigFromDrectionLight(SPSIn psIn, float3 normal);
 float3 CalcLambertDiffuse(float3 lightDirection, float3 lightColor, float3 normal);
 float3 CalcPhongSpecular(float3 lightDirection, float3 lightColor, float3 worldPos, float3 normal, float2 uv);
 float  ComputeFresnel(float3 normal, float3 viewDir, float baseReflectance);
@@ -172,9 +175,15 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     float2 albedoUv    = uvScaled + normal.xz * albedoDistortionStrength;
     float4 albedoColor = g_albedo.Sample(g_sampler, albedoUv);
 
-    float3 lig       = CalcLigFromDrectionLight(psIn, normal);
+    float3 diff      = CalcLambertDiffuse(
+        light.directionLight.direction, light.directionLight.color, normal);
+    float3 spec      = CalcPhongSpecular(
+        light.directionLight.direction, light.directionLight.color, psIn.worldPos, normal, psIn.uv);
+    float3 ambient   = light.ambientLightColor * ambientScale;
+
     float4 litColor  = albedoColor;
-    litColor.xyz    += lig;
+    litColor.xyz    *= saturate(diff + ambient);
+    litColor.xyz    += saturate(spec) * lerp(float3(1.0f, 1.0f, 1.0f), albedoColor.xyz, 0.3f);
 
     return litColor;
 }
@@ -200,22 +209,12 @@ float3 CalcPhongSpecular(float3 lightDirection, float3 lightColor, float3 worldP
     float3 refVec = reflect(lightDirection, normal);
     float3 toEye  = normalize(light.cameraPosition - worldPos);
 
-    float t = pow(max(0.0f, dot(refVec, toEye)), 10.0f);
+    float t       = pow(max(0.0f, dot(refVec, toEye)), specularPower);
+    // ComputeFresnelは内部で -normalize(viewDir) を使うため、
+    // toEye（サーフェスから視点への方向）を反転して渡す
+    float fresnel = ComputeFresnel(normal, -toEye, baseReflectance);
 
-    return lightColor * t;
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-// ディレクションライトを計算
-//////////////////////////////////////////////////////////////////////////////////
-float3 CalcLigFromDrectionLight(SPSIn psIn, float3 normal)
-{
-    float3 diff = CalcLambertDiffuse(
-        light.directionLight.direction, light.directionLight.color, normal);
-    float3 spec = CalcPhongSpecular(
-        light.directionLight.direction, light.directionLight.color, psIn.worldPos, normal, psIn.uv);
-
-    return diff + spec;
+    return lightColor * t * specularScale * fresnel;
 }
 
 //////////////////////////////////////////////////////////////////////////////////

@@ -780,6 +780,9 @@
     <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Nature\OceanParameter.h">
+      <Filter>Source\Nature</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
