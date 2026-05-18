@@ -1,22 +1,22 @@
-#pragma once
+ï»¿#pragma once
 
 #include <map>
 #include <string>
 
 namespace nsK2EngineLow {
 	/// <summary>
-	/// ƒGƒtƒFƒNƒgƒGƒ“ƒWƒ“ƒNƒ‰ƒXB
+	/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚¨ãƒ³ã‚¸ãƒ³ã‚¯ãƒ©ã‚¹ã€‚
 	/// </summary>
 	class EffectEngine : public Noncopyable {
-		static EffectEngine* m_instance;	//—Bˆê‚ÌƒCƒ“ƒXƒ^ƒ“ƒXB
-		EffekseerRenderer::RendererRef m_renderer[2];	//ƒŒƒ“ƒ_ƒ‰[B
-		Effekseer::RefPtr<EffekseerRenderer::SingleFrameMemoryPool> m_memoryPool[2];	//ƒƒ‚ƒŠƒv[ƒ‹B
-		Effekseer::RefPtr<EffekseerRenderer::CommandList> m_commandList[2];			//ƒRƒ}ƒ“ƒhƒŠƒXƒgB
+		static EffectEngine* m_instance;	//å”¯ä¸€ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã€‚
+		EffekseerRenderer::RendererRef m_renderer[2];	//ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã€‚
+		Effekseer::RefPtr<EffekseerRenderer::SingleFrameMemoryPool> m_memoryPool[2];	//ãƒ¡ãƒ¢ãƒªãƒ—ãƒ¼ãƒ«ã€‚
+		Effekseer::RefPtr<EffekseerRenderer::CommandList> m_commandList[2];			//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã€‚
 		Effekseer::ManagerRef m_manager;
 		std::map< int, Effekseer::EffectRef > m_effectMap;
 	public:
 		/// <summary>
-		/// ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìì¬B
+		/// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ä½œæˆã€‚
 		/// </summary>
 		static void CreateInstance()
 		{
@@ -25,7 +25,7 @@ namespace nsK2EngineLow {
 			}
 		}
 		/// <summary>
-		/// ƒCƒ“ƒXƒ^ƒ“ƒX‚Ìæ“¾B
+		/// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®å–å¾—ã€‚
 		/// </summary>
 		/// <returns></returns>
 		static EffectEngine* GetInstance()
@@ -33,7 +33,7 @@ namespace nsK2EngineLow {
 			return m_instance;
 		}
 		/// <summary>
-		/// ƒCƒ“ƒXƒ^ƒ“ƒX‚ÌíœB
+		/// ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®å‰Šé™¤ã€‚
 		/// </summary>
 		static void DeleteInstance()
 		{
@@ -42,7 +42,7 @@ namespace nsK2EngineLow {
 
 		}
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ªÄ¶’†‚©”»’èB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãŒå†ç”Ÿä¸­ã‹åˆ¤å®šã€‚
 		/// </summary>
 		/// <param name="handle"></param>
 		/// <returns></returns>
@@ -51,7 +51,27 @@ namespace nsK2EngineLow {
 			return m_manager->GetShown(handle);
 		}
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚Ìƒ[ƒ‹ƒhs—ñ‚ğXVB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãŒå­˜åœ¨ï¼ˆå†ç”Ÿç¶™ç¶šï¼‰ã—ã¦ã„ã‚‹ã‹åˆ¤å®šã€‚
+		/// GetShown()ã¨ç•°ãªã‚ŠSetShown(false)ã®å½±éŸ¿ã‚’å—ã‘ãªã„ã€‚
+		/// </summary>
+		/// <param name="handle">å¯¾è±¡ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒãƒ³ãƒ‰ãƒ«ã€‚</param>
+		/// <returns>å†ç”Ÿç¶™ç¶šä¸­ãªã‚‰trueã€‚</returns>
+		bool IsExist(const int handle) const
+		{
+			return m_manager->Exists(handle);
+		}
+		/// <summary>
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®æç”»å¯å¦ã‚’è¨­å®šã™ã‚‹ã€‚
+		/// å†ç”Ÿã¯ç¶™ç¶šã—ãŸã¾ã¾æç”»ã®ã¿ã‚’æŠ‘åˆ¶ã§ãã‚‹ã€‚
+		/// </summary>
+		/// <param name="handle">å¯¾è±¡ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒãƒ³ãƒ‰ãƒ«ã€‚</param>
+		/// <param name="shown">trueã§æç”»ã™ã‚‹ã€falseã§æç”»ã‚’æŠ‘åˆ¶ã™ã‚‹ã€‚</param>
+		void SetShown(const int handle, const bool shown)
+		{
+			m_manager->SetShown(handle, shown);
+		}
+		/// <summary>
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’æ›´æ–°ã€‚
 		/// </summary>
 		/// <param name="handle"></param>
 		/// <param name="pos"></param>
@@ -86,37 +106,37 @@ namespace nsK2EngineLow {
 			m_manager->SetBaseMatrix(handle, baseMat);
 		}
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ğÄ¶B
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’å†ç”Ÿã€‚
 		/// </summary>
-		/// <param name="filePath">Ä¶‚µ‚½‚¢ƒGƒtƒFƒNƒg</param>
-		/// <returns>Ä¶‚µ‚½ƒGƒtƒFƒNƒg‚Ìƒnƒ“ƒhƒ‹B</returns>
+		/// <param name="filePath">å†ç”Ÿã—ãŸã„ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ</param>
+		/// <returns>å†ç”Ÿã—ãŸã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®ãƒãƒ³ãƒ‰ãƒ«ã€‚</returns>
 		int Play(Effekseer::EffectRef effect);
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ğ’â~B
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’åœæ­¢ã€‚
 		/// </summary>
 		/// <param name="effectHandle"></param>
 		void Stop(int effectHandle);
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ğƒ[ƒhB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 		/// </summary>
 		Effekseer::EffectRef LoadEffect(const int number);
 		/// <summary>
-		/// XV
+		/// æ›´æ–°
 		/// </summary>
-		/// <param name="deltaTime">1ƒtƒŒ[ƒ€‚ÌŒo‰ßŠÔB</param>
+		/// <param name="deltaTime">1ãƒ•ãƒ¬ãƒ¼ãƒ ã®çµŒéæ™‚é–“ã€‚</param>
 		void Update(float deltaTime);
 		/// <summary>
-		/// •`‰æB
+		/// æç”»ã€‚
 		/// </summary>
 		void Draw();
 		/// <summary>
-		/// ƒGƒtƒFƒNƒg‚ğ“Ç‚İ‚ñ‚Å“o˜^‚·‚éB
+		/// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’èª­ã¿è¾¼ã‚“ã§ç™»éŒ²ã™ã‚‹ã€‚
 		/// </summary>
-		/// <param name="number">“o˜^”Ô†B</param>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
+		/// <param name="number">ç™»éŒ²ç•ªå·ã€‚</param>
+		/// <param name="filePath">ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã€‚</param>
 		void ResistEffect(const int number, const char16_t* filePath);
 		/// <summary>
-		/// ƒtƒŒ[ƒ€‚ÌŠJn‚ÉŒÄ‚Ño‚·•K—v‚ª‚ ‚éˆ—B
+		/// ãƒ•ãƒ¬ãƒ¼ãƒ ã®é–‹å§‹æ™‚ã«å‘¼ã³å‡ºã™å¿…è¦ãŒã‚ã‚‹å‡¦ç†ã€‚
 		/// </summary>
 		void BeginFrame();
 	private:

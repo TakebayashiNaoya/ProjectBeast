@@ -70,7 +70,7 @@ using namespace Microsoft::WRL;
 
 #include "graphics/RenderContext_inline.h"
 #include "graphics/DescriptorHeap_inline.h"
-
+#include "graphics/Material.h"
 #include "graphics/Sprite.h"
 #include "graphics/Model.h"
 #include "HID/GamePad.h"

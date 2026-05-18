@@ -1,10 +1,17 @@
 ﻿/**
  * @file EffectManager.h
  * @brief 必要なエフェクトファイルを読み込んだり再生したりなど管理する
- * @author 藤谷
+ * @author 藤谷、竹林
  */
 #pragma once
 #include "Types.h"
+
+
+namespace nsBeastEngine
+{
+	class Frustum;
+	class BeastEffectEmitter;
+}
 
 
 namespace app
@@ -22,12 +29,19 @@ namespace app
 	{
 	private:
 		/**
-		 * エフェクトインスタンスを保持
+		 * @brief エフェクトのインスタンスと種別をまとめて保持する構造体
 		 */
-		std::map<EffectHandle, EffectEmitter*> m_effectList;
-		/**
-		 * マップで参照するようにハンドル数を保持
-		 */
+		struct EffectEntry
+		{
+			/** エフェクトエミッター */
+			nsBeastEngine::BeastEffectEmitter* emitter = nullptr;
+			/** エフェクトの種類（バウンディング半径の参照に使用） */
+			EnEffectKind kind = EnEffectKind::None;
+		};
+
+		/** エフェクトインスタンスを保持 */
+		std::map<EffectHandle, EffectEntry> m_effectList;
+		/** マップで参照するようにハンドル数を保持 */
 		EffectHandle m_effectHandleCount = 0;
 
 
@@ -39,9 +53,12 @@ namespace app
 	public:
 		/**
 		 * @brief 更新処理
-		 * @details 再生が終了したエフェクトをm_effectListから除外する
+		 * @details
+		 *   再生が終了したエフェクトを m_effectList から除外し、
+		 *   フラスタム判定によりエフェクトの描画可否を切り替える。
+		 * @param frustum カリングに使用する視錐台
 		 */
-		void Update();
+		void Update(const nsBeastEngine::Frustum& frustum);
 
 
 	public:
@@ -65,18 +82,18 @@ namespace app
 		 * @param handle エフェクトのハンドル
 		 * @return エフェクトのポインタ（存在しない場合はnullptr）
 		 */
-		EffectEmitter* FindEffect(const EffectHandle handle)
+		nsBeastEngine::BeastEffectEmitter* FindEffect(const EffectHandle handle)
 		{
 			auto it = m_effectList.find(handle);
 			if (it != m_effectList.end()) {
-				return it->second;
+				return it->second.emitter;
 			}
 			return nullptr;
 		}
 
 		/**
 		 * @brief ハンドルをm_effectListから除外する
-		 * @details EffectEmitterが自己削除される際に呼び出す
+		 * @details BeastEffectEmitterが自己削除される際に呼び出す
 		 * @param handle 除外するエフェクトのハンドル
 		 */
 		void UnregisterEffect(const EffectHandle handle);
@@ -97,7 +114,6 @@ namespace app
 			}
 		}
 
-
 		/**
 		 * @brief インスタンスを取得
 		 */
@@ -105,7 +121,6 @@ namespace app
 		{
 			return *m_instance;
 		}
-
 
 		/**
 		 * @brief インスタンスを破棄
@@ -118,6 +133,7 @@ namespace app
 				m_instance = nullptr;
 			}
 		}
+
 
 	private:
 		/** シングルトンインスタンス */

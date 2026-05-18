@@ -1,5 +1,5 @@
-/*!
-* @brief	ƒAƒjƒ[ƒ^[ƒNƒ‰ƒXB
+ï»¿/*!
+* @brief	ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚¯ãƒ©ã‚¹ã€‚
 */
 #include "k2EngineLowPreCompile.h"
 #include "Animation.h"
@@ -7,7 +7,7 @@
 
 namespace nsK2EngineLow {
 	namespace {
-		//DCCƒc[ƒ‹‚Å‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ã‚Å‚Ì1ƒtƒŒ[ƒ€‚ÌŒo‰ßŠÔ(’PˆÊ‚Í•b)
+		//DCCãƒ„ãƒ¼ãƒ«ã§ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ä¸Šã§ã®1ãƒ•ãƒ¬ãƒ¼ãƒ ã®çµŒéæ™‚é–“(å˜ä½ã¯ç§’)
 		const float DELTA_SEC_PER_FRAME_ON_DCC_TOOL = 1.0f / 30.0f;
 	}
 
@@ -20,13 +20,13 @@ namespace nsK2EngineLow {
 		for (int i = 0; i < numAnimClip; i++) {
 			m_animationClips.push_back(&animClips[i]);
 		}
-		//footstepƒ{[ƒ“‚Ì”Ô†‚ğ’²‚×‚éB
+		//footstepãƒœãƒ¼ãƒ³ã®ç•ªå·ã‚’èª¿ã¹ã‚‹ã€‚
 		int footstepBoneNo = -1;
 		int numBone = m_skeleton->GetNumBones();
 		for (int boneNo = 0; boneNo < numBone; boneNo++) {
 			auto bone = m_skeleton->GetBone(boneNo);
 			if (wcscmp(bone->GetName(), L"footstep") == 0) {
-				//footstepƒ{[ƒ“‚ªŒ©‚Â‚©‚Á‚½B
+				//footstepãƒœãƒ¼ãƒ³ãŒè¦‹ã¤ã‹ã£ãŸã€‚
 				footstepBoneNo = boneNo;
 				break;
 			}
@@ -40,14 +40,14 @@ namespace nsK2EngineLow {
 		m_isInited = true;
 	}
 	/*!
-		* @brief	ƒ[ƒJƒ‹ƒ|[ƒY‚ÌXVB
+		* @brief	ãƒ­ãƒ¼ã‚«ãƒ«ãƒãƒ¼ã‚ºã®æ›´æ–°ã€‚
 		*/
 	void Animation::UpdateLocalPose(float deltaTime)
 	{
 		m_interpolateTime += deltaTime;
 		if (m_interpolateTime >= 1.0f) {
-			//•âŠÔŠ®—¹B
-			//Œ»İ‚ÌÅIƒAƒjƒ[ƒVƒ‡ƒ“ƒRƒ“ƒgƒ[ƒ‰‚Ö‚ÌƒCƒ“ƒfƒbƒNƒX‚ªŠJnƒCƒ“ƒfƒbƒNƒX‚É‚È‚éB
+			//è£œé–“å®Œäº†ã€‚
+			//ç¾åœ¨ã®æœ€çµ‚ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ã¸ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãŒé–‹å§‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã«ãªã‚‹ã€‚
 			m_startAnimationPlayController = GetLastAnimationControllerIndex();
 			m_numAnimationPlayController = 1;
 			m_interpolateTime = 1.0f;
@@ -57,7 +57,7 @@ namespace nsK2EngineLow {
 			int index = GetAnimationControllerIndex(m_startAnimationPlayController, i);
 			m_animationPlayController[index].Update(deltaTime, this, false);
 		}
-		//ÅŒã‚Ìƒ|[ƒY‚¾‚¯i‚ß‚Ä‚¢‚­B
+		//æœ€å¾Œã®ãƒãƒ¼ã‚ºã ã‘é€²ã‚ã¦ã„ãã€‚
 		int lastIndex = GetLastAnimationControllerIndex();
 		m_animationPlayController[lastIndex].Update(deltaTime, this, true);
 
@@ -71,20 +71,20 @@ namespace nsK2EngineLow {
 		mBias.MakeRotationX(Math::PI * -0.5f);
 		mBias.Apply(footstepDeltaValueInWorldSpace);
 
-		//ƒtƒbƒgƒXƒeƒbƒv‚ÌˆÚ“®—Ê‚ğŠg‘å‚·‚éB
+		//ãƒ•ãƒƒãƒˆã‚¹ãƒ†ãƒƒãƒ—ã®ç§»å‹•é‡ã‚’æ‹¡å¤§ã™ã‚‹ã€‚
 		footstepDeltaValueInWorldSpace.x *= scale.x;
 		footstepDeltaValueInWorldSpace.y *= scale.y;
 		footstepDeltaValueInWorldSpace.z *= scale.z;
-		//ƒtƒbƒgƒXƒeƒbƒv‚ÌˆÚ“®—Ê‚ğ‰ñ‚·B
+		//ãƒ•ãƒƒãƒˆã‚¹ãƒ†ãƒƒãƒ—ã®ç§»å‹•é‡ã‚’å›ã™ã€‚
 		rotation.Apply(footstepDeltaValueInWorldSpace);
-		//ƒtƒbƒgƒXƒeƒbƒv‚ÌˆÚ“®—Ê‚ğƒIƒCƒ‰[Ï•ª‚·‚éB
+		//ãƒ•ãƒƒãƒˆã‚¹ãƒ†ãƒƒãƒ—ã®ç§»å‹•é‡ã‚’ã‚ªã‚¤ãƒ©ãƒ¼ç©åˆ†ã™ã‚‹ã€‚
 		float t = m_deltaTimeOnUpdate / DELTA_SEC_PER_FRAME_ON_DCC_TOOL;
 		footstepDeltaValueInWorldSpace *= t;
 		return footstepDeltaValueInWorldSpace;
 	}
 	void Animation::UpdateGlobalPose()
 	{
-		//ƒOƒ[ƒoƒ‹ƒ|[ƒYŒvZ—p‚Ìƒƒ‚ƒŠ‚ğƒXƒ^ƒbƒN‚©‚çŠm•ÛB
+		//ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒ¼ã‚ºè¨ˆç®—ç”¨ã®ãƒ¡ãƒ¢ãƒªã‚’ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰ç¢ºä¿ã€‚
 		int numBone = m_skeleton->GetNumBones();
 		Quaternion* qGlobalPose = (Quaternion*)alloca(sizeof(Quaternion) * numBone);
 		Vector3* vGlobalPose = (Vector3*)alloca(sizeof(Vector3) * numBone);
@@ -95,29 +95,29 @@ namespace nsK2EngineLow {
 			vGlobalPose[i] = Vector3::Zero;
 			vGlobalScale[i] = Vector3::One;
 		}
-		//ƒOƒ[ƒoƒ‹ƒ|[ƒY‚ğŒvZ‚µ‚Ä‚¢‚­B
+		//ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒ¼ã‚ºã‚’è¨ˆç®—ã—ã¦ã„ãã€‚
 		int startIndex = m_startAnimationPlayController;
 		for (int i = 0; i < m_numAnimationPlayController; i++) {
 			int index = GetAnimationControllerIndex(startIndex, i);
 			float intepolateRate = m_animationPlayController[index].GetInterpolateRate();
 			const auto& localBoneMatrix = m_animationPlayController[index].GetBoneLocalMatrix();
 			auto deltaValueFootStep = m_animationPlayController[index].GetFootStepDeltaValueOnUpdate();
-			//footstep‚ÌˆÚ“®—Ê‚Ì•âŠ®
+			//footstepã®ç§»å‹•é‡ã®è£œå®Œ
 			m_footstepDeltaValue.Lerp(intepolateRate, m_footstepDeltaValue, deltaValueFootStep);
 			for (int boneNo = 0; boneNo < numBone; boneNo++) {
-				//•½sˆÚ“®‚Ì•âŠ®
+				//å¹³è¡Œç§»å‹•ã®è£œå®Œ
 				Matrix m = localBoneMatrix[boneNo];
 				vGlobalPose[boneNo].Lerp(
 					intepolateRate,
 					vGlobalPose[boneNo],
 					*(Vector3*)m.m[3]
 				);
-				//•½sˆÚ“®¬•ª‚ğíœB
+				//å¹³è¡Œç§»å‹•æˆåˆ†ã‚’å‰Šé™¤ã€‚
 				m.m[3][0] = 0.0f;
 				m.m[3][1] = 0.0f;
 				m.m[3][2] = 0.0f;
 
-				//Šg‘å¬•ª‚Ì•âŠÔB
+				//æ‹¡å¤§æˆåˆ†ã®è£œé–“ã€‚
 				Vector3 vBoneScale;
 				vBoneScale.x = (*(Vector3*)m.m[0]).Length();
 				vBoneScale.y = (*(Vector3*)m.m[1]).Length();
@@ -128,39 +128,61 @@ namespace nsK2EngineLow {
 					vGlobalScale[boneNo],
 					vBoneScale
 				);
-				//Šg‘å¬•ª‚ğœ‹B
-				m.m[0][0] /= vBoneScale.x;
-				m.m[0][1] /= vBoneScale.x;
-				m.m[0][2] /= vBoneScale.x;
+				//æ‹¡å¤§æˆåˆ†ã‚’é™¤å»ã€‚
+				// ã‚¹ã‚±ãƒ¼ãƒ«ãŒæ¥µã‚ã¦å°ã•ã„å ´åˆã¯ã‚¼ãƒ­é™¤ç®—ã«ã‚ˆã‚‹NaNç™ºç”Ÿã‚’é˜²ããŸã‚ã‚¹ã‚­ãƒƒãƒ—ã—å˜ä½è¡Œåˆ—æˆåˆ†ã‚’è¨­å®šã™ã‚‹ã€‚
+				if (vBoneScale.x > FLT_EPSILON) {
+					m.m[0][0] /= vBoneScale.x;
+					m.m[0][1] /= vBoneScale.x;
+					m.m[0][2] /= vBoneScale.x;
+				}
+				else {
+					m.m[0][0] = 1.0f;
+					m.m[0][1] = 0.0f;
+					m.m[0][2] = 0.0f;
+				}
 
-				m.m[1][0] /= vBoneScale.y;
-				m.m[1][1] /= vBoneScale.y;
-				m.m[1][2] /= vBoneScale.y;
+				if (vBoneScale.y > FLT_EPSILON) {
+					m.m[1][0] /= vBoneScale.y;
+					m.m[1][1] /= vBoneScale.y;
+					m.m[1][2] /= vBoneScale.y;
+				}
+				else {
+					m.m[1][0] = 0.0f;
+					m.m[1][1] = 1.0f;
+					m.m[1][2] = 0.0f;
+				}
 
-				m.m[2][0] /= vBoneScale.z;
-				m.m[2][1] /= vBoneScale.z;
-				m.m[2][2] /= vBoneScale.z;
+				if (vBoneScale.z > FLT_EPSILON) {
+					m.m[2][0] /= vBoneScale.z;
+					m.m[2][1] /= vBoneScale.z;
+					m.m[2][2] /= vBoneScale.z;
+				}
+				else {
+					m.m[2][0] = 0.0f;
+					m.m[2][1] = 0.0f;
+					m.m[2][2] = 1.0f;
+				}
 
-				//‰ñ“]‚Ì•âŠ®
+				//å›è»¢ã®è£œå®Œ
 				Quaternion qBone;
 				qBone.SetRotation(m);
 				qGlobalPose[boneNo].Slerp(intepolateRate, qGlobalPose[boneNo], qBone);
 			}
 		}
-		//ƒOƒ[ƒoƒ‹ƒ|[ƒY‚ğƒXƒPƒ‹ƒgƒ“‚É”½‰f‚³‚¹‚Ä‚¢‚­B
+		//ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒ¼ã‚ºã‚’ã‚¹ã‚±ãƒ«ãƒˆãƒ³ã«åæ˜ ã•ã›ã¦ã„ãã€‚
 		for (int boneNo = 0; boneNo < numBone; boneNo++) {
 
-			//Šg‘ås—ñ‚ğì¬B
+			//æ‹¡å¤§è¡Œåˆ—ã‚’ä½œæˆã€‚
 			Matrix scaleMatrix;
 			scaleMatrix.MakeScaling(vGlobalScale[boneNo]);
-			//‰ñ“]s—ñ‚ğì¬B
+			//å›è»¢è¡Œåˆ—ã‚’ä½œæˆã€‚
 			Matrix rotMatrix;
 			rotMatrix.MakeRotationFromQuaternion(qGlobalPose[boneNo]);
-			//•½sˆÚ“®s—ñ‚ğì¬B
+			//å¹³è¡Œç§»å‹•è¡Œåˆ—ã‚’ä½œæˆã€‚
 			Matrix transMat;
 			transMat.MakeTranslation(vGlobalPose[boneNo]);
 
-			//‘S•”‚ğ‡¬‚µ‚ÄAƒ{[ƒ“s—ñ‚ğì¬B
+			//å…¨éƒ¨ã‚’åˆæˆã—ã¦ã€ãƒœãƒ¼ãƒ³è¡Œåˆ—ã‚’ä½œæˆã€‚
 			Matrix boneMatrix;
 			boneMatrix = scaleMatrix * rotMatrix;
 			boneMatrix = boneMatrix * transMat;
@@ -172,12 +194,12 @@ namespace nsK2EngineLow {
 
 		}
 
-		//ÅIƒAƒjƒ[ƒVƒ‡ƒ“ˆÈŠO‚Í•âŠÔŠ®—¹‚µ‚Ä‚¢‚½‚çœ‹‚µ‚Ä‚¢‚­B
+		//æœ€çµ‚ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ä»¥å¤–ã¯è£œé–“å®Œäº†ã—ã¦ã„ãŸã‚‰é™¤å»ã—ã¦ã„ãã€‚
 		int numAnimationPlayController = m_numAnimationPlayController;
 		for (int i = 1; i < m_numAnimationPlayController; i++) {
 			int index = GetAnimationControllerIndex(startIndex, i);
 			if (m_animationPlayController[index].GetInterpolateRate() > 0.99999f) {
-				//•âŠÔ‚ªI‚í‚Á‚Ä‚¢‚é‚Ì‚ÅƒAƒjƒ[ƒVƒ‡ƒ“‚ÌŠJnˆÊ’u‚ğ‘O‚É‚·‚éB
+				//è£œé–“ãŒçµ‚ã‚ã£ã¦ã„ã‚‹ã®ã§ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®é–‹å§‹ä½ç½®ã‚’å‰ã«ã™ã‚‹ã€‚
 				m_startAnimationPlayController = index;
 				numAnimationPlayController = m_numAnimationPlayController - i;
 			}
@@ -191,10 +213,10 @@ namespace nsK2EngineLow {
 			return;
 		}
 		m_deltaTimeOnUpdate = deltaTime;
-		//ƒ[ƒJƒ‹ƒ|[ƒY‚ÌXV‚ğ‚â‚Á‚Ä‚¢‚­B
+		//ãƒ­ãƒ¼ã‚«ãƒ«ãƒãƒ¼ã‚ºã®æ›´æ–°ã‚’ã‚„ã£ã¦ã„ãã€‚
 		UpdateLocalPose(deltaTime);
 
-		//ƒOƒ[ƒoƒ‹ƒ|[ƒY‚ğŒvZ‚µ‚Ä‚¢‚­B
+		//ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒ¼ã‚ºã‚’è¨ˆç®—ã—ã¦ã„ãã€‚
 		UpdateGlobalPose();
 	}
 }

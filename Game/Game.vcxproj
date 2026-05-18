@@ -417,6 +417,7 @@
     <ClInclude Include="Source\Manager\ScoreManager.h" />
     <ClInclude Include="Source\Manager\TimeManager.h" />
     <ClInclude Include="Source\Nature\Ocean.h" />
+    <ClInclude Include="Source\Nature\OceanParameter.h" />
     <ClInclude Include="Source\Nature\Whirlpool.h" />
     <ClInclude Include="Source\Nature\WhirlpoolManager.h" />
     <ClInclude Include="Source\Nature\WhirlpoolParameter.h" />
