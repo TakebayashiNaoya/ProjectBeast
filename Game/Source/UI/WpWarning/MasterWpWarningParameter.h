@@ -24,7 +24,7 @@ namespace app
 			}
 #endif
 			/** JSONから受け取る変数群 */
-
+			float offsetY;
 		};
 	}
 }
