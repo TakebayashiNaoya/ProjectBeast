@@ -21,20 +21,32 @@ namespace app
 			/** アニメーションデータ */
 			struct AnimData
 			{
-				Vector3 startBound;
-				Vector3 endBound;
+				Vector3 rStartTlanslate;
+				Vector3 rEndSink;
+				Vector3 start;
+				Vector3 end;
+				Vector3 start2;
+				Vector3 end2;
+				Vector3 start3;
+				Vector3 end3;
+				Vector3 rSinkDown;
+				Vector3 rSinkBounce;
+				Vector3 tStartTlanslate;
+				Vector3 tEndTlanslate;
+
 				float duration;
 				util::EasingType easingType;
 				util::LoopMode loopMode;
 			};
 
+
 			/** バウンドアニメーション */
-			AnimData m_startBound;
-			AnimData m_endBound;
-			AnimData m_startSink;
-			AnimData m_endSink;
-			AnimData m_littleUp;
-			AnimData m_littleDown;
+			AnimData m_startBound;		// 救助数増加アニメーション。
+			AnimData m_endBound;		// 救助数増加アニメーション。
+			AnimData m_startSink;		// 救助数減少アニメーション。
+			AnimData m_endBounceDownUp; // 救助数減少アニメーション。
+			AnimData m_bounceDown;		// 総数減少アニメーション。
+			AnimData m_bounceUp;		// 総数減少アニメーション。
 
 
 		public:
@@ -44,19 +56,6 @@ namespace app
 			void SetUpUI() override;
 
 			void Update() override;
-
-			/** ゲッター群 */
-			AnimData GetStartBoundData() const { return m_startBound; }
-
-			AnimData GetEndBoundData() const { return m_endBound; }
-
-			AnimData GetStartSinkData() const { return m_startSink; }
-
-			AnimData GetEndSinkData() const { return m_endSink; }
-
-			AnimData GetLittleUpData() const { return m_littleUp; }
-
-			AnimData GetLittleDownData() const { return m_littleDown; }
 		};
 	}
 }

@@ -30,21 +30,14 @@ namespace app
 
 			/** 救助数(子ペンギン)のUIAnimationKey */
 			constexpr uint32_t RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY = Hash32("rTlanslateUpAnim");
-			constexpr uint32_t RESCUE_REMAIN_TLANSLATE_DOWN_ANIM_KEY = Hash32("rTlanslateDownAnim");
+			constexpr uint32_t RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY = Hash32("rBounceDownAnim");
 
-			constexpr uint32_t RESCUE_REMAIN_LITTLE_UP_ANIM_KEY = Hash32("rLittleUpAnim");
-			constexpr uint32_t RESCUE_REMAIN_LITTLE_DOWN_ANIM_KEY = Hash32("rLittleDownAnim");
-
-			constexpr uint32_t RESCUE_REMAIN_SINK_UP_ANIM_KEY = Hash32("rSinkUpAnim");
 			constexpr uint32_t RESCUE_REMAIN_SINK_DOWN_ANIM_KEY = Hash32("rSinkDownAnim");
+			constexpr uint32_t RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY = Hash32("rBounceDownUpAnim");
 
-			constexpr uint32_t RESCUE_TOTAL_LITTLE_UP_ANIM_KEY = Hash32("tLittleUpAnim");
-			constexpr uint32_t RESCUE_TOTAL_LITTLE_DOWN_ANIM_KEY = Hash32("tLittleDownAnim");
-
-			constexpr uint32_t RESCUE_TOTAL_SINK_UP_ANIM_KEY = Hash32("tSinkUpAnim");
 			constexpr uint32_t RESCUE_TOTAL_SINK_DOWN_ANIM_KEY = Hash32("tSinkDownAnim");
-			constexpr uint32_t RESCUE_TOTAL_TLANSLATE_UP_ANIM_KEY = Hash32("tTlanslateUpAnim");
-			constexpr uint32_t RESCUE_TOTAL_TLANSLATE_DOWN_ANIM_KEY = Hash32("tTlanslateDownAnim");
+			constexpr uint32_t RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY = Hash32("tBounceDownUpAnim");
+
 
 
 			constexpr uint32_t CPREACTION_SWAY_ANIM_KEY = Hash32("swayAnimation");

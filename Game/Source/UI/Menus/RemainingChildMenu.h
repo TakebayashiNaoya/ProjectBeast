@@ -39,8 +39,9 @@ namespace app
 			/** アニメーションのシーケンス */
 			enum class SeqType : uint8_t
 			{
-				Child,
-				Total,
+				RemainPlus,
+				RemainMinus,
+				TotalMinus,
 				Max
 			};
 

@@ -35,70 +35,76 @@ namespace app
 			// UIAnimationParameterのシングルトンインスタンスを取得。
 			const auto& param = UIAnimationParameter::Get();
 
+			// 救助数増加アニメーション。
 			const auto* startUpAnim = param.Find(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
 
 			if (startUpAnim)
 			{
-				m_startBound.startBound = startUpAnim->startV3;
-				m_startBound.endBound = startUpAnim->endV3;
+				m_startBound.rStartTlanslate = startUpAnim->startV3;
+				m_startBound.rEndSink = startUpAnim->endV3;
 				m_startBound.duration = startUpAnim->duration;
 				m_startBound.easingType = startUpAnim->easingType;
 				m_startBound.loopMode = startUpAnim->loopMode;
 			}
 
-			const auto* startDownAnim = param.Find(animKey::RESCUE_REMAIN_TLANSLATE_DOWN_ANIM_KEY);
+			// 救助数増加アニメーション。(上がった位置から元に戻るアニメーション)
+			const auto* endBounceDown = param.Find(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
 
-			if (startDownAnim)
+			if (endBounceDown)
 			{
-				m_endBound.startBound = startDownAnim->startV3;
-				m_endBound.endBound = startDownAnim->endV3;
-				m_endBound.duration = startDownAnim->duration;
-				m_endBound.easingType = startDownAnim->easingType;
-				m_endBound.loopMode = startDownAnim->loopMode;
+				m_endBound.start = endBounceDown->startV3;
+				m_endBound.end = endBounceDown->endV3;
+				m_endBound.duration = endBounceDown->duration;
+				m_endBound.easingType = endBounceDown->easingType;
+				m_endBound.loopMode = endBounceDown->loopMode;
 			}
 
-			const auto* sinkUpAnim = param.Find(animKey::RESCUE_REMAIN_SINK_UP_ANIM_KEY);
+			// 救助数減少アニメーション。
+			const auto* sinkDown = param.Find(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
 
-			if (sinkUpAnim)
+			if (sinkDown)
 			{
-				m_startSink.startBound = sinkUpAnim->startV3;
-				m_startSink.endBound = sinkUpAnim->endV3;
-				m_startSink.duration = sinkUpAnim->duration;
-				m_startSink.easingType = sinkUpAnim->easingType;
-				m_startSink.loopMode = sinkUpAnim->loopMode;
+				m_startSink.rSinkDown = sinkDown->startV3;
+				m_startSink.rSinkBounce = sinkDown->endV3;
+				m_startSink.duration = sinkDown->duration;
+				m_startSink.easingType = sinkDown->easingType;
+				m_startSink.loopMode = sinkDown->loopMode;
 			}
 
-			const auto* sinkDownAnim = param.Find(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
+			// 救助数減少アニメーション。(下がった位置から元に戻るアニメーション)
+			const auto* sinkBounceDownUp = param.Find(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
 
-			if (sinkDownAnim)
+			if (sinkBounceDownUp)
 			{
-				m_endSink.startBound = sinkDownAnim->startV3;
-				m_endSink.endBound = sinkDownAnim->endV3;
-				m_endSink.duration = sinkDownAnim->duration;
-				m_endSink.easingType = sinkDownAnim->easingType;
-				m_endSink.loopMode = sinkDownAnim->loopMode;
+				m_endBounceDownUp.start2 = sinkBounceDownUp->startV3;
+				m_endBounceDownUp.end2 = sinkBounceDownUp->endV3;
+				m_endBounceDownUp.duration = sinkBounceDownUp->duration;
+				m_endBounceDownUp.easingType = sinkBounceDownUp->easingType;
+				m_endBounceDownUp.loopMode = sinkBounceDownUp->loopMode;
 			}
 
-			const auto* littleUpAnim = param.Find(animKey::RESCUE_REMAIN_LITTLE_UP_ANIM_KEY);
+			// 総数減少アニメーション。
+			const auto* bounceDown = param.Find(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY);
 
-			if (littleUpAnim)
+			if (bounceDown)
 			{
-				m_littleUp.startBound = littleUpAnim->startV3;
-				m_littleUp.endBound = littleUpAnim->endV3;
-				m_littleUp.duration = littleUpAnim->duration;
-				m_littleUp.easingType = littleUpAnim->easingType;
-				m_littleUp.loopMode = littleUpAnim->loopMode;
+				m_bounceDown.tStartTlanslate = bounceDown->startV3;
+				m_bounceDown.tEndTlanslate = bounceDown->endV3;
+				m_bounceDown.duration = bounceDown->duration;
+				m_bounceDown.easingType = bounceDown->easingType;
+				m_bounceDown.loopMode = bounceDown->loopMode;
 			}
 
-			const auto* littleDownAnim = param.Find(animKey::RESCUE_REMAIN_LITTLE_DOWN_ANIM_KEY);
+			// 総数減少アニメーション。(下がった位置から元に戻るアニメーション)
+			const auto* bounceDownUp = param.Find(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY);
 
-			if (littleDownAnim)
+			if (bounceDownUp)
 			{
-				m_littleDown.startBound = littleDownAnim->startV3;
-				m_littleDown.endBound = littleDownAnim->endV3;
-				m_littleDown.duration = littleDownAnim->duration;
-				m_littleDown.easingType = littleDownAnim->easingType;
-				m_littleDown.loopMode = littleDownAnim->loopMode;
+				m_bounceUp.start3 = bounceDownUp->startV3;
+				m_bounceUp.end3 = bounceDownUp->endV3;
+				m_bounceUp.duration = bounceDownUp->duration;
+				m_bounceUp.easingType = bounceDownUp->easingType;
+				m_bounceUp.loopMode = bounceDownUp->loopMode;
 			}
 		}
 		

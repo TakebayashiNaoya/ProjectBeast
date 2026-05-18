@@ -13,9 +13,6 @@ namespace app
 	{
 		namespace
 		{
-			// 定数。
-			const Vector2 DIGIT_PIVOT = Vector2(0.5f, 0.5f);
-
 			// 救助数の座標。
 			const Vector3 REMAIN_DIGIT_POS = Vector3(-619.0f, 85.0f, 0.0f);
 
@@ -89,15 +86,21 @@ namespace app
 				if (m_childNum < num)
 				{
 					// enumの0番目にアクセスする。
-					auto& seq = m_sequences[static_cast<int>(SeqType::Child)];
+					auto& seq = m_sequences[static_cast<int>(SeqType::RemainPlus)];
 
-					// 使う予定のアニメーションを消去。
+					// 救助数増加アニメーションを消去。
 					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_TLANSLATE_DOWN_ANIM_KEY);
+					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
 					
+					// 念のため、減少アニメーションも消去。
+					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
+					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
+
+
 					// 座標アニメーションを登録。
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
-					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_TLANSLATE_DOWN_ANIM_KEY);
+					// 座標アニメーションを登録。(バウンドあり)
+					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
 
 					
 					// シーケンスをクリア。
@@ -106,7 +109,7 @@ namespace app
 					// シーケンスにアニメーションを追加する。
 					seq
 						.Add(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY, 0.0f)
-						.Add(animKey::RESCUE_REMAIN_TLANSLATE_DOWN_ANIM_KEY, 0.08f);
+						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY, 0.0f);
 					
 					// シーケンスを再生。
 					seq.Play(remainDigit);
@@ -115,16 +118,22 @@ namespace app
 				/** 減るアニメーション */
 				else if (m_childNum > num)
 				{
-					// 0番目にアクセス。
-					auto& seq = m_sequences[static_cast<int>(SeqType::Child)];
-
-					// アニメーションを消去。
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_UP_ANIM_KEY);
+					// 1番目にアクセス。
+					auto& seq = m_sequences[static_cast<int>(SeqType::RemainMinus)];
 					
+					// 救助数減少アニメーションを消去。
+					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
+					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
+
+					// 念のため、増加アニメーションも消去。
+					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
+					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
+
+
 					// 座標アニメーションを登録。
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
-					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_SINK_UP_ANIM_KEY);
+					// 座標アニメーションを登録。(バウンドなし)
+					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
 
 
 					// シーケンスをクリア。
@@ -133,7 +142,7 @@ namespace app
 					// シーケンスにアニメーションを追加。
 					seq
 						.Add(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY, 0.0f)
-						.Add(animKey::RESCUE_REMAIN_SINK_UP_ANIM_KEY, 0.08f);
+						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f);
 
 					// シーケンスを再生。
 					seq.Play(remainDigit);
@@ -158,23 +167,25 @@ namespace app
 				/** 減るアニメーション */
 				if (m_totalNum > num)
 				{
-					// 1番目にアクセスする。
-					auto& seq = m_sequences[static_cast<int>(SeqType::Total)];
+					// 2番目にアクセスする。
+					auto& seq = m_sequences[static_cast<int>(SeqType::TotalMinus)];
 
-					// アニメーションを消去。
+					// 使うアニメーションキーを消去。
 					totalDigit->RemoveAnimation(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY);
-					totalDigit->RemoveAnimation(animKey::RESCUE_TOTAL_SINK_UP_ANIM_KEY);
+					totalDigit->RemoveAnimation(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY);
 
-					// アニメーションを登録。
+					// 座標アニメーションを登録。
 					UIAnimationFactory::Attach<UITranslateAnimation>(totalDigit, animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY);
-					UIAnimationFactory::Attach<UITranslateAnimation>(totalDigit, animKey::RESCUE_TOTAL_SINK_UP_ANIM_KEY);
+					// 座標アニメーションを登録。(バウンドなし)
+					UIAnimationFactory::Attach<UITranslateAnimation>(totalDigit, animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY);
 
 					// シーケンスを削除。
 					seq.Clear();
 
+					// シーケンスにアニメーションを追加。
 					seq
 						.Add(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY, 0.0f)
-						.Add(animKey::RESCUE_TOTAL_SINK_UP_ANIM_KEY, 0.08f);
+						.Add(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f);
 
 					// シーケンスを再生。
 					seq.Play(totalDigit);
@@ -198,16 +209,10 @@ namespace app
 			if (bgIcon) bgIcon->m_isDraw = false;
 			
 			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
-			if (digit)
-			{
-				digit->m_isDraw = false;
-			}
-
+			if (digit) digit->m_isDraw = false;
+			
 			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
-			if (totalDigit)
-			{
-				totalDigit->m_isDraw = false;
-			}
+			if (totalDigit) totalDigit->m_isDraw = false;
 		}
 	}
 }

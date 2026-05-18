@@ -1,94 +1,69 @@
 {
     "animations":[
         {
-            "comment":"跳ねさせるアニメーション",
+            "comment":"救助数が跳ねさせるアニメーション",
             "key":"rTlanslateUpAnim",
             "valueType":"Vector3",
             "startValue":{ "x":-619, "y":85, "z":0 },
-            "endValue":{ "x":-619, "y":100, "z":0 },
-            "duration":0.1,
+            "endValue":{ "x":-619, "y":105, "z":0 },
+            "duration":0.18,
             "easing":"EaseOut",
             "loop":"Once"
         },
         {
-            "comment":"跳ねた後に元に戻すアニメーション",
-            "key":"rTlanslateDownAnim",
+            "comment":"救助数が増加した時に戻ってバウンドするアニメーション",
+            "key":"rBounceDownAnim",
             "valueType":"Vector3",
-            "startValue":{ "x":-619, "y":100, "z":0 },
+            "startValue":{ "x":-619, "y": 105, "z":0 },
             "endValue":{ "x":-619, "y":85, "z":0 },
-            "duration":0.2,
-            "easing":"EaseIn",
+            "duration":0.32,
+            "easing":"BounceOut",
             "loop":"Once"
         },
 
 
 
         {
-            "comment":"沈むアニメーション",
+            "comment":"救助数が減少した時に沈むアニメーション",
             "key":"rSinkDownAnim",
             "valueType":"Vector3",
             "startValue":{ "x":-619, "y":85, "z":0 },
-            "endValue":{ "x":-619, "y":70, "z":0 },
-            "duration":0.1,
+            "endValue":{ "x":-619, "y":65, "z":0 },
+            "duration":0.18,
             "easing":"EaseOut",
             "loop":"Once"
         },
         {
-            "comment":"沈んだ後に元に戻るアニメーション",
-            "key":"rSinkUpAnim",
+            "comment":"救助数が減少した時に戻ってバウンドするアニメーション",
+            "key":"rBounceDownUpAnim",
             "valueType":"Vector3",
-            "startValue":{ "x":-619, "y":70, "z":0 },
+            "startValue":{ "x": -619, "y":65, "z":0 },
             "endValue":{ "x":-619, "y":85, "z":0 },
-            "duration":0.2,
-            "easing":"EaseIn",
+            "duration":0.38,
+            "easing":"EaseOut",
             "loop":"Once"
         },
 
 
 
         {
-            "comment":"沈むアニメーション",
+            "comment":"総数が減少した時に沈むアニメーション",
             "key":"tSinkDownAnim",
             "valueType":"Vector3",
             "startValue":{ "x":-490, "y":85, "z":0 },
-            "endValue":{ "x":-490, "y":70, "z":0 },
-            "duration":0.1,
+            "endValue":{ "x":-490, "y":65, "z":0 },
+            "duration":0.18,
             "easing":"EaseOut",
             "loop":"Once"
         },
         {
-            "comment":"沈んだ後に元に戻るアニメーション",
-            "key":"tSinkUpAnim",
+            "comment":"総数が減少した時に沈んだ後に戻ってバウンドするアニメーション",
+            "key":"tBounceDownUpAnim",
             "valueType":"Vector3",
-            "startValue":{ "x":-490, "y":70, "z":0 },
+            "startValue":{ "x":-490, "y":65, "z":0 },
             "endValue":{ "x":-490, "y":85, "z":0 },
-            "duration":0.2,
-            "easing":"EaseIn",
-            "loop":"Once"
-        },
-        
-
-
-
-        
-        {
-            "comment":"跳ねさせるアニメーション",
-            "key":"tTlanslateUpAnim",
-            "valueType":"Vector3",
-            "startValue":{ "x":-490, "y":85, "z":0 },
-            "endValue":{ "x":-490, "y":100, "z":0 },
-            "duration":0.1,
+            "duration":0.38,
             "easing":"EaseOut",
-            "loop":"Once"
-        },
-        {
-            "comment":"跳ねた後に戻すアニメーション",
-            "key":"tTlanslateDownAnim",
-            "valueType":"Vector3",
-            "startValue":{ "x":-490, "y":100, "z":0 },
-            "endValue":{ "x":-490, "y":85, "z":0 },
-            "duration":0.2,
-            "easing":"EaseIn",
             "loop":"Once"
         }
     ]
