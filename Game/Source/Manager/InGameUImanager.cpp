@@ -210,6 +210,7 @@ namespace app
 
 		m_wpWarningSystem = new ui::WpWarningSystem();
 		m_wpWarningSystem->Initialize();
+		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
 
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);

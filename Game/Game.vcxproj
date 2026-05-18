@@ -341,6 +341,7 @@
     <ClCompile Include="Source\UI\WpWarning\WpWarningAnimStatus.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningMenu.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningStatus.cpp" />
+    <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
     <ClCompile Include="Source\Util\JsonConverter.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -472,10 +473,12 @@
     <ClInclude Include="Source\UI\Model\UIAnimationStatus.h" />
     <ClInclude Include="Source\UI\Model\UIStatus.h" />
     <ClInclude Include="Source\UI\Parts\UIParts.h" />
+    <ClInclude Include="Source\UI\System\SystemPacket.h" />
     <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningMenu.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningStatus.h" />
+    <ClInclude Include="Source\UI\WpWarning\WpWarningSystem.h" />
     <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />
     <ClInclude Include="Source\Util\JsonConverter.h" />

@@ -79,6 +79,9 @@
     <Filter Include="Source\UI\WpWarning">
       <UniqueIdentifier>{8fe50806-f46e-44b2-9c3c-384aa9f4e29d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\SystemBase">
+      <UniqueIdentifier>{5baf1a1c-6f2f-454d-820e-fe2856b8490a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -431,6 +434,9 @@
       <Filter>Source\UI\WpWarning</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\WpWarning\WpWarningMenu.cpp">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp">
       <Filter>Source\UI\WpWarning</Filter>
     </ClCompile>
   </ItemGroup>
@@ -806,6 +812,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\WpWarning\WpWarningStatus.h">
       <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\WpWarningSystem.h">
+      <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\System\SystemPacket.h">
+      <Filter>Source\UI\SystemBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
