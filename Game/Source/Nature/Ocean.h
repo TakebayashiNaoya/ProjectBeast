@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Nature/INatureObject.h"
+#include "OceanParameter.h"
 
 
 namespace app
@@ -272,21 +273,22 @@ namespace app
 			 * @brief 定数バッファ
 			 * @details HLSLのOceanCb（b1）と完全に一致させること。
 			 *          メンバを追加・削除する際はOcean.fxのOceanCbも同時に更新すること。
+			 *          チューニングパラメータはJSONから読み込んで設定する（oceanParameter.json参照）。
 			 */
 			struct OceanConstantBuffer
 			{
-				Light light;						/** ライト */
-				float baseReflectance = 0.0f;		/** 基本反射率 */
-				float waveScroll = 0.0f;			/** 波のスクロール値（頂点移動用） */
-				float textureScroll = 0.0f;			/** テクスチャのスクロール値（模様流れ用） */
-				float wave1Amplitude = 5.0f;		/** 波①の振幅 */
-				float wave1Frequency = 0.025f;		/** 波①の空間周波数 */
-				float wave2Amplitude = 2.0f;		/** 波②の振幅 */
-				float wave2Frequency = 0.06f;		/** 波②の空間周波数 */
-				float specularPower = 50.0f;			/** スペキュラのPhong指数（大きいほどハイライトが絞られる） */
-				float specularScale = 0.5f;			/** スペキュラ強度の倍率（0.0で照り返しを消せる） */
-				float ambientScale = 3.0f;			/** 海専用アンビエント強度倍率（他オブジェクトに影響しない） */
-				float padding0 = 0.0f;				/** パディング */
+				Light light;					/** ライト */
+				float baseReflectance = 0.0f;	/** 基本反射率 */
+				float waveScroll = 0.0f;		/** 波のスクロール値（頂点移動用） */
+				float textureScroll = 0.0f;		/** テクスチャのスクロール値（模様流れ用） */
+				float wave1Amplitude = 0.0f;	/** 波①の振幅 */
+				float wave1Frequency = 0.0f;	/** 波①の空間周波数 */
+				float wave2Amplitude = 0.0f;	/** 波②の振幅 */
+				float wave2Frequency = 0.0f;	/** 波②の空間周波数 */
+				float specularPower = 0.0f;		/** スペキュラのPhong指数（大きいほどハイライトが絞られる） */
+				float specularScale = 0.0f;		/** スペキュラ強度の倍率（0.0で照り返しを消せる） */
+				float ambientScale = 0.0f;		/** 海専用アンビエント強度倍率（他オブジェクトに影響しない） */
+				float padding0 = 0.0f;			/** パディング */
 			};
 
 
@@ -314,47 +316,6 @@ namespace app
 			 * @brief 波のスクロール速度を設定
 			 */
 			inline void SetWaveSpeed(float speed) { m_waveSpeed = speed; }
-
-			/**
-			 * @brief 波①の振幅を設定
-			 */
-			inline void SetWave1Amplitude(float amplitude) { m_constantBuffer.wave1Amplitude = amplitude; }
-
-			/**
-			 * @brief 波①の空間周波数を設定
-			 */
-			inline void SetWave1Frequency(float frequency) { m_constantBuffer.wave1Frequency = frequency; }
-
-			/**
-			 * @brief 波②の振幅を設定
-			 */
-			inline void SetWave2Amplitude(float amplitude) { m_constantBuffer.wave2Amplitude = amplitude; }
-
-			/**
-			 * @brief 波②の空間周波数を設定
-			 */
-			inline void SetWave2Frequency(float frequency) { m_constantBuffer.wave2Frequency = frequency; }
-
-			/**
-			 * @brief スペキュラのPhong指数を設定
-			 * @details 値を大きくするほどハイライトが絞られ、照り返しが狭くなる
-			 * @param power Phong指数（推奨範囲: 10.0〜200.0）
-			 */
-			inline void SetSpecularPower(float power) { m_constantBuffer.specularPower = power; }
-
-			/**
-			 * @brief スペキュラ強度の倍率を設定
-			 * @details 0.0にすると照り返しを完全に消せる
-			 * @param scale スペキュラ強度倍率（推奨範囲: 0.0〜1.0）
-			 */
-			inline void SetSpecularScale(float scale) { m_constantBuffer.specularScale = scale; }
-
-			/**
-			 * @brief 海専用アンビエント強度倍率を設定
-			 * @details シーンのアンビエントライトとは独立して海の明るさを調整できる
-			 * @param scale アンビエント強度倍率（推奨範囲: 1.0〜5.0）
-			 */
-			inline void SetAmbientScale(float scale) { m_constantBuffer.ambientScale = scale; }
 
 			/**
 			 * @brief 指定ワールドXZ座標における波面Yをバイリニア補間で取得する

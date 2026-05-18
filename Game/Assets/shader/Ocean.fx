@@ -83,7 +83,7 @@ cbuffer OceanCb : register(b1)
 
 ////////////////////////////////////////////////
 // グローバル変数。
-//////////////////////////////
+////////////////////////////////////////////////
 Texture2D<float4> g_albedo      : register(t0);
 Texture2D<float4> g_normalMap   : register(t1);
 Texture2D<float4> g_specularMap : register(t2);
@@ -92,7 +92,6 @@ sampler           g_sampler     : register(s0);
 ////////////////////////////////////////////////
 // 関数宣言。
 ////////////////////////////////////////////////
-float3 CalcLigFromDrectionLight(SPSIn psIn, float3 normal);
 float3 CalcLambertDiffuse(float3 lightDirection, float3 lightColor, float3 normal);
 float3 CalcPhongSpecular(float3 lightDirection, float3 lightColor, float3 worldPos, float3 normal, float2 uv);
 float  ComputeFresnel(float3 normal, float3 viewDir, float baseReflectance);
@@ -216,19 +215,6 @@ float3 CalcPhongSpecular(float3 lightDirection, float3 lightColor, float3 worldP
     float fresnel = ComputeFresnel(normal, -toEye, baseReflectance);
 
     return lightColor * t * specularScale * fresnel;
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-// ディレクションライトを計算
-//////////////////////////////////////////////////////////////////////////////////
-float3 CalcLigFromDrectionLight(SPSIn psIn, float3 normal)
-{
-    float3 diff = CalcLambertDiffuse(
-        light.directionLight.direction, light.directionLight.color, normal);
-    float3 spec = CalcPhongSpecular(
-        light.directionLight.direction, light.directionLight.color, psIn.worldPos, normal, psIn.uv);
-
-    return diff + spec;
 }
 
 //////////////////////////////////////////////////////////////////////////////////

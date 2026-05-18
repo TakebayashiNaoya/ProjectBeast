@@ -5,12 +5,22 @@
  */
 #include "stdafx.h"
 #include "Ocean.h"
+#include "OceanParameter.h"
+#include "Source/Core/ParameterManager.h"
+#include "Source/Util/JsonConverter.h"
 
 
 namespace app
 {
 	namespace nature
 	{
+		namespace
+		{
+			/** 海パラメーターJSONのパス */
+			const char* OCEAN_PARAMETER_JSON_PATH = "Assets/parameter/nature/oceanParameter.json";
+		}
+
+
 		//============================================================
 		// OceanMesh
 		//============================================================
@@ -765,7 +775,9 @@ namespace app
 
 
 		Ocean::~Ocean()
-		{}
+		{
+			core::ParameterManager::Get()->UnloadParameter<MasterOceanParameter>();
+		}
 
 
 		void Ocean::Start()
@@ -774,6 +786,36 @@ namespace app
 				DXGI_FORMAT_R32G32B32A32_FLOAT,
 				DXGI_FORMAT_UNKNOWN
 			};
+
+			// JSONからパラメーターを読み込む
+			core::ParameterManager::Get()->LoadParameter<MasterOceanParameter>(
+				OCEAN_PARAMETER_JSON_PATH,
+				[](const nlohmann::json& j, MasterOceanParameter& p)
+				{
+					p.baseReflectance = j["baseReflectance"].get<float>();
+					p.wave1Amplitude = j["wave1Amplitude"].get<float>();
+					p.wave1Frequency = j["wave1Frequency"].get<float>();
+					p.wave2Amplitude = j["wave2Amplitude"].get<float>();
+					p.wave2Frequency = j["wave2Frequency"].get<float>();
+					p.specularPower = j["specularPower"].get<float>();
+					p.specularScale = j["specularScale"].get<float>();
+					p.ambientScale = j["ambientScale"].get<float>();
+				}
+			);
+
+			// 読み込んだパラメーターを定数バッファに反映する
+			const auto* param = core::ParameterManager::Get()->GetParameter<MasterOceanParameter>();
+			if (param != nullptr)
+			{
+				m_constantBuffer.baseReflectance = param->baseReflectance;
+				m_constantBuffer.wave1Amplitude = param->wave1Amplitude;
+				m_constantBuffer.wave1Frequency = param->wave1Frequency;
+				m_constantBuffer.wave2Amplitude = param->wave2Amplitude;
+				m_constantBuffer.wave2Frequency = param->wave2Frequency;
+				m_constantBuffer.specularPower = param->specularPower;
+				m_constantBuffer.specularScale = param->specularScale;
+				m_constantBuffer.ambientScale = param->ambientScale;
+			}
 
 			m_oceanMesh.Init(
 				"Assets/shader/Ocean.fx",
