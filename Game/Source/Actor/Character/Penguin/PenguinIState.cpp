@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 #include "PenguinAnimationData.h"
 #include "PenguinEffectStatus.h"
 #include "PenguinIState.h"
@@ -325,6 +326,7 @@ namespace app
 
 			auto* effectStatus = m_owner->GetEffectStatus();
 			Vector3 scale = effectStatus->GetSlideFrostEffectScale();
+			Vector3 lineScale = effectStatus->GetSlideLineEffectScale();
 
 			const Vector3& velocity = m_owner->GetCurrentVelocity();
 			float currentSpeed = velocity.Length();
@@ -349,7 +351,7 @@ namespace app
 					forward.Normalize();
 				}
 
-				effectPosition += forward * effectStatus->GetEffectOffsetForward();
+				effectPosition += forward;
 
 				m_slideEffectTimer += g_gameTime->GetFrameDeltaTime();
 
@@ -363,10 +365,37 @@ namespace app
 						currentScale
 					);
 				}
+
+				if (m_slideLineEffectHandle == app::INVALID_EFFECT_HANDLE)
+				{
+					m_slideLineEffectHandle = EffectManager::Get().PlayEffect(
+						EnEffectKind::PenguinSlideLine,
+						effectPosition,
+						rot,
+						lineScale
+					);
+				}
+
+				if (m_slideLineEffectHandle == app::INVALID_EFFECT_HANDLE)
+				{
+					return;
+				}
+
+				auto* effect = EffectManager::Get().FindEffect(m_slideLineEffectHandle);
+				if (effect == nullptr)
+				{
+					m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
+					return;
+				}
+				effect->SetPosition(effectPosition);
+				effect->SetRotation(rot);
 			}
 			else
 			{
 				m_slideEffectTimer = effectStatus->GetSlideEffectInterval(); // 停止中はタイマーを満タンにしておく（停止→移動のときにすぐエフェクトが出るようにするため）
+				EffectManager::Get().StopEffect(m_slideLineEffectHandle);
+				EffectManager::Get().UnregisterEffect(m_slideLineEffectHandle);
+				m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
 			}
 
 			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
@@ -401,6 +430,7 @@ namespace app
 		PenguinSlidingState::PenguinSlidingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
 			, m_slideEffectTimer(0.0f)
+			, m_slideLineEffectHandle(app::INVALID_EFFECT_HANDLE)
 		{}
 
 

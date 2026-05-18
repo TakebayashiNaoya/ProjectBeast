@@ -192,6 +192,8 @@ namespace app
 			uint32_t m_soundHandle = -1;
 
 			float m_slideEffectTimer;
+
+			float m_slideLineEffectHandle;
 		};
 
 

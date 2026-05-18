@@ -30,7 +30,7 @@ namespace app
 			inline float GetSlideEffectInterval() const { return m_slideEffectInterval; }
 			inline float GetMinSlideFrostScaleRatio() const { return m_minSlideFrostEffectScaleRatio; }
 			inline float GetMaxSlideFrostScaleRatio() const { return m_maxSlideFrostEffectScaleRatio; }
-			inline float GetSlideLineEffectScale() const { return m_slideLineEffectScale.x; }
+			inline const Vector3& GetSlideLineEffectScale() const { return m_slideLineEffectScale; }
 
 
 		public:
