@@ -28,6 +28,7 @@ namespace app
 			const auto& param = UIAnimationParameter::Get();
 
 			const auto* animParam = param.Find(animKey::WP_GROW_AND_SHRINK_ANIM_KEY);
+			if (!animParam) return;
 
 			m_growAndShrinkAnimData.startScale = animParam->startV3;
 			m_growAndShrinkAnimData.endScale = animParam->endV3;

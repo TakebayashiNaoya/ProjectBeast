@@ -128,7 +128,7 @@ namespace app
 
 
 			// 描画フラグを更新
-			for (int i = 0; i < m_packets.size(); ++i)
+			for (size_t i = 0; i < m_packets.size(); ++i)
 			{
 				// パケットからMenuを取得
 				auto* menu = m_packets.at(i).GetMenu();

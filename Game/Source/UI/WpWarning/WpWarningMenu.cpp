@@ -77,10 +77,10 @@ namespace app
 				for (auto* it : icons)
 				{
 					if (!it) continue;
+					ResetAnimation(it);
 					it->m_isDraw = m_isDraw;
 
 				}
-				ResetAnimation();
 				return;
 			}
 
@@ -102,7 +102,7 @@ namespace app
 
 				if (!it->IsPlayAnimation())
 				{
-					SetAnimation();
+					SetAnimation(it);
 					it->PlayAnimation();
 				}
 
@@ -113,42 +113,28 @@ namespace app
 		}
 
 
-		void WpWarningMenu::SetAnimation()
+		void WpWarningMenu::SetAnimation(UIIcon* icon)
 		{
-			std::function<void(UIIcon*)> attach =
-				[&](UIIcon* icon)
-				{
-					const uint32_t animKey = animKey::WP_GROW_AND_SHRINK_ANIM_KEY;
-					icon->RemoveAnimation(animKey);
+			const uint32_t animKey = animKey::WP_GROW_AND_SHRINK_ANIM_KEY;
+			icon->RemoveAnimation(animKey);
 
-					UIAnimationFactory::Attach<UIScaleAnimation>(icon, animKey);
+			UIAnimationFactory::Attach<UIScaleAnimation>(icon, animKey);
 
-					auto* growAndShrinkAnim = icon->FindAnimation(animKey);
+			auto* growAndShrinkAnim = icon->FindAnimation(animKey);
 
 
-					if (growAndShrinkAnim)
-					{
-						growAndShrinkAnim->PlayAnimation();
-					}
-				};
-
-			attach(m_speechBubble);
-			attach(m_warning);
+			if (growAndShrinkAnim)
+			{
+				growAndShrinkAnim->PlayAnimation();
+			}
 		}
 
 
-		void WpWarningMenu::ResetAnimation()
+		void WpWarningMenu::ResetAnimation(UIIcon* icon)
 		{
-			std::function<void(UIIcon*)> detach =
-				[&](UIIcon* icon)
-				{
-					const uint32_t growAndShrinkAnimKey = animKey::WP_GROW_AND_SHRINK_ANIM_KEY;
-					icon->StopAnimation();
-					icon->RemoveAnimation(growAndShrinkAnimKey);
-				};
-
-			detach(m_speechBubble);
-			detach(m_warning);
+			const uint32_t growAndShrinkAnimKey = animKey::WP_GROW_AND_SHRINK_ANIM_KEY;
+			icon->StopAnimation();
+			icon->RemoveAnimation(growAndShrinkAnimKey);
 		}
 	}
 }

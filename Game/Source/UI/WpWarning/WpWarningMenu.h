@@ -69,9 +69,9 @@ namespace app
 			/** @brief アイコンの位置を更新する関数 */
 			void UpdateIconPosition();
 			/** @brief アニメーションを設定する関数 */
-			void SetAnimation();
+			void SetAnimation(UIIcon* icon);
 			/** @brief アニメーションをリセットする関数 */
-			void ResetAnimation();
+			void ResetAnimation(UIIcon* icon);
 
 
 		private:

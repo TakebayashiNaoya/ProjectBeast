@@ -75,6 +75,7 @@ namespace app
 		delete m_achievementNotificationLayout;
 		delete m_inGameButtonLayout;
 		delete m_cpReactionSystem;
+		delete m_wpWarningSystem;
 
 		for (auto* layout : m_searchLayouts)
 		{
