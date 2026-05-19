@@ -60,10 +60,10 @@ namespace app
 			float slideEffectInterval;
 
 			/** スライドフロストエフェクトの最小スケールの割合 */
-			float minSlideFrostEffectScaleRatio;
+			float minSlideFrostScaleRatio;
 
 			/** スライドフロストエフェクトの最大スケールの割合 */
-			float maxSlideFrostEffectScaleRatio;
+			float maxSlideFrostScaleRatio;
 
 			/** スライド時の集中線のスケール */
 			Vector3 slideLineEffectScale;

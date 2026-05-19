@@ -4,11 +4,11 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+
 #include "PenguinBase.h"
 #include "Physics/Physics.h"
 #include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinEffectStatus.h"
-#include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 
 

@@ -23,14 +23,14 @@
           "y": 1.0,
           "z": 1.0
         },
-        "slideEffectInterval":0.1,
+        "slideEffectInterval": 0.1,
         "minSlideFrostScaleRatio": 0.5,
         "maxSlideFrostScaleRatio": 1.0,
-        "slideLineEffectScale":{
+        "slideLineEffectScale": {
           "x": 2.0,
           "y": 2.0,
           "z": 2.0
         },
-        "slideLineEffectOffsetForward":20.0
+        "slideLineEffectOffsetForward": 20.0
     }
 ]

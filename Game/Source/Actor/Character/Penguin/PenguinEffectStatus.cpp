@@ -61,8 +61,8 @@ namespace app
 
 					parameter.slideEffectInterval = j["slideEffectInterval"].get<float>();
 
-					parameter.minSlideFrostEffectScaleRatio = j["minSlideFrostScaleRatio"].get<float>();
-					parameter.maxSlideFrostEffectScaleRatio = j["maxSlideFrostScaleRatio"].get<float>();
+					parameter.minSlideFrostScaleRatio = j["minSlideFrostScaleRatio"].get<float>();
+					parameter.maxSlideFrostScaleRatio = j["maxSlideFrostScaleRatio"].get<float>();
 
 					parameter.slideLineEffectScale.x = j["slideLineEffectScale"]["x"].get<float>();
 					parameter.slideLineEffectScale.y = j["slideLineEffectScale"]["y"].get<float>();
@@ -95,8 +95,8 @@ namespace app
 			m_landingEffectScale = parameter->landingEffectScale;
 			m_slideFrostEffectScale = parameter->slideFrostEffectScale;
 			m_slideEffectInterval = parameter->slideEffectInterval;
-			m_minSlideFrostEffectScaleRatio = parameter->minSlideFrostEffectScaleRatio;
-			m_maxSlideFrostEffectScaleRatio = parameter->maxSlideFrostEffectScaleRatio;
+			m_minSlideFrostEffectScaleRatio = parameter->minSlideFrostScaleRatio;
+			m_maxSlideFrostEffectScaleRatio = parameter->maxSlideFrostScaleRatio;
 			m_slideLineEffectScale = parameter->slideLineEffectScale;
 			m_slideLineOffsetForward = parameter->slideLineEffectOffsetForward;
 		}

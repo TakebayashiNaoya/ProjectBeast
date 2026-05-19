@@ -129,7 +129,6 @@ namespace app
 
 		PenguinSneakState::PenguinSneakState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
-			, m_soundHandle(app::INVALID_SE_HANDLE)
 		{}
 
 
@@ -197,7 +196,6 @@ namespace app
 
 		PenguinRunState::PenguinRunState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
-			, m_soundHandle(app::INVALID_SE_HANDLE)
 		{}
 
 
@@ -327,6 +325,8 @@ namespace app
 			);
 
 			auto* effectStatus = m_owner->GetEffectStatus();
+			if (effectStatus == nullptr) return;
+
 			Vector3 scale = effectStatus->GetSlideFrostEffectScale();
 			Vector3 lineScale = effectStatus->GetSlideLineEffectScale();
 
@@ -347,8 +347,6 @@ namespace app
 				Quaternion rot = m_owner->GetTransform().m_rotation;
 				Vector3 forward = Vector3::AxisZ;
 
-				Vector3 frostEffectPosition = effectPosition + forward;
-
 				rot.Apply(forward);
 				if (forward.LengthSq() > FORWARD_LENGTH_NORMALIZE_SQ)
 				{
@@ -356,6 +354,8 @@ namespace app
 				}
 
 				m_slideEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+				Vector3 frostEffectPosition = effectPosition + forward;
 
 				if (m_slideEffectTimer >= effectStatus->GetSlideEffectInterval())
 				{
@@ -368,33 +368,33 @@ namespace app
 					);
 				}
 
-				Vector3 LineEffectOffset = forward * effectStatus->GetSlideLineOffsetForward();
-				Vector3 LineEffectPosition = effectPosition + LineEffectOffset; // 前方に線エフェクトを出す
+				Vector3 lineEffectOffset = forward * effectStatus->GetSlideLineOffsetForward();
+				Vector3 lineEffectPosition = effectPosition + lineEffectOffset; // 前方に線エフェクトを出す
 
 				if (m_slideLineEffectHandle == app::INVALID_EFFECT_HANDLE)
 				{
 
 					m_slideLineEffectHandle = EffectManager::Get().PlayEffect(
 						EnEffectKind::PenguinSlideLine,
-						LineEffectPosition,
+						lineEffectPosition,
 						rot,
 						lineScale
 					);
 				}
 
-				if (m_slideLineEffectHandle == app::INVALID_EFFECT_HANDLE)
+				if (m_slideLineEffectHandle != app::INVALID_EFFECT_HANDLE)
 				{
-					return;
+					auto* effect = EffectManager::Get().FindEffect(m_slideLineEffectHandle);
+					if (effect == nullptr)
+					{
+						m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
+					}
+					else
+					{
+						effect->SetPosition(lineEffectPosition);
+						effect->SetRotation(rot);
+					}
 				}
-
-				auto* effect = EffectManager::Get().FindEffect(m_slideLineEffectHandle);
-				if (effect == nullptr)
-				{
-					m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
-					return;
-				}
-				effect->SetPosition(LineEffectPosition);
-				effect->SetRotation(rot);
 			}
 			else
 			{
@@ -428,14 +428,19 @@ namespace app
 		void PenguinSlidingState::Exit()
 		{
 			SoundManager::Get().StopSE(m_soundHandle);
-			EffectManager::Get().StopEffect(m_slideLineEffectHandle);
+
+			if (m_slideLineEffectHandle != app::INVALID_EFFECT_HANDLE)
+			{
+				EffectManager::Get().StopEffect(m_slideLineEffectHandle);
+				m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
+			}
+
 			m_soundHandle = app::INVALID_SE_HANDLE;
 		}
 
 
 		PenguinSlidingState::PenguinSlidingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
-			, m_soundHandle(app::INVALID_SE_HANDLE)
 			, m_slideEffectTimer(0.0f)
 			, m_slideLineEffectHandle(app::INVALID_EFFECT_HANDLE)
 		{}
