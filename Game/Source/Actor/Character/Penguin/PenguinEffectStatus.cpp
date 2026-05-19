@@ -68,7 +68,7 @@ namespace app
 					parameter.slideLineEffectScale.y = j["slideLineEffectScale"]["y"].get<float>();
 					parameter.slideLineEffectScale.z = j["slideLineEffectScale"]["z"].get<float>();
 
-					parameter.slideLineEffectOffsetForward = j["slideLineEffectOfssetForward"].get<float>();
+					parameter.slideLineEffectOffsetForward = j["slideLineEffectOffsetForward"].get<float>();
 				});
 		}
 

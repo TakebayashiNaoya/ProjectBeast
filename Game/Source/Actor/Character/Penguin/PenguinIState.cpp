@@ -129,6 +129,7 @@ namespace app
 
 		PenguinSneakState::PenguinSneakState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
+			, m_soundHandle(app::INVALID_SE_HANDLE)
 		{}
 
 
@@ -196,6 +197,7 @@ namespace app
 
 		PenguinRunState::PenguinRunState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
+			, m_soundHandle(app::INVALID_SE_HANDLE)
 		{}
 
 
@@ -331,7 +333,7 @@ namespace app
 			const Vector3& velocity = m_owner->GetCurrentVelocity();
 			float currentSpeed = velocity.Length();
 
-			float maxSpeed = max(effectStatus->GetMinSpeed(), m_owner->GetPenguinStatus()->GetSwimSpeed());
+			float maxSpeed = max(effectStatus->GetMinSpeed(), m_owner->GetPenguinStatus()->GetSlideSpeed());
 			float speedRatio = min(effectStatus->GetMaxSpeed(), currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
 
 			float scaleMultiplier = effectStatus->GetMinSlideFrostScaleRatio() + ((effectStatus->GetMaxSlideFrostScaleRatio() - effectStatus->GetMinSlideFrostScaleRatio()) * speedRatio);
@@ -433,6 +435,7 @@ namespace app
 
 		PenguinSlidingState::PenguinSlidingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
+			, m_soundHandle(app::INVALID_SE_HANDLE)
 			, m_slideEffectTimer(0.0f)
 			, m_slideLineEffectHandle(app::INVALID_EFFECT_HANDLE)
 		{}

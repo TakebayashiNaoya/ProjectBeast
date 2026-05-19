@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -40,6 +41,11 @@ namespace app
 			PenguinStateMachine* m_owner;
 			SEHandle m_seHandle;
 		};
+
+
+
+
+		/************************************/
 
 
 		/**
@@ -85,7 +91,7 @@ namespace app
 
 
 		private:
-			uint32_t m_soundHandle = -1;
+			uint32_t m_soundHandle;
 		};
 
 
@@ -113,7 +119,7 @@ namespace app
 
 
 		private:
-			uint32_t m_soundHandle = -1;
+			uint32_t m_soundHandle;
 		};
 
 
@@ -189,11 +195,11 @@ namespace app
 
 
 		private:
-			uint32_t m_soundHandle = -1;
+			uint32_t m_soundHandle;
 
 			float m_slideEffectTimer;
 
-			float m_slideLineEffectHandle;
+			EffectHandle m_slideLineEffectHandle;
 		};
 
 
@@ -243,6 +249,7 @@ namespace app
 			PenguinSwimmingState(PenguinStateMachine* owner);
 			~PenguinSwimmingState() override = default;
 
+
 		private:
 			float m_splashEffectTimer;
 		};
@@ -282,7 +289,7 @@ namespace app
 		 */
 		class PenguinDiyingState : public PenguinIState
 		{
-			appState(PenguinDyingState);
+			appState(PenguinDiyingState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -325,7 +332,9 @@ namespace app
 		/****************************************/
 
 
-
+		/**
+		 * @brief ペンギンの渦巻きステートクラス
+		 */
 		class PenguinInWhirlpoolState : public PenguinIState
 		{
 			appState(PenguinInWhirlpoolState);
