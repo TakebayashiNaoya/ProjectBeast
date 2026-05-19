@@ -28,6 +28,18 @@ namespace app
 			constexpr uint32_t ACHIEVE_FADE_OUT_ANIM_KEY = Hash32("fadeOutAnim");
 
 
+			/** 救助数(子ペンギン)のUIAnimationKey */
+			constexpr uint32_t RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY = Hash32("rTlanslateUpAnim");
+			constexpr uint32_t RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY = Hash32("rBounceDownAnim");
+
+			constexpr uint32_t RESCUE_REMAIN_SINK_DOWN_ANIM_KEY = Hash32("rSinkDownAnim");
+			constexpr uint32_t RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY = Hash32("rBounceDownUpAnim");
+
+			constexpr uint32_t RESCUE_TOTAL_SINK_DOWN_ANIM_KEY = Hash32("tSinkDownAnim");
+			constexpr uint32_t RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY = Hash32("tBounceDownUpAnim");
+
+
+
 			/** CPReaction用のUIAnimationKey */
 			constexpr uint32_t CPREACTION_SWAY_ANIM_KEY = Hash32("swayAnimation");
 

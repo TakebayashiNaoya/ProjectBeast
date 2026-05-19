@@ -26,9 +26,9 @@ namespace app
 
 		/**
 		 * @brief イージングの種類
-		 * @brief 線形補間、イーズイン、イーズアウト、イーズインアウト
+		 * @brief 線形補間、イーズイン、イーズアウト、イーズインアウト、バウンスアウト、バウンスイン
 		 */
-		enum class EasingType { Linear, EaseIn, EaseOut, EaseInOut };
+		enum class EasingType { Linear, EaseIn, EaseOut, EaseInOut, BounceOut, BounceIn };
 
 
 
@@ -187,8 +187,50 @@ namespace app
 				case EasingType::EaseInOut:
 					if (t < 0.5f)return 2.0f * t * t;
 					else         return -1.0f + (4.0f - 2.0f * t) * t;
+					/**
+					 * @brief 終点でバウンド
+					 */
+				case EasingType::BounceOut:
+					return BounceOut(t);
+					/**
+					 * @brief BounceOutの逆で、開始点でバウンド
+					 */
+				case EasingType::BounceIn:
+					return 1.0f - BounceOut(1.0f - t);
 				}
 				return t;
+			}
+
+
+			/**
+			 * @brief バウンスの補助関数
+			 */
+			static float BounceOut(float t)
+			{
+				// 1回目のバウンド。
+				if (t < 1.0f / 2.75f)
+				{
+					// 7.5625fは、(1/2.75)^2の逆数。
+					return 7.5625f * t * t;
+				}
+				// 2回目のバウンド。(中ぐらい)
+				else if (t < 2.0f / 2.75f)
+				{
+					t -= 1.5f / 2.75f;
+					return 7.5625f * t * t + 0.75f;
+				}
+				// 3回目のバウンド。(小さい)
+				else if (t < 2.5f / 2.75f)
+				{
+					t -= 2.25f / 2.75f;
+					return 7.5625f * t * t + 0.9375f;
+				}
+				// 4回目のバウンド。(ほぼ止まる)
+				else
+				{
+					t -= 2.625f / 2.75f;
+					return 7.5625f * t * t + 0.984375f;
+				}
 			}
 		};
 
@@ -205,4 +247,3 @@ namespace app
 		using Vector4Curve = Curve<Vector4>;
 	}
 }
-

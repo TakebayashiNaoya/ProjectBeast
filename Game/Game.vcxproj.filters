@@ -439,6 +439,9 @@
     <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp">
       <Filter>Source\UI\WpWarning</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Model\RemainingAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectParameter.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
@@ -805,6 +808,9 @@
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\RemainingAnimStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\Nature\OceanParameter.h">

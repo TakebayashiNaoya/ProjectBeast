@@ -214,9 +214,11 @@ namespace app
 
 			static util::EasingType ParseEasingType(const std::string& s)
 			{
-				if (s == "EaseIn")return util::EasingType::EaseIn;
-				if (s == "EaseOut")return util::EasingType::EaseOut;
-				if (s == "EaseInOut")return util::EasingType::EaseInOut;
+				if (s == "EaseIn") return util::EasingType::EaseIn;
+				if (s == "EaseOut") return util::EasingType::EaseOut;
+				if (s == "EaseInOut") return util::EasingType::EaseInOut;
+				if (s == "BounceOut") return util::EasingType::BounceOut;
+				if (s == "BounceIn") return util::EasingType::BounceIn;
 				return util::EasingType::Linear;
 			}
 

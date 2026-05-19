@@ -1,0 +1,70 @@
+{
+    "animations":[
+        {
+            "comment":"救助数が跳ねさせるアニメーション",
+            "key":"rTlanslateUpAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-619, "y":85, "z":0 },
+            "endValue":{ "x":-619, "y":105, "z":0 },
+            "duration":0.18,
+            "easing":"EaseOut",
+            "loop":"Once"
+        },
+        {
+            "comment":"救助数が増加した時に戻ってバウンドするアニメーション",
+            "key":"rBounceDownAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-619, "y": 105, "z":0 },
+            "endValue":{ "x":-619, "y":85, "z":0 },
+            "duration":0.32,
+            "easing":"BounceOut",
+            "loop":"Once"
+        },
+
+
+
+        {
+            "comment":"救助数が減少した時に沈むアニメーション",
+            "key":"rSinkDownAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-619, "y":85, "z":0 },
+            "endValue":{ "x":-619, "y":65, "z":0 },
+            "duration":0.18,
+            "easing":"EaseOut",
+            "loop":"Once"
+        },
+        {
+            "comment":"救助数が減少した時に戻ってバウンドするアニメーション",
+            "key":"rBounceDownUpAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x": -619, "y":65, "z":0 },
+            "endValue":{ "x":-619, "y":85, "z":0 },
+            "duration":0.38,
+            "easing":"EaseOut",
+            "loop":"Once"
+        },
+
+
+
+        {
+            "comment":"総数が減少した時に沈むアニメーション",
+            "key":"tSinkDownAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-490, "y":85, "z":0 },
+            "endValue":{ "x":-490, "y":65, "z":0 },
+            "duration":0.18,
+            "easing":"EaseOut",
+            "loop":"Once"
+        },
+        {
+            "comment":"総数が減少した時に沈んだ後に戻ってバウンドするアニメーション",
+            "key":"tBounceDownUpAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-490, "y":65, "z":0 },
+            "endValue":{ "x":-490, "y":85, "z":0 },
+            "duration":0.38,
+            "easing":"EaseOut",
+            "loop":"Once"
+        }
+    ]
+}

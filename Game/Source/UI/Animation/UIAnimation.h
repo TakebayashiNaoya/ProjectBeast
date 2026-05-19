@@ -423,8 +423,10 @@ namespace app
 			/** 更新処理 */
 			void Update() override
 			{
-				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
+				if (m_curve.IsPlaying()) {
+					m_curve.Update(g_gameTime->GetFrameDeltaTime());
+					m_applyFunc(m_curve.GetCurrentValue());
+				}
 			}
 		};
 
@@ -443,8 +445,10 @@ namespace app
 			/** 更新処理 */
 			void Update() override
 			{
-				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
+				if (m_curve.IsPlaying()) {
+					m_curve.Update(g_gameTime->GetFrameDeltaTime());
+					m_applyFunc(m_curve.GetCurrentValue());
+				}
 			}
 		};
 
@@ -463,8 +467,10 @@ namespace app
 			/** 更新処理 */
 			void Update() override
 			{
-				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
+				if (m_curve.IsPlaying()) {
+					m_curve.Update(g_gameTime->GetFrameDeltaTime());
+					m_applyFunc(m_curve.GetCurrentValue());
+				}
 			}
 		};
 
@@ -483,8 +489,10 @@ namespace app
 			/** 更新処理 */
 			void Update() override
 			{
-				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
+				if (m_curve.IsPlaying()) {
+					m_curve.Update(g_gameTime->GetFrameDeltaTime());
+					m_applyFunc(m_curve.GetCurrentValue());
+				}
 			}
 		};
 
@@ -503,8 +511,10 @@ namespace app
 			/** 更新処理 */
 			void Update() override
 			{
-				m_curve.Update(g_gameTime->GetFrameDeltaTime());
-				m_applyFunc(m_curve.GetCurrentValue());
+				if (m_curve.IsPlaying()) {
+					m_curve.Update(g_gameTime->GetFrameDeltaTime());
+					m_applyFunc(m_curve.GetCurrentValue());
+				}
 			}
 		};
 

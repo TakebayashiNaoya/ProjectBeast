@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
+#include "Source/UI/Model/RemainingAnimStatus.h"
 
 
 namespace app
@@ -21,11 +22,34 @@ namespace app
 
 
 		public:
-			void SetChildNum(const int num) { m_childNum = num; }
-			void SetTotalNum(const int num) { m_totalNum = num; }
+			/**
+			 * @biref 子ペンギンの救助数をアニメーションで設定
+			 * @param num 救助数
+			 */
+			void SetChildNum(const int num);
+			
+			/**
+			 * @brief 総子ペンギン数をアニメーションで設定
+			 * @param num 総数
+			 */
+			void SetTotalNum(const int num);
 
 
 		private:
+			/** アニメーションのシーケンス */
+			enum class SeqType : uint8_t
+			{
+				RemainPlus,
+				RemainMinus,
+				TotalMinus,
+				Max
+			};
+
+
+			/** アニメーションシーケンスの配列 */
+			std::array<UIAnimationSequence, static_cast<int>(SeqType::Max)> m_sequences;
+			/** std::unique_ptrでステータスを所有 */
+			std::unique_ptr<RemainingAnimStatus> m_remainAnimStatus;
 			/** 集めたペンギン数 */
 			int m_childNum;
 			/** ステージ上の総ペンギン数 */
