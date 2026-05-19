@@ -4,7 +4,9 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 #include "PenguinAnimationData.h"
+#include "PenguinEffectStatus.h"
 #include "PenguinIState.h"
 #include "PenguinStateMachine.h"
 #include "PenguinStatus.h"
@@ -21,29 +23,11 @@ namespace app
 	{
 		namespace
 		{
-			const Vector3 SPLASH_EFFECT_SCALE = { 7.0f, 5.0f, 7.0f };
-
-			constexpr float EFFECT_OFFSET_FORWARD = 30.0f;
-
-			constexpr float SPLASH_EFFECT_INTERVAL = 0.2f;// 泳ぎエフェクトの再生間隔
-
-			constexpr float MIN_MOVE_VELOCITY_SQ = 0.1f; // 泳ぎエフェクトを出すための最低速度の二乗
-
-			constexpr float MIN_SPLASH_SCALE_RATIO = 0.5f; // 泳ぎエフェクトの最小スケールの割合（速度が遅いときにエフェクトを小さくするため）
-
-			constexpr float MAX_SPLASH_SCALE_RATIO = 1.0f; // 泳ぎエフェクトの最大スケールの割合（速度が速いときにエフェクトを大きくするため）
-
-			constexpr float MIN_SPEED = 0.1f; // 泳ぎエフェクトのスケールを決めるための最低速度
-
-			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
-
 			constexpr float FORWARD_LENGTH_NORMALIZE_SQ = 0.0001f; // 前方ベクトルの正規化を行うかどうかの閾値の二乗
 
 			constexpr float DEFAULT_ANIMATION_SPEED = 1.0f; // アニメーションの再生速度のデフォルト値
 
 			constexpr float SLIDE_END_ANIMATION_SPEED = 2.5f; // スライド終了アニメーションの再生速度
-
-			const Vector3 LANDING_EFFECT_SCALE = { 1.5f, 1.5f, 1.5f }; // 着地エフェクトのスケール
 		}
 
 
@@ -257,11 +241,15 @@ namespace app
 				app::EnNoiseType::Fall
 			);
 
+
+			auto* effectStatus = m_owner->GetEffectStatus();
+			Vector3 scale = effectStatus ? effectStatus->GetLandingEffectScale() : Vector3::One;
+
 			EffectManager::Get().PlayEffect(
 				EnEffectKind::PenguinLanding,
 				m_owner->GetTransform().m_position,
 				Quaternion::Identity,
-				LANDING_EFFECT_SCALE
+				scale
 			);
 		}
 
@@ -336,6 +324,85 @@ namespace app
 				app::EnNoiseType::Slide
 			);
 
+			auto* effectStatus = m_owner->GetEffectStatus();
+			if (effectStatus == nullptr) return;
+
+			Vector3 scale = effectStatus->GetSlideFrostEffectScale();
+			Vector3 lineScale = effectStatus->GetSlideLineEffectScale();
+
+			const Vector3& velocity = m_owner->GetCurrentVelocity();
+			float currentSpeed = velocity.Length();
+
+			float maxSpeed = max(effectStatus->GetMinSpeed(), m_owner->GetPenguinStatus()->GetSlideSpeed());
+			float speedRatio = min(effectStatus->GetMaxSpeed(), currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
+
+			float scaleMultiplier = effectStatus->GetMinSlideFrostScaleRatio() + ((effectStatus->GetMaxSlideFrostScaleRatio() - effectStatus->GetMinSlideFrostScaleRatio()) * speedRatio);
+			Vector3 currentScale = scale * scaleMultiplier;
+
+			bool isMoving = (velocity.LengthSq() > effectStatus->GetMinMoveVelocitySq());
+
+			if (isMoving)
+			{
+				Vector3 effectPosition = m_owner->GetTransform().m_position;
+				Quaternion rot = m_owner->GetTransform().m_rotation;
+				Vector3 forward = Vector3::AxisZ;
+
+				rot.Apply(forward);
+				if (forward.LengthSq() > FORWARD_LENGTH_NORMALIZE_SQ)
+				{
+					forward.Normalize();
+				}
+
+				m_slideEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+				Vector3 frostEffectPosition = effectPosition + forward;
+
+				if (m_slideEffectTimer >= effectStatus->GetSlideEffectInterval())
+				{
+					m_slideEffectTimer = 0.0f;
+					EffectManager::Get().PlayEffect(
+						EnEffectKind::PenguinSlideFrost,
+						frostEffectPosition,
+						rot,
+						currentScale
+					);
+				}
+
+				Vector3 lineEffectOffset = forward * effectStatus->GetSlideLineOffsetForward();
+				Vector3 lineEffectPosition = effectPosition + lineEffectOffset; // 前方に線エフェクトを出す
+
+				if (m_slideLineEffectHandle == app::INVALID_EFFECT_HANDLE)
+				{
+
+					m_slideLineEffectHandle = EffectManager::Get().PlayEffect(
+						EnEffectKind::PenguinSlideLine,
+						lineEffectPosition,
+						rot,
+						lineScale
+					);
+				}
+
+				if (m_slideLineEffectHandle != app::INVALID_EFFECT_HANDLE)
+				{
+					auto* effect = EffectManager::Get().FindEffect(m_slideLineEffectHandle);
+					if (effect == nullptr)
+					{
+						m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
+					}
+					else
+					{
+						effect->SetPosition(lineEffectPosition);
+						effect->SetRotation(rot);
+					}
+				}
+			}
+			else
+			{
+				m_slideEffectTimer = effectStatus->GetSlideEffectInterval(); // 停止中はタイマーを満タンにしておく（停止→移動のときにすぐエフェクトが出るようにするため）
+				EffectManager::Get().StopEffect(m_slideLineEffectHandle);
+				m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
+			}
+
 			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
 			if (child == nullptr) return;
@@ -361,12 +428,21 @@ namespace app
 		void PenguinSlidingState::Exit()
 		{
 			SoundManager::Get().StopSE(m_soundHandle);
+
+			if (m_slideLineEffectHandle != app::INVALID_EFFECT_HANDLE)
+			{
+				EffectManager::Get().StopEffect(m_slideLineEffectHandle);
+				m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
+			}
+
 			m_soundHandle = app::INVALID_SE_HANDLE;
 		}
 
 
 		PenguinSlidingState::PenguinSlidingState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
+			, m_slideEffectTimer(0.0f)
+			, m_slideLineEffectHandle(app::INVALID_EFFECT_HANDLE)
 		{}
 
 
@@ -436,17 +512,20 @@ namespace app
 				}
 			}
 
+			auto* effectStatus = m_owner->GetEffectStatus();
+			if (!effectStatus) return; // 安全対策
+
 			// 慣性を含む現在の実際の速度を取得
 			const Vector3& velocity = m_owner->GetCurrentVelocity();
 			float currentSpeed = velocity.Length();
 
-			float maxSpeed = max(MIN_SPEED, m_owner->GetPenguinStatus()->GetSwimSpeed());
-			float speedRatio = min(MAX_SPEED, currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
+			float maxSpeed = max(effectStatus->GetMinSpeed(), m_owner->GetPenguinStatus()->GetSwimSpeed());
+			float speedRatio = min(effectStatus->GetMaxSpeed(), currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
 
-			float scaleMultiplier = MIN_SPLASH_SCALE_RATIO + ((MAX_SPLASH_SCALE_RATIO - MIN_SPLASH_SCALE_RATIO) * speedRatio);
-			Vector3 currentScale = SPLASH_EFFECT_SCALE * scaleMultiplier;
+			float scaleMultiplier = effectStatus->GetMinSplashScaleRatio() + ((effectStatus->GetMaxSplashScaleRatio() - effectStatus->GetMinSplashScaleRatio()) * speedRatio);
+			Vector3 currentScale = effectStatus->GetSplashEffectScale() * scaleMultiplier;
 
-			bool isMoving = (velocity.LengthSq() > MIN_MOVE_VELOCITY_SQ);
+			bool isMoving = (velocity.LengthSq() > effectStatus->GetMinMoveVelocitySq());
 
 			if (isMoving)
 			{
@@ -460,12 +539,12 @@ namespace app
 					forward.Normalize();
 				}
 
-				effectPosition += forward * EFFECT_OFFSET_FORWARD;
+				effectPosition += forward * effectStatus->GetEffectOffsetForward();
 
 				m_splashEffectTimer += g_gameTime->GetFrameDeltaTime();
 
-				// 一定間隔（0.1fなど）ごとに、古いものは消さずに新しいエフェクトを発生させる
-				if (m_splashEffectTimer > SPLASH_EFFECT_INTERVAL)
+				// 一定間隔ごとに、古いものは消さずに新しいエフェクトを発生させる
+				if (m_splashEffectTimer > effectStatus->GetSplashEffectInterval())
 				{
 					EffectManager::Get().PlayEffect(
 						EnEffectKind::SwimSplash,
@@ -479,7 +558,7 @@ namespace app
 			else
 			{
 				// 止まっているときも、すでに出た泡は自然に消えるのを待つため、ここでは何もしない
-				m_splashEffectTimer = SPLASH_EFFECT_INTERVAL; // 次に動き出した時にすぐ出るようにタイマーを満タンにしておく
+				m_splashEffectTimer = effectStatus->GetSplashEffectInterval(); // 次に動き出した時にすぐ出るようにタイマーを満タンにしておく
 			}
 
 			m_owner->Move();

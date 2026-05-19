@@ -4,10 +4,12 @@
  * @author 藤谷
  */
 #include "stdafx.h"
+
 #include "PenguinBase.h"
-#include "Source/Actor/Character/Penguin/PenguinIState.h"
-#include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Physics/Physics.h"
+#include "Source/Actor/Character/CharacterStateMachine.h"
+#include "Source/Actor/Character/Penguin/PenguinEffectStatus.h"
+#include "Source/Actor/Character/Penguin/PenguinIState.h"
 
 
 namespace app
@@ -20,6 +22,13 @@ namespace app
 			constexpr float SLIDE_TILT_SLERP_SPEED = 10.0f;
 			/** 真下レイの射程距離 */
 			constexpr float SLIDE_RAY_LENGTH = 200.0f;
+		}
+
+
+		PenguinBase::PenguinBase()
+		{
+			m_effectStatus = std::make_unique<PenguinEffectStatus>();
+			m_effectStatus->Setup();
 		}
 
 

@@ -7,23 +7,14 @@
     <Filter Include="Source\Scene">
       <UniqueIdentifier>{d62a2ce1-ab2a-46f9-b644-f1540da5b7e6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Actor">
-      <UniqueIdentifier>{e868b53b-57d1-4329-9910-c48a40ebf6cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Core">
       <UniqueIdentifier>{389db189-d25e-4be0-a402-9eae342f25ad}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\UI">
       <UniqueIdentifier>{bde9173b-0987-41ce-b6aa-f7bb0e192e40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Actor\Character">
-      <UniqueIdentifier>{cd3ea93b-69ad-46c4-83e2-cd7a71456c33}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\system">
       <UniqueIdentifier>{706b7812-7f1c-4488-854b-c24a37b2f3c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Stage">
-      <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Sound">
       <UniqueIdentifier>{aabee1f5-f07e-444b-9b88-76bb30eb9087}</UniqueIdentifier>
@@ -33,18 +24,6 @@
     </Filter>
     <Filter Include="Source\Achievement">
       <UniqueIdentifier>{8dd5c9a7-828b-46f3-9b18-9042d2de824e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\Enemy">
-      <UniqueIdentifier>{43478fe8-bc95-4006-80d2-755fcfe20067}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\penguin">
-      <UniqueIdentifier>{96a86590-7162-4a66-aa1f-738d6c97706b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\penguin\daddyPernguin">
-      <UniqueIdentifier>{c62219a9-2e76-4037-98f6-90b7912d25b8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Actor\Character\penguin\ChildPenguin">
-      <UniqueIdentifier>{25d9ee0e-41a8-4178-bf79-b80371945ac2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Effect">
       <UniqueIdentifier>{2bc75a8b-34a3-49dc-91cf-e98845bf3cc8}</UniqueIdentifier>
@@ -81,6 +60,27 @@
     </Filter>
     <Filter Include="Source\UI\SystemBase">
       <UniqueIdentifier>{5baf1a1c-6f2f-454d-820e-fe2856b8490a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor">
+      <UniqueIdentifier>{e868b53b-57d1-4329-9910-c48a40ebf6cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character">
+      <UniqueIdentifier>{cd3ea93b-69ad-46c4-83e2-cd7a71456c33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character\Enemy">
+      <UniqueIdentifier>{43478fe8-bc95-4006-80d2-755fcfe20067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character\penguin">
+      <UniqueIdentifier>{96a86590-7162-4a66-aa1f-738d6c97706b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character\penguin\daddyPernguin">
+      <UniqueIdentifier>{c62219a9-2e76-4037-98f6-90b7912d25b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Character\penguin\ChildPenguin">
+      <UniqueIdentifier>{25d9ee0e-41a8-4178-bf79-b80371945ac2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Actor\Stage">
+      <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -441,6 +441,12 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Model\RemainingAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectParameter.cpp">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectStatus.cpp">
+      <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -810,10 +816,13 @@
     <ClInclude Include="Source\Nature\OceanParameter.h">
       <Filter>Source\Nature</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h">
-      <Filter>Source\UI\WpWarning</Filter>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinEffectStatus.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinEffectParameter.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h">
       <Filter>Source\UI\WpWarning</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\WpWarning\WpWarningMenu.h">
@@ -827,6 +836,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\System\SystemPacket.h">
       <Filter>Source\UI\SystemBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
+      <Filter>Source\UI\WpWarning</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
