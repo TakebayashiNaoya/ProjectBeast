@@ -91,11 +91,6 @@ namespace app
 					// 救助数増加アニメーションを消去。
 					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
 					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
-					
-					// 念のため、減少アニメーションも消去。
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
-
 
 					// 座標アニメーションを登録。
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
@@ -124,11 +119,6 @@ namespace app
 					// 救助数減少アニメーションを消去。
 					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
 					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
-
-					// 念のため、増加アニメーションも消去。
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
-
 
 					// 座標アニメーションを登録。
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
