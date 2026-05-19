@@ -116,19 +116,19 @@ namespace app
 
 		void UIAnimationSequence::StartCurrentStep()
 		{
-			if (m_currentIndex < 0 || m_currentIndex >= static_cast<int>(m_steps.size()))
-			{
-				const auto& step = m_steps[m_currentIndex];
-				UIAnimationBase* anim = m_target->FindAnimation(step.animationKey);
-				if (anim){
-					if (step.onStart)step.onStart();
-					anim->PlayAnimation();
-				}
-				else {
-					// アニメーションが見つからない場合はスキップ。
-					AdvanceToNext();
-				}
+			if (m_currentIndex < 0 || m_currentIndex >= static_cast<int>(m_steps.size())) return;
+			
+			const auto& step = m_steps[m_currentIndex];
+			UIAnimationBase* anim = m_target->FindAnimation(step.animationKey);
+			if (anim){
+				if (step.onStart)step.onStart();
+				anim->PlayAnimation();
 			}
+			else {
+				// アニメーションが見つからない場合はスキップ。
+				AdvanceToNext();
+			}
+			
 		}
 	}
 }

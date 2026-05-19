@@ -439,6 +439,9 @@
     <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp">
       <Filter>Source\UI\WpWarning</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Model\RemainingAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -799,6 +802,9 @@
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\RemainingAnimStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\Nature\OceanParameter.h">
