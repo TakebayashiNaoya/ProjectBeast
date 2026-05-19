@@ -67,6 +67,9 @@ namespace app
 
 			/** スライド時の集中線のスケール */
 			Vector3 slideLineEffectScale;
+
+			/** 集中線のようなエフェクト発生位置の前方オフセット */
+			float slideLineEffectOffsetForward;
 		};
 	}
 }

@@ -345,13 +345,13 @@ namespace app
 				Quaternion rot = m_owner->GetTransform().m_rotation;
 				Vector3 forward = Vector3::AxisZ;
 
+				Vector3 frostEffectPosition = effectPosition + forward;
+
 				rot.Apply(forward);
 				if (forward.LengthSq() > FORWARD_LENGTH_NORMALIZE_SQ)
 				{
 					forward.Normalize();
 				}
-
-				effectPosition += forward;
 
 				m_slideEffectTimer += g_gameTime->GetFrameDeltaTime();
 
@@ -360,17 +360,21 @@ namespace app
 					m_slideEffectTimer = 0.0f;
 					EffectManager::Get().PlayEffect(
 						EnEffectKind::PenguinSlideFrost,
-						effectPosition,
+						frostEffectPosition,
 						rot,
 						currentScale
 					);
 				}
 
+				Vector3 LineEffectOffset = forward * effectStatus->GetSlideLineOffsetForward();
+				Vector3 LineEffectPosition = effectPosition + LineEffectOffset; // 前方に線エフェクトを出す
+
 				if (m_slideLineEffectHandle == app::INVALID_EFFECT_HANDLE)
 				{
+
 					m_slideLineEffectHandle = EffectManager::Get().PlayEffect(
 						EnEffectKind::PenguinSlideLine,
-						effectPosition,
+						LineEffectPosition,
 						rot,
 						lineScale
 					);
@@ -387,14 +391,13 @@ namespace app
 					m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
 					return;
 				}
-				effect->SetPosition(effectPosition);
+				effect->SetPosition(LineEffectPosition);
 				effect->SetRotation(rot);
 			}
 			else
 			{
 				m_slideEffectTimer = effectStatus->GetSlideEffectInterval(); // 停止中はタイマーを満タンにしておく（停止→移動のときにすぐエフェクトが出るようにするため）
 				EffectManager::Get().StopEffect(m_slideLineEffectHandle);
-				EffectManager::Get().UnregisterEffect(m_slideLineEffectHandle);
 				m_slideLineEffectHandle = app::INVALID_EFFECT_HANDLE;
 			}
 
@@ -423,6 +426,7 @@ namespace app
 		void PenguinSlidingState::Exit()
 		{
 			SoundManager::Get().StopSE(m_soundHandle);
+			EffectManager::Get().StopEffect(m_slideLineEffectHandle);
 			m_soundHandle = app::INVALID_SE_HANDLE;
 		}
 

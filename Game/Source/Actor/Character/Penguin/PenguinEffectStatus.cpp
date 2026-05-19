@@ -33,6 +33,8 @@ namespace app
 			, m_slideEffectInterval(0.0f)
 			, m_minSlideFrostEffectScaleRatio(0.0f)
 			, m_maxSlideFrostEffectScaleRatio(0.0f)
+			, m_slideLineEffectScale(Vector3::One)
+			, m_slideLineOffsetForward(0.0f)
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterPenguinEffectParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterPenguinEffectParameter& parameter)
@@ -65,6 +67,8 @@ namespace app
 					parameter.slideLineEffectScale.x = j["slideLineEffectScale"]["x"].get<float>();
 					parameter.slideLineEffectScale.y = j["slideLineEffectScale"]["y"].get<float>();
 					parameter.slideLineEffectScale.z = j["slideLineEffectScale"]["z"].get<float>();
+
+					parameter.slideLineEffectOffsetForward = j["slideLineEffectOfssetForward"].get<float>();
 				});
 		}
 
@@ -94,6 +98,7 @@ namespace app
 			m_minSlideFrostEffectScaleRatio = parameter->minSlideFrostEffectScaleRatio;
 			m_maxSlideFrostEffectScaleRatio = parameter->maxSlideFrostEffectScaleRatio;
 			m_slideLineEffectScale = parameter->slideLineEffectScale;
+			m_slideLineOffsetForward = parameter->slideLineEffectOffsetForward;
 		}
 
 

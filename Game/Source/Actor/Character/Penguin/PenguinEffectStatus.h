@@ -31,6 +31,7 @@ namespace app
 			inline float GetMinSlideFrostScaleRatio() const { return m_minSlideFrostEffectScaleRatio; }
 			inline float GetMaxSlideFrostScaleRatio() const { return m_maxSlideFrostEffectScaleRatio; }
 			inline const Vector3& GetSlideLineEffectScale() const { return m_slideLineEffectScale; }
+			inline float GetSlideLineOffsetForward() const { return m_slideLineOffsetForward; }
 
 
 		public:
@@ -59,6 +60,7 @@ namespace app
 			float m_minSlideFrostEffectScaleRatio;
 			float m_maxSlideFrostEffectScaleRatio;
 			Vector3 m_slideLineEffectScale;
+			float m_slideLineOffsetForward;
 		};
 	}
 }
