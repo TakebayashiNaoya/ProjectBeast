@@ -49,6 +49,10 @@ namespace app
 		enSoundKind_NoticeAchievement,
 		enSoundKind_FadeOutAchievement,
 
+		/** 救助数と総数の変動SE */
+		enSoundKind_RemainPlus,
+		enSoundKind_RemainORTotalMinus,
+
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
 
@@ -111,7 +115,8 @@ namespace app
 		SoundInformation("Assets/sound/SE/igloo/iglooBreak.wav"),
 		SoundInformation("Assets/sound/SE/achievement/noticeAchievement.wav"),
 		SoundInformation("Assets/sound/SE/achievement/fadeOutAchievement.wav"),
-
+		SoundInformation("Assets/sound/SE/UI/remaining/AS_69491_ぽいっ（ジャンプ、かわいい、低めの音）.wav"),
+		SoundInformation("Assets/sound/SE/UI/remaining/AS_1116931_ボワン（コミカルな残念音）.wav"),
 
 		//BGM
 		SoundInformation("Assets/sound/BGM/AS_1620196_滑稽・NGシーンに＿ドタバタポップ.wav"),
