@@ -107,11 +107,7 @@ namespace app
 						// アニメーション完了後にSEを停止する。
 						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY, 0.0f
 							, []() {}
-							, [remainDigit]()
-							{
-								// SEを停止。
-								SoundManager::Get().StopSE(enSoundKind_RemainPlus);
-							}
+							, []() {}
 						);
 					
 					// シーケンスを再生。
@@ -150,11 +146,7 @@ namespace app
 						// アニメーション完了後にSEを停止する。
 						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f
 							, []() {}
-							, []()
-							{
-								// SEを停止。
-								SoundManager::Get().StopSE(enSoundKind_RemainORTotalMinus);
-							}
+							, []() {}
 						);
 
 					// シーケンスを再生。
@@ -208,11 +200,7 @@ namespace app
 						// アニメーション完了後にSEを停止する。
 						.Add(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f
 							, []() {}
-							, []() 
-							{
-								// SEを停止。
-								SoundManager::Get().StopSE(enSoundKind_RemainORTotalMinus);
-							}
+							, []() {}
 						);
 
 					// シーケンスを再生。
