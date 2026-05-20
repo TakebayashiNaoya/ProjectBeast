@@ -5,28 +5,20 @@
  */
 #include "stdafx.h"
 #include "RemainingChildMenu.h"
+#include "Source/Sound/SoundManager.h"
 
 
 namespace app
 {
 	namespace ui
 	{
-		namespace
-		{
-			// 救助数の座標。
-			const Vector3 REMAIN_DIGIT_POS = Vector3(-619.0f, 85.0f, 0.0f);
-
-			// 総数の座標。
-			const Vector3 TOTAL_DIGIT_POS = Vector3(-490.0f, 85.0f, 0.0f);
-		}
-
 		RemainingChildMenu::RemainingChildMenu()
 			: m_childNum(0)
 			, m_totalNum(0)
 		{
 			// アニメーションステータスを生成。
 			m_remainAnimStatus = std::make_unique<RemainingAnimStatus>();
-			
+
 			// アニメーションステータスのセットアップUIを呼び出す。
 			m_remainAnimStatus->SetUpUI();
 		}
@@ -60,6 +52,7 @@ namespace app
 			// 配列の中のアニメーションシーケンスを更新する。
 			for (auto& seq : m_sequences)
 			{
+				// シーケンスが再生中なら更新。
 				if (seq.IsPlaying())
 				{
 					seq.Update(g_gameTime->GetFrameDeltaTime());
@@ -101,10 +94,25 @@ namespace app
 					// シーケンスをクリア。
 					seq.Clear();
 
-					// シーケンスにアニメーションを追加する。
+					// メソッドチェーンシーケンスにアニメーションとSEを追加。
 					seq
-						.Add(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY, 0.0f)
-						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY, 0.0f);
+						// アニメーション開始時にSEを再生する。
+						.Add(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY, 0.0f
+							, [remainDigit]()
+							{
+								// SEを再生。
+								SoundManager::Get().PlaySE(enSoundKind_RemainPlus);
+							}
+							, []() {})
+						// アニメーション完了後にSEを停止する。
+						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY, 0.0f
+							, []() {}
+							, [remainDigit]()
+							{
+								// SEを停止。
+								SoundManager::Get().StopSE(enSoundKind_RemainPlus);
+							}
+						);
 					
 					// シーケンスを再生。
 					seq.Play(remainDigit);
@@ -129,10 +137,25 @@ namespace app
 					// シーケンスをクリア。
 					seq.Clear();
 
-					// シーケンスにアニメーションを追加。
+					// メソッドチェーンシーケンスにアニメーションとSEを追加。
 					seq
-						.Add(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY, 0.0f)
-						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f);
+						// アニメーション開始時にSEを再生する。
+						.Add(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY, 0.0f
+							, [remainDigit]()
+							{
+								// SEを再生。
+								SoundManager::Get().PlaySE(enSoundKind_RemainORTotalMinus);
+							},
+							  []() {})
+						// アニメーション完了後にSEを停止する。
+						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f
+							, []() {}
+							, []()
+							{
+								// SEを停止。
+								SoundManager::Get().StopSE(enSoundKind_RemainORTotalMinus);
+							}
+						);
 
 					// シーケンスを再生。
 					seq.Play(remainDigit);
@@ -172,10 +195,25 @@ namespace app
 					// シーケンスを削除。
 					seq.Clear();
 
-					// シーケンスにアニメーションを追加。
+					// メソッドチェーンシーケンスにアニメーションを追加する。
 					seq
-						.Add(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY, 0.0f)
-						.Add(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f);
+						// アニメーション開始時にSEを再生する。
+						.Add(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY, 0.0f
+							, [totalDigit]()
+							{
+								// SEを再生。
+								SoundManager::Get().PlaySE(enSoundKind_RemainORTotalMinus);
+							}
+							, []() {})
+						// アニメーション完了後にSEを停止する。
+						.Add(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f
+							, []() {}
+							, []() 
+							{
+								// SEを停止。
+								SoundManager::Get().StopSE(enSoundKind_RemainORTotalMinus);
+							}
+						);
 
 					// シーケンスを再生。
 					seq.Play(totalDigit);
