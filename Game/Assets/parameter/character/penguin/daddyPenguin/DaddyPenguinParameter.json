@@ -3,14 +3,14 @@
     "comment": "親ペンギンのステータスのパラメーター",
     "maxHp": 3,
     "hp": 3,
-    "walkSpeed": 100.0,
-    "runSpeed": 150.0,
-    "swimSpeed" : 250.0,
-    "sneakSpeed" : 100.0,
-    "slideSpeed" : 200.0,
-    "jumpPower" : 300.0,
+    "walkSpeed": 80.0,
+    "runSpeed": 130.0,
+    "swimSpeed": 230.0,
+    "sneakSpeed": 70.0,
+    "slideSpeed": 180.0,
+    "jumpPower": 300.0,
     "radius": 10.0,
     "height": 70.0,
-    "enableCommandRange" : 40
+    "enableCommandRange": 40
   }
 ]

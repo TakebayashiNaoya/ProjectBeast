@@ -37,6 +37,12 @@ namespace app
 			constexpr float HYSTERESIS = 5.0f;
 
 			/**
+			 * @brief フェーズを上げるためのマージン（遊び）
+			 * @details 閾値からさらにこの距離だけ外側に離れて初めてフェーズを上げる。
+			 */
+			constexpr float PHASE_UP_MARGIN = 5.0f;
+
+			/**
 			 * @brief 停止判定で共通利用する速度の閾値（速度の二乗で比較）
 			 * @details Walk → Stop 遷移と BuildInputToTarget() 冒頭の強制 Stop 判定の
 			 *          両方でこの定数を参照する。
@@ -221,16 +227,16 @@ namespace app
 			{
 			case MovePhase::Stop:
 			{
-				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
-				else if (distToTarget > m_walkDistance) { m_movePhase = MovePhase::Run; }
-				else if (distToTarget > m_stopDistance + HYSTERESIS) { m_movePhase = MovePhase::Walk; }
+				if (distToTarget > m_runDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Slide; }
+				else if (distToTarget > m_walkDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Run; }
+				else if (distToTarget > m_stopDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Walk; }
 				break;
 			}
 
 			case MovePhase::Walk:
-				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
-				else if (distToTarget > m_walkDistance) { m_movePhase = MovePhase::Run; }
-				else if (distToTarget <= m_stopDistance)
+				if (distToTarget > m_runDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Slide; }
+				else if (distToTarget > m_walkDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Run; }
+				else if (distToTarget <= m_stopDistance - HYSTERESIS)
 				{
 					// lerpの慣性が残っている間は Stop に入らず Walk を維持する。
 					// 慣性が残ったまま Stop になるとアニメーションが止まっても滑り続けるため。
@@ -244,14 +250,14 @@ namespace app
 
 			case MovePhase::Run:
 				/** さらに離されたら Slide へ上げる */
-				if (distToTarget > m_runDistance) { m_movePhase = MovePhase::Slide; }
+				if (distToTarget > m_runDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Slide; }
 				/** m_walkDistance 以内に入ったら Walk へ戻し、そこから Stop へ段階的に落とす */
-				else if (distToTarget <= m_walkDistance) { m_movePhase = MovePhase::Walk; }
+				else if (distToTarget <= m_walkDistance - HYSTERESIS) { m_movePhase = MovePhase::Walk; }
 				break;
 
 			case MovePhase::Slide:
 				/** m_walkDistance 以内に入ったら Walk へ戻し、そこから Stop へ段階的に落とす */
-				if (distToTarget <= m_walkDistance) { m_movePhase = MovePhase::Walk; }
+				if (distToTarget <= m_walkDistance - HYSTERESIS) { m_movePhase = MovePhase::Walk; }
 				break;
 			}
 
