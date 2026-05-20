@@ -37,6 +37,16 @@ namespace app
 		{}
 
 
+		PenguinEffectStatus* PenguinStateMachine::GetEffectStatus() const
+		{
+			if (m_ownerPenguinBase)
+			{
+				return m_ownerPenguinBase->GetEffectStatus();
+			}
+			return nullptr;
+		}
+
+
 		core::IState* PenguinStateMachine::GetChangeState()
 		{
 			return nullptr;

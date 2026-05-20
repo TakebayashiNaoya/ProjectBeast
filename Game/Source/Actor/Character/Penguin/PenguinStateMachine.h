@@ -4,6 +4,7 @@
  * @author 藤谷
  */
 #pragma once
+#include "PenguinEffectStatus.h"
 #include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Source/Actor/Character/penguin/PenguinStatus.h"
 
@@ -102,6 +103,11 @@ namespace app
 			{
 				return m_isInWhirlpool;
 			}
+			/**
+			 * @brief エフェクトステータスを取得
+			 * @return エフェクトステータスのポインタ
+			 */
+			PenguinEffectStatus* GetEffectStatus() const;
 
 
 			/** ステートの変更先を取得する */

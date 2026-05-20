@@ -1,0 +1,36 @@
+[
+    {
+       "comment": "ペンギンのエフェクトのステータス",
+        "splashEffectScale": {
+          "x": 7.0,
+          "y": 5.0,
+          "z": 7.0
+        },
+        "effectOffsetForward": 30.0,
+        "splashEffectInterval": 0.2,
+        "minMoveVelocitySq": 0.1,
+        "minSplashScaleRatio": 0.5,
+        "maxSplashScaleRatio": 1.0,
+        "minSpeed": 0.1,
+        "maxSpeed": 1.0,
+        "landingEffectScale": {
+          "x": 1.5,
+          "y": 1.5,
+          "z": 1.5
+        },
+        "slideFrostEffectScale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "slideEffectInterval": 0.1,
+        "minSlideFrostScaleRatio": 0.5,
+        "maxSlideFrostScaleRatio": 1.0,
+        "slideLineEffectScale": {
+          "x": 2.0,
+          "y": 2.0,
+          "z": 2.0
+        },
+        "slideLineEffectOffsetForward": 20.0
+    }
+]

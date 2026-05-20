@@ -11,14 +11,24 @@ namespace app
 {
 	namespace actor
 	{
+		class PenguinEffectStatus;
+
+
 		/**
 		 * @brief ペンギンの基底クラス
 		 */
 		class PenguinBase : public CharacterBase
 		{
 		public:
-			PenguinBase() = default;
+			PenguinBase();
 			virtual ~PenguinBase() override = default;
+
+
+			/**
+			 * @brief エフェクトステータスを取得
+			 * @return エフェクトステータスのポインタ
+			 */
+			inline PenguinEffectStatus* GetEffectStatus() const { return m_effectStatus.get(); }
 
 
 		protected:
@@ -37,6 +47,8 @@ namespace app
 		protected:
 			/** スライド中の地形傾斜に合わせたモデル描画用回転（補間済み） */
 			Quaternion m_slideModelRotation;
+
+			std::unique_ptr<PenguinEffectStatus> m_effectStatus;
 		};
 	}
 }
