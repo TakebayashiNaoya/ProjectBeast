@@ -7,7 +7,7 @@
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/MiniMap.dds",
                 "width":233,
                 "height":233,
-                "position":[ -630, 280, 0],
+                "position":[ -600, 290, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
@@ -19,7 +19,7 @@
                 "asset":"Assets/spriteData/UI/Icon/MiniMapIcon/MiniMapFrameIcon.dds",
                 "width":280,
                 "height":280,
-                "position":[ -630, 280, 0],
+                "position":[ -600, 290, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]

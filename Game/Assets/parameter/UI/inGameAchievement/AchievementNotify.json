@@ -40,7 +40,7 @@
         "asset": "Assets/spriteData/UI/Achievement/AchieveName_/penguin_rescue50.DDS",
         "width": 400.0,
         "height": 40.0,
-        "position": [640.0, 240.0, 0.0],
+        "position": [650.0, 240.0, 0.0],
         "scale": [1.0, 1.0, 1.0],
         "rotation": 0.0,
         "color": [255, 255, 255, 255]
@@ -51,7 +51,7 @@
         "asset":"Assets/spriteData/UI/Achievement/AchieveName_/bear_chase_2.DDS",
         "width": 400.0,
         "height": 40.0,
-        "position": [640.0, 240.0, 0.0],
+        "position": [650.0, 240.0, 0.0],
         "scale": [1.0, 1.0, 1.0],
         "rotation": 0.0,
         "color": [255, 255, 255, 255]
@@ -62,7 +62,7 @@
         "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_chase_all.DDS",
         "width": 400.0,
         "height": 40.0,
-        "position": [640.0, 240.0, 0.0],
+        "position": [650.0, 240.0, 0.0],
         "scale": [1.0, 1.0, 1.0],
         "rotation": 0.0,
         "color": [255, 255, 255, 255]
@@ -73,7 +73,7 @@
         "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_wakeup.DDS",
         "width": 400.0,
         "height": 40.0,
-        "position": [640.0, 240.0, 0.0],
+        "position": [650.0, 240.0, 0.0],
         "scale": [1.0, 1.0, 1.0],
         "rotation": 0.0,
         "color": [255, 255, 255, 255]

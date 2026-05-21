@@ -7,7 +7,7 @@
                 "asset":"Assets/spriteData/UI/Icon/BgIcon.dds",
                 "width":330,
                 "height":78,
-                "position":[ -633, 85, 0],
+                "position":[ -603, 95, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 0, 0, 0, 150]
@@ -18,7 +18,7 @@
                 "asset":"Assets/spriteData/UI/Icon/ChildPenguinIcon.dds",
                 "width":40,
                 "height":40,
-                "position":[ -755, 85, 0],
+                "position":[ -725, 95, 0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -31,7 +31,7 @@
                 "number": 100,
                 "width":30,
                 "height":30,
-                "position":[-674,85,0],
+                "position":[-644,95,0],
                 "scale":[1,1,1],
                 "rotation":0
             },
@@ -41,7 +41,7 @@
                 "asset":"Assets/spriteData/UI/Icon/SlashIcon.dds",
                 "width":30,
                 "height":45,
-                "position":[-630,85,0],
+                "position":[-600,95,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -54,7 +54,7 @@
                 "number": 100,
                 "width":30,
                 "height":30,
-                "position":[-545,85,0],
+                "position":[-515,95,0],
                 "scale":[1,1,1],
                 "rotation":0
             }
