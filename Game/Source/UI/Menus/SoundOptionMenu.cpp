@@ -400,7 +400,7 @@ namespace app
 				// Digitの配列のキーを取得する。
 				const Key digitKey = SOUND_DIGIT_KEYS[i].key;
 				// digitの配列キーを取得する。
-				auto itD = m_soundDigitMap.find(key);
+				auto itD = m_soundDigitMap.find(digitKey);
 
 				// digitのマップにキーが存在していて、digitがnullptrでないなら
 				if (itD != m_soundDigitMap.end() && itD->second)
