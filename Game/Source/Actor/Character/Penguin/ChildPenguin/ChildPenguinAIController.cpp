@@ -966,10 +966,10 @@ namespace app
 				if (m_interventionTarget != nullptr)
 				{
 					/** 助けに向かう間は隊列から外れる */
-					if (m_isFollowing)
+					if (!m_isFollowing)
 					{
 						manager->RemoveFollower(m_owner);
-						m_isFollowing = false;
+						m_isFollowing = true;
 					}
 
 					if (IsCloseEnoughTo(m_interventionTarget))
