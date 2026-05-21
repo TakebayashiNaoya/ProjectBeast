@@ -253,17 +253,9 @@
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
             },
-            {
-                "type":"UIIcon",
-                "name":"SoundLeftArrowIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/LeftArrowIcon.dds",
-                "width":80,
-                "height":60,
-                "position":[ -700, 290, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 200]
-            },
+
+
+
             {
                 "type":"UIDigit",
                 "name":"SoundMasterDigit",

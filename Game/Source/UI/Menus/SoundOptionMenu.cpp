@@ -7,7 +7,6 @@
 #include "SoundOptionMenu.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/Util/Curve.h"
-#include "Source/Util/CRC32.h"
 
 
 namespace app
@@ -26,29 +25,35 @@ namespace app
 
 			/** サウンドオプションの数 */
 			constexpr int SOUND_SIZE = 4;
-			/** サウンドアイコンのキー */
-			constexpr SoundInfo SOUND_ICON_KEYS[SOUND_SIZE] =
+			/** サウンドアイコンの配列 */
+			constexpr std::array<SoundInfo,SOUND_SIZE>SOUND_ICON_KEYS =
 			{
+				{
 					{ Hash32("SoundKnobMasterIcon"),SoundType::Master }
 				,	{ Hash32("SoundKnobVoiceIcon"),SoundType::Voice }
 				,	{ Hash32("SoundKnobSEIcon"),SoundType::SE }
 				,	{ Hash32("SoundKnobBGMIcon"),SoundType::BGM }
+				}
 			};
 
 
-			/** サウンドの数値のキー */
-			constexpr SoundInfo SOUND_DIGIT_KEYS[SOUND_SIZE] =
+			/** サウンドディジットの配列 */
+			constexpr std::array<SoundInfo,SOUND_SIZE> SOUND_DIGIT_KEYS =
 			{
-				{ Hash32("SoundMasterDigit"), SoundType::Master },
-				{ Hash32("SoundVoiceDigit"), SoundType::Voice },
-				{ Hash32("SoundSEDigit"), SoundType::SE },
-				{ Hash32("SoundBGMDigit"), SoundType::BGM }
+				{
+					{ Hash32("SoundMasterDigit"), SoundType::Master }
+				,	{ Hash32("SoundVoiceDigit"), SoundType::Voice }
+				,	{ Hash32("SoundSEDigit"), SoundType::SE }
+				,	{ Hash32("SoundBGMDigit"), SoundType::BGM }
+				}
 			};
 
 
 
 			/** 音量の初期値 */
 			constexpr float INITIALIZE_VOLUME_VALUE = 0.5f;
+			/** 全体の音量の初期値 */
+			constexpr float RESET_VOLUME_VALUE = 0.1f;
 			/** 音量の最小値 */
 			constexpr float MIN_VOLUME_VALUE = 0.0f;
 			/** 音量の最大値 */
@@ -201,11 +206,39 @@ namespace app
 		}
 
 
+		void SoundIcon::SoundResetToPos()
+		{
+			// iconがないなら弾く。
+			if (!m_icon) return;
+
+			// 直接値を書き込んで初期値に戻す。
+			m_currentValue = RESET_VOLUME_VALUE;
+			// アイコンの位置を初期位置に戻す。
+			m_icon->m_transform.m_localTransform.m_position.x = VolumeToKnobPosX(m_currentValue);
+
+			// SoundManagerのインスタンスを取得。
+			auto& sound = SoundManager::Get();
+
+			// 各タイプごとに値を設定して、初期化する。
+			switch (m_type)
+			{
+			case SoundType::Master: sound.SetMasterVolume(m_currentValue); break;
+			case SoundType::Voice:  sound.SetVoiceVolume(m_currentValue); break;
+			case SoundType::SE:     sound.SetSEVolume(m_currentValue); break;
+			case SoundType::BGM:    sound.SetBGMVolume(m_currentValue); break;
+			}
+		}
+
+
+
+
+
 		/********************************************************/
 
 
 		SoundDigit::SoundDigit(SoundType type)
 			: m_type(type)
+			, m_currentValue(0.0f)
 			, m_digit(nullptr)
 			, m_soundIcon(nullptr)
 		{}
@@ -225,7 +258,7 @@ namespace app
 		{
 			const auto& soundGet = SoundManager::Get();
 			// 現在の値を所得。
-			float currentValue = 0.0f;
+			float currentValue = m_currentValue;
 			switch (m_type)
 			{
 				// 各タイプごとに値を取得。
@@ -267,6 +300,19 @@ namespace app
 		}
 
 
+		void SoundDigit::ResetToDigit()
+		{
+			// digitがnullptrの場合警告。
+			K2_ASSERT(m_digit != nullptr, "リセット失敗！");
+
+			// 選んでいるタイプに対応するSoundManagerの値を取得して、digitに値を設定する。
+			m_digit->SetNumber(GetCurrentVolumeFromManager(m_type));
+		}
+
+
+
+
+
 		/********************************************************/
 
 
@@ -284,11 +330,19 @@ namespace app
 			// 現在のタイプを保存。
 			const uint8_t currentType = static_cast<uint8_t>(m_currentSoundType);
 
-
+			// uint8_t型の変数を宣言。
 			uint8_t add = 0;
+
+			// Xボタンに入力があったら、リセットする関数を呼び出す。
+			if (g_pad[0]->IsTrigger(enButtonX))
+			{
+				// ここでリセットする関数を呼び出す。
+				Reset();
+			}
 
 			// 上方向に入力があったら
 			if (g_pad[0]->IsTrigger(enButtonUp)) add = 3;
+
 			// 下方向に入力があったら
 			if (g_pad[0]->IsTrigger(enButtonDown)) add = 1;
 
@@ -324,6 +378,37 @@ namespace app
 			InitializeIcon();
 
 			InitializeDigit();
+		}
+
+
+		void SoundOptionMenu::Reset()
+		{
+			// アイコンとディジットの両方を初期化する。
+			for (int i = 0; i < SOUND_SIZE; i++)
+			{
+				// Iconの配列のキーを取得する。
+				const Key key = SOUND_ICON_KEYS[i].key;
+				
+				auto it = m_soundIconMap.find(key);
+				
+				// アイコンのマップにキーが存在していて、iconがnullptrでないなら
+				if (it != m_soundIconMap.end() && it->second)
+				{
+					// it->second.get()でiconを取得して、初期化する関数を呼び出す。
+					it->second.get()->SoundResetToPos();
+				}
+				// Digitの配列のキーを取得する。
+				const Key digitKey = SOUND_DIGIT_KEYS[i].key;
+				// digitの配列キーを取得する。
+				auto itD = m_soundDigitMap.find(key);
+
+				// digitのマップにキーが存在していて、digitがnullptrでないなら
+				if (itD != m_soundDigitMap.end() && itD->second)
+				{
+					// it->second.get()でdigitを取得して、初期化する関数を呼び出す。
+					itD->second.get()->ResetToDigit();
+				}
+			}
 		}
 
 

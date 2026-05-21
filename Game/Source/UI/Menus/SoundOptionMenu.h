@@ -29,7 +29,16 @@ namespace app
 			~SoundIcon();
 			void Update();
 			void CalcRatio();
+			/**
+			 * @brief タイプの取得
+			 * @return タイプを取得
+			 */
+			SoundType GetType() const { return m_type; }
 			void SetUIIcon(UIIcon* icon);
+			/**
+			 * @brief アイコンの位置を初期値に戻す
+			 */
+			void SoundResetToPos();
 
 
 		private:
@@ -51,8 +60,15 @@ namespace app
 			void SetUIDigit(UIDigit* digit);
 			void SetSoundIcon(SoundIcon* soundIcon);
 			
+			/**
+			 * @brief 数字を初期位置に戻す
+			 */
+			void ResetToDigit();
+
 
 		private:
+			/** 現在値 */
+			float m_currentValue;
 			SoundType m_type;
 			UIDigit* m_digit;
 			SoundIcon* m_soundIcon;
@@ -70,6 +86,11 @@ namespace app
 			void Update()override;
 			void InitializeLogic()override;
 
+
+			/**
+			 * @brief 値と座標を初期値に戻す
+			 */
+			void Reset();
 
 			/**
 			 * @brief サウンドメニューで扱うアイコンの情報を初期化する
