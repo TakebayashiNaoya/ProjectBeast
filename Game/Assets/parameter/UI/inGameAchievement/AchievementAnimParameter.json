@@ -5,7 +5,7 @@
       "key": "fadeInAnim",
       "valueType": "Vector3",
       "startValue": { "x": 0.0, "y": 100.0, "z": 0.0 },
-      "endValue": { "x": 100.0, "y": 100.0, "z": 0.0 },
+      "endValue": { "x": 50.0, "y": 100.0, "z": 0.0 },
       "duration": 1.0,
       "easing": "EaseOut",
       "loop": "Once"
@@ -22,7 +22,7 @@
     {
       "key": "fadeOutAnim",
       "valueType": "Vector3",
-      "startValue": { "x": 100.0, "y": 100.0, "z": 0.0 },
+      "startValue": { "x": 50.0, "y": 100.0, "z": 0.0 },
       "endValue": { "x": 0.0, "y": 100.0, "z": 0.0 }, 
       "duration": 1.0,
       "easing": "EaseIn",
