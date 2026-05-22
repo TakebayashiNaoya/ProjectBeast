@@ -8,6 +8,8 @@
 #include "Graphics/Light/SceneLight.h"
 #include "Nature/INatureObject.h"
 #include "Geometry/Frustum.h"
+#include "Graphics/PostEffect/PostEffectManager.h"
+#include "Graphics/PostEffect/PostEffectTypes.h"
 
 
 namespace nsBeastEngine
@@ -146,6 +148,11 @@ namespace nsBeastEngine
 		 */
 		void Init2DRenderTarget();
 
+		/**
+		 * @brief ポストエフェクトマネージャーの初期化
+		 */
+		void InitPostEffectManager();
+
 
 		//============================================//
 		// Execute内で呼ばれる描画処理
@@ -169,6 +176,13 @@ namespace nsBeastEngine
 		 * @param rc レンダリングコンテキスト
 		 */
 		void ForwardRendering(RenderContext& rc);
+
+		/**
+		 * @brief ポストエフェクトの描画処理
+		 * @details 3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ。
+		 * @param rc レンダリングコンテキスト
+		 */
+		void PostEffect(RenderContext& rc);
 
 		/**
 		 * @brief 2D描画処理
@@ -209,6 +223,9 @@ namespace nsBeastEngine
 		Sprite			m_2DSprite;
 		/** 3D描画結果のスプライト */
 		Sprite			m_mainSprite;
+
+		/** ポストエフェクトマネージャー */
+		PostEffectManager m_postEffectManager;
 
 		/** ディファードモデルリスト */
 		std::vector<ModelRender*> m_deferredModelList;

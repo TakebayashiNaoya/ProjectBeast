@@ -37,6 +37,9 @@
     <ClCompile Include="graphics\Light\SpotLight.cpp" />
     <ClCompile Include="graphics\ModelRender.cpp" />
     <ClCompile Include="Graphics\OcclusionDitherManager.cpp" />
+    <ClCompile Include="Graphics\PostEffect\Bloom.cpp" />
+    <ClCompile Include="Graphics\PostEffect\GaussianBlur.cpp" />
+    <ClCompile Include="Graphics\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
     <ClCompile Include="Nature\SkyCube.cpp" />
@@ -77,6 +80,10 @@
     <ClInclude Include="graphics\ModelRender.h" />
     <ClInclude Include="graphics\MyRenderer.h" />
     <ClInclude Include="Graphics\OcclusionDitherManager.h" />
+    <ClInclude Include="Graphics\PostEffect\Bloom.h" />
+    <ClInclude Include="Graphics\PostEffect\GaussianBlur.h" />
+    <ClInclude Include="Graphics\PostEffect\PostEffectManager.h" />
+    <ClInclude Include="Graphics\PostEffect\PostEffectTypes.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
     <ClInclude Include="Nature\INatureObject.h" />
