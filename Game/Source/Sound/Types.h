@@ -53,6 +53,10 @@ namespace app
 		enSoundKind_RemainPlus,
 		enSoundKind_RemainORTotalMinus,
 
+		/** 子ペンギンのリアクションSE */
+		enSoundKind_CPReactionHappy,
+		enSoundKind_CPReactionTrouble,
+
 		/** SEの設定はここまで */
 		enSoundKind_SE_Max,
 
@@ -117,6 +121,8 @@ namespace app
 		SoundInformation("Assets/sound/SE/achievement/fadeOutAchievement.wav"),
 		SoundInformation("Assets/sound/SE/UI/remaining/AS_69491_ぽいっ（ジャンプ、かわいい、低めの音）.wav"),
 		SoundInformation("Assets/sound/SE/UI/remaining/AS_1116931_ボワン（コミカルな残念音）.wav"),
+		SoundInformation("Assets/sound/SE/CPReaction/happy.wav"),
+		SoundInformation("Assets/sound/SE/CPReaction/trouble.wav"),
 
 		//BGM
 		SoundInformation("Assets/sound/BGM/AS_1620196_滑稽・NGシーンに＿ドタバタポップ.wav"),
