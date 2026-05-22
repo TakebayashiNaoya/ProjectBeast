@@ -23,18 +23,20 @@ namespace nsBeastEngine
 		 *          1.0fを超えるHDR値も有効。
 		 *          サンプルに合わせて1.0fを基準とする。
 		 */
-		constexpr float LUMINANCE_THRESHOLD = 1.25f;
+		constexpr float LUMINANCE_THRESHOLD = 1.5f;
 
 		/** ブラーの強さ。数値が大きくなるほどボケが強くなる（ガウシアンブラー時のみ有効） */
-		constexpr float BLUR_STRENGTH = 20.0f;
+		constexpr float BLUR_STRENGTH = 10.0f;
 
 		/** ブルームの強度。メインRTへの加算合成時の明るさ倍率 */
-		constexpr float BLOOM_INTENSITY = 5.0f;
+		constexpr float BLOOM_INTENSITY = 2.0f;
 
 		/**
 		 * @brief 川瀬式ブルームの縮小バッファ数
 		 * @details 1〜Bloom::MAX_KAWASE_BUFFERS の範囲で設定する。
 		 *          大きいほどボケが広がるが処理負荷も増える。
+		 *          kawaseBloom.fx は常に4枚参照するため、
+		 *          未使用スロットは最後のバッファで埋める。
 		 */
 		constexpr int KAWASE_NUM_BUFFERS = 4;
 	}
@@ -190,6 +192,13 @@ namespace nsBeastEngine
 		for (int i = 0; i < m_numKawaseBuffers; i++)
 		{
 			initData.m_textures[i] = &m_gaussianBlurs[i].GetBokeTexture();
+		}
+
+		// kawaseBloom.fx は t0〜t3 を常に参照するため、
+		// 未使用スロットは最後のバッファを複製して埋め、未バインドSRV参照を防ぐ
+		for (int i = m_numKawaseBuffers; i < MAX_KAWASE_BUFFERS; i++)
+		{
+			initData.m_textures[i] = &m_gaussianBlurs[m_numKawaseBuffers - 1].GetBokeTexture();
 		}
 
 		initData.m_expandConstantBuffer = &m_bloomFinalCb;

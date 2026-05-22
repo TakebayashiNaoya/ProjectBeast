@@ -90,6 +90,7 @@ namespace nsBeastEngine
 			else
 			{
 				// 中心以外は左右対称で2回分加算する
+				// シェーダー側も±方向それぞれサンプルするため2回分として正規化する
 				total += 2.0f * tmp[x];
 			}
 		}
@@ -101,8 +102,9 @@ namespace nsBeastEngine
 		}
 
 		// Vector4[2]に詰め直す
-		// weights[0].xyzw = tmp[0]〜[3]
-		// weights[1].xyzw = tmp[4]〜[7]
+		// weights[0].x    = 中心テクセルの重み
+		// weights[0].yzw  = オフセット1〜3の重み
+		// weights[1].xyzw = オフセット4〜7の重み
 		m_blurCb.weights[0].x = tmp[0];
 		m_blurCb.weights[0].y = tmp[1];
 		m_blurCb.weights[0].z = tmp[2];
@@ -116,14 +118,13 @@ namespace nsBeastEngine
 
 	void GaussianBlur::SetAverageWeightsTable()
 	{
-		// 中心テクセル1つ＋左右7サンプルの合計15サンプルで均等な重みを設定する
-		// 片側8サンプルで合計が1になるよう正規化する
-		// 中心(1) + 左右(7×2) = 15サンプル
-		const float centerWeight = 1.0f / 15.0f;
-		const float sideWeight = 1.0f / 15.0f;
+		// blur.fx のPSは中心1回＋左右（上下）対称7サンプルの合計15サンプルを行う。
+		// 合計が1になるよう 1/15 で均等な重みを設定する。
+		// 中心(1回) + 左右7サンプル×2回 = 15サンプル
+		const float weight = 1.0f / 15.0f;
 
-		m_blurCb.weights[0] = Vector4(centerWeight, sideWeight, sideWeight, sideWeight);
-		m_blurCb.weights[1] = Vector4(sideWeight, sideWeight, sideWeight, sideWeight);
+		m_blurCb.weights[0] = Vector4(weight, weight, weight, weight);
+		m_blurCb.weights[1] = Vector4(weight, weight, weight, weight);
 	}
 
 

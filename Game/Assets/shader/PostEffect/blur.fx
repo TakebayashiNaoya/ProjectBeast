@@ -1,7 +1,9 @@
 /*!
  * @brief 横・縦ブラー（平均ブラー・ガウシアンブラー共用）
  * @details 重みテーブルに均等値を設定すれば平均ブラー、
- *          ガウス関数で計算した値を設定すればガウシアンブラーになる
+ *          ガウス関数で計算した値を設定すればガウシアンブラーになる。
+ *          中心テクセル1サンプル＋左右（または上下）対称7サンプルの
+ *          合計15サンプルで加重平均する。
  */
 
 cbuffer cb : register(b0)
@@ -13,10 +15,9 @@ cbuffer cb : register(b0)
 /*!
  * @brief ブラー用重みテーブル
  * @details C++側 GaussianBlur::SBlurCb::weights[2]（Vector4×2）と一致させること。
- *          HLSLのcbuffer内のfloat配列は各要素が16バイト境界にアライメントされるため、
- *          float4[2]で受け取り、PS内でfloat[8]として展開して使用する。
- *          weights[0].xyzw = weights[0]〜[3]
- *          weights[1].xyzw = weights[4]〜[7]
+ *          weights[0].x    = 中心テクセルの重み
+ *          weights[0].yzw  = オフセット1〜3の重み
+ *          weights[1].xyzw = オフセット4〜7の重み
  */
 cbuffer BlurCb : register(b1)
 {
@@ -31,6 +32,8 @@ struct VSInputBlur
 
 /*!
  * @brief ブラー用ピクセルシェーダーの入力（横・縦共用）
+ * @details uv[0]     = 中心テクセルのUV
+ *          uv[1..7]  = +方向オフセットのUV（-方向は PS 内で対称サンプル）
  */
 struct PSInputBlur
 {
@@ -43,7 +46,8 @@ sampler Sampler : register(s0);
 
 /*!
  * @brief 横ブラー用頂点シェーダー
- * @details テクセルサイズ分ずつ横にオフセットしたUVを8サンプル分計算する
+ * @details uv[0]を中心、uv[1..7]を+X方向へオフセットしたUVとして渡す。
+ *          PS内で-X方向にも対称サンプルを行う。
  */
 PSInputBlur VSXBlur(VSInputBlur In)
 {
@@ -51,13 +55,16 @@ PSInputBlur VSXBlur(VSInputBlur In)
     psIn.pos = mul(mvp, In.pos);
 
     // テクスチャのサイズからテクセルサイズを算出する
-    float width;
-    float height;
+    uint width;
+    uint height;
     g_texture.GetDimensions(width, height);
-    float texelSizeX = 1.0f / width;
+    float texelSizeX = 1.0f / (float)width;
 
-    // 基準テクセルを中心に左右4サンプルずつのUVを計算する
-    for (int i = 0; i < 8; i++)
+    // uv[0]は中心テクセル
+    psIn.uv[0] = In.uv;
+
+    // uv[1..7]は+X方向へオフセット（PS内で-X方向にも対称サンプルする）
+    for (int i = 1; i < 8; i++)
     {
         psIn.uv[i] = In.uv + float2(texelSizeX * float(i), 0.0f);
     }
@@ -67,7 +74,8 @@ PSInputBlur VSXBlur(VSInputBlur In)
 
 /*!
  * @brief 縦ブラー用頂点シェーダー
- * @details テクセルサイズ分ずつ縦にオフセットしたUVを8サンプル分計算する
+ * @details uv[0]を中心、uv[1..7]を+Y方向へオフセットしたUVとして渡す。
+ *          PS内で-Y方向にも対称サンプルを行う。
  */
 PSInputBlur VSYBlur(VSInputBlur In)
 {
@@ -75,13 +83,16 @@ PSInputBlur VSYBlur(VSInputBlur In)
     psIn.pos = mul(mvp, In.pos);
 
     // テクスチャのサイズからテクセルサイズを算出する
-    float width;
-    float height;
+    uint width;
+    uint height;
     g_texture.GetDimensions(width, height);
-    float texelSizeY = 1.0f / height;
+    float texelSizeY = 1.0f / (float)height;
 
-    // 基準テクセルを中心に上下4サンプルずつのUVを計算する
-    for (int i = 0; i < 8; i++)
+    // uv[0]は中心テクセル
+    psIn.uv[0] = In.uv;
+
+    // uv[1..7]は+Y方向へオフセット（PS内で-Y方向にも対称サンプルする）
+    for (int i = 1; i < 8; i++)
     {
         psIn.uv[i] = In.uv + float2(0.0f, texelSizeY * float(i));
     }
@@ -91,8 +102,9 @@ PSInputBlur VSYBlur(VSInputBlur In)
 
 /*!
  * @brief ブラー用ピクセルシェーダー（横・縦共用）
- * @details float4[2]の重みテーブルをfloat[8]として展開し、
- *          8サンプルを加重平均する
+ * @details 中心テクセルを weights[0].x で1回サンプル。
+ *          オフセット1〜7を対応する重みで±方向それぞれサンプルして加算。
+ *          合計15サンプルで加重平均する。
  */
 float4 PSBlur(PSInputBlur In) : SV_Target0
 {
@@ -107,10 +119,15 @@ float4 PSBlur(PSInputBlur In) : SV_Target0
     w[6] = weights[1].z;
     w[7] = weights[1].w;
 
-    float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    for (int i = 0; i < 8; i++)
+    // 中心テクセルをサンプルする（1回）
+    float4 color = g_texture.Sample(Sampler, In.uv[0]) * w[0];
+
+    // オフセット1〜7を±方向それぞれサンプルして加算する（左右または上下対称）
+    // uv[i]は+方向、2*uv[0]-uv[i]は-方向（中心を軸に反転）
+    for (int i = 1; i < 8; i++)
     {
-        color += g_texture.Sample(Sampler, In.uv[i]) * w[i];
+        color += g_texture.Sample(Sampler, In.uv[i])               * w[i];
+        color += g_texture.Sample(Sampler, 2.0f * In.uv[0] - In.uv[i]) * w[i];
     }
 
     return color;
