@@ -1,10 +1,11 @@
 ﻿/**
  * @file GaussianBlur.cpp
  * @brief ガウシアンブラー・平均ブラーの独自実装
- * @author 竹林
+ * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "Graphics/PostEffect/GaussianBlur.h"
+
 #include <cmath>
 
 
@@ -75,28 +76,54 @@ namespace nsBeastEngine
 	{
 		float total = 0.0f;
 
+		// 一時バッファに重みを計算する
+		float tmp[NUM_WEIGHTS];
 		for (int x = 0; x < NUM_WEIGHTS; x++)
 		{
-			m_blurCb.weights[x] = std::expf(-0.5f * static_cast<float>(x * x) / sigma);
-			total += 2.0f * m_blurCb.weights[x];
+			tmp[x] = std::expf(-0.5f * static_cast<float>(x * x) / sigma);
+
+			if (x == 0)
+			{
+				// 中心テクセルは1回だけ加算する
+				total += tmp[x];
+			}
+			else
+			{
+				// 中心以外は左右対称で2回分加算する
+				total += 2.0f * tmp[x];
+			}
 		}
 
 		// 重みの合計が1になるよう正規化する
 		for (int i = 0; i < NUM_WEIGHTS; i++)
 		{
-			m_blurCb.weights[i] /= total;
+			tmp[i] /= total;
 		}
+
+		// Vector4[2]に詰め直す
+		// weights[0].xyzw = tmp[0]〜[3]
+		// weights[1].xyzw = tmp[4]〜[7]
+		m_blurCb.weights[0].x = tmp[0];
+		m_blurCb.weights[0].y = tmp[1];
+		m_blurCb.weights[0].z = tmp[2];
+		m_blurCb.weights[0].w = tmp[3];
+		m_blurCb.weights[1].x = tmp[4];
+		m_blurCb.weights[1].y = tmp[5];
+		m_blurCb.weights[1].z = tmp[6];
+		m_blurCb.weights[1].w = tmp[7];
 	}
 
 
 	void GaussianBlur::SetAverageWeightsTable()
 	{
-		// 全サンプルに均等な重みを設定する
-		const float weight = 1.0f / static_cast<float>(NUM_WEIGHTS * 2);
-		for (int i = 0; i < NUM_WEIGHTS; i++)
-		{
-			m_blurCb.weights[i] = weight;
-		}
+		// 中心テクセル1つ＋左右7サンプルの合計15サンプルで均等な重みを設定する
+		// 片側8サンプルで合計が1になるよう正規化する
+		// 中心(1) + 左右(7×2) = 15サンプル
+		const float centerWeight = 1.0f / 15.0f;
+		const float sideWeight = 1.0f / 15.0f;
+
+		m_blurCb.weights[0] = Vector4(centerWeight, sideWeight, sideWeight, sideWeight);
+		m_blurCb.weights[1] = Vector4(sideWeight, sideWeight, sideWeight, sideWeight);
 	}
 
 

@@ -1,7 +1,7 @@
 ﻿/**
  * @file GaussianBlur.h
  * @brief ガウシアンブラー・平均ブラーの独自実装
- * @author 竹林
+ * @author 竹林尚哉
  */
 #pragma once
 #include "Graphics/PostEffect/PostEffectTypes.h"
@@ -88,11 +88,15 @@ namespace nsBeastEngine
 	private:
 		/**
 		 * @brief ブラー用の定数バッファ構造体
-		 * @details HLSL側の cbuffer BlurCb と一致させること
+		 * @details HLSL側の cbuffer BlurCb と一致させること。
+		 *          HLSLのcbuffer内のfloat配列は各要素が16バイト境界に
+		 *          アライメントされるため、Vector4[2]で渡す必要がある。
+		 *          weights[0].xyzw = weights[0]〜[3]
+		 *          weights[1].xyzw = weights[4]〜[7]
 		 */
 		struct SBlurCb
 		{
-			float weights[NUM_WEIGHTS]; /** 重みテーブル */
+			Vector4 weights[2]; /** 重みテーブル（float4×2 = 8サンプル分） */
 		};
 
 		/** 横ブラー用レンダリングターゲット */

@@ -12,10 +12,15 @@ cbuffer cb : register(b0)
 
 /*!
  * @brief ブラー用重みテーブル
+ * @details C++側 GaussianBlur::SBlurCb::weights[2]（Vector4×2）と一致させること。
+ *          HLSLのcbuffer内のfloat配列は各要素が16バイト境界にアライメントされるため、
+ *          float4[2]で受け取り、PS内でfloat[8]として展開して使用する。
+ *          weights[0].xyzw = weights[0]〜[3]
+ *          weights[1].xyzw = weights[4]〜[7]
  */
 cbuffer BlurCb : register(b1)
 {
-    float4 weights[2]; // weights[0].xyzw = [0]〜[3], weights[1].xyzw = [4]〜[7]
+    float4 weights[2]; // 重みテーブル（float4×2 = 8サンプル分）
 };
 
 struct VSInputBlur
@@ -25,21 +30,12 @@ struct VSInputBlur
 };
 
 /*!
- * @brief 横ブラー用頂点シェーダーの出力
+ * @brief ブラー用ピクセルシェーダーの入力（横・縦共用）
  */
-struct PSInputXBlur
+struct PSInputBlur
 {
-    float4 pos    : SV_POSITION;
-    float2 uv[8]  : TEXCOORD0;
-};
-
-/*!
- * @brief 縦ブラー用頂点シェーダーの出力
- */
-struct PSInputYBlur
-{
-    float4 pos    : SV_POSITION;
-    float2 uv[8]  : TEXCOORD0;
+    float4 pos   : SV_POSITION;
+    float2 uv[8] : TEXCOORD0;
 };
 
 Texture2D<float4> g_texture : register(t0);
@@ -49,9 +45,9 @@ sampler Sampler : register(s0);
  * @brief 横ブラー用頂点シェーダー
  * @details テクセルサイズ分ずつ横にオフセットしたUVを8サンプル分計算する
  */
-PSInputXBlur VSXBlur(VSInputBlur In)
+PSInputBlur VSXBlur(VSInputBlur In)
 {
-    PSInputXBlur psIn;
+    PSInputBlur psIn;
     psIn.pos = mul(mvp, In.pos);
 
     // テクスチャのサイズからテクセルサイズを算出する
@@ -65,6 +61,7 @@ PSInputXBlur VSXBlur(VSInputBlur In)
     {
         psIn.uv[i] = In.uv + float2(texelSizeX * float(i), 0.0f);
     }
+
     return psIn;
 }
 
@@ -72,9 +69,9 @@ PSInputXBlur VSXBlur(VSInputBlur In)
  * @brief 縦ブラー用頂点シェーダー
  * @details テクセルサイズ分ずつ縦にオフセットしたUVを8サンプル分計算する
  */
-PSInputYBlur VSYBlur(VSInputBlur In)
+PSInputBlur VSYBlur(VSInputBlur In)
 {
-    PSInputYBlur psIn;
+    PSInputBlur psIn;
     psIn.pos = mul(mvp, In.pos);
 
     // テクスチャのサイズからテクセルサイズを算出する
@@ -88,16 +85,18 @@ PSInputYBlur VSYBlur(VSInputBlur In)
     {
         psIn.uv[i] = In.uv + float2(0.0f, texelSizeY * float(i));
     }
+
     return psIn;
 }
 
 /*!
  * @brief ブラー用ピクセルシェーダー（横・縦共用）
- * @details 8サンプルを重みテーブルで加重平均する
+ * @details float4[2]の重みテーブルをfloat[8]として展開し、
+ *          8サンプルを加重平均する
  */
-float4 PSBlur(PSInputXBlur In) : SV_Target0
+float4 PSBlur(PSInputBlur In) : SV_Target0
 {
-    // weightsをfloat配列として扱うためにfloat4[2]から展開する
+    // float4[2]をfloat[8]として展開する
     float w[8];
     w[0] = weights[0].x;
     w[1] = weights[0].y;
@@ -113,5 +112,6 @@ float4 PSBlur(PSInputXBlur In) : SV_Target0
     {
         color += g_texture.Sample(Sampler, In.uv[i]) * w[i];
     }
+
     return color;
 }

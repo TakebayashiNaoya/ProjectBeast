@@ -16,14 +16,20 @@ namespace nsBeastEngine
 		// 調整する場合はここの値を変更する
 		//============================================//
 
-		/** 輝度抽出のしきい値。この値より暗いピクセルはブルームの対象外になる */
-		constexpr float LUMINANCE_THRESHOLD = 0.5f;
+		/**
+		 * @brief 輝度抽出のしきい値
+		 * @details この値より暗いピクセルはブルームの対象外になる。
+		 *          メインRTのフォーマットがR32G32B32A32_FLOATのため
+		 *          1.0fを超えるHDR値も有効。
+		 *          サンプルに合わせて1.0fを基準とする。
+		 */
+		constexpr float LUMINANCE_THRESHOLD = 1.25f;
 
 		/** ブラーの強さ。数値が大きくなるほどボケが強くなる（ガウシアンブラー時のみ有効） */
 		constexpr float BLUR_STRENGTH = 20.0f;
 
 		/** ブルームの強度。メインRTへの加算合成時の明るさ倍率 */
-		constexpr float BLOOM_INTENSITY = 1.5f;
+		constexpr float BLOOM_INTENSITY = 5.0f;
 
 		/**
 		 * @brief 川瀬式ブルームの縮小バッファ数
@@ -67,6 +73,7 @@ namespace nsBeastEngine
 		if (m_bloomType == EnBloomType::enNormal)
 		{
 			// 通常ブルーム：輝度テクスチャに1段ブラーをかける
+			// 解像度を半分に縮小してブラーをかける
 			m_gaussianBlurs[0].Init(
 				&m_luminanceRenderTarget.GetRenderTargetTexture(),
 				m_blurType,
@@ -78,7 +85,9 @@ namespace nsBeastEngine
 		}
 		else
 		{
-			// 川瀬式ブルーム：縮小バッファを多段でブラーをかける
+			// 川瀬式ブルーム：前段のボケテクスチャを次段の入力として多段ブラーをかける
+			// 各段で解像度を半分に縮小することでより広いボケを実現する
+			// gaussianBlur[0]は輝度テクスチャにブラーをかける
 			m_gaussianBlurs[0].Init(
 				&m_luminanceRenderTarget.GetRenderTargetTexture(),
 				m_blurType,
@@ -86,6 +95,7 @@ namespace nsBeastEngine
 				rtHeight / 2,
 				BLUR_STRENGTH
 			);
+			// gaussianBlur[1]以降は前段のボケテクスチャを入力にする
 			for (int i = 1; i < m_numKawaseBuffers; i++)
 			{
 				m_gaussianBlurs[i].Init(
