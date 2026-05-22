@@ -776,6 +776,7 @@ namespace app
 
 		Ocean::~Ocean()
 		{
+			g_renderingEngine->UnregisterNatureObject(this);
 			core::ParameterManager::Get()->UnloadParameter<MasterOceanParameter>();
 		}
 
