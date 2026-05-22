@@ -43,7 +43,7 @@ static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Ma
 {
 	EffectInformation(u"Assets/effect/DaddyPenguinCommand.efk",  50.0f),
 	EffectInformation(u"Assets/effect/enemy/EnemyAttack.efk",    80.0f),
-	EffectInformation(u"Assets/effect/whirlpool/Whirlpool.efk",  200.0f),
+	EffectInformation(u"Assets/effect/whirlpool/Whirlpool2.efk",  200.0f),
 	EffectInformation(u"Assets/effect/stage/igloo/IglooBreak.efk", 100.0f),
 	EffectInformation(u"Assets/effect/swim/swimSplash.efk",      60.0f),
 	EffectInformation(u"Assets/effect/penguin/jump/LandingFrost.efk", 60.0f),
