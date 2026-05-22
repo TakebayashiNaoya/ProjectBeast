@@ -314,6 +314,10 @@ namespace app
 			auto* bgIcon = GetUI<UIIcon>(Hash32("AchieveBackGroundIcon"));
 			auto* checkBox = GetUI<UIIcon>(Hash32("CheckBoxIcon"));
 			auto* stampIcon = GetUI<UIIcon>(Hash32("Stamp"));
+			auto* rescuePenguin = GetUI<UIIcon>(Hash32("RescuePenguin50"));
+			auto* chasedByTwoBears = GetUI<UIIcon>(Hash32("ChasedByTwoBears"));
+			auto* chasedByAllBears = GetUI<UIIcon>(Hash32("ChasedByAllBears"));
+			auto* wakeBears = GetUI<UIIcon>(Hash32("WakeUpBear"));
 
 			if (bgIcon) m_defaultBgPos = bgIcon->m_transform.m_localTransform.m_position;
 			if (checkBox) m_defaultCheckPos = checkBox->m_transform.m_localTransform.m_position;
@@ -323,6 +327,10 @@ namespace app
 			if (bgIcon) bgIcon->m_isDraw = false;
 			if (checkBox) checkBox->m_isDraw = false;
 			if (stampIcon) stampIcon->m_isDraw = false;
+			if (rescuePenguin) rescuePenguin->m_isDraw = false;
+			if (chasedByTwoBears) chasedByTwoBears->m_isDraw = false;
+			if (chasedByAllBears) chasedByAllBears->m_isDraw = false;
+			if (wakeBears) wakeBears->m_isDraw = false;
 		}
 	}
 }
