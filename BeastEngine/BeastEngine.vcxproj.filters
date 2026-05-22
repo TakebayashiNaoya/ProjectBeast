@@ -102,6 +102,15 @@
     <ClCompile Include="Graphics\Effect\BeastEffectEmitter.cpp">
       <Filter>Graphics\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\PostEffect\Bloom.cpp">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\PostEffect\GaussianBlur.cpp">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\PostEffect\PostEffectManager.cpp">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -229,6 +238,18 @@
     <ClInclude Include="Graphics\Effect\BeastEffectEmitter.h">
       <Filter>Graphics\Effect</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\PostEffect\Bloom.h">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PostEffect\GaussianBlur.h">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PostEffect\PostEffectManager.h">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PostEffect\PostEffectTypes.h">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -251,6 +272,9 @@
     </Filter>
     <Filter Include="Graphics\Effect">
       <UniqueIdentifier>{ef10080f-438e-4682-83cd-5c411c51a3fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\PostEffect">
+      <UniqueIdentifier>{bcefc37c-22a6-4efc-b9a2-2bc5dc31efd4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
