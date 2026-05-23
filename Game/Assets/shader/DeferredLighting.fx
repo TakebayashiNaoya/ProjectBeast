@@ -11,6 +11,10 @@ static const int   MAX_POINT_LIGHT = 32;
 static const int   MAX_SPOT_LIGHT  = 32;
 static const float PI              = 3.1415926f; // π
 
+// リムライトの計算に使用する定数
+static const float RIM_LIGHT_EXPONENT = 10.0f;   // リムライトの輪郭の鋭さ（指数）
+static const float RIM_LIGHT_STRENGTH = 0.5f;   // リムライトの強度倍率
+
 ///////////////////////////////////////
 // 構造体
 ///////////////////////////////////////
@@ -97,7 +101,9 @@ cbuffer LightCB : register(b1)
     float    pad2;               // offset: 108
     float3   ambientLightColor;  // offset: 112
     float    pad3;               // offset: 124
-    float4x4 mViewProjInv;       // offset: 128
+    float3   rimLightColor;      // offset: 128
+    float    pad4;               // offset: 140
+    float4x4 mViewProjInv;       // offset: 144
 };
 
 
@@ -233,6 +239,26 @@ float CalcDiffuseFromFresnel(float3 N, float3 L, float3 V)
 }
 
 /*!
+ * @brief 視線方向ベースのリムライトを計算する
+ * @details 視線ベクトルと法線の内積が小さい（輪郭付近）ほど強くなる。
+ *          視点が変わるとリムの位置も変わる、カメラ基準のリムライト。
+ * @param normal  法線ベクトル（ワールド空間）
+ * @param toEye   サーフェイスから視点に向かうベクトル（正規化済み）
+ * @return リムライトの反射光
+ */
+float3 CalcRimLight(float3 normal, float3 toEye)
+{
+    // 視線と法線の内積が小さいほど（輪郭付近ほど）リムライトが強くなる
+    // saturate でクランプして負値による pow の NaN 発生を防ぐ
+    float rimStrength = saturate(1.0f - saturate(dot(normal, toEye)));
+
+    // 指数関数的に変化させて輪郭を鋭くし、強度倍率を乗算する
+    rimStrength = pow(rimStrength, RIM_LIGHT_EXPONENT) * RIM_LIGHT_STRENGTH;
+
+    return rimLightColor * rimStrength;
+}
+
+/*!
  * @brief PBRベースのディレクションライトを計算する
  * @param normal         法線
  * @param worldPos       ワールド座標
@@ -281,6 +307,9 @@ float3 CalcDirectionLight(
     // 補正済み環境光を加算する
     lig += ambientLightColor * albedo * ambientScale;
 
+    // リムライトを加算する
+    lig += CalcRimLight(normal, toEye);
+
     return lig;
 }
 
@@ -308,8 +337,15 @@ float4 PSMain(PSInput In) : SV_Target0
     float4 albedo = g_albedoTexture.Sample(g_sampler, In.uv);
 
     // G-Bufferから法線をサンプリング
-    float3 normal = g_normalTexture.Sample(g_sampler, In.uv).xyz;
-    normal = (normal * 2.0f) - 1.0f;
+    float3 normalRaw = g_normalTexture.Sample(g_sampler, In.uv).xyz;
+    float3 normal    = (normalRaw * 2.0f) - 1.0f;
+
+    // GBufferに何も書き込まれていないピクセル（法線が未書き込み）はライティングをスキップする
+    // 未書き込み時は normalRaw = (0,0,0) → normal = (-1,-1,-1) となるため長さで判定する
+    if (dot(normal, normal) < 0.1f)
+    {
+        return float4(albedo.rgb, 1.0f);
+    }
 
     // G-BufferからPBRパラメータをサンプリング
     float4 metaricSmooth  = g_metaricSmoothTexture.Sample(g_sampler, In.uv);

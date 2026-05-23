@@ -46,6 +46,8 @@ struct Light
     float          padding0;          // パディング（4バイト）
     float3         ambientLightColor; // m_ambientLightColor（12バイト）
     float          padding1;          // パディング（4バイト）
+    float3         rimLightColor;     // m_rimLightColor（12バイト）
+    float          padding2;          // パディング（4バイト）
     float4x4       mViewProjInv;      // m_mViewProjInv（64バイト）
 };
 

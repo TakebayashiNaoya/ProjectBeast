@@ -33,6 +33,8 @@ namespace nsBeastEngine
 		//m_light.m_directionLight.m_LVP = g_camera3D->GetViewProjectionMatrix();
 		/** 環境光の設定 */
 		m_light.SetAmbientLight(0.6f, 0.6f, 0.6f);
+		/** リムライトの設定 */
+		m_light.SetRimLight(0.0f, 0.0f, 0.0f);
 	}
 
 
