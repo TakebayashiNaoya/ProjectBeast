@@ -341,8 +341,8 @@ float4 PSMain(PSInput In) : SV_Target0
     float3 normal    = (normalRaw * 2.0f) - 1.0f;
 
     // GBufferに何も書き込まれていないピクセル（法線が未書き込み）はライティングをスキップする
-    // 未書き込み時は normalRaw = (0,0,0) → normal = (-1,-1,-1) となるため長さで判定する
-    if (dot(normal, normal) < 0.1f)
+    // 未書き込み時は normalRaw = (0,0,0) となるため、生の法線値の長さで判定する
+    if (dot(normalRaw, normalRaw) < 0.1f)
     {
         return float4(albedo.rgb, 1.0f);
     }
