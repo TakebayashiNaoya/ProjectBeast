@@ -10,8 +10,11 @@
 
 namespace
 {
-	// SE再生上限数
-	constexpr uint8_t MAX_SE_PLAY_NUM = 7;
+	constexpr uint8_t CP_REACTION_SE_PLAY_NUM = 5;
+
+	constexpr uint8_t CP_SE_PLAY_NUM = 5;
+
+	constexpr uint8_t CP_WATER_OUT_NUM = 10;
 
 	constexpr float DEFAULT_VOLUME = 0.1f;
 
@@ -36,6 +39,19 @@ namespace app
 			const auto& info = soundInformation[i];
 			g_soundEngine->ResistWaveFileBank(i, info.assetPath.c_str());
 		}
+
+		// ===== SE種別ごとの同時再生数上限を設定 =====
+		// 子ペンギンの足音（数が多いため制限）
+		m_seConcurrentLimitMap[enSoundKind_PenguinSneak] = CP_SE_PLAY_NUM;
+		m_seConcurrentLimitMap[enSoundKind_PenguinDash] = CP_SE_PLAY_NUM;
+		m_seConcurrentLimitMap[enSoundKind_PenguinSlide] = CP_SE_PLAY_NUM;
+		//m_seConcurrentLimitMap[enSoundKind_PenguinWaterIn] = CP_SE_PLAY_NUM;
+		m_seConcurrentLimitMap[enSoundKind_PenguinWaterOut] = CP_WATER_OUT_NUM;
+		//m_seConcurrentLimitMap[enSoundKind_PenguinSwimming] = CP_SE_PLAY_NUM;
+		// 子ペンギンのリアクションSE（同種が重複しないよう制限）
+		m_seConcurrentLimitMap[enSoundKind_CPReactionHappy] = CP_REACTION_SE_PLAY_NUM;
+		m_seConcurrentLimitMap[enSoundKind_CPReactionTrouble] = CP_REACTION_SE_PLAY_NUM;
+
 	}
 
 
@@ -50,16 +66,15 @@ namespace app
 		for (auto& it : m_seList) {
 			const auto key = it.first;
 			auto* se = it.second;
-			/** 再生が終わっているなら削除 */
 			if (!se->IsPlaying()) {
 				eraseSEList.push_back(key);
-				DeleteGO(se);    // 再生を止める
+				DeleteGO(se);
 			}
 		}
 		for (const auto& key : eraseSEList) {
 			m_seList.erase(key);
+			m_seHandleKindMap.erase(key);
 		}
-
 
 
 		/** Voiceリストから再生していないものがあれば削除する */
@@ -79,29 +94,16 @@ namespace app
 
 
 		// リクエストされたSEを再生する
-		int playNum = 0;
-		// 優先度別のList
 		for (const auto& infoList : m_seInfomationList) {
-			// 優先度の中のリスト
 			for (const auto& info : infoList) {
 				auto* se = NewGO<SoundSource>(0, SOUND_GO_NAME);
 				se->Init(info.m_kind, info.m_is3D);
 				se->SetVolume(m_masterVolume * m_seVolume);
 				se->Play(info.m_isLoop);
 				m_seList.emplace(info.m_handle, se);
-				// 再生数加算
-				++playNum;
-				// 再生数を超えたかチェック
-				if (playNum >= MAX_SE_PLAY_NUM) {
-					break;
-				}
-			}
-			// 既に再生数を超えているなら処理する必要がない
-			if (playNum >= MAX_SE_PLAY_NUM) {
-				break;
+				m_seHandleKindMap.emplace(info.m_handle, info.m_kind);
 			}
 		}
-		// 再生完了なのでクリア
 		for (auto& infoList : m_seInfomationList) {
 			infoList.clear();
 		}
@@ -135,18 +137,41 @@ namespace app
 
 	SEHandle SoundManager::PlaySE(const int kind, const bool isLoop, const bool is3D, const EnSoundPriority priority)
 	{
-		/** ハンドルが最大数になったら使えない */
 		if (m_soundHandleCount == INVALID_SE_HANDLE) {
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
 			return INVALID_SE_HANDLE;
 		}
-		// ハンドルは常に加算していく
-		// そのため再生されない可能性があるので、Handle取得時はnullptrチェック必須
+
+		// ===== 同時再生数チェック =====
+		auto limitIt = m_seConcurrentLimitMap.find(kind);
+		if (limitIt != m_seConcurrentLimitMap.end())
+		{
+			uint32_t count = 0;
+
+			// 再生中のSEをカウント
+			for (const auto& kv : m_seHandleKindMap)
+			{
+				if (kv.second == kind) { ++count; }
+			}
+			// リクエスト済み（まだ再生されていない）SEもカウント
+			for (const auto& infoList : m_seInfomationList)
+			{
+				for (const auto& info : infoList)
+				{
+					if (info.m_kind == kind) { ++count; }
+				}
+			}
+
+			if (count >= limitIt->second)
+			{
+				// 上限に達しているので再生しない
+				return INVALID_SE_HANDLE;
+			}
+		}
+		// ================================
+
 		SEHandle handle = m_soundHandleCount++;
-
-		// 優先度別の再生リクエスト情報を追加
 		m_seInfomationList[priority].push_back(SEInformation(kind, isLoop, is3D, handle));
-
 		return handle;
 	}
 
@@ -165,22 +190,12 @@ namespace app
 	{
 		for (auto& it : m_seList) {
 			if (it.second != nullptr) {
-				it.second->Stop();    // 再生を止める
-				DeleteGO(it.second);  // ゲームオブジェクトとして破棄
+				it.second->Stop();
+				DeleteGO(it.second);
 			}
 		}
-		m_seList.clear(); // リストを空にする
-
-		//// Voice（鳴き声など）も同様に処理
-		//for (auto& it : m_voiceList) {
-		//	if (it.second != nullptr) {
-		//		it.second->Stop();
-		//		DeleteGO(it.second);
-		//	}
-		//}
-		//m_voiceList.clear();
-
-		//m_seList.clear();
+		m_seList.clear();
+		m_seHandleKindMap.clear(); // ← 追加
 
 		for (auto& infolist : m_seInfomationList) {
 			infolist.clear();
