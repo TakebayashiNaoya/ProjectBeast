@@ -96,9 +96,6 @@ namespace app
 		// リクエストされたSEを再生する
 		for (const auto& infoList : m_seInfomationList) {
 			for (const auto& info : infoList) {
-
-				const bool isLimited = (m_seConcurrentLimitMap.count(info.m_kind) > 0);
-
 				auto* se = NewGO<SoundSource>(0, SOUND_GO_NAME);
 				se->Init(info.m_kind, info.m_is3D);
 				se->SetVolume(m_masterVolume * m_seVolume);
@@ -149,7 +146,7 @@ namespace app
 		auto limitIt = m_seConcurrentLimitMap.find(kind);
 		if (limitIt != m_seConcurrentLimitMap.end())
 		{
-			uint8_t count = 0;
+			uint32_t count = 0;
 
 			// 再生中のSEをカウント
 			for (const auto& kv : m_seHandleKindMap)
