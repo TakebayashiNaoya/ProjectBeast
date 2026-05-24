@@ -12,45 +12,6 @@ namespace app
 {
 	namespace ui
 	{
-		enum class EnInGameTimerType : uint8_t
-		{
-			Frame,
-			FrameBackGround,
-			Max,
-		};
-
-
-		class TimerIcon
-		{
-		public:
-			TimerIcon();
-			~TimerIcon();
-
-			void Update();
-			void SetUIIcon(UIIcon* icon);
-			void SetIsDraw(bool isDraw) { if (m_icon) m_icon->m_isDraw = isDraw; }
-
-
-		private:
-			UIIcon* m_icon;
-		};
-
-
-		class TimerDigit
-		{
-		public:
-			TimerDigit();
-			~TimerDigit();
-
-			void Update();
-			void SetUIDigit(UIDigit* digit);
-			void SetValue(int value);
-			void SetIsDraw(bool isDraw) { if (m_digit) m_digit->m_isDraw = isDraw; }
-
-
-		private:
-			UIDigit* m_digit;
-		};
 
 
 		class InGameTimerMenu : public MenuBase
@@ -70,7 +31,13 @@ namespace app
 			 */
 			inline void SetTime(const float time) { m_currentTime = time; }
 
-			void SetIsDraw(bool isDraw);
+
+		private:
+			/**
+			 * @brief ゲーム開始時のアニメーションを更新する
+			 */
+			void UpdateGameStartingAnimation();
+
 
 			/**
 			 * @brief タイムの数字を更新するため
@@ -104,8 +71,15 @@ namespace app
 			/** 回転のタイマー */
 			float m_slopeTimer;
 
-			std::map<uint32_t, std::unique_ptr<TimerIcon>>  m_timerIconMap;
-			std::map<uint32_t, std::unique_ptr<TimerDigit>> m_timerDigitMap;
+
+			// ゲーム開始時のアニメーションのフラグ
+
+			/** 開始されたか */
+			bool m_isStartedGameStartingAnimation;
+			/** 再生中か */
+			bool m_isPlayingGameStartingAnimation;
+			/** 終了したか */
+			bool m_isFinishedGameStartingAnimation;
 		};
 	}
 }
