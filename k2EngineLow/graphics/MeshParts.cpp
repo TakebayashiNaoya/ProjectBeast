@@ -182,7 +182,36 @@ namespace nsK2EngineLow {
 				mesh->skinFlags.push_back(0);
 			}
 			};
-		//2. マテリアルを作成。
+		//2. インデックスバッファを作成。
+		if (!tkmMesh.indexBuffer16Array.empty()) {
+			//インデックスのサイズは2byte
+			mesh->m_indexBufferArray.reserve(tkmMesh.indexBuffer16Array.size());
+			for (auto& tkIb : tkmMesh.indexBuffer16Array) {
+				auto ib = new IndexBuffer;
+				ib->Init(static_cast<int>(tkIb.indices.size()) * 2, 2);
+				ib->Copy((uint16_t*)&tkIb.indices.at(0));
+
+				//スキンが設定されているかどうかを設定する。
+				SetSkinFlag(tkIb.indices[0]);
+
+				mesh->m_indexBufferArray.push_back(ib);
+			}
+		}
+		else {
+			//インデックスのサイズは4byte
+			mesh->m_indexBufferArray.reserve(tkmMesh.indexBuffer32Array.size());
+			for (auto& tkIb : tkmMesh.indexBuffer32Array) {
+				auto ib = new IndexBuffer;
+				ib->Init(static_cast<int>(tkIb.indices.size()) * 4, 4);
+				ib->Copy((uint32_t*)&tkIb.indices.at(0));
+
+				//スキンが設定されているかどうかを設定する。
+				SetSkinFlag(tkIb.indices[0]);
+
+				mesh->m_indexBufferArray.push_back(ib);
+			}
+		}
+		//3. マテリアルを作成。
 		mesh->m_materials.reserve(tkmMesh.materials.size());
 		for (auto& tkmMat : tkmMesh.materials) {
 			auto mat = new Material;

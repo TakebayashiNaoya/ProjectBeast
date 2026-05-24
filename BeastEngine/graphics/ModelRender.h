@@ -571,9 +571,9 @@ namespace nsBeastEngine
 		 */
 		SModelDitherCb m_modelDitherCb;
 
-		/** トゥーンシェーダー用定数バッファデータ（b5） */
+		/** トゥーンシェーダー用定数バッファデータ（b2） */
 		SToonCb m_toonCb;
-		/** アウトラインシェーダー用定数バッファデータ（b5） */
+		/** アウトラインシェーダー用定数バッファデータ（b2） */
 		SOutlineCb m_outlineCb;
 
 		/**

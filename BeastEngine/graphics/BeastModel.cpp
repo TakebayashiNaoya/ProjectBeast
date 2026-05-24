@@ -116,7 +116,54 @@ namespace nsBeastEngine
 	}
 
 
-	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, const Frustum& frustum, int numInstance)
+	void BeastModel::Draw(
+		nsK2EngineLow::RenderContext& rc,
+		Camera& camera,
+		int numInstance
+	)
+	{
+		if (!m_isInited)
+		{
+			return;
+		}
+		m_meshParts.Draw(
+			rc,
+			m_worldMatrix,
+			camera.GetViewMatrix(),
+			camera.GetProjectionMatrix(),
+			numInstance,
+			nullptr
+		);
+	}
+
+
+	void BeastModel::Draw(
+		nsK2EngineLow::RenderContext& rc,
+		const Matrix& viewMatrix,
+		const Matrix& projMatrix,
+		int numInstance
+	)
+	{
+		if (!m_isInited)
+		{
+			return;
+		}
+		m_meshParts.Draw(
+			rc,
+			m_worldMatrix,
+			viewMatrix,
+			projMatrix,
+			numInstance,
+			nullptr
+		);
+	}
+
+
+	void BeastModel::Draw(
+		nsK2EngineLow::RenderContext& rc,
+		const Frustum& frustum,
+		int numInstance
+	)
 	{
 		if (!m_isInited)
 		{
@@ -127,6 +174,28 @@ namespace nsBeastEngine
 			m_worldMatrix,
 			g_camera3D->GetViewMatrix(),
 			g_camera3D->GetProjectionMatrix(),
+			numInstance,
+			&frustum
+		);
+	}
+
+
+	void BeastModel::Draw(
+		nsK2EngineLow::RenderContext& rc,
+		Camera& camera,
+		const Frustum& frustum,
+		int numInstance
+	)
+	{
+		if (!m_isInited)
+		{
+			return;
+		}
+		m_meshParts.Draw(
+			rc,
+			m_worldMatrix,
+			camera.GetViewMatrix(),
+			camera.GetProjectionMatrix(),
 			numInstance,
 			&frustum
 		);
