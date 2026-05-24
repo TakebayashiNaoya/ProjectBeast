@@ -50,6 +50,8 @@ namespace nsBeastEngine
 		ResourceManager::GetInstance().Register<TksResource>(std::make_shared<TksLoader>());
 		/** リソースマネージャーを起動 */
 		ResourceManager::GetInstance().Start();
+		/** トゥーンシェーダーのグローバル設定を有効化 */
+		//ModelRender::SetToonGlobalEnabled(true);
 	}
 
 

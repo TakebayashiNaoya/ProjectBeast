@@ -112,49 +112,29 @@ namespace nsK2EngineLow {
 			m_meshParts.QueryMeshAndDescriptorHeap(queryFunc);
 		}
 		/// <summary>
-		/// アルベドマップを変更。
+		/// モデルの乗算カラーを設定する。
 		/// </summary>
-		/// <remarks>
-		/// この関数を呼び出すとディスクリプタヒープの再構築が行われるため、重い処理です。
-		/// 毎フレーム呼び出す必要がない場合は呼び出さないようにしてください。
-		/// </remarks>
-		/// <param name="materialName">変更したいマテリアルの名前</param>
-		/// <param name="albedoMap">アルベドマップ</param>
-		void ChangeAlbedoMap(const char* materialName, Texture& albedoMap);
-		/// <summary>
-		/// モデルの全マテリアルに乗算カラーを設定する。
-		/// </summary>
-		/// <param name="mulColor">乗算カラー</param>
 		void SetMulColor(const Vector4& mulColor)
 		{
 			m_meshParts.SetMulColor(mulColor);
 		}
 		/// <summary>
-		/// ユーザー拡張の定数バッファ（b2）のデータポインタをInit後に差し替える。
-		/// NOTE: OcclusionDitherManagerからRegister時に呼ばれる。
-		///       次のDraw()からdataの中身が自動でGPUに転送される。
+		/// ユーザー拡張の定数バッファ（b2）のデータポインタを差し替える。
 		/// </summary>
-		/// <param name="data">新しいデータポインタ</param>
 		void SetExpandData2(void* data)
 		{
 			m_meshParts.SetExpandData2(data);
 		}
 		/// <summary>
-		/// ユーザー拡張の定数バッファ（b3）のデータポインタをInit後に差し替える。
-		/// NOTE: OcclusionDitherManagerからRegister時に呼ばれる。
-		///       次のDraw()からdataの中身が自動でGPUに転送される。
+		/// ユーザー拡張の定数バッファ（b3）のデータポインタを差し替える。
 		/// </summary>
-		/// <param name="data">新しいデータポインタ</param>
 		void SetExpandData3(void* data)
 		{
 			m_meshParts.SetExpandData3(data);
 		}
 		/// <summary>
-		/// ユーザー拡張の定数バッファ（b4）のデータポインタをInit後に差し替える。
-		/// NOTE: ModelRender::SetDitherAlpha()経由で呼ばれる。
-		///       次のDraw()からdataの中身が自動でGPUに転送される。
+		/// ユーザー拡張の定数バッファ（b4）のデータポインタを差し替える。
 		/// </summary>
-		/// <param name="data">新しいデータポインタ</param>
 		void SetExpandData4(void* data)
 		{
 			m_meshParts.SetExpandData4(data);

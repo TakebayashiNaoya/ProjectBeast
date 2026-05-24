@@ -101,75 +101,32 @@ namespace nsBeastEngine
 
 	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, int numInstance)
 	{
-		if (numInstance == 0) { return; }
-		m_meshParts.Draw(
-			rc,
-			m_worldMatrix,
-			g_camera3D->GetViewMatrix(),
-			g_camera3D->GetProjectionMatrix(),
-			numInstance
-		);
-	}
-
-
-	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, Camera& camera, int numInstance)
-	{
-		if (numInstance == 0) { return; }
-		m_meshParts.Draw(
-			rc,
-			m_worldMatrix,
-			camera.GetViewMatrix(),
-			camera.GetProjectionMatrix(),
-			numInstance
-		);
-	}
-
-
-	void BeastModel::Draw(
-		nsK2EngineLow::RenderContext& rc,
-		const Matrix& viewMatrix,
-		const Matrix& projMatrix,
-		int numInstance
-	)
-	{
-		if (numInstance == 0) { return; }
-		m_meshParts.Draw(
-			rc,
-			m_worldMatrix,
-			viewMatrix,
-			projMatrix,
-			numInstance
-		);
-	}
-
-
-	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, const Frustum& frustum, int numInstance)
-	{
-		if (numInstance == 0) { return; }
+		if (!m_isInited)
+		{
+			return;
+		}
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
 			g_camera3D->GetViewMatrix(),
 			g_camera3D->GetProjectionMatrix(),
 			numInstance,
-			&frustum
+			nullptr
 		);
 	}
 
 
-	void BeastModel::Draw(
-		nsK2EngineLow::RenderContext& rc,
-		Camera& camera,
-		const Frustum& frustum,
-		int numInstance
-	)
+	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, const Frustum& frustum, int numInstance)
 	{
-		if (numInstance == 0) { return; }
+		if (!m_isInited)
+		{
+			return;
+		}
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
-			camera.GetViewMatrix(),
-			camera.GetProjectionMatrix(),
+			g_camera3D->GetViewMatrix(),
+			g_camera3D->GetProjectionMatrix(),
 			numInstance,
 			&frustum
 		);
