@@ -63,6 +63,10 @@ namespace nsK2EngineLow {
 			D3D12_CULL_MODE cullMode
 		);
 		/// <summary>
+		/// スケルトンをバインド。
+		/// </summary>
+		void BindSkeleton(Skeleton& skeleton);
+		/// <summary>
 		/// 描画。
 		/// </summary>
 		void Draw(
@@ -70,11 +74,8 @@ namespace nsK2EngineLow {
 			const Matrix& mWorld,
 			const Matrix& mView,
 			const Matrix& mProj,
-			int numInstance);
-		/// <summary>
-		/// スケルトンを関連付ける。
-		/// </summary>
-		void BindSkeleton(Skeleton& skeleton);
+			int numInstance
+		);
 		/// <summary>
 		/// メッシュに対して問い合わせを行う。
 		/// </summary>
@@ -135,6 +136,8 @@ namespace nsK2EngineLow {
 		/// マテリアルを再初期化。
 		/// </summary>
 		void ReInitMaterials(const MaterialReInitData& reInitData);
+
+
 	private:
 		/// <summary>
 		/// tkmメッシュからメッシュを作成。

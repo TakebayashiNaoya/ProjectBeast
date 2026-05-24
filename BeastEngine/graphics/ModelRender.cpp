@@ -10,6 +10,9 @@
 
 namespace nsBeastEngine
 {
+	bool ModelRender::s_isToonGlobalEnabled = false;
+
+
 	ModelRender::ModelRender()
 		: m_position(Vector3::Zero)
 		, m_scale(Vector3::One)
@@ -30,6 +33,15 @@ namespace nsBeastEngine
 		m_model.SetMulColor(mulColor);
 		m_renderToGBufferModel->SetMulColor(mulColor);
 		m_forwardRenderModel->SetMulColor(mulColor);
+
+		if (m_toonModel != nullptr)
+		{
+			m_toonModel->SetMulColor(mulColor);
+		}
+		if (m_outlineModel != nullptr)
+		{
+			m_outlineModel->SetMulColor(mulColor);
+		}
 	}
 
 
@@ -55,6 +67,15 @@ namespace nsBeastEngine
 		bool islighting,
 		EnModelUpAxis enModelUpAxiz)
 	{
+		// グローバルフラグが有効、かつフォワードレンダリング指定でない場合のみ
+		// 個別フラグに反映する。
+		// SetForwardRendering(true)を呼んでいるモデル（SkyCubeなど）は
+		// 独自の描画パスを持つためトゥーンの対象外とする。
+		if (s_isToonGlobalEnabled && !m_isForwardRender)
+		{
+			m_isToonEnabled = true;
+		}
+
 		// スケルトン初期化
 		InitSkeleton(filePath);
 		m_skeletonRef = &m_skeleton;
@@ -100,6 +121,12 @@ namespace nsBeastEngine
 			InitRenderToGBufferModel(modelInitData);
 		}
 
+		// トゥーン有効なら追加モデルを初期化する
+		if (IsToonEnabled())
+		{
+			InitToonModels(modelInitData);
+		}
+
 		// スケルトンを持つか記録する
 		m_hasSkeleton = m_skeletonRef->IsInited();
 
@@ -114,6 +141,13 @@ namespace nsBeastEngine
 		AnimationClip* animationeClips,
 		int numAnimationClips)
 	{
+		// グローバルフラグが有効、かつフォワードレンダリング指定でない場合のみ
+		// 個別フラグに反映する。
+		if (s_isToonGlobalEnabled && !m_isForwardRender)
+		{
+			m_isToonEnabled = true;
+		}
+
 		// 外部ロード済みデータをローカルに反映
 		m_animationClips = animationeClips;
 		m_numAnimationClips = numAnimationClips;
@@ -149,17 +183,17 @@ namespace nsBeastEngine
 			InitRenderToGBufferModel(modelInitData);
 		}
 
+		// トゥーン有効なら追加モデルを初期化する
+		if (IsToonEnabled())
+		{
+			InitToonModels(modelInitData);
+		}
+
 		// アニメーション初期化
 		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr)
 		{
 			m_animation.Init(*m_skeletonRef, m_animationClips, numAnimationClips);
 		}
-
-		// スケルトンを持つか記録する
-		m_hasSkeleton = (m_skeletonRef != nullptr) && m_skeletonRef->IsInited();
-
-		// ローカルAABBをtkmから計算する（スケルトンなしの場合に使用）
-		CalcLocalAABBFromTkm(initData.m_tkmFilePath);
 
 		// スケルトンを持つか記録する
 		m_hasSkeleton = (m_skeletonRef != nullptr) && m_skeletonRef->IsInited();
@@ -204,6 +238,50 @@ namespace nsBeastEngine
 		gBufferInitData.m_expandConstantBufferSize4 = sizeof(SModelDitherCb);
 
 		m_renderToGBufferModel->Init(gBufferInitData);
+	}
+
+
+	void ModelRender::InitToonModels(const ModelInitData& baseInitData)
+	{
+		m_toonModel = std::make_unique<BeastModel>();
+		m_outlineModel = std::make_unique<BeastModel>();
+
+		// ----- トゥーンモデル（toon.fx、フォワードパスで描画） -----
+		ModelInitData toonInitData = baseInitData;
+
+		toonInitData.m_fxFilePath = "Assets/shader/toon.fx";
+		toonInitData.m_vsEntryPointFunc = "VSMain";
+		toonInitData.m_vsSkinEntryPointFunc = "VSMainSkin";
+		toonInitData.m_psEntryPointFunc = "PSMain";
+
+		// フォワードレンダリング用カラーバッファフォーマット
+		toonInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+		// b2にトゥーンパラメータを設定する
+		toonInitData.m_expandConstantBuffer2 = &m_toonCb;
+		toonInitData.m_expandConstantBufferSize2 = sizeof(SToonCb);
+
+		m_toonModel->Init(toonInitData);
+
+		// ----- アウトラインモデル（outline.fx、前面カリングで背面だけ描画） -----
+		ModelInitData outlineInitData = baseInitData;
+
+		outlineInitData.m_fxFilePath = "Assets/shader/outline.fx";
+		outlineInitData.m_vsEntryPointFunc = "VSMain";
+		outlineInitData.m_vsSkinEntryPointFunc = "VSMainSkin";
+		outlineInitData.m_psEntryPointFunc = "PSMain";
+
+		// フォワードレンダリング用カラーバッファフォーマット
+		outlineInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+		// 背面法線押し出しのため前面をカリングする
+		outlineInitData.m_cullMode = D3D12_CULL_MODE_FRONT;
+
+		// b2にアウトラインパラメータを設定する
+		outlineInitData.m_expandConstantBuffer2 = &m_outlineCb;
+		outlineInitData.m_expandConstantBufferSize2 = sizeof(SOutlineCb);
+
+		m_outlineModel->Init(outlineInitData);
 	}
 
 
@@ -258,6 +336,15 @@ namespace nsBeastEngine
 		m_renderToGBufferModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_forwardRenderModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+
+		if (m_toonModel != nullptr)
+		{
+			m_toonModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		}
+		if (m_outlineModel != nullptr)
+		{
+			m_outlineModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		}
 	}
 
 
@@ -402,15 +489,17 @@ namespace nsBeastEngine
 	{
 		if (!m_visible) return;
 
-		if (!m_isForwardRender)
+		if (IsToonEnabled() || m_isForwardRender)
 		{
-			// ディファードレンダリングで描画するなら
-			g_renderingEngine->AddDeferredModelList(this);
+			// トゥーン有効またはフォワード指定: フォワードリストに登録する
+			// トゥーン有効時はGBufferへの書き込みをスキップし、
+			// フォワードパスの中でtoon.fx・outline.fxで描画する
+			g_renderingEngine->AddForwardModelList(this);
 		}
 		else
 		{
-			// フォワードレンダリングで描画するなら
-			g_renderingEngine->AddForwardModelList(this);
+			// ディファードレンダリングで描画するなら
+			g_renderingEngine->AddDeferredModelList(this);
 		}
 	}
 
@@ -422,13 +511,27 @@ namespace nsBeastEngine
 
 		const Frustum& frustum = g_renderingEngine->GetFrustum();
 
-		/** フォワードレンダリング用のモデルが有効な場合はそちらを描画し、そうでない場合は通常のモデルを描画する */
-		if (m_isForwardRender)
+		if (IsToonEnabled())
 		{
+			// トゥーン有効: GBufferへの書き込みをスキップし、フォワードパスで描画する
+			// アウトラインを先に描画して、トゥーンモデルで上書きする
+			if (m_outlineModel != nullptr)
+			{
+				m_outlineModel->Draw(rc, frustum, m_maxInstance);
+			}
+			if (m_toonModel != nullptr)
+			{
+				m_toonModel->Draw(rc, frustum, m_maxInstance);
+			}
+		}
+		else if (m_isForwardRender)
+		{
+			// トゥーン無効・フォワード: 通常のフォワード描画
 			m_forwardRenderModel->Draw(rc, frustum, m_maxInstance);
 		}
 		else
 		{
+			// トゥーン無効・ディファード: 通常のGBuffer描画
 			m_renderToGBufferModel->Draw(rc, frustum, m_maxInstance);
 		}
 	}
