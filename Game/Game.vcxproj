@@ -303,6 +303,7 @@
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\Animation\UIAnimation.cpp" />
+    <ClCompile Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp" />
@@ -442,6 +443,7 @@
     <ClInclude Include="Source\UI\Animation\UIAnimation.h" />
     <ClInclude Include="Source\UI\Animation\UIAnimationFactory.h" />
     <ClInclude Include="Source\UI\Animation\UIAnimationParameter.h" />
+    <ClInclude Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h" />
