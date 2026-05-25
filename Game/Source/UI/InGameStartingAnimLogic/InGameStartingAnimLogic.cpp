@@ -15,7 +15,10 @@ namespace app
 	namespace ui
 	{
 		InGameStartingAnimLogic::InGameStartingAnimLogic()
-			: m_uiParts{}
+			: m_totalSize(0)
+			, m_iconNames{}
+			, m_digitNames{}
+			, m_uiParts{}
 			, m_menu(nullptr)
 			, m_startOffset(Vector3::Zero)
 			, m_animState(AnimState::NotStarted)

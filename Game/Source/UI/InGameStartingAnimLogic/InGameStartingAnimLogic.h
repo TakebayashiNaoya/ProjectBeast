@@ -48,7 +48,7 @@ namespace app
 
 		public:
 			/** @brief ゲーム開始時のアニメーションが開始したかどうか */
-			bool IsStartedAnimation() const { return m_animState != AnimState::NotStarted; }
+			bool IsAnimationStarted() const { return m_animState != AnimState::NotStarted; }
 			/** @brief ゲーム開始時のアニメーションが終了したかどうか */
 			bool IsAnimationFinished() const { return m_animState == AnimState::Finished; }
 
