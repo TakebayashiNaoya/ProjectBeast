@@ -82,6 +82,9 @@
     <Filter Include="Source\Actor\Stage">
       <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\InGameButton">
+      <UniqueIdentifier>{6cf23173-7acb-4026-9850-4f2cb0624d76}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\UI\InGameTimer">
       <UniqueIdentifier>{1a5286f1-26e8-433a-86b8-dd21bbc4ef60}</UniqueIdentifier>
     </Filter>
@@ -406,9 +409,6 @@
     <ClCompile Include="Source\UI\Model\AchievementAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Menus\InGameButtonMenu.cpp">
-      <Filter>Source\UI\Menus</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Menus\CPReactionSystem.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -447,6 +447,9 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectStatus.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp">
+      <Filter>Source\UI\InGameButton</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp">
       <Filter>Source\UI\InGameTimer</Filter>
@@ -786,9 +789,6 @@
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Menus\InGameButtonMenu.h">
-      <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Model\MiniMapParameter.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
@@ -839,6 +839,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
       <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h">
+      <Filter>Source\UI\InGameButton</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h">
       <Filter>Source\UI\InGameTimer</Filter>
