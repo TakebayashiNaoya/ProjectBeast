@@ -12,13 +12,48 @@
                 "rotation":0,
                 "color":[255,255,255,120]
             },
+            
+            {
+                "type":"UIIcon",
+                "name":"PauseCloseBackIcon",
+                "asset":"Assets/spriteData/UI/Button/PauseScreen/PauseButton.dds",
+                "width":200,
+                "height":70,
+                "position":[160,-400,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,120]
+            },
+            {
+                "type":"UIIcon",
+                "name":"PauseEnterBackIcon",
+                "asset":"Assets/spriteData/UI/Button/PauseScreen/PauseButton.dds",
+                "width":200,
+                "height":70,
+                "position":[600, -400, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,120]
+            },
+            {
+                "type":"UIIcon",
+                "name":"PauseSelectBackIcon",
+                "asset":"Assets/spriteData/UI/Button/PauseScreen/PauseButton.dds",
+                "width":200,
+                "height":70,
+                "position":[ 380, -400, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,120]
+            },
+
             {
                 "type":"UIIcon",
                 "name":"UpDownIcon",
                 "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_dpad_round_vertical.dds",
                 "width":60,
                 "height":60,
-                "position":[ 280, -400, 0],
+                "position":[ 320, -400, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -29,7 +64,7 @@
                 "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_view.dds",
                 "width":60,
                 "height":60,
-                "position":[ 80, -400, 0],
+                "position":[ 100, -400, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -40,7 +75,7 @@
                 "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_a.dds",
                 "width":60,
                 "height":60,
-                "position":[ 460, -400, 0],
+                "position":[ 540, -400, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -51,10 +86,10 @@
                 "asset":"Assets/spriteData/UI/TextSprite/EnterText.dds",
                 "width":90,
                 "height":60,
-                "position":[ 530, -400, 0],
+                "position":[ 620, -400, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[0,0,0,255]
             },
             {
                 "type":"UIIcon",
@@ -62,10 +97,10 @@
                 "asset":"Assets/spriteData/UI/TextSprite/CloseText.dds",
                 "width":95,
                 "height":50,
-                "position":[ 160, -400, 0],
+                "position":[ 180, -400, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[0,0,0,255]
             },
             {
                 "type":"UIIcon",
@@ -73,12 +108,11 @@
                 "asset":"Assets/spriteData/UI/TextSprite/SelectText.dds",
                 "width":90,
                 "height":50,
-                "position":[ 360, -400, 0],
+                "position":[ 400, -400, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 0, 0, 0, 255]
             },
-
 
             {
                 "type":"UIButton",
@@ -89,7 +123,7 @@
                 "position":[0,100,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,120]
+                "color":[181,239,249,120]
             },
             {
                 "type":"UIButton",
@@ -100,7 +134,7 @@
                 "position":[0,-20,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,120]
+                "color":[181,239,249,120]
             },
             {
                 "type":"UIButton",
@@ -111,7 +145,7 @@
                 "position":[0,-140,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,120]
+                "color":[181,239,249,120]
             },
             {
                 "type":"UIButton",
@@ -122,7 +156,7 @@
                 "position":[0,-260,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,120]
+                "color":[181,239,249,120]
             },
 
 
@@ -135,7 +169,7 @@
                 "position":[0,280,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[16,49,87,255]
             },
             {
                 "type":"UIIcon",
@@ -146,7 +180,7 @@
                 "position":[0,100,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[16,49,87,255]
             },
             {
                 "type":"UIIcon",
@@ -157,7 +191,7 @@
                 "position":[5,-20,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[16,49,87,255]
             },
             {
                 "type":"UIIcon",
@@ -168,7 +202,7 @@
                 "position":[0,-140,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[16,49,87,255]
             },
             {
                 "type":"UIIcon",
@@ -179,7 +213,7 @@
                 "position":[0,-260,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[16,49,87,255]
             }
         ]
     }
