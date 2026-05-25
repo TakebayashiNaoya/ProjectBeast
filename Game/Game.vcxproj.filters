@@ -88,8 +88,14 @@
     <Filter Include="Source\UI\InGameTimer">
       <UniqueIdentifier>{1a5286f1-26e8-433a-86b8-dd21bbc4ef60}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\RemainingChild">
+      <UniqueIdentifier>{761969bc-a80d-46bd-b94a-fd6e027c74ef}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\UI\InGameStartingAnimLogic">
       <UniqueIdentifier>{45839254-7808-43c3-a769-ff8baf219a91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\MiniMap">
+      <UniqueIdentifier>{4948fc8c-fd5e-4b23-b2dd-3fcfeaa6d56b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -328,9 +334,6 @@
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Menus\RemainingChildMenu.cpp">
-      <Filter>Source\UI\Menus</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Menus\SearchMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -364,9 +367,6 @@
     <ClCompile Include="Source\UI\Menus\InGameAchievementMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Menus\MiniMapMenu.cpp">
-      <Filter>Source\UI\Menus</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -395,9 +395,6 @@
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\Model\SearchStatus.cpp">
-      <Filter>Source\UI\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Model\MiniMapStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\PBRStatus.cpp">
@@ -442,9 +439,6 @@
     <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp">
       <Filter>Source\UI\WpWarning</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Model\RemainingAnimStatus.cpp">
-      <Filter>Source\UI\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectParameter.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClCompile>
@@ -457,8 +451,20 @@
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp">
       <Filter>Source\UI\InGameTimer</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\RemainingChild\RemainingAnimStatus.cpp">
+      <Filter>Source\UI\RemainingChild</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp">
+      <Filter>Source\UI\RemainingChild</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp">
       <Filter>Source\UI\InGameStartingAnimLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp">
+      <Filter>Source\UI\MiniMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp">
+      <Filter>Source\UI\MiniMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -696,9 +702,6 @@
     <ClInclude Include="Source\UI\Menus\PBWakingUpTimerMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Menus\RemainingChildMenu.h">
-      <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Menus\SearchMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
@@ -730,9 +733,6 @@
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\InGameAchievementMenu.h">
-      <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Menus\MiniMapMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\PauseScreenMenu.h">
@@ -795,12 +795,6 @@
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Model\MiniMapParameter.h">
-      <Filter>Source\UI\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Model\MiniMapStatus.h">
-      <Filter>Source\UI\Model</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Menus\CPReactionMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
@@ -814,9 +808,6 @@
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h">
-      <Filter>Source\UI\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Model\RemainingAnimStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\Nature\OceanParameter.h">
@@ -852,8 +843,23 @@
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h">
       <Filter>Source\UI\InGameTimer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\RemainingChild\RemainingChildMenu.h">
+      <Filter>Source\UI\RemainingChild</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h">
+      <Filter>Source\UI\RemainingChild</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.h">
       <Filter>Source\UI\InGameStartingAnimLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h">
+      <Filter>Source\UI\MiniMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\MiniMap\MiniMapMenu.h">
+      <Filter>Source\UI\MiniMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h">
+      <Filter>Source\UI\MiniMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
