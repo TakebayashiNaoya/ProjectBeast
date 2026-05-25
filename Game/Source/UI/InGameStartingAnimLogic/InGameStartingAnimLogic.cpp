@@ -28,7 +28,8 @@ namespace app
 			MenuBase* menu,
 			const std::vector<std::string> iconNames,
 			const std::vector<std::string> digitNames,
-			const Vector3 startOffset
+			const Vector3 startOffset,
+			float duration
 		)
 		{
 			if (menu == nullptr) return;
@@ -92,7 +93,8 @@ namespace app
 				bool allFinished = true;
 				ForEach([&](UIBase* ui)
 					{
-						if (ui->IsPlayAnimation()) allFinished = false;
+						auto* anim = ui->FindAnimation(Hash32("GameStartFadeIn"));
+						if (anim && anim->IsPlayAnimation()) allFinished = false;
 					});
 				if (allFinished) m_animState = AnimState::Finished;
 				break;

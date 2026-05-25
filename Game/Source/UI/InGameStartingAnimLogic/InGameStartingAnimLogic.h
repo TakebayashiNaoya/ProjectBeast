@@ -30,12 +30,14 @@ namespace app
 			 * @param iconNames アイコンUIの名前
 			 * @param digitNames 数字UIの名前
 			 * @param startOffset 開始位置のオフセット
+			 * @param duration アニメーションの持続時間
 			 */
 			void Initialize(
 				MenuBase* menu,
 				const std::vector<std::string> iconNames,
 				const std::vector<std::string> digitNames,
-				const Vector3 startOffset
+				const Vector3 startOffset,
+				float duration = 1.0f
 			);
 
 			/**
