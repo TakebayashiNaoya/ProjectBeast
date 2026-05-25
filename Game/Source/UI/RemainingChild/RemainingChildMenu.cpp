@@ -26,6 +26,21 @@ namespace app
 
 		void RemainingChildMenu::Update()
 		{
+			if (!m_startingAnimLogic.IsAnimationStarted())
+			{
+				// ゲーム開始時のアニメーションを更新する。
+				m_startingAnimLogic.Initialize(
+					this,
+					{ "ChildPenguinIcon", "SlashIcon", "BgIcon" },
+					{ "RemainingNum", "TotalNum" },
+					Vector3(-400.0f, 0.0f, 0.0f)
+				);
+			}
+			if (!m_startingAnimLogic.IsAnimationFinished())
+			{
+				m_startingAnimLogic.Update();
+			}
+
 			auto* icon = GetUI<UIIcon>(Hash32("ChildPenguinIcon"));
 			if (icon) icon->m_isDraw = true;
 
@@ -90,7 +105,7 @@ namespace app
 					// 座標アニメーションを登録。(バウンドあり)
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
 
-					
+
 					// シーケンスをクリア。
 					seq.Clear();
 
@@ -109,7 +124,7 @@ namespace app
 							, []() {}
 							, []() {}
 						);
-					
+
 					// シーケンスを再生。
 					seq.Play(remainDigit);
 				}
@@ -119,7 +134,7 @@ namespace app
 				{
 					// 1番目にアクセス。
 					auto& seq = m_sequences[static_cast<int>(SeqType::RemainMinus)];
-					
+
 					// 救助数減少アニメーションを消去。
 					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
 					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
@@ -142,7 +157,7 @@ namespace app
 								// SEを再生。
 								SoundManager::Get().PlaySE(enSoundKind_RemainORTotalMinus);
 							},
-							  []() {})
+							[]() {})
 						// アニメーション完了後にSEを停止する。
 						.Add(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY, 0.0f
 							, []() {}
@@ -152,7 +167,7 @@ namespace app
 					// シーケンスを再生。
 					seq.Play(remainDigit);
 				}
-				
+
 				m_childNum = num;
 			}
 		}
@@ -165,7 +180,7 @@ namespace app
 
 			// Digitがないなら処理しない。
 			if (!totalDigit) return;
-			
+
 			// 今の総数と異なっていたら
 			if (m_totalNum != num)
 			{
@@ -212,6 +227,21 @@ namespace app
 		}
 
 
+		void RemainingChildMenu::UpdateGameStartingAnimation()
+		{
+			const char* iconNames[] = {
+				"ChildPenguinIcon",
+				"SlashIcon",
+				"BgIcon"
+			};
+
+			const char* digitNames[] = {
+				"RemainingNum",
+				"TotalNum"
+			};
+		}
+
+
 		void RemainingChildMenu::InitializeLogic()
 		{
 			// 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのwため）
@@ -223,10 +253,10 @@ namespace app
 
 			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
 			if (bgIcon) bgIcon->m_isDraw = false;
-			
+
 			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
 			if (digit) digit->m_isDraw = false;
-			
+
 			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
 			if (totalDigit) totalDigit->m_isDraw = false;
 		}
