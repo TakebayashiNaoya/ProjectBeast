@@ -21,6 +21,7 @@ namespace app
 			, m_uiParts{}
 			, m_menu(nullptr)
 			, m_startOffset(Vector3::Zero)
+			, m_duration(1.0f)
 			, m_animState(AnimState::NotStarted)
 		{}
 
@@ -35,7 +36,7 @@ namespace app
 			if (menu == nullptr) return;
 			m_menu = menu;
 			m_startOffset = startOffset;
-
+			m_duration = util::clamp(duration, 0.1f, 10.0f);
 			m_totalSize = iconNames.size() + digitNames.size();
 			m_iconNames = iconNames;
 			m_digitNames = digitNames;
@@ -72,7 +73,7 @@ namespace app
 					trsAnim->SetParameter(
 						startPos,
 						jsonPos,
-						1.0f,
+						m_duration,
 						util::EasingType::EaseInOut,
 						util::LoopMode::Once
 					);

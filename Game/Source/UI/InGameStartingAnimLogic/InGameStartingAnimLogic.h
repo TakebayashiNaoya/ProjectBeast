@@ -56,8 +56,11 @@ namespace app
 
 
 		private:
+			/** UIの合計サイズ */
 			size_t m_totalSize;
+			/** アイコンUIの名前 */
 			std::vector<std::string> m_iconNames;
+			/** 数字UIの名前 */
 			std::vector<std::string> m_digitNames;
 			/** UIパーツのリスト */
 			std::vector<UIBase*> m_uiParts;
@@ -65,6 +68,8 @@ namespace app
 			MenuBase* m_menu;
 			/** 開始位置のオフセット */
 			Vector3 m_startOffset;
+			/** アニメーションの持続時間 */
+			float m_duration;
 
 			/** ゲーム開始時のアニメーションの状態 */
 			enum class AnimState : uint8_t
