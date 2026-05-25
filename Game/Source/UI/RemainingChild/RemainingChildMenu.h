@@ -5,7 +5,10 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include "Source/UI/Model/RemainingAnimStatus.h"
+
+#include "RemainingAnimStatus.h"
+
+#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
 namespace app
@@ -27,12 +30,17 @@ namespace app
 			 * @param num 救助数
 			 */
 			void SetChildNum(const int num);
-			
+
 			/**
 			 * @brief 総子ペンギン数をアニメーションで設定
 			 * @param num 総数
 			 */
 			void SetTotalNum(const int num);
+
+
+		private:
+			/** ゲーム開始時のアニメーションを更新する */
+			void UpdateGameStartingAnimation();
 
 
 		private:
@@ -54,6 +62,9 @@ namespace app
 			int m_childNum;
 			/** ステージ上の総ペンギン数 */
 			int m_totalNum;
+
+			/** ゲーム開始時のアニメーションロジック */
+			InGameStartingAnimLogic m_startingAnimLogic;
 		};
 	}
 }
