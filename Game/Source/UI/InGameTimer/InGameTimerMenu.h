@@ -5,7 +5,8 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include <map>
+
+#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
 namespace app
@@ -33,12 +34,6 @@ namespace app
 
 
 		private:
-			/**
-			 * @brief ゲーム開始時のアニメーションを更新する
-			 */
-			void UpdateGameStartingAnimation();
-
-
 			/**
 			 * @brief タイムの数字を更新するため
 			 * @brief Update内を肥大化させない為に分割
@@ -72,14 +67,7 @@ namespace app
 			float m_slopeTimer;
 
 
-			// ゲーム開始時のアニメーションのフラグ
-
-			/** 開始されたか */
-			bool m_isStartedGameStartingAnimation;
-			/** 再生中か */
-			bool m_isPlayingGameStartingAnimation;
-			/** 終了したか */
-			bool m_isFinishedGameStartingAnimation;
+			InGameStartingAnimLogic m_gameStartingAnimLogic;
 		};
 	}
 }

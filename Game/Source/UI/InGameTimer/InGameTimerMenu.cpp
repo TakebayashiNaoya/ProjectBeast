@@ -54,16 +54,13 @@ namespace app
 			, m_isBlinkAnimationPlaying(false)
 			, m_isRotAnimationPlaying(false)
 			, m_isScaleAnimPlaying(false)
-			, m_isStartedGameStartingAnimation(false)
-			, m_isPlayingGameStartingAnimation(false)
-			, m_isFinishedGameStartingAnimation(false)
 		{}
 
 
 		void InGameTimerMenu::Update()
 		{
 			/** 表示状態にする */
-			const char* iconNames[] =
+			const std::vector<std::string> iconNames =
 			{
 				"InGameTimerFrameIcon",
 				"InGameTimerFrameBackGroundIcon",
@@ -73,19 +70,37 @@ namespace app
 
 			for (const auto& iconName : iconNames)
 			{
-				if (auto* icon = GetUI<UIIcon>(Hash32(iconName)))
+				if (auto* icon = GetUI<UIIcon>(Hash32(iconName.c_str())))
 				{
 					icon->m_isDraw = true;
 				}
 			}
 
 
-			/** ゲーム開始時のアニメーション更新 */
-			if (!m_isFinishedGameStartingAnimation)
+			const std::vector<std::string> digitNames =
 			{
-				UpdateGameStartingAnimation();
+				"MinutesDigits",
+				"TensPlaceDigits",
+				"OnesPlaceDigits",
+			};
 
+
+			if (!m_gameStartingAnimLogic.IsAnimationStarted())
+			{
+				m_gameStartingAnimLogic.Initialize(
+					this,
+					iconNames,
+					digitNames,
+					Vector3(0.0f, 200.0f, 0.0f)
+				);
 			}
+			if (!m_gameStartingAnimLogic.IsAnimationFinished())
+			{
+				m_gameStartingAnimLogic.Update();
+			}
+
+
+			/** ゲーム開始時のアニメーション更新 */
 
 			/** 分/秒に変換して表示(例: 0:00形式) */
 			UpdateTimerDigits();
@@ -101,7 +116,7 @@ namespace app
 		void InGameTimerMenu::InitializeLogic()
 		{
 			/** 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのため） */
-			const char* iconNames[] =
+			constexpr const char* iconNames[] =
 			{
 				"InGameTimerFrameBackGroundIcon",
 				"InGameTimerFrameIcon",
@@ -118,7 +133,7 @@ namespace app
 			}
 
 
-			const char* digitNames[] =
+			constexpr const char* digitNames[] =
 			{
 				"MinutesDigits",
 				"CloneIcon",
@@ -132,118 +147,6 @@ namespace app
 				{
 					digit->m_isDraw = false;
 				}
-			}
-		}
-
-
-		void InGameTimerMenu::UpdateGameStartingAnimation()
-		{
-			// UIの収集
-
-			constexpr const char* iconNames[] =
-			{
-				"InGameTimerFrameIcon",
-				"InGameTimerFrameBackGroundIcon",
-				"TimeClockIcon",
-				"CloneIcon"
-			};
-
-
-			constexpr const char* digitNames[] =
-			{
-				"MinutesDigits",
-				"TensPlaceDigits",
-				"OnesPlaceDigits",
-			};
-
-			std::array<UIBase*, UI_TYPE_COUNT> uiParts;
-
-			int index = 0;
-			for (const auto& iconName : iconNames)
-			{
-				uiParts.at(index) = GetUI<UIIcon>(Hash32(iconName));
-
-				index++;
-			}
-			for (const auto& digitName : digitNames)
-			{
-				uiParts.at(index) = GetUI<UIDigit>(Hash32(digitName));
-				++index;
-			}
-
-			assert(index == UI_TYPE_COUNT && "数の不一致");
-
-
-			auto ForEach = [&](auto&& func)
-				{
-					for (const auto& ui : uiParts)
-					{
-						if (ui == nullptr)continue;
-						func(ui);
-					}
-				};
-
-
-			// 状態に応じた処理
-
-			// アニメーションが開始されていなければ
-			if (!m_isStartedGameStartingAnimation)
-			{
-				constexpr float startPosY = 0.0f;
-				constexpr float endPosY = 370.0f;
-				constexpr float posZ = 0.0f;
-
-				ForEach([&](UIBase* ui)
-					{
-						const float posX = ui->m_transform.m_localTransform.m_position.x;
-						// 各UIに対して、フェードインアニメーションを登録して再生させる。
-						Vector3 startPos = Vector3(posX, startPosY, posZ);
-						Vector3 endPos = Vector3(posX, endPosY, posZ);
-						auto trsAnim = std::make_unique<UITranslateAnimation>();
-						trsAnim->SetParameter(
-							startPos,
-							endPos,
-							1.0f,
-							util::EasingType::EaseInOut,
-							util::LoopMode::Once
-						);
-						trsAnim->SetFunc([ui](const Vector3& pos)
-							{
-								ui->m_transform.m_localTransform.m_position = pos;
-							});
-						ui->AddAnimation(Hash32("GameStartFadeIn"), std::move(trsAnim));
-						ui->PlayAnimation();
-					});
-
-				m_isStartedGameStartingAnimation = true;
-				m_isPlayingGameStartingAnimation = true;
-			}
-			// アニメーションが再生中であれば
-			else if (m_isPlayingGameStartingAnimation)
-			{
-				bool allFinished = true;
-				ForEach([&](UIBase* ui)
-					{
-						if (ui->IsPlayAnimation())
-							allFinished = false;
-					});
-
-				if (allFinished)
-				{
-					m_isPlayingGameStartingAnimation = false;
-					m_isFinishedGameStartingAnimation = true;
-				}
-			}
-			// アニメーションが終了していれば
-			else if (m_isFinishedGameStartingAnimation)
-			{
-				// アニメーションが終了したら、通常の更新処理に移行する。
-				return;
-			}
-			else
-			{
-				assert(false && "想定されない状態");
-				return;
 			}
 		}
 
