@@ -148,12 +148,11 @@ namespace app
 					Vector3(-400.0f, 0.0f, 0.0f)
 				);
 			}
+			// アニメーション中の更新はここで行う。
+			// ※ SetDrawMovableIcon(false) は Map*() 群の後で呼ぶため、ここでは呼ばない。
 			if (!m_startingAnimLogic.IsAnimationFinished())
 			{
 				m_startingAnimLogic.Update();
-
-
-				SetDrawMovableIcon(false);
 			}
 
 			// ミニマップを表示しないときは、全てのアイコンを非表示にする。
@@ -196,6 +195,14 @@ namespace app
 				MapWhirlpool();
 				MapDaddyPen();
 				MapIgloo();
+			}
+
+			// アニメーション中は Map*() による isDraw の上書きを打ち消して非表示にする。
+			// @detail Map*() 内部で m_isDraw(=true) を各アイコンに書き込んだ後に上書きすることで、
+			//         開始アニメーション中に動的アイコンがマップ中央に寄って見えるバグを防ぐ。
+			if (!m_startingAnimLogic.IsAnimationFinished())
+			{
+				SetDrawMovableIcon(false);
 			}
 
 
@@ -682,6 +689,10 @@ namespace app
 				auto* bearIcon = GetUI<UIIcon>(key);
 				if (bearIcon) bearIcon->m_isDraw = isDraw;
 			}
+
+			// 親ペンギンのアイコンを非表示にする。
+			auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
+			if (daddyIcon) daddyIcon->m_isDraw = isDraw;
 		}
 
 
