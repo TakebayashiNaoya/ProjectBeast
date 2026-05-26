@@ -56,6 +56,15 @@ namespace app
 				}
 			};
 
+
+			/** カラーのα値 */
+			const Vector4 COLOR_ALPHA = { 0.0f,0.0f,0.0f,0.5f };
+			/** カラーアニメーションのスパン */
+			constexpr float COLOR_ANIM_DURATION = 0.8f;
+			/** 内部的には0 */
+			constexpr float MIN_VALUE = 0.0f;
+			/** 内部的には100 */
+			constexpr float MAX_VALUE = 100.0f;
 			/** 全体の音量のリセット値 */
 			constexpr float RESET_VOLUME_VALUE = 0.1f;
 			/** 音量の最小値 */
@@ -71,7 +80,7 @@ namespace app
 			/** 座標の幅 */
 			const float POSITION_RANGE = fabsf(RIGHT_LIMITE - LEFT_LIMITE);
 			/** 音量の変化に対するポジションの変化の値 */
-			const float DELTA_POSITION_VALUE = POSITION_RANGE / VOLUME_VALUE_CONVERTER;
+			const float VOLUME_STEP = POSITION_RANGE / VOLUME_VALUE_CONVERTER;
 
 			/**
 			 * @brief タイプに対応する SoundManager の現在音量を取得する
@@ -231,13 +240,13 @@ namespace app
 			// 十字キー右を押したとき
 			if (g_pad[0]->IsTrigger(enButtonRight))
 			{
-				volumeInt += DELTA_POSITION_VALUE;
+				volumeInt += VOLUME_STEP;
 				isChange = true;
 			}
 			// 十字キー左を押したとき
 			else if (g_pad[0]->IsTrigger(enButtonLeft))
 			{
-				volumeInt -= DELTA_POSITION_VALUE;
+				volumeInt -= VOLUME_STEP;
 				isChange = true;
 			}
 
@@ -247,7 +256,7 @@ namespace app
 			
 			if (isChange)
 			{
-				volumeInt = util::clamp<int>(volumeInt, 0, 100);
+				volumeInt = util::clamp<int>(volumeInt, MIN_VALUE, MAX_VALUE);
 				currentVolume = static_cast<float>(volumeInt) / VOLUME_VALUE_CONVERTER;
 
 				// ノブの座標を更新する。
@@ -322,7 +331,6 @@ namespace app
 
 				// SoundManagerの音量をリセットする。
 				SetVolumeToManager(SOUND_ICON_KEYS[i].type, RESET_VOLUME_VALUE);
-				SetVolumeToManager(SOUND_FRAME_KEYS[i].type, RESET_VOLUME_VALUE);
 			}
 
 			// Digitの表示も即時反映する。
@@ -372,11 +380,11 @@ namespace app
 				auto colorAnim = std::make_unique<UIColorAnimation>();
 
 				// 開始色。
-				Vector4 startColor = Vector4::White;
+				const Vector4 startColor = Vector4::White;
 				// 終了色。
-				Vector4 endColor = Vector4(0.0f, 0.0f, 0.0f, 0.5f);
+				const Vector4 endColor = COLOR_ALPHA;
 				// 間隔。
-				float duration = 0.8f;
+				float duration = COLOR_ANIM_DURATION;
 
 				// アニメーションのパラメータを設定する。
 				colorAnim->SetParameter(

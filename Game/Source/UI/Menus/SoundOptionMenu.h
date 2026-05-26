@@ -11,6 +11,9 @@ namespace app
 {
 	namespace ui
 	{
+		/**
+		 * @brief サウンドの種類
+		 */
 		enum class SoundType : uint8_t
 		{
 			Master,
@@ -20,6 +23,9 @@ namespace app
 		};
 
 
+		/**
+		 * @brief サウンドオプションの動的クラス
+		 */
 		class SoundOptionMenu : public MenuBase
 		{
 			using SoundClass = MenuBase;
@@ -28,8 +34,8 @@ namespace app
 		public:
 			SoundOptionMenu();
 
-			void Update()override;
-			void InitializeLogic()override;
+			void Update() override;
+			void InitializeLogic() override;
 
 
 		private:
@@ -44,7 +50,7 @@ namespace app
 			void UpdateKnob();
 
 			/**
-			 * @brief 選択中のアイコンのカラーを線形的に変か佐是る。
+			 * @brief 選択中のアイコンのカラーを線形的に変化させる。
 			 */
 			void UpdateColorAnim();
 
@@ -77,7 +83,7 @@ namespace app
 			 * @brief 戻るフラグ
 			 * @return 戻るフラグを取得
 			 */
-			bool IsBack()const { return m_isBack; }
+			bool IsBack() const { return m_isBack; }
 			/**
 			 * @brief 戻るフラグを設定
 			 * @param isReturn 戻るフラグ
