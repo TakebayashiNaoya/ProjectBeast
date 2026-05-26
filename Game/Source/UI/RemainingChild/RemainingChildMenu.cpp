@@ -41,26 +41,30 @@ namespace app
 				m_startingAnimLogic.Update();
 			}
 
+			// 開始アニメーション中は非表示のまま保つ。
+			// アニメーション完了前に救助が発生しても、UIが突然現れるバグを防ぐ。
+			const bool isVisible = m_startingAnimLogic.IsAnimationFinished();
+
 			auto* icon = GetUI<UIIcon>(Hash32("ChildPenguinIcon"));
-			if (icon) icon->m_isDraw = true;
+			if (icon) icon->m_isDraw = isVisible;
 
 			auto* slashIcon = GetUI<UIIcon>(Hash32("SlashIcon"));
-			if (slashIcon) slashIcon->m_isDraw = true;
+			if (slashIcon) slashIcon->m_isDraw = isVisible;
 
 			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
-			if (bgIcon) bgIcon->m_isDraw = true;
+			if (bgIcon) bgIcon->m_isDraw = isVisible;
 
 			// 残り子ペンギンの数更新
 			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
 			if (digit) {
-				digit->m_isDraw = true;
+				digit->m_isDraw = isVisible;
 				digit->SetNumber(m_childNum);
 			}
 
 			// ステージ上の総ペンギン数更新
 			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
 			if (totalDigit) {
-				totalDigit->m_isDraw = true;
+				totalDigit->m_isDraw = isVisible;
 				totalDigit->SetNumber(m_totalNum);
 			}
 
