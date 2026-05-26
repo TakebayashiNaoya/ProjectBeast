@@ -5,14 +5,15 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include <unordered_map>
-#include <memory>
 
 
 namespace app
 {
 	namespace ui
 	{
+		/**
+		 * @brief サウンドの種類
+		 */
 		enum class SoundType : uint8_t
 		{
 			Master,
@@ -22,43 +23,9 @@ namespace app
 		};
 
 
-		class SoundIcon
-		{
-		public:
-			SoundIcon(SoundType type);
-			~SoundIcon();
-			void Update();
-			void CalcRatio();
-			void SetUIIcon(UIIcon* icon);
-
-
-		private:
-			float m_currentValue;
-			float m_deltaValue;
-			SoundType m_type;
-			UIIcon* m_icon;
-			GamePad* m_gamePad;
-		};
-
-
-		class SoundDigit
-		{
-		public:
-			SoundDigit(SoundType tpye);
-			~SoundDigit();
-			void Update();
-			void Calc();
-			void SetUIDigit(UIDigit* digit);
-			void SetSoundIcon(SoundIcon* soundIcon);
-			
-
-		private:
-			SoundType m_type;
-			UIDigit* m_digit;
-			SoundIcon* m_soundIcon;
-		};
-
-
+		/**
+		 * @brief サウンドオプションの動的クラス
+		 */
 		class SoundOptionMenu : public MenuBase
 		{
 			using SoundClass = MenuBase;
@@ -67,15 +34,46 @@ namespace app
 		public:
 			SoundOptionMenu();
 
-			void Update()override;
-			void InitializeLogic()override;
+			void Update() override;
+			void InitializeLogic() override;
 
+
+		private:
+			/**
+			 * @brief 全てのDigitの表示を更新する
+			 */
+			void UpdateDigits();
+
+			/**
+			 * @brief 現在選択中のノブアイコンの入力処理と音量反映
+			 */
+			void UpdateKnob();
+
+			/**
+			 * @brief 選択中のアイコンのカラーを線形的に変化させる。
+			 */
+			void UpdateColorAnim();
+
+			/**
+			 * @brief 値と座標を初期値に戻す
+			 */
+			void Reset();
 
 			/**
 			 * @brief サウンドメニューで扱うアイコンの情報を初期化する
 			 */
 			void InitializeIcon();
-			
+
+			/**
+			 * @brief サウンドメニューで扱うフレームの情報を初期化する
+			 */
+			void InitializeFrame();
+
+			/**
+			 * @brief サウンドメニューで扱うアイコンのアニメーションを登録する用
+			 */
+			void InitializeIconAnim();
+
 			/**
 			 * @brief サウンドメニューで扱う数値の情報を初期化する
 			 */
@@ -85,25 +83,20 @@ namespace app
 			 * @brief 戻るフラグ
 			 * @return 戻るフラグを取得
 			 */
-			bool IsBack()const { return m_isBack; }
+			bool IsBack() const { return m_isBack; }
 			/**
-			 * @biref 戻るフラグを設定
+			 * @brief 戻るフラグを設定
 			 * @param isReturn 戻るフラグ
 			 */
 			void SetBack(bool isBack) { m_isBack = isBack; }
 			
 
 		private:
+			/** 現在値 */
+			float m_currentValue;
 			/** 戻るボタンのフラグ */
 			bool m_isBack;
 			SoundType m_currentSoundType;
-
-
-			using Icon = std::unique_ptr<SoundIcon>;
-			using Digit = std::unique_ptr<SoundDigit>;
-			using Key = uint32_t;
-			std::unordered_map<Key, Icon>m_soundIconMap;
-			std::unordered_map<Key, Digit> m_soundDigitMap;
 		};
 	}
 }
