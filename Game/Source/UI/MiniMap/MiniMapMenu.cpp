@@ -5,10 +5,10 @@
  */
 #include "stdafx.h"
 #include "MiniMapMenu.h"
-#include "Source/Actor/Character/penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Actor/Character/penguin/ChildPenguin/ChildPenguin.h"
-#include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Nature/Whirlpool.h"
@@ -139,6 +139,21 @@ namespace app
 
 		void MiniMapMenu::Update()
 		{
+			if (!m_startingAnimLogic.IsAnimationStarted())
+			{
+				m_startingAnimLogic.Initialize(
+					this,
+					{ "MiniMapIcon", "MiniMapFrameIcon", "DaddyIcon" },
+					{},
+					Vector3(-400.0f, 0.0f, 0.0f)
+				);
+			}
+			// アニメーション中の更新はここで行う。
+			if (!m_startingAnimLogic.IsAnimationFinished())
+			{
+				m_startingAnimLogic.Update();
+			}
+
 			// ミニマップを表示しないときは、全てのアイコンを非表示にする。
 			if (!m_isDraw)
 			{
@@ -152,66 +167,7 @@ namespace app
 				auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
 				if (daddyIcon) daddyIcon->m_isDraw = false;
 
-				// シロクマの巣のアイコンを全て非表示にする。
-				for (const auto& key : BEAR_NEST_ICON_KEYS)
-				{
-					auto* bearNestsIcon = GetUI<UIIcon>(key);
-					if (bearNestsIcon) bearNestsIcon->m_isDraw = false;
-				}
-
-				// 渦潮のアイコンを全て非表示にする。
-				for (const auto& key : WHIRLPOOL_ICON_KEYS)
-				{
-					auto* whirlpoolIcon = GetUI<UIIcon>(key);
-					if (whirlpoolIcon) whirlpoolIcon->m_isDraw = false;
-				}
-
-				// イグルーのアイコンを全て非表示にする。
-				for (const auto& key : IGLOO_ICON_KEYS)
-				{
-					auto* iglooIcon = GetUI<UIIcon>(key);
-					if (iglooIcon) iglooIcon->m_isDraw = false;
-				}
-
-				// シロクマの巣のアイコンを全て非表示にする。
-				for (const auto& key : BEAR_NEST_ICON_KEYS)
-				{
-					auto* bearNestsIcon = GetUI<UIIcon>(key);
-					if (bearNestsIcon) bearNestsIcon->m_isDraw = false;
-				}
-
-				// 渦潮のアイコンを全て非表示にする。
-				for (const auto& key : WHIRLPOOL_ICON_KEYS)
-				{
-					auto* whirlpoolIcon = GetUI<UIIcon>(key);
-					if (whirlpoolIcon) whirlpoolIcon->m_isDraw = false;
-				}
-
-				// イグルーのアイコンを全て非表示にする。
-				for (const auto& key : IGLOO_ICON_KEYS)
-				{
-					auto* iglooIcon = GetUI<UIIcon>(key);
-					if (iglooIcon) iglooIcon->m_isDraw = false;
-				}
-
-				// 子ペンギンのアイコンを全て非表示にする。
-				for (const auto& info : MINIMAP_ICON_KEYS)
-				{
-					// アイコンの数だけループして、全てのアイコンを非表示。
-					for (uint8_t i = 0; i < CHILD_PEN_TYPE_ICON; ++i)
-					{
-						IconKey key = info.key + std::to_string(i);
-						auto* childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
-						if (childIcon) childIcon->m_isDraw = false;
-					}
-				}
-
-				// シロクマのアイコンを全て非表示にする。
-				for (auto key : POLAR_BEAR_ICON_KEYS)
-				{
-					auto* bearIcon = GetUI<UIIcon>(key);
-					if (bearIcon) bearIcon->m_isDraw = false;
-				}
+				SetDrawMovableIcon(false);
 
 				MenuBase::Update();
 				return;
@@ -238,6 +194,14 @@ namespace app
 				MapWhirlpool();
 				MapDaddyPen();
 				MapIgloo();
+			}
+
+			// アニメーション中は Map*() による isDraw の上書きを打ち消して非表示にする。
+			// @detail Map*() 内部で m_isDraw(=true) を各アイコンに書き込んだ後に上書きすることで、
+			//         開始アニメーション中に動的アイコンがマップ中央に寄って見えるバグを防ぐ。
+			if (!m_startingAnimLogic.IsAnimationFinished())
+			{
+				SetDrawMovableIcon(false);
 			}
 
 
@@ -273,7 +237,7 @@ namespace app
 			rot.Apply(diff);
 
 			diff.Normalize();
-			
+
 			// マップの大きさと距離の限界値から、回転させた差分をマップ座標に変換するための倍率を計算する。
 			const float mapRadius = m_miniMapStatus->GetRadius();
 			const float mapLimitDis = m_miniMapStatus->GetLimitDistance();
@@ -333,7 +297,7 @@ namespace app
 
 				// シロクマの巣がマップに表示できる数を超えたら描画しない。
 				if (index >= BEAR_NEST_ICON_SIZE) return;
-				
+
 				auto* bearNestIcon = GetUI<UIIcon>(BEAR_NEST_ICON_KEYS[index]);
 				// 無いときに次のアイコンに行くためにインデックスを増加させる。
 				if (!bearNestIcon) {
@@ -375,50 +339,50 @@ namespace app
 		{
 			// 渦潮のマネージャーを取得する。
 			const auto& wrhirlpoolMgr = nature::WhirlpoolManager::GetInstance();
-			
+
 			// 渦潮のアイコンのインデックスを用意する。
 			uint32_t whirlpoolIndex = 0;
 
 			// 渦潮の数だけループさせる。
 			wrhirlpoolMgr->ForEach([&](nature::Whirlpool* whirlpool)
-			{
-				// 渦潮がマップに表示できる数を超えたら描画しない。
-				if (whirlpoolIndex >= WHIRLPOOL_ICON_SIZE) return;
+				{
+					// 渦潮がマップに表示できる数を超えたら描画しない。
+					if (whirlpoolIndex >= WHIRLPOOL_ICON_SIZE) return;
 
-				auto* whirlpoolIcon = GetUI<UIIcon>(WHIRLPOOL_ICON_KEYS[whirlpoolIndex]);
-				
-				// 無いときに次のアイコンに行くためにインデックスを増加させる。
-				if (!whirlpoolIcon) {
+					auto* whirlpoolIcon = GetUI<UIIcon>(WHIRLPOOL_ICON_KEYS[whirlpoolIndex]);
+
+					// 無いときに次のアイコンに行くためにインデックスを増加させる。
+					if (!whirlpoolIcon) {
+						whirlpoolIndex++;
+						return;
+					}
+
+					// ワールド座標をマップ座標に変換するための座標を用意。
+					const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
+					const Vector3& whirlpoolPos = whirlpool->GetTransform().m_position;
+					Vector3 mapPos = Vector3::Zero;
+
+					if (WorldPosConverterToMapPos(daddyPos, whirlpoolPos, mapPos))
+					{
+						// 座標を更新して、ミニマップの範囲内なら表示する。
+						whirlpoolIcon->m_transform.m_localTransform.m_position = mapPos;
+						whirlpoolIcon->m_isDraw = true;
+					}
+					else
+					{
+						whirlpoolIcon->m_isDraw = false;
+					}
+
+					// 渦潮のアイコンの要素数を超えないようにインデックスを増加させる。
 					whirlpoolIndex++;
-					return;
-				}
-
-				// ワールド座標をマップ座標に変換するための座標を用意。
-				const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
-				const Vector3& whirlpoolPos = whirlpool->GetTransform().m_position;
-				Vector3 mapPos = Vector3::Zero;
-				
-				if (WorldPosConverterToMapPos(daddyPos, whirlpoolPos, mapPos))
-				{
-					// 座標を更新して、ミニマップの範囲内なら表示する。
-					whirlpoolIcon->m_transform.m_localTransform.m_position = mapPos;
-					whirlpoolIcon->m_isDraw = true;
-				}
-				else
-				{
-					whirlpoolIcon->m_isDraw = false;
-				}
-
-				// 渦潮のアイコンの要素数を超えないようにインデックスを増加させる。
-				whirlpoolIndex++;
-			});
+				});
 
 			// 使われなかったアイコンを非表示にする。
 			for (uint32_t i = whirlpoolIndex; i < WHIRLPOOL_ICON_SIZE; i++)
 			{
 				auto* whirlpoolIcon = GetUI<UIIcon>(WHIRLPOOL_ICON_KEYS[i]);
 				if (whirlpoolIcon) whirlpoolIcon->m_isDraw = false;
-			 }
+			}
 		}
 
 
@@ -447,19 +411,19 @@ namespace app
 
 				// イグルーがマップに表示できる数を超えたら描画しない。
 				if (iglooIndex >= IGLOO_SIZE) return;
-				
+
 				auto* iglooIcon = GetUI<UIIcon>(IGLOO_ICON_KEYS[iglooIndex]);
-				
+
 				// 無いときに次のアイコンに行くためにインデックスを増加させる。
 				if (!iglooIcon) {
 					iglooIndex++;
 					return;
 				}
-				
+
 				// ワールド座標をマップ座標に変換するための座標を用意。
 				const Vector3 iglooPos = stageObj->GetTransform().m_position;
 				Vector3 mapPos = Vector3::Zero;
-				
+
 				if (WorldPosConverterToMapPos(daddyPos, iglooPos, mapPos))
 				{
 					// 座標を更新して、ミニマップの範囲内なら表示する。
@@ -522,8 +486,8 @@ namespace app
 
 					switch (type)
 					{
-					// タイプごとのアイコンは20個までとする。
-					// まじめ。
+						// タイプごとのアイコンは20個までとする。
+						// まじめ。
 					case app::actor::EnChildPenguinType::Serious:
 					{
 						MiniMapInfo& info = MINIMAP_ICON_KEYS[static_cast<uint8_t>(EnChildPenType::Blue)];
@@ -552,7 +516,7 @@ namespace app
 						if (info.number >= CHILD_PEN_TYPE_ICON)continue;
 						uint8_t index = info.number++;
 						IconKey key = info.key + std::to_string(index);
- 						childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
+						childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
 						break;
 					}
 
@@ -611,20 +575,20 @@ namespace app
 		void MiniMapMenu::MapPolarBear()
 		{
 			// エネミーのリストを取得。
-			const auto& enemis = app::actor::EnemyManager::GetInstance()->GetEnemies();				
-			
+			const auto& enemis = app::actor::EnemyManager::GetInstance()->GetEnemies();
+
 			// シロクマのアイコンのインデックス(要素数)。
 			int bearIconIndex = 0;
 
 			// エネミーのリスト分だけループさせる。
 			for (const auto& enemy : enemis)
-			{	
+			{
 				// シロクマのアイコン数を超えたら描画しない。
 				if (bearIconIndex >= static_cast<int>(std::size(POLAR_BEAR_ICON_KEYS))) return;
 
 				// シロクマのアイコンを取得。
 				auto* bearIcon = GetUI<UIIcon>(POLAR_BEAR_ICON_KEYS[bearIconIndex]);
-				
+
 				if (!bearIcon)
 				{
 					bearIconIndex++;
@@ -647,13 +611,13 @@ namespace app
 				else
 				{
 					// ミニマップの範囲外は非表示。
-					if(bearIcon) bearIcon->m_isDraw = false;
+					if (bearIcon) bearIcon->m_isDraw = false;
 				}
 
 				// シロクマのアイコンの要素数を超えないようにインデックスを増加させる。
 				bearIconIndex++;
 			}
-			
+
 			// 使われなかったアイコンを非表示にする。
 			for (uint32_t i = bearIconIndex; i < BEAR_ICON_SIZE; i++)
 			{
@@ -662,7 +626,75 @@ namespace app
 			}
 		}
 
-		
+		void MiniMapMenu::SetDrawMovableIcon(bool isDraw)
+		{
+			// シロクマの巣のアイコンを全て非表示にする。
+			for (const auto& key : BEAR_NEST_ICON_KEYS)
+			{
+				auto* bearNestsIcon = GetUI<UIIcon>(key);
+				if (bearNestsIcon) bearNestsIcon->m_isDraw = isDraw;
+			}
+
+			// 渦潮のアイコンを全て非表示にする。
+			for (const auto& key : WHIRLPOOL_ICON_KEYS)
+			{
+				auto* whirlpoolIcon = GetUI<UIIcon>(key);
+				if (whirlpoolIcon) whirlpoolIcon->m_isDraw = isDraw;
+			}
+
+			// イグルーのアイコンを全て非表示にする。
+			for (const auto& key : IGLOO_ICON_KEYS)
+			{
+				auto* iglooIcon = GetUI<UIIcon>(key);
+				if (iglooIcon) iglooIcon->m_isDraw = isDraw;
+			}
+
+			// シロクマの巣のアイコンを全て非表示にする。
+			for (const auto& key : BEAR_NEST_ICON_KEYS)
+			{
+				auto* bearNestsIcon = GetUI<UIIcon>(key);
+				if (bearNestsIcon) bearNestsIcon->m_isDraw = isDraw;
+			}
+
+			// 渦潮のアイコンを全て非表示にする。
+			for (const auto& key : WHIRLPOOL_ICON_KEYS)
+			{
+				auto* whirlpoolIcon = GetUI<UIIcon>(key);
+				if (whirlpoolIcon) whirlpoolIcon->m_isDraw = isDraw;
+			}
+
+			// イグルーのアイコンを全て非表示にする。
+			for (const auto& key : IGLOO_ICON_KEYS)
+			{
+				auto* iglooIcon = GetUI<UIIcon>(key);
+				if (iglooIcon) iglooIcon->m_isDraw = isDraw;
+			}
+
+			// 子ペンギンのアイコンを全て非表示にする。
+			for (const auto& info : MINIMAP_ICON_KEYS)
+			{
+				// アイコンの数だけループして、全てのアイコンを非表示。
+				for (uint8_t i = 0; i < CHILD_PEN_TYPE_ICON; ++i)
+				{
+					IconKey key = info.key + std::to_string(i);
+					auto* childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
+					if (childIcon) childIcon->m_isDraw = isDraw;
+				}
+			}
+
+			// シロクマのアイコンを全て非表示にする。
+			for (auto key : POLAR_BEAR_ICON_KEYS)
+			{
+				auto* bearIcon = GetUI<UIIcon>(key);
+				if (bearIcon) bearIcon->m_isDraw = isDraw;
+			}
+
+			// 親ペンギンのアイコンを非表示にする。
+			auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
+			if (daddyIcon) daddyIcon->m_isDraw = isDraw;
+		}
+
+
 		void MiniMapMenu::InitializeLogic()
 		{
 			// 初期は非表示。
@@ -670,44 +702,12 @@ namespace app
 			if (miniMapIcon) miniMapIcon->m_isDraw = false;
 
 			auto* mapFrameIcon = GetUI<UIIcon>(Hash32("MiniMapFrameIcon"));
-			if(mapFrameIcon) mapFrameIcon->m_isDraw = false;
+			if (mapFrameIcon) mapFrameIcon->m_isDraw = false;
 
 			auto* daddyIcon = GetUI<UIIcon>(Hash32("DaddyIcon"));
 			if (daddyIcon) daddyIcon->m_isDraw = false;
 
-			for (const auto& key : BEAR_NEST_ICON_KEYS)
-			{
-				auto* bearNestsIcon = GetUI<UIIcon>(key);
-				if (bearNestsIcon) bearNestsIcon->m_isDraw = false;
-			}
-
-			for (const auto& key : WHIRLPOOL_ICON_KEYS)
-			{
-				auto* whirlpoolIcon = GetUI<UIIcon>(key);
-				if (whirlpoolIcon) whirlpoolIcon->m_isDraw = false;
-			}
-
-			for (const auto& key : IGLOO_ICON_KEYS)
-			{
-				auto* iglooIcon = GetUI<UIIcon>(key);
-				if (iglooIcon) iglooIcon->m_isDraw = false;
-			}
-
-			for(const auto& info : MINIMAP_ICON_KEYS)
-			{
-				for (uint8_t i = 0; i < CHILD_PEN_TYPE_ICON; ++i)
-				{
-					IconKey key = info.key + std::to_string(i);
-					auto* childIcon = GetUI<UIIcon>(Hash32(key.c_str()));
-					if (childIcon) childIcon->m_isDraw = false;
-				}
-			}
-
-			for (auto& key : POLAR_BEAR_ICON_KEYS)
-			{
-				auto* polarBear = GetUI<UIIcon>(key);
-				if (polarBear) polarBear->m_isDraw = false;
-			}
+			SetDrawMovableIcon(false);
 		}
 	}
 }

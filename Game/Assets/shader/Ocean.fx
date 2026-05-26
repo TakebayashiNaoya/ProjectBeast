@@ -46,6 +46,8 @@ struct Light
     float          padding0;          // パディング（4バイト）
     float3         ambientLightColor; // m_ambientLightColor（12バイト）
     float          padding1;          // パディング（4バイト）
+    float3         rimLightColor;     // m_rimLightColor（12バイト）
+    float          padding2;          // パディング（4バイト）
     float4x4       mViewProjInv;      // m_mViewProjInv（64バイト）
 };
 
@@ -168,22 +170,28 @@ SPSIn VSMain(SVSIn vsIn)
 /// </summary>
 float4 PSMain(SPSIn psIn) : SV_Target0
 {
-    float2 uvScaled               = psIn.uv * float2(20.0, 20.0);
+    float2 uvScaled                 = psIn.uv * float2(20.0, 20.0);
     float  albedoDistortionStrength = 0.3;
 
     float3 normal      = ComputeNormal(psIn, uvScaled, textureScroll);
     float2 albedoUv    = uvScaled + normal.xz * albedoDistortionStrength;
     float4 albedoColor = g_albedo.Sample(g_sampler, albedoUv);
 
-    float3 diff      = CalcLambertDiffuse(
+    float3 diff    = CalcLambertDiffuse(
         light.directionLight.direction, light.directionLight.color, normal);
-    float3 spec      = CalcPhongSpecular(
+    float3 spec    = CalcPhongSpecular(
         light.directionLight.direction, light.directionLight.color, psIn.worldPos, normal, psIn.uv);
-    float3 ambient   = light.ambientLightColor * ambientScale;
+
+    // ambientScale は 1.0 を超えてHDR値として使用するため saturate() を使わない
+    float3 ambient = light.ambientLightColor * ambientScale;
 
     float4 litColor  = albedoColor;
-    litColor.xyz    *= saturate(diff + ambient);
-    litColor.xyz    += saturate(spec) * lerp(float3(1.0f, 1.0f, 1.0f), albedoColor.xyz, 0.3f);
+
+    // diffはマイナスにならないよう max(0) で保護しつつ、ambient は上限なしで加算する
+    litColor.xyz    *= (max(float3(0.0, 0.0, 0.0), diff) + ambient);
+
+    // specularも上限なしで加算してHDRブルームに対応する
+    litColor.xyz    += max(float3(0.0, 0.0, 0.0), spec) * lerp(float3(1.0f, 1.0f, 1.0f), albedoColor.xyz, 0.3f);
 
     return litColor;
 }

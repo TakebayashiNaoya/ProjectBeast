@@ -38,6 +38,9 @@ namespace nsBeastEngine
 		// 2D描画用のレンダリングターゲットの初期化
 		Init2DRenderTarget();
 
+		// ポストエフェクトマネージャーの初期化
+		InitPostEffectManager();
+
 		m_sceneLight.Init();
 	}
 
@@ -91,6 +94,10 @@ namespace nsBeastEngine
 
 		// エフェクトを描画
 		EffectEngine::GetInstance()->Draw();
+
+		// ポストエフェクトの描画処理
+		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
+		PostEffect(rc);
 
 		// 2D描画処理
 		Render2D(rc);
@@ -224,6 +231,17 @@ namespace nsBeastEngine
 	}
 
 
+	void RenderingEngine::InitPostEffectManager()
+	{
+		// ブルームの種別・ブラーの種別をここで切り替える
+		m_postEffectManager.Init(
+			m_mainRenderTarget,
+			EnBloomType::enKawase,   // enNone / enNormal / enKawase
+			EnBlurType::enGaussian   // enAverage / enGaussian
+		);
+	}
+
+
 	void RenderingEngine::RenderToGBuffer(RenderContext& rc)
 	{
 		BeginGPUEvent("RenderToGBuffer");
@@ -303,6 +321,16 @@ namespace nsBeastEngine
 
 		// メインレンダリングターゲットへの書き込み終了待ち
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+
+		EndGPUEvent();
+	}
+
+
+	void RenderingEngine::PostEffect(RenderContext& rc)
+	{
+		BeginGPUEvent("PostEffect");
+
+		m_postEffectManager.Render(rc, m_mainRenderTarget);
 
 		EndGPUEvent();
 	}

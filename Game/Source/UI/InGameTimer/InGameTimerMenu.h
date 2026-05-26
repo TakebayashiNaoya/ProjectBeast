@@ -5,52 +5,14 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include <map>
+
+#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
 namespace app
 {
 	namespace ui
 	{
-		enum class EnInGameTimerType : uint8_t
-		{
-			Frame,
-			FrameBackGround,
-			Max,
-		};
-
-
-		class TimerIcon
-		{
-		public:
-			TimerIcon();
-			~TimerIcon();
-
-			void Update();
-			void SetUIIcon(UIIcon* icon);
-			void SetIsDraw(bool isDraw) { if (m_icon) m_icon->m_isDraw = isDraw; }
-
-
-		private:
-			UIIcon* m_icon;
-		};
-
-
-		class TimerDigit
-		{
-		public:
-			TimerDigit();
-			~TimerDigit();
-
-			void Update();
-			void SetUIDigit(UIDigit* digit);
-			void SetValue(int value);
-			void SetIsDraw(bool isDraw) { if (m_digit) m_digit->m_isDraw = isDraw; }
-
-
-		private:
-			UIDigit* m_digit;
-		};
 
 
 		class InGameTimerMenu : public MenuBase
@@ -70,8 +32,8 @@ namespace app
 			 */
 			inline void SetTime(const float time) { m_currentTime = time; }
 
-			void SetIsDraw(bool isDraw);
 
+		private:
 			/**
 			 * @brief タイムの数字を更新するため
 			 * @brief Update内を肥大化させない為に分割
@@ -104,8 +66,8 @@ namespace app
 			/** 回転のタイマー */
 			float m_slopeTimer;
 
-			std::map<uint32_t, std::unique_ptr<TimerIcon>>  m_timerIconMap;
-			std::map<uint32_t, std::unique_ptr<TimerDigit>> m_timerDigitMap;
+
+			InGameStartingAnimLogic m_gameStartingAnimLogic;
 		};
 	}
 }

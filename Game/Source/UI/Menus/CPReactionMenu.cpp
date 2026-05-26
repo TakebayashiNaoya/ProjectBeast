@@ -5,12 +5,15 @@
  */
 #include "stdafx.h"
 #include "CPReactionMenu.h"
+
+#include "Source/UI/Model/CPReactionStatus.h"
+
+#include "Source/UI/Animation/UIAnimationFactory.h"
+
 #include "Source/actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
-#include "Source/UI/Animation/UIAnimationFactory.h"
-#include "Source/UI/Model/CPReactionStatus.h"
-#include "Source/UIAnimationTypes.h"
-#include "Source/Util/CRC32.h"
+
+#include "Source/Sound/SoundManager.h"
 
 
 namespace app
@@ -19,6 +22,8 @@ namespace app
 	{
 		void CPReactionMenu::PlayUIAnimation(const EnReactionType type)
 		{
+			// サウンドマネージャーのインスタンスを取得
+			auto& soundMng = SoundManager::Get();
 
 			m_type = type;
 
@@ -27,12 +32,18 @@ namespace app
 				m_speechBubble->m_isDraw = true;
 				m_troubleReaction->m_isDraw = true;
 				m_happyReaction->m_isDraw = false;
+
+				// 困りリアクションのサウンドを再生
+				soundMng.PlaySE(enSoundKind::enSoundKind_CPReactionTrouble);
 			}
 			else if (m_type == EnReactionType::Happy)
 			{
 				m_speechBubble->m_isDraw = true;
 				m_troubleReaction->m_isDraw = false;
 				m_happyReaction->m_isDraw = true;
+
+				// 喜びリアクションのサウンドを再生
+				soundMng.PlaySE(enSoundKind::enSoundKind_CPReactionHappy);
 			}
 
 			SetAnimation();

@@ -5,8 +5,11 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
+
+#include "MiniMapStatus.h"
+#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
+
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
-#include "Source/UI/Model/MiniMapStatus.h"
 
 
 namespace app
@@ -37,16 +40,16 @@ namespace app
 			 * @param mapPos 変換した後のマップ座標。
 			 */
 			bool WorldPosConverterToMapPos(
-					Vector3 worldCenterPos
-				,	Vector3 worldPos
-				,	Vector3& mapPos
+				Vector3 worldCenterPos
+				, Vector3 worldPos
+				, Vector3& mapPos
 			);
 
 			/**
 			 * @brief マップのフレームアイコンをカメラの向きに併せて回転する用
 			 */
 			void MapFrameRotation();
-			
+
 			/**
 			 * @brief シロクマの巣のアイコンをマップに表示する用
 			 */
@@ -85,12 +88,19 @@ namespace app
 
 
 		private:
+			void SetDrawMovableIcon(bool isDraw);
+
+
+		private:
 			/** ミニマップのステータスをunique_ptrで所有 */
 			std::unique_ptr<MiniMapStatus> m_miniMapStatus;
 			/** UIを表示するかのフラグ */
 			bool m_isDraw;
 			/** 親ペンギンのポインタ */
 			actor::DaddyPenguin* m_daddyPenguin;
+
+			/** ゲーム開始時のアニメーションロジック */
+			InGameStartingAnimLogic m_startingAnimLogic;
 		};
 	}
 }

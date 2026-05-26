@@ -4,8 +4,8 @@
  * @author 忽那
  */
 #include "stdafx.h"
-#include "MiniMapStatus.h"
 #include "MiniMapParameter.h"
+#include "MiniMapStatus.h"
 #include "Source/Core/ParameterManager.h"
 
 
@@ -32,14 +32,14 @@ namespace app
 					param.mapCenterPos = util::JsonConverter::ToVector3(j["centerPos"]);
 				});
 		}
-		
-		
+
+
 		MiniMapStatus::~MiniMapStatus()
 		{
 			core::ParameterManager::Get()->UnloadParameter<MiniMapParameter>();
 		}
-		
-		
+
+
 		void MiniMapStatus::SetUpUI()
 		{
 			const auto* param = core::ParameterManager::Get()->GetParameter<MiniMapParameter>();

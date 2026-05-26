@@ -12,6 +12,7 @@ namespace nsBeastEngine
 	class BeastModel;
 	// Frustum は参照でのみ使用するため前方宣言で十分
 	class Frustum;
+
 	/**
 	 * @brief PBR補正パラメータ
 	 * @details モデルごとに個別設定できるPBRライティングの補正値。
@@ -57,6 +58,41 @@ namespace nsBeastEngine
 		float modelDitherAlpha = 0.0f;
 		/** パディング（16バイト境界用） */
 		float pad[3] = { 0.0f, 0.0f, 0.0f };
+	};
+
+	/**
+	 * @brief トゥーンシェーダー用定数バッファ（b2）
+	 * @details
+	 *   toon.fx の cbuffer ToonCb : register(b2) に対応する。
+	 *   toon.fx は独立した fxファイルのため b2 が空いている。
+	 *   閾値・係数は明るい側から順に設定すること（thresholds[0] > thresholds[1] > ...）。
+	 *   stepCount で実際に使う段階数を指定する（1〜4）。
+	 *   SetToonParam()で更新し、次のDraw()でGPUに自動転送される。
+	 */
+	struct SToonCb
+	{
+		/** 各段階の閾値（x=段階1, y=段階2, z=段階3, w=段階4）明るい側から順に */
+		Vector4 shadowThresholds = { 0.0f, -0.3f, -0.6f, -1.0f };
+		/** 各段階の暗さ係数（x=段階1, y=段階2, z=段階3, w=段階4） */
+		Vector4 shadowColorRates = { 0.8f,  0.6f,  0.4f,  0.2f };
+		/** 実際に使う段階数（1〜4） */
+		int     stepCount = 2;
+		/** パディング（16バイト境界用） */
+		float   pad[3] = { 0.0f, 0.0f, 0.0f };
+	};
+
+	/**
+	 * @brief アウトラインシェーダー用定数バッファ（b2）
+	 * @details
+	 *   outline.fx の cbuffer OutlineCb : register(b2) に対応する。
+	 *   outline.fx は独立した fxファイルのため b2 が空いている。
+	 *   SetOutlineParam()で更新し、次のDraw()でGPUに自動転送される。
+	 */
+	struct SOutlineCb
+	{
+		float   outlineWidth = 0.005f;					/** 輪郭線の太さ（法線押し出し量） */
+		float   pad[3] = { 0.0f, 0.0f, 0.0f };			/** パディング（16バイト境界用） */
+		Vector4 outlineColor = { 0.0f, 0.0f, 0.0f, 1.0f };	/** 輪郭線の色（RGBA） */
 	};
 
 
@@ -243,6 +279,72 @@ namespace nsBeastEngine
 		 */
 		inline const Vector3& GetWorldAABBMax() const { return m_worldAABBMax; }
 
+		/**
+		 * @brief このモデルに対してトゥーンシェーダーを有効にする
+		 * @details
+		 *   Init()より前に呼ぶこと。
+		 *   s_isToonGlobalEnabled が true の場合は本フラグに関わらず全モデルで有効になる。
+		 * @param enabled trueでトゥーン有効
+		 */
+		inline void SetToonEnabled(const bool enabled) { m_isToonEnabled = enabled; }
+
+		/**
+		 * @brief トゥーンシェーダーが有効か取得する
+		 * @details 個別フラグのみで判定する。
+		 *          グローバルフラグはInit()時に個別フラグへ焼き込まれる。
+		 * @return トゥーン有効ならtrue
+		 */
+		inline bool IsToonEnabled() const { return m_isToonEnabled; }
+
+		/**
+		 * @brief トゥーンシェーダーのパラメータを設定する
+		 * @details Init()より前でも後でも設定可能。次のDraw()からGPUに転送される。
+		 *          閾値は明るい側から順に設定すること（thresholds.x > thresholds.y > ...）。
+		 * @param shadowThresholds	各段階の閾値（x=段階1, y=段階2, z=段階3, w=段階4）
+		 * @param shadowColorRates	各段階の暗さ係数（x=段階1, y=段階2, z=段階3, w=段階4）
+		 * @param stepCount			実際に使う段階数（1〜4）
+		 */
+		inline void SetToonParam(
+			const Vector4& shadowThresholds,
+			const Vector4& shadowColorRates,
+			const int stepCount = 2)
+		{
+			m_toonCb.shadowThresholds = shadowThresholds;
+			m_toonCb.shadowColorRates = shadowColorRates;
+			m_toonCb.stepCount = max(1, min(stepCount, 4));
+		}
+
+		/**
+		 * @brief アウトラインのパラメータを設定する
+		 * @details Init()より前でも後でも設定可能。次のDraw()からGPUに転送される。
+		 * @param outlineWidth	輪郭線の太さ（法線押し出し量）
+		 * @param outlineColor	輪郭線の色（RGBA）
+		 */
+		inline void SetOutlineParam(const float outlineWidth, const Vector4& outlineColor)
+		{
+			m_outlineCb.outlineWidth = outlineWidth;
+			m_outlineCb.outlineColor = outlineColor;
+		}
+
+		/**
+		 * @brief 全モデルに対してトゥーンシェーダーを一括で有効/無効にする
+		 * @details RenderingEngineなどから呼ぶことを想定している。
+		 * @param enabled trueで全モデルのトゥーンが有効になる
+		 */
+		static void SetToonGlobalEnabled(const bool enabled)
+		{
+			s_isToonGlobalEnabled = enabled;
+		}
+
+		/**
+		 * @brief 全体トゥーンフラグの状態を取得する
+		 * @return 全体フラグが有効ならtrue
+		 */
+		static bool IsToonGlobalEnabled()
+		{
+			return s_isToonGlobalEnabled;
+		}
+
 
 	public:
 		ModelRender();
@@ -350,6 +452,13 @@ namespace nsBeastEngine
 		void InitRenderToGBufferModel(const ModelInitData& baseInitData);
 
 		/**
+		 * @brief トゥーンモデル・アウトラインモデルの初期化
+		 * @details IsToonEnabled()がtrueの場合のみ呼ばれる。
+		 * @param baseInitData m_modelの初期化データをベースに使用する
+		 */
+		void InitToonModels(const ModelInitData& baseInitData);
+
+		/**
 		 * @brief シェーダーのエントリーポイントの設定
 		 * @param modelInitData モデルの初期化データ
 		 */
@@ -404,6 +513,20 @@ namespace nsBeastEngine
 		 */
 		std::unique_ptr<BeastModel> m_forwardRenderModel;
 
+		/**
+		 * @brief トゥーンシェーダー描画用モデル（フォワードパスで描画）
+		 * @details IsToonEnabled()がtrueの場合のみ InitToonModels() で初期化される。
+		 *          GBufferへの書き込みをスキップし、toon.fx でフォワード描画する。
+		 */
+		std::unique_ptr<BeastModel> m_toonModel;
+
+		/**
+		 * @brief アウトライン描画用モデル（フォワードパスで描画）
+		 * @details IsToonEnabled()がtrueの場合のみ InitToonModels() で初期化される。
+		 *          背面法線押し出し方式で輪郭線を描画する。カリングはフロントフェース。
+		 */
+		std::unique_ptr<BeastModel> m_outlineModel;
+
 		/** ボーン（自前保有） */
 		Skeleton       m_skeleton;
 		/** ボーン参照（外部注入または自前） */
@@ -425,6 +548,8 @@ namespace nsBeastEngine
 		bool           m_isForwardRender = false;
 		/** 描画するかどうか */
 		bool           m_visible = true;
+		/** このモデル個別のトゥーン有効フラグ */
+		bool           m_isToonEnabled = false;
 		/** PBR補正パラメータ */
 		PBRParam       m_pbrParam;
 
@@ -445,6 +570,11 @@ namespace nsBeastEngine
 		 *   OcclusionDitherManager（b3）とは独立して動作する。
 		 */
 		SModelDitherCb m_modelDitherCb;
+
+		/** トゥーンシェーダー用定数バッファデータ（b2） */
+		SToonCb m_toonCb;
+		/** アウトラインシェーダー用定数バッファデータ（b2） */
+		SOutlineCb m_outlineCb;
 
 		/**
 		 * @brief ローカル空間AABB（Init時に計算・以降不変）
@@ -487,5 +617,8 @@ namespace nsBeastEngine
 		 * @details WhiteBear など特定モデルのログ絞り込みに使用する
 		 */
 		std::string    m_debugName;
+
+		/** 全モデル共通のトゥーン有効フラグ（staticで全インスタンスに共有） */
+		static bool s_isToonGlobalEnabled;
 	};
 }

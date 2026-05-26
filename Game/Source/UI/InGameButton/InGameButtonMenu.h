@@ -5,7 +5,8 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include <vector>
+
+#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
 namespace app
@@ -26,13 +27,17 @@ namespace app
 
 
 		private:
+			/** ボタンのアイコンの更新処理 */
 			void ButtonIconUpdate();
 
 			bool IsInputAButton() const;
 			bool IsInputBButton() const;
 			bool IsInputXButton() const;
 			bool IsInputYButton() const;
-		};
 
+
+		private:
+			InGameStartingAnimLogic m_startingAnimLogic;
+		};
 	}
 }

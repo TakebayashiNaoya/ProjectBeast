@@ -83,19 +83,19 @@ namespace nsK2EngineLow {
 
 
 	//todo ここも変更する必要あり？？
-	void Model::ChangeAlbedoMap(const char* materialName, Texture& albedoMap)
-	{
-		m_meshParts.QueryMeshs([&](const SMesh& mesh) {
-			//todo マテリアル名をtkmファイルに出力してなかった。
-			//todo 今は全マテリアル差し替えます
-			for (Material* material : mesh.m_materials) {
-				material->GetAlbedoMap().InitFromD3DResource(albedoMap.Get());
-			}
-			});
-		//ディスクリプタヒープの再作成。
-		m_meshParts.CreateDescriptorHeaps();
+	//void Model::ChangeAlbedoMap(const char* materialName, Texture& albedoMap)
+	//{
+	//	m_meshParts.QueryMeshs([&](const SMesh& mesh) {
+	//		//todo マテリアル名をtkmファイルに出力してなかった。
+	//		//todo 今は全マテリアル差し替えます
+	//		for (Material* material : mesh.m_materials) {
+	//			material->GetAlbedoMap().InitFromD3DResource(albedoMap.Get());
+	//		}
+	//		});
+	//	//ディスクリプタヒープの再作成。
+	//	m_meshParts.CreateDescriptorHeaps();
 
-	}
+	//}
 
 
 	void Model::Draw(

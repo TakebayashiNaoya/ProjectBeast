@@ -415,6 +415,8 @@ namespace nsBeastEngine
 		float				padding0;						// パディング（16バイトアラインメントのため）
 		Vector3				m_ambientLightColor;			// 環境光の色
 		float				padding1;						// パディング（16バイトアラインメントのため）
+		Vector3				m_rimLightColor;				// リムライトの色
+		float				padding2;						// パディング（16バイトアラインメントのため）
 		Matrix				m_mViewProjInv;					// カメラのビュープロジェクション行列の逆行列
 
 
@@ -426,6 +428,8 @@ namespace nsBeastEngine
 			, padding0(0.0f)
 			, m_ambientLightColor(Vector3::Zero)
 			, padding1(0.0f)
+			, m_rimLightColor(Vector3::Zero)
+			, padding2(0.0f)
 			, m_mViewProjInv(Matrix::Identity)
 		{}
 
@@ -454,6 +458,25 @@ namespace nsBeastEngine
 		void SetAmbientLight(float x, float y, float z)
 		{
 			SetAmbientLight({ x,y,z });
+		}
+
+		/**
+		 * @brief リムライトの色の設定
+		 * @param color リムライトの色
+		 */
+		void SetRimLight(const Vector3& color)
+		{
+			m_rimLightColor = color;
+		}
+		/**
+		 * @brief リムライトの色の設定
+		 * @param x 赤成分
+		 * @param y 緑成分
+		 * @param z 青成分
+		 */
+		void SetRimLight(float x, float y, float z)
+		{
+			SetRimLight({ x,y,z });
 		}
 	};
 

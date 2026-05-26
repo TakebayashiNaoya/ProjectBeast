@@ -5,7 +5,6 @@
  */
 #include "stdafx.h"
 #include "InGameTimerMenu.h"
-#include "Source/Util/CRC32.h"
 
 
 namespace app
@@ -14,12 +13,6 @@ namespace app
 	{
 		namespace
 		{
-			struct TimerInfo
-			{
-				uint32_t key;
-				EnInGameTimerType type;
-			};
-
 			// マジックナンバー対策。
 			const Vector4 BLINK_TEXT_COLOR = { 20.0f, 0.0f, 0.0f, 1.0f };
 			const Vector4 CLOCK_ROT_COLOR = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -40,70 +33,11 @@ namespace app
 			// 10秒を切った時に拡縮を行うための条件式の秒数。
 			constexpr float LAST_SECONDS = 11.0f;
 
-			/** 要素数 */
-			constexpr int TIMER_ICON_SIZE = static_cast<int>(EnInGameTimerType::Max);
-			/** 配列 */
-			constexpr TimerInfo TIMER_ICON_KEYS[TIMER_ICON_SIZE] =
-			{
-					{ Hash32("InGameTimerFrameIcon"),           EnInGameTimerType::Frame           }
-				,	{ Hash32("InGameTimerFrameBackGroundIcon"), EnInGameTimerType::FrameBackGround }
-			};
+
+
+			// UIの種類の数。UIの種類が増えたらこの数も増やすこと。
+			constexpr uint8_t UI_TYPE_COUNT = 7;
 		}
-
-
-		TimerIcon::TimerIcon()
-			: m_icon(nullptr)
-		{}
-
-
-		TimerIcon::~TimerIcon()
-		{}
-
-
-		void TimerIcon::Update()
-		{}
-
-
-		void TimerIcon::SetUIIcon(UIIcon* icon)
-		{
-			m_icon = icon;
-			K2_ASSERT(m_icon != nullptr, "登録失敗です。");
-		}
-
-
-
-
-		/***********************************************/
-
-
-		TimerDigit::TimerDigit()
-			: m_digit(nullptr)
-		{}
-
-
-		TimerDigit::~TimerDigit()
-		{}
-
-
-		void TimerDigit::Update()
-		{}
-
-
-		void TimerDigit::SetUIDigit(UIDigit* digit)
-		{
-			m_digit = digit;
-			K2_ASSERT(m_digit != nullptr, "登録失敗です。");
-		}
-
-
-		void TimerDigit::SetValue(int value)
-		{
-			if (m_digit != nullptr)
-			{
-				m_digit->SetNumber(value);
-			}
-		}
-
 
 
 
@@ -126,11 +60,47 @@ namespace app
 		void InGameTimerMenu::Update()
 		{
 			/** 表示状態にする */
-			auto* frameIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameIcon"));
-			if (frameIcon) frameIcon->m_isDraw = true;
+			const std::vector<std::string> iconNames =
+			{
+				"InGameTimerFrameIcon",
+				"InGameTimerFrameBackGroundIcon",
+				"TimeClockIcon",
+				"CloneIcon"
+			};
 
-			auto* bgIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameBackGroundIcon"));
-			if (bgIcon) bgIcon->m_isDraw = true;
+			for (const auto& iconName : iconNames)
+			{
+				if (auto* icon = GetUI<UIIcon>(Hash32(iconName.c_str())))
+				{
+					icon->m_isDraw = true;
+				}
+			}
+
+
+			const std::vector<std::string> digitNames =
+			{
+				"MinutesDigits",
+				"TensPlaceDigits",
+				"OnesPlaceDigits",
+			};
+
+
+			if (!m_gameStartingAnimLogic.IsAnimationStarted())
+			{
+				m_gameStartingAnimLogic.Initialize(
+					this,
+					iconNames,
+					digitNames,
+					Vector3(0.0f, 200.0f, 0.0f)
+				);
+			}
+			if (!m_gameStartingAnimLogic.IsAnimationFinished())
+			{
+				m_gameStartingAnimLogic.Update();
+			}
+
+
+			/** ゲーム開始時のアニメーション更新 */
 
 			/** 分/秒に変換して表示(例: 0:00形式) */
 			UpdateTimerDigits();
@@ -146,38 +116,37 @@ namespace app
 		void InGameTimerMenu::InitializeLogic()
 		{
 			/** 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのため） */
-			auto* frameIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameIcon"));
-			if (frameIcon) frameIcon->m_isDraw = false;
-
-			auto* bgIcon = GetUI<UIIcon>(Hash32("InGameTimerFrameBackGroundIcon"));
-			if (bgIcon) bgIcon->m_isDraw = false;
-
-			auto* clockIcon = GetUI<UIIcon>(Hash32("TimerClockIcon"));
-			if (clockIcon)clockIcon->m_isDraw = false;
-
-			auto* minutesDigit = GetUI<UIDigit>(Hash32("MinutesDigits"));
-			if (minutesDigit)minutesDigit->m_isDraw = false;
-
-			auto* cloneIcon = GetUI<UIIcon>(Hash32("CloneIcon"));
-			if (cloneIcon)cloneIcon->m_isDraw = false;
-
-			auto* tensPlaceDigit = GetUI<UIDigit>(Hash32("TensPlaceDigits"));
-			if (tensPlaceDigit)tensPlaceDigit->m_isDraw = false;
-
-			auto* onesPlaceDigit = GetUI<UIDigit>(Hash32("OnesPlaceDigits"));
-			if (onesPlaceDigit)onesPlaceDigit->m_isDraw = false;
-		}
-
-
-		void InGameTimerMenu::SetIsDraw(bool isDraw)
-		{
-			for (const auto& icon : m_timerIconMap)
+			constexpr const char* iconNames[] =
 			{
-				icon.second->SetIsDraw(isDraw);
+				"InGameTimerFrameBackGroundIcon",
+				"InGameTimerFrameIcon",
+				"TimeClockIcon",
+				"CloneIcon",
+			};
+
+			for (const auto& iconName : iconNames)
+			{
+				if (auto* icon = GetUI<UIIcon>(Hash32(iconName)))
+				{
+					icon->m_isDraw = false;
+				}
 			}
-			for (const auto& digit : m_timerDigitMap)
+
+
+			constexpr const char* digitNames[] =
 			{
-				digit.second->SetIsDraw(isDraw);
+				"MinutesDigits",
+				"CloneIcon",
+				"TensPlaceDigits",
+				"OnesPlaceDigits",
+			};
+
+			for (const auto& digitName : digitNames)
+			{
+				if (auto* digit = GetUI<UIDigit>(Hash32(digitName)))
+				{
+					digit->m_isDraw = false;
+				}
 			}
 		}
 
@@ -195,13 +164,11 @@ namespace app
 
 
 			auto* minutesDigits = GetUI<UIDigit>(Hash32("MinutesDigits"));
-			auto* cloneIcon = GetUI<UIIcon>(Hash32("CloneIcon"));
 			auto* tensPlaceDigits = GetUI<UIDigit>(Hash32("TensPlaceDigits"));
 			auto* onesPlaceDigits = GetUI<UIDigit>(Hash32("OnesPlaceDigits"));
-			
+
 			/** 数値の設定 */
-			if (minutesDigits)   { minutesDigits->m_isDraw   = true; minutesDigits->SetNumber(minutes); }
-			if (cloneIcon)		 { cloneIcon->m_isDraw       = true; }
+			if (minutesDigits) { minutesDigits->m_isDraw = true; minutesDigits->SetNumber(minutes); }
 			if (tensPlaceDigits) { tensPlaceDigits->m_isDraw = true; tensPlaceDigits->SetNumber(tensPlace); }
 			if (onesPlaceDigits) { onesPlaceDigits->m_isDraw = true; onesPlaceDigits->SetNumber(onesPlace); }
 
@@ -210,7 +177,7 @@ namespace app
 			if (m_currentTime <= BLINK_THRESHOLD && m_currentTime > 0.0f)
 			{
 				// 点滅アニメーションが再生されていないときに初回のみ登録して再生させる。
-				if(!m_isBlinkAnimationPlaying)
+				if (!m_isBlinkAnimationPlaying)
 				{
 					Vector4 startColor = Vector4::White;
 					Vector4 endColor(BLINK_TEXT_COLOR);
@@ -220,11 +187,11 @@ namespace app
 							if (digit == nullptr)return;
 							auto colorAnim = std::make_unique<UIColorAnimation>();
 							colorAnim->SetParameter(
-									startColor
-								,	endColor
-								,	BLINK_INTERVAL
-								,	util::EasingType::EaseOut
-								,	util::LoopMode::PingPong
+								startColor
+								, endColor
+								, BLINK_INTERVAL
+								, util::EasingType::EaseOut
+								, util::LoopMode::PingPong
 							);
 							colorAnim->SetFunc([digit](const Vector4& color)
 								{
@@ -282,24 +249,24 @@ namespace app
 			// 時計の回転角度を計算(最大45度の傾き)。
 			const float baseAngle = MAX_LIMITE_DEG * (1.0f - ratio);
 			// 傾きの角度を計算して、sin関数を使って揺れを表現してみた。
-			const float slopeAngle= sinf(m_slopeTimer * SLOPE_SPEED) * Math::DegToRad(SLOPE_AMP);
+			const float slopeAngle = sinf(m_slopeTimer * SLOPE_SPEED) * Math::DegToRad(SLOPE_AMP);
 
-			
+
 			// 残り30秒を切ったら点滅アニメーションを初回のみ登録して再生させる。
 			if (m_currentTime <= BLINK_THRESHOLD && m_currentTime > 0.0f)
 			{
 				if (!m_isRotAnimationPlaying)
 				{
 					auto rotAnim = std::make_unique<UIRotationAnimation>();
-					
+
 					rotAnim->SetParameter(
-							baseAngle - SLOPE_AMP
-						,   baseAngle + SLOPE_AMP
-						,	1.0f / SLOPE_SPEED
-						,	util::EasingType::Linear
-						,	util::LoopMode::PingPong
+						baseAngle - SLOPE_AMP
+						, baseAngle + SLOPE_AMP
+						, 1.0f / SLOPE_SPEED
+						, util::EasingType::Linear
+						, util::LoopMode::PingPong
 					);
-					
+
 					// 回転アニメーションの登録。
 					clock->AddAnimation(Hash32("ClockRotAnim"), std::move(rotAnim));
 					// 回転アニメーションの再生。
@@ -332,7 +299,7 @@ namespace app
 							);
 
 							// UIScaleAnimationの更新関数に回転アニメーションと同じタイマーを参照するラムダをセットする。
-							scaleAnim->SetFunc([this,icon](const Vector3& scale)
+							scaleAnim->SetFunc([this, icon](const Vector3& scale)
 								{
 									if (this->m_currentTime <= LAST_SECONDS && this->m_currentTime > 0.0f)
 									{
@@ -355,7 +322,7 @@ namespace app
 					m_slopeTimer = 0.0f;
 					m_isRotAnimationPlaying = false;
 				}
-				
+
 				// 通常時は残り時間の割合に応じた傾きを直接セットする。
 				Quaternion rot;
 				rot.SetRotationZ(Math::DegToRad(baseAngle));
@@ -363,7 +330,7 @@ namespace app
 				clock->m_transform.m_localTransform.m_rotation = rot;
 
 				// 通常時に拡縮アニメーションを停止して通常の大きさに戻す。
-				if(m_isScaleAnimPlaying)
+				if (m_isScaleAnimPlaying)
 				{
 					clock->StopAnimation();
 					clock->m_transform.m_localTransform.m_scale = Vector3::One;

@@ -26,7 +26,7 @@ namespace app
 			Vector3 target = Vector3::Zero;
 			Vector3 up = Vector3::Up;
 			float fov = Math::DegToRad(60.0f);
-			float nearClip = 0.01f;
+			float nearClip = 1.0f;
 			float farClip = 13000.0f;
 
 			/** 線形補間（ブレンド用） */

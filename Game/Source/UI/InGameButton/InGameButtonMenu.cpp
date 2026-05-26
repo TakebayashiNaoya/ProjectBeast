@@ -16,9 +16,33 @@ namespace app
 
 		void InGameButtonMenu::Update()
 		{
+			// ゲーム開始時のアニメーション
+			if (!m_startingAnimLogic.IsAnimationStarted())
+			{
+				m_startingAnimLogic.Initialize(
+					this,
+					{
+						"NotInputJumpIcon", "NotInputSneakIcon", "NotInputSlideIcon", "NotInputOrderIcon",
+						"InputJumpIcon",    "InputSneakIcon",    "InputSlideIcon",    "InputOrderIcon",
+						"NotInputAbuttonIcon", "NotInputBbuttonIcon", "NotInputXbuttonIcon", "NotInputYbuttonIcon",
+						"InputAbuttonIcon",    "InputBbuttonIcon",    "InputXbuttonIcon",    "InputYbuttonIcon"
+					},
+					{}, // 数字UIは使用しないため空のリストを渡す
+					Vector3(300.0f, 0.0f, 0.0f)
+				);
+			}
+			if (!m_startingAnimLogic.IsAnimationFinished())
+			{
+				m_startingAnimLogic.Update();
+			}
+
 			ButtonIconUpdate();
 			MenuBase::Update();
 		}
+
+
+
+
 
 		void InGameButtonMenu::ButtonIconUpdate()
 		{

@@ -197,6 +197,12 @@ namespace app
 		/** SE再生のリクエスト用情報 */
 		std::vector<SEInformation> m_seInfomationList[enSoundPriority_Max];
 
+		/** 再生中SEのKindを管理 */
+		std::map<SEHandle, int>m_seHandleKindMap;
+
+		/** SE種別ごとの同時再生数上限 */
+		std::unordered_map<int, uint8_t> m_seConcurrentLimitMap;
+
 
 	private:
 		/** 全体の音量 */

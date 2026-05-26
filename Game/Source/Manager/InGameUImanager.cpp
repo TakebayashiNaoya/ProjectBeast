@@ -17,6 +17,9 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
 
 #include "Source/UI/Layout.h"
+
+#include "Source/UI/InGameButton/InGameButtonMenu.h"
+#include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
 #include "Source/UI/Menus/CountDownMenu.h"
 #include "Source/UI/Menus/CPReactionSystem.h"
@@ -24,16 +27,14 @@
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
 #include "Source/UI/Menus/InGameAchievementMenu.h"
-#include "Source/UI/Menus/InGameButtonMenu.h"
-#include "Source/UI/Menus/InGameTimerMenu.h"
-#include "Source/UI/Menus/MiniMapMenu.h"
 #include "Source/UI/Menus/PauseScreenMenu.h"
 #include "Source/UI/Menus/PBWakingUpTimerMenu.h"
-#include "Source/UI/Menus/RemainingChildMenu.h"
 #include "Source/UI/Menus/SearchMenu.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
+#include "Source/UI/MiniMap/MiniMapMenu.h"
+#include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
 
 

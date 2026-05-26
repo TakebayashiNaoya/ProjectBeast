@@ -101,26 +101,38 @@ namespace nsBeastEngine
 
 	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, int numInstance)
 	{
-		if (numInstance == 0) { return; }
+		if (!m_isInited)
+		{
+			return;
+		}
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
 			g_camera3D->GetViewMatrix(),
 			g_camera3D->GetProjectionMatrix(),
-			numInstance
+			numInstance,
+			nullptr
 		);
 	}
 
 
-	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, Camera& camera, int numInstance)
+	void BeastModel::Draw(
+		nsK2EngineLow::RenderContext& rc,
+		Camera& camera,
+		int numInstance
+	)
 	{
-		if (numInstance == 0) { return; }
+		if (!m_isInited)
+		{
+			return;
+		}
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
 			camera.GetViewMatrix(),
 			camera.GetProjectionMatrix(),
-			numInstance
+			numInstance,
+			nullptr
 		);
 	}
 
@@ -132,20 +144,31 @@ namespace nsBeastEngine
 		int numInstance
 	)
 	{
-		if (numInstance == 0) { return; }
+		if (!m_isInited)
+		{
+			return;
+		}
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
 			viewMatrix,
 			projMatrix,
-			numInstance
+			numInstance,
+			nullptr
 		);
 	}
 
 
-	void BeastModel::Draw(nsK2EngineLow::RenderContext& rc, const Frustum& frustum, int numInstance)
+	void BeastModel::Draw(
+		nsK2EngineLow::RenderContext& rc,
+		const Frustum& frustum,
+		int numInstance
+	)
 	{
-		if (numInstance == 0) { return; }
+		if (!m_isInited)
+		{
+			return;
+		}
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
@@ -164,7 +187,10 @@ namespace nsBeastEngine
 		int numInstance
 	)
 	{
-		if (numInstance == 0) { return; }
+		if (!m_isInited)
+		{
+			return;
+		}
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
