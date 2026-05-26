@@ -122,9 +122,9 @@ namespace app
 				}
 				else if (selectKey == Hash32("EndFrameBackIcon"))
 				{
-					// タイトルに。
-					// 現在はタイトルから遷移しないため、ここにくることはない。
-					K2_ASSERT(false, "警告です。");
+					// ゲームを終了する。
+					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+					PostQuitMessage(0);
 					return;
 				}
 			}
