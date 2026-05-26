@@ -149,7 +149,6 @@ namespace app
 				);
 			}
 			// アニメーション中の更新はここで行う。
-			// ※ SetDrawMovableIcon(false) は Map*() 群の後で呼ぶため、ここでは呼ばない。
 			if (!m_startingAnimLogic.IsAnimationFinished())
 			{
 				m_startingAnimLogic.Update();
