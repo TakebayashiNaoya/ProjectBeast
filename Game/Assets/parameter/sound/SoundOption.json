@@ -4,21 +4,21 @@
             {
                 "type":"UIIcon",
                 "name":"SoundTextAllBackGroundIcon",
-                "asset":"Assets/spriteData/UI/Icon/SoundOptionAllBackGround.dds",
-                "width":2070,
+                "asset":"Assets/spriteData/UI/SoundOption/SoundOptionBg.dds",
+                "width":1920,
                 "height":1080,
                 "position":[ 0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 255, 255, 255, 200]
             },
             {
                 "type":"UIIcon",
                 "name":"UpDownIcon",
-                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_dpad_round_vertical.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/xbox_dpad_vertical.dds",
                 "width":60,
                 "height":60,
-                "position":[ 170, -360, 0],
+                "position":[ 70, -360, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -26,10 +26,10 @@
             {
                 "type":"UIIcon",
                 "name":"LeftRightIcon",
-                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_dpad_round_horizontal.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/xbox_dpad_horizontal.dds",
                 "width":60,
                 "height":60,
-                "position":[ 360, -360, 0],
+                "position":[ 240, -360, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -37,10 +37,21 @@
             {
                 "type":"UIIcon",
                 "name":"BbuttonIcon",
-                "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_b.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/xbox_button_color_b.dds",
                 "width":60,
                 "height":60,
-                "position":[ 550, -360, 0],
+                "position":[ 590, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"XbuttonIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/xbox_button_color_x.dds",
+                "width":60,
+                "height":60,
+                "position":[ 410, -360, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -48,13 +59,14 @@
 
 
 
+
             {
                 "type":"UIIcon",
                 "name":"SelectTextIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/SelectText.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/SelectIcon.dds",
                 "width":90,
                 "height":50,
-                "position":[ 260, -360, 0],
+                "position":[ 150, -360, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -62,10 +74,10 @@
             {
                 "type":"UIIcon",
                 "name":"MoveTextIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/MovingText.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/LeftorRightIcon.dds",
                 "width":90,
                 "height":50,
-                "position":[ 450, -360, 0],
+                "position":[ 320, -360, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -73,13 +85,24 @@
             {
                 "type":"UIIcon",
                 "name":"CloseIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/CloseText.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/CloseIcon.dds",
                 "width":95,
                 "height":50,
-                "position":[ 640, -360, 0],
+                "position":[ 680, -360, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"DefaultIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/DefaultIcon.dds",
+                "width":95,
+                "height":50,
+                "position":[ 500, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
             },
 
 
@@ -87,87 +110,80 @@
             {
                 "type":"UIIcon",
                 "name":"MasterVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/TextMasterVolume.dds",
-                "width":160,
-                "height":50,
-                "position":[ -540, 130, 0],
+                "asset":"Assets/spriteData/UI/SoundOption/MasterIcon.dds",
+                "width":200,
+                "height":55,
+                "position":[ -545, 130, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 0, 0, 0, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"VoiceVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/TextVoiceVolume.dds",
-                "width":130,
-                "height":50,
+                "asset":"Assets/spriteData/UI/SoundOption/VoiceIcon.dds",
+                "width":155,
+                "height":58,
                 "position":[ -555, 20, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 0, 0, 0, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"SEVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/TextSEVolume.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/SEIcon.dds",
                 "width":90,
                 "height":48,
                 "position":[ -555, -92, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 0, 0, 0, 255]
             },
             {
                 "type":"UIIcon",
                 "name":"BGMVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/TextBGMVolume.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/BGMIcon.dds",
                 "width":150,
                 "height":50,
-                "position":[ -548, -200, 0],
+                "position":[ -552, -200, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]  
+                "color":[ 0, 0, 0, 255]  
             },
             {
                 "type":"UIIcon",
                 "name":"SoundOptionTitleBackFrameIcon",
-                "asset":"Assets/spriteData/UI/Frame/TitleFrame.dds",
-                "width":900,
-                "height":118,
-                "position":[ -330, 290, 0],
+                "asset":"Assets/spriteData/UI/SoundOption/SubTitleFrameIcon.dds",
+                "width":700,
+                "height":100,
+                "position":[ -330, 320, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 100]
+                "color":[ 255, 255, 255, 120]
             },
             {
                 "type":"UIIcon",
                 "name":"SoundOptionTitleIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/TextSoundOption.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/SubTitleIcon.dds",
                 "width":600,
                 "height":70,
-                "position":[ -330, 300, 0],
+                "position":[ -330, 320, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 0, 0, 0, 255]
             },
-            {
-                "type":"UIIcon",
-                "name":"SoundOptionLowGroundIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/LowGround.dds",
-                "width":680,
-                "height":40,
-                "position":[ -289, 244, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
-            },
+
+
+
+
             {
                 "type":"UIGauge",
                 "name":"SoundOptionMasterGauge",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/VolumeBarIcon.dds",
                 "width":1000,
-                "height":50,
-                "position":[ -420, 130, 0],
+                "height":40,
+                "position":[ -420, 123, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255],
@@ -176,10 +192,10 @@
             {
                 "type":"UIGauge",
                 "name":"SoundOptionVoiceGauge",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/VolumeBarIcon.dds",
                 "width":1000,
-                "height":50,
-                "position":[ -420, 20, 0],
+                "height":40,
+                "position":[ -420, 15, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255],
@@ -188,9 +204,9 @@
             {
                 "type":"UIGauge",
                 "name":"SoundOptionSEGauge",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/VolumeBarIcon.dds",
                 "width":1000,
-                "height":50,
+                "height":40,
                 "position":[ -420, -90, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -200,32 +216,46 @@
             {
                 "type":"UIGauge",
                 "name":"SoundOptionBGMGauge",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_amount.dds",
+                "asset":"Assets/spriteData/UI/SoundOption/VolumeBarIcon.dds",
                 "width":1000,
-                "height":50,
+                "height":40,
                 "position":[ -420, -200, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255],
                 "pivot":[ 0, 0.5]
             },
+            
             {
                 "type":"UIIcon",
-                "name":"SoundKnobMasterIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "name":"SoundMasterFrame",
+                "asset":"Assets/spriteData/UI/SoundOption/knobFrameIcon.dds",
                 "width":40,
-                "height":78,
-                "position":[ 580, 130, 0],
+                "height":85,
+                "position":[ 580, 125, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
             },
+
             {
                 "type":"UIIcon",
-                "name":"SoundKnobVoiceIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "name":"SoundKnobMasterIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/knobIconStick.dds",
+                "width":30,
+                "height":70,
+                "position":[ 580, 125, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+            {
+                "type":"UIIcon",
+                "name":"SoundVoiceFrame",
+                "asset":"Assets/spriteData/UI/SoundOption/knobFrameIcon.dds",
                 "width":40,
-                "height":78,
+                "height":85,
                 "position":[ 580, 20, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -233,10 +263,22 @@
             },
             {
                 "type":"UIIcon",
-                "name":"SoundKnobSEIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "name":"SoundKnobVoiceIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/knobIconStick.dds",
+                "width":30,
+                "height":70,
+                "position":[ 580, 20, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+            {
+                "type":"UIIcon",
+                "name":"SoundSEFrame",
+                "asset":"Assets/spriteData/UI/SoundOption/knobFrameIcon.dds",
                 "width":40,
-                "height":78,
+                "height":85,
                 "position":[ 580, -90, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -244,10 +286,33 @@
             },
             {
                 "type":"UIIcon",
-                "name":"SoundKnobBGMIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/volume_knob.dds",
+                "name":"SoundKnobSEIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/knobIconStick.dds",
+                "width":30,
+                "height":70,
+                "position":[ 580, -90, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+
+            {
+                "type":"UIIcon",
+                "name":"SoundBGMFrame",
+                "asset":"Assets/spriteData/UI/SoundOption/knobFrameIcon.dds",
                 "width":40,
-                "height":78,
+                "height":85,
+                "position":[ 580, -200, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"SoundKnobBGMIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/knobIconStick.dds",
+                "width":30,
+                "height":70,
                 "position":[ 580 , -200, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
@@ -255,52 +320,51 @@
             },
 
 
-
             {
                 "type":"UIDigit",
                 "name":"SoundMasterDigit",
-                "asset":"Assets/spriteData/UI/Number",
+                "asset":"Assets/spriteData/UI/Number/White",
                 "digit":3,
                 "number":50,
-                "width":30,
-                "height":40,
-                "position":[ 700, 130, 0],
+                "width":45,
+                "height":45,
+                "position":[ 730, 130, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0
             },
             {
                 "type":"UIDigit",
                 "name":"SoundVoiceDigit",
-                "asset":"Assets/spriteData/UI/Number",
+                "asset":"Assets/spriteData/UI/Number/White",
                 "digit":3,
                 "number":50,
-                "width":30,
-                "height":40,
-                "position":[ 700, 20, 0],
+                "width":45,
+                "height":45,
+                "position":[ 730, 20, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0
             },
             {
                 "type":"UIDigit",
                 "name":"SoundSEDigit",
-                "asset":"Assets/spriteData/UI/Number",
+                "asset":"Assets/spriteData/UI/Number/White",
                 "digit":3,
                 "number":50,
-                "width":30,
-                "height":40,
-                "position":[ 700, -90, 0],
+                "width":45,
+                "height":45,
+                "position":[ 730, -90, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0
             },
             {
                 "type":"UIDigit",
                 "name":"SoundBGMDigit",
-                "asset":"Assets/spriteData/UI/Number",
+                "asset":"Assets/spriteData/UI/Number/White",
                 "digit":3,
                 "number":50,
-                "width":30,
-                "height":40,
-                "position":[ 700, -200, 0],
+                "width":45,
+                "height":45,
+                "position":[ 730, -200, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0
             }
