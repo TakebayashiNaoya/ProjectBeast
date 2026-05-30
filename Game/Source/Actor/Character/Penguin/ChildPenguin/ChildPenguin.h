@@ -21,7 +21,7 @@ namespace app
 		namespace
 		{
 			/** 子ペンギンのスケール */
-			const Vector3 CHILD_PENGUIN_SCALE = Vector3(0.8f, 0.6f, 0.8f);
+			const Vector3 CHILD_PENGUIN_SCALE = Vector3(0.6f, 0.4f, 0.6f);
 		}
 
 
