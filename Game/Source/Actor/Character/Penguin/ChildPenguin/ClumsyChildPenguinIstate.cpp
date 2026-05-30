@@ -10,6 +10,8 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 
+#include "Source/sound/SoundManager.h"
+
 
 namespace app
 {
@@ -40,6 +42,11 @@ namespace app
 
 		void ClumsyTripState::Exit()
 		{
+			if (!m_owner->GetIsHelped()) // IsHelped() を GetIsHelped() に修正
+			{
+				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+			}
+
 			/** 転倒フラグをリセットする */
 			m_owner->SetIsTripped(false);
 		}
@@ -104,7 +111,11 @@ namespace app
 
 		void ClumsySlipState::Exit()
 		{
-			/** スリップフラグをリセットする */
+			if (!m_owner->GetIsHelped()) // IsHelped() を GetIsHelped() に修正
+			{
+				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+			}
+
 			m_owner->SetIsSlipped(false);
 		}
 
