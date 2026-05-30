@@ -29,36 +29,20 @@ namespace app
 			void Searching();
 			
 			/**
-			 * @brief アイコンとフレームの描画のオンオフをまとめる用
-			 * @param isDraw アイコンとフレームの描画の設定
-			 */
-			void SetAllIconActive(bool isDraw);
-
-			/**
 			 * @brief アクティブの取得
 			 * @return m_isActive アクティブの取得
 			 */
-			inline bool IsActive()const { return m_isActive; }
+			bool IsActive()const { return m_isActive; }
 			/**
 			 * @brief アクティブの設定
 			 * @param isActive アクティブに応じての設定
 			 */
-			inline void SetIsActive(bool isActive) { m_isActive = isActive; }
+			void SetIsActive(bool isActive) { m_isActive = isActive; }
 			/**
 			 * @brief 敵の情報の設定
 			 * @param enemy 敵の情報の設定
 			 */
 			void SetEnemy(actor::Enemy* enemy) { m_enemy = enemy; }
-			/**
-			 * @brief 見つけるか見つけないかのフラグの設定
-			 * @param canFind 見つけるか見つけないかのフラグの設定
-			 */
-			inline void SetCanFind(bool canFind) { m_canFind = canFind; }
-			/**
-			 * @brief 見つけるか見つけないかのフラグの取得
-			 * @return m_canFind 見つけるか見つけないかのフラグの取得
-			 */
-			inline bool CanFind()const { return m_canFind; }
 
 			/**
 			 * @brief 描画の設定
@@ -73,7 +57,6 @@ namespace app
 			actor::Enemy* m_enemy = nullptr;
 			bool m_isDraw = false;
 			bool m_isActive = false;
-			bool m_canFind = false;
 		};
 	}
 }
