@@ -229,7 +229,7 @@ namespace app
 		{
 			menu->SetEnemy(enemy);
 			menu->SetIsActive(true);
-			menu->SetDraw(true);
+			menu->SetDraw(false);
 		}
 
 		m_searchLayouts.push_back(layout);
