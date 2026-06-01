@@ -22,36 +22,8 @@ namespace app
 	{
 		namespace
 		{
-			/** 泣きエフェクトの頭部Yオフセット（足元から頭の高さ分） 要調整 */
-			constexpr float CRY_EFFECT_HEAD_OFFSET_Y = 80.0f;
-
-
-			/**
-			* @brief 指定座標からカメラを向くビルボード回転を計算する
-			*/
-			Quaternion CalcBillboardRotation(const Vector3& pos)
-			{
-				Vector3 toCam = g_camera3D->GetPosition() - pos;
-				toCam.Normalize();
-
-				const Vector3 defaultForward(0.0f, 0.0f, 1.0f);
-				Vector3 rotAxis;
-				rotAxis.Cross(defaultForward, toCam);
-
-				Quaternion result;
-				const float lenSq = rotAxis.LengthSq();
-				if (lenSq > FLT_EPSILON)
-				{
-					rotAxis.Normalize();
-					const float dot = std::clamp(defaultForward.Dot(toCam), -1.0f, 1.0f);
-					result.SetRotation(rotAxis, acosf(dot));
-				}
-				else if (defaultForward.Dot(toCam) < 0.0f)
-				{
-					result.SetRotationY(Math::PI);
-				}
-				return result;
-			}
+			/** 転んだ時のエフェクトのスケール */
+			const Vector3 CRY_EFFECT_SCALE = { 6.0f,6.0f,6.0f };
 		}
 
 
@@ -129,14 +101,19 @@ namespace app
 
 		void ClumsyStandUpState::Exit()
 		{
+			// 起き上がり完了時にエフェクトを停止する
+			const EffectHandle handle = m_owner->GetCryEffectHandle();
+			if (handle != INVALID_EFFECT_HANDLE)
+			{
+				EffectManager::Get().StopEffect(handle);
+				m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
+			}
+
 			/** 助けられフラグをリセットする */
 			m_owner->SetIsHelped(false);
 
 			/** Managerの転倒中リストから解除する */
 			ChildPenguinManager::GetInstance()->UnregisterDowning(m_owner->GetOwnerChildPenguin());
-
-			// エフェクトハンドルをリセット
-			m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
 		}
 
 
@@ -180,7 +157,7 @@ namespace app
 					EnEffectKind::ChildPenguinCry,
 					pos,
 					Quaternion::Identity,
-					Vector3(6.0f, 6.0f, 6.0f)
+					CRY_EFFECT_SCALE
 				);
 				m_owner->SetCryEffectHandle(handle);
 			}

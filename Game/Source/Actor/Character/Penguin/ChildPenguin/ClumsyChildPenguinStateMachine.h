@@ -5,8 +5,8 @@
  */
 #pragma once
 #include "ChildPenguinStateMachine.h"
-
 #include "Source/Effect/EffectManager.h"
+
 
 namespace app
 {
@@ -61,18 +61,14 @@ namespace app
 				m_isHelped = isHelped;
 			}
 
-
+			/**
+			 * @brief エフェクトのハンドルを設定する
+			 * @param handle エフェクトのハンドル
+			 */
 			inline void SetCryEffectHandle(const EffectHandle handle)
 			{
 				m_cryEffectHandle = handle;
 			}
-
-
-			inline EffectHandle GetCryEffectHandle() const
-			{
-				return m_cryEffectHandle;
-			}
-
 
 			/**
 			 * @brief 転倒中かどうかを取得する
@@ -82,6 +78,7 @@ namespace app
 			{
 				return m_isTripped;
 			}
+
 
 			/**
 			 * @brief スリップ中かどうかを取得する
@@ -99,6 +96,15 @@ namespace app
 			inline bool GetIsHelped() const
 			{
 				return m_isHelped;
+			}
+
+			/**
+			 * @brief エフェクトのハンドルを取得する
+			 * @return m_cryEffectHandle エフェクトのハンドル
+			 */
+			inline EffectHandle GetCryEffectHandle() const
+			{
+				return m_cryEffectHandle;
 			}
 
 
