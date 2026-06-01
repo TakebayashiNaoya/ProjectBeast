@@ -19,6 +19,7 @@ enum class EnEffectKind : uint8_t
 	PenguinLanding,
 	PenguinSlideFrost,
 	PenguinSlideLine,
+	ChildPenguinCry,
 	Max,
 	None = Max,
 };
@@ -49,4 +50,5 @@ static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Ma
 	EffectInformation(u"Assets/effect/penguin/jump/LandingFrost.efk", 60.0f),
 	EffectInformation(u"Assets/effect/penguin/slide/SlideFrost.efk", 50.0f),
 	EffectInformation(u"Assets/effect/penguin/slide/SlideLine.efk", 100.0f),
+	EffectInformation(u"Assets/effect/penguin/childPenguin/penguinCRY.efk", 150.0f),
 };

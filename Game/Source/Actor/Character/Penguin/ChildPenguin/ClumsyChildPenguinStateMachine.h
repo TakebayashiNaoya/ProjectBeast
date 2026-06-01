@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "ChildPenguinStateMachine.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -61,6 +62,15 @@ namespace app
 			}
 
 			/**
+			 * @brief エフェクトのハンドルを設定する
+			 * @param handle エフェクトのハンドル
+			 */
+			inline void SetCryEffectHandle(const EffectHandle handle)
+			{
+				m_cryEffectHandle = handle;
+			}
+
+			/**
 			 * @brief 転倒中かどうかを取得する
 			 * @return 転倒中ならtrue
 			 */
@@ -68,6 +78,7 @@ namespace app
 			{
 				return m_isTripped;
 			}
+
 
 			/**
 			 * @brief スリップ中かどうかを取得する
@@ -85,6 +96,15 @@ namespace app
 			inline bool GetIsHelped() const
 			{
 				return m_isHelped;
+			}
+
+			/**
+			 * @brief エフェクトのハンドルを取得する
+			 * @return m_cryEffectHandle エフェクトのハンドル
+			 */
+			inline EffectHandle GetCryEffectHandle() const
+			{
+				return m_cryEffectHandle;
 			}
 
 
@@ -110,6 +130,8 @@ namespace app
 			bool m_isSlipped = false;
 			/** 世話焼きペンギンに助けられたフラグ（転倒・スリップ中の即復帰に使う） */
 			bool m_isHelped = false;
+			/** おっちょこちょいペンギンのエフェクトのハンドル */
+			EffectHandle m_cryEffectHandle = INVALID_EFFECT_HANDLE;
 		};
 	}
 }
