@@ -491,7 +491,12 @@ namespace app
 			m_owner->SetIsSwimming(true);
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
 
-			if (m_seHandle == app::INVALID_SE_HANDLE)
+			m_seHandle = app::INVALID_SE_HANDLE;
+
+			/** 自分が子ペンギンで、かつ可聴対象の場合のみSEを開始する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child == nullptr
+				|| ChildPenguinManager::GetInstance()->IsAudible(child))
 			{
 				m_seHandle = SoundManager::Get().PlaySE(enSoundKind::enSoundKind_PenguinWaterIn, false);
 			}
@@ -503,11 +508,49 @@ namespace app
 		void PenguinSwimmingState::Update()
 		{
 			SoundManager* sound = &SoundManager::Get();
+
+			/** 可聴状態を先に取得し、以降のブロックで共用する */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			const bool isAudible = (child == nullptr)
+				|| ChildPenguinManager::GetInstance()->IsAudible(child);
+
+			/** WaterIn SE の終了検出：FindSE が nullptr = 再生終了 → ハンドルをリセットする */
+			/** （PlaySE はリクエスト方式のため、登録直後は FindSE が nullptr を返す場合がある。 */
+			/**   そのため有効ハンドルかつ SoundSource 生成済み（FindSE != nullptr）の状態で */
+			/**   再生終了したときのみリセットする） */
 			if (m_seHandle != app::INVALID_SE_HANDLE)
 			{
 				auto* se = sound->FindSE(m_seHandle);
-				if (se && se->IsPlaying()) {
+				if (se != nullptr && !se->IsPlaying())
+				{
+					/** WaterIn SE が再生終了したのでハンドルをリセットする */
+					m_seHandle = app::INVALID_SE_HANDLE;
+				}
+			}
+
+			/** 子ペンギンの場合、可聴状態の変化に応じてSwimming SEを開始・停止する */
+			if (child != nullptr)
+			{
+				/** soundHandle が有効値かどうかだけで再生中を判定する */
+				const bool isPlaying = (m_seHandle != app::INVALID_SE_HANDLE);
+
+				if (isAudible && !isPlaying)
+				{
+					/** WaterIn 終了後、または可聴対象になったので Swimming SEを開始する */
+					m_seHandle = sound->PlaySE(enSoundKind::enSoundKind_PenguinSwimming, true);
+				}
+				else if (!isAudible && isPlaying)
+				{
+					/** 可聴対象から外れたのでSEを停止する */
 					sound->StopSE(m_seHandle);
+					m_seHandle = app::INVALID_SE_HANDLE;
+				}
+			}
+			else
+			{
+				/** 親ペンギンの場合：WaterIn 終了後に Swimming SEを開始する */
+				if (m_seHandle == app::INVALID_SE_HANDLE)
+				{
 					m_seHandle = sound->PlaySE(enSoundKind::enSoundKind_PenguinSwimming, true);
 				}
 			}
@@ -576,7 +619,13 @@ namespace app
 				if (se && se->IsPlaying()) {
 					sound->StopSE(m_seHandle);
 					m_seHandle = app::INVALID_SE_HANDLE;
-					sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
+
+					// バトルが終了済みの場合は水から出るSEを鳴らさない
+					const bool isBattleEnded = TimeManager::GetInstance().IsTimeUp();
+					if (!isBattleEnded)
+					{
+						sound->PlaySE(enSoundKind::enSoundKind_PenguinWaterOut, false);
+					}
 				}
 			}
 		}

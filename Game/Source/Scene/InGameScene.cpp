@@ -387,6 +387,8 @@ namespace app
 			/** 終了判定 */
 			if (BattleManager::GetInstance().GetBattleState() != BattleManager::EnBattleState::Playing)
 			{
+				SoundManager::Get().StopAllSE();
+
 				/** FINISH 演出開始 */
 				auto* finishMenu = uiMngr->GetFinishMenu();
 				if (finishMenu) finishMenu->StartFinish();
