@@ -22,6 +22,10 @@ namespace app
 	{
 		namespace
 		{
+			/** 泣きエフェクトの頭部Yオフセット（足元から頭の高さ分） 要調整 */
+			constexpr float CRY_EFFECT_HEAD_OFFSET_Y = 80.0f;
+
+
 			/**
 			* @brief 指定座標からカメラを向くビルボード回転を計算する
 			*/
@@ -112,9 +116,7 @@ namespace app
 				auto* emitter = EffectManager::Get().FindEffect(handle);
 				if (emitter != nullptr)
 				{
-					// ペンギンの現在位置でビルボード回転を更新
-					const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
-					emitter->SetRotation(CalcBillboardRotation(pos));
+
 				}
 				else
 				{
@@ -171,13 +173,14 @@ namespace app
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+				//const Vector3 headPos = pos + Vector3(0.0f, CRY_EFFECT_HEAD_OFFSET_Y, 0.0f); // 追加: 頭部オフセット
 
 				// エフェクト再生（ハンドルをステートマシンに保存）
 				const EffectHandle handle = EffectManager::Get().PlayEffect(
 					EnEffectKind::ChildPenguinCry,
 					pos,
-					CalcBillboardRotation(pos),
-					Vector3(2.0f, 2.0f, 2.0f)
+					Quaternion::Identity,
+					Vector3(6.0f, 6.0f, 6.0f)
 				);
 				m_owner->SetCryEffectHandle(handle);
 			}
