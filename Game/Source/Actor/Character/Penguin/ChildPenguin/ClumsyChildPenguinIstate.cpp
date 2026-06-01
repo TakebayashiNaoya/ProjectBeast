@@ -20,7 +20,7 @@ namespace app
 		namespace
 		{
 			/** 転んだ時のエフェクトのスケール */
-			const Vector3 CRY_EFFECT_SCALE = { 6.0f,6.0f,6.0f };
+			const Vector3 CRY_EFFECT_SCALE = { 6.0f, 6.0f, 6.0f };
 		}
 
 
@@ -131,8 +131,6 @@ namespace app
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
-				//const Vector3 headPos = pos + Vector3(0.0f, CRY_EFFECT_HEAD_OFFSET_Y, 0.0f); // 追加: 頭部オフセット
-
 				// エフェクト再生（ハンドルをステートマシンに保存）
 				const EffectHandle handle = EffectManager::Get().PlayEffect(
 					EnEffectKind::ChildPenguinCry,
