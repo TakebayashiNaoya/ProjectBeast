@@ -9,11 +9,8 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
-
-#include "graphics/effect/BeastEffectEmitter.h"
 #include "Source/Effect/EffectManager.h"
 #include "Source/Sound/SoundManager.h"
-#include <algorithm>
 
 
 namespace app
@@ -80,23 +77,7 @@ namespace app
 
 
 		void ClumsyStandUpState::Update()
-		{
-			// ── エフェクトが再生中なら毎フレームカメラを向かせる ──
-			const EffectHandle handle = m_owner->GetCryEffectHandle();
-			if (handle != INVALID_EFFECT_HANDLE)
-			{
-				auto* emitter = EffectManager::Get().FindEffect(handle);
-				if (emitter != nullptr)
-				{
-
-				}
-				else
-				{
-					// エフェクト終了済み → ハンドルをリセット
-					m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
-				}
-			}
-		}
+		{}
 
 
 		void ClumsyStandUpState::Exit()
