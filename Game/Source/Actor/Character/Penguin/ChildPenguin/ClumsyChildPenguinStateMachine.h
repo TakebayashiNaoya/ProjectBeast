@@ -6,6 +6,7 @@
 #pragma once
 #include "ChildPenguinStateMachine.h"
 
+#include "Source/Effect/EffectManager.h"
 
 namespace app
 {
@@ -60,6 +61,19 @@ namespace app
 				m_isHelped = isHelped;
 			}
 
+
+			inline void SetCryEffectHandle(const EffectHandle handle)
+			{
+				m_cryEffectHandle = handle;
+			}
+
+
+			inline EffectHandle GetCryEffectHandle() const
+			{
+				return m_cryEffectHandle;
+			}
+
+
 			/**
 			 * @brief 転倒中かどうかを取得する
 			 * @return 転倒中ならtrue
@@ -110,6 +124,8 @@ namespace app
 			bool m_isSlipped = false;
 			/** 世話焼きペンギンに助けられたフラグ（転倒・スリップ中の即復帰に使う） */
 			bool m_isHelped = false;
+			/** おっちょこちょいペンギンのエフェクトのハンドル */
+			EffectHandle m_cryEffectHandle = INVALID_EFFECT_HANDLE;
 		};
 	}
 }

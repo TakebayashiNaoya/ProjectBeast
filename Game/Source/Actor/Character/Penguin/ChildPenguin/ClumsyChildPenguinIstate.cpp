@@ -10,13 +10,47 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 
+#include "graphics/effect/BeastEffectEmitter.h"
+#include "Source/Effect/EffectManager.h"
 #include "Source/Sound/SoundManager.h"
+#include <algorithm>
 
 
 namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/**
+			* @brief 指定座標からカメラを向くビルボード回転を計算する
+			*/
+			Quaternion CalcBillboardRotation(const Vector3& pos)
+			{
+				Vector3 toCam = g_camera3D->GetPosition() - pos;
+				toCam.Normalize();
+
+				const Vector3 defaultForward(0.0f, 0.0f, 1.0f);
+				Vector3 rotAxis;
+				rotAxis.Cross(defaultForward, toCam);
+
+				Quaternion result;
+				const float lenSq = rotAxis.LengthSq();
+				if (lenSq > FLT_EPSILON)
+				{
+					rotAxis.Normalize();
+					const float dot = std::clamp(defaultForward.Dot(toCam), -1.0f, 1.0f);
+					result.SetRotation(rotAxis, acosf(dot));
+				}
+				else if (defaultForward.Dot(toCam) < 0.0f)
+				{
+					result.SetRotationY(Math::PI);
+				}
+				return result;
+			}
+		}
+
+
 		ClumsyChildPenguinIState::ClumsyChildPenguinIState(ClumsyChildPenguinStateMachine* owner)
 			: m_owner(owner)
 		{}
@@ -70,7 +104,25 @@ namespace app
 
 
 		void ClumsyStandUpState::Update()
-		{}
+		{
+			// ── エフェクトが再生中なら毎フレームカメラを向かせる ──
+			const EffectHandle handle = m_owner->GetCryEffectHandle();
+			if (handle != INVALID_EFFECT_HANDLE)
+			{
+				auto* emitter = EffectManager::Get().FindEffect(handle);
+				if (emitter != nullptr)
+				{
+					// ペンギンの現在位置でビルボード回転を更新
+					const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+					emitter->SetRotation(CalcBillboardRotation(pos));
+				}
+				else
+				{
+					// エフェクト終了済み → ハンドルをリセット
+					m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
+				}
+			}
+		}
 
 
 		void ClumsyStandUpState::Exit()
@@ -80,6 +132,9 @@ namespace app
 
 			/** Managerの転倒中リストから解除する */
 			ChildPenguinManager::GetInstance()->UnregisterDowning(m_owner->GetOwnerChildPenguin());
+
+			// エフェクトハンドルをリセット
+			m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
 		}
 
 
@@ -114,6 +169,17 @@ namespace app
 			if (!m_owner->GetIsHelped())
 			{
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+
+				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+
+				// エフェクト再生（ハンドルをステートマシンに保存）
+				const EffectHandle handle = EffectManager::Get().PlayEffect(
+					EnEffectKind::ChildPenguinCry,
+					pos,
+					CalcBillboardRotation(pos),
+					Vector3(2.0f, 2.0f, 2.0f)
+				);
+				m_owner->SetCryEffectHandle(handle);
 			}
 
 			m_owner->SetIsSlipped(false);
