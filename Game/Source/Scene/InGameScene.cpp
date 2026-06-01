@@ -385,8 +385,10 @@ namespace app
 			NoiseManager::GetInstance().ClearNoises();
 
 			/** 終了判定 */
-			if (BattleManager::GetInstance().GetBattleState() != BattleManager::EnBattleState::Playing)
+			if (BattleManager::GetInstance().GetBattleState() == BattleManager::EnBattleState::Finished)
 			{
+				SoundManager::Get().StopAllSE();
+
 				/** FINISH 演出開始 */
 				auto* finishMenu = uiMngr->GetFinishMenu();
 				if (finishMenu) finishMenu->StartFinish();
