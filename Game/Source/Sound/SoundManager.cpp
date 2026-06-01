@@ -16,6 +16,8 @@ namespace
 
 	constexpr uint8_t CP_WATER_OUT_NUM = 10;
 
+	constexpr uint8_t CLUMSY_CP_CRY_NUM = 5;
+
 	constexpr float DEFAULT_VOLUME = 0.1f;
 
 	constexpr const char* SOUND_GO_NAME = "se";
@@ -51,6 +53,7 @@ namespace app
 		// 子ペンギンのリアクションSE（同種が重複しないよう制限）
 		m_seConcurrentLimitMap[enSoundKind_CPReactionHappy] = CP_REACTION_SE_PLAY_NUM;
 		m_seConcurrentLimitMap[enSoundKind_CPReactionTrouble] = CP_REACTION_SE_PLAY_NUM;
+		m_seConcurrentLimitMap[enSoundKind_ChildPenguinCRY] = CLUMSY_CP_CRY_NUM;
 
 	}
 

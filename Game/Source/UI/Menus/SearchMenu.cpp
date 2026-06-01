@@ -8,7 +8,6 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/UI/Model/SearchStatus.h"
-#include "Source/Util/CRC32.h"
 
 
 namespace app
@@ -18,7 +17,6 @@ namespace app
 		SearchMenu::SearchMenu()
 			: m_enemy(nullptr)
 			, m_isActive(false)
-			, m_canFind(false)
 		{
 			// シロクマ追跡・索敵専用ステータスを生成。
 			m_searchStatus = std::make_unique<SearchStatus>();
@@ -36,8 +34,17 @@ namespace app
 			// インゲーム内で一瞬だけ表示されるバグを防ぐ。
 			if (!m_isDraw)
 			{
-				// アイコンとフレームを全て非表示にする。
-				SetAllIconActive(false);
+				auto* iconA = GetUI<UIIcon>(Hash32("canSearchIcon"));
+				if (iconA) iconA->m_isDraw = false;
+
+				auto* iconB = GetUI<UIIcon>(Hash32("canNotSearchIcon"));
+				if (iconB) iconB->m_isDraw = false;
+
+				auto* frameA = GetUI<UIIcon>(Hash32("canSearchFrame"));
+				if (frameA) frameA->m_isDraw = false;
+
+				auto* frameB = GetUI<UIIcon>(Hash32("canNotSearchFrame"));
+				if(frameB) frameB->m_isDraw = false;
 
 				MenuBase::Update();
 				return;
@@ -59,6 +66,7 @@ namespace app
 		{
 			// 敵やステートマシンが存在しない場合は処理を行わない。
 			if (!m_enemy || !m_enemy->GetEnemyStateMachine()) return;
+			// 敵のステートマシンを取得。
 			auto* sm = m_enemy->GetEnemyStateMachine();
 
 			// 索敵状態と追跡状態の取得。
@@ -80,13 +88,27 @@ namespace app
 				// カメラからシロクマへのベクトルを計算。
 				Vector3 toEnemy = enemyPos - cameraPos;
 				
+				// ベクトルを正規化。
+				toEnemy.Normalize();
+
 				// 内積が0以下の時は、全てのUIIconを非表示。
 				if (g_camera3D->GetForward().Dot(toEnemy) <= m_searchStatus->GetDotValue())
 				{
-					// シロクマがカメラの後ろにいる場合は、全てのアイコンを非表示にする。
-					SetAllIconActive(false);
+					auto* canFindIcon = GetUI<UIIcon>(Hash32("canSearchIcon"));
+					if (canFindIcon) canFindIcon->m_isDraw = false;
+
+					auto* canNotFindIcon = GetUI<UIIcon>(Hash32("canNotSearchIcon"));
+					if (canNotFindIcon) canNotFindIcon->m_isDraw = false;
+
+					auto* frameA = GetUI<UIIcon>(Hash32("canSearchFrame"));
+					if (frameA) frameA->m_isDraw = false;
+
+					auto* frameB = GetUI<UIIcon>(Hash32("canNotSearchFrame"));
+					if (frameB) frameB->m_isDraw = false;
+
 					return;
 				}
+
 
 				Vector2 screenPos = Vector2::Zero;
 				// シロクマの頭上のスクリーン座標を計算
@@ -115,7 +137,8 @@ namespace app
 				if (frameA) frameA->m_transform.m_localTransform.m_position = iconPos + offsetA;
 			}
 			// 索敵状態のアイコンとフレームの描画設定。
-			bool canNotDraw = m_isActive && isSearching;
+			// 追跡状態の時の表示を優先するので、追跡中は索敵アイコンを出さないようにする。
+			bool canNotDraw = m_isActive && isSearching && !isChasing;
 
 			if (canNotFindIcon) canNotFindIcon->m_isDraw = canNotDraw;
 			if (frameB) frameB->m_isDraw = canNotDraw;
@@ -128,24 +151,19 @@ namespace app
 		}
 
 
-		void SearchMenu::SetAllIconActive(bool isDraw)
-		{
-			auto* canFindIcon = GetUI<UIIcon>(Hash32("canSearchIcon"));
-			auto* canNotFindIcon = GetUI<UIIcon>(Hash32("canNotSearchIcon"));
-			auto* frameA = GetUI<UIIcon>(Hash32("canSearchFrame"));
-			auto* frameB = GetUI<UIIcon>(Hash32("canNotSearchFrame"));
-
-			if (canFindIcon)    canFindIcon->m_isDraw = isDraw;
-			if (canNotFindIcon) canNotFindIcon->m_isDraw = isDraw;
-			if (frameA)         frameA->m_isDraw = isDraw;
-			if (frameB)         frameB->m_isDraw = isDraw;
-		}
-
-
 		void SearchMenu::InitializeLogic()
 		{
-			// ゲームが開始段階であれば、アイコンとフレームは全て非表示にする。
-			SetAllIconActive(false);
+			auto* canFindIcon = GetUI<UIIcon>(Hash32("canSearchIcon"));
+			if (canFindIcon) canFindIcon->m_isDraw = false;
+
+			auto* canNotFindIcon = GetUI<UIIcon>(Hash32("canNotSearchIcon"));
+			if (canNotFindIcon) canNotFindIcon->m_isDraw = false;
+
+			auto* frameA = GetUI<UIIcon>(Hash32("canSearchFrame"));
+			if (frameA) frameA->m_isDraw = false;
+
+			auto* frameB = GetUI<UIIcon>(Hash32("canNotSearchFrame"));
+			if (frameB) frameB->m_isDraw = false;
 		}
 	}
 }
