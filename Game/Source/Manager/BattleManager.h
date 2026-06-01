@@ -61,8 +61,7 @@ namespace app
 		enum class EnBattleState : uint8_t
 		{
 			Playing,   /** プレイ中			*/
-			Clear,     /** クリア			*/
-			GameOver   /** ゲームオーバー	*/
+			Finished   /** ゲーム終了（タイムアップ or 全員救助）	*/
 		};
 
 		/**

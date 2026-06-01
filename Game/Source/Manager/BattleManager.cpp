@@ -14,18 +14,12 @@ namespace app
 	BattleManager* BattleManager::m_instance = nullptr;
 
 
-	namespace
-	{
-		constexpr int CLEAR_COUNT = 50;	/** クリア条件のペンギンの数 */
-	}
-
-
 	void BattleManager::Update()
 	{
 		/** バトルの状態を確認 */
 		m_battleState = CheckBattleState();
 
-		/** ゲームクリアorゲームオーバーなら更新処理をブロック */
+		/** ゲーム終了なら更新処理をブロック */
 		if (m_battleState != EnBattleState::Playing) return;
 
 
@@ -76,33 +70,18 @@ namespace app
 
 	BattleManager::EnBattleState BattleManager::CheckBattleState() const
 	{
-		/** スコアマネージャーから、今のスコアと最大スコアを取得 */
-		auto& score = ScoreManager::GetInstance();
 		const int collected = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
-		const int total = score.GetTotalCount();
-		/** タイムマネージャーから、タイムアップしているかどうかを取得 */
+		const int total = ScoreManager::GetInstance().GetTotalCount();
 		const bool isTimeUp = TimeManager::GetInstance().IsTimeUp();
 
 		/**
-		 *	【クリア条件】
-		 *	1. 一定数以上救助 & 全ての子ペンギンを救助
-		 *	2. 一定数以上救助 & タイムアップ
+		 *	[終了条件]
+		 *	1. 全員救助（救助数 == ステージ上の総数）
+		 *	2. タイムアップ
 		 */
-		if ((collected >= CLEAR_COUNT && collected == total)
-			|| (collected >= CLEAR_COUNT && isTimeUp))
+		if (collected == total || isTimeUp)
 		{
-			return EnBattleState::Clear;
-		}
-
-		/**
-		 *	【ゲームオーバー条件】
-		 *	1. ステージ上の子ペンギンが一定数未満（シロクマに食べられた）
-		 *	2. 救助数が一定以下 & タイムアップ
-		 */
-		if ((total < CLEAR_COUNT)
-			|| (collected < CLEAR_COUNT && isTimeUp))
-		{
-			return EnBattleState::GameOver;
+			return EnBattleState::Finished;
 		}
 
 		/** どちらも満たしていなければ継続 */

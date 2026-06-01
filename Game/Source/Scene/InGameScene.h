@@ -107,7 +107,5 @@ namespace app
 		/** ホイッスルを鳴らしたかどうか（Finishing フェーズで1回だけ鳴らすためのフラグ） */
 		bool m_isWhistlePlayed = false;
 
-		/** クリア判定用定数 */
-		static constexpr int CLEAR_COUNT = 50;
 	};
 }

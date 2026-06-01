@@ -238,5 +238,7 @@ namespace nsBeastEngine
 
 		/** フラスタム（視錐台）カリング用 */
 		Frustum m_frustum;
+		/** フラスタムカリングの有効/無効 */
+		bool m_frustumCullingEnabled = true;
 	};
 }

@@ -132,7 +132,7 @@ namespace app
 
 		public:
 			Whirlpool();
-			~Whirlpool() = default;
+			~Whirlpool();
 
 
 		private:
