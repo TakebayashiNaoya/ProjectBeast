@@ -12,6 +12,8 @@
 #include "Source/Effect/EffectManager.h"
 #include "Source/Sound/SoundManager.h"
 
+#include "Source/Noise/NoiseManager.h" 
+
 
 namespace app
 {
@@ -52,6 +54,9 @@ namespace app
 			if (!m_owner->GetIsHelped())
 			{
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+
+				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
 			}
 
 			/** 転倒フラグをリセットする */
@@ -131,6 +136,10 @@ namespace app
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+
+				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
+
+
 				// エフェクト再生（ハンドルをステートマシンに保存）
 				const EffectHandle handle = EffectManager::Get().PlayEffect(
 					EnEffectKind::ChildPenguinCry,

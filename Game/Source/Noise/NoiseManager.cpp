@@ -25,6 +25,8 @@ namespace app
 			return { 250.0f, 1.9f, 500.0f };
 		case EnNoiseType::Fall:
 			return { 400.0f, 1.0f, 500.0f };
+		case EnNoiseType::ClumsyCRY:
+			return { 7000.0f,0.5f,1000.0f };
 		default:
 			return { 0.0f, 0.0f, 0.0f };
 		}
