@@ -92,12 +92,20 @@ namespace nsBeastEngine
 
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 
-		// エフェクトを描画
-		EffectEngine::GetInstance()->Draw();
-
 		// ポストエフェクトの描画処理
 		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
 		PostEffect(rc);
+
+		// ブルーム完了後、mainRTをRTV状態に戻してエフェクトの描画先として設定する
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		rc.SetRenderTarget(
+			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
+			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
+		);
+
+		// エフェクトを描画
+		// ※PostEffect()完了後に呼び出すことでブルームの影響を受けないようにする
+		EffectEngine::GetInstance()->Draw();
 
 		// 2D描画処理
 		Render2D(rc);
