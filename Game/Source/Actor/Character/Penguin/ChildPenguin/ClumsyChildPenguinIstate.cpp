@@ -9,14 +9,23 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
-
+#include "Source/Effect/EffectManager.h"
 #include "Source/Sound/SoundManager.h"
+
+#include "Source/Noise/NoiseManager.h" 
 
 
 namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** 転んだ時のエフェクトのスケール */
+			const Vector3 CRY_EFFECT_SCALE = { 6.0f, 6.0f, 6.0f };
+		}
+
+
 		ClumsyChildPenguinIState::ClumsyChildPenguinIState(ClumsyChildPenguinStateMachine* owner)
 			: m_owner(owner)
 		{}
@@ -45,6 +54,9 @@ namespace app
 			if (!m_owner->GetIsHelped())
 			{
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+
+				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
 			}
 
 			/** 転倒フラグをリセットする */
@@ -75,6 +87,14 @@ namespace app
 
 		void ClumsyStandUpState::Exit()
 		{
+			// 起き上がり完了時にエフェクトを停止する
+			const EffectHandle handle = m_owner->GetCryEffectHandle();
+			if (handle != INVALID_EFFECT_HANDLE)
+			{
+				EffectManager::Get().StopEffect(handle);
+				m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
+			}
+
 			/** 助けられフラグをリセットする */
 			m_owner->SetIsHelped(false);
 
@@ -114,6 +134,20 @@ namespace app
 			if (!m_owner->GetIsHelped())
 			{
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+
+				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+
+				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
+
+
+				// エフェクト再生（ハンドルをステートマシンに保存）
+				const EffectHandle handle = EffectManager::Get().PlayEffect(
+					EnEffectKind::ChildPenguinCry,
+					pos,
+					Quaternion::Identity,
+					CRY_EFFECT_SCALE
+				);
+				m_owner->SetCryEffectHandle(handle);
 			}
 
 			m_owner->SetIsSlipped(false);

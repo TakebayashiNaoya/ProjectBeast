@@ -265,7 +265,8 @@ namespace nsBeastEngine
 		// フラスタムカリングで視錐台内のモデルのみ描画する
 		for (auto& MobjData : m_deferredModelList)
 		{
-			if (MobjData->IsCullingEnabled() &&
+			if (m_frustumCullingEnabled &&
+				MobjData->IsCullingEnabled() &&
 				!m_frustum.IsIntersectAABBWorld(MobjData->GetWorldAABBMin(), MobjData->GetWorldAABBMax()))
 			{
 				continue;
@@ -311,7 +312,8 @@ namespace nsBeastEngine
 		// フラスタムカリングで視錐台内のモデルのみ描画する
 		for (auto& renderObj : m_forwardModelList)
 		{
-			if (renderObj->IsCullingEnabled() &&
+			if (m_frustumCullingEnabled &&
+				renderObj->IsCullingEnabled() &&
 				!m_frustum.IsIntersectAABBWorld(renderObj->GetWorldAABBMin(), renderObj->GetWorldAABBMax()))
 			{
 				continue;

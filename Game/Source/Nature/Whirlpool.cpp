@@ -207,6 +207,12 @@ namespace app
 		{}
 
 
+		Whirlpool::~Whirlpool()
+		{
+			StopWhirlpoolEffect();
+		}
+
+
 		void Whirlpool::StateMachine()
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
