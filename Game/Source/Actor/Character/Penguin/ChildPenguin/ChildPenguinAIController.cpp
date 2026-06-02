@@ -22,13 +22,17 @@
 #include <random>
 
 
-
 namespace app
 {
 	namespace actor
 	{
 		namespace
 		{
+			/** 甘えん坊ペンギンのエフェクトオフセット */
+			const Vector3 CLINGY_HART_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
+			/** 甘えん坊ペンギンのエフェクトスケール */
+			const Vector3 CLINGY_HART_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
+			
 			/**
 			 * @brief ヒステリシス幅
 			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
@@ -109,6 +113,7 @@ namespace app
 		ChildPenguinAIController::ChildPenguinAIController(ChildPenguin* owner, EnChildPenguinType type)
 			: m_owner(owner)
 			, m_stateMachine(owner->GetStateMachine())
+			, m_hartEffectHandle(INVALID_EFFECT_HANDLE)
 		{
 			const auto& td = GetTypeData(type);
 
@@ -526,6 +531,7 @@ namespace app
 
 		ClingyChildPenguinAI::ClingyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Clingy)
+			, m_clingyEffectHandle(INVALID_EFFECT_HANDLE)
 		{}
 
 
@@ -552,10 +558,33 @@ namespace app
 					manager->AddFollower(m_owner);
 					m_isFollowing = true;
 				}
+
+				if (m_isFollowing)
+				{
+					m_effectInterval += g_gameTime->GetFrameDeltaTime();
+					if (m_effectInterval > 1.0f)
+					{
+						const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
+						const Vector3 hartScl = m_owner->GetTransform().m_scale + CLINGY_HART_EFFECT_SCALE;
+						m_clingyEffectHandle = EffectManager::Get().PlayEffect(
+							EnEffectKind::ClingyPenguinHart
+							, hartPos
+							, Quaternion::Identity
+							, hartScl
+						);
+						m_effectInterval = 0.0f;
+					}
+				}
+
 				else if (m_isFollowing && distDaddy > m_giveUpDistance)
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
+
+					// エフェクトを停止する。
+					EffectManager::Get().StopEffect(m_clingyEffectHandle);
+					// ハンドルを無効化する。
+					m_clingyEffectHandle = INVALID_EFFECT_HANDLE;					
 				}
 
 				if (!m_isFollowing)
@@ -608,6 +637,36 @@ namespace app
 			{
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
+			}
+
+			// エフェクト再生。
+			if (m_isFollowing && !m_isRestrained)
+			{
+				m_effectInterval += g_gameTime->GetFrameDeltaTime();
+				if (m_effectInterval > 1.0f)
+				{
+					const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
+					const Vector3 hartScl = m_owner->GetTransform().m_scale + CLINGY_HART_EFFECT_SCALE;
+					m_clingyEffectHandle = EffectManager::Get().PlayEffect(
+						EnEffectKind::ClingyPenguinHart
+						, hartPos
+						, Quaternion::Identity
+						, hartScl
+					);
+					m_effectInterval = 0.0f;
+				}
+			}
+
+			// エフェクト停止。
+			else
+			{
+				/** 追従から外れた、または制止された場合はエフェクトを即座に停止する */
+				if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
+				{
+					EffectManager::Get().StopEffect(m_clingyEffectHandle);
+					m_clingyEffectHandle = INVALID_EFFECT_HANDLE;
+					m_effectInterval = 0.0f; // インターバルをリセットし、次回追従時の表示タイミングを正常に保つ
+				}
 			}
 
 			/** 隊列参加中：距離だけで移動手段を決定する */
