@@ -15,6 +15,7 @@ namespace app
 		Dash,
 		Slide,
 		Fall,
+		ClumsyCRY,
 		Custom
 	};
 
