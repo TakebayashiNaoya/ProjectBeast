@@ -545,6 +545,43 @@ namespace app
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
+			// エフェクトの再生と位置更新を行うラムダ。
+			auto updateClingyEffect = [&]()
+				{
+					// 計測時間。
+					m_effectInterval += g_gameTime->GetFrameDeltaTime();
+					// ハートエフェクトの生み出される地点。
+					const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
+
+					// 1秒を超えたらエフェクトを再生。
+					if (m_effectInterval > 1.0f)
+					{
+						const Vector3 hartScl = m_owner->GetTransform().m_scale + CLINGY_HART_EFFECT_SCALE;
+						m_clingyEffectHandle = EffectManager::Get().PlayEffect(
+							EnEffectKind::ClingyPenguinHart
+							, hartPos
+							, Quaternion::Identity
+							, hartScl
+						);
+						// インターバルをリセット。
+						m_effectInterval = 0.0f;
+					}
+				};
+
+			// エフェクトを停止するラムダ。
+			auto stopEffect = [&]()
+				{
+					if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
+					{
+						// エフェクトを停止。
+						EffectManager::Get().StopEffect(m_clingyEffectHandle);
+						// ハンドルを無効化。
+						m_clingyEffectHandle = INVALID_EFFECT_HANDLE;
+						// インターバルをリセット。
+						m_effectInterval = 0.0f;
+					}
+				};
+
 			/** 追従命令のとき：制止・登録を解除して通常追従する */
 			if (isFollowCmd)
 			{
@@ -561,19 +598,7 @@ namespace app
 
 				if (m_isFollowing)
 				{
-					m_effectInterval += g_gameTime->GetFrameDeltaTime();
-					if (m_effectInterval > 1.0f)
-					{
-						const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
-						const Vector3 hartScl = m_owner->GetTransform().m_scale + CLINGY_HART_EFFECT_SCALE;
-						m_clingyEffectHandle = EffectManager::Get().PlayEffect(
-							EnEffectKind::ClingyPenguinHart
-							, hartPos
-							, Quaternion::Identity
-							, hartScl
-						);
-						m_effectInterval = 0.0f;
-					}
+					updateClingyEffect();
 				}
 
 				else if (m_isFollowing && distDaddy > m_giveUpDistance)
@@ -581,10 +606,7 @@ namespace app
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 
-					// エフェクトを停止する。
-					EffectManager::Get().StopEffect(m_clingyEffectHandle);
-					// ハンドルを無効化する。
-					m_clingyEffectHandle = INVALID_EFFECT_HANDLE;					
+					stopEffect();
 				}
 
 				if (!m_isFollowing)
@@ -642,19 +664,7 @@ namespace app
 			// エフェクト再生。
 			if (m_isFollowing && !m_isRestrained)
 			{
-				m_effectInterval += g_gameTime->GetFrameDeltaTime();
-				if (m_effectInterval > 1.0f)
-				{
-					const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
-					const Vector3 hartScl = m_owner->GetTransform().m_scale + CLINGY_HART_EFFECT_SCALE;
-					m_clingyEffectHandle = EffectManager::Get().PlayEffect(
-						EnEffectKind::ClingyPenguinHart
-						, hartPos
-						, Quaternion::Identity
-						, hartScl
-					);
-					m_effectInterval = 0.0f;
-				}
+				updateClingyEffect();
 			}
 
 			// エフェクト停止。
@@ -663,9 +673,7 @@ namespace app
 				/** 追従から外れた、または制止された場合はエフェクトを即座に停止する */
 				if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
 				{
-					EffectManager::Get().StopEffect(m_clingyEffectHandle);
-					m_clingyEffectHandle = INVALID_EFFECT_HANDLE;
-					m_effectInterval = 0.0f; // インターバルをリセットし、次回追従時の表示タイミングを正常に保つ
+					stopEffect();
 				}
 			}
 
