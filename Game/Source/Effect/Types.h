@@ -20,7 +20,6 @@ enum class EnEffectKind : uint8_t
 	PenguinSlideFrost,
 	PenguinSlideLine,
 	ClingyPenguinHart,
-	ClingyFollowingHart,
 	Max,
 	None = Max,
 };
@@ -52,5 +51,4 @@ static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Ma
 	EffectInformation(u"Assets/effect/penguin/slide/SlideFrost.efk", 50.0f),
 	EffectInformation(u"Assets/effect/penguin/slide/SlideLine.efk", 100.0f),
 	EffectInformation(u"Assets/effect/childPenguin/childPenguinClingyHart.efk", 200.0f),
-	EffectInformation(u"Assets/effect/childPenguin/childPenguinClingyHart2.efk",200.0f),
 };
