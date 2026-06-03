@@ -19,6 +19,8 @@ namespace nsBeastEngine
 
 	BeastEngine::~BeastEngine()
 	{
+		SubCameraManager::DestroyInstance();
+		CameraSystem::DestroyInstance();
 		g_renderingEngine = nullptr;
 		g_engine = nullptr;
 	}
@@ -100,6 +102,11 @@ namespace nsBeastEngine
 		 */
 		g_engine->ExecuteRender();
 
+		// カメラの更新
+		SubCameraManager::Get().Update();
+		CameraSystem::Get().Update();
+
+		// レンダリングエンジンの描画処理を実行
 		m_renderingEngine.Execute(renderContext);
 
 		// 半透明オブジェクトやエフェクト（後で実装）

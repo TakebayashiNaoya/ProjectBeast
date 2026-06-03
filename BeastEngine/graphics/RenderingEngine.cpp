@@ -50,8 +50,6 @@ namespace nsBeastEngine
 	void RenderingEngine::Update()
 	{
 		g_sceneLight->Update();
-		SubCameraManager::Get().Update();
-		CameraSystem::Get().Update();
 	}
 
 
