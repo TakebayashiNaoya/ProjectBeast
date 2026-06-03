@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "ChildPenguinTypes.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -162,6 +163,8 @@ namespace app
 			bool m_isInsideIgloo = false;
 			/** かまくらの入り口（青い円）の目標座標 */
 			Vector3 m_iglooTargetPos = Vector3::Zero;
+			/** エフェクトハンドル */
+			EffectHandle m_hartEffectHandle;
 
 
 		private:
@@ -243,6 +246,10 @@ namespace app
 		private:
 			/** 世話焼きペンギンに制止されているかどうか */
 			bool m_isRestrained = false;
+			/** 甘えん坊専用エフェクトハンドル */
+			EffectHandle m_clingyEffectHandle;
+			/** エフェクトの再生時間 */
+			float m_effectInterval = 0.0f;
 		};
 
 
