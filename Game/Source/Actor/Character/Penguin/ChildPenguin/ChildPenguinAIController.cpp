@@ -22,13 +22,17 @@
 #include <random>
 
 
-
 namespace app
 {
 	namespace actor
 	{
 		namespace
 		{
+			/** 甘えん坊ペンギンのエフェクトオフセット */
+			const Vector3 CLINGY_HART_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
+			/** 甘えん坊ペンギンのエフェクトスケール */
+			const Vector3 CLINGY_HART_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
+			
 			/**
 			 * @brief ヒステリシス幅
 			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
@@ -109,6 +113,7 @@ namespace app
 		ChildPenguinAIController::ChildPenguinAIController(ChildPenguin* owner, EnChildPenguinType type)
 			: m_owner(owner)
 			, m_stateMachine(owner->GetStateMachine())
+			, m_hartEffectHandle(INVALID_EFFECT_HANDLE)
 		{
 			const auto& td = GetTypeData(type);
 
@@ -526,6 +531,7 @@ namespace app
 
 		ClingyChildPenguinAI::ClingyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Clingy)
+			, m_clingyEffectHandle(INVALID_EFFECT_HANDLE)
 		{}
 
 
@@ -538,6 +544,43 @@ namespace app
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
+
+			// エフェクトの再生と位置更新を行うラムダ。
+			auto updateClingyEffect = [&]()
+				{
+					// 計測時間。
+					m_effectInterval += g_gameTime->GetFrameDeltaTime();
+					// ハートエフェクトの生み出される地点。
+					const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
+
+					// 1秒を超えたらエフェクトを再生。
+					if (m_effectInterval > 1.0f)
+					{
+						const Vector3 hartScl = m_owner->GetTransform().m_scale + CLINGY_HART_EFFECT_SCALE;
+						m_clingyEffectHandle = EffectManager::Get().PlayEffect(
+							EnEffectKind::ClingyPenguinHart
+							, hartPos
+							, Quaternion::Identity
+							, hartScl
+						);
+						// インターバルをリセット。
+						m_effectInterval = 0.0f;
+					}
+				};
+
+			// エフェクトを停止するラムダ。
+			auto stopEffect = [&]()
+				{
+					if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
+					{
+						// エフェクトを停止。
+						EffectManager::Get().StopEffect(m_clingyEffectHandle);
+						// ハンドルを無効化。
+						m_clingyEffectHandle = INVALID_EFFECT_HANDLE;
+						// インターバルをリセット。
+						m_effectInterval = 0.0f;
+					}
+				};
 
 			/** 追従命令のとき：制止・登録を解除して通常追従する */
 			if (isFollowCmd)
@@ -552,10 +595,18 @@ namespace app
 					manager->AddFollower(m_owner);
 					m_isFollowing = true;
 				}
+
+				if (m_isFollowing)
+				{
+					updateClingyEffect();
+				}
+
 				else if (m_isFollowing && distDaddy > m_giveUpDistance)
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
+
+					stopEffect();
 				}
 
 				if (!m_isFollowing)
@@ -608,6 +659,22 @@ namespace app
 			{
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
+			}
+
+			// エフェクト再生。
+			if (m_isFollowing && !m_isRestrained)
+			{
+				updateClingyEffect();
+			}
+
+			// エフェクト停止。
+			else
+			{
+				/** 追従から外れた、または制止された場合はエフェクトを即座に停止する */
+				if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
+				{
+					stopEffect();
+				}
 			}
 
 			/** 隊列参加中：距離だけで移動手段を決定する */
