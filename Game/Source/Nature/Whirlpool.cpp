@@ -400,8 +400,8 @@ namespace app
 			// 共通定数バッファを更新する（b0）
 			SCommonConstantBuffer commonCb;
 			commonCb.mWorld = mWorld;
-			commonCb.mView = g_camera3D->GetViewMatrix();
-			commonCb.mProj = g_camera3D->GetProjectionMatrix();
+			commonCb.mView = CameraSystem::Get().GetMainCamera().GetViewMatrix();
+			commonCb.mProj = CameraSystem::Get().GetMainCamera().GetProjectionMatrix();
 			commonCb.mulColor = Vector4::One;
 			m_commonConstantBuffer.CopyToVRAM(commonCb);
 

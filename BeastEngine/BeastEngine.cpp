@@ -5,6 +5,7 @@
  */
 #include "BeastEnginePreCompile.h"
 #include "BeastEngine.h"
+#include "Graphics/Camera/SubCameraManager.h"
 
 
 namespace nsBeastEngine
@@ -35,10 +36,16 @@ namespace nsBeastEngine
 			initData.frameBufferHeight
 		);
 
-		if (g_camera3D) {
-			g_camera3D->SetPosition({ 0.0f, 100.0f, -200.0f }); /** 手前・上に配置 */
-			g_camera3D->SetTarget({ 0.0f, 50.0f, 0.0f });       /** 原点より少し上を見る */
-		}
+		// サブカメラマネージャーの初期化
+		SubCameraManager::CreateInstance();
+
+		// カメラシステムの初期化（メインカメラの生成）
+		CameraSystem::CreateInstance();
+		CameraSystem::Get().Init();
+
+		// メインカメラの初期位置を設定
+		CameraSystem::Get().GetMainCamera().SetPosition({ 0.0f, 100.0f, -200.0f }); /** 手前・上に配置 */
+		CameraSystem::Get().GetMainCamera().SetTarget({ 0.0f, 50.0f, 0.0f });       /** 原点より少し上を見る */
 
 		m_renderingEngine.Init();
 

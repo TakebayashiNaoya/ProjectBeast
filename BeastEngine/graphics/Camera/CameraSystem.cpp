@@ -14,15 +14,15 @@ namespace nsBeastEngine
 
 	void CameraSystem::Init()
 	{
-		m_mainCamera.SetNear(0.01f);
-		m_mainCamera.SetFar(5000.0f);
+		// g_camera3D をメインカメラとしてラップする
+		// 実体・更新は k2EngineLow（GraphicsEngine::BeginRender）が管理する
+		m_mainCamera = g_camera3D;
 	}
 
 
 	void CameraSystem::Update()
 	{
-		m_mainCamera.Update();
-
+		// メインカメラは GraphicsEngine::BeginRender() が更新するため、ここでは不要
 		if (m_subCamera != nullptr)
 		{
 			m_subCamera->Update();

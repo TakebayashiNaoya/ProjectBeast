@@ -12,14 +12,14 @@ namespace nsBeastEngine
 	void SPointLight::Update()
 	{
 		m_positionInView = m_position;
-		g_camera3D->GetViewMatrix().Apply(m_positionInView);
+		CameraSystem::Get().GetMainCamera().GetViewMatrix().Apply(m_positionInView);
 	}
 
 
 	void SSpotLight::Update()
 	{
 		m_positionInView = m_position;
-		g_camera3D->GetViewMatrix().Apply(m_positionInView);
+		CameraSystem::Get().GetMainCamera().GetViewMatrix().Apply(m_positionInView);
 	}
 
 
@@ -29,8 +29,8 @@ namespace nsBeastEngine
 		m_light.m_directionLight.SetDirection(-1.0f, -3.0f, 1.0f);
 		m_light.m_directionLight.SetColor(3.5f, 3.5f, 3.5f);
 		/** カメラの位置の登録 */
-		m_light.m_cameraPosition = g_camera3D->GetPosition();
-		//m_light.m_directionLight.m_LVP = g_camera3D->GetViewProjectionMatrix();
+		m_light.m_cameraPosition = CameraSystem::Get().GetMainCamera().GetPosition();
+		//m_light.m_directionLight.m_LVP = CameraSystem::Get().GetMainCamera().GetViewProjectionMatrix();
 		/** 環境光の設定 */
 		m_light.SetAmbientLight(0.6f, 0.6f, 0.6f);
 		/** リムライトの設定 */
@@ -41,10 +41,10 @@ namespace nsBeastEngine
 	void SceneLight::Update()
 	{
 		/** カメラの位置を更新する */
-		m_light.m_cameraPosition = g_camera3D->GetPosition();
+		m_light.m_cameraPosition = CameraSystem::Get().GetMainCamera().GetPosition();
 
 		/** カメラのビュープロジェクション行列の逆行列を更新する */
-		m_light.m_mViewProjInv = g_camera3D->GetViewProjectionMatrixInv();
+		m_light.m_mViewProjInv = CameraSystem::Get().GetMainCamera().GetViewProjectionMatrixInv();
 
 		/** ライトをカメラと見立てたビュー行列を計算する */
 		Vector3 lightPosition = m_lightPosition;
@@ -53,8 +53,8 @@ namespace nsBeastEngine
 		viewMatrix.MakeLookAt(lightPosition, lightTarget, Vector3::Up);
 
 		/** プロジェクション行列を計算する */
-		float shadowNear = g_camera3D->GetNear() - 4000;
-		float shadowFar = g_camera3D->GetFar() + 6000;
+		float shadowNear = CameraSystem::Get().GetMainCamera().GetNear() - 4000;
+		float shadowFar = CameraSystem::Get().GetMainCamera().GetFar() + 6000;
 		Matrix projMatrix;
 		projMatrix.MakeOrthoProjectionMatrix(4000, 4000, shadowNear, shadowFar);
 

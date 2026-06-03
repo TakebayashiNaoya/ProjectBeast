@@ -88,7 +88,7 @@ namespace app
 			const Vector3 wpPosition = m_whirlpool->GetTransform().m_position;
 
 			Vector2 screenPos = Vector2::Zero;
-			g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, wpPosition);
+			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, wpPosition);
 			const Vector3 prevPosition = Vector3(
 				screenPos.x,
 				screenPos.y + m_status->GetIconOffsetY(),

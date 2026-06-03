@@ -1,29 +1,35 @@
 ﻿/**
  * @file CameraSystem.h
  * @brief カメラシステム。メイン・サブカメラの保持と更新を行う
- * @author 竹林
+ * @author
  */
 #pragma once
 
 
 namespace nsBeastEngine
 {
+
+
 	/**
 	 * @brief カメラシステム
 	 * @details メインカメラとサブカメラの実体を保持し、毎フレーム更新する。
-	 *          SubCameraManager からサブカメラの生成・破棄を行う。
+	 *          メインカメラは g_camera3D をラップして提供する。
+	 *          g_camera3D の Update は GraphicsEngine::BeginRender() が行うため、
+	 *          CameraSystem::Update() ではサブカメラのみ更新する。
+	 *          サブカメラの生成・破棄は SubCameraManager から呼び出す。
 	 */
 	class CameraSystem
 	{
 	public:
 		/**
-		 * @brief メインカメラを初期化する
+		 * @brief 初期化する
+		 * @details g_camera3D をメインカメラとして設定する
 		 */
 		void Init();
 
 		/**
 		 * @brief 毎フレームの更新処理
-		 * @details メイン・サブ両カメラを更新する
+		 * @details サブカメラのみ更新する。メインカメラは GraphicsEngine が更新する
 		 */
 		void Update();
 
@@ -47,7 +53,7 @@ namespace nsBeastEngine
 		 */
 		nsK2EngineLow::Camera& GetMainCamera()
 		{
-			return m_mainCamera;
+			return *m_mainCamera;
 		}
 
 		/**
@@ -56,7 +62,7 @@ namespace nsBeastEngine
 		 */
 		const nsK2EngineLow::Camera& GetMainCamera() const
 		{
-			return m_mainCamera;
+			return *m_mainCamera;
 		}
 
 		/**
@@ -88,9 +94,9 @@ namespace nsBeastEngine
 
 
 	private:
-		/** メインカメラ */
-		nsK2EngineLow::Camera m_mainCamera;
-		/** サブカメラ（未生成時はnullptr） */
+		/** メインカメラ（g_camera3D をラップ。実体は k2EngineLow が所有） */
+		nsK2EngineLow::Camera* m_mainCamera = nullptr;
+		/** サブカメラ */
 		nsK2EngineLow::Camera* m_subCamera = nullptr;
 
 
@@ -109,15 +115,18 @@ namespace nsBeastEngine
 		/** @brief シングルトンインスタンスを生成する */
 		static void CreateInstance()
 		{
-			if (m_instance == nullptr) {
+			if (m_instance == nullptr)
+			{
 				m_instance = new CameraSystem();
 			}
 		}
+
 		/** @brief シングルトンインスタンスを取得する */
 		static CameraSystem& Get()
 		{
 			return *m_instance;
 		}
+
 		/** @brief シングルトンインスタンスを破棄する */
 		static void DestroyInstance()
 		{
@@ -125,4 +134,6 @@ namespace nsBeastEngine
 			m_instance = nullptr;
 		}
 	};
-}
+
+
+} // namespace nsBeastEngine

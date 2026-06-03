@@ -111,6 +111,12 @@
     <ClCompile Include="Graphics\PostEffect\PostEffectManager.cpp">
       <Filter>Graphics\PostEffect</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Camera\CameraSystem.cpp">
+      <Filter>Graphics\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Camera\SubCameraManager.cpp">
+      <Filter>Graphics\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -250,6 +256,12 @@
     <ClInclude Include="Graphics\PostEffect\PostEffectTypes.h">
       <Filter>Graphics\PostEffect</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Camera\CameraSystem.h">
+      <Filter>Graphics\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Camera\SubCameraManager.h">
+      <Filter>Graphics\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -275,6 +287,9 @@
     </Filter>
     <Filter Include="Graphics\PostEffect">
       <UniqueIdentifier>{bcefc37c-22a6-4efc-b9a2-2bc5dc31efd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Camera">
+      <UniqueIdentifier>{dd545e6b-93f7-4982-9eee-6b29d68b62e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

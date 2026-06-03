@@ -4,6 +4,7 @@
  * @author 竹林尚哉
  */
 #pragma once
+#include "Graphics/Camera/CameraSystem.h"
 
 
 namespace nsBeastEngine
@@ -438,7 +439,7 @@ namespace nsBeastEngine
 		 */
 		void SetCameraPos()
 		{
-			m_cameraPosition = g_camera3D->GetPosition();
+			m_cameraPosition = CameraSystem::Get().GetMainCamera().GetPosition();
 		}
 
 		/**

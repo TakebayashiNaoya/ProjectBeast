@@ -5,6 +5,8 @@
  */
 #include "BeastEnginePreCompile.h"
 #include "RenderingEngine.h"
+#include "Camera/SubCameraManager.h"
+#include "Camera/CameraSystem.h"
 
 
 namespace nsBeastEngine
@@ -48,14 +50,20 @@ namespace nsBeastEngine
 	void RenderingEngine::Update()
 	{
 		g_sceneLight->Update();
+		SubCameraManager::Get().Update();
+		CameraSystem::Get().Update();
 	}
 
 
 	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
 	{
+		// サブカメラのオフスクリーン描画（メイン描画パスより前に実行する）
+		SubCameraManager::Get().RenderOffscreen(rc);
+
 		// ビュープロジェクション行列からフラスタム（視錐台）を更新する
+		auto& mainCamera = CameraSystem::Get().GetMainCamera();
 		Matrix viewProjMatrix;
-		viewProjMatrix.Multiply(g_camera3D->GetViewMatrix(), g_camera3D->GetProjectionMatrix());
+		viewProjMatrix.Multiply(mainCamera.GetViewMatrix(), mainCamera.GetProjectionMatrix());
 
 #if defined(_DEBUG)
 		// デバッグ時はフラスタムを画面内側に縮小して境界を画面上で確認できるようにする
@@ -66,13 +74,13 @@ namespace nsBeastEngine
 #endif
 
 		// G-Bufferへの描画処理
-		RenderToGBuffer(rc);
+		RenderToGBuffer(rc, mainCamera, m_frustum);
 
 		// ディファードライティングの描画処理
-		DeferredLighting(rc);
+		DeferredLighting(rc, m_mainRenderTarget);
 
 		// フォワードレンダリングの描画処理
-		ForwardRendering(rc);
+		ForwardRendering(rc, mainCamera, m_frustum, m_mainRenderTarget);
 
 		// 自然オブジェクトを描画する
 		// GBufferに書き込まれた深度値を引き継ぐため、DSVはm_gBuffer[enGBuffer_Albedo]を使用する
@@ -117,6 +125,18 @@ namespace nsBeastEngine
 		m_deferredModelList.clear();
 		m_forwardModelList.clear();
 		m_renderObjects.clear();
+	}
+
+
+	void RenderingEngine::RenderOffscreenPass(
+		RenderContext& rc,
+		nsK2EngineLow::Camera& camera,
+		Frustum& frustum,
+		RenderTarget& renderTarget)
+	{
+		RenderToGBuffer(rc, camera, frustum);
+		DeferredLighting(rc, renderTarget);
+		ForwardRendering(rc, camera, frustum, renderTarget);
 	}
 
 
@@ -250,7 +270,7 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::RenderToGBuffer(RenderContext& rc)
+	void RenderingEngine::RenderToGBuffer(RenderContext& rc, nsK2EngineLow::Camera& camera, Frustum& frustum)
 	{
 		BeginGPUEvent("RenderToGBuffer");
 
@@ -275,7 +295,7 @@ namespace nsBeastEngine
 		{
 			if (m_frustumCullingEnabled &&
 				MobjData->IsCullingEnabled() &&
-				!m_frustum.IsIntersectAABBWorld(MobjData->GetWorldAABBMin(), MobjData->GetWorldAABBMax()))
+				!frustum.IsIntersectAABBWorld(MobjData->GetWorldAABBMin(), MobjData->GetWorldAABBMax()))
 			{
 				continue;
 			}
@@ -289,31 +309,31 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::DeferredLighting(RenderContext& rc)
+	void RenderingEngine::DeferredLighting(RenderContext& rc, RenderTarget& renderTarget)
 	{
 		BeginGPUEvent("DeferredLighting");
 
-		// レンダリング先をメインレンダリングターゲットにする
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+		// レンダリング先を指定のレンダリングターゲットにする
+		rc.WaitUntilToPossibleSetRenderTarget(renderTarget);
+		rc.SetRenderTargetAndViewport(renderTarget);
 		// G-Bufferの内容を元にしてディファードライティング
 		m_deferredLightingSprite.Draw(rc);
 
-		// メインレンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+		// レンダリングターゲットへの書き込み終了待ち
+		rc.WaitUntilFinishDrawingToRenderTarget(renderTarget);
 
 		EndGPUEvent();
 	}
 
 
-	void RenderingEngine::ForwardRendering(RenderContext& rc)
+	void RenderingEngine::ForwardRendering(RenderContext& rc, nsK2EngineLow::Camera& camera, Frustum& frustum, RenderTarget& renderTarget)
 	{
 		BeginGPUEvent("ForwardRendering");
 
-		// レンダリング先をメインレンダリングターゲットにする
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		// レンダリング先を指定のレンダリングターゲットにする
+		rc.WaitUntilToPossibleSetRenderTarget(renderTarget);
 		rc.SetRenderTarget(
-			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
+			renderTarget.GetRTVCpuDescriptorHandle(),
 			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
 		);
 
@@ -322,15 +342,15 @@ namespace nsBeastEngine
 		{
 			if (m_frustumCullingEnabled &&
 				renderObj->IsCullingEnabled() &&
-				!m_frustum.IsIntersectAABBWorld(renderObj->GetWorldAABBMin(), renderObj->GetWorldAABBMax()))
+				!frustum.IsIntersectAABBWorld(renderObj->GetWorldAABBMin(), renderObj->GetWorldAABBMax()))
 			{
 				continue;
 			}
 			renderObj->OnDraw(rc);
 		}
 
-		// メインレンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+		// レンダリングターゲットへの書き込み終了待ち
+		rc.WaitUntilFinishDrawingToRenderTarget(renderTarget);
 
 		EndGPUEvent();
 	}
@@ -364,6 +384,9 @@ namespace nsBeastEngine
 		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
 		m_2DSprite.Draw(rc);
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+
+		// 小窓（サブカメラ）の描画
+		SubCameraManager::Get().RenderToScreen(rc);
 
 		EndGPUEvent();
 	}

@@ -6,6 +6,7 @@
 #include "BeastEnginePreCompile.h"
 #include "SubCameraManager.h"
 #include "CameraSystem.h"
+#include "Graphics/RenderingEngine.h"
 
 
 namespace nsBeastEngine
@@ -78,7 +79,16 @@ namespace nsBeastEngine
 	{
 		if (!m_isActive) return;
 
-		// TODO: サブカメラ視点でのオフスクリーン描画を実装する
+		auto* subCamera = CameraSystem::Get().GetSubCamera();
+		if (subCamera == nullptr) return;
+
+		// サブカメラのビュープロジェクション行列からフラスタムを更新する
+		Matrix viewProjMatrix;
+		viewProjMatrix.Multiply(subCamera->GetViewMatrix(), subCamera->GetProjectionMatrix());
+		m_frustum.Update(viewProjMatrix);
+
+		// サブカメラ視点でオフスクリーンパスを実行する
+		g_renderingEngine->RenderOffscreenPass(rc, *subCamera, m_frustum, m_renderTarget);
 	}
 
 

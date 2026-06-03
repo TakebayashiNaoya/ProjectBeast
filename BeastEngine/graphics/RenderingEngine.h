@@ -61,6 +61,21 @@ namespace nsBeastEngine
 		 */
 		const Frustum& GetFrustum() const { return m_frustum; }
 
+		/**
+		 * @brief サブカメラ用のオフスクリーン描画パスを実行する
+		 * @details SubCameraManager::RenderOffscreen() から呼ばれる
+		 * @param rc レンダリングコンテキスト
+		 * @param camera 使用するカメラ
+		 * @param frustum 使用するフラスタム
+		 * @param renderTarget 描画先のレンダリングターゲット
+		 */
+		void RenderOffscreenPass(
+			RenderContext& rc,
+			nsK2EngineLow::Camera& camera,
+			Frustum& frustum,
+			RenderTarget& renderTarget
+		);
+
 
 		//============================================//
 		// 登録・解除用の関数
@@ -162,20 +177,26 @@ namespace nsBeastEngine
 		/**
 		 * @brief GBufferへの描画処理
 		 * @param rc レンダリングコンテキスト
+		 * @param camera 使用するカメラ
+		 * @param frustum 使用するフラスタム
 		 */
-		void RenderToGBuffer(RenderContext& rc);
+		void RenderToGBuffer(RenderContext& rc, nsK2EngineLow::Camera& camera, Frustum& frustum);
 
 		/**
 		 * @brief ディファードライティングの描画処理
 		 * @param rc レンダリングコンテキスト
+		 * @param renderTarget 描画先のレンダリングターゲット
 		 */
-		void DeferredLighting(RenderContext& rc);
+		void DeferredLighting(RenderContext& rc, RenderTarget& renderTarget);
 
 		/**
 		 * @brief フォワードレンダリングの描画処理
 		 * @param rc レンダリングコンテキスト
+		 * @param camera 使用するカメラ
+		 * @param frustum 使用するフラスタム
+		 * @param renderTarget 描画先のレンダリングターゲット
 		 */
-		void ForwardRendering(RenderContext& rc);
+		void ForwardRendering(RenderContext& rc, nsK2EngineLow::Camera& camera, Frustum& frustum, RenderTarget& renderTarget);
 
 		/**
 		 * @brief ポストエフェクトの描画処理

@@ -5,6 +5,7 @@
  */
 #pragma once
 #include <functional>
+#include "Geometry/Frustum.h"
 
 
 namespace nsBeastEngine
@@ -96,6 +97,8 @@ namespace nsBeastEngine
 		RenderTarget m_renderTarget;
 		/** 小窓表示用Sprite */
 		Sprite m_sprite;
+		/** サブカメラ用フラスタム */
+		Frustum m_frustum;
 
 
 		//============================================//
