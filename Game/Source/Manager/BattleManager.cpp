@@ -7,10 +7,24 @@
 #include "BattleManager.h"
 
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Graphics/Camera/SubCameraManager.h"
 
 
 namespace app
 {
+	namespace
+	{
+		/** サブカメラのターゲットからの距離 */
+		constexpr float SUB_CAMERA_DISTANCE = 150.0f;
+		/** サブカメラのターゲットからの高さ */
+		constexpr float SUB_CAMERA_HEIGHT = 80.0f;
+	}
+
+
 	BattleManager* BattleManager::m_instance = nullptr;
 
 
@@ -51,6 +65,87 @@ namespace app
 		{
 			m_onSleepingEnemyChanged();
 		}
+
+
+		//--------------------------------------------//
+		// サブカメラの更新
+		//--------------------------------------------//
+		UpdateSubCamera();
+	}
+
+
+	void BattleManager::UpdateSubCamera()
+	{
+		const auto& enemies = actor::EnemyManager::GetInstance()->GetEnemies();
+
+		/** 攻撃中のシロクマを探す */
+		bool isAnyAttacking = false;
+		for (auto* enemy : enemies)
+		{
+			if (enemy == nullptr) continue;
+			if (!enemy->GetEnemyStateMachine()->IsAttack()) continue;
+
+			isAnyAttacking = true;
+			break;
+		}
+
+		/** 攻撃中のシロクマがいなければサブカメラを停止する */
+		if (!isAnyAttacking)
+		{
+			if (m_isSubCameraActive)
+			{
+				nsBeastEngine::SubCameraManager::Get().End();
+				m_isSubCameraActive = false;
+			}
+			return;
+		}
+
+		/** 攻撃中のシロクマがいればサブカメラを起動する */
+		if (!m_isSubCameraActive)
+		{
+			nsBeastEngine::SubCameraManager::Get().Begin();
+			m_isSubCameraActive = true;
+		}
+
+		/** 親ペンギンに最も近い子ペンギンを選ぶ */
+		// TODO: IsInDanger()が実装されたら危険な子ペンギンを候補に絞る
+		const Vector3 daddyPos = actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
+		const auto& childPenguins = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
+
+		const actor::ChildPenguin* nearestChild = nullptr;
+		float nearestDistSq = FLT_MAX;
+		for (const auto* child : childPenguins)
+		{
+			if (child == nullptr) continue;
+
+			Vector3 diff = child->GetTransform().m_position - daddyPos;
+			diff.y = 0.0f;
+			const float distSq = diff.LengthSq();
+			if (distSq < nearestDistSq)
+			{
+				nearestDistSq = distSq;
+				nearestChild = child;
+			}
+		}
+
+		if (nearestChild == nullptr) return;
+
+		/** ターゲット座標・カメラ座標をセットする */
+		const Vector3 targetPos = nearestChild->GetTransform().m_position;
+
+		/** 親ペンギン→子ペンギンの方向にカメラを配置する */
+		Vector3 toTarget = targetPos - daddyPos;
+		toTarget.y = 0.0f;
+		toTarget.Normalize();
+
+		const Vector3 cameraPos = Vector3(
+			targetPos.x - toTarget.x * SUB_CAMERA_DISTANCE,
+			targetPos.y + SUB_CAMERA_HEIGHT,
+			targetPos.z - toTarget.z * SUB_CAMERA_DISTANCE
+		);
+
+		nsBeastEngine::SubCameraManager::Get().SetTargetPosition(targetPos);
+		nsBeastEngine::SubCameraManager::Get().SetCameraPosition(cameraPos);
 	}
 
 

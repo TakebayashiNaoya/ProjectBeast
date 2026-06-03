@@ -21,10 +21,6 @@ namespace nsBeastEngine
 		constexpr float SUB_CAMERA_NEAR = 0.01f;
 		/** サブカメラのFarクリップ */
 		constexpr float SUB_CAMERA_FAR = 5000.0f;
-		/** サブカメラのターゲットからの距離 */
-		constexpr float SUB_CAMERA_DISTANCE = 150.0f;
-		/** サブカメラのターゲットからの高さ */
-		constexpr float SUB_CAMERA_HEIGHT = 80.0f;
 	}
 
 
@@ -133,15 +129,9 @@ namespace nsBeastEngine
 		if (subCamera == nullptr) return;
 
 		// TODO: IsInDanger()が実装されたら危険な子ペンギンを候補に絞る
-		// 現状はSetTargetPosition()で外部からセットされた座標を使用する
+		// カメラ座標・ターゲット座標はGame側からSetCameraPosition()・SetTargetPosition()で設定する
 
-		const Vector3 cameraPos = Vector3(
-			m_targetPosition.x,
-			m_targetPosition.y + SUB_CAMERA_HEIGHT,
-			m_targetPosition.z - SUB_CAMERA_DISTANCE
-		);
-
-		subCamera->SetPosition(cameraPos);
+		subCamera->SetPosition(m_cameraPosition);
 		subCamera->SetTarget(m_targetPosition);
 	}
 }

@@ -56,6 +56,16 @@ namespace nsBeastEngine
 		void RenderToScreen(nsK2EngineLow::RenderContext& rc);
 
 		/**
+		 * @brief カメラ座標を設定する
+		 * @details サブカメラの座標を設定する
+		 * @param position カメラのワールド座標
+		 */
+		void SetCameraPosition(const Vector3& position)
+		{
+			m_cameraPosition = position;
+		}
+
+		/**
 		 * @brief ターゲット座標を設定する
 		 * @details サブカメラが注視する座標を設定する
 		 * @param position ターゲットのワールド座標
@@ -91,6 +101,8 @@ namespace nsBeastEngine
 	private:
 		/** 動作中フラグ */
 		bool m_isActive = false;
+		/** カメラのワールド座標 */
+		Vector3 m_cameraPosition = Vector3::Zero;
 		/** ターゲットのワールド座標 */
 		Vector3 m_targetPosition = Vector3::Zero;
 		/** オフスクリーン描画用RenderTarget */
