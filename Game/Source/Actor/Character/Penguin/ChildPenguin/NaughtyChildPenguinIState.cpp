@@ -40,18 +40,30 @@ namespace app {
 
 		void NaughtyWakeBearState::Enter()
 		{
+			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
+			m_owner->SetMoveSpeed(0.0f);
+
 			// TODO: シロクマを起こすアニメID に差し替える
 			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
 
 			// 効果音（やんちゃな声など）
 			// SoundManager::Get().PlaySE(enSoundKind_NaughtyPoke, false, false, enSoundPriority_Hight);
+
+			const Vector3& myPos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+			NoiseManager::GetInstance().AddNoise(myPos, EnNoiseType::NaughtyPoke);
+
+			const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+
+			const EffectHandle handle = EffectManager::Get().PlayEffect(
+				EnEffectKind::ChildPenguinCry,
+				pos,
+				Quaternion::Identity,
+				Vector3{ 6.0f, 6.0f, 6.0f }
+			);
 		}
 
 		void NaughtyWakeBearState::Update()
-		{
-			const Vector3& myPos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
-			NoiseManager::GetInstance().AddNoise(myPos, EnNoiseType::NaughtyPoke);
-		}
+		{}
 
 		void NaughtyWakeBearState::Exit()
 		{

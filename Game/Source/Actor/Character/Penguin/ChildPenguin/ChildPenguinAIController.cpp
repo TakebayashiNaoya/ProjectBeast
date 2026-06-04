@@ -12,6 +12,10 @@
 #include "ChildPenguinStatus.h"
 #include "ChildPenguinTypes.h"
 #include "ClumsyChildPenguinStateMachine.h"
+#include "NaughtyChildPenguinStateMachine.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -32,7 +36,12 @@ namespace app
 			const Vector3 CLINGY_HART_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
 			/** 甘えん坊ペンギンのエフェクトスケール */
 			const Vector3 CLINGY_HART_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
-			
+
+			/** シロクマを起こすための距離 */
+			constexpr float WAKE_BEAR_TRIGGER_DISTANCE = 300.0f;
+			/**  */
+			constexpr float REACH_BEAR_DISTANCE = 200.0f;
+
 			/**
 			 * @brief ヒステリシス幅
 			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
@@ -693,6 +702,7 @@ namespace app
 
 		NaughtyChildPenguinAI::NaughtyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Naughty)
+			, m_naughtyStateMachine(static_cast<NaughtyChildPenguinStateMachine*>(owner->GetStateMachine()))
 		{
 			const auto& td = GetTypeData(EnChildPenguinType::Naughty);
 			m_roamTriggerDistance = RollRange(td.roamTriggerDistance);
@@ -717,12 +727,81 @@ namespace app
 			/** （命令に関わらず最優先で制止を適用する） */
 			if (m_isRestrained)
 			{
+				// 制止されたらシロクマを起こしに行く行動もやめる
+				if (m_naughtyStateMachine->GetIsGoingToWakeBear())
+				{
+					m_naughtyStateMachine->SetIsGoingToWakeBear(false);
+					m_naughtyStateMachine->SetIsAtBear(false);
+				}
+
 				if (m_isFollowing)
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
+			// まだシロクマに向かっていない場合、近くにシロクマがいるか索敵する
+			if (!m_naughtyStateMachine->GetIsGoingToWakeBear())
+			{
+				const Vector3& myPos = m_owner->GetTransform().m_position;
+
+				// ★ マネージャーの機能を使って、指定距離内にいる一番近い「寝ているシロクマ」を取得
+				Enemy* targetBear = EnemyManager::GetInstance()->GetNearestSleepingEnemy(myPos, WAKE_BEAR_TRIGGER_DISTANCE);
+
+				// 近くに寝ているシロクマが見つかったらフラグをONにして向かう！
+				if (targetBear != nullptr)
+				{
+					m_naughtyStateMachine->SetIsGoingToWakeBear(true);
+					m_naughtyStateMachine->SetTargetBear(targetBear);
+					m_naughtyStateMachine->SetBearTargetPos(targetBear->GetTransform().m_position);
+
+					// シロクマに向かうため、隊列や徘徊からは離脱する
+					if (m_isFollowing)
+					{
+						manager->RemoveFollower(m_owner);
+						m_isFollowing = false;
+					}
+					if (manager->IsRoaming(m_owner))
+					{
+						manager->UnregisterRoaming(m_owner);
+					}
+				}
+			}
+
+			// すでにシロクマに向かっている最中（または上で向かう決定をした直後）の処理
+			if (m_naughtyStateMachine->GetIsGoingToWakeBear())
+			{
+				// ==========================================================
+				// ★ 追加：向かっている途中でシロクマが起きてしまったら行動をキャンセルする
+				// ==========================================================
+				Enemy* bear = m_naughtyStateMachine->GetTargetBear();
+				if (bear == nullptr || !bear->GetEnemyStateMachine()->IsCoolDown())
+				{
+					m_naughtyStateMachine->SetIsGoingToWakeBear(false);
+					m_naughtyStateMachine->SetIsAtBear(false);
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					return;
+				}
+
+				const Vector3& bearPos = m_naughtyStateMachine->GetBearTargetPos();
+				const float distToBear = GetDistanceToTarget(bearPos);
+
+				// シロクマに到達したか判定（停止距離を利用）
+				if (distToBear <= REACH_BEAR_DISTANCE)
+				{
+					m_naughtyStateMachine->SetIsAtBear(true);
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				}
+				else
+				{
+					// 到達していなければシロクマに向かって移動
+					BuildInputToTarget(bearPos);
+				}
+
+				// シロクマに対処している間は、この後の「追従・待機の通常ロジック」を無視する
 				return;
 			}
 

@@ -36,31 +36,15 @@ namespace app
 				{
 					m_isGoingToWakeBear = false;
 					m_isAtBear = false;
-					return nullptr; // → GetChangeState() 側でIdleが選ばれる
+					return nullptr; // → GetChangeState() 側でIdle等が選ばれる
 				}
 				return FindState(NaughtyWakeBearState::ID()); // アニメ中は維持
 			}
 
-			// ── SeekBear 中 ──────────────────────────────────────────────
-			if (IsEqualCurrentState(NaughtySeekBearState::ID()))
+			// ── シロクマに到達した瞬間 ───────────────────────────────
+			if (m_isAtBear)
 			{
-				if (!m_isGoingToWakeBear)
-				{
-					// 制止などでフラグが落ちた → 通常に戻す
-					return nullptr;
-				}
-				if (m_isAtBear)
-				{
-					// 到達 → 起こすステートへ
-					return FindState(NaughtyWakeBearState::ID());
-				}
-				return FindState(NaughtySeekBearState::ID()); // まだ移動中
-			}
-
-			// ── 通常ステートからの遷移判定 ───────────────────────────────
-			if (m_isGoingToWakeBear)
-			{
-				return FindState(NaughtySeekBearState::ID());
+				return FindState(NaughtyWakeBearState::ID());
 			}
 
 			return nullptr;
