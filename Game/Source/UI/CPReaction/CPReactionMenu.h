@@ -5,9 +5,6 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include "Source/UI/Model/CPReactionAnimStatus.h"
-#include "Source/UI/Model/CPReactionStatus.h"
-#include "Source/Util/Curve.h"
 
 
 namespace app
@@ -23,6 +20,7 @@ namespace app
 	{
 		/** 前方宣言 */
 		class CPReactionStatus;
+		class CPReactionAnimStatus;
 
 
 		/**

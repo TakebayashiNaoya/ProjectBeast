@@ -97,6 +97,9 @@
     <Filter Include="Source\UI\MiniMap">
       <UniqueIdentifier>{4948fc8c-fd5e-4b23-b2dd-3fcfeaa6d56b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\CPReaction">
+      <UniqueIdentifier>{9f2e90cb-287a-41c6-862d-67239f9bef28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -409,21 +412,6 @@
     <ClCompile Include="Source\UI\Model\AchievementAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Menus\CPReactionSystem.cpp">
-      <Filter>Source\UI\Menus</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Menus\CPReactionMenu.cpp">
-      <Filter>Source\UI\Menus</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Model\CPReactionStatus.cpp">
-      <Filter>Source\UI\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Model\MasterCPReactionParameter.cpp">
-      <Filter>Source\UI\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Model\CPReactionAnimStatus.cpp">
-      <Filter>Source\UI\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\WpWarning\WpWarningStatus.cpp">
       <Filter>Source\UI\WpWarning</Filter>
     </ClCompile>
@@ -465,6 +453,21 @@
     </ClCompile>
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp">
       <Filter>Source\UI\MiniMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\CPReaction\CPReactionMenu.cpp">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\CPReaction\CPReactionStatus.cpp">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\CPReaction\CPReactionSystem.cpp">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\CPReaction\CPReactionAnimStatus.cpp">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\CPReaction\MasterCPReactionParameter.cpp">
+      <Filter>Source\UI\CPReaction</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -795,21 +798,6 @@
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Menus\CPReactionMenu.h">
-      <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Menus\CPReactionSystem.h">
-      <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Model\CPReactionStatus.h">
-      <Filter>Source\UI\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Model\MasterCPReactionParameter.h">
-      <Filter>Source\UI\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h">
-      <Filter>Source\UI\Model</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Nature\OceanParameter.h">
       <Filter>Source\Nature</Filter>
     </ClInclude>
@@ -860,6 +848,21 @@
     </ClInclude>
     <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h">
       <Filter>Source\UI\MiniMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\CPReaction\CPReactionAnimStatus.h">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\CPReaction\CPReactionMenu.h">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\CPReaction\CPReactionStatus.h">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\CPReaction\CPReactionSystem.h">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\CPReaction\MasterCPReactionParameter.h">
+      <Filter>Source\UI\CPReaction</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
