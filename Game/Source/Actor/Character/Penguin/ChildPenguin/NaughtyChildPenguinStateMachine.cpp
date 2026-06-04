@@ -36,6 +36,9 @@ namespace app
 				{
 					m_isGoingToWakeBear = false;
 					m_isAtBear = false;
+
+					m_hasFinishedWaking = true;
+
 					return nullptr; // → GetChangeState() 側でIdle等が選ばれる
 				}
 				return FindState(NaughtyWakeBearState::ID()); // アニメ中は維持

@@ -28,7 +28,7 @@ namespace app
 		case EnNoiseType::ClumsyCRY:
 			return { 7000.0f,0.5f,1000.0f };
 		case EnNoiseType::NaughtyPoke:
-			return { 5000.0f, 0.5f, 1500.0f };
+			return { 2000.0f, 0.5f, 1000.0f };
 		default:
 			return { 0.0f, 0.0f, 0.0f };
 		}

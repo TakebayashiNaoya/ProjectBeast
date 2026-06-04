@@ -47,7 +47,7 @@ namespace app {
 			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
 
 			// 効果音（やんちゃな声など）
-			// SoundManager::Get().PlaySE(enSoundKind_NaughtyPoke, false, false, enSoundPriority_Hight);
+			SoundManager::Get().PlaySE(enSoundKind_NaughtyPoke, false, false, enSoundPriority_Hight);
 
 			const Vector3& myPos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
 			NoiseManager::GetInstance().AddNoise(myPos, EnNoiseType::NaughtyPoke);

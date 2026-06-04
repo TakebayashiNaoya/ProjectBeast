@@ -307,6 +307,8 @@ namespace app
 			float m_roamTriggerDistance = 0.0f;
 			/** 徘徊先を選ぶ現在地からの半径 */
 			float m_roamRadius = 0.0f;
+
+			float m_scoldCooldown;
 		};
 
 
@@ -393,7 +395,7 @@ namespace app
 			 */
 			float m_interventionRange = 0.0f;
 			/** 介入到達とみなす距離 */
-			static constexpr float INTERVENTION_REACH_DISTANCE = 10.0f;
+			static constexpr float INTERVENTION_REACH_DISTANCE = 25.0f;
 		};
 	}
 }

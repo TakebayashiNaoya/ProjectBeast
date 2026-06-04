@@ -32,6 +32,9 @@ namespace app
 			inline void SetTargetBear(Enemy* bear) { m_targetBear = bear; }
 			inline Enemy* GetTargetBear() const { return m_targetBear; }
 
+			inline void SetHasFinishedWaking(bool v) { m_hasFinishedWaking = v; }
+			inline bool GetHasFinishedWaking() const { return m_hasFinishedWaking; }
+
 		public:
 			NaughtyChildPenguinStateMachine(ChildPenguin* ownerChildPenguin);
 			~NaughtyChildPenguinStateMachine() = default;
@@ -51,6 +54,9 @@ namespace app
 
 			/** 起こしに行くシロクマのポインタ*/
 			Enemy* m_targetBear;
+
+			/** アニメーションが完了したことをAIに伝えるフラグ */
+			bool m_hasFinishedWaking = false;
 		};
 	}
 }
