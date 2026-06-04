@@ -15,6 +15,7 @@ namespace app
 		class SoundOptionMenu;
 		class TitleEventMenu;
 		class TutorialMenu;
+		class StageSelectMenu;
 	}
 
 	class TitleScene :public IScene
@@ -61,5 +62,6 @@ namespace app
 		ui::SoundOptionMenu* m_soundOption;
 		ui::TitleEventMenu* m_titleEventMenu;
 		ui::TutorialMenu* m_tutorialMenu;
+		ui::UIPacket<ui::StageSelectMenu> m_stageSelectPacket;
 	};
 }

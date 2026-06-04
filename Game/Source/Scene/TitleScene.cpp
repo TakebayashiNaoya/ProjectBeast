@@ -24,6 +24,7 @@ namespace app
 		, m_tutorialMenu(nullptr)
 		, m_titleEventMenu(nullptr)
 		, m_titleLayout(nullptr)
+		, m_stageSelectPacket(nullptr)
 	{}
 
 
@@ -60,9 +61,7 @@ namespace app
 		);
 		m_tutorialMenu = m_tutorialLayout->GetMenu<ui::TutorialMenu>();
 
-		m_titleLayout->Reload();
-		m_soundOptionLayout->Reload();
-		m_tutorialLayout->Reload();
+		ui::InitUIPacket(m_stageSelectPacket, "Assets/parameter/stageSelect/StageSelect.json");
 
 		SoundManager::Get().PlayBGM(enSoundKind_Title);
 
