@@ -73,6 +73,28 @@ namespace app
 			/** メニュー */
 			TMenu* m_menu;
 		};
+
+
+		/**
+		 * @brief SystemPacketのユニークポインタ
+		 * @details SystemPacketをstd::unique_ptrで管理したいため、using宣言で省略形を定義
+		 */
+		template <typename TMenu>
+		using UIPacket = std::unique_ptr<SystemPacket<TMenu>>;
+
+
+		/**
+		 * @brief SystemPacketの初期化関数
+		 * @param packet 初期化するSystemPacketのユニークポインタ
+		 * @param path Layoutのjsonファイルのパス
+		 * @details SystemPacketを生成して初期化する
+		 */
+		template <typename TMenu>
+		inline void InitUIPacket(UIPacket<TMenu>& packet, const char* path)
+		{
+			packet = std::make_unique<SystemPacket<TMenu>>();
+			packet->Initialize(path);
+		}
 	}
 }
 
