@@ -14,6 +14,11 @@
 namespace app {
 	namespace actor {
 
+		namespace
+		{
+			const Vector3 EFFECT_SCALE = { 6.0f, 6.0f, 6.0f };
+		}
+
 		NaughtyChildPenguinIState::NaughtyChildPenguinIState(NaughtyChildPenguinStateMachine* owner)
 			: m_owner(owner)
 		{}
@@ -58,7 +63,7 @@ namespace app {
 				EnEffectKind::ChildPenguinCry,
 				pos,
 				Quaternion::Identity,
-				Vector3{ 6.0f, 6.0f, 6.0f }
+				EFFECT_SCALE
 			);
 		}
 
