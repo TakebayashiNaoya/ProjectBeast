@@ -15,11 +15,8 @@ namespace nsBeastEngine
 	 * @brief BeastEngine
 	 * @details 自作エンジン
 	 */
-	class BeastEngine {
-	private:
-		// RenderingEngine m_renderingEngine; // ←
-		// これはK2のレンダラーなので一旦削除！
-
+	class BeastEngine
+	{
 	private:
 		BeastEngine() {}
 		~BeastEngine();
@@ -29,20 +26,33 @@ namespace nsBeastEngine
 		 * @brief 初期化データの構造体
 		 * @details k2EngineLowに渡す
 		 */
-		struct InitData {
+		struct InitData
+		{
 			HWND hwnd;              /**	ウィドウハンドル */
 			UINT frameBufferWidth;  /**	フレームバッファの幅 */
 			UINT frameBufferHeight; /**	フレームバッファの高さ */
 		};
+
 		/**
 		 * @brief BeastEngineの初期化
 		 * @param initData 初期化データ
 		 */
 		void Init(const InitData& initData);
+
 		/**
-		 * @brief エンジンの処理を実行
+		 * @brief フレーム前半の処理
+		 * @details BeginFrame〜ExecuteRenderまでを実行する
+		 *          Application::Render()の前に呼ぶ
 		 */
-		void Execute();
+		void BeginExecute();
+
+		/**
+		 * @brief フレーム後半の処理
+		 * @details RenderingEngine::Execute〜EndFrameまでを実行する
+		 *          Application::Render()の後に呼ぶ
+		 */
+		void EndExecute();
+
 
 	private:
 		/** K2EngineLowの実体 */
@@ -50,9 +60,11 @@ namespace nsBeastEngine
 		/** レンダリングエンジン */
 		RenderingEngine m_renderingEngine;
 
-		/**
-		 * @brief シングルトンパターンの実装
-		 */
+
+		//============================================//
+		// シングルトン関連
+		//============================================//
+
 	public:
 		/**
 		 * @brief インスタンスの作成
