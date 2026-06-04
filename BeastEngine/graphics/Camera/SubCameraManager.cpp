@@ -90,10 +90,7 @@ namespace nsBeastEngine
 
 	void SubCameraManager::RenderToScreen(nsK2EngineLow::RenderContext& rc)
 	{
-		if (!m_isActive)
-		{
-			return;
-		}
+		if (!m_isActive) return;
 
 		// TODO: 描画優先度を実装する
 		m_sprite.Draw(rc);
