@@ -305,6 +305,11 @@
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\Animation\UIAnimation.cpp" />
+    <ClCompile Include="Source\UI\CPReaction\CPReactionAnimStatus.cpp" />
+    <ClCompile Include="Source\UI\CPReaction\CPReactionMenu.cpp" />
+    <ClCompile Include="Source\UI\CPReaction\CPReactionStatus.cpp" />
+    <ClCompile Include="Source\UI\CPReaction\CPReactionSystem.cpp" />
+    <ClCompile Include="Source\UI\CPReaction\MasterCPReactionParameter.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp" />
     <ClCompile Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp" />
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp" />
@@ -312,8 +317,6 @@
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\CountDownMenu.cpp" />
-    <ClCompile Include="Source\UI\Menus\CPReactionMenu.cpp" />
-    <ClCompile Include="Source\UI\Menus\CPReactionSystem.cpp" />
     <ClCompile Include="Source\UI\Menus\EnemySleepingMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\EventMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\FinishMenu.cpp" />
@@ -324,9 +327,6 @@
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp" />
-    <ClCompile Include="Source\UI\Model\CPReactionAnimStatus.cpp" />
-    <ClCompile Include="Source\UI\Model\CPReactionStatus.cpp" />
-    <ClCompile Include="Source\UI\Model\MasterCPReactionParameter.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\SearchMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\SoundOptionMenu.cpp" />
@@ -447,6 +447,11 @@
     <ClInclude Include="Source\UI\Animation\UIAnimation.h" />
     <ClInclude Include="Source\UI\Animation\UIAnimationFactory.h" />
     <ClInclude Include="Source\UI\Animation\UIAnimationParameter.h" />
+    <ClInclude Include="Source\UI\CPReaction\CPReactionAnimStatus.h" />
+    <ClInclude Include="Source\UI\CPReaction\CPReactionMenu.h" />
+    <ClInclude Include="Source\UI\CPReaction\CPReactionStatus.h" />
+    <ClInclude Include="Source\UI\CPReaction\CPReactionSystem.h" />
+    <ClInclude Include="Source\UI\CPReaction\MasterCPReactionParameter.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />
     <ClInclude Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.h" />
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h" />
@@ -454,8 +459,6 @@
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h" />
     <ClInclude Include="Source\UI\Menus\CountDownMenu.h" />
-    <ClInclude Include="Source\UI\Menus\CPReactionMenu.h" />
-    <ClInclude Include="Source\UI\Menus\CPReactionSystem.h" />
     <ClInclude Include="Source\UI\Menus\EnemySleepingMenu.h" />
     <ClInclude Include="Source\UI\Menus\EventMenu.h" />
     <ClInclude Include="Source\UI\Menus\FinishMenu.h" />
@@ -473,9 +476,6 @@
     <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h" />
     <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h" />
-    <ClInclude Include="Source\UI\Model\CPReactionAnimStatus.h" />
-    <ClInclude Include="Source\UI\Model\CPReactionStatus.h" />
-    <ClInclude Include="Source\UI\Model\MasterCPReactionParameter.h" />
     <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h" />

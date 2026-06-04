@@ -5,6 +5,9 @@
  */
 #include "stdafx.h"
 #include "JsonConverter.h"
+
+#include "Curve.h"
+
 #include <fstream>
 
 #define ERROR_ASSERT K2_ASSERT(false, "キーが無効です。");
@@ -189,8 +192,12 @@ namespace app
 		}
 
 
-		Vector4 JsonConverter::ToVector4(const nlohmann::json& json, const char* key)
+		Vector4 JsonConverter::ToVector4(const nlohmann::json& json, const char* key, bool isConvert)
 		{
+			constexpr float minValue = 0.0f;
+			constexpr float maxValue = 1.0f;
+			constexpr float convertValue = 255.0f;
+
 			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 4)
 			{
 				ERROR_ASSERT;
@@ -208,12 +215,22 @@ namespace app
 				}
 			}
 
-			return Vector4(
+			Vector4 result(
 				array[0].get<float>(),
 				array[1].get<float>(),
 				array[2].get<float>(),
 				array[3].get<float>()
 			);
+
+			if (isConvert)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					result.v[i] = clamp(result.v[i] / convertValue, minValue, maxValue);
+				}
+			}
+
+			return result;
 		}
 
 

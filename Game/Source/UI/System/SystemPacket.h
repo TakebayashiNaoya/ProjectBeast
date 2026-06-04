@@ -38,6 +38,8 @@ namespace app
 			 */
 			void Initialize(const char* jsonFilePath)
 			{
+				m_layout.reset();
+				m_layout = nullptr;
 				m_layout = std::make_unique<Layout>();
 				m_layout->Initialize<TMenu>(jsonFilePath);
 				m_menu = m_layout->GetMenu<TMenu>();
