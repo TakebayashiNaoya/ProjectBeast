@@ -33,7 +33,7 @@ namespace app
 			 * @brief 描画処理
 			 * @param rc レンダリングコンテキスト
 			 */
-			void Render(RenderContext& rc) override;
+			void Render(RenderContext& rc, const Frustum& frustum) override;
 
 
 		private:

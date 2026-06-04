@@ -11,6 +11,15 @@
 
 namespace nsBeastEngine
 {
+	namespace
+	{
+		/** サブカメラのRenderTarget幅 */
+		constexpr UINT SUB_CAMERA_RT_WIDTH = 480;
+		/** サブカメラのRenderTarget高さ */
+		constexpr UINT SUB_CAMERA_RT_HEIGHT = 270;
+	}
+
+
 	RenderingEngine::RenderingEngine()
 	{
 		g_sceneLight = &m_sceneLight;
@@ -25,14 +34,33 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Init()
 	{
-		// メインレンダリングターゲットの初期化
-		InitMainRenderTarget();
+		// メインビューの初期化
+		m_mainView.width = g_graphicsEngine->GetFrameBufferWidth();
+		m_mainView.height = g_graphicsEngine->GetFrameBufferHeight();
+		m_mainView.renderTarget.Create(
+			m_mainView.width,
+			m_mainView.height,
+			1,
+			1,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_D32_FLOAT
+		);
+		InitGBuffer(m_mainView);
+		InitDeferredLightingSprite(m_mainView);
 
-		// Gバッファの初期化
-		InitGBuffer();
-
-		// ディファードライティング用のスプライトの初期化
-		InitDeferredLightingSprite();
+		// サブビューの初期化
+		m_subView.width = SUB_CAMERA_RT_WIDTH;
+		m_subView.height = SUB_CAMERA_RT_HEIGHT;
+		m_subView.renderTarget.Create(
+			m_subView.width,
+			m_subView.height,
+			1,
+			1,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_D32_FLOAT
+		);
+		InitGBuffer(m_subView);
+		InitDeferredLightingSprite(m_subView);
 
 		// メインレンダリングターゲットの内容をフレームバッファにコピーするためのスプライトの初期化
 		InitCopyMainRenderTargetToFrameBufferSprite();
@@ -55,10 +83,7 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Execute(nsK2EngineLow::RenderContext& rc)
 	{
-		// サブカメラのオフスクリーン描画（メイン描画パスより前に実行する）
-		SubCameraManager::Get().RenderOffscreen(rc);
-
-		// ビュープロジェクション行列からフラスタム（視錐台）を更新する
+		// メインカメラのフラスタムを更新する
 		auto& mainCamera = CameraSystem::Get().GetMainCamera();
 		Matrix viewProjMatrix;
 		viewProjMatrix.Multiply(mainCamera.GetViewMatrix(), mainCamera.GetProjectionMatrix());
@@ -66,55 +91,42 @@ namespace nsBeastEngine
 #if defined(_DEBUG)
 		// デバッグ時はフラスタムを画面内側に縮小して境界を画面上で確認できるようにする
 		// 確認が終わったら Frustum.h の DEBUG_FRUSTUM_SHRINK_SCALE を 1.0f に戻すこと
-		m_frustum.Update(viewProjMatrix, Frustum::DEBUG_FRUSTUM_SHRINK_SCALE);
+		m_mainView.frustum.Update(viewProjMatrix, Frustum::DEBUG_FRUSTUM_SHRINK_SCALE);
 #else
-		m_frustum.Update(viewProjMatrix);
+		m_mainView.frustum.Update(viewProjMatrix);
 #endif
 
-		// G-Bufferへの描画処理
-		RenderToGBuffer(rc, mainCamera, m_frustum);
-
-		// ディファードライティングの描画処理
-		DeferredLighting(rc, m_mainRenderTarget);
-
-		// フォワードレンダリングの描画処理
-		ForwardRendering(rc, mainCamera, m_frustum, m_mainRenderTarget);
-
-		// 自然オブジェクトを描画する
-		// GBufferに書き込まれた深度値を引き継ぐため、DSVはm_gBuffer[enGBuffer_Albedo]を使用する
-		// ForwardRenderingと同じDSVを使うことで、ステージ・キャラクターとの深度関係が正しく保たれる
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-		rc.SetRenderTarget(
-			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
-			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
-		);
-
-		BeginGPUEvent("NatureObjects");
-		for (auto* obj : m_natureObjects)
-		{
-			obj->Render(rc);
-		}
-		EndGPUEvent();
-
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+		// メインカメラの描画パスを実行する
+		ExecuteViewPass(rc, m_mainView);
 
 		// ポストエフェクトの描画処理
 		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
 		PostEffect(rc);
 
 		// ブルーム完了後、mainRTをRTV状態に戻してエフェクトの描画先として設定する
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainView.renderTarget);
 		rc.SetRenderTarget(
-			m_mainRenderTarget.GetRTVCpuDescriptorHandle(),
-			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
+			m_mainView.renderTarget.GetRTVCpuDescriptorHandle(),
+			m_mainView.gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
 		);
 
 		// エフェクトを描画
 		// ※PostEffect()完了後に呼び出すことでブルームの影響を受けないようにする
 		EffectEngine::GetInstance()->Draw();
 
-		// 2D描画処理
+		// 2D描画処理（小窓スプライトの描画も含む）
 		Render2D(rc);
+
+		// サブカメラの描画パスを実行する（メイン描画パス完了後）
+		if (CameraSystem::Get().HasSubCamera())
+		{
+			auto* subCamera = CameraSystem::Get().GetSubCamera();
+			Matrix subViewProjMatrix;
+			subViewProjMatrix.Multiply(subCamera->GetViewMatrix(), subCamera->GetProjectionMatrix());
+			m_subView.frustum.Update(subViewProjMatrix);
+
+			ExecuteViewPass(rc, m_subView);
+		}
 
 		// メインレンダリングターゲットの内容をフレームバッファにコピー
 		CopyMainRenderTargetToFrameBufferSprite(rc);
@@ -126,37 +138,21 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::RenderOffscreenPass(
-		RenderContext& rc,
-		nsK2EngineLow::Camera& camera,
-		Frustum& frustum,
-		RenderTarget& renderTarget)
+	void RenderingEngine::ExecuteViewPass(RenderContext& rc, RenderViewContext& view)
 	{
-		RenderToGBuffer(rc, camera, frustum);
-		DeferredLighting(rc, renderTarget);
-		ForwardRendering(rc, camera, frustum, renderTarget);
+		RenderToGBuffer(rc, view);
+		DeferredLighting(rc, view);
+		ForwardRendering(rc, view);
+		RenderNatureObjects(rc, view);
 	}
 
 
-	void RenderingEngine::InitMainRenderTarget()
-	{
-		m_mainRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
-			1,
-			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			DXGI_FORMAT_D32_FLOAT
-		);
-	}
-
-
-	void RenderingEngine::InitGBuffer()
+	void RenderingEngine::InitGBuffer(RenderViewContext& view)
 	{
 		// アルベドカラー用のターゲットを作成
-		m_gBuffer[enGBuffer_Albedo].Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
+		view.gBuffer[enGBuffer_Albedo].Create(
+			view.width,
+			view.height,
 			1,
 			1,
 			DXGI_FORMAT_R32G32B32A32_FLOAT,
@@ -164,9 +160,9 @@ namespace nsBeastEngine
 		);
 
 		// 法線用のターゲットを作成
-		m_gBuffer[enGBuffer_Normal].Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
+		view.gBuffer[enGBuffer_Normal].Create(
+			view.width,
+			view.height,
 			1,
 			1,
 			DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -174,9 +170,9 @@ namespace nsBeastEngine
 		);
 
 		// PBRパラメータ用のターゲットを作成
-		m_gBuffer[enGBuffer_Specular].Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
+		view.gBuffer[enGBuffer_Specular].Create(
+			view.width,
+			view.height,
 			1,
 			1,
 			DXGI_FORMAT_R32G32B32A32_FLOAT,
@@ -185,39 +181,30 @@ namespace nsBeastEngine
 	}
 
 
-	void RenderingEngine::InitDeferredLightingSprite()
+	void RenderingEngine::InitDeferredLightingSprite(RenderViewContext& view)
 	{
-		// ディファードライティングを行うためのスプライトを初期化
 		SpriteInitData spriteInitData;
-		spriteInitData.m_width = FRAME_BUFFER_W;
-		spriteInitData.m_height = FRAME_BUFFER_H;
-
-		// ディファードライティングで使用するテクスチャを設定
-		spriteInitData.m_textures[enGBuffer_Albedo] = &m_gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
-		spriteInitData.m_textures[enGBuffer_Normal] = &m_gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
-		spriteInitData.m_textures[enGBuffer_Specular] = &m_gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
-
+		spriteInitData.m_width = view.width;
+		spriteInitData.m_height = view.height;
+		spriteInitData.m_textures[enGBuffer_Albedo] = &view.gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
+		spriteInitData.m_textures[enGBuffer_Normal] = &view.gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
+		spriteInitData.m_textures[enGBuffer_Specular] = &view.gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
 		spriteInitData.m_fxFilePath = "Assets/shader/DeferredLighting.fx";
-
 		spriteInitData.m_expandConstantBuffer = m_sceneLight.GetLight();
 		spriteInitData.m_expandConstantBufferSize = sizeof(Light);
-
-		// ディファードレンダリング用のスプライトを初期化
-		m_deferredLightingSprite.Init(spriteInitData);
+		view.deferredLightingSprite.Init(spriteInitData);
 	}
 
 
 	void RenderingEngine::InitCopyMainRenderTargetToFrameBufferSprite()
 	{
 		nsK2EngineLow::SpriteInitData spriteInitData;
-
-		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
+		spriteInitData.m_textures[0] = &m_mainView.renderTarget.GetRenderTargetTexture();
 		spriteInitData.m_width = g_graphicsEngine->GetFrameBufferWidth();
 		spriteInitData.m_height = g_graphicsEngine->GetFrameBufferHeight();
 		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
 		spriteInitData.m_psEntryPoinFunc = "PSMain";
 		spriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-
 		m_copyMainRtToFrameBufferSprite.Init(spriteInitData);
 	}
 
@@ -239,20 +226,18 @@ namespace nsBeastEngine
 		nsK2EngineLow::SpriteInitData spriteInitData;
 
 		spriteInitData.m_textures[0] = &m_2DRenderTarget.GetRenderTargetTexture();
-		spriteInitData.m_width = m_mainRenderTarget.GetWidth();
-		spriteInitData.m_height = m_mainRenderTarget.GetHeight();
+		spriteInitData.m_width = m_mainView.renderTarget.GetWidth();
+		spriteInitData.m_height = m_mainView.renderTarget.GetHeight();
 		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
 		spriteInitData.m_vsEntryPointFunc = "VSMain";
 		spriteInitData.m_psEntryPoinFunc = "PSMain";
 		spriteInitData.m_alphaBlendMode = AlphaBlendMode_None;
-		spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
-
+		spriteInitData.m_colorBufferFormat[0] = m_mainView.renderTarget.GetColorBufferFormat();
 		m_2DSprite.Init(spriteInitData);
 
-		spriteInitData.m_textures[0] = &m_mainRenderTarget.GetRenderTargetTexture();
+		spriteInitData.m_textures[0] = &m_mainView.renderTarget.GetRenderTargetTexture();
 		spriteInitData.m_width = m_2DRenderTarget.GetWidth();
 		spriteInitData.m_height = m_2DRenderTarget.GetHeight();
-
 		m_mainSprite.Init(spriteInitData);
 	}
 
@@ -261,96 +246,102 @@ namespace nsBeastEngine
 	{
 		// ブルームの種別・ブラーの種別をここで切り替える
 		m_postEffectManager.Init(
-			m_mainRenderTarget,
+			m_mainView.renderTarget,
 			EnBloomType::enKawase,   // enNone / enNormal / enKawase
 			EnBlurType::enGaussian   // enAverage / enGaussian
 		);
 	}
 
 
-	void RenderingEngine::RenderToGBuffer(RenderContext& rc, nsK2EngineLow::Camera& camera, Frustum& frustum)
+	void RenderingEngine::RenderToGBuffer(RenderContext& rc, RenderViewContext& view)
 	{
 		BeginGPUEvent("RenderToGBuffer");
 
-		// レンダリングターゲットをG-Bufferに変更して書き込む
 		RenderTarget* rts[] = {
-			&m_gBuffer[enGBuffer_Albedo]    // 0番目のレンダリングターゲット
-			,&m_gBuffer[enGBuffer_Normal]   // 1番目のレンダリングターゲット
-			,&m_gBuffer[enGBuffer_Specular] // 2番目のレンダリングターゲット
+			&view.gBuffer[enGBuffer_Albedo]
+			,&view.gBuffer[enGBuffer_Normal]
+			,&view.gBuffer[enGBuffer_Specular]
 		};
 
-		// まず、レンダリングターゲットとして設定できるようになるまで待つ
 		rc.WaitUntilToPossibleSetRenderTargets(ARRAYSIZE(rts), rts);
-
-		// レンダリングターゲットを設定
-		rc.SetRenderTargets(ARRAYSIZE(rts), rts);
-
-		// レンダリングターゲットをクリア
+		rc.SetRenderTargetsAndViewport(ARRAYSIZE(rts), rts);
 		rc.ClearRenderTargetViews(ARRAYSIZE(rts), rts);
 
-		// フラスタムカリングで視錐台内のモデルのみ描画する
 		for (auto& MobjData : m_deferredModelList)
 		{
 			if (m_frustumCullingEnabled &&
 				MobjData->IsCullingEnabled() &&
-				!frustum.IsIntersectAABBWorld(MobjData->GetWorldAABBMin(), MobjData->GetWorldAABBMax()))
+				!view.frustum.IsIntersectAABBWorld(MobjData->GetWorldAABBMin(), MobjData->GetWorldAABBMax()))
 			{
 				continue;
 			}
 			MobjData->OnDraw(rc);
 		}
 
-		// レンダリングターゲットへの書き込み待ち
 		rc.WaitUntilFinishDrawingToRenderTargets(ARRAYSIZE(rts), rts);
 
 		EndGPUEvent();
 	}
 
 
-	void RenderingEngine::DeferredLighting(RenderContext& rc, RenderTarget& renderTarget)
+	void RenderingEngine::DeferredLighting(RenderContext& rc, RenderViewContext& view)
 	{
 		BeginGPUEvent("DeferredLighting");
 
-		// レンダリング先を指定のレンダリングターゲットにする
-		rc.WaitUntilToPossibleSetRenderTarget(renderTarget);
-		rc.SetRenderTargetAndViewport(renderTarget);
-		// G-Bufferの内容を元にしてディファードライティング
-		m_deferredLightingSprite.Draw(rc);
-
-		// レンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(renderTarget);
+		rc.WaitUntilToPossibleSetRenderTarget(view.renderTarget);
+		rc.SetRenderTargetAndViewport(view.renderTarget);
+		view.deferredLightingSprite.Draw(rc);
+		rc.WaitUntilFinishDrawingToRenderTarget(view.renderTarget);
 
 		EndGPUEvent();
 	}
 
 
-	void RenderingEngine::ForwardRendering(RenderContext& rc, nsK2EngineLow::Camera& camera, Frustum& frustum, RenderTarget& renderTarget)
+	void RenderingEngine::ForwardRendering(RenderContext& rc, RenderViewContext& view)
 	{
 		BeginGPUEvent("ForwardRendering");
 
-		// レンダリング先を指定のレンダリングターゲットにする
-		rc.WaitUntilToPossibleSetRenderTarget(renderTarget);
+		rc.WaitUntilToPossibleSetRenderTarget(view.renderTarget);
 		rc.SetRenderTarget(
-			renderTarget.GetRTVCpuDescriptorHandle(),
-			m_gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
+			view.renderTarget.GetRTVCpuDescriptorHandle(),
+			view.gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
 		);
 
-		// フラスタムカリングで視錐台内のモデルのみ描画する
 		for (auto& renderObj : m_forwardModelList)
 		{
 			if (m_frustumCullingEnabled &&
 				renderObj->IsCullingEnabled() &&
-				!frustum.IsIntersectAABBWorld(renderObj->GetWorldAABBMin(), renderObj->GetWorldAABBMax()))
+				!view.frustum.IsIntersectAABBWorld(renderObj->GetWorldAABBMin(), renderObj->GetWorldAABBMax()))
 			{
 				continue;
 			}
 			renderObj->OnDraw(rc);
 		}
 
-		// レンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(renderTarget);
+		rc.WaitUntilFinishDrawingToRenderTarget(view.renderTarget);
 
 		EndGPUEvent();
+	}
+
+
+	void RenderingEngine::RenderNatureObjects(RenderContext& rc, RenderViewContext& view)
+	{
+		// GBufferに書き込まれた深度値を引き継ぐため、DSVはgBuffer[enGBuffer_Albedo]を使用する
+		// ForwardRenderingと同じDSVを使うことで、ステージ・キャラクターとの深度関係が正しく保たれる
+		rc.WaitUntilToPossibleSetRenderTarget(view.renderTarget);
+		rc.SetRenderTarget(
+			view.renderTarget.GetRTVCpuDescriptorHandle(),
+			view.gBuffer[enGBuffer_Albedo].GetDSVCpuDescriptorHandle()
+		);
+
+		BeginGPUEvent("NatureObjects");
+		for (auto* obj : m_natureObjects)
+		{
+			obj->Render(rc, view.frustum);
+		}
+		EndGPUEvent();
+
+		rc.WaitUntilFinishDrawingToRenderTarget(view.renderTarget);
 	}
 
 
@@ -358,7 +349,7 @@ namespace nsBeastEngine
 	{
 		BeginGPUEvent("PostEffect");
 
-		m_postEffectManager.Render(rc, m_mainRenderTarget);
+		m_postEffectManager.Render(rc, m_mainView.renderTarget);
 
 		EndGPUEvent();
 	}
@@ -376,15 +367,16 @@ namespace nsBeastEngine
 		{
 			renderObj->OnRender2D(rc);
 		}
-		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);
-
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-		m_2DSprite.Draw(rc);
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 
 		// 小窓（サブカメラ）の描画
 		SubCameraManager::Get().RenderToScreen(rc);
+
+		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);
+
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainView.renderTarget);
+		rc.SetRenderTargetAndViewport(m_mainView.renderTarget);
+		m_2DSprite.Draw(rc);
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainView.renderTarget);
 
 		EndGPUEvent();
 	}

@@ -851,11 +851,10 @@ namespace app
 		}
 
 
-		void Ocean::Render(RenderContext& rc)
+		void Ocean::Render(RenderContext& rc, const Frustum& frustum)
 		{
 			// DispatchWaveCS()・BuildChunkAABBs()はUpdate()で完了済みのため、
 			// ここでは描画コマンドのみを発行する
-			const nsBeastEngine::Frustum& frustum = g_renderingEngine->GetFrustum();
 			m_oceanMesh.Draw(rc, CalcWorldMatrix(), frustum);
 		}
 

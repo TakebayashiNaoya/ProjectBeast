@@ -310,7 +310,7 @@ namespace app
 			 * @details RenderingEngine::Execute()内から呼ばれる
 			 * @param rc レンダリングコンテキスト
 			 */
-			void Render(RenderContext& rc) override;
+			void Render(RenderContext& rc, const Frustum& frustum) override;
 
 			/**
 			 * @brief 波のスクロール速度を設定

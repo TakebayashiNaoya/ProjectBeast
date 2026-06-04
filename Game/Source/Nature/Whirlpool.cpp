@@ -139,7 +139,7 @@ namespace app
 		}
 
 
-		void Whirlpool::Render(RenderContext& rc, const nsBeastEngine::Frustum& frustum)
+		void Whirlpool::Render(RenderContext& rc, const Frustum& frustum)
 		{
 			if (m_state == EnWhirlpoolState::None) return;
 

@@ -156,10 +156,8 @@ namespace app
 		}
 
 
-		void WhirlpoolManager::Render(RenderContext& rc)
+		void WhirlpoolManager::Render(RenderContext& rc, const Frustum& frustum)
 		{
-			const nsBeastEngine::Frustum& frustum = g_renderingEngine->GetFrustum();
-
 			ForEach([&](Whirlpool* whirlpool)
 				{
 					// 球判定で視錐台外の渦潮をスキップする

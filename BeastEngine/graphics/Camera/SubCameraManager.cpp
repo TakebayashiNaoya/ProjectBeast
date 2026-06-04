@@ -18,9 +18,9 @@ namespace nsBeastEngine
 		/** サブカメラのRenderTarget高さ */
 		constexpr UINT SUB_CAMERA_RT_HEIGHT = 270;
 		/** サブカメラのNearクリップ */
-		constexpr float SUB_CAMERA_NEAR = 0.01f;
+		constexpr float SUB_CAMERA_NEAR = 1.0f;
 		/** サブカメラのFarクリップ */
-		constexpr float SUB_CAMERA_FAR = 5000.0f;
+		constexpr float SUB_CAMERA_FAR = 13000.0f;
 	}
 
 
@@ -73,18 +73,18 @@ namespace nsBeastEngine
 
 	void SubCameraManager::RenderOffscreen(nsK2EngineLow::RenderContext& rc)
 	{
-		if (!m_isActive) return;
+		//if (!m_isActive) return;
 
-		auto* subCamera = CameraSystem::Get().GetSubCamera();
-		if (subCamera == nullptr) return;
+		//auto* subCamera = CameraSystem::Get().GetSubCamera();
+		//if (subCamera == nullptr) return;
 
-		// サブカメラのビュープロジェクション行列からフラスタムを更新する
-		Matrix viewProjMatrix;
-		viewProjMatrix.Multiply(subCamera->GetViewMatrix(), subCamera->GetProjectionMatrix());
-		m_frustum.Update(viewProjMatrix);
+		//// サブカメラのビュープロジェクション行列からフラスタムを更新する
+		//Matrix viewProjMatrix;
+		//viewProjMatrix.Multiply(subCamera->GetViewMatrix(), subCamera->GetProjectionMatrix());
+		//m_frustum.Update(viewProjMatrix);
 
-		// サブカメラ視点でオフスクリーンパスを実行する
-		g_renderingEngine->RenderOffscreenPass(rc, *subCamera, m_frustum, m_renderTarget);
+		//// サブカメラ視点でオフスクリーンパスを実行する
+		//g_renderingEngine->RenderOffscreenPass(rc, *subCamera, m_frustum, m_renderTarget);
 	}
 
 
@@ -109,7 +109,7 @@ namespace nsBeastEngine
 		);
 
 		SpriteInitData spriteInitData;
-		spriteInitData.m_textures[0] = &m_renderTarget.GetRenderTargetTexture();
+		spriteInitData.m_textures[0] = &g_renderingEngine->GetSubCameraRenderTarget().GetRenderTargetTexture();
 		spriteInitData.m_width = SUB_CAMERA_RT_WIDTH;
 		spriteInitData.m_height = SUB_CAMERA_RT_HEIGHT;
 		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
