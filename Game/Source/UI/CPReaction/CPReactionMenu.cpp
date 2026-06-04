@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "CPReactionMenu.h"
 
+#include "CPReactionAnimStatus.h"
 #include "CPReactionStatus.h"
 
 #include "Source/UI/Animation/UIAnimationFactory.h"
@@ -159,8 +160,6 @@ namespace app
 			}
 
 
-			const float deltaTime = g_gameTime->GetFrameDeltaTime();
-
 			switch (m_type)
 			{
 			case EnReactionType::Trouble:
@@ -187,6 +186,8 @@ namespace app
 			}
 			}
 
+
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			if (m_type != EnReactionType::None && m_isPlayAnimation)
 			{
@@ -225,12 +226,11 @@ namespace app
 			std::function<void(UIIcon*)> attach =
 				[&](UIIcon* icon)
 				{
-					const uint32_t swayAnimKey = animKey::CPREACTION_SWAY_ANIM_KEY;
-					icon->RemoveAnimation(swayAnimKey);
+					icon->RemoveAnimation(animKey::CPREACTION_SWAY_ANIM_KEY);
 
-					UIAnimationFactory::Attach<UIRotationAnimation>(icon, swayAnimKey);
+					UIAnimationFactory::Attach<UIRotationAnimation>(icon, animKey::CPREACTION_SWAY_ANIM_KEY);
 
-					auto* anim = icon->FindAnimation(swayAnimKey);
+					auto* anim = icon->FindAnimation(animKey::CPREACTION_SWAY_ANIM_KEY);
 
 
 					if (anim) anim->PlayAnimation();

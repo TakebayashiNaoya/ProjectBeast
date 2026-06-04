@@ -35,6 +35,7 @@ namespace app
 				util::LoopMode loopMode;
 			};
 
+
 		public:
 			CPReactionAnimStatus();
 			virtual ~CPReactionAnimStatus() override;
@@ -42,7 +43,7 @@ namespace app
 
 		public:
 			/** 構造体のゲッター関数 */
-			inline AnimData GetSwayAnimationData() const { return m_swayAnimationData; }
+			inline const AnimData& GetSwayAnimationData() const { return m_swayAnimationData; }
 
 
 		public:

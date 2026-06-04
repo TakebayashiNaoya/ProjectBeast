@@ -1,5 +1,5 @@
 ﻿/**
- * @file CPReaction.cpp
+ * @file CPReactionStatus.cpp
  * @brief CPReactionのステータス
  * @author 藤谷
  */
