@@ -23,7 +23,7 @@ namespace app
 			 * @brief 選択されているアイコンのビジュアルを変更させる
 			 */
 			void SelectVisual();
-			
+
 			/**
 			 * @brief 現在選択されているキーを取得する
 			 * @return 現在選択されているキーの取得
@@ -36,13 +36,50 @@ namespace app
 			 */
 			void SetDraw(bool isDraw) { m_isDraw = isDraw; }
 
+			/**
+			 * @brief UIパーツの取得
+			 */
+			void GetUIParts();
+
+			/**
+			 * @brief 描画フラグの更新
+			 */
+			void UpdateDrawFlag();
+
+
+		public:
+			/**
+			 * @brief イベントの種類のenum
+			 * @details Start:スタート、Sound:サウンドオプション、Rule:ルール説明、End:おわり
+			 */
+			enum class EnEventType : uint8_t
+			{
+				Start,
+				Sound,
+				Rule,
+				End,
+				Num
+			};
+
 
 		private:
 			GamePad* m_gamePad;
-			int m_selectIndex;
+			EnEventType m_selectIndex;
 			bool m_isStickNeutral;
 			bool m_isSelect;
 			bool m_isDraw;
+
+
+			/** 背景アイコン */
+			UIIcon* m_bgIcon;
+			/** ロゴアイコン */
+			UIIcon* m_rogoIcon;
+			/** フレームアイコン */
+			UIIcon* m_frameIcon;
+			/** フレームの背景アイコン */
+			UIIcon* m_frameBackIcon;
+			/** イベントアイコン */
+			std::array<UIIcon*, static_cast<uint8_t>(EnEventType::Num)> m_eventIcon;
 		};
 	}
 }

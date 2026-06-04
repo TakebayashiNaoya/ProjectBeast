@@ -23,30 +23,30 @@
                 "rotation":0,
                 "color":[255,255,255,255]
             },
-
-
             {
-                "type":"UIIcon",
-                "name":"StartFrameIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
-                "width":300,
-                "height":130,
-                "position":[ -500, -310, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "type" : "UIIcon",
+                "name" : "Frame",
+                "asset" : "Assets/spriteData/UI/Title/Frame/Frame.dds",
+                "width" : 300,
+                "height" : 130,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
             },
             {
-                "type":"UIIcon",
-                "name":"StartFrameBackIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
+                "type" : "UIIcon",
+                "name" : "FrameBack",
+                "asset" : "Assets/spriteData/UI/Title/Frame/FrameBackGround.dds",
                 "width":280,
                 "height":101,
-                "position":[ -500, -309, 0],
+                "position":[0, 0, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 120]
             },
+
+
             {
                 "type":"UIIcon",
                 "name":"StartIcon",
@@ -57,30 +57,6 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
-            },
-
-
-            {
-                "type":"UIIcon",
-                "name":"OptionFrameIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
-                "width":300,
-                "height":130,
-                "position":[ -175, -310, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
-            },
-            {
-                "type":"UIIcon",
-                "name":"OptionFrameBackIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
-                "width":280,
-                "height":101,
-                "position":[ -175, -309, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 120]
             },
             {
                 "type":"UIIcon",
@@ -93,30 +69,6 @@
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
             },
-
-
-            {
-                "type":"UIIcon",
-                "name":"RuleFrameIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
-                "width":300,
-                "height":130,
-                "position":[ 175, -310, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
-            },
-            {
-                "type":"UIIcon",
-                "name":"RuleFrameBackIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
-                "width":280,
-                "height":101,
-                "position":[ 175, -309, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 120]
-            },
             {
                 "type":"UIIcon",
                 "name":"RuleIcon",
@@ -127,30 +79,6 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
-            },
-
-
-            {
-                "type":"UIIcon",
-                "name":"EndFrameIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/Frame.dds",
-                "width":300,
-                "height":130,
-                "position":[ 500, -310, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
-            },
-            {
-                "type":"UIIcon",
-                "name":"EndFrameBackIcon",
-                "asset":"Assets/spriteData/UI/Frame/Title/FrameBackGround.dds",
-                "width":280,
-                "height":101,
-                "position":[ 500, -309, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 120]
             },
             {
                 "type":"UIIcon",
