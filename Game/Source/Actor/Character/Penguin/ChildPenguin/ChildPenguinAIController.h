@@ -16,6 +16,7 @@ namespace app
 		class ChildPenguin;
 		class ChildPenguinStateMachine;
 		class ClumsyChildPenguinStateMachine;
+		class NaughtyChildPenguinStateMachine;
 
 
 		/**
@@ -296,6 +297,8 @@ namespace app
 			void PickNewRoamTarget();
 
 		private:
+			/** おっちょこちょい固有ステートマシンへのポインタ（キャスト済みのキャッシュ） */
+			NaughtyChildPenguinStateMachine* m_naughtyStateMachine = nullptr;
 			/** 世話焼きペンギンに制止されているかどうか */
 			bool m_isRestrained = false;
 			/** 徘徊先の目標座標 */
