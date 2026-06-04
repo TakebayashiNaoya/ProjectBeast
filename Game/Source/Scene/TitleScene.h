@@ -6,6 +6,8 @@
 #pragma once
 #include "IScene.h"
 
+#include "Source/UI/System/SystemPacket.h"
+
 
 namespace app
 {
@@ -34,10 +36,23 @@ namespace app
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
+
+	private:
+		/** @brief タイトル画面の更新 */
+		void TitleUpdate();
+		/** @brief ステージ選択画面の更新 */
+		void StageSelectUpdate();
+		/** @brief サウンドオプション画面の更新 */
+		void SoundOptionUpdate();
+		/** @brief チュートリアル画面の更新 */
+		void TutorialUpdate();
+
+
 	private:
 		enum class TitleState
 		{
 			Title,
+			StageSelect,
 			SoundOption,
 			Tutorial
 		};
@@ -46,13 +61,6 @@ namespace app
 
 	private:
 		bool m_nextScene = false;
-
-
-	private:
-		SpriteRender m_titleRender;
-		SpriteRender m_AButton;
-		SpriteRender m_XButton;
-		SpriteRender m_PenTakt;
 
 
 	private:

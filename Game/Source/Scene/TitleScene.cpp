@@ -9,9 +9,9 @@
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Layout.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
+#include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
 #include "TitleScene.h"
-#include "Source/UI/Menus/TitleEventMenu.h"
 
 
 namespace app
@@ -75,93 +75,25 @@ namespace app
 		{
 		case TitleState::Title:
 		{
-			if (!m_titleLayout)
-			{
-				m_titleLayout = new ui::Layout;
-				m_titleLayout->Initialize<ui::TitleEventMenu>(
-					"Assets/parameter/title/Title.json"
-				);
-				m_titleEventMenu = m_titleLayout->GetMenu<ui::TitleEventMenu>();
-			}
+			TitleUpdate();
+			break;
+		}
 
-
-			if (g_pad[0]->IsTrigger(enButtonA))
-			{
-				const uint32_t selectKey = m_titleEventMenu->GetSelectKey();
-				if (selectKey == Hash32("StartFrameBackIcon"))
-				{
-					// ゲーム開始。
-					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-					SoundManager::Get().StopBGM();
-					m_nextScene = true;
-				}
-				else if (selectKey == Hash32("OptionFrameBackIcon"))
-				{
-					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-					m_state = TitleState::SoundOption;
-					// オプション画面。
-					if (!m_soundOption)
-					{
-						m_soundOptionLayout = new ui::Layout;
-						m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
-							"Assets/parameter/sound/SoundOption.json"
-						);
-						m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
-					}
-				}
-				else if (selectKey == Hash32("RuleFrameBackIcon"))
-				{
-					// ルール画面。
-					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-					m_state = TitleState::Tutorial;
-					if (m_tutorialMenu)
-					{
-						m_tutorialMenu->SetClosed(false);
-					}
-				}
-				else if (selectKey == Hash32("EndFrameBackIcon"))
-				{
-					// ゲームを終了する。
-					SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-					PostQuitMessage(0);
-					return;
-				}
-			}
-
-			m_titleRender.Update();
-			m_titleLayout->Update();
+		case TitleState::StageSelect:
+		{
+			StageSelectUpdate();
 			break;
 		}
 
 		case TitleState::SoundOption:
 		{
-			if (m_soundOptionLayout)
-			{
-				m_soundOptionLayout->Update();
-			}
-
-			if (g_pad[0]->IsTrigger(enButtonB))
-			{
-				SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-				m_state = TitleState::Title;
-			}
+			SoundOptionUpdate();
 			break;
 		}
 
 		case TitleState::Tutorial:
 		{
-			if (m_tutorialLayout)
-			{
-				m_tutorialLayout->Update();
-			}
-
-			// TutorialMenu 内で Bボタンが押されたら閉じる。
-			if (m_tutorialMenu && m_tutorialMenu->IsClosed())
-			{
-				SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-				m_tutorialMenu->SetClosed(false);
-				m_state = TitleState::Title;
-			}
+			TutorialUpdate();
 			break;
 		}
 		}
@@ -173,26 +105,26 @@ namespace app
 
 	void TitleScene::Render(RenderContext& rc)
 	{
-		if (m_state == TitleState::Title)
+		switch (m_state)
 		{
-			if (m_titleLayout)
-			{
-				m_titleLayout->Render(rc);
-			}
-		}
-		else if (m_state == TitleState::SoundOption)
-		{
-			if (m_soundOptionLayout)
-			{
-				m_soundOptionLayout->Render(rc);
-			}
-		}
-		else if (m_state == TitleState::Tutorial)
-		{
-			if (m_tutorialLayout)
-			{
-				m_tutorialLayout->Render(rc);
-			}
+		case TitleState::Title:
+			if (m_titleLayout) { m_titleLayout->Render(rc); }
+			break;
+
+		case TitleState::StageSelect:
+			if (m_stageSelectPacket) { m_stageSelectPacket->Render(rc); }
+			break;
+
+		case TitleState::SoundOption:
+			if (m_soundOptionLayout) { m_soundOptionLayout->Render(rc); }
+			break;
+
+		case TitleState::Tutorial:
+			if (m_tutorialLayout) { m_tutorialLayout->Render(rc); }
+			break;
+
+		default:
+			break;
 		}
 	}
 
@@ -204,5 +136,119 @@ namespace app
 			return true;
 		}
 		return false;
+	}
+
+
+	void TitleScene::TitleUpdate()
+	{
+		if (!m_titleLayout)
+		{
+			m_titleLayout = new ui::Layout;
+			m_titleLayout->Initialize<ui::TitleEventMenu>(
+				"Assets/parameter/title/Title.json"
+			);
+			m_titleEventMenu = m_titleLayout->GetMenu<ui::TitleEventMenu>();
+		}
+
+
+		if (g_pad[0]->IsTrigger(enButtonA))
+		{
+			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+
+			const uint32_t selectKey = m_titleEventMenu->GetSelectKey();
+			if (selectKey == Hash32("StartFrameBackIcon"))
+			{
+				m_state = TitleState::StageSelect;
+
+				if (!m_stageSelectPacket)
+				{
+					ui::InitUIPacket(m_stageSelectPacket, "Assets/parameter/stageSelect/StageSelect.json");
+				}
+			}
+			else if (selectKey == Hash32("OptionFrameBackIcon"))
+			{
+				m_state = TitleState::SoundOption;
+				// オプション画面。
+				if (!m_soundOption)
+				{
+					m_soundOptionLayout = new ui::Layout;
+					m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
+						"Assets/parameter/sound/SoundOption.json"
+					);
+					m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
+				}
+			}
+			else if (selectKey == Hash32("RuleFrameBackIcon"))
+			{
+				// ルール画面。
+				m_state = TitleState::Tutorial;
+				if (m_tutorialMenu)
+				{
+					m_tutorialMenu->SetClosed(false);
+				}
+			}
+			else if (selectKey == Hash32("EndFrameBackIcon"))
+			{
+				// ゲームを終了する。
+				PostQuitMessage(0);
+				return;
+			}
+		}
+
+		m_titleLayout->Update();
+	}
+
+
+	void TitleScene::StageSelectUpdate()
+	{
+		if (!m_stageSelectPacket) return;
+
+		m_stageSelectPacket->Update();
+
+		if (g_pad[0]->IsTrigger(enButtonB))
+		{
+			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			m_state = TitleState::Title;
+		}
+
+		if (g_pad[0]->IsTrigger(enButtonA))
+		{
+			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			SoundManager::Get().StopBGM();
+
+			m_nextScene = true;
+		}
+	}
+
+
+	void TitleScene::SoundOptionUpdate()
+	{
+		if (m_soundOptionLayout)
+		{
+			m_soundOptionLayout->Update();
+		}
+
+		if (g_pad[0]->IsTrigger(enButtonB))
+		{
+			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			m_state = TitleState::Title;
+		}
+	}
+
+
+	void TitleScene::TutorialUpdate()
+	{
+		if (m_tutorialLayout)
+		{
+			m_tutorialLayout->Update();
+		}
+
+		// TutorialMenu 内で Bボタンが押されたら閉じる。
+		if (m_tutorialMenu && m_tutorialMenu->IsClosed())
+		{
+			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			m_tutorialMenu->SetClosed(false);
+			m_state = TitleState::Title;
+		}
 	}
 }
