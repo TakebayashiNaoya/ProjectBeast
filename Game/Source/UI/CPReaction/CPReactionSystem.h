@@ -5,7 +5,7 @@
  */
 #pragma once
 #include "CPReactionMenu.h"
-#include "Source/UI/Model/CPReactionStatus.h"
+#include "CPReactionStatus.h"
 
 
 namespace app

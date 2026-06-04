@@ -14,8 +14,8 @@
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
-#include "Source/UI/Menus/CPReactionMenu.h"
-#include "Source/UI/Menus/CPReactionSystem.h"
+#include "Source/UI/CPReaction/CPReactionMenu.h"
+#include "Source/UI/CPReaction/CPReactionSystem.h"
 #include <random>
 
 

@@ -5,7 +5,9 @@
  */
 #include "stdafx.h"
 #include "CPReactionAnimStatus.h"
-#include "Source/UIAnimationTypes.h"
+
+#include "Source/UI/Animation/UIAnimationParameter.h"
+
 
 namespace app
 {

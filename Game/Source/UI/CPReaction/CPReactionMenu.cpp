@@ -6,12 +6,13 @@
 #include "stdafx.h"
 #include "CPReactionMenu.h"
 
-#include "Source/UI/Model/CPReactionStatus.h"
+#include "CPReactionStatus.h"
 
 #include "Source/UI/Animation/UIAnimationFactory.h"
 
-#include "Source/actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
-#include "Source/actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
 
 #include "Source/Sound/SoundManager.h"
 
@@ -27,24 +28,59 @@ namespace app
 
 			m_type = type;
 
+			bool isDrawSpeechBubble = false;
+			bool isDrawTroubleReaction = false;
+			bool isDrawHappyReaction = false;
+			Vector4 speechBubbleColor = Vector4::Black;
+
+			enSoundKind kind = enSoundKind::enSoundKind_None;
+
 			if (m_type == EnReactionType::Trouble)
 			{
-				m_speechBubble->m_isDraw = true;
-				m_troubleReaction->m_isDraw = true;
-				m_happyReaction->m_isDraw = false;
+				isDrawSpeechBubble = true;
+				isDrawTroubleReaction = true;
+				isDrawHappyReaction = false;
 
-				// 困りリアクションのサウンドを再生
-				soundMng.PlaySE(enSoundKind::enSoundKind_CPReactionTrouble);
+				kind = enSoundKind::enSoundKind_CPReactionTrouble;
 			}
 			else if (m_type == EnReactionType::Happy)
 			{
-				m_speechBubble->m_isDraw = true;
-				m_troubleReaction->m_isDraw = false;
-				m_happyReaction->m_isDraw = true;
+				isDrawSpeechBubble = true;
+				isDrawTroubleReaction = false;
+				isDrawHappyReaction = true;
 
-				// 喜びリアクションのサウンドを再生
-				soundMng.PlaySE(enSoundKind::enSoundKind_CPReactionHappy);
+				kind = enSoundKind::enSoundKind_CPReactionHappy;
 			}
+
+			auto cpType = m_target->GetChildPenguinType();
+			switch (cpType)
+			{
+			case actor::EnChildPenguinType::Serious:
+				speechBubbleColor = m_status->GetSeriousReactionColor();
+				break;
+			case actor::EnChildPenguinType::Clingy:
+				speechBubbleColor = m_status->GetClingyReactionColor();
+				break;
+			case actor::EnChildPenguinType::Naughty:
+				speechBubbleColor = m_status->GetNaughtyReactionColor();
+				break;
+			case actor::EnChildPenguinType::Clumsy:
+				speechBubbleColor = m_status->GetClumsyReactionColor();
+				break;
+			case actor::EnChildPenguinType::Caring:
+				speechBubbleColor = m_status->GetCaringReactionColor();
+				break;
+			default:
+				break;
+			}
+
+			m_speechBubble->m_isDraw = isDrawSpeechBubble;
+			m_troubleReaction->m_isDraw = isDrawTroubleReaction;
+			m_happyReaction->m_isDraw = isDrawHappyReaction;
+
+			m_speechBubble->m_color = speechBubbleColor;
+
+			soundMng.PlaySE(kind);
 
 			SetAnimation();
 			m_timer = 0.0f;

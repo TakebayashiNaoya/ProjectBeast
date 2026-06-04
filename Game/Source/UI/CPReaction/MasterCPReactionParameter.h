@@ -35,6 +35,16 @@ namespace app
 			Vector3 troubleReactionOffset;
 			/** 喜びリアクションのオフセット */
 			Vector3 happyReactionOffset;
+			/** 真面目ペンギンのリアクションカラー */
+			Vector4 seriousReactionColor;
+			/** 甘えん坊ペンギンのリアクションカラー */
+			Vector4 clingyReactionColor;
+			/** やんちゃペンギンのリアクションカラー */
+			Vector4 naughtyReactionColor;
+			/** おっちょこちょいペンギンのリアクションカラー */
+			Vector4 clumsyReactionColor;
+			/** 世話焼きペンギンのリアクションカラー */
+			Vector4 caringReactionColor;
 		};
 	}
 }

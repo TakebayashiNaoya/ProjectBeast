@@ -20,6 +20,11 @@ namespace app
 			, m_speechBubbleOffset(Vector3::Zero)
 			, m_troubleReactionOffset(Vector3::Zero)
 			, m_happyReactionOffset(Vector3::Zero)
+			, m_seriousReactionColor(Vector4::White)
+			, m_clingyReactionColor(Vector4::White)
+			, m_naughtyReactionColor(Vector4::White)
+			, m_clumsyReactionColor(Vector4::White)
+			, m_caringReactionColor(Vector4::White)
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameter<MasterCPReactionParameter>("Assets/parameter/UI/cpReaction/CPReactionParameter.json", [](const nlohmann::json& j, MasterCPReactionParameter& parameter)
@@ -29,6 +34,11 @@ namespace app
 					parameter.speechBubbleOffset = util::JsonConverter::ToVector3(j, "speechBubbleOffset");
 					parameter.troubleReactionOffset = util::JsonConverter::ToVector3(j, "troubleReactionOffset");
 					parameter.happyReactionOffset = util::JsonConverter::ToVector3(j, "happyReactionOffset");
+					parameter.seriousReactionColor = util::JsonConverter::ToVector4(j, "seriousReactionColor");
+					parameter.clingyReactionColor = util::JsonConverter::ToVector4(j, "clingyReactionColor");
+					parameter.naughtyReactionColor = util::JsonConverter::ToVector4(j, "naughtyReactionColor");
+					parameter.clumsyReactionColor = util::JsonConverter::ToVector4(j, "clumsyReactionColor");
+					parameter.caringReactionColor = util::JsonConverter::ToVector4(j, "caringReactionColor");
 				});
 		}
 
@@ -49,6 +59,11 @@ namespace app
 			m_speechBubbleOffset = parameter->speechBubbleOffset;
 			m_troubleReactionOffset = parameter->troubleReactionOffset;
 			m_happyReactionOffset = parameter->happyReactionOffset;
+			m_seriousReactionColor = parameter->seriousReactionColor;
+			m_clingyReactionColor = parameter->clingyReactionColor;
+			m_naughtyReactionColor = parameter->naughtyReactionColor;
+			m_clumsyReactionColor = parameter->clumsyReactionColor;
+			m_caringReactionColor = parameter->caringReactionColor;
 		}
 
 

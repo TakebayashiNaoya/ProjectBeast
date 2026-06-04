@@ -4,9 +4,9 @@
  * @author 藤谷
  */
 #pragma once
-#include "UIAnimationStatus.h"
+#include "Source/UI/Model/UIAnimationStatus.h"
 
-#include "Source/UI/Animation/UIAnimationFactory.h"
+#include "Source/Util/Curve.h"
 
 
 namespace app
