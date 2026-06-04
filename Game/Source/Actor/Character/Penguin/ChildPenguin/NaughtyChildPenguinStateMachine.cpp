@@ -16,6 +16,10 @@ namespace app
 		NaughtyChildPenguinStateMachine::NaughtyChildPenguinStateMachine(ChildPenguin* ownerChildPenguin)
 			: ChildPenguinStateMachine(ownerChildPenguin, EnChildPenguinType::Naughty)
 			, m_ownerChildPenguin(ownerChildPenguin)
+			, m_bearTargetPos(Vector3::Zero)
+			, m_targetBear(nullptr)
+			, m_isGoingToWakeBear(false)
+			, m_isAtBear(false)
 		{
 			AddState<NaughtySeekBearState>(this);
 			AddState<NaughtyWakeBearState>(this);

@@ -8,6 +8,7 @@
 #include "NaughtyChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Noise/NoiseManager.h" 
 #include "Source/Sound/SoundManager.h"
 
 namespace app {
@@ -40,18 +41,21 @@ namespace app {
 		void NaughtyWakeBearState::Enter()
 		{
 			// TODO: シロクマを起こすアニメID に差し替える
-			// m_owner->PlayAnimation(EnPenguinAnimationID::Poke);
+			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
 
 			// 効果音（やんちゃな声など）
 			// SoundManager::Get().PlaySE(enSoundKind_NaughtyPoke, false, false, enSoundPriority_Hight);
 		}
 
 		void NaughtyWakeBearState::Update()
-		{}
+		{
+			const Vector3& myPos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
+			NoiseManager::GetInstance().AddNoise(myPos, EnNoiseType::NaughtyPoke);
+		}
 
 		void NaughtyWakeBearState::Exit()
 		{
-			// フラグのリセットはStateMachine側のGetTypeSpecificChangeState()で行う
+
 		}
 
 		NaughtyWakeBearState::NaughtyWakeBearState(NaughtyChildPenguinStateMachine* owner)

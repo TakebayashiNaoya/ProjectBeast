@@ -13,6 +13,7 @@ namespace app
 	namespace actor
 	{
 		class ChildPenguin;
+		class Enemy;
 
 		class NaughtyChildPenguinStateMachine : public ChildPenguinStateMachine
 		{
@@ -28,6 +29,9 @@ namespace app
 			inline void SetBearTargetPos(const Vector3& pos) { m_bearTargetPos = pos; }
 			inline const Vector3& GetBearTargetPos() const { return m_bearTargetPos; }
 
+			inline void SetTargetBear(Enemy* bear) { m_targetBear = bear; }
+			inline Enemy* GetTargetBear() const { return m_targetBear; }
+
 		public:
 			NaughtyChildPenguinStateMachine(ChildPenguin* ownerChildPenguin);
 			~NaughtyChildPenguinStateMachine() = default;
@@ -39,11 +43,14 @@ namespace app
 			ChildPenguin* m_ownerChildPenguin;
 
 			/** シロクマを起こしに行くフラグ（AIがtrueにし、WakeBear終了時にリセット） */
-			bool m_isGoingToWakeBear = false;
+			bool m_isGoingToWakeBear;
 			/** シロクマへの到達フラグ（AIがtrueにし、WakeBear終了時にリセット） */
-			bool m_isAtBear = false;
+			bool m_isAtBear;
 			/** シロクマの座標（AIがセット） */
 			Vector3 m_bearTargetPos;
+
+			/** 起こしに行くシロクマのポインタ*/
+			Enemy* m_targetBear;
 		};
 	}
 }
