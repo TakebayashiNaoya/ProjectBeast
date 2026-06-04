@@ -146,9 +146,10 @@ namespace app
 			 * @brief jsonからVector4を読み込む
 			 * @param json 読み込むjsonファイル
 			 * @param key 読み込むキー
+			 * @param isConvert 0-255の値を0.0-1.0に変換するかどうか
 			 * @return 読み込んだVector4
 			 */
-			static Vector4 ToVector4(const nlohmann::json& json, const char* key);
+			static Vector4 ToVector4(const nlohmann::json& json, const char* key, bool isConvert = true);
 
 			/**
 			 * @brief jsonからFloatRange(Min, Max)を読み込む
