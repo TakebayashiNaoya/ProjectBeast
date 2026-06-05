@@ -84,6 +84,27 @@ namespace nsBeastEngine
 			return m_isActive;
 		}
 
+		/**
+		 * @brief 小窓スプライトのスクリーン座標を設定する
+		 * @details DangerArrowSystem から毎フレーム呼び出す。
+		 *          中心=(0,0)、範囲±フレームバッファハーフサイズの座標系。
+		 * @param pos スクリーン座標
+		 */
+		void SetSpriteScreenPosition(const Vector2& pos)
+		{
+			m_spriteScreenPos = pos;
+		}
+
+		/**
+		 * @brief 小窓スプライトの表示・非表示を設定する
+		 * @details DangerArrowSystem がフラスタム内かつ近距離のときに非表示にする。
+		 * @param visible 表示するか
+		 */
+		void SetSpriteVisible(const bool visible)
+		{
+			m_isSpriteVisible = visible;
+		}
+
 
 	private:
 		/**
@@ -101,10 +122,14 @@ namespace nsBeastEngine
 	private:
 		/** 動作中フラグ */
 		bool m_isActive = false;
+		/** 小窓スプライト表示フラグ（Begin()でtrueにリセット） */
+		bool m_isSpriteVisible = true;
 		/** カメラのワールド座標 */
 		Vector3 m_cameraPosition = Vector3::Zero;
 		/** ターゲットのワールド座標 */
 		Vector3 m_targetPosition = Vector3::Zero;
+		/** 小窓スプライトのスクリーン座標（DangerArrowSystemから毎フレームセット） */
+		Vector2 m_spriteScreenPos = Vector2::Zero;
 		/** オフスクリーン描画用RenderTarget */
 		RenderTarget m_renderTarget;
 		/** 小窓表示用Sprite */

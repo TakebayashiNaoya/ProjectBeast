@@ -40,6 +40,8 @@ namespace nsBeastEngine
 		InitRenderTargetAndSprite();
 
 		m_isActive = true;
+		m_isSpriteVisible = true;
+		m_spriteScreenPos = Vector2::Zero;
 
 		if (onBegin)
 		{
@@ -91,6 +93,13 @@ namespace nsBeastEngine
 	void SubCameraManager::RenderToScreen(nsK2EngineLow::RenderContext& rc)
 	{
 		if (!m_isActive) return;
+		if (!m_isSpriteVisible) return;
+
+		m_sprite.Update(
+			Vector3(m_spriteScreenPos.x, m_spriteScreenPos.y, 0.0f),
+			Quaternion::Identity,
+			Vector3::One
+		);
 
 		// TODO: 描画優先度を実装する
 		m_sprite.Draw(rc);
