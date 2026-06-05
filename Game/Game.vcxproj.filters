@@ -454,6 +454,12 @@
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp">
       <Filter>Source\UI\MiniMap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\CPReaction\CPReactionMenu.cpp">
       <Filter>Source\UI\CPReaction</Filter>
     </ClCompile>
@@ -848,6 +854,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h">
       <Filter>Source\UI\MiniMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\CPReaction\CPReactionAnimStatus.h">
       <Filter>Source\UI\CPReaction</Filter>

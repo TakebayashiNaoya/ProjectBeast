@@ -24,6 +24,7 @@ namespace app
 
 		/** 子ペンギンのSE */
 		enSoundKind_ChildPenguinCRY,
+		enSoundKind_NaughtyPoke,
 
 		/** ペンギン共通のSE */
 		enSoundKind_PenguinDash,
@@ -101,6 +102,7 @@ namespace app
 		SoundInformation("Assets/sound/SE/penguin/daddyPenguin/systemFollow.wav"),
 		SoundInformation("Assets/sound/SE/penguin/daddyPenguin/systemWait.wav"),
 		SoundInformation("Assets/sound/SE/penguin/childPenguin/penguin_cry.wav"),
+		SoundInformation("Assets/sound/SE/penguin/childPenguin/NaughtyPenguinWakeBear.wav"),
 		SoundInformation("Assets/sound/SE/penguin/dash.wav"),
 		SoundInformation("Assets/sound/SE/penguin/jump.wav"),
 		SoundInformation("Assets/sound/SE/penguin/landing.wav"),
