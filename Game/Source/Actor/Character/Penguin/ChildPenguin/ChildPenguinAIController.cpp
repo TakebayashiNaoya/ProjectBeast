@@ -20,6 +20,7 @@
 #include "Source/Manager/IglooManager.h"
 #include <algorithm>
 #include <random>
+#include "graphics/effect/BeastEffectEmitter.h"
 
 
 namespace app
@@ -32,7 +33,15 @@ namespace app
 			const Vector3 CLINGY_HART_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
 			/** 甘えん坊ペンギンのエフェクトスケール */
 			const Vector3 CLINGY_HART_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
-			
+			/** 世話焼きペンギンのエフェクトオフセット */
+			const Vector3 CARING_SWEAT_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
+			/** 世話焼きペンギンのエフェクトスケール */
+			const Vector3 CARING_SWEAT_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
+			/** 世話焼きペンギンの最大再生回数 */
+			constexpr int MAX_SWEAT_COUNT = 3;
+			/** ずらす間隔 */
+			constexpr float SWEAT_INTERVAL = 0.3f;
+
 			/**
 			 * @brief ヒステリシス幅
 			 * @details フェーズを下げるとき、閾値からさらにこの距離だけ内側に入って初めて下げる。
@@ -566,6 +575,13 @@ namespace app
 						// インターバルをリセット。
 						m_effectInterval = 0.0f;
 					}
+
+					// エフェクトの位置を子ペンギンの頭上に固定更新。
+					auto* effect = EffectManager::Get().FindEffect(m_clingyEffectHandle);
+					if (effect != nullptr)
+					{
+						effect->SetPosition(hartPos);
+					}
 				};
 
 			// エフェクトを停止するラムダ。
@@ -964,6 +980,7 @@ namespace app
 
 		CaringChildPenguinAI::CaringChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Caring)
+			, m_caringEffectHandle(INVALID_EFFECT_HANDLE)
 		{
 			const auto& td = GetTypeData(EnChildPenguinType::Caring);
 			m_interventionRange = td.interventionRange;
@@ -1005,6 +1022,9 @@ namespace app
 						ReleaseSuppression(m_interventionTarget);
 						manager->UnregisterAssigned(m_interventionTarget);
 						m_interventionTarget = nullptr;
+
+						m_sweatEffectCount = 0;
+						m_sweatEffectCoolTime = 0.0f;
 					}
 				}
 				else if (m_interventionTarget != nullptr)
@@ -1093,6 +1113,8 @@ namespace app
 					/** 起き上がり完了 → 介入終了 */
 					manager->UnregisterAssigned(m_interventionTarget);
 					m_interventionTarget = nullptr;
+					m_sweatEffectCount = 0;
+					m_sweatEffectCoolTime = 0.0f;
 				}
 			}
 
@@ -1158,6 +1180,42 @@ namespace app
 		}
 
 
+		void CaringChildPenguinAI::PlayCaringEffect() const
+		{
+			// カウント数が最大カウント数より大きい場合
+			if (m_sweatEffectCount >= MAX_SWEAT_COUNT) return;
+
+			// 汗エフェクトの連続再生制御のための時間計測。
+			m_sweatEffectCoolTime += g_gameTime->GetFrameDeltaTime();
+
+			// カウントゼロじゃないかつインターバル未満の場合エフェクトを再生しない。
+			if (m_sweatEffectCount != 0 && m_sweatEffectCoolTime < SWEAT_INTERVAL) return;
+
+			// 汗エフェクトが生み出される位置。
+			const Vector3 sweatPos = m_owner->GetTransform().m_position + CARING_SWEAT_EFFECT_POSITION;
+			// 汗エフェクトの大きさ。
+			const Vector3 sweatScl = m_owner->GetTransform().m_scale + CARING_SWEAT_EFFECT_SCALE;
+			// 汗エフェクトの再生。
+			m_caringEffectHandle = EffectManager::Get().PlayEffect(
+				EnEffectKind::CaringPenguinSweat
+				, sweatPos
+				, Quaternion::Identity
+				, sweatScl
+			);
+			// カウントを増やす。
+			m_sweatEffectCount++;
+			// 値のリセット。
+			m_sweatEffectCoolTime = 0.0f;
+
+			// エフェクトの位置を子ペンギンの頭上に固定更新。
+			auto* effect = EffectManager::Get().FindEffect(m_caringEffectHandle);
+			if (effect != nullptr)
+			{
+				effect->SetPosition(sweatPos);
+			}
+		}
+
+
 		void CaringChildPenguinAI::ApplyIntervention(ChildPenguin* target) const
 		{
 			switch (target->GetChildPenguinType())
@@ -1166,9 +1224,12 @@ namespace app
 			{
 				/** おっちょこちょいを助けて即座に起き上がらせる */
 				auto* ai = static_cast<ClumsyChildPenguinAI*>(target->GetAIController());
+				
 				if (ai)
 				{
 					ai->HelpedByCaringPenguin();
+
+					PlayCaringEffect();
 				}
 				break;
 			}
