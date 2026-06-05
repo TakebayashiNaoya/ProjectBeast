@@ -385,8 +385,15 @@ namespace app
 			 * @param target 制止を解除する対象
 			 */
 			void ReleaseSuppression(ChildPenguin* target) const;
+			
 
 		private:
+			/**
+			 * @brief 介入時にエフェクトを再生する
+			 * @details 対象ペンギンの頭上に汗エフェクト
+			 */
+			void PlayCaringEffect() const;
+
 			/** 現在介入中の対象ペンギン */
 			ChildPenguin* m_interventionTarget = nullptr;
 			/**
@@ -396,6 +403,12 @@ namespace app
 			float m_interventionRange = 0.0f;
 			/** 介入到達とみなす距離 */
 			static constexpr float INTERVENTION_REACH_DISTANCE = 25.0f;
+			/** 複数回連続で流すための制御値 */
+			mutable float m_sweatEffectCoolTime = 0.0f;
+			/** 汗エフェクトハンドル */
+			mutable EffectHandle m_caringEffectHandle;
+			/** 汗エフェクトの回数制御値 */
+			mutable int m_sweatEffectCount = 0;
 		};
 	}
 }
