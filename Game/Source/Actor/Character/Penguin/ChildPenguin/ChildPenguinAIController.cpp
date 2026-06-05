@@ -39,8 +39,10 @@ namespace app
 
 			/** シロクマを起こすための距離 */
 			constexpr float WAKE_BEAR_TRIGGER_DISTANCE = 300.0f;
-			/**  */
-			constexpr float REACH_BEAR_DISTANCE = 50.0f;
+			/** シロクマに到達するための距離 */
+			constexpr float REACH_BEAR_DISTANCE = 80.0f;
+			/** やんちゃペンギンがシロクマを起こした後、または制止された後の再行動抑制時間 */
+			constexpr float SCOLD_COOLDOWN_DURATION = 5.0f;
 
 			/**
 			 * @brief ヒステリシス幅
@@ -62,7 +64,7 @@ namespace app
 			 *          lerpの慣性が残っているうちは Stop に入らず Walk を維持し、
 			 *          停止アニメ中も滑り続ける問題を防ぐ。
 			 */
-			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 1.0f;
+			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 0.1f;
 
 			/**
 			 * @brief 乱数エンジン（起動時に一度だけシード初期化）
@@ -222,7 +224,7 @@ namespace app
 			if (m_movePhase != MovePhase::Stop && distToTarget <= m_stopDistance + HYSTERESIS)
 			{
 				const Vector3& currentVel = m_stateMachine->GetCurrentVelocity();
-				if (currentVel.LengthSq() < 0.1f) // 速度がほぼゼロ
+				if (currentVel.LengthSq() < STOP_VELOCITY_THRESHOLD_SQ) // 速度がほぼゼロ
 				{
 					m_movePhase = MovePhase::Stop;
 				}
@@ -252,13 +254,7 @@ namespace app
 				else if (distToTarget > m_walkDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Run; }
 				else if (distToTarget <= m_stopDistance - HYSTERESIS)
 				{
-					// lerpの慣性が残っている間は Stop に入らず Walk を維持する。
-					// 慣性が残ったまま Stop になるとアニメーションが止まっても滑り続けるため。
-					//const Vector3& currentVel = m_stateMachine->GetCurrentVelocity();
-					//if (currentVel.LengthSq() < STOP_VELOCITY_THRESHOLD_SQ)
-					//{
 					m_movePhase = MovePhase::Stop;
-					//}
 				}
 				break;
 
@@ -407,7 +403,7 @@ namespace app
 			else
 			{
 				// まだ遠い場合は青い円に向かって歩く
-				if (dirToTarget.LengthSq() > 0.0001f)
+				if (dirToTarget.LengthSq() > FLT_EPSILON)
 				{
 					dirToTarget.Normalize();
 				}
@@ -703,7 +699,6 @@ namespace app
 		NaughtyChildPenguinAI::NaughtyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Naughty)
 			, m_naughtyStateMachine(static_cast<NaughtyChildPenguinStateMachine*>(owner->GetStateMachine()))
-			, m_scoldCooldown(0.0f)
 		{
 			const auto& td = GetTypeData(EnChildPenguinType::Naughty);
 			m_roamTriggerDistance = RollRange(td.roamTriggerDistance);
@@ -735,7 +730,7 @@ namespace app
 					m_naughtyStateMachine->SetIsAtBear(false);
 
 					manager->UnregisterAttempting(m_owner);
-					m_scoldCooldown = 5.0f;
+					m_scoldCooldown = SCOLD_COOLDOWN_DURATION;
 				}
 
 				if (m_isFollowing)
@@ -751,7 +746,7 @@ namespace app
 			{
 				m_naughtyStateMachine->SetHasFinishedWaking(false);
 				manager->UnregisterAttempting(m_owner); // 問題行動リストから外れる
-				m_scoldCooldown = 5.0f; // 5秒間は満足してシロクマを無視する
+				m_scoldCooldown = SCOLD_COOLDOWN_DURATION; // SCOLD_COOLDOWN_DURATION秒間は満足してシロクマを無視する
 			}
 
 			if (m_scoldCooldown > 0.0f)
@@ -1177,13 +1172,15 @@ namespace app
 					else
 					{
 						/** ターゲットの座標へ向かって移動する */
-						BuildInputToTarget(m_interventionTarget->GetTransform().m_position);
-
 						if (m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Naughty)
 						{
 							Vector3 dir = CalculateDirectionToTarget(m_interventionTarget->GetTransform().m_position);
 
 							m_stateMachine->SetActionInput(dir, false, true, false, true);
+						}
+						else
+						{
+							BuildInputToTarget(m_interventionTarget->GetTransform().m_position);
 						}
 					}
 					return;
@@ -1278,13 +1275,15 @@ namespace app
 				else
 				{
 					/** ターゲットの座標へ向かって移動する */
-					BuildInputToTarget(m_interventionTarget->GetTransform().m_position);
-
 					if (m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Naughty)
 					{
 						Vector3 dir = CalculateDirectionToTarget(m_interventionTarget->GetTransform().m_position);
 
 						m_stateMachine->SetActionInput(dir, false, true, false, true);
+					}
+					else
+					{
+						BuildInputToTarget(m_interventionTarget->GetTransform().m_position);
 					}
 				}
 				return;

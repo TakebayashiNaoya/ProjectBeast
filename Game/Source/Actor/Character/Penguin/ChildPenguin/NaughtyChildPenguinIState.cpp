@@ -56,12 +56,9 @@ namespace app {
 
 			const Vector3& myPos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
 			NoiseManager::GetInstance().AddNoise(myPos, EnNoiseType::NaughtyPoke);
-
-			const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
-
-			const EffectHandle handle = EffectManager::Get().PlayEffect(
+			EffectManager::Get().PlayEffect(
 				EnEffectKind::ChildPenguinCry,
-				pos,
+				myPos,
 				Quaternion::Identity,
 				EFFECT_SCALE
 			);

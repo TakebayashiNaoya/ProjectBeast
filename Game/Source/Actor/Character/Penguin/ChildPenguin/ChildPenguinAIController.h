@@ -308,7 +308,7 @@ namespace app
 			/** 徘徊先を選ぶ現在地からの半径 */
 			float m_roamRadius = 0.0f;
 
-			float m_scoldCooldown;
+			float m_scoldCooldown = 0.0f;
 		};
 
 
