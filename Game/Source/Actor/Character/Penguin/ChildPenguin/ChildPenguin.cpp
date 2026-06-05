@@ -11,6 +11,7 @@
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "ClumsyChildPenguinStateMachine.h"
+#include "NaughtyChildPenguinStateMachine.h"
 #include "Physics/Physics.h"
 #include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
@@ -60,6 +61,10 @@ namespace app
 			if (m_type == EnChildPenguinType::Clumsy)
 			{
 				m_stateMachine = std::make_unique<ClumsyChildPenguinStateMachine>(this);
+			}
+			else if (m_type == EnChildPenguinType::Naughty)
+			{
+				m_stateMachine = std::make_unique<NaughtyChildPenguinStateMachine>(this);
 			}
 			else
 			{

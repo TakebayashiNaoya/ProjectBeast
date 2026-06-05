@@ -16,6 +16,7 @@ namespace app
 		Slide,
 		Fall,
 		ClumsyCRY,
+		NaughtyPoke,
 		Custom
 	};
 

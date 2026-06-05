@@ -1,5 +1,5 @@
 ﻿/**
- * @file MasterCPReactionParameter.h
+ * @file MasterCPReactionParameter.cpp
  * @brief CPReactionのパラメーター管理クラス
  * @author 藤谷
  */

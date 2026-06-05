@@ -5,6 +5,16 @@
     "iconOffsetY" : 150,
     "speechBubbleOffset" : [-100, 0, 0],
     "troubleReactionOffset" : [-95, 10, 0],
-    "happyReactionOffset" : [-95, 10, 0]
+    "happyReactionOffset" : [-95, 10, 0],
+    "com1" : "真面目ペンギンのリアクションカラー",
+    "seriousReactionColor" : [140, 173, 219, 255],
+    "com2" : "甘えん坊ペンギンのリアクションカラー",
+    "clingyReactionColor" : [255, 194, 209, 255],
+    "com3" : "やんちゃ真面目ペンギンのリアクションカラー",
+    "naughtyReactionColor" : [255, 250, 156, 255],
+    "com4" : "おっちょこちょいペンギンのリアクションカラー",
+    "clumsyReactionColor" : [255, 209, 161, 255],
+    "com5" : "世話焼きペンギンのリアクションカラー",
+    "caringReactionColor" : [168, 235, 189, 255]
   }
 ]
