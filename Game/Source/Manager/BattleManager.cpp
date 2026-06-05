@@ -9,6 +9,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Graphics/Camera/SubCameraManager.h"
@@ -76,7 +77,8 @@ namespace app
 
 	void BattleManager::UpdateSubCamera()
 	{
-		const auto& enemies = actor::EnemyManager::GetInstance()->GetEnemies();
+		const auto enemies = actor::EnemyManager::GetInstance()->GetEnemies();
+		const auto controllers = actor::EnemyManager::GetInstance()->GetControllers();
 
 		/** 攻撃中のシロクマを探す */
 		bool isAnyAttacking = false;
@@ -107,15 +109,27 @@ namespace app
 			m_isSubCameraActive = true;
 		}
 
-		/** 親ペンギンに最も近い子ペンギンを選ぶ */
-		// TODO: IsInDanger()が実装されたら危険な子ペンギンを候補に絞る
+		/**
+		 * 攻撃中のシロクマが追いかけている子ペンギンを候補に、
+		 * 親ペンギンに最も近いものをターゲットにする。
+		 * 複数のシロクマが同時に攻撃中の場合でも正しく機能する。
+		 */
 		const Vector3 daddyPos = actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
-		const auto& childPenguins = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
 
-		const actor::ChildPenguin* nearestChild = nullptr;
+		const actor::ChildPenguin* targetChild = nullptr;
 		float nearestDistSq = FLT_MAX;
-		for (const auto* child : childPenguins)
+
+		const int enemyCount = static_cast<int>(enemies.size());
+		for (int i = 0; i < enemyCount; i++)
 		{
+			auto* enemy = enemies[i];
+			if (enemy == nullptr) continue;
+			if (!enemy->GetEnemyStateMachine()->IsAttack()) continue;
+
+			auto* controller = controllers[i];
+			if (controller == nullptr) continue;
+
+			const auto* child = controller->GetFoundPenguin();
 			if (child == nullptr) continue;
 
 			Vector3 diff = child->GetTransform().m_position - daddyPos;
@@ -124,14 +138,15 @@ namespace app
 			if (distSq < nearestDistSq)
 			{
 				nearestDistSq = distSq;
-				nearestChild = child;
+				targetChild = child;
 			}
 		}
 
-		if (nearestChild == nullptr) return;
+		/** 攻撃対象の子ペンギンが特定できなければ終了 */
+		if (targetChild == nullptr) return;
 
 		/** ターゲット座標・カメラ座標をセットする */
-		const Vector3 targetPos = nearestChild->GetTransform().m_position;
+		const Vector3 targetPos = targetChild->GetTransform().m_position;
 
 		/** 親ペンギン→子ペンギンの方向にカメラを配置する */
 		Vector3 toTarget = targetPos - daddyPos;
