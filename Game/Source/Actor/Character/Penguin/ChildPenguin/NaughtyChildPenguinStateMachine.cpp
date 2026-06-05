@@ -21,8 +21,8 @@ namespace app
 			, m_isGoingToWakeBear(false)
 			, m_isAtBear(false)
 		{
-			AddState<NaughtySeekBearState>(this);
 			AddState<NaughtyWakeBearState>(this);
+			AddState<NaughtyDiveWhirlpoolState>(this);
 		}
 
 
@@ -49,6 +49,26 @@ namespace app
 			{
 				return FindState(NaughtyWakeBearState::ID());
 			}
+
+			//if (IsEqualCurrentState(NaughtyDiveWhirlpoolState::ID()))
+			//{
+			//	if (!GetIsInWhirlpool())
+			//	{
+			//		m_isGoingToWhirlpool = false;
+			//		m_isAtWhirlpool = false;
+
+			//		m_hasFinishedDiving = true;
+
+			//		return nullptr;
+			//	}
+			//	return FindState(NaughtyDiveWhirlpoolState::ID());
+			//}
+
+			//// 渦潮に到達した瞬間
+			//if (m_isAtWhirlpool)
+			//{
+			//	return FindState(NaughtyDiveWhirlpoolState::ID());
+			//}
 
 			return nullptr;
 		}
