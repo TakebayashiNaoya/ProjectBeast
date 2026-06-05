@@ -149,13 +149,13 @@ namespace app
 		}
 
 
-		void OceanMesh::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld)
+		void OceanMesh::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view)
 		{
 			// 共通定数バッファを更新する（b0）
 			SCommonConstantBuffer cb;
 			cb.mWorld = mWorld;
-			cb.mView = CameraSystem::Get().GetMainCamera().GetViewMatrix();
-			cb.mProj = CameraSystem::Get().GetMainCamera().GetProjectionMatrix();
+			cb.mView = view.camera->GetViewMatrix();
+			cb.mProj = view.camera->GetProjectionMatrix();
 			cb.mulColor = Vector4::One;
 			m_commonConstantBuffer.CopyToVRAM(cb);
 
@@ -171,17 +171,9 @@ namespace app
 		}
 
 
-		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld)
+		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view)
 		{
-			SetupDrawCommands(rc, mWorld);
-			rc.SetIndexBuffer(m_indexBuffer);
-			rc.DrawIndexedInstance(m_indexCount, 1);
-		}
-
-
-		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::Frustum& frustum)
-		{
-			SetupDrawCommands(rc, mWorld);
+			SetupDrawCommands(rc, mWorld, view);
 
 			// 可視インデックスを収集する
 			m_visibleIndexArray.clear();
@@ -199,7 +191,7 @@ namespace app
 					const SChunkAABB& chunkAABB = m_chunkAABBs[static_cast<size_t>(chunkIndex)];
 
 					// チャンクAABBが視錐台と交差しない場合はスキップする
-					if (!frustum.IsIntersectAABBWorld(chunkAABB.min, chunkAABB.max))
+					if (!view.frustum.IsIntersectAABBWorld(chunkAABB.min, chunkAABB.max))
 					{
 						continue;
 					}
@@ -224,7 +216,7 @@ namespace app
 							const Vector3 cellMax(cellMaxX, chunkAABB.max.y, cellMaxZ);
 
 							// セルAABBが視錐台と交差しない場合はスキップする
-							if (!frustum.IsIntersectAABBWorld(cellMin, cellMax))
+							if (!view.frustum.IsIntersectAABBWorld(cellMin, cellMax))
 							{
 								continue;
 							}
@@ -851,11 +843,11 @@ namespace app
 		}
 
 
-		void Ocean::Render(RenderContext& rc, const Frustum& frustum)
+		void Ocean::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			// DispatchWaveCS()・BuildChunkAABBs()はUpdate()で完了済みのため、
 			// ここでは描画コマンドのみを発行する
-			m_oceanMesh.Draw(rc, CalcWorldMatrix(), frustum);
+			m_oceanMesh.Draw(rc, CalcWorldMatrix(), view);
 		}
 
 

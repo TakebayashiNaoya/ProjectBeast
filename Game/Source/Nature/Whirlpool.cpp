@@ -129,7 +129,7 @@ namespace app
 			mTrans.MakeTranslation(m_transform.m_position);
 			const Matrix mWorld = mScale * mRot * mTrans;
 
-			SetupDrawCommands(rc, mWorld);
+			SetupDrawCommands(rc, mWorld, g_renderingEngine->GetMainView());
 
 			// カリングなし：元インデックスバッファをそのまま使用する
 			rc.SetIndexBuffer(m_indexBuffer);
@@ -139,7 +139,7 @@ namespace app
 		}
 
 
-		void Whirlpool::Render(RenderContext& rc, const Frustum& frustum)
+		void Whirlpool::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			if (m_state == EnWhirlpoolState::None) return;
 
@@ -155,7 +155,7 @@ namespace app
 			mTrans.MakeTranslation(m_transform.m_position);
 			const Matrix mWorld = mScale * mRot * mTrans;
 
-			SetupDrawCommands(rc, mWorld);
+			SetupDrawCommands(rc, mWorld, view);
 
 			// トライアングルカリング
 			// m_verticesのposをワールド変換してからTriangleCullerに渡す
@@ -174,7 +174,7 @@ namespace app
 				numVerts,
 				m_srcIndexArray.data(),
 				static_cast<int>(m_srcIndexArray.size()),
-				frustum,
+				view.frustum,
 				m_visibleIndexArray
 			);
 
@@ -395,13 +395,13 @@ namespace app
 		}
 
 
-		void Whirlpool::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld)
+		void Whirlpool::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view)
 		{
 			// 共通定数バッファを更新する（b0）
 			SCommonConstantBuffer commonCb;
 			commonCb.mWorld = mWorld;
-			commonCb.mView = CameraSystem::Get().GetMainCamera().GetViewMatrix();
-			commonCb.mProj = CameraSystem::Get().GetMainCamera().GetProjectionMatrix();
+			commonCb.mView = view.camera->GetViewMatrix();
+			commonCb.mProj = view.camera->GetProjectionMatrix();
 			commonCb.mulColor = Vector4::One;
 			m_commonConstantBuffer.CopyToVRAM(commonCb);
 

@@ -262,6 +262,9 @@
     <ClInclude Include="Graphics\Camera\SubCameraManager.h">
       <Filter>Graphics\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\RenderViewContext.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">

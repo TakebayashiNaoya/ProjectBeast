@@ -6,6 +6,7 @@
 #pragma once
 #include "MyRenderer.h"
 #include "Graphics/Light/SceneLight.h"
+#include "Graphics/RenderViewContext.h"
 #include "Nature/INatureObject.h"
 #include "Geometry/Frustum.h"
 #include "Graphics/PostEffect/PostEffectManager.h"
@@ -24,35 +25,6 @@ namespace nsBeastEngine
 	 */
 	class RenderingEngine
 	{
-	private:
-		/** GBufferに入れるレンダリングターゲットの役割 */
-		enum EnGBuffer
-		{
-			enGBuffer_Albedo = 0,  /** アルベド		*/
-			enGBuffer_Normal,      /** 法線			*/
-			enGBuffer_Specular,    /** スペキュラ   */
-			enGBuffer_Num,         /** G-Bufferの数 */
-		};
-
-		/** 描画に使用するリソース */
-		struct RenderViewContext
-		{
-			UINT width = 0;		/** 幅 */
-			UINT height = 0;	/** 高さ */
-
-			std::array<RenderTarget, enGBuffer_Num> gBuffer;	/** GBufferのレンダリングターゲット */
-
-			RenderTarget	renderTarget;			/** レンダリングターゲット */
-			Sprite			deferredLightingSprite;	/** ディファードシェーディング用のスプライト */
-			Frustum			frustum;				/** フラスタム */
-		};
-
-		/** メインカメラで映すビュー */
-		RenderViewContext m_mainView;
-		/** サブカメラで映すビュー */
-		RenderViewContext m_subView;
-
-
 	public:
 		RenderingEngine();
 		~RenderingEngine();
@@ -83,6 +55,18 @@ namespace nsBeastEngine
 		SceneLight& GetSceneLight() { return m_sceneLight; }
 
 		/**
+		 * @brief メインビューを取得する
+		 * @return メインビューの参照
+		 */
+		const RenderViewContext& GetMainView() const { return m_mainView; }
+
+		/**
+		 * @brief サブビューを取得する
+		 * @return サブビューの参照
+		 */
+		const RenderViewContext& GetSubView() const { return m_subView; }
+
+		/**
 		 * @brief メインカメラのフラスタムを取得する
 		 * @details WhirlpoolManagerなど、RenderingEngine外部から
 		 *          カリング判定を行う場合に使用する。
@@ -91,8 +75,15 @@ namespace nsBeastEngine
 		const Frustum& GetFrustum() const { return m_mainView.frustum; }
 
 		/**
+		 * @brief 現在描画中のビューのフラスタムを取得する
+		 * @details ModelRender::OnDrawから参照される。
+		 *          ExecuteViewPass前にm_activeFrustumがセットされる。
+		 * @return アクティブフラスタムの参照
+		 */
+		const Frustum& GetActiveFrustum() const { return *m_activeFrustum; }
+
+		/**
 		 * @brief サブカメラ用レンダリングターゲットを取得する
-		 * @details SubCameraManager::RenderToScreen()でスプライトに貼り付けるために使用する
 		 * @return サブカメラ用レンダリングターゲットの参照
 		 */
 		RenderTarget& GetSubCameraRenderTarget() { return m_subView.renderTarget; }
@@ -248,6 +239,11 @@ namespace nsBeastEngine
 
 
 	private:
+		/** メインカメラで映すビュー */
+		RenderViewContext m_mainView;
+		/** サブカメラで映すビュー */
+		RenderViewContext m_subView;
+
 		/** シーンライト */
 		SceneLight		m_sceneLight;
 		/** メインレンダリングターゲットをフレームバッファにコピーするためのスプライト */
@@ -273,5 +269,7 @@ namespace nsBeastEngine
 
 		/** フラスタムカリングの有効/無効 */
 		bool m_frustumCullingEnabled = true;
+		/** 現在描画中のビューのフラスタム（ExecuteViewPass前にセットされる） */
+		const Frustum* m_activeFrustum = nullptr;
 	};
 }

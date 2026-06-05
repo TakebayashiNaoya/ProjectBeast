@@ -133,23 +133,14 @@ namespace app
 			void BuildChunkAABBs(float maxWaveHeight);
 
 			/**
-			 * @brief カリングなしで描画する
-			 * @details DispatchWaveCS()はUpdate()で完了済みであることを前提とする。
-			 *          描画コマンドのみを発行する。
-			 * @param rc		描画コンテキスト
-			 * @param mWorld	ワールド行列
-			 */
-			void Draw(RenderContext& rc, const Matrix& mWorld);
-
-			/**
 			 * @brief チャンク単位のフラスタムカリングを行いながら描画する
 			 * @details DispatchWaveCS()・BuildChunkAABBs()がUpdate()で完了済みであることを前提とする。
 			 *          視錐台と交差するチャンクのインデックスのみをGPUバッファに書き込んで描画する。
 			 * @param rc		描画コンテキスト
 			 * @param mWorld	ワールド行列
-			 * @param frustum	カリングに使用する視錐台
+			 * @param view		使用するビュー（カメラ行列・フラスタムを含む）
 			 */
-			void Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::Frustum& frustum);
+			void Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view);
 
 			/**
 			 * @brief 拡張定数バッファを更新する
@@ -189,8 +180,9 @@ namespace app
 			 * @details Draw()の共通処理（定数バッファ更新・パイプライン設定・頂点バッファ設定）をまとめる
 			 * @param rc		描画コンテキスト
 			 * @param mWorld	ワールド行列
+			 * @param view		使用するビュー（カメラ行列の取得に使用）
 			 */
-			void SetupDrawCommands(RenderContext& rc, const Matrix& mWorld);
+			void SetupDrawCommands(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view);
 
 
 		private:
@@ -310,7 +302,7 @@ namespace app
 			 * @details RenderingEngine::Execute()内から呼ばれる
 			 * @param rc レンダリングコンテキスト
 			 */
-			void Render(RenderContext& rc, const Frustum& frustum) override;
+			void Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view) override;
 
 			/**
 			 * @brief 波のスクロール速度を設定

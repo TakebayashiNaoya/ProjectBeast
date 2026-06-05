@@ -66,6 +66,27 @@ namespace nsBeastEngine
 		}
 
 		/**
+		 * @brief 現在描画中のアクティブカメラを取得する
+		 * @details RenderingEngineがExecuteViewPass前にSetActiveCameraで設定する。
+		 *          描画パス外では m_mainCamera と同じ。
+		 * @return アクティブカメラのポインタ
+		 */
+		nsK2EngineLow::Camera* GetActiveCamera()
+		{
+			return m_activeCamera;
+		}
+
+		/**
+		 * @brief アクティブカメラを設定する
+		 * @details RenderingEngine::ExecuteViewPass からのみ呼ぶこと
+		 * @param camera 設定するカメラ
+		 */
+		void SetActiveCamera(nsK2EngineLow::Camera* camera)
+		{
+			m_activeCamera = camera;
+		}
+
+		/**
 		 * @brief サブカメラを取得する
 		 * @return サブカメラのポインタ。未生成の場合はnullptr
 		 */
@@ -98,6 +119,8 @@ namespace nsBeastEngine
 		nsK2EngineLow::Camera* m_mainCamera = nullptr;
 		/** サブカメラ */
 		nsK2EngineLow::Camera* m_subCamera = nullptr;
+		/** 現在描画中のカメラ（ExecuteViewPass前にセットされる） */
+		nsK2EngineLow::Camera* m_activeCamera = nullptr;
 
 
 		//============================================//

@@ -4,7 +4,8 @@
  * @author 竹林
  */
 #pragma once
-#include "Geometry/Frustum.h"
+#include "BeastEnginePreCompile.h"
+#include "Graphics/RenderViewContext.h"
 
 
 namespace nsBeastEngine
@@ -28,6 +29,6 @@ namespace nsBeastEngine
 		 *          描画コマンドを直接発行できる。
 		 * @param rc レンダリングコンテキスト
 		 */
-		virtual void Render(RenderContext& rc, const Frustum& frustum) = 0;
+		virtual void Render(RenderContext& rc, const RenderViewContext& view) = 0;
 	};
 }

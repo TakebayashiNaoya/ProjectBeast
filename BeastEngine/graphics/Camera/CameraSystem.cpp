@@ -17,6 +17,7 @@ namespace nsBeastEngine
 		// g_camera3D をメインカメラとしてラップする
 		// 実体・更新は k2EngineLow（GraphicsEngine::BeginRender）が管理する
 		m_mainCamera = g_camera3D;
+		m_activeCamera = m_mainCamera;
 	}
 
 

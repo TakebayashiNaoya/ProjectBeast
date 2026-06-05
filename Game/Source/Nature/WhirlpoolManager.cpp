@@ -156,7 +156,7 @@ namespace app
 		}
 
 
-		void WhirlpoolManager::Render(RenderContext& rc, const Frustum& frustum)
+		void WhirlpoolManager::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			ForEach([&](Whirlpool* whirlpool)
 				{
@@ -165,13 +165,13 @@ namespace app
 					const Vector3& center = whirlpool->GetTransform().m_position;
 					const float    radius = whirlpool->GetMaxScaleXZ() * Whirlpool::MESH_RADIUS;
 
-					if (!frustum.IsIntersectSphere(center, radius))
+					if (!view.frustum.IsIntersectSphere(center, radius))
 					{
 						return;
 					}
 
 					// 球判定を通過した渦潮に対してトライアングルカリングを適用して描画する
-					whirlpool->Render(rc, frustum);
+					whirlpool->Render(rc, view);
 				});
 		}
 

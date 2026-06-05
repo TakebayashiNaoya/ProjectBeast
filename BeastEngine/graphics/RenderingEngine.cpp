@@ -37,6 +37,7 @@ namespace nsBeastEngine
 		// メインビューの初期化
 		m_mainView.width = g_graphicsEngine->GetFrameBufferWidth();
 		m_mainView.height = g_graphicsEngine->GetFrameBufferHeight();
+		m_mainView.camera = &CameraSystem::Get().GetMainCamera();
 		m_mainView.renderTarget.Create(
 			m_mainView.width,
 			m_mainView.height,
@@ -51,6 +52,7 @@ namespace nsBeastEngine
 		// サブビューの初期化
 		m_subView.width = SUB_CAMERA_RT_WIDTH;
 		m_subView.height = SUB_CAMERA_RT_HEIGHT;
+		m_subView.camera = CameraSystem::Get().GetSubCamera();
 		m_subView.renderTarget.Create(
 			m_subView.width,
 			m_subView.height,
@@ -71,6 +73,9 @@ namespace nsBeastEngine
 		// ポストエフェクトマネージャーの初期化
 		InitPostEffectManager();
 
+		// アクティブフラスタムのデフォルトをメインビューに設定する
+		m_activeFrustum = &m_mainView.frustum;
+
 		m_sceneLight.Init();
 	}
 
@@ -85,6 +90,7 @@ namespace nsBeastEngine
 	{
 		// メインカメラのフラスタムを更新する
 		auto& mainCamera = CameraSystem::Get().GetMainCamera();
+		m_mainView.camera = &mainCamera;
 		Matrix viewProjMatrix;
 		viewProjMatrix.Multiply(mainCamera.GetViewMatrix(), mainCamera.GetProjectionMatrix());
 
@@ -121,6 +127,7 @@ namespace nsBeastEngine
 		if (CameraSystem::Get().HasSubCamera())
 		{
 			auto* subCamera = CameraSystem::Get().GetSubCamera();
+			m_subView.camera = subCamera;
 			Matrix subViewProjMatrix;
 			subViewProjMatrix.Multiply(subCamera->GetViewMatrix(), subCamera->GetProjectionMatrix());
 			m_subView.frustum.Update(subViewProjMatrix);
@@ -140,6 +147,9 @@ namespace nsBeastEngine
 
 	void RenderingEngine::ExecuteViewPass(RenderContext& rc, RenderViewContext& view)
 	{
+		CameraSystem::Get().SetActiveCamera(view.camera);
+		m_activeFrustum = &view.frustum;
+
 		RenderToGBuffer(rc, view);
 		DeferredLighting(rc, view);
 		ForwardRendering(rc, view);
@@ -337,7 +347,7 @@ namespace nsBeastEngine
 		BeginGPUEvent("NatureObjects");
 		for (auto* obj : m_natureObjects)
 		{
-			obj->Render(rc, view.frustum);
+			obj->Render(rc, view);
 		}
 		EndGPUEvent();
 
