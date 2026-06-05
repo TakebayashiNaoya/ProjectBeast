@@ -30,6 +30,12 @@ namespace app
 			// m_fenceEvent が未初期化（Init未呼び出し）の場合は何もしない
 			if (m_fenceEvent == nullptr) return;
 
+			// 可視インデックスバッファを削除する
+			for (auto* ib : m_visibleIndexBuffers)
+			{
+				delete ib;
+			}
+
 			//------------------------------------------------------------
 			// GPUがコマンドキューを使い終わるまで待つ
 			//------------------------------------------------------------
@@ -247,9 +253,11 @@ namespace app
 				return;
 			}
 
-			// 可視インデックスをGPUバッファに書き込んでドローコールを発行する
-			m_visibleIndexBuffer.Copy(m_visibleIndexArray.data());
-			rc.SetIndexBuffer(m_visibleIndexBuffer);
+			// メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で別スロットに書き込む
+			const int frameIdx = g_graphicsEngine->GetBackBufferIndex();
+			auto* visIb = m_visibleIndexBuffers[frameIdx];
+			visIb->Copy(m_visibleIndexArray.data());
+			rc.SetIndexBuffer(*visIb);
 			rc.DrawIndexedInstance(static_cast<int>(m_visibleIndexArray.size()), 1);
 		}
 
@@ -350,12 +358,16 @@ namespace app
 			);
 			m_indexBuffer.Copy(m_srcIndexArray.data());
 
-			// 可視インデックスバッファ（カリングあり描画用）
-			// 最大でも全インデックス数と同じサイズになるため、同サイズで確保する
-			m_visibleIndexBuffer.Init(
-				static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
-				sizeof(uint32_t)
-			);
+			// 可視インデックスバッファをダブルバッファで作成する
+			// [0]=メインビュー用、[1]=サブビュー用（SetFrameIndexによる切り替えと対応）
+			for (int buf = 0; buf < 2; buf++)
+			{
+				m_visibleIndexBuffers[buf] = new IndexBuffer;
+				m_visibleIndexBuffers[buf]->Init(
+					static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
+					sizeof(uint32_t)
+				);
+			}
 
 			// 可視インデックス配列を最大サイズで事前確保しておく（毎フレームのアロケーションを避ける）
 			m_visibleIndexArray.reserve(static_cast<size_t>(totalIndices));

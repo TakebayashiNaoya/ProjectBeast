@@ -217,8 +217,8 @@ namespace app
 			Texture        m_albedoMap;					/** アルベドマップ */
 
 			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
-			IndexBuffer    m_indexBuffer;				/** 元インデックスバッファ（カリングなし描画用） */
-			IndexBuffer    m_visibleIndexBuffer;		/** 可視インデックスバッファ（カリングあり描画用） */
+			IndexBuffer    m_indexBuffer;					/** 元インデックスバッファ（カリングなし描画用） */
+			IndexBuffer*   m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
 			int            m_indexCount = 0;			/** インデックス数 */
 
 			/** 元インデックス配列（CPUキャッシュ・カリング判定用） */

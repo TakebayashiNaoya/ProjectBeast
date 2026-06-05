@@ -130,13 +130,30 @@ namespace nsBeastEngine
 			m_subView.camera = subCamera;
 			Matrix subViewProjMatrix;
 			subViewProjMatrix.Multiply(subCamera->GetViewMatrix(), subCamera->GetProjectionMatrix());
+#if defined(_DEBUG)
+			m_subView.frustum.Update(subViewProjMatrix, Frustum::DEBUG_FRUSTUM_SHRINK_SCALE);
+#else
 			m_subView.frustum.Update(subViewProjMatrix);
+#endif
+
+			// サブビューパスではもう一方のフレームバッファインデックスを使用する。
+			// 同フレーム内でメインビューとサブビューが同じ定数バッファスロットに書き込むと
+			// サブビューがメインビューのマトリクスを上書きしてしまうため、別スロットを使う。
+			const UINT mainFrameIdx = g_graphicsEngine->GetBackBufferIndex();
+			g_graphicsEngine->SetFrameIndex(1 - mainFrameIdx);
 
 			ExecuteViewPass(rc, m_subView);
+
+			g_graphicsEngine->SetFrameIndex(mainFrameIdx);
 		}
 
 		// メインレンダリングターゲットの内容をフレームバッファにコピー
 		CopyMainRenderTargetToFrameBufferSprite(rc);
+
+		// 全ビューの描画完了後、アクティブカメラをメインカメラに戻す
+		// フレーム間でGetActiveCamera()が呼ばれた際にサブカメラが返らないようにするため
+		CameraSystem::Get().SetActiveCamera(&CameraSystem::Get().GetMainCamera());
+		m_activeFrustum = &m_mainView.frustum;
 
 		// 描画オブジェクトのリストをクリア
 		m_deferredModelList.clear();
