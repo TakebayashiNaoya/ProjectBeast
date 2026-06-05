@@ -99,6 +99,7 @@ namespace app
 				nsBeastEngine::SubCameraManager::Get().End();
 				m_isSubCameraActive = false;
 			}
+			m_lastTargetChild = nullptr;
 			return;
 		}
 
@@ -140,6 +141,20 @@ namespace app
 				nearestDistSq = distSq;
 				targetChild = child;
 			}
+		}
+
+		/**
+		 * チェイス中に特定できた場合はキャッシュを更新する。
+		 * EnterAttack()でGetFoundPenguin()がnullptrになった後も
+		 * m_lastTargetChildを使ってカメラを追従し続ける。
+		 */
+		if (targetChild != nullptr)
+		{
+			m_lastTargetChild = targetChild;
+		}
+		else
+		{
+			targetChild = m_lastTargetChild;
 		}
 
 		/** 攻撃対象の子ペンギンが特定できなければ終了 */

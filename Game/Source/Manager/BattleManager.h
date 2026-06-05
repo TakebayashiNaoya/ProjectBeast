@@ -6,6 +6,7 @@
 #pragma once
 #include <functional>
 
+namespace app { namespace actor { class ChildPenguin; } }
 
 namespace app
 {
@@ -176,6 +177,14 @@ namespace app
 	private:
 		/** サブカメラが起動中かどうか */
 		bool m_isSubCameraActive = false;
+
+		/**
+		 * 最後に特定できた攻撃ターゲットの子ペンギン。
+		 * EnemyController::EnterAttack()でm_foundPenguinがクリアされるため、
+		 * 攻撃フェーズ中はここにキャッシュした値でカメラを追従し続ける。
+		 * サブビュー終了時にnullptrへリセットする。
+		 */
+		const actor::ChildPenguin* m_lastTargetChild = nullptr;
 
 
 

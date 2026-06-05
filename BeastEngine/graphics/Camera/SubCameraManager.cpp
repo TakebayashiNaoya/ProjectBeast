@@ -112,8 +112,11 @@ namespace nsBeastEngine
 		spriteInitData.m_textures[0] = &g_renderingEngine->GetSubCameraRenderTarget().GetRenderTargetTexture();
 		spriteInitData.m_width = SUB_CAMERA_RT_WIDTH;
 		spriteInitData.m_height = SUB_CAMERA_RT_HEIGHT;
-		spriteInitData.m_fxFilePath = "Assets/shader/sprite.fx";
+		spriteInitData.m_fxFilePath = "Assets/shader/SubViewCircle.fx";
 		spriteInitData.m_psEntryPoinFunc = "PSMain";
+		// smoothstepフェザリングのアルファ値を2D合成バッファに正しくブレンドするために
+		// AlphaBlendMode_Transを使用する（Noneだと縁のアルファが無視されてジャギーになる）
+		spriteInitData.m_alphaBlendMode = AlphaBlendMode_Trans;
 		spriteInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		m_sprite.Init(spriteInitData);
