@@ -5,7 +5,8 @@
  */
 #pragma once
 #include "CPReactionMenu.h"
-#include "Source/UI/Model/CPReactionStatus.h"
+
+#include "Source/UI/System/SystemPacket.h"
 
 
 namespace app
@@ -18,16 +19,10 @@ namespace app
 
 	namespace ui
 	{
-		namespace
-		{
-			/** リアクションの最大数 */
-			constexpr uint8_t MAX_REACTIONS_NUM = 10;
-		}
-
-
 		/** 前方宣言 */
 		class Layout;
 		class CPReactionMenu;
+		class CPReactionStatus;
 
 
 
@@ -36,6 +31,11 @@ namespace app
 		 */
 		class CPReactionSystem : Noncopyable
 		{
+		private:
+			/** リアクションの最大数 */
+			static constexpr uint8_t REACTION_PACKET_NUM = 10;
+
+
 		public:
 			/**
 			 * @brief リアクションの対象となる子ペンギンを設定
@@ -47,7 +47,7 @@ namespace app
 
 		public:
 			/** @brief リアクションメニューの配列を取得 */
-			std::array<CPReactionMenu*, MAX_REACTIONS_NUM>& GetReactionMenus() { return m_reactionMenus; }
+			const std::array<SystemPacket<CPReactionMenu>, REACTION_PACKET_NUM>& GetReactionMenus() const { return m_reactionPackets; }
 
 
 		public:
@@ -73,10 +73,8 @@ namespace app
 
 
 		private:
-			/** リアクションレイアウトの配列 */
-			std::array<Layout*, MAX_REACTIONS_NUM> m_reactionLayouts;
-			/** リアクションメニューの配列 */
-			std::array<CPReactionMenu*, MAX_REACTIONS_NUM> m_reactionMenus;
+			/** リアクションのSystemPacketの配列 */
+			std::array<SystemPacket<CPReactionMenu>, REACTION_PACKET_NUM> m_reactionPackets;
 			/** リアクションの親パラメータ */
 			std::unique_ptr<CPReactionStatus> m_reactionStatusParent;
 		};

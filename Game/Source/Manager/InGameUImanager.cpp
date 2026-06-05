@@ -18,11 +18,11 @@
 
 #include "Source/UI/Layout.h"
 
+#include "Source/UI/CPReaction/CPReactionSystem.h"
 #include "Source/UI/InGameButton/InGameButtonMenu.h"
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
 #include "Source/UI/Menus/CountDownMenu.h"
-#include "Source/UI/Menus/CPReactionSystem.h"
 #include "Source/UI/Menus/EnemySleepingMenu.h"
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
