@@ -79,6 +79,35 @@ namespace app
 	{
 		const auto enemies = actor::EnemyManager::GetInstance()->GetEnemies();
 		const auto controllers = actor::EnemyManager::GetInstance()->GetControllers();
+		const int enemyCount = static_cast<int>(enemies.size());
+		const Vector3 daddyPos = actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
+
+		/**
+		 * チェイス状態（攻撃前）のシロクマからターゲットをキャッシュする。
+		 * GetFoundPenguin()はEnterAttack()でクリアされるため、
+		 * 攻撃フェーズに入る前のチェイス中に毎フレーム更新しておく必要がある。
+		 * IsAttack()を条件にしないことで、チェイス中にも確実にキャッシュできる。
+		 */
+		{
+			float nearestDistSq = FLT_MAX;
+			for (int i = 0; i < enemyCount; i++)
+			{
+				auto* enemy = enemies[i];
+				if (enemy == nullptr) continue;
+				auto* controller = controllers[i];
+				if (controller == nullptr) continue;
+				const auto* child = controller->GetFoundPenguin();
+				if (child == nullptr) continue;
+				Vector3 diff = child->GetTransform().m_position - daddyPos;
+				diff.y = 0.0f;
+				const float distSq = diff.LengthSq();
+				if (distSq < nearestDistSq)
+				{
+					nearestDistSq = distSq;
+					m_lastTargetChild = child;
+				}
+			}
+		}
 
 		/** 攻撃中のシロクマを探す */
 		bool isAnyAttacking = false;
@@ -98,8 +127,8 @@ namespace app
 			{
 				nsBeastEngine::SubCameraManager::Get().End();
 				m_isSubCameraActive = false;
+				m_lastTargetChild = nullptr;
 			}
-			m_lastTargetChild = nullptr;
 			return;
 		}
 
@@ -110,52 +139,8 @@ namespace app
 			m_isSubCameraActive = true;
 		}
 
-		/**
-		 * 攻撃中のシロクマが追いかけている子ペンギンを候補に、
-		 * 親ペンギンに最も近いものをターゲットにする。
-		 * 複数のシロクマが同時に攻撃中の場合でも正しく機能する。
-		 */
-		const Vector3 daddyPos = actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
-
-		const actor::ChildPenguin* targetChild = nullptr;
-		float nearestDistSq = FLT_MAX;
-
-		const int enemyCount = static_cast<int>(enemies.size());
-		for (int i = 0; i < enemyCount; i++)
-		{
-			auto* enemy = enemies[i];
-			if (enemy == nullptr) continue;
-			if (!enemy->GetEnemyStateMachine()->IsAttack()) continue;
-
-			auto* controller = controllers[i];
-			if (controller == nullptr) continue;
-
-			const auto* child = controller->GetFoundPenguin();
-			if (child == nullptr) continue;
-
-			Vector3 diff = child->GetTransform().m_position - daddyPos;
-			diff.y = 0.0f;
-			const float distSq = diff.LengthSq();
-			if (distSq < nearestDistSq)
-			{
-				nearestDistSq = distSq;
-				targetChild = child;
-			}
-		}
-
-		/**
-		 * チェイス中に特定できた場合はキャッシュを更新する。
-		 * EnterAttack()でGetFoundPenguin()がnullptrになった後も
-		 * m_lastTargetChildを使ってカメラを追従し続ける。
-		 */
-		if (targetChild != nullptr)
-		{
-			m_lastTargetChild = targetChild;
-		}
-		else
-		{
-			targetChild = m_lastTargetChild;
-		}
+		/** チェイス中にキャッシュしたターゲットを使用してカメラを追従する */
+		const actor::ChildPenguin* targetChild = m_lastTargetChild;
 
 		/** 攻撃対象の子ペンギンが特定できなければ終了 */
 		if (targetChild == nullptr) return;
