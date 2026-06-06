@@ -85,24 +85,21 @@ namespace nsBeastEngine
 		}
 
 		/**
-		 * @brief 小窓スプライトのスクリーン座標を設定する
-		 * @details DangerArrowSystem から毎フレーム呼び出す。
-		 *          中心=(0,0)、範囲±フレームバッファハーフサイズの座標系。
-		 * @param pos スクリーン座標
-		 */
-		void SetSpriteScreenPosition(const Vector2& pos)
-		{
-			m_spriteScreenPos = pos;
-		}
-
-		/**
 		 * @brief 小窓スプライトの表示・非表示を設定する
-		 * @details DangerArrowSystem がフラスタム内かつ近距離のときに非表示にする。
+		 * @details - true: スライドイン開始。ただしスライドアウト中なら一度完全に隠れてからスライドイン。
+		 *          - false: スライドアウト開始。保留中のスライドインもキャンセルする。
 		 * @param visible 表示するか
 		 */
-		void SetSpriteVisible(const bool visible)
+		void SetSpriteVisible(bool visible);
+
+		/**
+		 * @brief 小窓スプライトの表示スケールを設定する
+		 * @details 1.0 が原寸（480x270px）。DangerArrowSystem::Initialize() から呼び出す。
+		 * @param scale 均等スケール
+		 */
+		void SetSpriteScale(const float scale)
 		{
-			m_isSpriteVisible = visible;
+			m_spriteScale = scale;
 		}
 
 
@@ -122,16 +119,28 @@ namespace nsBeastEngine
 	private:
 		/** 動作中フラグ */
 		bool m_isActive = false;
-		/** 小窓スプライト表示フラグ（Begin()でtrueにリセット） */
-		bool m_isSpriteVisible = true;
+		/** 表示したいか（DangerArrowSystemからセット） */
+		bool m_targetVisible = false;
+		/** スライドアウト完了後にスライドインする保留フラグ */
+		bool m_pendingShow = false;
+		/** スライドアウト完了後に終了処理を実行する保留フラグ */
+		bool m_pendingEnd = false;
+		/** End() の保留中コールバック */
+		std::function<void()> m_pendingEndCallback;
+		/** スライドアニメーション進行度（0=画面外、1=完全表示） */
+		float m_slideProgress = 0.0f;
 		/** カメラのワールド座標 */
 		Vector3 m_cameraPosition = Vector3::Zero;
 		/** ターゲットのワールド座標 */
 		Vector3 m_targetPosition = Vector3::Zero;
-		/** 小窓スプライトのスクリーン座標（DangerArrowSystemから毎フレームセット） */
-		Vector2 m_spriteScreenPos = Vector2::Zero;
+		/** 小窓スプライトの表示スケール（1.0 = 原寸） */
+		float m_spriteScale = 1.0f;
 		/** オフスクリーン描画用RenderTarget */
 		RenderTarget m_renderTarget;
+		/** 小窓の背景（枠）スプライト */
+		Sprite m_bgSprite;
+		/** 背景スプライトが初期化済みか（再Begin時に再初期化しない） */
+		bool m_bgSpriteInitialized = false;
 		/** 小窓表示用Sprite */
 		Sprite m_sprite;
 		/** サブカメラ用フラスタム */

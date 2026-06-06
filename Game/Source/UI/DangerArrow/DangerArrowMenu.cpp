@@ -41,9 +41,23 @@ namespace app
             Quaternion rot;
             rot.SetRotationZ(m_arrowAngleRad);
 
+            // パルスアニメーション: sin で 1±0.25 の範囲でスケールが振動する
+            float pulseScale = 1.0f;
+            if (m_isPulsing)
+            {
+                m_pulseTimer += g_gameTime->GetFrameDeltaTime() * 5.0f;
+                pulseScale = 1.0f + 0.25f * sinf(m_pulseTimer);
+            }
+            else
+            {
+                m_pulseTimer = 0.0f;
+            }
+
             m_arrowIcon->m_transform.m_localTransform.m_position =
                 Vector3(m_arrowScreenPos.x, m_arrowScreenPos.y, 0.0f);
             m_arrowIcon->m_transform.m_localTransform.m_rotation = rot;
+            m_arrowIcon->m_transform.m_localTransform.m_scale =
+                Vector3(pulseScale, pulseScale, 1.0f);
         }
     }
 }

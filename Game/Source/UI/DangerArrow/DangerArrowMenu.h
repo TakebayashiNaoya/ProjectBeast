@@ -56,6 +56,12 @@ namespace app
              */
             void SetVisible(const bool visible) { m_isVisible = visible; }
 
+            /**
+             * @brief サブビューに映っているペンギンを指す矢印かどうかを設定する
+             * @details true にするとサイン波スケールで小刻みに拡縮する
+             */
+            void SetPulsing(const bool pulsing) { m_isPulsing = pulsing; }
+
 
         private:
             /** @brief UIIconのトランスフォームと isDraw を更新する */
@@ -72,6 +78,10 @@ namespace app
             float m_arrowAngleRad = 0.0f;
             /** 表示フラグ */
             bool m_isVisible = false;
+            /** パルスアニメーション中かどうか */
+            bool m_isPulsing = false;
+            /** パルスアニメーション用タイマー（ラジアン） */
+            float m_pulseTimer = 0.0f;
         };
     }
 }

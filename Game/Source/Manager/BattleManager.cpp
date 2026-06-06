@@ -8,6 +8,7 @@
 
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
@@ -22,7 +23,9 @@ namespace app
 		/** サブカメラのターゲットからの距離 */
 		constexpr float SUB_CAMERA_DISTANCE = 150.0f;
 		/** サブカメラのターゲットからの高さ */
-		constexpr float SUB_CAMERA_HEIGHT = 80.0f;
+		constexpr float SUB_CAMERA_HEIGHT = 60.0f;
+		/** ペンギンのルート座標から注視点までのYオフセット */
+		constexpr float SUB_CAMERA_TARGET_HEIGHT = 0.0f;
 	}
 
 
@@ -34,8 +37,17 @@ namespace app
 		/** バトルの状態を確認 */
 		m_battleState = CheckBattleState();
 
-		/** ゲーム終了なら更新処理をブロック */
-		if (m_battleState != EnBattleState::Playing) return;
+		/** ゲーム終了なら更新処理をブロック。サブカメラが出ていれば閉じる */
+		if (m_battleState != EnBattleState::Playing)
+		{
+			if (m_isSubCameraActive)
+			{
+				nsBeastEngine::SubCameraManager::Get().End();
+				m_isSubCameraActive = false;
+				m_lastTargetChild = nullptr;
+			}
+			return;
+		}
 
 
 		//--------------------------------------------//
@@ -111,13 +123,14 @@ namespace app
 
 		/** 攻撃中のシロクマを探す */
 		bool isAnyAttacking = false;
+		const actor::Enemy* attackingEnemy = nullptr;
 		for (auto* enemy : enemies)
 		{
 			if (enemy == nullptr) continue;
 			if (!enemy->GetEnemyStateMachine()->IsAttack()) continue;
 
 			isAnyAttacking = true;
-			break;
+			if (attackingEnemy == nullptr) attackingEnemy = enemy;
 		}
 
 		/** 攻撃中のシロクマがいなければサブカメラを停止する */
@@ -142,24 +155,56 @@ namespace app
 		/** チェイス中にキャッシュしたターゲットを使用してカメラを追従する */
 		const actor::ChildPenguin* targetChild = m_lastTargetChild;
 
+		/** ターゲットが死亡していたらキャッシュをクリアしてサブビューを非表示にする */
+		if (targetChild != nullptr && targetChild->GetStatus<actor::ChildPenguinStatus>()->IsDead())
+		{
+			m_lastTargetChild = nullptr;
+			targetChild = nullptr;
+		}
+
 		/** 攻撃対象の子ペンギンが特定できなければ終了 */
 		if (targetChild == nullptr) return;
 
 		/** ターゲット座標・カメラ座標をセットする */
-		const Vector3 targetPos = targetChild->GetTransform().m_position;
+		const Vector3 basePos   = targetChild->GetTransform().m_position;
+		const Vector3 targetPos = basePos + Vector3(0.0f, SUB_CAMERA_TARGET_HEIGHT, 0.0f);
 
-		/** 親ペンギン→子ペンギンの方向にカメラを配置する */
-		Vector3 toTarget = targetPos - daddyPos;
-		toTarget.y = 0.0f;
-		toTarget.Normalize();
+		// カメラ方向: 子ペンギン→シロクマ方向にカメラを向ける。
+		// カメラはペンギンの「シロクマと反対側」に置き、ペンギン越しにシロクマが迫る画を映す。
+		// bearToPenguin = penguinPos - bearPos（シロクマ→ペンギン方向）
+		Vector3 bearToPenguin;
+		if (attackingEnemy != nullptr)
+		{
+			bearToPenguin = basePos - attackingEnemy->GetTransform().m_position;
+		}
+		else
+		{
+			bearToPenguin = basePos - daddyPos;
+		}
+		bearToPenguin.y = 0.0f;
+		const float bearToPenguinLen = bearToPenguin.Length();
+		if (bearToPenguinLen < 0.01f)
+		{
+			bearToPenguin = Vector3(0.0f, 0.0f, 1.0f);
+		}
+		else
+		{
+			bearToPenguin /= bearToPenguinLen;
+		}
 
+		// + bearToPenguin でペンギンのシロクマ反対側にカメラを配置する
 		const Vector3 cameraPos = Vector3(
-			targetPos.x - toTarget.x * SUB_CAMERA_DISTANCE,
+			targetPos.x + bearToPenguin.x * SUB_CAMERA_DISTANCE,
 			targetPos.y + SUB_CAMERA_HEIGHT,
-			targetPos.z - toTarget.z * SUB_CAMERA_DISTANCE
+			targetPos.z + bearToPenguin.z * SUB_CAMERA_DISTANCE
 		);
 
-		nsBeastEngine::SubCameraManager::Get().SetTargetPosition(targetPos);
+		// 注視点: シロクマを中心に映す。シロクマがいない場合のみペンギンにフォールバック。
+		const Vector3 lookAtPos = (attackingEnemy != nullptr)
+			? attackingEnemy->GetTransform().m_position + Vector3(0.0f, SUB_CAMERA_TARGET_HEIGHT, 0.0f)
+			: targetPos;
+
+		nsBeastEngine::SubCameraManager::Get().SetTargetPosition(lookAtPos);
 		nsBeastEngine::SubCameraManager::Get().SetCameraPosition(cameraPos);
 	}
 

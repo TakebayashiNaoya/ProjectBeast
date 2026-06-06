@@ -25,6 +25,7 @@ namespace app
 			{
 				packet.Initialize("Assets/parameter/UI/dangerArrow/DangerArrow.json");
 			}
+			SubCameraManager::Get().SetSpriteScale(SUB_VIEW_SCALE);
 		}
 
 
@@ -33,6 +34,22 @@ namespace app
 			RefreshTargetCache();
 			CalcArrowInfos();
 			UpdateSubView();
+
+			// サブビューが表示中のとき、最近傍の矢印にパルスフラグを立てる
+			int nearestArrowIdx = -1;
+			if (SubCameraManager::Get().IsActive() && !m_arrowInfos.empty())
+			{
+				float minDist = m_arrowInfos[0].distSq;
+				nearestArrowIdx = 0;
+				for (int i = 1; i < static_cast<int>(m_arrowInfos.size()); i++)
+				{
+					if (m_arrowInfos[i].distSq < minDist)
+					{
+						minDist = m_arrowInfos[i].distSq;
+						nearestArrowIdx = i;
+					}
+				}
+			}
 
 			for (int i = 0; i < MAX_ARROWS; i++)
 			{
@@ -45,10 +62,12 @@ namespace app
 					menu->SetArrowScreenPos(info.screenPos);
 					menu->SetArrowAngleRad(info.angleRad);
 					menu->SetVisible(info.visible);
+					menu->SetPulsing(i == nearestArrowIdx);
 				}
 				else
 				{
 					menu->SetVisible(false);
+					menu->SetPulsing(false);
 				}
 
 				m_packets[i].Update();
@@ -177,17 +196,6 @@ namespace app
 
 			SubCameraManager::Get().SetSpriteVisible(!hideSubView);
 
-			// スプライトは +Y 向きを起点に Z 回転 angleRad される。
-			// tip 方向 = (-sin, cos)(angleRad)、base(根本)方向 = (sin, -cos)(angleRad)。
-			// サブビュー(480x270 circleシェーダー)の実効半径 = 135px。
-			// 矢印位置から根本方向へ 135px オフセットすることで
-			// サブビューの外縁が矢印の根本に揃う。
-			const float baseX = sinf(nearest.angleRad);
-			const float baseY = -cosf(nearest.angleRad);
-			SubCameraManager::Get().SetSpriteScreenPosition(
-				Vector2(nearest.screenPos.x + baseX * 135.0f,
-				        nearest.screenPos.y + baseY * 135.0f)
-			);
 		}
 
 
@@ -204,10 +212,10 @@ namespace app
 			// スクリーン中央 → 目標方向の角度
 			const float angle = atan2f(screenPos.y, screenPos.x);
 
-			// 円縁に配置
+			// 円縁に配置（中心を CIRCLE_CENTER_Y だけオフセット）
 			info.screenPos = Vector2(
 				CIRCLE_RADIUS * cosf(angle),
-				CIRCLE_RADIUS * sinf(angle)
+				CIRCLE_CENTER_Y + CIRCLE_RADIUS * sinf(angle)
 			);
 
 			// DDSが上向き基準: ターゲット方向へ向けるために -π/2 オフセット
