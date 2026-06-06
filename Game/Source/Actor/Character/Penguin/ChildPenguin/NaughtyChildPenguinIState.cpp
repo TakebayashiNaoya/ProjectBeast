@@ -67,7 +67,7 @@ namespace app {
 
 		/****************************************/
 
-		// ★ 追加：渦潮に飛び込むステートの実装
+
 		void NaughtyDiveWhirlpoolState::Enter()
 		{
 			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);

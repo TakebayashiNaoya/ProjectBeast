@@ -57,7 +57,7 @@ namespace app
 
 		/**
 		 * @brief 渦潮に飛び込むステート
-		 * @details
+		 * @details 渦潮に到達後、LaunchBeginアニメを再生する。巻き込まれるまで入力はゼロに保つ
 		 */
 		class NaughtyDiveWhirlpoolState : public NaughtyChildPenguinIState
 		{
