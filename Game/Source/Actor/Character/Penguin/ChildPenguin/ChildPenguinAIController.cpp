@@ -12,6 +12,7 @@
 #include "ChildPenguinStatus.h"
 #include "ChildPenguinTypes.h"
 #include "ClumsyChildPenguinStateMachine.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 #include "NaughtyChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
@@ -26,7 +27,6 @@
 #include "Source/Nature/WhirlpoolManager.h"
 #include <algorithm>
 #include <random>
-#include "graphics/effect/BeastEffectEmitter.h"
 
 
 namespace app
@@ -1254,6 +1254,11 @@ namespace app
 						{
 							shouldRelease = false; // シロクマに対処中なので離さない
 						}
+
+						if (naughtySM && naughtySM->GetIsInWhirlpool())
+						{
+							shouldRelease = true;
+						}
 					}
 
 					if (shouldRelease)
@@ -1281,7 +1286,7 @@ namespace app
 						{
 							auto* naughtySM = static_cast<NaughtyChildPenguinStateMachine*>(supervisionTarget->GetStateMachine());
 							// シロクマに向かっている場合のみターゲットにする
-							if (naughtySM && (naughtySM->GetIsGoingToWakeBear() || naughtySM->GetIsGoingToWhirlpool()))
+							if (naughtySM && (naughtySM->GetIsGoingToWakeBear() || (naughtySM->GetIsGoingToWhirlpool() && !naughtySM->GetIsInWhirlpool())))
 							{
 								target = supervisionTarget;
 							}
@@ -1377,7 +1382,7 @@ namespace app
 			{
 				auto* naughtySM = static_cast<NaughtyChildPenguinStateMachine*>(m_interventionTarget->GetStateMachine());
 				// シロクマにも渦潮にも向かっていなければ（反省していれば）手を離す
-				if (naughtySM && !naughtySM->GetIsGoingToWakeBear() && !naughtySM->GetIsGoingToWhirlpool())
+				if (naughtySM && ((!naughtySM->GetIsGoingToWakeBear() && !naughtySM->GetIsGoingToWhirlpool()) || naughtySM->GetIsInWhirlpool()))
 				{
 					ReleaseSuppression(m_interventionTarget);
 					manager->UnregisterAssigned(m_interventionTarget);
@@ -1409,7 +1414,21 @@ namespace app
 				/** 優先②：問題行動中の甘えん坊・やんちゃ */
 				if (target == nullptr)
 				{
-					target = manager->FindNearestNeedingSupervision(myPos, assigned, m_interventionRange);
+					ChildPenguin* supervisionTarget = manager->FindNearestNeedingSupervision(myPos, assigned, m_interventionRange);
+
+					// ==========================================================
+					// ★ 追加：渦潮に飲まれているやんちゃはターゲットから除外する
+					// ==========================================================
+					if (supervisionTarget != nullptr && supervisionTarget->GetChildPenguinType() == EnChildPenguinType::Naughty)
+					{
+						auto* naughtySM = static_cast<NaughtyChildPenguinStateMachine*>(supervisionTarget->GetStateMachine());
+						if (naughtySM && naughtySM->GetIsInWhirlpool())
+						{
+							supervisionTarget = nullptr;
+						}
+					}
+
+					target = supervisionTarget;
 				}
 
 				if (target != nullptr)
@@ -1500,7 +1519,7 @@ namespace app
 			{
 				/** おっちょこちょいを助けて即座に起き上がらせる */
 				auto* ai = static_cast<ClumsyChildPenguinAI*>(target->GetAIController());
-				
+
 				if (ai)
 				{
 					ai->HelpedByCaringPenguin();
