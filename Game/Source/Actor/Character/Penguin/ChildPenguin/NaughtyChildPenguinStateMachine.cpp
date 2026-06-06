@@ -21,8 +21,8 @@ namespace app
 			, m_isGoingToWakeBear(false)
 			, m_isAtBear(false)
 		{
-			AddState<NaughtySeekBearState>(this);
 			AddState<NaughtyWakeBearState>(this);
+			AddState<NaughtyDiveWhirlpoolState>(this);
 		}
 
 
@@ -49,7 +49,6 @@ namespace app
 			{
 				return FindState(NaughtyWakeBearState::ID());
 			}
-
 			return nullptr;
 		}
 	}

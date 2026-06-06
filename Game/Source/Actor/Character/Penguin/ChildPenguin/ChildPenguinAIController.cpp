@@ -12,6 +12,7 @@
 #include "ChildPenguinStatus.h"
 #include "ChildPenguinTypes.h"
 #include "ClumsyChildPenguinStateMachine.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 #include "NaughtyChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
@@ -22,9 +23,10 @@
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Manager/IglooManager.h"
+#include "Source/Nature/Whirlpool.h"
+#include "Source/Nature/WhirlpoolManager.h"
 #include <algorithm>
 #include <random>
-#include "graphics/effect/BeastEffectEmitter.h"
 
 
 namespace app
@@ -53,6 +55,12 @@ namespace app
 			constexpr float REACH_BEAR_DISTANCE = 80.0f;
 			/** やんちゃペンギンがシロクマを起こした後、または制止された後の再行動抑制時間 */
 			constexpr float SCOLD_COOLDOWN_DURATION = 5.0f;
+			/** 渦潮消滅時の短い反省時間 */
+			constexpr float WHIRLPOOL_MISS_COOLDOWN_DURATION = 2.0f;
+			/** 渦潮に到達するための距離 */
+			constexpr float REACH_WHIRLPOOL_DISTANCE = 30.0f;
+			/** 渦潮を見つけて向かい始める距離 */
+			constexpr float WHIRLPOOL_TRIGGER_DISTANCE = 300.0f;
 
 			/**
 			 * @brief ヒステリシス幅
@@ -740,11 +748,16 @@ namespace app
 			/** （命令に関わらず最優先で制止を適用する） */
 			if (m_isRestrained)
 			{
-				// 制止されたらシロクマを起こしに行く行動もやめる
-				if (m_naughtyStateMachine->GetIsGoingToWakeBear())
+				// 制止されたらシロクマや渦潮に向かう行動もやめる
+				if (m_naughtyStateMachine->GetIsGoingToWakeBear() || m_naughtyStateMachine->GetIsGoingToWhirlpool())
 				{
 					m_naughtyStateMachine->SetIsGoingToWakeBear(false);
 					m_naughtyStateMachine->SetIsAtBear(false);
+
+					m_naughtyStateMachine->SetIsGoingToWhirlpool(false);
+					m_naughtyStateMachine->SetIsAtWhirlpool(false);
+
+					m_wasSwallowedByWhirlpool = false;
 
 					manager->UnregisterAttempting(m_owner);
 					m_scoldCooldown = SCOLD_COOLDOWN_DURATION;
@@ -755,10 +768,16 @@ namespace app
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
+				if (manager->IsRoaming(m_owner))
+				{
+					manager->UnregisterRoaming(m_owner);
+				}
+
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
 
+			// シロクマを起こし終わった時
 			if (m_naughtyStateMachine->GetHasFinishedWaking())
 			{
 				m_naughtyStateMachine->SetHasFinishedWaking(false);
@@ -771,13 +790,46 @@ namespace app
 				m_scoldCooldown -= g_gameTime->GetFrameDeltaTime();
 			}
 
-			// まだシロクマに向かっていない場合、近くにシロクマがいるか索敵する
-			if (!m_naughtyStateMachine->GetIsGoingToWakeBear() && m_scoldCooldown <= 0.0f)
+			// ==========================================================
+			// 索敵処理：シロクマと渦潮の両方を探す
+			// ==========================================================
+			// まだどちらにも向かっていない場合
+			if (!m_naughtyStateMachine->GetIsGoingToWakeBear() && !m_naughtyStateMachine->GetIsGoingToWhirlpool() && m_scoldCooldown <= 0.0f)
 			{
 				const Vector3& myPos = m_owner->GetTransform().m_position;
 
-				// ★ マネージャーの機能を使って、指定距離内にいる一番近い「寝ているシロクマ」を取得
+				// マネージャーの機能を使って、指定距離内にいる一番近い「寝ているシロクマ」を取得
 				Enemy* targetBear = EnemyManager::GetInstance()->GetNearestSleepingEnemy(myPos, WAKE_BEAR_TRIGGER_DISTANCE);
+
+				Vector3 whirlpoolPos = Vector3::Zero;
+				bool foundWhirlpool = false;
+				float minDistSq = WHIRLPOOL_TRIGGER_DISTANCE * WHIRLPOOL_TRIGGER_DISTANCE;
+
+				nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* wp)
+					{
+						if (wp->GetState() == nature::Whirlpool::EnWhirlpoolState::None) return;
+
+						const Vector3& pos = wp->GetTransform().m_position;
+						float distSq = (pos - myPos).LengthSq();
+
+						if (distSq <= minDistSq)
+						{
+							minDistSq = distSq;
+							whirlpoolPos = pos;
+							foundWhirlpool = true;
+						}
+					});
+
+				if (targetBear != nullptr && foundWhirlpool)
+				{
+					float bearDistSq = (targetBear->GetTransform().m_position - myPos).LengthSq();
+					if (bearDistSq < minDistSq) {
+						foundWhirlpool = false; // シロクマ優先
+					}
+					else {
+						targetBear = nullptr;   // 渦潮優先
+					}
+				}
 
 				// 近くに寝ているシロクマが見つかったらフラグをONにして向かう！
 				if (targetBear != nullptr)
@@ -799,13 +851,72 @@ namespace app
 
 					manager->RegisterAttempting(m_owner);
 				}
+				// 近くに寝ているシロクマはいないけど、渦潮が見つかったら向かう
+				else if (foundWhirlpool)
+				{
+					m_naughtyStateMachine->SetIsGoingToWhirlpool(true);
+					m_naughtyStateMachine->SetWhirlpoolTargetPos(whirlpoolPos);
+
+					if (m_isFollowing) { manager->RemoveFollower(m_owner); m_isFollowing = false; }
+					if (manager->IsRoaming(m_owner)) { manager->UnregisterRoaming(m_owner); }
+					manager->RegisterAttempting(m_owner);
+				}
+			}
+
+			// ==========================================================
+			// 渦潮に向かっている最中の処理
+			// ==========================================================
+			if (m_naughtyStateMachine->GetIsGoingToWhirlpool())
+			{
+				// 1. 現在渦潮に巻き込まれているかチェック
+				if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+				{
+					// TODO: 渦潮に入った瞬間のSEを鳴らす場合はここに実装する
+
+
+					// 巻き込まれたフラグを立てて、入力はゼロにしてシステムに身を任せる
+					m_wasSwallowedByWhirlpool = true;
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					return;
+				}
+				else
+				{
+					// 2. 巻き込まれていない場合
+					if (m_wasSwallowedByWhirlpool)
+					{
+						// 一度巻き込まれた後なら、渦潮から吐き出された（遊び終わった）ということ！
+						m_naughtyStateMachine->SetIsGoingToWhirlpool(false);
+						m_wasSwallowedByWhirlpool = false;
+						manager->UnregisterAttempting(m_owner);
+						m_scoldCooldown = SCOLD_COOLDOWN_DURATION; // 満足して親の元へ帰る
+						return;
+					}
+
+					// 3. まだ巻き込まれていない場合は、目標地点へ向かって走る
+					const Vector3& targetPos = m_naughtyStateMachine->GetWhirlpoolTargetPos();
+					const float distToWhirlpool = GetDistanceToTarget(targetPos);
+
+					// 渦潮の中心付近に到達したのに巻き込まれない場合は、渦潮が既に消滅していると判断
+					if (distToWhirlpool <= REACH_WHIRLPOOL_DISTANCE)
+					{
+						m_naughtyStateMachine->SetIsGoingToWhirlpool(false);
+						manager->UnregisterAttempting(m_owner);
+						m_scoldCooldown = WHIRLPOOL_MISS_COOLDOWN_DURATION; // 少し反省して帰る
+					}
+					else
+					{
+						Vector3 dir = CalculateDirectionToTarget(targetPos);
+						m_stateMachine->SetActionInput(dir, false, true, false, false); // ダッシュで向かう
+					}
+					return;
+				}
 			}
 
 			// すでにシロクマに向かっている最中（または上で向かう決定をした直後）の処理
 			if (m_naughtyStateMachine->GetIsGoingToWakeBear())
 			{
 				// ==========================================================
-				// ★ 追加：向かっている途中でシロクマが起きてしまったら行動をキャンセルする
+				// 向かっている途中でシロクマが起きてしまったら行動をキャンセルする
 				// ==========================================================
 				Enemy* bear = m_naughtyStateMachine->GetTargetBear();
 				if (bear == nullptr || !bear->GetEnemyStateMachine()->IsCoolDown())
@@ -1091,6 +1202,21 @@ namespace app
 			}
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
+
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+			{
+				if (m_interventionTarget != nullptr)
+				{
+					// 手を離してあげる
+					ReleaseSuppression(m_interventionTarget);
+					manager->UnregisterAssigned(m_interventionTarget);
+					m_interventionTarget = nullptr;
+				}
+				// 自分の入力もゼロにしてシステムに身を任せる
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
 			/** 追従命令のとき */
@@ -1129,9 +1255,14 @@ namespace app
 					if (m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Naughty)
 					{
 						auto* naughtySM = static_cast<NaughtyChildPenguinStateMachine*>(m_interventionTarget->GetStateMachine());
-						if (naughtySM && naughtySM->GetIsGoingToWakeBear())
+						if (naughtySM && (naughtySM->GetIsGoingToWakeBear() || naughtySM->GetIsGoingToWhirlpool()))
 						{
 							shouldRelease = false; // シロクマに対処中なので離さない
+						}
+
+						if (naughtySM && naughtySM->GetIsInWhirlpool())
+						{
+							shouldRelease = true;
 						}
 					}
 
@@ -1160,7 +1291,7 @@ namespace app
 						{
 							auto* naughtySM = static_cast<NaughtyChildPenguinStateMachine*>(supervisionTarget->GetStateMachine());
 							// シロクマに向かっている場合のみターゲットにする
-							if (naughtySM && naughtySM->GetIsGoingToWakeBear())
+							if (naughtySM && (naughtySM->GetIsGoingToWakeBear() || (naughtySM->GetIsGoingToWhirlpool() && !naughtySM->GetIsInWhirlpool())))
 							{
 								target = supervisionTarget;
 							}
@@ -1251,6 +1382,18 @@ namespace app
 					m_sweatEffectCoolTime = 0.0f;
 				}
 			}
+			else if (m_interventionTarget != nullptr &&
+				m_interventionTarget->GetChildPenguinType() == EnChildPenguinType::Naughty)
+			{
+				auto* naughtySM = static_cast<NaughtyChildPenguinStateMachine*>(m_interventionTarget->GetStateMachine());
+				// シロクマにも渦潮にも向かっていなければ（反省していれば）手を離す
+				if (naughtySM && ((!naughtySM->GetIsGoingToWakeBear() && !naughtySM->GetIsGoingToWhirlpool()) || naughtySM->GetIsInWhirlpool()))
+				{
+					ReleaseSuppression(m_interventionTarget);
+					manager->UnregisterAssigned(m_interventionTarget);
+					m_interventionTarget = nullptr;
+				}
+			}
 
 			/** 担当対象が消えていたら（死亡など）クリアする */
 			if (m_interventionTarget != nullptr)
@@ -1276,7 +1419,21 @@ namespace app
 				/** 優先②：問題行動中の甘えん坊・やんちゃ */
 				if (target == nullptr)
 				{
-					target = manager->FindNearestNeedingSupervision(myPos, assigned, m_interventionRange);
+					ChildPenguin* supervisionTarget = manager->FindNearestNeedingSupervision(myPos, assigned, m_interventionRange);
+
+					// ==========================================================
+					// 渦潮に飲まれているやんちゃはターゲットから除外する
+					// ==========================================================
+					if (supervisionTarget != nullptr && supervisionTarget->GetChildPenguinType() == EnChildPenguinType::Naughty)
+					{
+						auto* naughtySM = static_cast<NaughtyChildPenguinStateMachine*>(supervisionTarget->GetStateMachine());
+						if (naughtySM && naughtySM->GetIsInWhirlpool())
+						{
+							supervisionTarget = nullptr;
+						}
+					}
+
+					target = supervisionTarget;
 				}
 
 				if (target != nullptr)
@@ -1367,7 +1524,7 @@ namespace app
 			{
 				/** おっちょこちょいを助けて即座に起き上がらせる */
 				auto* ai = static_cast<ClumsyChildPenguinAI*>(target->GetAIController());
-				
+
 				if (ai)
 				{
 					ai->HelpedByCaringPenguin();

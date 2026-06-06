@@ -28,26 +28,10 @@ namespace app
 		};
 
 
-		/****************************************/
-
-		/**
-		 * @brief シロクマへ向かうステート
-		 * @details AIがBuildInputToTarget()でシロクマへ誘導する。到達したらWakeBearStateへ
-		 */
-		class NaughtySeekBearState : public NaughtyChildPenguinIState
-		{
-			appState(NaughtySeekBearState);
-		public:
-			void Enter() override final;
-			void Update() override final;
-			void Exit() override final;
-
-			NaughtySeekBearState(NaughtyChildPenguinStateMachine* owner);
-			~NaughtySeekBearState() override = default;
-		};
 
 
 		/****************************************/
+
 
 		/**
 		 * @brief シロクマを起こすステート
@@ -65,5 +49,26 @@ namespace app
 			~NaughtyWakeBearState() override = default;
 		};
 
+
+
+
+		/****************************************/
+
+
+		/**
+		 * @brief 渦潮に飛び込むステート
+		 * @details 渦潮に到達後、LaunchBeginアニメを再生する。巻き込まれるまで入力はゼロに保つ
+		 */
+		class NaughtyDiveWhirlpoolState : public NaughtyChildPenguinIState
+		{
+			appState(NaughtyDiveWhirlpoolState);
+		public:
+			void Enter() override final;
+			void Update() override final;
+			void Exit() override final;
+
+			NaughtyDiveWhirlpoolState(NaughtyChildPenguinStateMachine* owner);
+			~NaughtyDiveWhirlpoolState() override = default;
+		};
 	}
 }

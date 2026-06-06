@@ -15,10 +15,12 @@ namespace app
 		class ChildPenguin;
 		class Enemy;
 
+
 		class NaughtyChildPenguinStateMachine : public ChildPenguinStateMachine
 		{
 		public:
 			inline ChildPenguin* GetOwnerChildPenguin() const { return m_ownerChildPenguin; }
+
 
 			/**
 			 * @brief シロクマを起こしに行くフラグを設定
@@ -70,6 +72,47 @@ namespace app
 			 * @return シロクマが起きたかどうかをAIに伝えるフラグ
 			 */
 			inline bool GetHasFinishedWaking() const { return m_hasFinishedWaking; }
+			/**
+			 * @brief 渦潮に移動するフラグを設定
+			 * @param value 渦潮に移動するフラグ
+			 */
+			inline void SetIsGoingToWhirlpool(bool value) { m_isGoingToWhirlpool = value; }
+			/**
+			 * @brief 渦潮に移動するフラグを取得
+			 * @return 渦潮に移動するフラグ
+			 */
+			inline bool GetIsGoingToWhirlpool() const { return m_isGoingToWhirlpool; }
+			/**
+			 * @brief 渦潮への到達フラグを設定
+			 * @param value 渦潮への到達フラグ
+			 */
+			inline void SetIsAtWhirlpool(bool value) { m_isAtWhirlpool = value; }
+			/**
+			 * @brief 渦潮への到達フラグを取得
+			 * @return 渦潮への到達フラグ
+			 */
+			inline bool GetIsAtWhirlpool() const { return m_isAtWhirlpool; }
+			/**
+			 * @brief 渦潮の座標を設定
+			 * @param pos 渦潮の座標
+			 */
+			inline void SetWhirlpoolTargetPos(const Vector3& pos) { m_whirlpoolTargetPos = pos; }
+			/**
+			 * @brief 渦潮の座標を取得
+			 * @return 渦潮の座標
+			 */
+			inline const Vector3& GetWhirlpoolTargetPos() const { return m_whirlpoolTargetPos; }
+			/**
+			 * @brief 渦潮への飛び込みが完了したことをAIに伝えるフラグを設定
+			 * @param value 渦潮への飛び込みが完了したことをAIに伝えるフラグ
+			 */
+			inline void SetHasFinishedDiving(bool value) { m_hasFinishedDiving = value; }
+			/**
+			 * @brief 渦潮への飛び込みが完了したことをAIに伝えるフラグを取得
+			 * @return 渦潮への飛び込みが完了したことをAIに伝えるフラグ
+			 */
+			inline bool GetHasFinishedDiving() const { return m_hasFinishedDiving; }
+
 
 		public:
 			NaughtyChildPenguinStateMachine(ChildPenguin* ownerChildPenguin);
@@ -93,6 +136,15 @@ namespace app
 
 			/** アニメーションが完了したことをAIに伝えるフラグ */
 			bool m_hasFinishedWaking = false;
+
+			/** 渦潮に移動するフラグ */
+			bool m_isGoingToWhirlpool = false;
+			/** 渦潮への到達フラグ */
+			bool m_isAtWhirlpool = false;
+			/** 渦潮の座標 */
+			Vector3 m_whirlpoolTargetPos = Vector3::Zero;
+			/** 渦潮への飛び込みが完了したことをAIに伝えるフラグ */
+			bool m_hasFinishedDiving = false;
 		};
 	}
 }

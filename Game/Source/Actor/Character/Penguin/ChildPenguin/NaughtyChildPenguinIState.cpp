@@ -23,25 +23,11 @@ namespace app {
 			: m_owner(owner)
 		{}
 
-		/****************************************/
 
-		void NaughtySeekBearState::Enter()
-		{
-			// AIがBuildInputToTargetで動かすので、ここでは入力を触らない
-			// 必要ならManagerに「問題行動中」を登録してもよい
-		}
 
-		void NaughtySeekBearState::Update()
-		{}
-
-		void NaughtySeekBearState::Exit()
-		{}
-
-		NaughtySeekBearState::NaughtySeekBearState(NaughtyChildPenguinStateMachine* owner)
-			: NaughtyChildPenguinIState(owner)
-		{}
 
 		/****************************************/
+
 
 		void NaughtyWakeBearState::Enter()
 		{
@@ -76,5 +62,31 @@ namespace app {
 			: NaughtyChildPenguinIState(owner)
 		{}
 
+
+
+
+		/****************************************/
+
+
+		void NaughtyDiveWhirlpoolState::Enter()
+		{
+			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
+			m_owner->SetMoveSpeed(0.0f);
+
+			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchBegin);
+
+			// 歓声などの効果音
+			SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+		}
+
+		void NaughtyDiveWhirlpoolState::Update()
+		{}
+
+		void NaughtyDiveWhirlpoolState::Exit()
+		{}
+
+		NaughtyDiveWhirlpoolState::NaughtyDiveWhirlpoolState(NaughtyChildPenguinStateMachine* owner)
+			: NaughtyChildPenguinIState(owner)
+		{}
 	}
 }
