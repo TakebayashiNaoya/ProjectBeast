@@ -143,13 +143,6 @@ namespace nsBeastEngine
 	}
 
 
-	void SubCameraManager::RenderOffscreen(nsK2EngineLow::RenderContext& rc)
-	{
-		//if (!m_isActive) return;
-		// ...
-	}
-
-
 	void SubCameraManager::RenderToScreen(nsK2EngineLow::RenderContext& rc)
 	{
 		if (!m_isActive) return;
@@ -193,15 +186,6 @@ namespace nsBeastEngine
 
 	void SubCameraManager::InitRenderTargetAndSprite()
 	{
-		m_renderTarget.Create(
-			SUB_CAMERA_RT_WIDTH,
-			SUB_CAMERA_RT_HEIGHT,
-			1,
-			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			DXGI_FORMAT_D32_FLOAT
-		);
-
 		// 背景（枠）スプライト: DDS テクスチャを所有するため Begin() のたびに
 		// 再 Init() するとデファードリリースでクラッシュする。初回のみ初期化する。
 		if (!m_bgSpriteInitialized)

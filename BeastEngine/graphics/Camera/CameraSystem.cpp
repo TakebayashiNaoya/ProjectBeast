@@ -35,7 +35,7 @@ namespace nsBeastEngine
 	{
 		if (m_subCamera != nullptr)
 		{
-			K2_ASSERT(m_subCamera == nullptr, "サブカメラはすでに生成されています。");
+			K2_ASSERT(false, "サブカメラはすでに生成されています。");
 			return;
 		}
 		m_subCamera = new nsK2EngineLow::Camera();

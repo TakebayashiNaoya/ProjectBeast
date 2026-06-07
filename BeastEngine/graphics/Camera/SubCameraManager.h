@@ -5,7 +5,6 @@
  */
 #pragma once
 #include <functional>
-#include "Geometry/Frustum.h"
 
 
 namespace nsBeastEngine
@@ -40,13 +39,6 @@ namespace nsBeastEngine
 		 * @details サブカメラのターゲット追従を行う
 		 */
 		void Update();
-
-		/**
-		 * @brief オフスクリーンの描画処理
-		 * @details サブカメラ視点でRenderTargetに描画する
-		 * @param rc レンダリングコンテキスト
-		 */
-		void RenderOffscreen(nsK2EngineLow::RenderContext& rc);
 
 		/**
 		 * @brief 小窓の描画処理
@@ -135,16 +127,12 @@ namespace nsBeastEngine
 		Vector3 m_targetPosition = Vector3::Zero;
 		/** 小窓スプライトの表示スケール（1.0 = 原寸） */
 		float m_spriteScale = 1.0f;
-		/** オフスクリーン描画用RenderTarget */
-		RenderTarget m_renderTarget;
 		/** 小窓の背景（枠）スプライト */
 		Sprite m_bgSprite;
 		/** 背景スプライトが初期化済みか（再Begin時に再初期化しない） */
 		bool m_bgSpriteInitialized = false;
 		/** 小窓表示用Sprite */
 		Sprite m_sprite;
-		/** サブカメラ用フラスタム */
-		Frustum m_frustum;
 
 
 		//============================================//

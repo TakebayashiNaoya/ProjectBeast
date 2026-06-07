@@ -1,7 +1,7 @@
 ﻿/**
  * @file CameraSystem.h
  * @brief カメラシステム。メイン・サブカメラの保持と更新を行う
- * @author
+ * @author 竹林
  */
 #pragma once
 
