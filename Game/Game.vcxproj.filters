@@ -100,6 +100,9 @@
     <Filter Include="Source\UI\CPReaction">
       <UniqueIdentifier>{9f2e90cb-287a-41c6-862d-67239f9bef28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\DangerArrow">
+      <UniqueIdentifier>{62914d05-498f-48ae-bbd7-1f6000ebc36a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -474,6 +477,12 @@
     </ClCompile>
     <ClCompile Include="Source\UI\CPReaction\MasterCPReactionParameter.cpp">
       <Filter>Source\UI\CPReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\DangerArrow\DangerArrowMenu.cpp">
+      <Filter>Source\UI\DangerArrow</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\DangerArrow\DangerArrowSystem.cpp">
+      <Filter>Source\UI\DangerArrow</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -875,6 +884,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\CPReaction\MasterCPReactionParameter.h">
       <Filter>Source\UI\CPReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\DangerArrow\DangerArrowMenu.h">
+      <Filter>Source\UI\DangerArrow</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h">
+      <Filter>Source\UI\DangerArrow</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

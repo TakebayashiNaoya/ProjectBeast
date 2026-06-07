@@ -1,0 +1,18 @@
+{
+    "comment": "シロクマに襲われている子ペンギンへの方向矢印UI（1本分）。DDSは上向き（+Y）を向いたデザインを想定。",
+    "canvas": {
+        "elements": [
+            {
+                "type": "UIIcon",
+                "name": "arrow",
+                "asset": "Assets/spriteData/UI/Icon/arrow.DDS",
+                "width": 64,
+                "height": 64,
+                "position": [0, 0, 0],
+                "scale": [1, 1, 1],
+                "rotation": 0,
+                "color": [255, 255, 255, 255]
+            }
+        ]
+    }
+}

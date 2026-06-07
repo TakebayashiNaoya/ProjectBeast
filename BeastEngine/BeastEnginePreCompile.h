@@ -31,13 +31,13 @@ using namespace nsK2EngineLow;
 #include "Physics/RigidBody.h"
 #include "Physics/CharacterController.h"
 
+#include "Graphics/Camera/CameraSystem.h"
 #include "Graphics/light/SceneLight.h"
 #include "Graphics/light/HemisphereLight.h"
 #include "Graphics/light/SpotLight.h"
 #include "Graphics/light/PointLight.h"
 #include "Graphics/OcclusionDitherManager.h"
-
-#include "graphics/effect/EffectEmitter.h"
+#include "Graphics/effect/EffectEmitter.h"
 
 #include "BeastEngine.h"
 #include "Nature/SkyCube.h"

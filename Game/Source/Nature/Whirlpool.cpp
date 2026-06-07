@@ -129,7 +129,7 @@ namespace app
 			mTrans.MakeTranslation(m_transform.m_position);
 			const Matrix mWorld = mScale * mRot * mTrans;
 
-			SetupDrawCommands(rc, mWorld);
+			SetupDrawCommands(rc, mWorld, g_renderingEngine->GetMainView());
 
 			// カリングなし：元インデックスバッファをそのまま使用する
 			rc.SetIndexBuffer(m_indexBuffer);
@@ -139,7 +139,7 @@ namespace app
 		}
 
 
-		void Whirlpool::Render(RenderContext& rc, const nsBeastEngine::Frustum& frustum)
+		void Whirlpool::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			if (m_state == EnWhirlpoolState::None) return;
 
@@ -155,7 +155,7 @@ namespace app
 			mTrans.MakeTranslation(m_transform.m_position);
 			const Matrix mWorld = mScale * mRot * mTrans;
 
-			SetupDrawCommands(rc, mWorld);
+			SetupDrawCommands(rc, mWorld, view);
 
 			// トライアングルカリング
 			// m_verticesのposをワールド変換してからTriangleCullerに渡す
@@ -174,7 +174,7 @@ namespace app
 				numVerts,
 				m_srcIndexArray.data(),
 				static_cast<int>(m_srcIndexArray.size()),
-				frustum,
+				view.frustum,
 				m_visibleIndexArray
 			);
 
@@ -185,9 +185,11 @@ namespace app
 				return;
 			}
 
-			// 可視インデックスをGPUバッファに書き込んでドローコールを発行する
-			m_visibleIndexBuffer.Copy(m_visibleIndexArray.data());
-			rc.SetIndexBuffer(m_visibleIndexBuffer);
+			// メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で別スロットに書き込む
+			const int frameIdx = g_graphicsEngine->GetBackBufferIndex();
+			auto* visIb = m_visibleIndexBuffers[frameIdx];
+			visIb->Copy(m_visibleIndexArray.data());
+			rc.SetIndexBuffer(*visIb);
 			rc.DrawIndexedInstance(static_cast<int>(m_visibleIndexArray.size()), 1);
 
 			m_whirlpoolPowerSystem->RenderWrapper(rc);
@@ -210,6 +212,10 @@ namespace app
 		Whirlpool::~Whirlpool()
 		{
 			StopWhirlpoolEffect();
+			for (auto* ib : m_visibleIndexBuffers)
+			{
+				delete ib;
+			}
 		}
 
 
@@ -383,25 +389,29 @@ namespace app
 			);
 			m_indexBuffer.Copy(m_srcIndexArray.data());
 
-			// 可視インデックスバッファ（カリングあり描画用）を同サイズで確保する
-			// 最大でも全インデックス数と同じサイズになるため、同サイズで確保する
-			m_visibleIndexBuffer.Init(
-				static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
-				sizeof(uint32_t)
-			);
+			// 可視インデックスバッファをダブルバッファで作成する
+			// [0]=メインビュー用、[1]=サブビュー用（SetFrameIndexによる切り替えと対応）
+			for (int buf = 0; buf < 2; buf++)
+			{
+				m_visibleIndexBuffers[buf] = new IndexBuffer;
+				m_visibleIndexBuffers[buf]->Init(
+					static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
+					sizeof(uint32_t)
+				);
+			}
 
 			// 可視インデックス配列を最大サイズで事前確保しておく（毎フレームのアロケーションを避ける）
 			m_visibleIndexArray.reserve(m_srcIndexArray.size());
 		}
 
 
-		void Whirlpool::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld)
+		void Whirlpool::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view)
 		{
 			// 共通定数バッファを更新する（b0）
 			SCommonConstantBuffer commonCb;
 			commonCb.mWorld = mWorld;
-			commonCb.mView = g_camera3D->GetViewMatrix();
-			commonCb.mProj = g_camera3D->GetProjectionMatrix();
+			commonCb.mView = view.camera->GetViewMatrix();
+			commonCb.mProj = view.camera->GetProjectionMatrix();
 			commonCb.mulColor = Vector4::One;
 			m_commonConstantBuffer.CopyToVRAM(commonCb);
 

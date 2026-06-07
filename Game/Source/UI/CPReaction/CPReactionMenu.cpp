@@ -137,7 +137,7 @@ namespace app
 			const Vector3 targetPosition = m_target->GetTransform().m_position;
 
 			Vector2 screenPos = Vector2::Zero;
-			g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, targetPosition);
+			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, targetPosition);
 
 			const Vector3 prevPosition = Vector3(
 				screenPos.x,

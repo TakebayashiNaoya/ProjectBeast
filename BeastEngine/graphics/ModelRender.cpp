@@ -509,7 +509,7 @@ namespace nsBeastEngine
 		/** 描画が有効でない場合は処理しない */
 		if (!m_visible) return;
 
-		const Frustum& frustum = g_renderingEngine->GetFrustum();
+		const Frustum& frustum = g_renderingEngine->GetActiveFrustum();
 
 		if (IsToonEnabled())
 		{

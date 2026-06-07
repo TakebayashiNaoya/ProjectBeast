@@ -37,6 +37,7 @@ namespace app
 
 		class CPReactionSystem;
 		class WpWarningSystem;
+		class DangerArrowSystem;
 	}
 
 
@@ -172,6 +173,7 @@ namespace app
 
 		ui::CPReactionSystem* m_cpReactionSystem = nullptr;
 		ui::WpWarningSystem* m_wpWarningSystem = nullptr;
+		ui::DangerArrowSystem* m_dangerArrowSystem = nullptr;
 
 
 		//------------------------------------------------------------
