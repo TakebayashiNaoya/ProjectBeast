@@ -296,6 +296,16 @@ namespace app
 			 */
 			void PickNewRoamTarget();
 
+			/**
+			 * @brief わいわいエフェクトの再生
+			 */
+			void PlayLivelyEffect();
+
+			/**
+			 * @brief わいわいエフェクトの停止
+			 */
+			void StopLivelyEffect();
+
 		private:
 			/** やんちゃ固有ステートマシンへのポインタ（キャスト済みのキャッシュ） */
 			NaughtyChildPenguinStateMachine* m_naughtyStateMachine = nullptr;
@@ -311,6 +321,10 @@ namespace app
 			float m_scoldCooldown = 0.0f;
 			/** 渦潮に飲み込まれたかどうかのフラグ */
 			bool m_wasSwallowedByWhirlpool = false;
+			/** わいわいエフェクトのインターバル */
+			float m_livelyInterval = 0.0f;
+			/** わいわいエフェクト */
+			EffectHandle m_livelyEffectHandle = INVALID_EFFECT_HANDLE;
 		};
 
 
