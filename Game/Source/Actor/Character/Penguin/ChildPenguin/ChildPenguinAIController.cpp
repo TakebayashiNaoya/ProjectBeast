@@ -84,6 +84,29 @@ namespace app
 			 */
 			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 0.1f;
 
+
+			/**
+			 * @brief 逃走方向を次に変えるまでの最短保持時間（秒）
+			 */
+			constexpr float FLEE_DIR_HOLD_MIN = 0.5f;
+			/**
+			 * @brief 逃走方向を次に変えるまでの最長保持時間（秒）
+			 */
+			constexpr float FLEE_DIR_HOLD_MAX = 1.5f;
+			/**
+			 * @brief 逃走時に直進を選ぶ確率（残りは横方向回避）
+			 */
+			constexpr float FLEE_STRAIGHT_CHANCE = 0.7f;
+			/**
+			 * @brief 回避時の最小角度（ラジアン） = 45度
+			 */
+			constexpr float FLEE_DODGE_ANGLE_MIN = 0.785398f;
+			/**
+			 * @brief 回避時の最大角度（ラジアン） = 90度
+			 */
+			constexpr float FLEE_DODGE_ANGLE_MAX = 1.570796f;
+
+
 			/**
 			 * @brief 乱数エンジン（起動時に一度だけシード初期化）
 			 */
@@ -448,6 +471,83 @@ namespace app
 		}
 
 
+		bool ChildPenguinAIController::CheckAndFlee()
+		{
+			Vector3 chaserPos;
+			if (!EnemyManager::GetInstance()->FindNearestChaserOf(m_owner, chaserPos))
+			{
+				// 追跡者がいなくなったらタイマーをリセットして次回の逃走に備える
+				m_fleeDirChangeTimer = 0.0f;
+				m_fleeAngleOffset = 0.0f;
+				return false;
+			}
+
+			Vector3 myPos = m_owner->GetTransform().m_position;
+			Vector3 fleeDir = myPos - chaserPos;
+			fleeDir.y = 0.0f;
+
+			// 追跡中でも距離が遠すぎる場合はまだ逃げない
+			if (fleeDir.LengthSq() > FLEE_DETECTION_DISTANCE * FLEE_DETECTION_DISTANCE)
+			{
+				m_fleeDirChangeTimer = 0.0f;
+				m_fleeAngleOffset = 0.0f;
+				return false;
+			}
+
+			// 親が隊列参加距離以内にいる場合は逃走より隊列を優先する
+			// → false を返すことで呼び出し元の通常AI（隊列追従）処理へ制御を渡す
+			if (GetDistanceToDaddy() <= m_joinDistance)
+			{
+				m_fleeDirChangeTimer = 0.0f;
+				m_fleeAngleOffset = 0.0f;
+				return false;
+			}
+
+			if (fleeDir.LengthSq() > FLT_EPSILON)
+			{
+				fleeDir.Normalize();
+			}
+
+			// ── 逃走方向の揺らぎ（たまに横方向へ逃げる）──
+			// タイマーがゼロ以下になるたびに方向を再抽選する
+			m_fleeDirChangeTimer -= g_gameTime->GetFrameDeltaTime();
+			if (m_fleeDirChangeTimer <= 0.0f)
+			{
+				// 次の方向変更まで 0.5～1.5 秒保持する
+				std::uniform_real_distribution<float> intervalDist(FLEE_DIR_HOLD_MIN, FLEE_DIR_HOLD_MAX);
+				m_fleeDirChangeTimer = intervalDist(GetRandomEngine());
+
+				if (RollUnit() >= FLEE_STRAIGHT_CHANCE)
+				{
+					// 30%の確率で横方向（45～90度）へ回避する
+					std::uniform_real_distribution<float> angleDist(FLEE_DODGE_ANGLE_MIN, FLEE_DODGE_ANGLE_MAX);
+					const float sign = (RollUnit() < 0.5f) ? 1.0f : -1.0f;
+					m_fleeAngleOffset = angleDist(GetRandomEngine()) * sign;
+				}
+				else
+				{
+					// 70%の確率で直進
+					m_fleeAngleOffset = 0.0f;
+				}
+			}
+
+			// オフセット角度を X-Z 平面上で flee 方向に適用（Y軸回転）
+			if (fabsf(m_fleeAngleOffset) > FLT_EPSILON)
+			{
+				const float cosA = cosf(m_fleeAngleOffset);
+				const float sinA = sinf(m_fleeAngleOffset);
+				const float newX = fleeDir.x * cosA - fleeDir.z * sinA;
+				const float newZ = fleeDir.x * sinA + fleeDir.z * cosA;
+				fleeDir.x = newX;
+				fleeDir.z = newZ;
+			}
+
+			// エネミーから離れる方向へダッシュ
+			m_stateMachine->SetActionInput(fleeDir, false, true, false, false);
+			return true;
+		}
+
+
 		void ChildPenguinAIController::ForceEjectFromIgloo(const Vector3& iglooPos)
 		{
 			// 1. 各種イベントフラグを強制解除（通常のAI処理に戻すため）
@@ -500,6 +600,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 
@@ -564,6 +668,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
@@ -737,6 +845,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
@@ -1096,6 +1208,9 @@ namespace app
 				return;
 			}
 
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 待機命令のとき */
 			if (!isFollowCmd)
 			{
@@ -1200,6 +1315,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 

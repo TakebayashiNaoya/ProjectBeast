@@ -135,6 +135,14 @@ namespace app
 			/** かまくらイベントの更新処理 */
 			void UpdateIglooEvent();
 
+			/**
+			 * @brief シロクマ逃走チェックと移動入力設定
+			 * @details 自分を追跡中のエネミーが FLEE_DETECTION_DISTANCE 以内にいれば
+			 *          エネミーと反対方向へダッシュ入力を設定してtrueを返す。
+			 * @return 逃走行動中ならtrue（このフレームの通常AIをスキップする）
+			 */
+			bool CheckAndFlee();
+
 
 		protected:
 			/** 子ペンギンのポインタ */
@@ -183,6 +191,21 @@ namespace app
 
 			/** 現在の移動フェーズ */
 			MovePhase m_movePhase = MovePhase::Stop;
+
+			/** 逃走検知距離（この距離以内の追跡エネミーがいると逃走行動に入る） */
+			static constexpr float FLEE_DETECTION_DISTANCE = 500.0f;
+
+			/**
+			 * @brief 逃走方向を切り替えるまでの残り時間（秒）
+			 * @details 0以下になると次の方向が抽選される
+			 */
+			float m_fleeDirChangeTimer = 0.0f;
+
+			/**
+			 * @brief 逃走方向に加えるY軸回転オフセット（ラジアン）
+			 * @details 0のとき直進、±値のとき左右に振れる
+			 */
+			float m_fleeAngleOffset = 0.0f;
 		};
 
 
@@ -387,7 +410,7 @@ namespace app
 			 * @param target 制止を解除する対象
 			 */
 			void ReleaseSuppression(ChildPenguin* target) const;
-			
+
 
 		private:
 			/**

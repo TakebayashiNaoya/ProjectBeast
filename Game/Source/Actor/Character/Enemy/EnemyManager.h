@@ -69,6 +69,14 @@ namespace app
 			/** 全エネミーの座標取得 */
 			std::vector<Vector3> GetPositionList() const;
 
+			/**
+			 * @brief 指定ペンギンを追跡中の最近接エネミー座標を返す
+			 * @param penguin   チェック対象ペンギン
+			 * @param outPos    追跡中エネミーの座標（出力）
+			 * @return 追跡中エネミーが存在すればtrue
+			 */
+			bool FindNearestChaserOf(const actor::ChildPenguin* penguin, Vector3& outPos) const;
+
 
 		private:
 			EnemyManager();
