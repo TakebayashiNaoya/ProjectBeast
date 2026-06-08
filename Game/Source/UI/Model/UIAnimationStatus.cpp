@@ -11,6 +11,11 @@ namespace app
 {
 	namespace ui
 	{
+		void UIAnimationStatus::SetUp()
+		{}
 
+
+		void UIAnimationStatus::Update()
+		{}
 	}
 }

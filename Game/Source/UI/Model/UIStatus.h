@@ -4,6 +4,7 @@
  * @author 忽那
  */
 #pragma once
+#include "Source/Core/IStatus.h"
 
 
 namespace app
@@ -13,7 +14,7 @@ namespace app
 		/**
 		 * @biref UIStatusの基底クラス
 		 */
-		class UIStatus
+		class UIStatus : public core::IStatus
 		{
 		public:
 			UIStatus() = default;
@@ -21,13 +22,13 @@ namespace app
 
 			/**
 			 * @brief セットアップUI
-			 * @detail ステータスの持ち主が呼び出す。純粋仮想関数。
+			 * @detail ステータスの持ち主が呼び出す。
 			 */
-			virtual void SetUpUI() = 0;
+			virtual void SetUp() override;
 			/**
 			 * @brief 更新処理
 			 */
-			virtual void Update() = 0;
+			virtual void Update() override;
 		};
 	}
 }

@@ -129,7 +129,7 @@ namespace app
 			m_miniMapStatus = std::make_unique<MiniMapStatus>();
 
 			// ミニマップ専用のセットアップUIを呼び出す。
-			m_miniMapStatus->SetUpUI();
+			m_miniMapStatus->SetUp();
 		}
 
 

@@ -37,7 +37,7 @@ namespace app
 		{
 			// ステータスを生成,初期化
 			m_parentStatus = std::make_unique<WpWarningStatus>();
-			m_parentStatus->SetUpUI();
+			m_parentStatus->SetUp();
 
 			// パケットを初期化
 			for (auto& packet : m_packets)

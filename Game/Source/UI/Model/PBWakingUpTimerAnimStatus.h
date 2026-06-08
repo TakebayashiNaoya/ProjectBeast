@@ -4,8 +4,8 @@
  * @author 忽那
  */
 #pragma once
-#include "UIAnimationStatus.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
+#include "UIAnimationStatus.h"
 
 
 namespace app
@@ -47,7 +47,7 @@ namespace app
 			AnimData GetThirdAnimData()const { return m_thirdAnimData; }
 
 
-			void SetUpUI()override;
+			void SetUp()override;
 			void Update()override;
 		};
 	}

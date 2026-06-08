@@ -22,7 +22,7 @@ namespace app
 		CPReactionAnimStatus::CPReactionAnimStatus()
 		{
 			UIAnimationParameter::Get().Load(JSON_PATH);
-			SetUpUI();
+			SetUp();
 		}
 
 
@@ -30,7 +30,7 @@ namespace app
 		{}
 
 
-		void CPReactionAnimStatus::SetUpUI()
+		void CPReactionAnimStatus::SetUp()
 		{
 			const auto& param = UIAnimationParameter::Get();
 
@@ -54,7 +54,7 @@ namespace app
 
 		void CPReactionAnimStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

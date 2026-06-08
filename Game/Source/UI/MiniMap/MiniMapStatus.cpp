@@ -40,7 +40,7 @@ namespace app
 		}
 
 
-		void MiniMapStatus::SetUpUI()
+		void MiniMapStatus::SetUp()
 		{
 			const auto* param = core::ParameterManager::Get()->GetParameter<MiniMapParameter>();
 			m_radius = param->mapRadius;
@@ -51,7 +51,7 @@ namespace app
 
 		void MiniMapStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

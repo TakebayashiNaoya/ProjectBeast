@@ -279,6 +279,7 @@
     <ClCompile Include="Source\Core\Fade.cpp" />
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp" />
     <ClCompile Include="Source\Core\IMasterParameter.cpp" />
+    <ClCompile Include="Source\Core\IStatus.cpp" />
     <ClCompile Include="Source\Core\ParameterManager.cpp" />
     <ClCompile Include="Source\Core\StateMachineBase.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
@@ -410,6 +411,7 @@
     <ClInclude Include="Source\Core\Fade.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
     <ClInclude Include="Source\Core\IMasterParameter.h" />
+    <ClInclude Include="Source\Core\IStatus.h" />
     <ClInclude Include="Source\Core\ParameterManager.h" />
     <ClInclude Include="Source\Core\StateMachineBase.h" />
     <ClInclude Include="Source\Core\Transform.h" />

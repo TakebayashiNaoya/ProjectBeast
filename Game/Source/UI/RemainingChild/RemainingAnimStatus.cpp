@@ -17,7 +17,7 @@ namespace app
 			// JSONのパス。
 			const char* JSON_PATH = "Assets/parameter/UI/remainingChild/remainingChildAnimParameter.json";
 		}
-		
+
 
 		RemainingAnimStatus::RemainingAnimStatus()
 		{
@@ -28,9 +28,9 @@ namespace app
 
 		RemainingAnimStatus::~RemainingAnimStatus()
 		{}
-		
-		
-		void RemainingAnimStatus::SetUpUI()
+
+
+		void RemainingAnimStatus::SetUp()
 		{
 			// UIAnimationParameterのシングルトンインスタンスを取得。
 			const auto& param = UIAnimationParameter::Get();
@@ -107,11 +107,11 @@ namespace app
 				m_bounceUp.loopMode = bounceDownUp->loopMode;
 			}
 		}
-		
-		
+
+
 		void RemainingAnimStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

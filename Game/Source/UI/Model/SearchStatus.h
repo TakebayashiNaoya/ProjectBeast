@@ -20,7 +20,7 @@ namespace app
 			SearchStatus();
 			~SearchStatus() override;
 
-			void SetUpUI() override;
+			void SetUp() override;
 			void Update() override;
 
 			/** ゲッター群 */

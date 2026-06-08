@@ -44,7 +44,7 @@ namespace app
 			AnimData GetStampData() const { return m_stampData; }
 
 
-			void SetUpUI() override;
+			void SetUp() override;
 			void Update() override;
 
 

@@ -53,7 +53,7 @@ namespace app
 			RemainingAnimStatus();
 			virtual ~RemainingAnimStatus() override;
 
-			void SetUpUI() override;
+			void SetUp() override;
 
 			void Update() override;
 		};

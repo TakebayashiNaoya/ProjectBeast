@@ -22,7 +22,7 @@ namespace app
 		{}
 
 
-		void WpWarningAnimStatus::SetUpUI()
+		void WpWarningAnimStatus::SetUp()
 		{
 			// UIAnimationParameterのシングルトンインスタンスを取得。
 			const auto& param = UIAnimationParameter::Get();
@@ -40,7 +40,7 @@ namespace app
 
 		void WpWarningAnimStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

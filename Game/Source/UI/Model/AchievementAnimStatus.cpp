@@ -21,7 +21,7 @@ namespace app
 		AchievementAnimStatus::AchievementAnimStatus()
 		{
 			UIAnimationParameter::Get().Load(JSON_PATH);
-			SetUpUI();
+			SetUp();
 		}
 
 
@@ -29,7 +29,7 @@ namespace app
 		{}
 
 
-		void AchievementAnimStatus::SetUpUI()
+		void AchievementAnimStatus::SetUp()
 		{
 			// UIAnimationParameterのシングルトンインスタンスを取得。
 			const auto& param = UIAnimationParameter::Get();
@@ -86,7 +86,7 @@ namespace app
 
 		void AchievementAnimStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

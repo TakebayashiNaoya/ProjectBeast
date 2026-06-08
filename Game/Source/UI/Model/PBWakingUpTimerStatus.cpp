@@ -61,7 +61,7 @@ namespace app
 		}
 
 
-		void PBWakingUpTimerStatus::SetUpUI()
+		void PBWakingUpTimerStatus::SetUp()
 		{
 			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterPBWakingUpTimerParameter>();
 			m_timerFirstValue = parameter->timerFirstValue;
@@ -82,7 +82,7 @@ namespace app
 
 		void PBWakingUpTimerStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

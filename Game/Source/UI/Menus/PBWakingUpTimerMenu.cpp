@@ -5,8 +5,8 @@
  */
 #include "stdafx.h"
 #include "PBWakingUpTimerMenu.h"
-#include "Source/UI/Model/PBWakingUpTimerAnimStatus.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
+#include "Source/UI/Model/PBWakingUpTimerAnimStatus.h"
 
 
 namespace app
@@ -24,13 +24,13 @@ namespace app
 			// シロクマ専用UIAnimationStatusを生成。
 			m_pbAnimStatus = std::make_unique<PBWakingUpTimerAnimStatus>();
 			// シロクマ専用のセットアップUIを呼び出す。
-			m_pbAnimStatus->SetUpUI();
+			m_pbAnimStatus->SetUp();
 
 			// シロクマ専用UIのステータスを生成。
 			m_pbTimerStatus = std::make_unique<PBWakingUpTimerStatus>();
 
 			// シロクマ専用UIのセットアップUIを呼び出す。
-			m_pbTimerStatus->SetUpUI();
+			m_pbTimerStatus->SetUp();
 		}
 
 
@@ -45,9 +45,9 @@ namespace app
 			{
 				auto* cirGaugeA = GetUI<UICircleGauge>(Hash32("PBTimerCircleGaugeA"));
 				if (cirGaugeA) cirGaugeA->m_isDraw = false;
-				
+
 				auto* cirGaugeB = GetUI<UICircleGauge>(Hash32("PBTimerCircleGaugeB"));
-				if(cirGaugeB) cirGaugeB->m_isDraw = false;
+				if (cirGaugeB) cirGaugeB->m_isDraw = false;
 
 				auto* alarmClock = GetUI<UIIcon>(Hash32("PBalarmClock"));
 				if (alarmClock) alarmClock->m_isDraw = false;
@@ -90,7 +90,7 @@ namespace app
 
 			// タイマーのオフセットY値を取得。
 			const float offsetY = m_pbTimerStatus->GetOffsetValueY();
-			
+
 			// ゲージAと針を同じ中心座標に配置するために中心座標を計算する。
 			Vector3 centerPos = Vector3(screenPos.x, screenPos.y + offsetY, m_pbTimerStatus->GetInitialPosZ());
 
@@ -106,7 +106,7 @@ namespace app
 			// 残り時間を0~1に正規化する。
 			const float rotRatio = m_currentPBTime / m_pbTimerStatus->GetDegreeValue();
 			// サークルゲージAの進行度を設定する。
-			cirGaugeA->SetProgressRange(rotRatio,m_pbTimerStatus->GetRatioProgress());
+			cirGaugeA->SetProgressRange(rotRatio, m_pbTimerStatus->GetRatioProgress());
 			// サークルゲージBの進行度を設定する。
 			cirGaugeB->SetProgress(m_pbTimerStatus->GetRatioProgress());
 			// 長針にピボットを設定する。
@@ -117,7 +117,7 @@ namespace app
 			// 長針の回転を適用する。
 			needle->m_transform.m_localTransform.m_rotation = rot;
 
-			
+
 			// 現在のタイマーが30秒から20秒の間には、緑色から黄色に変化させるアニメーションを再生する。
 			if (m_currentPBTime <= m_pbTimerStatus->GetTimerFirstValue() && m_currentPBTime >= m_pbTimerStatus->GetTimerSecondValue())
 			{
@@ -127,10 +127,10 @@ namespace app
 					// すでに再生されているアニメーションを削除する。
 					cirGaugeA->RemoveAnimation(animKey::PB_CIRCLE_COLOR_SECOND_ANIM_KEY);
 					cirGaugeA->RemoveAnimation(animKey::PB_CIRCLE_COLOR_THIRD_ANIM_KEY);
-					
+
 					const bool colorCheck = UIAnimationFactory::Attach<UIColorAnimation>
 						(cirGaugeA, animKey::PB_CIRCLE_COLOR_FIRST_ANIM_KEY);
-					
+
 					// 両方取得出来たら、同フレームでアニメーションを再生。
 					if (colorCheck) {
 						cirGaugeA->SetBgColor(m_pbTimerStatus->GetSkeltonColor());
@@ -153,12 +153,12 @@ namespace app
 					cirGaugeA->RemoveAnimation(animKey::PB_CIRCLE_COLOR_THIRD_ANIM_KEY);
 					needle->RemoveAnimation(animKey::PB_NEEDLE_ROT_ANIM_KEY);
 
-					const bool colorCheck=UIAnimationFactory::Attach<UIColorAnimation>
+					const bool colorCheck = UIAnimationFactory::Attach<UIColorAnimation>
 						(cirGaugeA, animKey::PB_CIRCLE_COLOR_SECOND_ANIM_KEY);
 
 					if (colorCheck) {
 						cirGaugeA->SetBgColor(m_pbTimerStatus->GetSkeltonColor());
-						
+
 						cirGaugeA->FindAnimation(animKey::PB_CIRCLE_COLOR_SECOND_ANIM_KEY);
 						cirGaugeA->PlayAnimation();
 						m_isYellowPlayed = true;
@@ -181,7 +181,7 @@ namespace app
 
 					if (colorCheck) {
 						cirGaugeA->SetBgColor(m_pbTimerStatus->GetSkeltonColor());
-						
+
 						cirGaugeA->FindAnimation(animKey::PB_CIRCLE_COLOR_THIRD_ANIM_KEY);
 						cirGaugeA->PlayAnimation();
 						m_isRedPlayed = true;
@@ -192,9 +192,9 @@ namespace app
 			}
 
 			// サークルゲージの描画を有効にする。
-			cirGaugeA->m_isDraw  = true;
-			cirGaugeB->m_isDraw  = true;
-			needle->m_isDraw	 = true;
+			cirGaugeA->m_isDraw = true;
+			cirGaugeB->m_isDraw = true;
+			needle->m_isDraw = true;
 			alarmClock->m_isDraw = true;
 			// タイマーが0秒以下になったら、フラグをリセットする。
 			if (m_currentPBTime <= m_pbTimerStatus->GetResetValue())

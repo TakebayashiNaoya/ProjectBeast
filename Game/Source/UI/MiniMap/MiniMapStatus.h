@@ -20,7 +20,7 @@ namespace app
 			MiniMapStatus();
 			~MiniMapStatus() override;
 
-			void SetUpUI() override;
+			void SetUp() override;
 
 			void Update() override;
 
