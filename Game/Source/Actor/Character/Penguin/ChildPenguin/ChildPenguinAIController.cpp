@@ -88,15 +88,15 @@ namespace app
 			/**
 			 * @brief 逃走方向を次に変えるまでの最短保持時間（秒）
 			 */
-			constexpr float FLEE_DIR_HOLD_MIN = 0.5f;
+			constexpr float FLEE_DIR_HOLD_MIN = 1.5f;
 			/**
 			 * @brief 逃走方向を次に変えるまでの最長保持時間（秒）
 			 */
-			constexpr float FLEE_DIR_HOLD_MAX = 1.5f;
+			constexpr float FLEE_DIR_HOLD_MAX = 2.0f;
 			/**
 			 * @brief 逃走時に直進を選ぶ確率（残りは横方向回避）
 			 */
-			constexpr float FLEE_STRAIGHT_CHANCE = 0.7f;
+			constexpr float FLEE_STRAIGHT_CHANCE = 0.4f;
 			/**
 			 * @brief 回避時の最小角度（ラジアン） = 45度
 			 */

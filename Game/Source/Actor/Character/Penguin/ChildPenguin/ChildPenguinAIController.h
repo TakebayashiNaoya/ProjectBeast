@@ -193,7 +193,7 @@ namespace app
 			MovePhase m_movePhase = MovePhase::Stop;
 
 			/** 逃走検知距離（この距離以内の追跡エネミーがいると逃走行動に入る） */
-			static constexpr float FLEE_DETECTION_DISTANCE = 500.0f;
+			static constexpr float FLEE_DETECTION_DISTANCE = 300.0f;
 
 			/**
 			 * @brief 逃走方向を切り替えるまでの残り時間（秒）
