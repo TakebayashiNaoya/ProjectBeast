@@ -26,7 +26,7 @@
             {
                 "type" : "UIIcon",
                 "name" : "Frame",
-                "asset" : "Assets/spriteData/UI/Title/Frame/Frame.dds",
+                "asset" : "Assets/spriteData/UI/Frame/Frame.dds",
                 "width" : 300,
                 "height" : 130,
                 "position" : [0, 0, 0],
@@ -37,7 +37,7 @@
             {
                 "type" : "UIIcon",
                 "name" : "FrameBack",
-                "asset" : "Assets/spriteData/UI/Title/Frame/FrameBackGround.dds",
+                "asset" : "Assets/spriteData/UI/Frame/FrameBackGround.dds",
                 "width":280,
                 "height":101,
                 "position":[0, 0, 0],
@@ -50,7 +50,7 @@
             {
                 "type":"UIIcon",
                 "name":"StartIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/StartTextIcon.dds",
+                "asset":"Assets/spriteData/UI/Title/Text/StartTextIcon.dds",
                 "width":240,
                 "height":65,
                 "position":[ -500, -310, 0],
@@ -61,7 +61,7 @@
             {
                 "type":"UIIcon",
                 "name":"SoundIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/SoundTextIcon.dds",
+                "asset":"Assets/spriteData/UI/Title/Text/SoundTextIcon.dds",
                 "width":240,
                 "height":65,
                 "position":[ -175, -310, 0],
@@ -72,7 +72,7 @@
             {
                 "type":"UIIcon",
                 "name":"RuleIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/RuleTextIcon.dds",
+                "asset":"Assets/spriteData/UI/Title/Text/RuleTextIcon.dds",
                 "width":180,
                 "height":65,
                 "position":[ 175, -310, 0],
@@ -83,7 +83,7 @@
             {
                 "type":"UIIcon",
                 "name":"EndIcon",
-                "asset":"Assets/spriteData/UI/TextSprite/Title/EndTextIcon.dds",
+                "asset":"Assets/spriteData/UI/Title/Text/EndTextIcon.dds",
                 "width":180,
                 "height":65,
                 "position":[ 500, -310, 0],
