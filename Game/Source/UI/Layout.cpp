@@ -7,7 +7,7 @@
 #include "Layout.h"
 
 #include "Source/Util/CRC32.h"
-#include "Source/Util/JsonConverter.h"
+
 #include <fstream>
 #include <sys/stat.h>
 #include <Windows.h>
@@ -15,10 +15,6 @@
 
 namespace
 {
-	/** カラーに使う用の値 */
-	constexpr float COLOR_VALUE = 255.0f;
-
-
 	/**
 	 * @brief UTF-8(JSONの文字列)をShift-JIS(Windowsアプリ用)に変換する
 	 */
@@ -171,14 +167,11 @@ namespace app
 
 #ifdef APP_ENABLE_LAYOUT_HOTRELOAD
 			/** ホットリロードチェック */
-			struct stat st;
-			if (stat(m_filePath.c_str(), &st) == 0)
+			if (app::util::JsonConverter::CheckFileModified(m_filePath, m_lastUpdateTime))
 			{
-				if (m_lastUpdateTime != st.st_mtime)
-				{
-					m_lastUpdateTime = st.st_mtime;
-					Reload();
-				}
+				// 更新日時を最新に上書きしてからReload
+				m_lastUpdateTime = app::util::JsonConverter::GetFileLastWriteTime(m_filePath.c_str());
+				Reload();
 			}
 #endif //APP_ENABLE_LAYOUT_HOTRELOAD
 		}
