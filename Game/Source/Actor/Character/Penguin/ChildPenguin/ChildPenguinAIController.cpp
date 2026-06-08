@@ -43,10 +43,14 @@ namespace app
 			const Vector3 CARING_SWEAT_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
 			/** 世話焼きペンギンのエフェクトスケール */
 			const Vector3 CARING_SWEAT_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
+			/** やんちゃペンギンのエフェクトスケール */
+			const Vector3 NAUGHTY_LIVELY_EFFECT_SCALE = { 50.0f,50.0f,50.0f };
 			/** 世話焼きペンギンの最大再生回数 */
 			constexpr int MAX_SWEAT_COUNT = 3;
 			/** ずらす間隔 */
 			constexpr float SWEAT_INTERVAL = 0.3f;
+			/** 秒数判定 */
+			constexpr float LIVELY_INTERVAL = 0.7f;
 
 
 			/** シロクマを起こすための距離 */
@@ -877,6 +881,8 @@ namespace app
 
 					manager->UnregisterAttempting(m_owner);
 					m_scoldCooldown = SCOLD_COOLDOWN_DURATION;
+
+					StopLivelyEffect();
 				}
 
 				if (m_isFollowing)
@@ -899,6 +905,7 @@ namespace app
 				m_naughtyStateMachine->SetHasFinishedWaking(false);
 				manager->UnregisterAttempting(m_owner); // 問題行動リストから外れる
 				m_scoldCooldown = SCOLD_COOLDOWN_DURATION; // SCOLD_COOLDOWN_DURATION秒間は満足してシロクマを無視する
+				StopLivelyEffect();
 			}
 
 			if (m_scoldCooldown > 0.0f)
@@ -993,6 +1000,7 @@ namespace app
 					// 巻き込まれたフラグを立てて、入力はゼロにしてシステムに身を任せる
 					m_wasSwallowedByWhirlpool = true;
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					PlayLivelyEffect();
 					return;
 				}
 				else
@@ -1005,6 +1013,7 @@ namespace app
 						m_wasSwallowedByWhirlpool = false;
 						manager->UnregisterAttempting(m_owner);
 						m_scoldCooldown = SCOLD_COOLDOWN_DURATION; // 満足して親の元へ帰る
+						StopLivelyEffect();
 						return;
 					}
 
@@ -1018,12 +1027,16 @@ namespace app
 						m_naughtyStateMachine->SetIsGoingToWhirlpool(false);
 						manager->UnregisterAttempting(m_owner);
 						m_scoldCooldown = WHIRLPOOL_MISS_COOLDOWN_DURATION; // 少し反省して帰る
+						StopLivelyEffect();
+						return;
 					}
 					else
 					{
 						Vector3 dir = CalculateDirectionToTarget(targetPos);
 						m_stateMachine->SetActionInput(dir, false, true, false, false); // ダッシュで向かう
 					}
+
+					PlayLivelyEffect();
 					return;
 				}
 			}
@@ -1041,6 +1054,8 @@ namespace app
 					m_naughtyStateMachine->SetIsAtBear(false);
 					manager->UnregisterAttempting(m_owner);
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					
+					StopLivelyEffect();
 					return;
 				}
 
@@ -1061,6 +1076,8 @@ namespace app
 					m_stateMachine->SetActionInput(dir, true, false, false, false);
 				}
 
+				// エフェクトを再生する。
+				PlayLivelyEffect();
 				// シロクマに対処している間は、この後の「追従・待機の通常ロジック」を無視する
 				return;
 			}
@@ -1074,6 +1091,8 @@ namespace app
 					/** 徘徊登録を解除する */
 					manager->UnregisterRoaming(m_owner);
 
+					StopLivelyEffect();
+
 					if (!m_isFollowing)
 					{
 						manager->AddFollower(m_owner);
@@ -1086,6 +1105,8 @@ namespace app
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
+
+					PlayLivelyEffect();
 				}
 
 				/** 隊列に参加していない状態（＝まだ遠くにいる）なら徘徊を継続する */
@@ -1107,6 +1128,7 @@ namespace app
 					}
 
 					BuildInputToTarget(m_roamTarget);
+					PlayLivelyEffect();
 					return;
 				}
 
@@ -1143,6 +1165,7 @@ namespace app
 				}
 
 				BuildInputToTarget(m_roamTarget);
+				PlayLivelyEffect();
 				return;
 			}
 
@@ -1171,6 +1194,56 @@ namespace app
 
 			/** 最大試行回数を超えた場合は現在地をそのまま目標にする */
 			m_roamTarget = currentPos;
+		}
+
+
+		void NaughtyChildPenguinAI::PlayLivelyEffect()
+		{
+			// 時間計測。
+			m_livelyInterval += g_gameTime->GetFrameDeltaTime();
+
+			// 子ペンギンの座標を取得。
+			const Vector3 effectPos = m_owner->GetTransform().m_position;
+			// 子ペンギンのスケールを取得。
+			const Vector3 effectScl = m_owner->GetTransform().m_scale + NAUGHTY_LIVELY_EFFECT_SCALE;
+
+
+			if (m_livelyInterval > LIVELY_INTERVAL)
+			{
+				// エフェクトの再生。
+				m_livelyEffectHandle = EffectManager::Get().PlayEffect(
+					EnEffectKind::NaughtyPenguinLively
+					, effectPos
+					, Quaternion::Identity
+					, effectScl
+				);
+
+				// インターバルをリセット。
+				m_livelyInterval = 0.0f;
+			}
+
+			auto* effect = EffectManager::Get().FindEffect(m_livelyEffectHandle);
+			// エフェクトが存在しているなら
+			if (effect != nullptr)
+			{
+				// 子ペンギンの頭上にエフェクトを表示。
+				effect->SetPosition(effectPos);
+			}
+		}
+
+
+		void NaughtyChildPenguinAI::StopLivelyEffect()
+		{
+			// エフェクトハンドルが有効なら
+			if (m_livelyEffectHandle != INVALID_EFFECT_HANDLE)
+			{
+				// エフェクトを停止。
+				EffectManager::Get().StopEffect(m_livelyEffectHandle);
+				// ハンドルを無効化。
+				m_livelyEffectHandle = INVALID_EFFECT_HANDLE;
+				// インターバルをリセット。
+				m_livelyInterval = 0.0f;
+			}
 		}
 
 
