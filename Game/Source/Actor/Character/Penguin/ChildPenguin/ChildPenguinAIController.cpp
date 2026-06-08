@@ -43,8 +43,6 @@ namespace app
 			const Vector3 CARING_SWEAT_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
 			/** 世話焼きペンギンのエフェクトスケール */
 			const Vector3 CARING_SWEAT_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
-			/** やんちゃペンギンのエフェクトオフセット */
-			const Vector3 NAUGHTY_LIVELY_EFFECT_POSITION = { 0.0f,10.0f,0.0f };
 			/** やんちゃペンギンのエフェクトスケール */
 			const Vector3 NAUGHTY_LIVELY_EFFECT_SCALE = { 50.0f,50.0f,50.0f };
 			/** 世話焼きペンギンの最大再生回数 */
@@ -1089,7 +1087,7 @@ namespace app
 			m_livelyInterval += g_gameTime->GetFrameDeltaTime();
 
 			// 子ペンギンの座標を取得。
-			const Vector3 effectPos = m_owner->GetTransform().m_position; // + NAUGHTY_LIVELY_EFFECT_POSITION;
+			const Vector3 effectPos = m_owner->GetTransform().m_position;
 			// 子ペンギンのスケールを取得。
 			const Vector3 effectScl = m_owner->GetTransform().m_scale + NAUGHTY_LIVELY_EFFECT_SCALE;
 
@@ -1109,7 +1107,6 @@ namespace app
 			}
 
 			auto* effect = EffectManager::Get().FindEffect(m_livelyEffectHandle);
-			// ハンドルからエフェクトを取得して
 			// エフェクトが存在しているなら
 			if (effect != nullptr)
 			{
