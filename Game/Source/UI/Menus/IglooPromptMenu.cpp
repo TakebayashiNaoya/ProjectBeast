@@ -51,7 +51,7 @@ namespace app
 
 			// 親ペンギンのワールド座標をスクリーン座標に変換
 			Vector2 screenPos = Vector2::Zero;
-			g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, m_targetPosition);
+			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, m_targetPosition);
 
 			if (iconA) {
 				iconA->m_isDraw = true;

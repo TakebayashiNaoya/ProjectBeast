@@ -16,10 +16,18 @@ namespace nsBeastEngine
 	{
 		for (auto& mesh : m_meshs)
 		{
-			// インデックスバッファを削除する
+			// 元インデックスバッファを削除する
 			for (auto& ib : mesh->m_indexBufferArray)
 			{
 				delete ib;
+			}
+			// 可視インデックスバッファを削除する（ダブルバッファ）
+			for (auto& ibArr : mesh->m_visibleIndexBuffers)
+			{
+				for (auto* ib : ibArr)
+				{
+					delete ib;
+				}
 			}
 			// マテリアルを削除する
 			for (auto& mat : mesh->m_materials)
@@ -229,6 +237,7 @@ namespace nsBeastEngine
 			mesh->m_indexBufferArray.reserve(tkmMesh.indexBuffer16Array.size());
 			mesh->m_srcIndexArrays.resize(tkmMesh.indexBuffer16Array.size());
 			mesh->m_visibleIndices.resize(tkmMesh.indexBuffer16Array.size());
+			mesh->m_visibleIndexBuffers.resize(tkmMesh.indexBuffer16Array.size());
 
 			int ibNo = 0;
 			for (auto& tkIb : tkmMesh.indexBuffer16Array)
@@ -248,6 +257,16 @@ namespace nsBeastEngine
 				}
 				mesh->m_visibleIndices[ibNo].reserve(tkIb.indices.size());
 
+				// トライアングルカリング用の可視インデックスバッファをダブルバッファで作成する
+				// buf=0 がメインビュー用、buf=1 がサブビュー用（SetFrameIndex による切り替えと対応）
+				for (int buf = 0; buf < 2; buf++)
+				{
+					auto visIb = new IndexBuffer;
+					visIb->Init(static_cast<int>(tkIb.indices.size()) * 2, 2);
+					visIb->Copy(const_cast<uint16_t*>(&tkIb.indices[0]));
+					mesh->m_visibleIndexBuffers[ibNo][buf] = visIb;
+				}
+
 				mesh->m_indexBufferArray.push_back(ib);
 				ibNo++;
 			}
@@ -258,6 +277,7 @@ namespace nsBeastEngine
 			mesh->m_indexBufferArray.reserve(tkmMesh.indexBuffer32Array.size());
 			mesh->m_srcIndexArrays.resize(tkmMesh.indexBuffer32Array.size());
 			mesh->m_visibleIndices.resize(tkmMesh.indexBuffer32Array.size());
+			mesh->m_visibleIndexBuffers.resize(tkmMesh.indexBuffer32Array.size());
 
 			int ibNo = 0;
 			for (auto& tkIb : tkmMesh.indexBuffer32Array)
@@ -276,6 +296,15 @@ namespace nsBeastEngine
 					srcArray.push_back(idx);
 				}
 				mesh->m_visibleIndices[ibNo].reserve(tkIb.indices.size());
+
+				// トライアングルカリング用の可視インデックスバッファをダブルバッファで作成する
+				for (int buf = 0; buf < 2; buf++)
+				{
+					auto visIb = new IndexBuffer;
+					visIb->Init(static_cast<int>(tkIb.indices.size()) * 4, 4);
+					visIb->Copy(const_cast<uint32_t*>(&tkIb.indices[0]));
+					mesh->m_visibleIndexBuffers[ibNo][buf] = visIb;
+				}
 
 				mesh->m_indexBufferArray.push_back(ib);
 				ibNo++;
@@ -360,8 +389,6 @@ namespace nsBeastEngine
 				mesh->m_materials[matNo]->BeginRender(rc, mesh->skinFlags[matNo]);
 				rc.SetDescriptorHeap(m_descriptorHeap);
 
-				auto& ib = mesh->m_indexBufferArray[matNo];
-
 				// トライアングルカリングを適用する
 				// スキンありメッシュ（skinFlags == 1）はCPUに変形後頂点座標がないためスキップする
 				if (frustum != nullptr && mesh->skinFlags[matNo] == 0)
@@ -397,14 +424,18 @@ namespace nsBeastEngine
 						continue;
 					}
 
-					// 可視インデックスをGPUバッファに書き込んでドローコールを発行する
-					ib->Copy(visibleIndices.data());
-					rc.SetIndexBuffer(*ib);
+					// メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で別スロットに書き込む。
+					// 定数バッファと同様に SetFrameIndex による切り替えと連動している。
+					const int frameIdx = g_graphicsEngine->GetBackBufferIndex();
+					auto* visIb = mesh->m_visibleIndexBuffers[matNo][frameIdx];
+					visIb->Copy(visibleIndices.data());
+					rc.SetIndexBuffer(*visIb);
 					rc.DrawIndexedInstance(static_cast<int>(visibleIndices.size()), numInstance);
 				}
 				else
 				{
 					// カリングなし：元のインデックスバッファをそのまま使用する
+					auto* ib = mesh->m_indexBufferArray[matNo];
 					rc.SetIndexBuffer(*ib);
 					rc.DrawIndexedInstance(ib->GetCount(), numInstance);
 				}

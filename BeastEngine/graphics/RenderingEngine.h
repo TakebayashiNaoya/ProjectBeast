@@ -6,6 +6,7 @@
 #pragma once
 #include "MyRenderer.h"
 #include "Graphics/Light/SceneLight.h"
+#include "Graphics/RenderViewContext.h"
 #include "Nature/INatureObject.h"
 #include "Geometry/Frustum.h"
 #include "Graphics/PostEffect/PostEffectManager.h"
@@ -54,12 +55,38 @@ namespace nsBeastEngine
 		SceneLight& GetSceneLight() { return m_sceneLight; }
 
 		/**
-		 * @brief フラスタムを取得する
+		 * @brief メインビューを取得する
+		 * @return メインビューの参照
+		 */
+		const RenderViewContext& GetMainView() const { return m_mainView; }
+
+		/**
+		 * @brief サブビューを取得する
+		 * @return サブビューの参照
+		 */
+		const RenderViewContext& GetSubView() const { return m_subView; }
+
+		/**
+		 * @brief メインカメラのフラスタムを取得する
 		 * @details WhirlpoolManagerなど、RenderingEngine外部から
 		 *          カリング判定を行う場合に使用する。
 		 * @return フラスタムの参照
 		 */
-		const Frustum& GetFrustum() const { return m_frustum; }
+		const Frustum& GetFrustum() const { return m_mainView.frustum; }
+
+		/**
+		 * @brief 現在描画中のビューのフラスタムを取得する
+		 * @details ModelRender::OnDrawから参照される。
+		 *          ExecuteViewPass前にm_activeFrustumがセットされる。
+		 * @return アクティブフラスタムの参照
+		 */
+		const Frustum& GetActiveFrustum() const { return *m_activeFrustum; }
+
+		/**
+		 * @brief サブカメラ用レンダリングターゲットを取得する
+		 * @return サブカメラ用レンダリングターゲットの参照
+		 */
+		RenderTarget& GetSubCameraRenderTarget() { return m_subView.renderTarget; }
 
 
 		//============================================//
@@ -123,19 +150,16 @@ namespace nsBeastEngine
 
 	private:
 		/**
-		 * @brief メインレンダリングターゲットの初期化
-		 */
-		void InitMainRenderTarget();
-
-		/**
 		 * @brief GBufferの初期化
+		 * @param view 初期化対象のビュー
 		 */
-		void InitGBuffer();
+		void InitGBuffer(RenderViewContext& view);
 
 		/**
 		 * @brief ディファードシェーディングを行うためのスプライトの初期化
+		 * @param view 初期化対象のビュー
 		 */
-		void InitDeferredLightingSprite();
+		void InitDeferredLightingSprite(RenderViewContext& view);
 
 		/**
 		 * @brief メインレンダリングターゲットのカラーバッファの内容を
@@ -160,22 +184,39 @@ namespace nsBeastEngine
 
 	private:
 		/**
+		 * @brief 指定したビューの描画パスを実行する
+		 * @param rc レンダリングコンテキスト
+		 * @param view 描画に使用するビュー
+		 */
+		void ExecuteViewPass(RenderContext& rc, RenderViewContext& view);
+
+		/**
 		 * @brief GBufferへの描画処理
 		 * @param rc レンダリングコンテキスト
+		 * @param view 使用するビュー
 		 */
-		void RenderToGBuffer(RenderContext& rc);
+		void RenderToGBuffer(RenderContext& rc, RenderViewContext& view);
 
 		/**
 		 * @brief ディファードライティングの描画処理
 		 * @param rc レンダリングコンテキスト
+		 * @param view 使用するビュー
 		 */
-		void DeferredLighting(RenderContext& rc);
+		void DeferredLighting(RenderContext& rc, RenderViewContext& view);
 
 		/**
 		 * @brief フォワードレンダリングの描画処理
 		 * @param rc レンダリングコンテキスト
+		 * @param view 使用するビュー
 		 */
-		void ForwardRendering(RenderContext& rc);
+		void ForwardRendering(RenderContext& rc, RenderViewContext& view);
+
+		/**
+		 * @brief 自然オブジェクトの描画処理
+		 * @param rc レンダリングコンテキスト
+		 * @param view 使用するビュー
+		 */
+		void RenderNatureObjects(RenderContext& rc, RenderViewContext& view);
 
 		/**
 		 * @brief ポストエフェクトの描画処理
@@ -198,25 +239,15 @@ namespace nsBeastEngine
 
 
 	private:
-		/** GBufferに入れるレンダリングターゲットの役割 */
-		enum EnGBuffer
-		{
-			enGBuffer_Albedo = 0,  /** アルベド		*/
-			enGBuffer_Normal,      /** 法線			*/
-			enGBuffer_Specular,    /** スペキュラ   */
-			enGBuffer_Num,         /** G-Bufferの数 */
-		};
-		/** GBuffer用のレンダリングターゲット */
-		std::array<RenderTarget, enGBuffer_Num> m_gBuffer;
+		/** メインカメラで映すビュー */
+		RenderViewContext m_mainView;
+		/** サブカメラで映すビュー */
+		RenderViewContext m_subView;
 
 		/** シーンライト */
 		SceneLight		m_sceneLight;
-		/** ディファードライティング用のスプライト */
-		Sprite			m_deferredLightingSprite;
 		/** メインレンダリングターゲットをフレームバッファにコピーするためのスプライト */
 		Sprite			m_copyMainRtToFrameBufferSprite;
-		/** メインレンダリングターゲット */
-		RenderTarget	m_mainRenderTarget;
 		/** 2D描画用のレンダーターゲット */
 		RenderTarget	m_2DRenderTarget;
 		/** 2D合成用のスプライト */
@@ -236,9 +267,9 @@ namespace nsBeastEngine
 		/** 自然オブジェクトのリスト（Ocean・WhirlpoolManagerなど） */
 		std::vector<INatureObject*> m_natureObjects;
 
-		/** フラスタム（視錐台）カリング用 */
-		Frustum m_frustum;
 		/** フラスタムカリングの有効/無効 */
 		bool m_frustumCullingEnabled = true;
+		/** 現在描画中のビューのフラスタム（ExecuteViewPass前にセットされる） */
+		const Frustum* m_activeFrustum = nullptr;
 	};
 }

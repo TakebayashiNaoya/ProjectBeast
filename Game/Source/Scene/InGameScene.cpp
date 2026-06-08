@@ -41,6 +41,7 @@
 
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
+#include "Graphics/Camera/SubCameraManager.h"
 
 #include "Source/Nature/Ocean.h"
 #include "Source/Nature/WhirlpoolManager.h"
@@ -94,6 +95,9 @@ namespace app
 		BattleManager::DestroyInstance();
 		ScoreManager::DestroyInstance();
 		TimeManager::DestroyInstance();
+
+		/** シーン破棄時にサブカメラを強制停止する（タイトル遷移後に残らないよう） */
+		nsBeastEngine::SubCameraManager::Get().ForceEnd();
 
 		/** タイトルへ戻る場合は ResultScene を経由しないため、ここで破棄する。
 		 *  リザルト遷移の場合は ResultScene::~ResultScene が担当する。 */
@@ -433,10 +437,11 @@ namespace app
 
 	void InGameScene::PauseUpdate()
 	{
-		/** ポーズ開始フレームに1回だけ全SEを停止する */
+		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする */
 		if (!m_isPauseEntered)
 		{
 			SoundManager::Get().StopAllSE();
+			nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(true);
 			m_isPauseEntered = true;
 		}
 
@@ -458,6 +463,7 @@ namespace app
 			if (pauseMenu->IsRetry())
 			{
 				pauseMenu->IsRetry(false);
+				nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(false);
 				SceneManager::GetInstance()->SetPause(false);
 				/** ポーズ解除時にフラグをリセットする */
 				m_isPauseEntered = false;

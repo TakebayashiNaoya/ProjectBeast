@@ -83,7 +83,7 @@ namespace nsBeastEngine
 		if (m_playerModelRender == nullptr) { return; }
 
 		// カメラのワールド座標を取得する
-		const Vector3 cameraWorldPos = g_camera3D->GetPosition();
+		const Vector3 cameraWorldPos = CameraSystem::Get().GetMainCamera().GetPosition();
 
 		// プレイヤーのワールド座標を取得する
 		const Vector3 playerWorldPos = m_playerModelRender->GetPosition()

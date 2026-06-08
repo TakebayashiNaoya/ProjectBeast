@@ -230,7 +230,7 @@ namespace app
 			float length = diff.Length();
 
 			// カメラの向きに合わせてワールド座標の差分を回転させる。
-			Vector3 forward = g_camera3D->GetForward();
+			Vector3 forward = CameraSystem::Get().GetMainCamera().GetForward();
 			Quaternion rot;
 			rot.SetRotationY(atan2(-forward.x, forward.z));
 			// ベクトルの回転を適用。
@@ -264,7 +264,7 @@ namespace app
 			if (miniMapIcon && mapFrameIcon)
 			{
 				// カメラの向きに合わせてマップのフレームアイコンを回転させる。
-				Vector3 forward = g_camera3D->GetForward();
+				Vector3 forward = CameraSystem::Get().GetMainCamera().GetForward();
 				const float angle = (atan2(forward.x, forward.z));
 
 				Quaternion qrot;

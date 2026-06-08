@@ -143,8 +143,8 @@ namespace nsBeastEngine
 			/** mVPの更新(シェーダー) */
 			Matrix VP;		/** ビュー行列とプロジェクション行列 */
 			/** ビューとプロジェクションの掛け算 */
-			Matrix v = g_camera3D->GetViewMatrix();
-			Matrix p = g_camera3D->GetProjectionMatrix();
+			Matrix v = CameraSystem::Get().GetMainCamera().GetViewMatrix();
+			Matrix p = CameraSystem::Get().GetMainCamera().GetProjectionMatrix();
 			VP.Multiply(v, p);
 			/** 定数バッファに渡したい変数を格納(m_constantBufferの内容を上書き) */
 			m_constantBuffer.CopyToVRAM(&VP);

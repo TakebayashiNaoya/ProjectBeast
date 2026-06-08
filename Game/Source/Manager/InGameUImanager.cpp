@@ -36,6 +36,7 @@
 #include "Source/UI/MiniMap/MiniMapMenu.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
+#include "Source/UI/DangerArrow/DangerArrowSystem.h"
 
 
 namespace app
@@ -77,6 +78,7 @@ namespace app
 		delete m_inGameButtonLayout;
 		delete m_cpReactionSystem;
 		delete m_wpWarningSystem;
+		delete m_dangerArrowSystem;
 
 		for (auto* layout : m_searchLayouts)
 		{
@@ -214,6 +216,9 @@ namespace app
 		m_wpWarningSystem->Initialize();
 		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
 
+		m_dangerArrowSystem = new ui::DangerArrowSystem();
+		m_dangerArrowSystem->Initialize();
+
 		/** BattleManagerへのUI通知functionを登録 */
 		RegisterObservers(daddyPenguin);
 	}
@@ -335,6 +340,7 @@ namespace app
 
 		if (m_cpReactionSystem) m_cpReactionSystem->Update();
 		if (m_wpWarningSystem) m_wpWarningSystem->Update();
+		if (m_dangerArrowSystem) m_dangerArrowSystem->Update();
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Update();
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Update();
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Update();
@@ -371,6 +377,7 @@ namespace app
 		if (m_enemySleepingLayout)   m_enemySleepingLayout->Render(rc);
 		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
 		if (m_wpWarningSystem) m_wpWarningSystem->Render(rc);
+		if (m_dangerArrowSystem) m_dangerArrowSystem->Render(rc);
 		if (m_pbWakingUpTimerLayout) m_pbWakingUpTimerLayout->Render(rc);
 		if (m_iglooPromptLayout)     m_iglooPromptLayout->Render(rc);
 		if (m_miniMapLayout)         m_miniMapLayout->Render(rc);

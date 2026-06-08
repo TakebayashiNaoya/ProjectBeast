@@ -19,13 +19,13 @@ namespace app
 
 			// 35%の割合。
 			constexpr float RATIO_THERTY_FIVE_PERCENT = 0.35f;
-			
+
 			// 0%の割合。
 			constexpr float RATIO_ZERO = 0.0f;
 
 			// 配列のサイズ。
 			constexpr int FLOAT_SIZE = 8;
-			
+
 			// 配列。
 			constexpr float ADD_POS[FLOAT_SIZE] =
 			{
@@ -39,7 +39,7 @@ namespace app
 			const Vector4 RATIO_YELLOW_COLOR = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
 			// 赤色。
 			const Vector4 RATIO_RED_COLOR = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-			
+
 			constexpr float OFFSET_X = -200.0f;
 			constexpr float OFFSET_Y = 150.0f;
 
@@ -85,7 +85,7 @@ namespace app
 
 			// クマの位置によって変える。
 			Vector2 screenPosition;
-			g_camera3D->CalcScreenPositionFromWorldPosition(screenPosition, m_targetPosition);
+			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPosition, m_targetPosition);
 
 			auto* gauge = GetUI<UIGauge>(Hash32("GaugeA"));
 			if (gauge) {
@@ -107,12 +107,12 @@ namespace app
 					gauge->m_color = RATIO_RED_COLOR;
 				}
 			}
-			
-			
+
+
 
 			Vector2 framePosition;
-			g_camera3D->CalcScreenPositionFromWorldPosition(framePosition, m_targetPosition);
-			
+			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(framePosition, m_targetPosition);
+
 			{
 				auto* frame = GetUI<UIIcon>(Hash32("FrameIcon"));
 				if (frame) {
@@ -143,7 +143,7 @@ namespace app
 				{
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconC"));
 					if (icon) {
-						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x  - ADD_POS[2] + OFFSET_X, screenPosition.y + ADD_POS[5] + OFFSET_Y, ADD_POS[7]);
+						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - ADD_POS[2] + OFFSET_X, screenPosition.y + ADD_POS[5] + OFFSET_Y, ADD_POS[7]);
 						icon->m_isDraw = m_sleepingRate > RATE_MIN;
 					}
 				}
@@ -151,11 +151,11 @@ namespace app
 				// 吹き出し
 				{
 					auto* icon = GetUI<UIIcon>(Hash32("SleepIconD"));
-						if (icon)
-						{
-							icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - ADD_POS[3] + OFFSET_X, screenPosition.y + ADD_POS[6] + OFFSET_Y, ADD_POS[7]);
-							icon->m_isDraw = m_sleepingRate > RATE_MIN;
-						}
+					if (icon)
+					{
+						icon->m_transform.m_localTransform.m_position.Set(screenPosition.x - ADD_POS[3] + OFFSET_X, screenPosition.y + ADD_POS[6] + OFFSET_Y, ADD_POS[7]);
+						icon->m_isDraw = m_sleepingRate > RATE_MIN;
+					}
 				}
 			}
 

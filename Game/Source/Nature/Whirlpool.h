@@ -124,10 +124,10 @@ namespace app
 			 * @details
 			 *   視錐台と交差する三角形のインデックスのみをGPUバッファに書き込んで描画する。
 			 *   頂点はUpdateVertexHeights()で毎フレーム更新済みのm_verticesを使用する。
-			 * @param rc      描画コンテキスト
-			 * @param frustum カリングに使用する視錐台
+			 * @param rc   描画コンテキスト
+			 * @param view 使用するビュー（カメラ行列・フラスタムを含む）
 			 */
-			void Render(RenderContext& rc, const nsBeastEngine::Frustum& frustum);
+			void Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view);
 
 
 		public:
@@ -198,8 +198,9 @@ namespace app
 			 *   パイプライン設定・頂点バッファ設定・UpdateVertexHeights() をまとめる。
 			 * @param rc     描画コンテキスト
 			 * @param mWorld ワールド行列
+			 * @param camera カメラ情報（ビュー・プロジェクション行列の取得に使用する）
 			 */
-			void SetupDrawCommands(RenderContext& rc, const Matrix& mWorld);
+			void SetupDrawCommands(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view);
 
 
 		private:
@@ -216,8 +217,8 @@ namespace app
 			Texture        m_albedoMap;					/** アルベドマップ */
 
 			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
-			IndexBuffer    m_indexBuffer;				/** 元インデックスバッファ（カリングなし描画用） */
-			IndexBuffer    m_visibleIndexBuffer;		/** 可視インデックスバッファ（カリングあり描画用） */
+			IndexBuffer    m_indexBuffer;					/** 元インデックスバッファ（カリングなし描画用） */
+			IndexBuffer*   m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
 			int            m_indexCount = 0;			/** インデックス数 */
 
 			/** 元インデックス配列（CPUキャッシュ・カリング判定用） */

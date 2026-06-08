@@ -21,7 +21,7 @@ namespace nsBeastEngine
 	struct SBeastMesh
 	{
 		VertexBuffer                        m_vertexBuffer;		/** 頂点バッファ */
-		std::vector<IndexBuffer*>           m_indexBufferArray;	/** インデックスバッファ配列 */
+		std::vector<IndexBuffer*>           m_indexBufferArray;	/** 元インデックスバッファ配列（読み取り専用） */
 		std::vector<Material*>              m_materials;		/** マテリアル配列 */
 		std::vector<int>                    skinFlags;			/** スキンフラグ（1=スキンあり） */
 
@@ -30,6 +30,11 @@ namespace nsBeastEngine
 		std::vector<Vector3>                m_localVertexPositions;	/** ローカル座標の頂点位置 */
 		std::vector<std::vector<uint32_t>>  m_srcIndexArrays;		/** マテリアルごとの元インデックス */
 		std::vector<std::vector<uint32_t>>  m_visibleIndices;		/** マテリアルごとの可視インデックス（毎フレーム更新） */
+
+		// トライアングルカリング書き込み先のインデックスバッファ（ダブルバッファ）
+		// 定数バッファと同様に、メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で
+		// 別スロットに書き込むことで同フレーム内の上書き競合を防ぐ
+		std::vector<std::array<IndexBuffer*, 2>> m_visibleIndexBuffers;
 	};
 
 

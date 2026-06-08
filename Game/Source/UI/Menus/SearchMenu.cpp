@@ -13,7 +13,7 @@
 namespace app
 {
 	namespace ui
-	{	
+	{
 		SearchMenu::SearchMenu()
 			: m_enemy(nullptr)
 			, m_isActive(false)
@@ -44,7 +44,7 @@ namespace app
 				if (frameA) frameA->m_isDraw = false;
 
 				auto* frameB = GetUI<UIIcon>(Hash32("canNotSearchFrame"));
-				if(frameB) frameB->m_isDraw = false;
+				if (frameB) frameB->m_isDraw = false;
 
 				MenuBase::Update();
 				return;
@@ -82,17 +82,17 @@ namespace app
 				Vector3 enemyPos = m_enemy->GetTransform().m_position;
 				// ワールド座標でシロクマの頭上の座標を計算した後に、スクリーン空間に変換する。
 				Vector3 iconWorldPos = enemyPos + Vector3(m_searchStatus->GetIconPosX(), m_searchStatus->GetOffsetValueY(), m_searchStatus->GetIconPosZ());
-				
+
 				// カメラの座標を取得。
-				Vector3 cameraPos = g_camera3D->GetPosition();
+				Vector3 cameraPos = CameraSystem::Get().GetMainCamera().GetPosition();
 				// カメラからシロクマへのベクトルを計算。
 				Vector3 toEnemy = enemyPos - cameraPos;
-				
+
 				// ベクトルを正規化。
 				toEnemy.Normalize();
 
 				// 内積が0以下の時は、全てのUIIconを非表示。
-				if (g_camera3D->GetForward().Dot(toEnemy) <= m_searchStatus->GetDotValue())
+				if (CameraSystem::Get().GetMainCamera().GetForward().Dot(toEnemy) <= m_searchStatus->GetDotValue())
 				{
 					auto* canFindIcon = GetUI<UIIcon>(Hash32("canSearchIcon"));
 					if (canFindIcon) canFindIcon->m_isDraw = false;
@@ -112,7 +112,7 @@ namespace app
 
 				Vector2 screenPos = Vector2::Zero;
 				// シロクマの頭上のスクリーン座標を計算
-				g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, iconWorldPos);
+				CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, iconWorldPos);
 				iconPos = Vector3(screenPos.x, screenPos.y, 0.0f);
 			}
 
@@ -142,7 +142,7 @@ namespace app
 
 			if (canNotFindIcon) canNotFindIcon->m_isDraw = canNotDraw;
 			if (frameB) frameB->m_isDraw = canNotDraw;
-			
+
 			if (canNotDraw)
 			{
 				if (canNotFindIcon) canNotFindIcon->m_transform.m_localTransform.m_position = iconPos;

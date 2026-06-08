@@ -22,10 +22,10 @@ namespace app
 
 
 			// カメラの初期化
-			g_camera3D->SetNear(0.01f);
-			g_camera3D->SetFar(5000.0f);
+			CameraSystem::Get().GetMainCamera().SetNear(0.01f);
+			CameraSystem::Get().GetMainCamera().SetFar(5000.0f);
 
-			Setup(g_camera3D);
+			Setup(&CameraSystem::Get().GetMainCamera());
 		}
 
 
@@ -147,7 +147,6 @@ namespace app
 			// 必要ならUpdateを呼ぶ
 			// m_engineCamera->Update(); 
 			//m_springCamera->Update();
-			g_camera3D->Update();
 		}
 	}
 }
