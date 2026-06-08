@@ -78,31 +78,10 @@ namespace app
 			bool FindNearestChaserOf(const actor::ChildPenguin* penguin, Vector3& outPos) const;
 
 
-		private:
-			EnemyManager();
-			~EnemyManager();
-
-
-		private:
-			/** エネミーとコントローラーのセット */
-			struct EnemyData
-			{
-				Enemy* enemy = nullptr;
-				EnemyController* controller = nullptr;
-			};
-
-			/** エネミーのリスト */
-			std::vector<EnemyData> m_enemyList;
-
-
-
-
 			//============================================//
 			// シングルトン関連
 			//============================================//
-
-		public:
-			/** インスタンスの生成 */
+				/** インスタンスの生成 */
 			static void CreateInstance()
 			{
 				if (m_instance == nullptr) {
@@ -125,6 +104,20 @@ namespace app
 
 
 		private:
+			EnemyManager();
+			~EnemyManager();
+
+			/** エネミーとコントローラーのセット */
+			struct EnemyData
+			{
+				Enemy* enemy = nullptr;
+				EnemyController* controller = nullptr;
+			};
+
+			/** エネミーのリスト */
+			std::vector<EnemyData> m_enemyList;
+
+
 			static EnemyManager* m_instance;
 		};
 	}// namespace actor

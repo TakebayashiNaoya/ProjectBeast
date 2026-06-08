@@ -105,6 +105,10 @@ namespace app
 			 * @brief 回避時の最大角度（ラジアン） = 90度
 			 */
 			constexpr float FLEE_DODGE_ANGLE_MAX = 1.570796f;
+			/**
+			 * @brief 左右どちらによけるかの確率
+			 */
+			constexpr float FLEE_SIGN_FLIP_CHANCE = 0.5f;
 
 
 			/**
@@ -521,7 +525,7 @@ namespace app
 				{
 					// 30%の確率で横方向（45～90度）へ回避する
 					std::uniform_real_distribution<float> angleDist(FLEE_DODGE_ANGLE_MIN, FLEE_DODGE_ANGLE_MAX);
-					const float sign = (RollUnit() < 0.5f) ? 1.0f : -1.0f;
+					const float sign = (RollUnit() < FLEE_SIGN_FLIP_CHANCE) ? 1.0f : -1.0f;
 					m_fleeAngleOffset = angleDist(GetRandomEngine()) * sign;
 				}
 				else
