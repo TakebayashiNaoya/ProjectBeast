@@ -94,6 +94,22 @@ namespace nsBeastEngine
 			m_spriteScale = scale;
 		}
 
+		/**
+		 * @brief 描画をブロックする（ポーズ画面の背後に隠す用途）
+		 * @details true のとき RenderToScreen は描画をスキップする。
+		 *          スライドアニメーションの状態は保持されるため、
+		 *          false に戻すと再び表示される。
+		 * @param blocked ブロックするか
+		 */
+		void SetRenderingBlocked(bool blocked) { m_renderingBlocked = blocked; }
+
+		/**
+		 * @brief サブカメラをアニメーションなしで即座に停止する
+		 * @details タイトル遷移時など、すぐに消す必要がある場合に使用する。
+		 *          End() と異なりスライドアウト演出は行わない。
+		 */
+		void ForceEnd();
+
 
 	private:
 		/**
@@ -111,6 +127,8 @@ namespace nsBeastEngine
 	private:
 		/** 動作中フラグ */
 		bool m_isActive = false;
+		/** 描画ブロックフラグ（ポーズ中など） */
+		bool m_renderingBlocked = false;
 		/** 表示したいか（DangerArrowSystemからセット） */
 		bool m_targetVisible = false;
 		/** スライドアウト完了後にスライドインする保留フラグ */

@@ -143,10 +143,25 @@ namespace nsBeastEngine
 	}
 
 
+	void SubCameraManager::ForceEnd()
+	{
+		if (!m_isActive) return;
+		m_isActive = false;
+		m_pendingEnd = false;
+		m_pendingShow = false;
+		m_targetVisible = false;
+		m_slideProgress = 0.0f;
+		m_pendingEndCallback = nullptr;
+		m_renderingBlocked = false;
+		CameraSystem::Get().DestroySubCamera();
+	}
+
+
 	void SubCameraManager::RenderToScreen(nsK2EngineLow::RenderContext& rc)
 	{
 		if (!m_isActive) return;
 		if (m_slideProgress < 0.01f) return;
+		if (m_renderingBlocked) return;
 
 		// スケール変化時に左下コーナーを固定する
 		// スケール=1 のとき SPRITE_POS_X/Y が中心座標。
