@@ -69,32 +69,19 @@ namespace app
 			/** 全エネミーの座標取得 */
 			std::vector<Vector3> GetPositionList() const;
 
-
-		private:
-			EnemyManager();
-			~EnemyManager();
-
-
-		private:
-			/** エネミーとコントローラーのセット */
-			struct EnemyData
-			{
-				Enemy* enemy = nullptr;
-				EnemyController* controller = nullptr;
-			};
-
-			/** エネミーのリスト */
-			std::vector<EnemyData> m_enemyList;
-
-
+			/**
+			 * @brief 指定ペンギンを追跡中の最近接エネミー座標を返す
+			 * @param penguin   チェック対象ペンギン
+			 * @param outPos    追跡中エネミーの座標（出力）
+			 * @return 追跡中エネミーが存在すればtrue
+			 */
+			bool FindNearestChaserOf(const actor::ChildPenguin* penguin, Vector3& outPos) const;
 
 
 			//============================================//
 			// シングルトン関連
 			//============================================//
-
-		public:
-			/** インスタンスの生成 */
+				/** インスタンスの生成 */
 			static void CreateInstance()
 			{
 				if (m_instance == nullptr) {
@@ -117,6 +104,20 @@ namespace app
 
 
 		private:
+			EnemyManager();
+			~EnemyManager();
+
+			/** エネミーとコントローラーのセット */
+			struct EnemyData
+			{
+				Enemy* enemy = nullptr;
+				EnemyController* controller = nullptr;
+			};
+
+			/** エネミーのリスト */
+			std::vector<EnemyData> m_enemyList;
+
+
 			static EnemyManager* m_instance;
 		};
 	}// namespace actor
