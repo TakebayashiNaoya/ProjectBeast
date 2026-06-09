@@ -11,6 +11,6 @@
         "maxEat":3,
         "maxStamina":30.0,
         "staminaDrainRate": 1.0,
-        "lostChaseDistance": 800.0
+        "lostChaseDistance": 700.0
     }
 ]
