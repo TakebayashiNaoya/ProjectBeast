@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "DebugScene.h"
 #include "TutorialInGameScene.h"
-#include "InGameScene.h"
+#include "NormalInGameScene.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Layout.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
@@ -201,7 +201,7 @@ namespace app
 	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		if (m_nextScene) {
-			id = InGameScene::ID();
+			id = NormalInGameScene::ID();
 			waitTime = 3.0f;
 			return true;
 		}

@@ -186,7 +186,7 @@
     <ClCompile Include="Source\Scene\TitleScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scene\InGameScene.cpp">
+    <ClCompile Include="Source\Scene\NormalInGameScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scene\ResultScene.cpp">
@@ -581,7 +581,7 @@
     <ClInclude Include="Source\Scene\TitleScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scene\InGameScene.h">
+    <ClInclude Include="Source\Scene\NormalInGameScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\ResultScene.h">

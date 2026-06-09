@@ -6,7 +6,7 @@
 #include "stdafx.h"
 
 #include "DebugScene.h"
-#include "InGameScene.h"
+#include "NormalInGameScene.h"
 #include "TutorialInGameScene.h"
 #include "ResultScene.h"
 #include "SceneManager.h"
@@ -27,7 +27,7 @@ namespace app
 		// ここでシーン追加
 		AddSceneMap<app::DebugScene>();
 		AddSceneMap<app::TitleScene>();
-		AddSceneMap<app::InGameScene>();
+		AddSceneMap<app::NormalInGameScene>();
 		AddSceneMap<app::TutorialInGameScene>();
 		AddSceneMap<app::ResultScene>();
 

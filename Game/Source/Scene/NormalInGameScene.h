@@ -1,5 +1,5 @@
 ﻿/**
- * @file InGameScene.h
+ * @file NormalInGameScene.h
  * @brief インゲームシーン（ノーマルステージ）
  * @author 立山、竹林
  */
@@ -14,9 +14,9 @@ namespace app
 	 * @detail ステージ固有のパラメータを返す。
 	 *         ゲームロジックは InGameSceneBase が担う。
 	 */
-	class InGameScene : public InGameSceneBase
+	class NormalInGameScene : public InGameSceneBase
 	{
-		appScene(InGameScene);
+		appScene(NormalInGameScene);
 
 	protected:
 		float GetTimeLimit() const override { return 180.0f; }
