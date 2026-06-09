@@ -6,6 +6,7 @@
 #pragma once
 #include "Source/Core/HierarchicalTransform.h"
 #include "Source/UI/Animation/UIAnimation.h"
+#include "Graphics/Video/VideoRender.h"
 #include <unordered_map>
 
 
@@ -536,6 +537,50 @@ namespace app
 		private:
 			nsBeastEngine::FontRender m_fontRender;
 			float m_scale;
+		};
+
+
+
+		/** @brief UIVideo の初期化データ */
+		struct UIVideoInitData
+		{
+			const char* clipPath = "";      ///< フォルダパス（末尾 /）または動画ファイルパス
+			float       width    = 1920.0f; ///< 表示幅（ピクセル）
+			float       height   = 1080.0f; ///< 表示高さ（ピクセル）
+			float       fps      = 24.0f;   ///< コマ撮りの FPS
+			bool        loop     = false;   ///< ループ再生
+			bool        autoPlay = true;    ///< 初期化後すぐに再生開始
+		};
+
+
+		/**
+		 * @brief 映像を再生できる UI パーツ
+		 * @details
+		 *   JSON では type: "UIVideo" として配置する。
+		 *   clipPath にフォルダパス（末尾 /）を指定するとコマ撮り（PNG/JPG）を再生する。
+		 */
+		class UIVideo : public UIBase
+		{
+		public:
+			UIVideo();
+			~UIVideo();
+
+			void Update() override;
+			void Render(RenderContext& rc) override;
+
+			void Initialize(const UIVideoInitData& data);
+
+			void Play()  { m_videoRender.Play(); }
+			void Pause() { m_videoRender.Pause(); }
+			void Stop()  { m_videoRender.Stop(); }
+			void SetLoop(bool loop)            { m_videoRender.SetLoop(loop); }
+			void SetPlaybackSpeed(float speed) { m_videoRender.SetPlaybackSpeed(speed); }
+			void SetOnFinished(std::function<void()> cb) { m_videoRender.SetOnFinished(cb); }
+			bool IsPlaying()  const { return m_videoRender.IsPlaying(); }
+			bool IsFinished() const { return m_videoRender.IsFinished(); }
+
+		private:
+			nsBeastEngine::VideoRender m_videoRender;
 		};
 
 

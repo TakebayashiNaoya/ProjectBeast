@@ -44,6 +44,15 @@
     <ClCompile Include="Graphics\PostEffect\PostEffectManager.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
+    <ClCompile Include="Graphics\Video\stb_image_impl.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+    </ClCompile>
+    <ClCompile Include="Graphics\Video\VideoClip.cpp" />
+    <ClCompile Include="Graphics\Video\VideoFrameTexture.cpp" />
+    <ClCompile Include="Graphics\Video\VideoPlayer.cpp" />
+    <ClCompile Include="Graphics\Video\VideoRender.cpp" />
     <ClCompile Include="Nature\SkyCube.cpp" />
     <ClCompile Include="Physics\BoundingVolume.cpp" />
     <ClCompile Include="Physics\BoxCollider.cpp" />
@@ -91,6 +100,11 @@
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\RenderViewContext.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
+    <ClInclude Include="Graphics\Video\stb_image.h" />
+    <ClInclude Include="Graphics\Video\VideoClip.h" />
+    <ClInclude Include="Graphics\Video\VideoFrameTexture.h" />
+    <ClInclude Include="Graphics\Video\VideoPlayer.h" />
+    <ClInclude Include="Graphics\Video\VideoRender.h" />
     <ClInclude Include="Nature\INatureObject.h" />
     <ClInclude Include="Nature\SkyCube.h" />
     <ClInclude Include="Physics\BoundingVolume.h" />
