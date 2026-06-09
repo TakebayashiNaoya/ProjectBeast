@@ -1,0 +1,28 @@
+[
+    {
+        "comment" : "ステージセレクト画面に使うパラメーター",
+        "inputInterval" : 0.2,
+        "inputThreshold" : 0.5,
+
+
+        "stageSlectPosition" : [-500,400,0],
+        
+        "choicesYOffset" : -280,
+        "tutorialPositionX" : -450,
+        "easyPositionX" : -150,
+        "normalPositionX" : 150,
+        "hardPositionX" : 450,
+        "choicesTextColor" : [180, 210, 245, 255],
+        
+
+        "buttonBGPosition" : [530, -400, 0],        
+        "buttonXOffset" : 70,
+        "buttonYOffset" : -400,
+        "backButtonPositionX" : 620,
+        "decideButtonPositionX" : 470,
+        "selectButtonPositionX" : 320,
+        
+
+        "textBGColor" : [128, 128, 128, 225]
+    }
+]

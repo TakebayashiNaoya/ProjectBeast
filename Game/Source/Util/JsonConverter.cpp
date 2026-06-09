@@ -10,7 +10,8 @@
 
 #include <fstream>
 
-#define ERROR_ASSERT K2_ASSERT(false, "キーが無効です。");
+#define NO_CONTAINS K2_ASSERT(false, "キーが存在しません。");
+#define VALUE_DIFFER K2_ASSERT(false, "値が無効です。");
 
 namespace app
 {
@@ -61,134 +62,138 @@ namespace app
 
 		bool JsonConverter::ToBool(const nlohmann::json& json, const char* key)
 		{
-			if (json.contains(key) && json[key].is_boolean())
-			{
-				return json[key].get<bool>();
-			}
-			ERROR_ASSERT;
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_boolean()) VALUE_DIFFER;
+
+			bool result = json.contains(key) && json[key].is_boolean();
+
+			if (result) return json[key].get<bool>();
+
 			return InvalidBool;
 		}
 
 
 		int JsonConverter::ToInt(const nlohmann::json& json, const char* key)
 		{
-			if (json.contains(key) && json[key].is_number_integer())
-			{
-				return json[key].get<int>();
-			}
-			ERROR_ASSERT;
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_number_integer()) VALUE_DIFFER;
+
+			bool result = json.contains(key) && json[key].is_number_integer();
+
+			if (result) return json[key].get<int>();
+
 			return InvalidInt;
 		}
 
 
 		uint32_t JsonConverter::ToUInt32(const nlohmann::json& json, const char* key)
 		{
-			if (json.contains(key) && json[key].is_number_unsigned())
-			{
-				return json[key].get<uint32_t>();
-			}
-			ERROR_ASSERT;
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_number_unsigned()) VALUE_DIFFER;
+
+			bool result = json.contains(key) && json[key].is_number_unsigned();
+
+			if (result) return json[key].get<uint32_t>();
+
 			return InvalidUInt32;
 		}
 
 
 		float JsonConverter::ToFloat(const nlohmann::json& json, const char* key)
 		{
-			if (json.contains(key) && json[key].is_number())
-			{
-				return json[key].get<float>();
-			}
-			ERROR_ASSERT;
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_number()) VALUE_DIFFER;
+
+			bool result = json.contains(key) && json[key].is_number();
+
+			if (result) return json[key].get<float>();
+
 			return InvalidFloat;
 		}
 
 
 		std::string JsonConverter::ToString(const nlohmann::json& json, const char* key)
 		{
-			if (json.contains(key) && json[key].is_string())
-			{
-				return json[key].get<std::string>();
-			}
-			ERROR_ASSERT;
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_string()) VALUE_DIFFER;
+
+			bool result = json.contains(key) && json[key].is_string();
+
+			if (result) return json[key].get<std::string>();
+
 			return InvalidString;
 		}
 
 
 		Vector2 JsonConverter::ToVector2(const nlohmann::json& json, const char* key)
 		{
-			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 2)
-			{
-				ERROR_ASSERT;
-				return InvalidVector2;
-			}
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_array() || json[key].size() != 2) VALUE_DIFFER;
 
 			const auto& array = json[key];
+			bool result = json.contains(key) && json[key].is_array() && json[key].size() == 2;
 
-			for (int i = 0; i < 2; i++)
+			for (size_t i = 0; i < json[key].size(); i++)
 			{
-				if (!array[i].is_number())
-				{
-					ERROR_ASSERT;
-					return InvalidVector2;
-				}
+				if (!array[i].is_number()) VALUE_DIFFER;
+
+				result = result && array[i].is_number();
 			}
 
-			return Vector2(
+			if (result) return Vector2(
 				array[0].get<float>(),
 				array[1].get<float>()
 			);
+
+			return InvalidVector2;
 		}
 
 
 		Vector3 JsonConverter::ToVector3(const nlohmann::json& json, const char* key)
 		{
-			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 3)
-			{
-				ERROR_ASSERT;
-				return InvalidVector3;
-			}
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_array() || json[key].size() != 3) VALUE_DIFFER;
 
 			const auto& array = json[key];
+			bool result = json.contains(key) && json[key].is_array() && json[key].size() == 3;
 
-			for (int i = 0; i < 3; i++)
+			for (size_t i = 0; i < json[key].size(); i++)
 			{
-				if (!array[i].is_number())
-				{
-					ERROR_ASSERT;
-					return InvalidVector3;
-				}
+				if (!array[i].is_number()) VALUE_DIFFER;
+
+				result = result && array[i].is_number();
 			}
 
-			return Vector3(
+			if (result) return Vector3(
 				array[0].get<float>(),
 				array[1].get<float>(),
 				array[2].get<float>()
 			);
+
+			return InvalidVector3;
 		}
 
 
 		Vector3 JsonConverter::ToVector3(const nlohmann::json& json)
 		{
-			if (!json.is_array() || json.size() != 3)
+			if (!json.is_array() || json.size() != 3) VALUE_DIFFER;
+
+			bool result = json.is_array() && json.size() == 3;
+
+			for (size_t i = 0; i < json.size(); i++)
 			{
-				ERROR_ASSERT;
-				return InvalidVector3;
+				if (!json[i].is_number()) VALUE_DIFFER;
+
+				result = result && json[i].is_number();
 			}
 
-			for (int i = 0; i < 3; i++)
-			{
-				if (!json[i].is_number())
-				{
-					ERROR_ASSERT;
-					return InvalidVector3;
-				}
-			}
-
-			return Vector3(
+			if (result) return Vector3(
 				json[0].get<float>(),
 				json[1].get<float>(),
 				json[2].get<float>()
 			);
+
+			return InvalidVector3;
 		}
 
 
@@ -198,24 +203,24 @@ namespace app
 			constexpr float maxValue = 1.0f;
 			constexpr float convertValue = 255.0f;
 
-			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 4)
-			{
-				ERROR_ASSERT;
-				return InvalidVector4;
-			}
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_array() || json[key].size() != 4) VALUE_DIFFER;
 
 			const auto& array = json[key];
 
-			for (int i = 0; i < 4; i++)
+			bool result = json.contains(key) && json[key].is_array() && json[key].size() == 4;
+
+			for (size_t i = 0; i < json[key].size(); i++)
 			{
-				if (!array[i].is_number())
-				{
-					ERROR_ASSERT;
-					return InvalidVector4;
-				}
+				if (!array[i].is_number()) VALUE_DIFFER;
+
+				result = result && array[i].is_number();
 			}
 
-			Vector4 result(
+			if (!result) return InvalidVector4;
+
+
+			Vector4 color(
 				array[0].get<float>(),
 				array[1].get<float>(),
 				array[2].get<float>(),
@@ -224,39 +229,38 @@ namespace app
 
 			if (isConvert)
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					result.v[i] = clamp(result.v[i] / convertValue, minValue, maxValue);
-				}
+				color.x = clamp(color.x / convertValue, minValue, maxValue);
+				color.y = clamp(color.y / convertValue, minValue, maxValue);
+				color.z = clamp(color.z / convertValue, minValue, maxValue);
+				color.w = clamp(color.w / convertValue, minValue, maxValue);
 			}
 
-			return result;
+			return color;
 		}
 
 
 		FloatRange JsonConverter::ToFloatRange(const nlohmann::json& json, const char* key)
 		{
-			if (!json.contains(key) || !json[key].is_array() || json[key].size() != 2)
-			{
-				ERROR_ASSERT;
-				return InvalidFloatRange;
-			}
+			if (!json.contains(key)) NO_CONTAINS;
+			if (!json[key].is_array() || json[key].size() != 2) VALUE_DIFFER;
 
 			const auto& array = json[key];
 
-			for (int i = 0; i < 2; i++)
+			bool result = json.contains(key) && json[key].is_array() && json[key].size() == 2;
+
+			for (size_t i = 0; i < json[key].size(); i++)
 			{
-				if (!array[i].is_number())
-				{
-					ERROR_ASSERT;
-					return InvalidFloatRange;
-				}
+				if (!array[i].is_number()) VALUE_DIFFER;
+
+				result = result && array[i].is_number();
 			}
 
-			return FloatRange{
+			if (result) return FloatRange{
 				array[0].get<float>(),
 				array[1].get<float>()
 			};
+
+			return InvalidFloatRange;
 		}
 	}
 }

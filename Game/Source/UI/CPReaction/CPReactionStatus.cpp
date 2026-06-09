@@ -49,7 +49,7 @@ namespace app
 		}
 
 
-		void CPReactionStatus::SetUpUI()
+		void CPReactionStatus::SetUp()
 		{
 			// 読み込んだパラメーター取得
 			const auto* parameter = core::ParameterManager::Get()->GetParameter<MasterCPReactionParameter>();
@@ -69,7 +69,7 @@ namespace app
 
 		void CPReactionStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

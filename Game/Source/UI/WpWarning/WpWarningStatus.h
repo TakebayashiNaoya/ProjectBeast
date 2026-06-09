@@ -20,7 +20,7 @@ namespace app
 
 		public:
 			/** @brief UIのロジック初期化処理 */
-			void SetUpUI() override final;
+			void SetUp() override final;
 			/** @brief UIの更新処理 */
 			void Update() override final;
 

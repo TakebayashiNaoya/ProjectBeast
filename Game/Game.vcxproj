@@ -281,6 +281,7 @@
     <ClCompile Include="Source\Core\Fade.cpp" />
     <ClCompile Include="Source\Core\HierarchicalTransform.cpp" />
     <ClCompile Include="Source\Core\IMasterParameter.cpp" />
+    <ClCompile Include="Source\Core\IStatus.cpp" />
     <ClCompile Include="Source\Core\ParameterManager.cpp" />
     <ClCompile Include="Source\Core\StateMachineBase.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
@@ -347,6 +348,9 @@
     <ClCompile Include="Source\UI\Parts\UIParts.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingAnimStatus.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp" />
+    <ClCompile Include="Source\UI\StageSelect\MasterStageSelectParameter.cpp" />
+    <ClCompile Include="Source\UI\StageSelect\StageSelectMenu.cpp" />
+    <ClCompile Include="Source\UI\StageSelect\StageSelectStatus.cpp" />
     <ClCompile Include="Source\UI\WpWarning\MasterWpWarningParameter.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningAnimStatus.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningMenu.cpp" />
@@ -418,6 +422,7 @@
     <ClInclude Include="Source\Core\Fade.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
     <ClInclude Include="Source\Core\IMasterParameter.h" />
+    <ClInclude Include="Source\Core\IStatus.h" />
     <ClInclude Include="Source\Core\ParameterManager.h" />
     <ClInclude Include="Source\Core\StateMachineBase.h" />
     <ClInclude Include="Source\Core\Transform.h" />
@@ -494,6 +499,9 @@
     <ClInclude Include="Source\UI\Parts\UIParts.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingChildMenu.h" />
+    <ClInclude Include="Source\UI\StageSelect\MasterStageSelectParameter.h" />
+    <ClInclude Include="Source\UI\StageSelect\StageSelectMenu.h" />
+    <ClInclude Include="Source\UI\StageSelect\StageSelectStatus.h" />
     <ClInclude Include="Source\UI\System\SystemPacket.h" />
     <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h" />

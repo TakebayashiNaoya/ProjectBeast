@@ -5,18 +5,16 @@
  */
 #include "stdafx.h"
 #include "Layout.h"
+
+#include "Source/Util/CRC32.h"
+
 #include <fstream>
 #include <sys/stat.h>
 #include <Windows.h>
-#include "Source/Util/CRC32.h"
 
 
 namespace
 {
-	/** カラーに使う用の値 */
-	constexpr float COLOR_VALUE = 255.0f;
-
-
 	/**
 	 * @brief UTF-8(JSONの文字列)をShift-JIS(Windowsアプリ用)に変換する
 	 */
@@ -36,47 +34,6 @@ namespace
 /**
  * @brief パース関連
  */
-Vector2 ParseVector2(const nlohmann::json& arr)
-{
-	return Vector2(
-		arr[0].get<float>(),
-		arr[1].get<float>()
-	);
-}
-
-
-Vector3 ParseVector3(const nlohmann::json& arr)
-{
-	return Vector3(
-		arr[0].get<float>(),
-		arr[1].get<float>(),
-		arr[2].get<float>()
-	);
-}
-
-
-Vector4 ParseVector4(const nlohmann::json& arr)
-{
-	return Vector4(
-		arr[0].get<float>(),
-		arr[1].get<float>(),
-		arr[2].get<float>(),
-		arr[3].get<float>()
-	);
-}
-
-
-Vector4 ParseColor(const nlohmann::json& arr)
-{
-	return Vector4(
-		arr[0].get<float>() / COLOR_VALUE,
-		arr[1].get<float>() / COLOR_VALUE,
-		arr[2].get<float>() / COLOR_VALUE,
-		arr[3].get<float>() / COLOR_VALUE
-	);
-}
-
-
 Quaternion ParseRotation(const float rotation)
 {
 	Quaternion q;
@@ -97,21 +54,21 @@ void InitializeUIParts(T* parts, const nlohmann::json& item)
 
 void InitializeUIParts(app::ui::UICircleGauge* gauge, const nlohmann::json& item)
 {
-	const std::string asset = item["asset"].get<std::string>();
-	const std::string fx = item["fx"].get<std::string>();
-	const float w = item["width"].get<float>();
-	const float h = item["height"].get<float>();
-	const Vector3 position = ParseVector3(item["position"]);
-	const Vector3 scale = ParseVector3(item["scale"]);
-	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
-	const Vector2 pivot = ParseVector2(item["pivot"]);
-	const Vector4 gaugeColor = ParseColor(item["gaugeColor"]);
-	const Vector4 bgColor = ParseColor(item["bgColor"]);
-	const float innerRadius = item["innerRadius"].get<float>();
-	const float outerRadius = item["outerRadius"].get<float>();
+	const std::string asset = app::util::JsonConverter::ToString(item, "asset");
+	const std::string fx = app::util::JsonConverter::ToString(item, "fx");
+	const float w = app::util::JsonConverter::ToFloat(item, "width");
+	const float h = app::util::JsonConverter::ToFloat(item, "height");
+	const Vector3 position = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3 scale = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector2 pivot = app::util::JsonConverter::ToVector2(item, "pivot");
+	const Vector4 gaugeColor = app::util::JsonConverter::ToVector4(item, "gaugeColor");
+	const Vector4 bgColor = app::util::JsonConverter::ToVector4(item, "bgColor");
+	const float innerRadius = app::util::JsonConverter::ToFloat(item, "innerRadius");
+	const float outerRadius = app::util::JsonConverter::ToFloat(item, "outerRadius");
 
 
-	gauge->Initialize(asset.c_str(),fx.c_str(), w, h, position, scale, rotation, pivot, gaugeColor, bgColor, innerRadius, outerRadius);
+	gauge->Initialize(asset.c_str(), fx.c_str(), w, h, position, scale, rotation, pivot, gaugeColor, bgColor, innerRadius, outerRadius);
 	gauge->m_transform.m_localTransform.m_position = position;
 	gauge->m_transform.m_localTransform.m_scale = scale;
 	gauge->m_transform.m_localTransform.m_rotation = rotation;
@@ -122,13 +79,13 @@ void InitializeUIParts(app::ui::UICircleGauge* gauge, const nlohmann::json& item
 
 void InitializeUIParts(app::ui::UIIcon* image, const nlohmann::json& item)
 {
-	const std::string assetName = item["asset"].get<std::string>();
-	const float w = item["width"].get<float>();
-	const float h = item["height"].get<float>();
-	const Vector3 position = ParseVector3(item["position"]);
-	const Vector3 scale = ParseVector3(item["scale"]);
-	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
-	const Vector4 color = ParseColor(item["color"]);
+	const std::string assetName = app::util::JsonConverter::ToString(item, "asset");
+	const float w = app::util::JsonConverter::ToFloat(item, "width");
+	const float h = app::util::JsonConverter::ToFloat(item, "height");
+	const Vector3 position = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3 scale = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector4 color = app::util::JsonConverter::ToVector4(item, "color");
 
 
 	image->Initialize(assetName.c_str(), w, h, position, scale, rotation, color);
@@ -141,14 +98,14 @@ void InitializeUIParts(app::ui::UIIcon* image, const nlohmann::json& item)
 
 void InitializeUIParts(app::ui::UIGauge* gauge, const nlohmann::json& item)
 {
-	const std::string asset = item["asset"].get<std::string>();
-	const float w = item["width"].get<float>();
-	const float h = item["height"].get<float>();
-	const Vector3 position = ParseVector3(item["position"]);
-	const Vector3 scale = ParseVector3(item["scale"]);
-	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
-	const Vector4 color = ParseColor(item["color"]);
-	const Vector2 pivot = ParseVector2(item["pivot"]);
+	const std::string asset = app::util::JsonConverter::ToString(item, "asset");
+	const float w = app::util::JsonConverter::ToFloat(item, "width");
+	const float h = app::util::JsonConverter::ToFloat(item, "height");
+	const Vector3 position = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3 scale = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector4 color = app::util::JsonConverter::ToVector4(item, "color");
+	const Vector2 pivot = app::util::JsonConverter::ToVector2(item, "pivot");
 
 
 	gauge->Initialize(asset.c_str(), w, h, position, scale, rotation, color, pivot);
@@ -162,16 +119,16 @@ void InitializeUIParts(app::ui::UIGauge* gauge, const nlohmann::json& item)
 
 void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
 {
-	const std::string asset = item["asset"].get<std::string>();
-	const float w = item["width"].get<float>();
-	const float h = item["height"].get<float>();
-	const Vector3 position = ParseVector3(item["position"]);
-	const Vector3 scale = ParseVector3(item["scale"]);
-	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
-	const Vector4 color = ParseColor(item["color"]);
+	const std::string asset = app::util::JsonConverter::ToString(item, "asset");
+	const float w = app::util::JsonConverter::ToFloat(item, "width");
+	const float h = app::util::JsonConverter::ToFloat(item, "height");
+	const Vector3 position = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3 scale = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector4 color = app::util::JsonConverter::ToVector4(item, "color");
 
 
-	button->Initialize(asset.c_str(), w, h, position, scale, rotation,color);
+	button->Initialize(asset.c_str(), w, h, position, scale, rotation, color);
 	button->m_transform.m_localTransform.m_position = position;
 	button->m_transform.m_localTransform.m_scale = scale;
 	button->m_transform.m_localTransform.m_rotation = rotation;
@@ -181,14 +138,14 @@ void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
 
 void InitializeUIParts(app::ui::UIDigit* digit, const nlohmann::json& item)
 {
-	const std::string asset = item["asset"].get<std::string>();
-	const int digitNumber = item["digit"].get<int>();
-	const int number = item["number"].get<int>();
-	const float w = item["width"].get<float>();
-	const float h = item["height"].get<float>();
-	const Vector3 position = ParseVector3(item["position"]);
-	const Vector3 scale = ParseVector3(item["scale"]);
-	const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
+	const std::string asset = app::util::JsonConverter::ToString(item, "asset");
+	const int digitNumber = app::util::JsonConverter::ToInt(item, "digit");
+	const int number = app::util::JsonConverter::ToInt(item, "number");
+	const float w = app::util::JsonConverter::ToFloat(item, "width");
+	const float h = app::util::JsonConverter::ToFloat(item, "height");
+	const Vector3 position = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3 scale = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
 
 
 	digit->Initialize(asset.c_str(), digitNumber, number, w, h, position, scale, rotation);
@@ -210,14 +167,11 @@ namespace app
 
 #ifdef APP_ENABLE_LAYOUT_HOTRELOAD
 			/** ホットリロードチェック */
-			struct stat st;
-			if (stat(m_filePath.c_str(), &st) == 0)
+			if (app::util::JsonConverter::CheckFileModified(m_filePath, m_lastUpdateTime))
 			{
-				if (m_lastUpdateTime != st.st_mtime)
-				{
-					m_lastUpdateTime = st.st_mtime;
-					Reload();
-				}
+				// 更新日時を最新に上書きしてからReload
+				m_lastUpdateTime = app::util::JsonConverter::GetFileLastWriteTime(m_filePath.c_str());
+				Reload();
 			}
 #endif //APP_ENABLE_LAYOUT_HOTRELOAD
 		}
@@ -233,7 +187,7 @@ namespace app
 		{
 			std::ifstream file(m_filePath);
 			if (!file.is_open())return;
-			
+
 			nlohmann::json j;
 			file >> j;
 

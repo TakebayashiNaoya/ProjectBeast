@@ -34,7 +34,7 @@ namespace app
 		}
 
 
-		void WpWarningStatus::SetUpUI()
+		void WpWarningStatus::SetUp()
 		{
 			auto* parameter = core::ParameterManager::Get()->GetParameter<MasterWpWarningParameter>();
 
@@ -46,7 +46,7 @@ namespace app
 
 		void WpWarningStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

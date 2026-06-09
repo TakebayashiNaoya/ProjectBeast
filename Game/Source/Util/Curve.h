@@ -1,10 +1,9 @@
 ﻿/**
  * @file Curve.h
  * @brief 線形補間のCurve処理群
- * @author 忽那
+ * @author 忽那, 藤谷
  */
 #pragma once
-#include <algorithm>
 
 
 namespace app
@@ -71,8 +70,7 @@ namespace app
 				, m_currentTime(0.0f)
 				, m_isPlaying(false)
 				, m_direction(0)
-			{
-			}
+			{}
 
 
 			/**
@@ -245,5 +243,141 @@ namespace app
 		using Vector2Curve = Curve<Vector2>;
 		using Vector3Curve = Curve<Vector3>;
 		using Vector4Curve = Curve<Vector4>;
+
+
+
+
+		/********************************************************************/
+
+
+		/**
+		 * @brief 二次ベジェ曲線のクラス
+		 * @tparam T ベジェ曲線の型（Vector2、Vector3のみ）
+		 * @details 始点、制御点、終点の3点を使って曲線を描く
+		 *			制御点は曲がる方向と強さを決める点
+		 *			時間経過に応じて現在の値を取得できる
+		 */
+		template<typename T>
+		class QuadraticBezierCurve
+		{
+		private:
+			/** 始める数値 (P0) */
+			T m_startValue;
+			/** 制御点 (P1) 曲がる方向と強さを決める点 */
+			T m_controlValue;
+			/** 終わる数値 (P2) */
+			T m_endValue;
+			/** 時間の間隔 */
+			float m_duration;
+			/** 現在の時間 */
+			float m_currentTime;
+			/** ループモード */
+			LoopMode m_loopMode;
+			/** 再生するかどうか */
+			bool m_isPlaying;
+			/** 方向 */
+			int m_direction;
+
+
+		public:
+			QuadraticBezierCurve()
+				: m_duration(1.0f)
+				, m_currentTime(0.0f)
+				, m_loopMode(LoopMode::Once)
+				, m_isPlaying(false)
+				, m_direction(1)
+			{}
+
+			/**
+			 * @brief 初期化
+			 * @param start 始める位置
+			 * @param control 制御点（この点に向かってカーブします）
+			 * @param end 終わる位置
+			 * @param timeSec 時間
+			 */
+			void Initialize(
+				const T& start,
+				const T& control,
+				const T& end,
+				const float timeSec,
+				LoopMode loopMode = LoopMode::Once
+			)
+			{
+				m_startValue = start;
+				m_controlValue = control;
+				m_endValue = end;
+				m_duration = std::max<float>(0.0001f, timeSec);
+				m_currentTime = 0.0f;
+				m_loopMode = loopMode;
+				m_direction = 1;
+			}
+
+			/** 再生 */
+			void Play() { m_isPlaying = true; }
+
+			/** 停止 */
+			void Stop() { m_isPlaying = false; }
+
+			/** 更新 */
+			void Update(float deltaTime)
+			{
+				/** 再生していなければ何もしない */
+				if (!m_isPlaying)return;
+
+				/** 時間を進める */
+				m_currentTime += m_loopMode == LoopMode::PingPong ? deltaTime * m_direction : deltaTime;
+
+				/** 終了判定とループ判定 */
+				if (m_currentTime >= m_duration)
+				{
+					if (m_loopMode == LoopMode::Once)
+					{
+						m_currentTime = m_duration;
+						m_isPlaying = false;
+					}
+					else if (m_loopMode == LoopMode::Loop)
+					{
+						m_currentTime = 0.0f;
+					}
+					else if (m_loopMode == LoopMode::PingPong)
+					{
+						m_currentTime = m_duration;
+						m_direction = -1;
+					}
+				}
+				else if (m_currentTime <= 0.0f)
+				{
+					if (m_loopMode == LoopMode::PingPong)
+					{
+						m_currentTime = 0.0f;
+						m_direction = 1;
+					}
+				}
+			}
+
+			/** 現在の値（座標）を取得 */
+			const T GetCurrentValue() const
+			{
+				// 進行度 t を 0.0 ~ 1.0 にクランプ
+				float t = clamp<float>(m_currentTime / m_duration, 0.0f, 1.0f);
+
+				// ベジェ曲線の計算に必要な (1 - t)
+				float u = 1.0f - t;
+
+				// (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
+				return (m_startValue * (u * u)) +
+					(m_controlValue * (2.0f * u * t)) +
+					(m_endValue * (t * t));
+			}
+
+			/** 再生中かどうかを取得 */
+			bool IsPlaying() const { return m_isPlaying; }
+		};
+
+		// using宣言の例
+		/** Vector2型の二次ベジェ曲線 */
+		using Vector2BezierCurve = QuadraticBezierCurve<Vector2>;
+		/** Vector3型の二次ベジェ曲線 */
+		using Vector3BezierCurve = QuadraticBezierCurve<Vector3>;
 	}
 }

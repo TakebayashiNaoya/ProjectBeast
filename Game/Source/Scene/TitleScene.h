@@ -6,15 +6,17 @@
 #pragma once
 #include "IScene.h"
 
+#include "Source/UI/System/SystemPacket.h"
+
 
 namespace app
 {
 	namespace ui
 	{
-		class Layout;
 		class SoundOptionMenu;
 		class TitleEventMenu;
 		class TutorialMenu;
+		class StageSelectMenu;
 	}
 
 	class TitleScene :public IScene
@@ -33,10 +35,23 @@ namespace app
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
+
+	private:
+		/** @brief タイトル画面の更新 */
+		void TitleUpdate();
+		/** @brief ステージ選択画面の更新 */
+		void StageSelectUpdate();
+		/** @brief サウンドオプション画面の更新 */
+		void SoundOptionUpdate();
+		/** @brief チュートリアル画面の更新 */
+		void TutorialUpdate();
+
+
 	private:
 		enum class TitleState
 		{
 			Title,
+			StageSelect,
 			SoundOption,
 			Tutorial
 		};
@@ -48,18 +63,9 @@ namespace app
 
 
 	private:
-		SpriteRender m_titleRender;
-		SpriteRender m_AButton;
-		SpriteRender m_XButton;
-		SpriteRender m_PenTakt;
-
-
-	private:
-		ui::Layout* m_titleLayout;
-		ui::Layout* m_soundOptionLayout;
-		ui::Layout* m_tutorialLayout;
-		ui::SoundOptionMenu* m_soundOption;
-		ui::TitleEventMenu* m_titleEventMenu;
-		ui::TutorialMenu* m_tutorialMenu;
+		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
+		ui::UIPacket<ui::SoundOptionMenu> m_soundOptionPacket;
+		ui::UIPacket<ui::TutorialMenu> m_tutorialPacket;
+		ui::UIPacket<ui::StageSelectMenu> m_stageSelectPacket;
 	};
 }

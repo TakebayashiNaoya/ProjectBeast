@@ -39,7 +39,7 @@ namespace app
 
 
 		public:
-			void SetUpUI() override final;
+			void SetUp() override final;
 			void Update() override final;
 
 

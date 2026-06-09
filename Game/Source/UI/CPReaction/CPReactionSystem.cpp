@@ -37,7 +37,7 @@ namespace app
 		void CPReactionSystem::Initialize()
 		{
 			m_reactionStatusParent = std::make_unique<CPReactionStatus>();
-			m_reactionStatusParent->SetUpUI();
+			m_reactionStatusParent->SetUp();
 
 			for (int i = 0; i < REACTION_PACKET_NUM; ++i)
 			{

@@ -5,8 +5,8 @@
  */
 #include "stdafx.h"
 #include "PBWakingUpTimerMenu.h"
-#include "Source/UI/Model/PBWakingUpTimerAnimStatus.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
+#include "Source/UI/Model/PBWakingUpTimerAnimStatus.h"
 
 
 namespace app
@@ -24,13 +24,13 @@ namespace app
 			// シロクマ専用UIAnimationStatusを生成。
 			m_pbAnimStatus = std::make_unique<PBWakingUpTimerAnimStatus>();
 			// シロクマ専用のセットアップUIを呼び出す。
-			m_pbAnimStatus->SetUpUI();
+			m_pbAnimStatus->SetUp();
 
 			// シロクマ専用UIのステータスを生成。
 			m_pbTimerStatus = std::make_unique<PBWakingUpTimerStatus>();
 
 			// シロクマ専用UIのセットアップUIを呼び出す。
-			m_pbTimerStatus->SetUpUI();
+			m_pbTimerStatus->SetUp();
 		}
 
 

@@ -24,18 +24,17 @@ namespace app
 			// JSONファイルからUIAnimationパラメーターを読み込む。
 			UIAnimationParameter::Get().Load(JSON_PATH);
 		}
-		
-		
+
+
 		PBWakingUpTimerAnimStatus::~PBWakingUpTimerAnimStatus()
-		{
-		}
-		
-		
-		void PBWakingUpTimerAnimStatus::SetUpUI()
+		{}
+
+
+		void PBWakingUpTimerAnimStatus::SetUp()
 		{
 			// UIAnimationParameterのシングルトンインスタンスを取得。
 			const auto& param = UIAnimationParameter::Get();
-			
+
 			// PB起床タイマー専用のfirstアニメーションの定義を取得。
 			const auto* first = param.Find(animKey::PB_CIRCLE_COLOR_FIRST_ANIM_KEY);
 			if (!first)return;
@@ -61,7 +60,7 @@ namespace app
 			// PB起床タイマー専用のthirdAnimationの定義を取得。
 			const auto* third = param.Find(animKey::PB_CIRCLE_COLOR_THIRD_ANIM_KEY);
 			if (!third)return;
-			if(third)
+			if (third)
 			{
 				m_thirdAnimData.startColor = third->startV4;
 				m_thirdAnimData.endColor = third->endV4;
@@ -70,11 +69,11 @@ namespace app
 				m_thirdAnimData.loopMode = third->loopMode;
 			}
 		}
-		
-		
+
+
 		void PBWakingUpTimerAnimStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

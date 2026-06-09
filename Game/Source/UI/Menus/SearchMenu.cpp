@@ -21,7 +21,7 @@ namespace app
 			// シロクマ追跡・索敵専用ステータスを生成。
 			m_searchStatus = std::make_unique<SearchStatus>();
 			// シロクマ追跡・索敵専用のセットアップUIを呼び出す。
-			m_searchStatus->SetUpUI();
+			m_searchStatus->SetUp();
 		}
 
 

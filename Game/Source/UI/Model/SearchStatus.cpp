@@ -4,9 +4,9 @@
  * @author 忽那
  */
 #include "stdafx.h"
+#include "SearchParameter.h"
 #include "SearchStatus.h"
 #include "Source/Core/ParameterManager.h"
-#include "SearchParameter.h"
 
 
 namespace app
@@ -46,7 +46,7 @@ namespace app
 		}
 
 
-		void SearchStatus::SetUpUI()
+		void SearchStatus::SetUp()
 		{
 			const auto* param = core::ParameterManager::Get()->GetParameter<SearchParameter>();
 			m_offsetValueY = param->offsetValueY;
@@ -60,7 +60,7 @@ namespace app
 
 		void SearchStatus::Update()
 		{
-			SetUpUI();
+			SetUp();
 		}
 	}
 }

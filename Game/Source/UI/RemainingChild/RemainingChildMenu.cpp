@@ -20,7 +20,7 @@ namespace app
 			m_remainAnimStatus = std::make_unique<RemainingAnimStatus>();
 
 			// アニメーションステータスのセットアップUIを呼び出す。
-			m_remainAnimStatus->SetUpUI();
+			m_remainAnimStatus->SetUp();
 		}
 
 

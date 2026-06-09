@@ -4,12 +4,14 @@
  * @author 忽那
  */
 #pragma once
-#include "Menu.h"
 #include "Json/json.hpp"
+#include "Menu.h"
+
+#include "Source/Util/JsonConverter.h"
 
 
 #ifdef APP_DEBUG
-	#define APP_ENABLE_LAYOUT_HOTRELOAD
+#define APP_ENABLE_LAYOUT_HOTRELOAD
 #endif
 
 
@@ -23,8 +25,8 @@ namespace app
 		class Layout : public Noncopyable
 		{
 		public:
-			Layout(){}
-			~Layout(){}
+			Layout() {}
+			~Layout() {}
 
 
 		public:
@@ -33,6 +35,12 @@ namespace app
 			{
 				m_filePath = path;
 				m_menu = std::make_unique<T>();
+
+#ifdef APP_ENABLE_LAYOUT_HOTRELOAD
+				// 初回読み込み時のタイムスタンプを保存して、1フレーム目の暴発を防ぐ
+				m_lastUpdateTime = app::util::JsonConverter::GetFileLastWriteTime(m_filePath.c_str());
+#endif
+
 				Reload();
 			}
 
@@ -54,7 +62,7 @@ namespace app
 			 */
 			template<typename T>
 			T* GetMenu() { return dynamic_cast<T*>(m_menu.get()); }
-			
+
 
 		private:
 #ifdef APP_ENABLE_LAYOUT_HOTRELOAD
@@ -67,10 +75,10 @@ namespace app
 
 		private:
 			static UIBase* CreateUI(
-					UICanvas* canvas
-				,	const std::string& type
-				,	const uint32_t key
-				,	nlohmann::json& item
+				UICanvas* canvas
+				, const std::string& type
+				, const uint32_t key
+				, nlohmann::json& item
 			);
 		};
 	}

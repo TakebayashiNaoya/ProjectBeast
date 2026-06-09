@@ -24,7 +24,7 @@ namespace app
 			 * @brief セットアップUI
 			 * @note ステータスの持ち主が呼び出す
 			 */
-			void SetUpUI() override;
+			void SetUp() override;
 
 			/**
 			 * @biref 更新処理
