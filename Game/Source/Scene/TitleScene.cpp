@@ -18,13 +18,11 @@
 namespace app
 {
 	TitleScene::TitleScene()
-		:m_state(TitleState::Title)
-		, m_soundOption(nullptr)
-		, m_soundOptionLayout(nullptr)
-		, m_tutorialLayout(nullptr)
-		, m_tutorialMenu(nullptr)
-		, m_titleEventMenu(nullptr)
-		, m_titleLayout(nullptr)
+		: m_state(TitleState::Title)
+		, m_nextScene(false)
+		, m_titleEventPacket(nullptr)
+		, m_soundOptionPacket(nullptr)
+		, m_tutorialPacket(nullptr)
 		, m_stageSelectPacket(nullptr)
 	{}
 
@@ -35,32 +33,16 @@ namespace app
 		// デバッグ描画を止めてから破棄する（破棄済みShapeへのアクセスを防ぐ）
 		nsBeastEngine::nsCollision::PhysicsWorld::Get().DisableDrawDebugWireFrame();
 #endif
-		delete m_soundOptionLayout;
-		delete m_tutorialLayout;
-		delete m_titleLayout;
 	}
 
 
 	bool TitleScene::Start()
 	{
-		m_titleLayout = new ui::Layout;
-		m_titleLayout->Initialize<ui::TitleEventMenu>(
-			"Assets/parameter/title/Title.json"
-		);
-		m_titleEventMenu = m_titleLayout->GetMenu<ui::TitleEventMenu>();
+		ui::InitUIPacket(m_titleEventPacket, "Assets/parameter/title/Title.json");
 
+		ui::InitUIPacket(m_soundOptionPacket, "Assets/parameter/sound/SoundOption.json");
 
-		m_soundOptionLayout = new ui::Layout;
-		m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
-			"Assets/parameter/sound/SoundOption.json"
-		);
-		m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
-
-		m_tutorialLayout = new ui::Layout;
-		m_tutorialLayout->Initialize<ui::TutorialMenu>(
-			"Assets/parameter/tutorial/Tutorial.json"
-		);
-		m_tutorialMenu = m_tutorialLayout->GetMenu<ui::TutorialMenu>();
+		ui::InitUIPacket(m_tutorialPacket, "Assets/parameter/tutorial/Tutorial.json");
 
 		ui::InitUIPacket(m_stageSelectPacket, "Assets/parameter/UI/stageSelect/StageSelect.json");
 
@@ -109,7 +91,7 @@ namespace app
 		switch (m_state)
 		{
 		case TitleState::Title:
-			if (m_titleLayout) { m_titleLayout->Render(rc); }
+			if (m_titleEventPacket) { m_titleEventPacket->Render(rc); }
 			break;
 
 		case TitleState::StageSelect:
@@ -117,11 +99,11 @@ namespace app
 			break;
 
 		case TitleState::SoundOption:
-			if (m_soundOptionLayout) { m_soundOptionLayout->Render(rc); }
+			if (m_soundOptionPacket) { m_soundOptionPacket->Render(rc); }
 			break;
 
 		case TitleState::Tutorial:
-			if (m_tutorialLayout) { m_tutorialLayout->Render(rc); }
+			if (m_tutorialPacket) { m_tutorialPacket->Render(rc); }
 			break;
 
 		default:
@@ -146,7 +128,7 @@ namespace app
 		{
 			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
 
-			const uint32_t selectKey = m_titleEventMenu->GetSelectKey();
+			const uint32_t selectKey = m_titleEventPacket->GetMenu()->GetSelectKey();
 			if (selectKey == Hash32("StartIcon"))
 			{
 				m_state = TitleState::StageSelect;
@@ -159,9 +141,9 @@ namespace app
 			{
 				// ルール画面。
 				m_state = TitleState::Tutorial;
-				if (m_tutorialMenu)
+				if (m_tutorialPacket->GetMenu())
 				{
-					m_tutorialMenu->SetClosed(false);
+					m_tutorialPacket->GetMenu()->SetClosed(false);
 				}
 			}
 			else if (selectKey == Hash32("EndIcon"))
@@ -172,9 +154,9 @@ namespace app
 			}
 		}
 
-		if (m_titleLayout)
+		if (m_titleEventPacket)
 		{
-			m_titleLayout->Update();
+			m_titleEventPacket->Update();
 		}
 	}
 
@@ -230,9 +212,9 @@ namespace app
 
 	void TitleScene::SoundOptionUpdate()
 	{
-		if (m_soundOptionLayout)
+		if (m_soundOptionPacket)
 		{
-			m_soundOptionLayout->Update();
+			m_soundOptionPacket->Update();
 		}
 
 		if (g_pad[0]->IsTrigger(enButtonB))
@@ -245,16 +227,16 @@ namespace app
 
 	void TitleScene::TutorialUpdate()
 	{
-		if (m_tutorialLayout)
+		if (m_tutorialPacket)
 		{
-			m_tutorialLayout->Update();
+			m_tutorialPacket->Update();
 		}
 
 		// TutorialMenu 内で Bボタンが押されたら閉じる。
-		if (m_tutorialMenu && m_tutorialMenu->IsClosed())
+		if (m_tutorialPacket->GetMenu() && m_tutorialPacket->GetMenu()->IsClosed())
 		{
 			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-			m_tutorialMenu->SetClosed(false);
+			m_tutorialPacket->GetMenu()->SetClosed(false);
 			m_state = TitleState::Title;
 		}
 	}

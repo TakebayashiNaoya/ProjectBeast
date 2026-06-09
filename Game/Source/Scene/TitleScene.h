@@ -13,7 +13,6 @@ namespace app
 {
 	namespace ui
 	{
-		class Layout;
 		class SoundOptionMenu;
 		class TitleEventMenu;
 		class TutorialMenu;
@@ -64,12 +63,9 @@ namespace app
 
 
 	private:
-		ui::Layout* m_titleLayout;
-		ui::Layout* m_soundOptionLayout;
-		ui::Layout* m_tutorialLayout;
-		ui::SoundOptionMenu* m_soundOption;
-		ui::TitleEventMenu* m_titleEventMenu;
-		ui::TutorialMenu* m_tutorialMenu;
+		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
+		ui::UIPacket<ui::SoundOptionMenu> m_soundOptionPacket;
+		ui::UIPacket<ui::TutorialMenu> m_tutorialPacket;
 		ui::UIPacket<ui::StageSelectMenu> m_stageSelectPacket;
 	};
 }
