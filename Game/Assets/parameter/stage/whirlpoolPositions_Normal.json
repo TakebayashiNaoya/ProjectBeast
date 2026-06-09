@@ -6,7 +6,7 @@
     { "index": 3, "position": [-2700, 0, -2700] },
     { "index": 4, "position": [-2700, 0,    93] },
     { "index": 5, "position": [-2189, 0,   -85] },
-    { "index": 6, "position": [-500, 0,   -930] },
+    { "index": 6, "position": [ -500, 0,  -930] },
     { "index": 7, "position": [  -423, 0, -3591] },
     { "index": 8, "position": [  -460, 0, -2029] },
     { "index": 9, "position": [-2000, 0, -2800] }
