@@ -281,5 +281,10 @@ namespace app
 		{
 			return m_owner->GetStatus<EnemyStatus>();
 		}
+
+		EnemyStatus* EnemyStateMachine::GetOwnerStatusMutable()
+		{
+			return m_owner->GetStatus<EnemyStatus>();
+		}
 	}
 }

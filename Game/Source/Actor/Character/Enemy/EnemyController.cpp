@@ -523,6 +523,8 @@ namespace app
 					enemy->m_hasChased = true;
 				}
 			}
+
+			enemy->m_prePosition = enemy->m_target->GetTransform().m_position;
 		}
 
 
@@ -530,8 +532,12 @@ namespace app
 		{
 			Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
 
-			Vector3 targetPos;
+			float movedDist = (enemyPos - enemy->m_prePosition).Length();
+			enemy->m_prePosition = enemyPos;
 
+			auto* status = enemy->m_target->GetEnemyStateMachine()->GetOwnerStatus();
+
+			Vector3 targetPos;
 			if (enemy->m_foundPenguin != nullptr)
 			{
 				targetPos = enemy->m_foundPenguin->GetTransform().m_position;
@@ -552,6 +558,14 @@ namespace app
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
 			sm->SetMoveDirection(dir);
 			sm->SetStickLAmount(1.0f);
+
+			auto* mutableStatus = sm->GetOwnerStatusMutable();
+			if (mutableStatus != nullptr)
+			{
+				// フレーム時間 × 減衰率(staminaDrainRate) を計算して減らす
+				float drainAmount = mutableStatus->GetStaminaDrainRate() * g_gameTime->GetFrameDeltaTime();
+				mutableStatus->DecreaseStamina(drainAmount);
+			}
 		}
 
 
@@ -575,6 +589,16 @@ namespace app
 
 		int EnemyController::CheckChase(EnemyController* enemy)
 		{
+			auto* sm = enemy->m_target->GetEnemyStateMachine();
+			auto* status = sm->GetOwnerStatus();
+
+			// スタミナが尽きたらターゲットを諦め、巣へ帰る
+			if (status->IsStaminaEmpty())
+			{
+				enemy->m_foundPenguin = nullptr;
+				return enEnemyState_ReturnHome;
+			}
+
 			if (enemy->m_foundPenguin != nullptr)
 			{
 				Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
@@ -583,11 +607,13 @@ namespace app
 				Vector3 diff = penguinPos - enemyPos;
 				diff.y = 0.0f;
 
-				const float LOST_DIST = 800.0f;
+				float lostDist = status->GetLostChaseDistance();
 
-				if (diff.LengthSq() > LOST_DIST * LOST_DIST)
+				// 距離が離れすぎたらターゲットを諦め、巣へ帰る
+				if (diff.LengthSq() > lostDist * lostDist)
 				{
 					enemy->m_foundPenguin = nullptr;
+					return enEnemyState_ReturnHome;
 				}
 			}
 

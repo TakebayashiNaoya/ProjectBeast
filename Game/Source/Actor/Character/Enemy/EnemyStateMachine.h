@@ -42,6 +42,9 @@ namespace app
 
 			const EnemyStatus* GetOwnerStatus();
 
+			// ステータスの数値を変更したい時用のミュータブルなゲッター
+			EnemyStatus* GetOwnerStatusMutable();
+
 
 		public:
 

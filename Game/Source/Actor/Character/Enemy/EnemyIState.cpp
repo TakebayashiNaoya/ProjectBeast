@@ -557,6 +557,13 @@ namespace app
 			// 寝た瞬間に両ゲージを満タンにする
 			m_owner->SetWakeUpGauge(MAX_WAKE_UP_GAUGE);
 			m_owner->SetSleepTimer(MAX_SLEEP_TIME);
+
+			// 寝た瞬間にスタミナも全回復させる
+			auto* mutableStatus = m_owner->GetOwnerStatusMutable();
+			if (mutableStatus != nullptr)
+			{
+				mutableStatus->FullRecoverStamina();
+			}
 		}
 
 
