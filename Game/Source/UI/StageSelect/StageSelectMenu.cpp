@@ -195,16 +195,16 @@ namespace app
 			}
 
 			// 入力のインターバル
-			constexpr float INPUT_INTERVAL = 0.2f;
+			const float inputInterval = m_status->GetInputInterval();
 			// スティックの閾値
-			constexpr float STICK_INPUT_THRESHOLD = 0.5f;
+			const float inputThreshold = m_status->GetInputThreshold();
 			// スティックの入力値
 			const float stickLXF = g_pad[0]->GetLStickXF();
 
 			// 左にスティックを倒した場合
-			if (stickLXF < -STICK_INPUT_THRESHOLD)
+			if (stickLXF < -inputThreshold)
 			{
-				m_selectInputInterval = INPUT_INTERVAL;
+				m_selectInputInterval = inputInterval;
 				switch (m_selectingStage)
 				{
 				case EnStageChoices::Easy: m_selectingStage = EnStageChoices::Back; break;
@@ -215,9 +215,9 @@ namespace app
 			}
 
 			// 右にスティックを倒した場合
-			else if (stickLXF > STICK_INPUT_THRESHOLD)
+			else if (stickLXF > inputThreshold)
 			{
-				m_selectInputInterval = INPUT_INTERVAL;
+				m_selectInputInterval = inputInterval;
 				switch (m_selectingStage)
 				{
 				case EnStageChoices::Back: m_selectingStage = EnStageChoices::Easy; break;

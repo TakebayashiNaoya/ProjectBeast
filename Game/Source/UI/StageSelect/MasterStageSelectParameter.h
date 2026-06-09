@@ -24,8 +24,10 @@ namespace app
 			}
 #endif
 			/** JSONから受け取る変数群 */
-			/** 選択肢のピボット */
-			Vector2 choicesPivot;
+			/** 入力間隔 */
+			float inputInterval;
+			/** 入力閾値 */
+			float inputThreshold;
 			/* イージー選択肢の位置 */
 			Vector3 easyPosition;
 			/* ノーマル選択肢の位置 */
@@ -34,8 +36,6 @@ namespace app
 			Vector3 hardPosition;
 			/* 戻る選択肢の位置 */
 			Vector3 backPosition;
-			/** オフセット位置 */
-			Vector3 offSetPosition;
 			/** テキストの色 */
 			Vector4 textColor;
 		};

@@ -1,12 +1,12 @@
 [
     {
         "comment" : "ステージセレクト画面に使うパラメーター",
-        "choicesPivot" : [0, 0],
+        "inputInterval" : 0.2,
+        "inputThreshold" : 0.5,
         "easyPosition" : [-400, -200, 0],
         "normalPosition" : [0, -200, 0],
         "hardPosition" : [400, -200, 0],
         "backPosition" : [-600, -350 ,0],
-        "offsetPosition" : [0, 0, 0],
         "textColor" : [180, 210, 245, 255]
     }
 ]
