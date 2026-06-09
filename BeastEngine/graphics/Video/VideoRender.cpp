@@ -37,7 +37,7 @@ namespace nsBeastEngine
 		SpriteInitData initData;
 		initData.m_textures[0] = &m_frameTex.GetK2Texture();
 		initData.m_fxFilePath = "Assets/shader/sprite.fx";
-		initData.m_width  = static_cast<UINT>(dispWidth  * scaleX);
+		initData.m_width = static_cast<UINT>(dispWidth * scaleX);
 		initData.m_height = static_cast<UINT>(dispHeight * scaleY);
 		initData.m_alphaBlendMode = AlphaBlendMode_Trans;
 		m_sprite.Init(initData);

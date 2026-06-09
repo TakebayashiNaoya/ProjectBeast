@@ -86,15 +86,31 @@ namespace nsBeastEngine
 
 	bool VideoClip::LoadFrameSequence(const std::string& folderPath)
 	{
-		// フォルダの存在確認
-		const DWORD attr = GetFileAttributesA(folderPath.c_str());
+		// 相対パス → 絶対パスに変換（LoadMP4 と同様）
+		char absPathBuf[MAX_PATH] = {};
+		GetFullPathNameA(folderPath.c_str(), MAX_PATH, absPathBuf, nullptr);
+		std::string absFolder = absPathBuf;
+
+		// GetFileAttributesA はトレイリングスラッシュがあると失敗する場合があるので除去してチェック
+		std::string checkPath = absFolder;
+		if (!checkPath.empty() && (checkPath.back() == '/' || checkPath.back() == '\\'))
+			checkPath.pop_back();
+
+		K2_LOG("VideoClip::LoadFrameSequence: checking %s\n", checkPath.c_str());
+		const DWORD attr = GetFileAttributesA(checkPath.c_str());
 		if (attr == INVALID_FILE_ATTRIBUTES || !(attr & FILE_ATTRIBUTE_DIRECTORY))
 		{
-			K2_LOG("VideoClip: folder not found: %s\n", folderPath.c_str());
+			K2_LOG("VideoClip: folder not found: %s\n", checkPath.c_str());
 			return false;
 		}
+
+		// CollectImageFiles にはトレイリングスラッシュ付きで渡す（ファイル名連結用）
+		if (absFolder.empty() || (absFolder.back() != '/' && absFolder.back() != '\\'))
+			absFolder += '\\';
+
 		// フォルダ内の画像ファイルを収集
-		const std::vector<std::string> files = CollectImageFiles(folderPath);
+		const std::vector<std::string> files = CollectImageFiles(absFolder);
+		K2_LOG("VideoClip::LoadFrameSequence: found %d image file(s)\n", static_cast<int>(files.size()));
 		if (files.empty())
 		{
 			K2_LOG("VideoClip: no image files in: %s\n", folderPath.c_str());
