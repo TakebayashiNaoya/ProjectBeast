@@ -21,10 +21,23 @@ namespace app
 		 */
 		enum class EnStageChoices : uint8_t
 		{
-			Back,
+			Tutorial,
 			Easy,
 			Normal,
 			Hard,
+			Max,
+		};
+
+
+		/**
+		 * @brief ボタンの種類
+		 * @detail もどる、決定、選択
+		 */
+		enum class EnStageButtonTypes : uint8_t
+		{
+			Back,
+			Decide,
+			Select,
 			Max,
 		};
 
@@ -101,12 +114,9 @@ namespace app
 			};
 
 
-		private:
 			/** ステージ選択肢のデータ構造体 */
 			struct StageChoicesData
 			{
-				/** 位置 */
-				Vector3 m_position;
 				/** テキストアイコン */
 				UIIcon* m_textIcon;
 				/** バブルアイコン */
@@ -117,6 +127,27 @@ namespace app
 				~StageChoicesData() = default;
 			};
 
+
+
+
+			/*****************************************************/
+
+
+			/** ステージ選択のデータ構造体 */
+			struct StageButtonData
+			{
+				/** ボタンアイコン */
+				UIIcon* m_button;
+				/** テキストアイコン */
+				UIIcon* m_textIcon;
+
+
+				StageButtonData();
+				~StageButtonData() = default;
+			};
+
+
+		private:
 			/** ステージ選択のステータス */
 			std::unique_ptr<StageSelectStatus> m_status;
 			/** ステージ選択状態 */
@@ -129,19 +160,21 @@ namespace app
 			UIIcon* m_bgIcon;
 			/** "ステージセレクト"のアイコン */
 			UIIcon* m_stageSelectTextIcon;
+			/** "ステージセレクト"の背景アイコン */
+			UIIcon* m_stageSelectTextBGIcon;
+
 			/** ステージ選択肢 */
 			std::array<StageChoicesData, static_cast<uint8_t>(EnStageChoices::Max)> m_choices;
 
+			/** ステージ選択画面のボタン */
+			std::array<StageButtonData, static_cast<uint8_t>(EnStageButtonTypes::Max)> m_buttons;
+			/** ボタンの背景アイコン */
+			UIIcon* m_buttonBGIcon;
 
 			/** 選択カーソルのフレーム */
 			UIIcon* m_cursorFrame;
 			/** 選択カーソルのフレームの背景 */
 			UIIcon* m_cursorFrameBG;
-
-			/** ステージ選択肢のバブルのフレーム */
-			UIIcon* m_backBubbleFrame;
-			/** ステージ選択肢のバブルのフレームの背景 */
-			UIIcon* m_backBubbleFrameBG;
 
 
 			/** 選択入力のインターバル */
