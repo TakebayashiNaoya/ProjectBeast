@@ -441,6 +441,48 @@ namespace app
 		/*************************************/
 
 
+		UIVideo::UIVideo()
+		{}
+
+
+		UIVideo::~UIVideo()
+		{}
+
+
+		void UIVideo::Initialize(const UIVideoInitData& data)
+		{
+			m_videoRender.SetLoop(data.loop);
+			m_videoRender.Init(data.clipPath.c_str(), data.width, data.height, data.fps);
+
+			if (data.autoPlay)
+				m_videoRender.Play();
+		}
+
+
+		void UIVideo::Update()
+		{
+			UpdateAnimation();
+			m_transform.UpdateTransform();
+
+			m_videoRender.SetMulColor(m_color);
+			m_videoRender.SetPosition(m_transform.m_localTransform.m_position);
+			m_videoRender.SetScale(m_transform.m_localTransform.m_scale);
+			m_videoRender.SetRotation(m_transform.m_localTransform.m_rotation);
+			m_videoRender.SetPivot(m_pivot);
+			m_videoRender.Update();
+		}
+
+
+		void UIVideo::Render(RenderContext& rc)
+		{
+			if (m_isDraw)
+				m_videoRender.Draw(rc);
+		}
+
+
+		/*************************************/
+
+
 		UICanvas::UICanvas()
 		{
 			uiList_.clear();
