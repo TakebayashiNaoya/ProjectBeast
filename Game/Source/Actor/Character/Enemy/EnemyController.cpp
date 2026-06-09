@@ -37,6 +37,34 @@ namespace app
 			constexpr float STUCK_MOVE_THRESHOLD = 5.0f;
 			/** スタック検出：この時間（秒）停滞し続けたら強制スキップ */
 			constexpr float STUCK_TIME_LIMIT = 3.0f;
+
+			// --- マジックナンバー排除用の内部定数 ---
+			/** ターゲットをIdleにする距離の二乗 */
+			constexpr float DIST_TO_IDLE_SQ = 600.0f * 600.0f;
+			/** 視野角（角度） */
+			constexpr float VIEW_ANGLE = 70.0f;
+			/** 巣から離れすぎたと判定する最大距離 */
+			constexpr float MAX_DIST_FROM_HOME = 500.0f;
+			/** ランダムな待機時間を計算するための係数（モジュロ用） */
+			constexpr int RANDOM_IDLE_TIME_MOD = 500;
+			/** ランダムな待機時間を計算するための係数（乗算用） */
+			constexpr float RANDOM_IDLE_TIME_MULT = 0.01f;
+			/** 索敵閾値 */
+			constexpr float SEARCH_THRESHOLD = 15.0f;
+			/** 音の目標地点までの到着判定距離の二乗 */
+			constexpr float REACHED_TARGET_DIST_SQ = 5.0f * 5.0f;
+			/** 音が鳴らなくなってから諦めるまでの時間 */
+			constexpr float GIVE_UP_SEARCH_TIME = 3.0f;
+			/** 方向ベクトルのゼロ除算防止用のしきい値 */
+			constexpr float CHASE_DIR_NORMALIZE_SQ = 0.001f;
+			/** 通常の攻撃発生距離 */
+			constexpr float NORMAL_ATTACK_DIST = 80.0f;
+			/** かまくらへの攻撃発生距離 */
+			constexpr float IGLOO_ATTACK_DIST = 240.0f;
+			/** 最後に見失った位置に到達したと判定する距離 */
+			constexpr float ARRIVE_LAST_KNOWN_POS_DIST = 20.0f;
+			/** 帰巣時に移動を停止する距離の二乗 */
+			constexpr float RETURN_HOME_STOP_DIST_SQ = 200.0f;
 		}
 
 
@@ -45,7 +73,7 @@ namespace app
 
 
 		EnemyController::EnemyController()
-			:m_target(nullptr)
+			: m_target(nullptr)
 			, m_foundPenguin(nullptr)
 			, m_elapsedTime(0.0f)
 			, m_prePosition(Vector3::Zero)
@@ -105,11 +133,11 @@ namespace app
 				m_isInitialized = true;
 			}
 
-
 			/** 遷移判定 */
 			const int nextState = currentState->check(this);
 			if (nextState != -1 && nextState != m_currentState) {
-				ChangeState((EnEnemyStateID)nextState);
+				// C言語スタイルキャストを static_cast に修正
+				ChangeState(static_cast<EnEnemyStateID>(nextState));
 				currentState = FindAIState(m_currentState);
 			}
 
@@ -178,7 +206,7 @@ namespace app
 				Vector3 targetPos = m_target->GetTransform().m_position;
 				Vector3 diff = penguin->GetTransform().m_position - targetPos;
 				diff.y = 0.0f;
-				if (diff.LengthSq() > 600.0f * 600.0f)// 距離外ならIdleへ
+				if (diff.LengthSq() > DIST_TO_IDLE_SQ)
 				{
 					continue;
 				}
@@ -186,7 +214,7 @@ namespace app
 				diff.Normalize();
 				auto moveDirection = m_target->GetEnemyStateMachine()->GetMoveDirection();
 				float cosv = moveDirection.Dot(diff);
-				float cosAngle = cosf(Math::PI / 180.0f * 70.0f);
+				float cosAngle = cosf(Math::PI / 180.0f * VIEW_ANGLE);
 				if (cosv < cosAngle)
 				{
 					continue;
@@ -217,13 +245,12 @@ namespace app
 		}
 
 
-		bool EnemyController::IsFarFromHome()const
+		bool EnemyController::IsFarFromHome() const
 		{
 			Vector3 pos = m_target->GetTransform().m_position;
 			Vector3 toHome = m_target->GetHomePosition() - pos;
 
-			const float MAX_DIST = 500.0f;
-			if (toHome.LengthSq() > MAX_DIST * MAX_DIST)
+			if (toHome.LengthSq() > MAX_DIST_FROM_HOME * MAX_DIST_FROM_HOME)
 			{
 				return true;
 			}
@@ -291,12 +318,12 @@ namespace app
 			}
 
 			// 音で索敵フラグが立ったらSearchへ
-			if (enemy->m_target->GetEnemyStateMachine()->IsSeach())
+			if (enemy->m_target->GetEnemyStateMachine()->IsSearch())
 			{
 				return enEnemyState_Search;
 			}
 
-			const float idleTime = static_cast<float>(rand() % 500) * 0.01f;
+			const float idleTime = static_cast<float>(rand() % RANDOM_IDLE_TIME_MOD) * RANDOM_IDLE_TIME_MULT;
 			if (enemy->m_elapsedTime > idleTime) {
 				// 時間経過によるランダム遷移は、(0,0,0)へ行かないようWanderingに統一
 				return enEnemyState_Wandering;
@@ -307,15 +334,11 @@ namespace app
 
 		/** スタン */
 		void EnemyController::EnterStun(EnemyController* enemy)
-		{
-
-		}
+		{}
 
 
 		void EnemyController::UpdateStun(EnemyController* enemy)
-		{
-
-		}
+		{}
 
 
 		void EnemyController::ExitStun(EnemyController* enemy)
@@ -328,13 +351,12 @@ namespace app
 		}
 
 
-
 		/** サーチ（音のした場所へ向かう） */
 		void EnemyController::EnterSearch(EnemyController* enemy)
 		{
 			if (enemy->m_target == nullptr) return;
 
-			enemy->m_target->GetEnemyStateMachine()->SetSeach(true);
+			enemy->m_target->GetEnemyStateMachine()->SetSearch(true);
 			enemy->m_searchTimer = 0.0f; // タイマーリセット
 		}
 
@@ -354,7 +376,6 @@ namespace app
 			// 2. 索敵中も耳を澄ませて、新しい音がしたら目標地点を更新する
 			Vector3 loudestPos;
 			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(enemy->m_target->GetTransform().m_position, loudestPos);
-			const float SEARCH_THRESHOLD = 15.0f; // 閾値
 
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
 
@@ -371,7 +392,7 @@ namespace app
 			toTarget.y = 0.0f; // 高さは無視して平面の距離だけを見る
 
 			float distanceSq = toTarget.LengthSq();
-			if (distanceSq > 5.0f * 5.0f) // 目標までまだ遠い場合（距離5.0f以内で到着とする）
+			if (distanceSq > REACHED_TARGET_DIST_SQ)
 			{
 				toTarget.Normalize();
 				sm->SetMoveDirection(toTarget);
@@ -384,9 +405,9 @@ namespace app
 
 				// 到着してしばらく（例：3秒）音が鳴らなければ諦める
 				enemy->m_searchTimer += g_gameTime->GetFrameDeltaTime();
-				if (enemy->m_searchTimer > 3.0f)
+				if (enemy->m_searchTimer > GIVE_UP_SEARCH_TIME)
 				{
-					sm->SetSeach(false); // 諦めフラグを落とす
+					sm->SetSearch(false); // 諦めフラグを落とす
 				}
 			}
 		}
@@ -395,7 +416,7 @@ namespace app
 		void EnemyController::ExitSearch(EnemyController* enemy)
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
-			enemy->m_target->GetEnemyStateMachine()->SetSeach(false);
+			enemy->m_target->GetEnemyStateMachine()->SetSearch(false);
 			enemy->m_searchTimer = 0.0f;
 		}
 
@@ -413,7 +434,7 @@ namespace app
 			}
 
 			// 諦めフラグが立っていたら徘徊に戻る
-			if (!enemy->m_target->GetEnemyStateMachine()->IsSeach()) {
+			if (!enemy->m_target->GetEnemyStateMachine()->IsSearch()) {
 				return enEnemyState_Wandering;
 			}
 
@@ -486,7 +507,7 @@ namespace app
 			}
 
 			// 耳で音を検知してフラグが立ったら、索敵ステートへ移行
-			if (enemy->m_target->GetEnemyStateMachine()->IsSeach()) {
+			if (enemy->m_target->GetEnemyStateMachine()->IsSearch()) {
 				return enEnemyState_Search;
 			}
 
@@ -550,7 +571,7 @@ namespace app
 			Vector3 dir = targetPos - enemyPos;
 			dir.y = 0.0f;
 
-			if (dir.LengthSq() > 0.001f)
+			if (dir.LengthSq() > CHASE_DIR_NORMALIZE_SQ)
 			{
 				dir.Normalize();
 			}
@@ -628,14 +649,14 @@ namespace app
 				float distSq = diff.LengthSq();
 
 				// 一定距離で攻撃
-				float attackDist = 80.0f;
-				const float iglooAttackDist = 240.0f;
+				float attackDist = NORMAL_ATTACK_DIST;
+
 				// ターゲットがかまくらの中にいるかチェック
 				const auto& insidePenguins = app::actor::IglooManager::GetInstance().GetInsidePenguins();
 				if (std::find(insidePenguins.begin(), insidePenguins.end(), enemy->m_foundPenguin) != insidePenguins.end())
 				{
 					// ★ 重要：かまくらの上に登らないよう、壁の手前で攻撃モーションに入る距離
-					attackDist = iglooAttackDist;
+					attackDist = IGLOO_ATTACK_DIST;
 				}
 
 				if (distSq <= attackDist * attackDist)
@@ -652,15 +673,13 @@ namespace app
 				diff.y = 0.0f;
 
 				// 最後の位置に到達したらIdle
-				const float ARRIVE_DIST = 20.0f;
-				if (diff.LengthSq() <= ARRIVE_DIST * ARRIVE_DIST)
+				if (diff.LengthSq() <= ARRIVE_LAST_KNOWN_POS_DIST * ARRIVE_LAST_KNOWN_POS_DIST)
 				{
 					return enEnemyState_Idle;
 				}
 			}
 			return enEnemyState_Invalid;
 		}
-
 
 
 		/** ジャンプ */
@@ -680,7 +699,6 @@ namespace app
 		{
 			return enEnemyState_Invalid;
 		}
-
 
 
 		/** 泳ぐ */
@@ -735,7 +753,6 @@ namespace app
 		{
 			return enEnemyState_Invalid;
 		}
-
 
 
 		/** 攻撃 */
@@ -869,7 +886,7 @@ namespace app
 			Vector3 toHome = enemy->m_target->GetHomePosition() - pos;
 
 			// 到着判定
-			if (toHome.LengthSq() < 200.0f)
+			if (toHome.LengthSq() < RETURN_HOME_STOP_DIST_SQ)
 			{
 				enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 				return;
@@ -961,10 +978,10 @@ namespace app
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
 
 			// EnemyCoolDownState::Update() 内で起床条件を満たした場合にフラグが折られる
-			// 音で起きた場合は IsSeach() が true になっているのでSearchへ、そうでなければIdleへ
+			// 音で起きた場合は IsSearch() が true になっているのでSearchへ、そうでなければIdleへ
 			if (!sm->IsCoolDown())
 			{
-				if (sm->IsSeach()) {
+				if (sm->IsSearch()) {
 					if (auto* am = app::achievement::AchievementManager::GetInstance()) {
 						// JSONのcondition名 "WakeUpBear" をハッシュ化して探す
 						auto* baseAchieve = am->GetAchievement(Hash32("WakeUpBear"));
@@ -990,9 +1007,7 @@ namespace app
 
 
 		void EnemyController::UpdateRoar(EnemyController* enemy)
-		{
-
-		}
+		{}
 
 
 		void EnemyController::ExitRoar(EnemyController* enemy)
@@ -1009,6 +1024,5 @@ namespace app
 			}
 			return enEnemyState_Invalid;
 		}
-
 	}
 }

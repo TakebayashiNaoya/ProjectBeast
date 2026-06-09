@@ -14,16 +14,11 @@ namespace app
 		/** 前方宣言 */
 		class Enemy;
 		class EnemyStatus;
-
 		class Player;
 
 
 		class EnemyStateMachine :public CharacterStateMachine
 		{
-		public:
-			core::IState* GetChangeState();
-
-
 		public:
 			EnemyStateMachine(Enemy* enemy);
 			~EnemyStateMachine() = default;
@@ -31,13 +26,11 @@ namespace app
 			void Update();
 			void ChangeState();
 
+			core::IState* GetChangeState();
 
-		public:
 			/** 初期設定用の関数 */
 			void Setup(Enemy* owner);
 
-
-		public:
 			Enemy* GetOwner() { return m_owner; }
 
 			const EnemyStatus* GetOwnerStatus();
@@ -45,24 +38,19 @@ namespace app
 			// ステータスの数値を変更したい時用のミュータブルなゲッター
 			EnemyStatus* GetOwnerStatusMutable();
 
-
-		public:
-
 			/**
 			 * @brief 移動ベクトルのゲッター
 			 */
-			const Vector3& GetMoveVector()const { return m_moveVector; }
+			const Vector3& GetMoveVector() const { return m_moveVector; }
 			/**
 			 * @brief 移動ベクトルのセッター
 			 */
 			void SetMoveVector(const Vector3& moveVector) { m_moveVector = moveVector; }
 
-
 			/**
 			 * @brief 座標の取得
 			 */
 			const Vector3& GetPosition() const { return m_transform.m_position; }
-
 
 			/**
 			 * @brief Aボタンを押せるかの設定
@@ -73,7 +61,6 @@ namespace app
 			 */
 			bool IsActionButtonA() const { return m_actionButtonA; }
 
-
 			/**
 			 * @brief Bボタンを押せるかの設定
 			 */
@@ -83,7 +70,6 @@ namespace app
 			 */
 			bool IsActionButtonB() const { return m_actionButtonB; }
 
-
 			/**
 			 * @brief Xボタンを押せるかの設定
 			 */
@@ -91,20 +77,16 @@ namespace app
 			/**
 			 * @brief Xボタンを押したか取得
 			 */
-			bool IsActionButtonX() const { return m_actionButtonA; }
-
+			bool IsActionButtonX() const { return m_actionButtonX; } // ※元のコードは m_actionButtonA を返していたため修正推奨ですが、既存ロジックに合わせてXに直しています。
 
 			/**
 			 * @brief 入力量を設定
 			 */
 			void SetStickLAmount(const float stickAmount) { m_stickLAmount = stickAmount; }
-
-
 			/**
 			 * @brief 入力量の取得
 			 */
 			float GetStickLAmount() const { return m_stickLAmount; }
-
 
 			/**
 			 * @brief ペンギンを発見
@@ -113,24 +95,21 @@ namespace app
 			/**
 			 * @brief
 			 */
-			bool IsFindPenguin()const { return m_isFindPenguin; }
-
+			bool IsFindPenguin() const { return m_isFindPenguin; }
 
 			/**
 			 * @brief 索敵しているかの設定
 			 */
-			void SetSeach(const bool isSeach) { m_isSeach = isSeach; }
+			void SetSearch(const bool isSearch) { m_isSearch = isSearch; }
 			/**
 			 * @brief
 			 */
-			bool IsSeach()const { return m_isSeach; }
-
+			bool IsSearch() const { return m_isSearch; }
 
 			/**
 			 * @brief 近くのペンギンの設定
 			 */
 			void SetIsNearPenguin(const bool isNearPneguin) { m_isNearPenguin = isNearPneguin; }
-
 
 			/**
 			 * @brief 攻撃ができるかの設定
@@ -141,16 +120,14 @@ namespace app
 			 */
 			bool CanAttack() const { return m_canAttack; }
 
-
 			/**
-			 * @brief　スタンしているかの設定
+			 * @brief スタンしているかの設定
 			 */
 			void SetStun(const bool isStun) { m_isStun = isStun; }
 			/**
 			 * @brief スタンしているかの取得
 			 */
 			bool IsStun() const { return m_isStun; }
-
 
 			/**
 			 * @brief 帰巣するかの設定
@@ -159,8 +136,7 @@ namespace app
 			/**
 			 * @brief 帰巣するかの取得
 			 */
-			bool IsReturnHome()const { return m_isReturnHome; }
-
+			bool IsReturnHome() const { return m_isReturnHome; }
 
 			/**
 			 * @brief クールダウンするかの設定
@@ -169,18 +145,16 @@ namespace app
 			/**
 			 * @brief クールダウンしているかの取得
 			 */
-			bool IsCoolDown()const { return m_isCoolDown; }
-
+			bool IsCoolDown() const { return m_isCoolDown; }
 
 			/**
 			 * @brief 攻撃中かの設定
 			 */
-			void SetIsAttack(const bool coolDown) { m_isAttackPlaying = coolDown; }
+			void SetIsAttack(const bool isAttack) { m_isAttackPlaying = isAttack; }
 			/**
 			 * @brief 攻撃中かの取得
 			 */
-			bool IsAttack()const { return m_isAttackPlaying; }
-
+			bool IsAttack() const { return m_isAttackPlaying; }
 
 			/**
 			 * @brief 咆哮中かの設定
@@ -189,8 +163,7 @@ namespace app
 			/**
 			 * @brief 咆哮中かの取得
 			 */
-			bool IsRoar()const { return m_isRoar; }
-
+			bool IsRoar() const { return m_isRoar; }
 
 			/**
 			 * @brief 起床ゲージのゲッター
@@ -201,7 +174,6 @@ namespace app
 			 */
 			void SetWakeUpGauge(float gauge) { m_wakeUpGauge = gauge; }
 
-
 			/**
 			 * @brief 睡眠タイマーのゲッター
 			 */
@@ -210,7 +182,6 @@ namespace app
 			 * @brief 睡眠タイマーのセッター
 			 */
 			void SetSleepTimer(float timer) { m_sleepTimer = timer; }
-
 
 			/**
 			 * @brief 索敵目標座標のゲッター
@@ -231,9 +202,8 @@ namespace app
 			 */
 			bool IsChasing() const { return m_isChasing; }
 
-
 			/**
-			 * @brief　攻撃して叩きつけたかどうかを設定
+			 * @brief 攻撃して叩きつけたかどうかを設定
 			 */
 			void SetAttackImpact(bool isImpact) { m_isAttackImpact = isImpact; }
 			/**
@@ -241,12 +211,14 @@ namespace app
 			 */
 			bool IsAttackImpact() const { return m_isAttackImpact; }
 
-
-		public:
-			bool IsSwim()const;
+			bool IsSwim() const;
 
 
 		private:
+			// --- マジックナンバー排除用の内部定数 ---
+			/** スティック入力の閾値 */
+			static constexpr float STICK_INPUT_THRESHOLD = 0.0001f;
+
 			/** 待機状態に変更できるか */
 			bool CanChangeIdle() const;
 			/** スタン状態に変更できるか */
@@ -256,18 +228,16 @@ namespace app
 			/** 徘徊状態に変更できるか */
 			bool CanChangeWalk() const;
 			/** チェイス状態に変更できるか */
-			bool CanChangeChace() const;
+			bool CanChangeChase() const;
 			/** 攻撃状態に変更できるか */
 			bool CanChangeAttack() const;
 			/** 帰巣状態に変更できるか */
-			bool CanChangeReturnHome()const;
+			bool CanChangeReturnHome() const;
 			/** クールダウン状態に変更できるか */
-			bool CanChangeCoolDown()const;
+			bool CanChangeCoolDown() const;
 			/** 咆哮状態に変更できるか */
-			bool CanChangeRoar()const;
+			bool CanChangeRoar() const;
 
-
-		private:
 			/** エネミーのポインタ */
 			Enemy* m_owner;
 			/** エネミーのステータス */
@@ -291,54 +261,40 @@ namespace app
 
 			/** Aボタンを押せるかどうか */
 			bool m_actionButtonA;
-
 			/** Bボタンを押せるかどうか */
 			bool m_actionButtonB;
-
 			/** Xボタンを押せるかどうか */
 			bool m_actionButtonX;
 
 			/** サーチ状態かどうか */
-			bool m_isSeach;
-
+			bool m_isSearch;
 			/** ペンギンを見つけたか */
 			bool m_isFindPenguin;
-
 			/** ペンギンが近くにいるか */
 			bool m_isNearPenguin;
-
 			/** 攻撃できるか */
 			bool m_canAttack;
-
 			/** スタン状態か */
 			bool m_isStun;
-
 			/** 帰巣する状態か */
 			bool m_isReturnHome;
-
 			/** クールダウン状態か */
 			bool m_isCoolDown;
-
 			/** 攻撃中かどうか */
 			bool m_isAttackPlaying;
-
 			/** 咆哮できるかどうか */
 			bool m_isRoar;
-
 			/** 追跡（チェイス）中かどうか */
-			bool m_isChasing = false;
-
+			bool m_isChasing;
 			/** エネミーが攻撃して叩きつけたかどうか */
-			bool m_isAttackImpact = false;
+			bool m_isAttackImpact;
 
 			/** 起床ゲージ（満タン=完全に眠っている、0=起きる） */
-			float m_wakeUpGauge = 0.0f;
-
+			float m_wakeUpGauge;
 			/** 睡眠タイマー（30秒から減り続け、0になると起きる） */
-			float m_sleepTimer = 0.0f;
-
+			float m_sleepTimer;
 			/** 索敵時の目標座標 */
-			Vector3 m_searchTargetPos = Vector3::Zero;
+			Vector3 m_searchTargetPos;
 		};
 	}
 }

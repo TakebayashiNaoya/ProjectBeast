@@ -53,8 +53,9 @@ namespace app
 			m_staminaDrainRate = parameter->staminaDrainRate;
 			m_lostChaseDistance = parameter->lostChaseDistance;
 
-			// 初回呼び出し時（-1.0f の時）のみ最大スタミナをセットする
-			if (m_stamina < 0.0f)
+			// 初回呼び出し時のみ最大スタミナをセットする
+			// （マジックナンバー -1.0f を UNINITIALIZED_STAMINA に変更）
+			if (m_stamina == UNINITIALIZED_STAMINA)
 			{
 				m_stamina = m_maxStamina;
 			}

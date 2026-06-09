@@ -7,7 +7,6 @@
 #include "Enemy.h"
 #include "EnemyIState.h"
 #include "EnemyStateMachine.h"
-
 #include "EnemyStatus.h"
 
 
@@ -28,15 +27,20 @@ namespace app
 			, m_actionButtonA(false)
 			, m_actionButtonB(false)
 			, m_actionButtonX(false)
+			, m_isSearch(false)
 			, m_isFindPenguin(false)
 			, m_isNearPenguin(false)
 			, m_canAttack(false)
-			, m_isSeach(false)
 			, m_isStun(false)
 			, m_isReturnHome(false)
 			, m_isCoolDown(false)
 			, m_isAttackPlaying(false)
 			, m_isRoar(false)
+			, m_isChasing(false)
+			, m_isAttackImpact(false)
+			, m_wakeUpGauge(0.0f)
+			, m_sleepTimer(0.0f)
+			, m_searchTargetPos(Vector3::Zero)
 		{
 			// ステートの追加
 			AddState<EnemyIdleState>(this);
@@ -51,12 +55,11 @@ namespace app
 			AddState<EnemyCoolDownState>(this);
 			AddState<EnemyRoarState>(this);
 
-
 			// 初期ステートの設定
 			m_currentState = FindState(EnemyIdleState::ID());
 
+			// TODO: 初期座標のハードコーディング。必要に応じてパラメータ化を検討
 			m_transform.m_position = Vector3(0.0f, 10.0f, 100.0f);
-
 		}
 
 
@@ -89,58 +92,6 @@ namespace app
 
 		core::IState* EnemyStateMachine::GetChangeState()
 		{
-			//// 泳ぎ判定（チャタリング防止ロジック）
-			//if (m_currentState == FindState(EnemySwimState::ID()))
-			//{
-			//	// すでに泳いでいる場合：地面（陸地）に足が着くまで水泳を維持する
-			//	if (IsInWater() || !IsOnGround())
-			//	{
-			//		return FindState(EnemySwimState::ID());
-			//	}
-			//}
-			//else if (CanChangeSwimState())
-			//{
-			//	// まだ泳いでいない場合：水に入る条件を満たしたら水泳開始
-			//	return FindState(EnemySwimState::ID());
-			//}
-
-			//if (CanChangeReturnHome())
-			//{
-			//	return FindState(EnemyReturnHomeState::ID());
-			//}
-			//if (CanChangeStun())
-			//{
-			//	return FindState(EnemyStunState::ID());
-			//}
-
-			//if (CanChangeAttack())
-			//{
-			//	return FindState(EnemyAttackState::ID());
-			//}
-			//if (CanChangeRoar())
-			//{
-			//	return FindState(EnemyRoarState::ID());
-			//}
-
-			//if (CanChangeChace())
-			//{
-			//	return FindState(EnemyChaseState::ID());
-			//}
-			//if (CanChangeSearch())
-			//{
-			//	return FindState(EnemySearchState::ID());
-			//}
-
-			//if (CanChangeWalk())
-			//{
-			//	return FindState(EnemyWalkState::ID());
-			//}
-			//if (CanChangeCoolDown())
-			//{
-			//	return FindState(EnemyCoolDownState::ID());
-			//}
-
-			//return FindState(EnemyIdleState::ID());
 			// ① クールダウン中は絶対維持
 			if (m_currentState == FindState(EnemyCoolDownState::ID()))
 			{
@@ -169,7 +120,7 @@ namespace app
 
 			// ⑥ 以降は既存の優先度
 			if (CanChangeReturnHome()) return FindState(EnemyReturnHomeState::ID());
-			if (CanChangeChace())      return FindState(EnemyChaseState::ID());
+			if (CanChangeChase())      return FindState(EnemyChaseState::ID());
 			if (CanChangeSearch())     return FindState(EnemySearchState::ID());
 			if (CanChangeWalk())       return FindState(EnemyWalkState::ID());
 			if (CanChangeCoolDown())   return FindState(EnemyCoolDownState::ID());
@@ -180,7 +131,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeIdle() const
 		{
-			if (m_stickLAmount < 0.0001f) {
+			if (m_stickLAmount < STICK_INPUT_THRESHOLD) {
 				return true;
 			}
 			return false;
@@ -199,7 +150,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeSearch() const
 		{
-			if (m_isSeach && m_stickLAmount >= 0.0001f)
+			if (m_isSearch && m_stickLAmount >= STICK_INPUT_THRESHOLD)
 			{
 				return true;
 			}
@@ -209,14 +160,14 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeWalk() const
 		{
-			if (m_stickLAmount >= 0.0001f) {
+			if (m_stickLAmount >= STICK_INPUT_THRESHOLD) {
 				return true;
 			}
 			return false;
 		}
 
 
-		bool EnemyStateMachine::CanChangeReturnHome()const
+		bool EnemyStateMachine::CanChangeReturnHome() const
 		{
 			if (m_isReturnHome)
 			{
@@ -226,9 +177,9 @@ namespace app
 		}
 
 
-		bool EnemyStateMachine::CanChangeChace() const
+		bool EnemyStateMachine::CanChangeChase() const
 		{
-			if (m_actionButtonB && m_stickLAmount > 0.0001f) {
+			if (m_actionButtonB && m_stickLAmount > STICK_INPUT_THRESHOLD) {
 				return true;
 			}
 			return false;
@@ -237,7 +188,7 @@ namespace app
 
 		bool EnemyStateMachine::CanChangeAttack() const
 		{
-			if (!m_isNearPenguin)return false;
+			if (!m_isNearPenguin) return false;
 			if (m_actionButtonX) {
 				return true;
 			}
@@ -245,7 +196,7 @@ namespace app
 		}
 
 
-		bool EnemyStateMachine::CanChangeCoolDown()const
+		bool EnemyStateMachine::CanChangeCoolDown() const
 		{
 			if (m_isCoolDown)
 			{
@@ -255,7 +206,7 @@ namespace app
 		}
 
 
-		bool EnemyStateMachine::CanChangeRoar()const
+		bool EnemyStateMachine::CanChangeRoar() const
 		{
 			if (m_isRoar)
 			{
@@ -274,13 +225,14 @@ namespace app
 		void EnemyStateMachine::Setup(Enemy* owner)
 		{
 			m_owner = owner;
-
 		}
+
 
 		const EnemyStatus* EnemyStateMachine::GetOwnerStatus()
 		{
 			return m_owner->GetStatus<EnemyStatus>();
 		}
+
 
 		EnemyStatus* EnemyStateMachine::GetOwnerStatusMutable()
 		{
