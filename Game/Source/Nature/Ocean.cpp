@@ -16,8 +16,6 @@ namespace app
 	{
 		namespace
 		{
-			/** 海パラメーターJSONのパス */
-			const char* OCEAN_PARAMETER_JSON_PATH = "Assets/parameter/nature/oceanParameter.json";
 		}
 
 
@@ -785,7 +783,7 @@ namespace app
 		}
 
 
-		void Ocean::Start()
+		void Ocean::Start(const char* parameterJsonPath)
 		{
 			const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> colorBufferFormat = {
 				DXGI_FORMAT_R32G32B32A32_FLOAT,
@@ -794,7 +792,7 @@ namespace app
 
 			// JSONからパラメーターを読み込む
 			core::ParameterManager::Get()->LoadParameter<MasterOceanParameter>(
-				OCEAN_PARAMETER_JSON_PATH,
+				parameterJsonPath,
 				[](const nlohmann::json& j, MasterOceanParameter& p)
 				{
 					p.baseReflectance = j["baseReflectance"].get<float>();

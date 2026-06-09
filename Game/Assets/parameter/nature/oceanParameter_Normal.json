@@ -1,0 +1,12 @@
+[
+  {
+    "baseReflectance": 0.0,
+    "wave1Amplitude":  5.0,
+    "wave1Frequency":  0.025,
+    "wave2Amplitude":  2.0,
+    "wave2Frequency":  0.06,
+    "specularPower":   50.0,
+    "specularScale":   0.5,
+    "ambientScale":    2.0
+  }
+]
