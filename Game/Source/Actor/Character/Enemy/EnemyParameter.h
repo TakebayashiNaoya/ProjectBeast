@@ -31,6 +31,13 @@ namespace app
 			float walkSpeed;
 			/** 最大食事数 */
 			int maxEat;
+
+			/** 最大スタミナ */
+			float maxStamina;
+			/** スタミナの消費量 */
+			float staminaDrainRate;
+			/** ペンギンを追うのを止める距離 */
+			float lostChaseDistance;
 		};
 	}
 }

@@ -47,13 +47,17 @@ namespace app
 
 			constexpr int SEARCH_RAND_RATE = 30; // 索敵状態に入るときのランダム率
 
-			constexpr int SAERCE_RAND_MAX = 100; // 索敵状態に入るときのランダム率の最大値
+			constexpr int SEARCH_RAND_MAX = 100; // 索敵状態に入るときのランダム率の最大値
 
 			constexpr float MIN_SPEED = 0.1f; // 泳ぎエフェクトのスケールを決めるための最低速度
 
 			constexpr float MAX_SPEED = 1.0f; // 泳ぎエフェクトのスケールを決めるための最高速度
 
 			constexpr float SEARCH_THRESHOLD = 15.0f; // 索敵に入るための閾値
+
+			constexpr float ATTACK_OFFSET_FORWARD = 60.0f; // 攻撃エフェクトの前方オフセット
+
+			constexpr float ATTACK_OFFSET_DOWN = 10.0f;    // 攻撃エフェクトの下方向オフセット
 		}
 
 
@@ -64,7 +68,7 @@ namespace app
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyIdleState::Enter()
@@ -78,9 +82,7 @@ namespace app
 				m_owner->PlayAnimation(EnEnemyAnimationType::Idle);
 			}
 
-
 			SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
-
 		}
 
 
@@ -92,7 +94,7 @@ namespace app
 
 			if (totalNoise >= SEARCH_THRESHOLD)
 			{
-				m_owner->SetSeach(true);
+				m_owner->SetSearch(true);
 				m_owner->SetSearchTargetPos(loudestPos);
 			}
 		}
@@ -109,9 +111,7 @@ namespace app
 
 
 
-		/************************************/
-
-
+		/***************************************/
 
 
 		void EnemyStunState::Enter()
@@ -141,15 +141,14 @@ namespace app
 
 
 		EnemyStunState::EnemyStunState(EnemyStateMachine* owner)
-			:EnemyIState(owner),
-			m_stunTimer(0.0f)
-		{
-
-		}
+			: EnemyIState(owner)
+			, m_stunTimer(0.0f)
+		{}
 
 
-		/************************************/
 
+
+		/***************************************/
 
 
 		void EnemySearchState::Enter()
@@ -164,7 +163,7 @@ namespace app
 			{
 				m_owner->PlayAnimation(EnEnemyAnimationType::BackWalk);
 			}
-			if (rand() % SAERCE_RAND_MAX < SEARCH_RAND_RATE)
+			if (rand() % SEARCH_RAND_MAX < SEARCH_RAND_RATE)
 			{
 				SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
 			}
@@ -198,7 +197,7 @@ namespace app
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyWalkState::Enter()
@@ -224,7 +223,7 @@ namespace app
 
 		void EnemyWalkState::Update()
 		{
-			if (m_owner->GetStickLAmount() < 0.0001f) {
+			if (m_owner->GetStickLAmount() < STICK_AMOUNT_THRESHOLD) {
 				return;
 			}
 			m_owner->Move();
@@ -240,7 +239,7 @@ namespace app
 
 			if (totalNoise >= SEARCH_THRESHOLD)
 			{
-				m_owner->SetSeach(true);
+				m_owner->SetSearch(true);
 				m_owner->SetSearchTargetPos(loudestPos);
 			}
 		}
@@ -265,7 +264,7 @@ namespace app
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyChaseState::Enter()
@@ -315,37 +314,29 @@ namespace app
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyJumpState::Enter()
-		{
-
-		}
+		{}
 
 
 		void EnemyJumpState::Update()
-		{
-
-		}
+		{}
 
 
 		void EnemyJumpState::Exit()
-		{
-
-		}
+		{}
 
 
 		EnemyJumpState::EnemyJumpState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
-		{
-
-		}
+		{}
 
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemySwimState::Enter()
@@ -369,8 +360,8 @@ namespace app
 			const Vector3& velocity = m_owner->GetCurrentVelocity();
 			float currentSpeed = velocity.Length();
 
-			float maxSpeed = max(MIN_SPEED, m_owner->GetStickLAmount());
-			float speedRatio = min(MAX_SPEED, currentSpeed / maxSpeed); // 速度の割合（0.0～1.0）
+			float maxSpeed = (std::max)(MIN_SPEED, m_owner->GetStickLAmount());
+			float speedRatio = (std::min)(MAX_SPEED, currentSpeed / maxSpeed);
 
 			float scaleMultiplier = MIN_SPLASH_SCALE_RATIO + ((MAX_SPLASH_SCALE_RATIO - MIN_SPLASH_SCALE_RATIO) * speedRatio);
 			Vector3 currentScale = SPLASH_EFFECT_SCALE * scaleMultiplier;
@@ -412,14 +403,12 @@ namespace app
 		EnemySwimState::EnemySwimState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
 			, m_splashEffectTimer(0.0f)
-		{
-
-		}
+		{}
 
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyAttackState::Enter()
@@ -456,10 +445,10 @@ namespace app
 				}
 
 				// 3. 座標をずらす
-				const float OFFSET_FORWARD = 60.0f;
+				const float OFFSET_FORWARD = ATTACK_OFFSET_FORWARD;
 				effectPos += forward * OFFSET_FORWARD;
 
-				const float OFFSET_DOWN = 10.0f;
+				const float OFFSET_DOWN = ATTACK_OFFSET_DOWN;
 				effectPos.y += OFFSET_DOWN;
 
 
@@ -495,7 +484,7 @@ namespace app
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyReturnHomeState::Enter()
@@ -545,7 +534,7 @@ namespace app
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyCoolDownState::Enter()
@@ -557,6 +546,13 @@ namespace app
 			// 寝た瞬間に両ゲージを満タンにする
 			m_owner->SetWakeUpGauge(MAX_WAKE_UP_GAUGE);
 			m_owner->SetSleepTimer(MAX_SLEEP_TIME);
+
+			// 寝た瞬間にスタミナも全回復させる
+			auto* mutableStatus = m_owner->GetOwnerStatusMutable();
+			if (mutableStatus != nullptr)
+			{
+				mutableStatus->FullRecoverStamina();
+			}
 		}
 
 
@@ -591,7 +587,7 @@ namespace app
 			//------------------------------------------------------------
 			float sleepTimer = m_owner->GetSleepTimer();
 			sleepTimer -= deltaTime;
-			sleepTimer = max(0.0f, sleepTimer);
+			sleepTimer = (std::max)(0.0f, sleepTimer);
 			m_owner->SetSleepTimer(sleepTimer);
 
 			//------------------------------------------------------------
@@ -604,7 +600,7 @@ namespace app
 				// 音で起きた場合は索敵状態へ
 				if (wakeUpGauge <= 0.0f)
 				{
-					m_owner->SetSeach(true);
+					m_owner->SetSearch(true);
 					m_owner->SetSearchTargetPos(loudestPos);
 				}
 			}
@@ -624,7 +620,7 @@ namespace app
 
 
 
-		/************************************/
+		/***************************************/
 
 
 		void EnemyRoarState::Enter()
@@ -636,9 +632,7 @@ namespace app
 
 
 		void EnemyRoarState::Update()
-		{
-
-		}
+		{}
 
 
 		void EnemyRoarState::Exit()
@@ -649,8 +643,6 @@ namespace app
 
 		EnemyRoarState::EnemyRoarState(EnemyStateMachine* owner)
 			: EnemyIState(owner)
-		{
-
-		}
+		{}
 	}
 }
