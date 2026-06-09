@@ -8,6 +8,7 @@
 #include "EnemyController.h"
 #include "EnemyManager.h"
 #include "EnemyStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Util/JsonConverter.h"
 
@@ -152,6 +153,33 @@ namespace app
 			}
 
 			return nearest;
+		}
+
+
+		bool EnemyManager::FindNearestChaserOf(const actor::ChildPenguin* penguin, Vector3& outPos) const
+		{
+			float nearestDistSq = FLT_MAX;
+			bool found = false;
+
+			for (const auto& data : m_enemyList)
+			{
+				if (data.controller == nullptr) continue;
+
+				/** 自分（penguin）を追跡中でなければスキップ */
+				if (data.controller->GetFoundPenguin() != penguin) continue;
+
+				Vector3 diff = data.enemy->GetTransform().m_position - penguin->GetTransform().m_position;
+				diff.y = 0.0f;
+				const float distSq = diff.LengthSq();
+
+				if (distSq < nearestDistSq)
+				{
+					nearestDistSq = distSq;
+					outPos = data.enemy->GetTransform().m_position;
+					found = true;
+				}
+			}
+			return found;
 		}
 	}
 }

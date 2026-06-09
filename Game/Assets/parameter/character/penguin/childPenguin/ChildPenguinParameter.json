@@ -98,7 +98,7 @@
     "interventionRange": 300.0,
     "randomRanges": {
       "runSpeed":          [100.0, 130.0],
-      "swimSpeed":         [180.0, 220.0],
+      "swimSpeed":         [220.0, 260.0],
       "sneakSpeed":        [70.0,  90.0],
       "slideSpeed":        [130.0, 170.0],
       "jumpPower":         [250.0, 290.0],

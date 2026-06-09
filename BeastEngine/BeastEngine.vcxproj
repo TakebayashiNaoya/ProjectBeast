@@ -29,6 +29,8 @@
     <ClCompile Include="Geometry\TriangleCuller.cpp" />
     <ClCompile Include="Graphics\BeastMeshParts.cpp" />
     <ClCompile Include="Graphics\BeastModel.cpp" />
+    <ClCompile Include="Graphics\Camera\CameraSystem.cpp" />
+    <ClCompile Include="Graphics\Camera\SubCameraManager.cpp" />
     <ClCompile Include="Graphics\Effect\BeastEffectEmitter.cpp" />
     <ClCompile Include="Graphics\FontRender.cpp" />
     <ClCompile Include="graphics\Light\HemisphereLight.cpp" />
@@ -69,6 +71,8 @@
     <ClInclude Include="Geometry\TriangleCuller.h" />
     <ClInclude Include="Graphics\BeastMeshParts.h" />
     <ClInclude Include="Graphics\BeastModel.h" />
+    <ClInclude Include="Graphics\Camera\CameraSystem.h" />
+    <ClInclude Include="Graphics\Camera\SubCameraManager.h" />
     <ClInclude Include="Graphics\Effect\BeastEffectEmitter.h" />
     <ClInclude Include="Graphics\FontRender.h" />
     <ClInclude Include="graphics\GraphicsEnums.h" />
@@ -85,6 +89,7 @@
     <ClInclude Include="Graphics\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Graphics\PostEffect\PostEffectTypes.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
+    <ClInclude Include="Graphics\RenderViewContext.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />
     <ClInclude Include="Nature\INatureObject.h" />
     <ClInclude Include="Nature\SkyCube.h" />

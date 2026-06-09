@@ -30,6 +30,12 @@ namespace app
 			// m_fenceEvent が未初期化（Init未呼び出し）の場合は何もしない
 			if (m_fenceEvent == nullptr) return;
 
+			// 可視インデックスバッファを削除する
+			for (auto* ib : m_visibleIndexBuffers)
+			{
+				delete ib;
+			}
+
 			//------------------------------------------------------------
 			// GPUがコマンドキューを使い終わるまで待つ
 			//------------------------------------------------------------
@@ -149,13 +155,13 @@ namespace app
 		}
 
 
-		void OceanMesh::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld)
+		void OceanMesh::SetupDrawCommands(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view)
 		{
 			// 共通定数バッファを更新する（b0）
 			SCommonConstantBuffer cb;
 			cb.mWorld = mWorld;
-			cb.mView = g_camera3D->GetViewMatrix();
-			cb.mProj = g_camera3D->GetProjectionMatrix();
+			cb.mView = view.camera->GetViewMatrix();
+			cb.mProj = view.camera->GetProjectionMatrix();
 			cb.mulColor = Vector4::One;
 			m_commonConstantBuffer.CopyToVRAM(cb);
 
@@ -171,17 +177,9 @@ namespace app
 		}
 
 
-		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld)
+		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::RenderViewContext& view)
 		{
-			SetupDrawCommands(rc, mWorld);
-			rc.SetIndexBuffer(m_indexBuffer);
-			rc.DrawIndexedInstance(m_indexCount, 1);
-		}
-
-
-		void OceanMesh::Draw(RenderContext& rc, const Matrix& mWorld, const nsBeastEngine::Frustum& frustum)
-		{
-			SetupDrawCommands(rc, mWorld);
+			SetupDrawCommands(rc, mWorld, view);
 
 			// 可視インデックスを収集する
 			m_visibleIndexArray.clear();
@@ -199,7 +197,7 @@ namespace app
 					const SChunkAABB& chunkAABB = m_chunkAABBs[static_cast<size_t>(chunkIndex)];
 
 					// チャンクAABBが視錐台と交差しない場合はスキップする
-					if (!frustum.IsIntersectAABBWorld(chunkAABB.min, chunkAABB.max))
+					if (!view.frustum.IsIntersectAABBWorld(chunkAABB.min, chunkAABB.max))
 					{
 						continue;
 					}
@@ -224,7 +222,7 @@ namespace app
 							const Vector3 cellMax(cellMaxX, chunkAABB.max.y, cellMaxZ);
 
 							// セルAABBが視錐台と交差しない場合はスキップする
-							if (!frustum.IsIntersectAABBWorld(cellMin, cellMax))
+							if (!view.frustum.IsIntersectAABBWorld(cellMin, cellMax))
 							{
 								continue;
 							}
@@ -255,9 +253,11 @@ namespace app
 				return;
 			}
 
-			// 可視インデックスをGPUバッファに書き込んでドローコールを発行する
-			m_visibleIndexBuffer.Copy(m_visibleIndexArray.data());
-			rc.SetIndexBuffer(m_visibleIndexBuffer);
+			// メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で別スロットに書き込む
+			const int frameIdx = g_graphicsEngine->GetBackBufferIndex();
+			auto* visIb = m_visibleIndexBuffers[frameIdx];
+			visIb->Copy(m_visibleIndexArray.data());
+			rc.SetIndexBuffer(*visIb);
 			rc.DrawIndexedInstance(static_cast<int>(m_visibleIndexArray.size()), 1);
 		}
 
@@ -358,12 +358,16 @@ namespace app
 			);
 			m_indexBuffer.Copy(m_srcIndexArray.data());
 
-			// 可視インデックスバッファ（カリングあり描画用）
-			// 最大でも全インデックス数と同じサイズになるため、同サイズで確保する
-			m_visibleIndexBuffer.Init(
-				static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
-				sizeof(uint32_t)
-			);
+			// 可視インデックスバッファをダブルバッファで作成する
+			// [0]=メインビュー用、[1]=サブビュー用（SetFrameIndexによる切り替えと対応）
+			for (int buf = 0; buf < 2; buf++)
+			{
+				m_visibleIndexBuffers[buf] = new IndexBuffer;
+				m_visibleIndexBuffers[buf]->Init(
+					static_cast<int>(sizeof(uint32_t) * m_srcIndexArray.size()),
+					sizeof(uint32_t)
+				);
+			}
 
 			// 可視インデックス配列を最大サイズで事前確保しておく（毎フレームのアロケーションを避ける）
 			m_visibleIndexArray.reserve(static_cast<size_t>(totalIndices));
@@ -851,12 +855,11 @@ namespace app
 		}
 
 
-		void Ocean::Render(RenderContext& rc)
+		void Ocean::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			// DispatchWaveCS()・BuildChunkAABBs()はUpdate()で完了済みのため、
 			// ここでは描画コマンドのみを発行する
-			const nsBeastEngine::Frustum& frustum = g_renderingEngine->GetFrustum();
-			m_oceanMesh.Draw(rc, CalcWorldMatrix(), frustum);
+			m_oceanMesh.Draw(rc, CalcWorldMatrix(), view);
 		}
 
 

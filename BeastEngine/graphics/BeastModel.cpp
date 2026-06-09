@@ -108,8 +108,8 @@ namespace nsBeastEngine
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
-			g_camera3D->GetViewMatrix(),
-			g_camera3D->GetProjectionMatrix(),
+			CameraSystem::Get().GetActiveCamera()->GetViewMatrix(),
+			CameraSystem::Get().GetActiveCamera()->GetProjectionMatrix(),
 			numInstance,
 			nullptr
 		);
@@ -172,8 +172,8 @@ namespace nsBeastEngine
 		m_meshParts.Draw(
 			rc,
 			m_worldMatrix,
-			g_camera3D->GetViewMatrix(),
-			g_camera3D->GetProjectionMatrix(),
+			CameraSystem::Get().GetActiveCamera()->GetViewMatrix(),
+			CameraSystem::Get().GetActiveCamera()->GetProjectionMatrix(),
 			numInstance,
 			&frustum
 		);

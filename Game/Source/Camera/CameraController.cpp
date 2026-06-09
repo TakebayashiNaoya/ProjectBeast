@@ -32,8 +32,8 @@ namespace app
 				inputDirection.z = g_pad[0]->GetLStickYF();
 
 				// カメラの前方向と右方向のベクトルを取得
-				Vector3 forward = g_camera3D->GetForward();
-				Vector3 right = g_camera3D->GetRight();
+				Vector3 forward = CameraSystem::Get().GetMainCamera().GetForward();
+				Vector3 right = CameraSystem::Get().GetMainCamera().GetRight();
 
 				// y方向には移動しない
 				forward.y = 0.0f;

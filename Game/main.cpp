@@ -49,35 +49,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
-		g_engine->BeginFrame();
-
-		// 更新まわりはここから下
-
-		g_engine->ExecuteUpdate();
 		application->Update();
 
-		// 描画まわりはここから下
-
-		// レンダリングエンジンの更新。
-		g_renderingEngine->Update();
-
-		g_engine->ExecuteRender();
-		auto& renderContext = g_graphicsEngine->GetRenderContext();
-
-#ifdef DEBUG
-		nsBeastEngine::nsCollision::PhysicsWorld::Get().DebubDrawWorld(renderContext);
-#endif // DEBUG
-
-		application->Render(renderContext);
-		//レンダリングエンジンを実行。		
-		g_renderingEngine->Execute(renderContext);
-
-		//当たり判定描画。
-		g_engine->DebubDrawWorld();
-
-
-
-		g_engine->EndFrame();
+		auto* engine = nsBeastEngine::BeastEngine::GetInstance();
+		engine->BeginExecute();
+		application->Render(g_graphicsEngine->GetRenderContext());
+		engine->EndExecute();
 	}
 
 	delete application;
@@ -94,4 +71,3 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 #endif // _DEBUG
 	return 0;
 }
-

@@ -16,6 +16,7 @@ namespace app
 		class ChildPenguin;
 		class ChildPenguinStateMachine;
 		class ClumsyChildPenguinStateMachine;
+		class NaughtyChildPenguinStateMachine;
 
 
 		/**
@@ -134,6 +135,14 @@ namespace app
 			/** かまくらイベントの更新処理 */
 			void UpdateIglooEvent();
 
+			/**
+			 * @brief シロクマ逃走チェックと移動入力設定
+			 * @details 自分を追跡中のエネミーが FLEE_DETECTION_DISTANCE 以内にいれば
+			 *          エネミーと反対方向へダッシュ入力を設定してtrueを返す。
+			 * @return 逃走行動中ならtrue（このフレームの通常AIをスキップする）
+			 */
+			bool CheckAndFlee();
+
 
 		protected:
 			/** 子ペンギンのポインタ */
@@ -182,6 +191,21 @@ namespace app
 
 			/** 現在の移動フェーズ */
 			MovePhase m_movePhase = MovePhase::Stop;
+
+			/** 逃走検知距離（この距離以内の追跡エネミーがいると逃走行動に入る） */
+			static constexpr float FLEE_DETECTION_DISTANCE = 300.0f;
+
+			/**
+			 * @brief 逃走方向を切り替えるまでの残り時間（秒）
+			 * @details 0以下になると次の方向が抽選される
+			 */
+			float m_fleeDirChangeTimer = 0.0f;
+
+			/**
+			 * @brief 逃走方向に加えるY軸回転オフセット（ラジアン）
+			 * @details 0のとき直進、±値のとき左右に振れる
+			 */
+			float m_fleeAngleOffset = 0.0f;
 		};
 
 
@@ -295,7 +319,19 @@ namespace app
 			 */
 			void PickNewRoamTarget();
 
+			/**
+			 * @brief わいわいエフェクトの再生
+			 */
+			void PlayLivelyEffect();
+
+			/**
+			 * @brief わいわいエフェクトの停止
+			 */
+			void StopLivelyEffect();
+
 		private:
+			/** やんちゃ固有ステートマシンへのポインタ（キャスト済みのキャッシュ） */
+			NaughtyChildPenguinStateMachine* m_naughtyStateMachine = nullptr;
 			/** 世話焼きペンギンに制止されているかどうか */
 			bool m_isRestrained = false;
 			/** 徘徊先の目標座標 */
@@ -304,6 +340,14 @@ namespace app
 			float m_roamTriggerDistance = 0.0f;
 			/** 徘徊先を選ぶ現在地からの半径 */
 			float m_roamRadius = 0.0f;
+			/** 反省時間 */
+			float m_scoldCooldown = 0.0f;
+			/** 渦潮に飲み込まれたかどうかのフラグ */
+			bool m_wasSwallowedByWhirlpool = false;
+			/** わいわいエフェクトのインターバル */
+			float m_livelyInterval = 0.0f;
+			/** わいわいエフェクト */
+			EffectHandle m_livelyEffectHandle = INVALID_EFFECT_HANDLE;
 		};
 
 
@@ -381,7 +425,14 @@ namespace app
 			 */
 			void ReleaseSuppression(ChildPenguin* target) const;
 
+
 		private:
+			/**
+			 * @brief 介入時にエフェクトを再生する
+			 * @details 対象ペンギンの頭上に汗エフェクト
+			 */
+			void PlayCaringEffect() const;
+
 			/** 現在介入中の対象ペンギン */
 			ChildPenguin* m_interventionTarget = nullptr;
 			/**
@@ -390,7 +441,13 @@ namespace app
 			 */
 			float m_interventionRange = 0.0f;
 			/** 介入到達とみなす距離 */
-			static constexpr float INTERVENTION_REACH_DISTANCE = 10.0f;
+			static constexpr float INTERVENTION_REACH_DISTANCE = 25.0f;
+			/** 複数回連続で流すための制御値 */
+			mutable float m_sweatEffectCoolTime = 0.0f;
+			/** 汗エフェクトハンドル */
+			mutable EffectHandle m_caringEffectHandle;
+			/** 汗エフェクトの回数制御値 */
+			mutable int m_sweatEffectCount = 0;
 		};
 	}
 }

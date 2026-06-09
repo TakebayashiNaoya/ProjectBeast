@@ -86,7 +86,7 @@ namespace app
 
 			// ワールド座標をスクリーン座標に変換してアイコンの位置をシロクマの頭上に設定。
 			Vector2 screenPos = Vector2::Zero;
-			g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, m_targetPosition);
+			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, m_targetPosition);
 
 			// タイマーのオフセットY値を取得。
 			const float offsetY = m_pbTimerStatus->GetOffsetValueY();

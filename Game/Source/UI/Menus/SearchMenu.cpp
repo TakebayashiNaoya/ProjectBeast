@@ -84,7 +84,7 @@ namespace app
 				Vector3 iconWorldPos = enemyPos + Vector3(m_searchStatus->GetIconPosX(), m_searchStatus->GetOffsetValueY(), m_searchStatus->GetIconPosZ());
 
 				// カメラの座標を取得。
-				Vector3 cameraPos = g_camera3D->GetPosition();
+				Vector3 cameraPos = CameraSystem::Get().GetMainCamera().GetPosition();
 				// カメラからシロクマへのベクトルを計算。
 				Vector3 toEnemy = enemyPos - cameraPos;
 
@@ -92,7 +92,7 @@ namespace app
 				toEnemy.Normalize();
 
 				// 内積が0以下の時は、全てのUIIconを非表示。
-				if (g_camera3D->GetForward().Dot(toEnemy) <= m_searchStatus->GetDotValue())
+				if (CameraSystem::Get().GetMainCamera().GetForward().Dot(toEnemy) <= m_searchStatus->GetDotValue())
 				{
 					auto* canFindIcon = GetUI<UIIcon>(Hash32("canSearchIcon"));
 					if (canFindIcon) canFindIcon->m_isDraw = false;
@@ -112,7 +112,7 @@ namespace app
 
 				Vector2 screenPos = Vector2::Zero;
 				// シロクマの頭上のスクリーン座標を計算
-				g_camera3D->CalcScreenPositionFromWorldPosition(screenPos, iconWorldPos);
+				CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, iconWorldPos);
 				iconPos = Vector3(screenPos.x, screenPos.y, 0.0f);
 			}
 
