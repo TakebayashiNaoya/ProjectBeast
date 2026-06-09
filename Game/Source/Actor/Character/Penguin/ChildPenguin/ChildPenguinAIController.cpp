@@ -43,10 +43,14 @@ namespace app
 			const Vector3 CARING_SWEAT_EFFECT_POSITION = { 0.0f,30.0f,0.0f };
 			/** 世話焼きペンギンのエフェクトスケール */
 			const Vector3 CARING_SWEAT_EFFECT_SCALE = { 10.0f,10.0f,10.0f };
+			/** やんちゃペンギンのエフェクトスケール */
+			const Vector3 NAUGHTY_LIVELY_EFFECT_SCALE = { 50.0f,50.0f,50.0f };
 			/** 世話焼きペンギンの最大再生回数 */
 			constexpr int MAX_SWEAT_COUNT = 3;
 			/** ずらす間隔 */
 			constexpr float SWEAT_INTERVAL = 0.3f;
+			/** 秒数判定 */
+			constexpr float LIVELY_INTERVAL = 0.7f;
 
 
 			/** シロクマを起こすための距離 */
@@ -83,6 +87,33 @@ namespace app
 			 *          停止アニメ中も滑り続ける問題を防ぐ。
 			 */
 			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 0.1f;
+
+
+			/**
+			 * @brief 逃走方向を次に変えるまでの最短保持時間（秒）
+			 */
+			constexpr float FLEE_DIR_HOLD_MIN = 1.5f;
+			/**
+			 * @brief 逃走方向を次に変えるまでの最長保持時間（秒）
+			 */
+			constexpr float FLEE_DIR_HOLD_MAX = 2.0f;
+			/**
+			 * @brief 逃走時に直進を選ぶ確率（残りは横方向回避）
+			 */
+			constexpr float FLEE_STRAIGHT_CHANCE = 0.4f;
+			/**
+			 * @brief 回避時の最小角度（ラジアン） = 45度
+			 */
+			constexpr float FLEE_DODGE_ANGLE_MIN = 0.785398f;
+			/**
+			 * @brief 回避時の最大角度（ラジアン） = 90度
+			 */
+			constexpr float FLEE_DODGE_ANGLE_MAX = 1.570796f;
+			/**
+			 * @brief 左右どちらによけるかの確率
+			 */
+			constexpr float FLEE_SIGN_FLIP_CHANCE = 0.5f;
+
 
 			/**
 			 * @brief 乱数エンジン（起動時に一度だけシード初期化）
@@ -448,6 +479,83 @@ namespace app
 		}
 
 
+		bool ChildPenguinAIController::CheckAndFlee()
+		{
+			Vector3 chaserPos;
+			if (!EnemyManager::GetInstance()->FindNearestChaserOf(m_owner, chaserPos))
+			{
+				// 追跡者がいなくなったらタイマーをリセットして次回の逃走に備える
+				m_fleeDirChangeTimer = 0.0f;
+				m_fleeAngleOffset = 0.0f;
+				return false;
+			}
+
+			Vector3 myPos = m_owner->GetTransform().m_position;
+			Vector3 fleeDir = myPos - chaserPos;
+			fleeDir.y = 0.0f;
+
+			// 追跡中でも距離が遠すぎる場合はまだ逃げない
+			if (fleeDir.LengthSq() > FLEE_DETECTION_DISTANCE * FLEE_DETECTION_DISTANCE)
+			{
+				m_fleeDirChangeTimer = 0.0f;
+				m_fleeAngleOffset = 0.0f;
+				return false;
+			}
+
+			// 親が隊列参加距離以内にいる場合は逃走より隊列を優先する
+			// → false を返すことで呼び出し元の通常AI（隊列追従）処理へ制御を渡す
+			if (GetDistanceToDaddy() <= m_joinDistance)
+			{
+				m_fleeDirChangeTimer = 0.0f;
+				m_fleeAngleOffset = 0.0f;
+				return false;
+			}
+
+			if (fleeDir.LengthSq() > FLT_EPSILON)
+			{
+				fleeDir.Normalize();
+			}
+
+			// ── 逃走方向の揺らぎ（たまに横方向へ逃げる）──
+			// タイマーがゼロ以下になるたびに方向を再抽選する
+			m_fleeDirChangeTimer -= g_gameTime->GetFrameDeltaTime();
+			if (m_fleeDirChangeTimer <= 0.0f)
+			{
+				// 次の方向変更まで 0.5～1.5 秒保持する
+				std::uniform_real_distribution<float> intervalDist(FLEE_DIR_HOLD_MIN, FLEE_DIR_HOLD_MAX);
+				m_fleeDirChangeTimer = intervalDist(GetRandomEngine());
+
+				if (RollUnit() >= FLEE_STRAIGHT_CHANCE)
+				{
+					// 30%の確率で横方向（45～90度）へ回避する
+					std::uniform_real_distribution<float> angleDist(FLEE_DODGE_ANGLE_MIN, FLEE_DODGE_ANGLE_MAX);
+					const float sign = (RollUnit() < FLEE_SIGN_FLIP_CHANCE) ? 1.0f : -1.0f;
+					m_fleeAngleOffset = angleDist(GetRandomEngine()) * sign;
+				}
+				else
+				{
+					// 70%の確率で直進
+					m_fleeAngleOffset = 0.0f;
+				}
+			}
+
+			// オフセット角度を X-Z 平面上で flee 方向に適用（Y軸回転）
+			if (fabsf(m_fleeAngleOffset) > FLT_EPSILON)
+			{
+				const float cosA = cosf(m_fleeAngleOffset);
+				const float sinA = sinf(m_fleeAngleOffset);
+				const float newX = fleeDir.x * cosA - fleeDir.z * sinA;
+				const float newZ = fleeDir.x * sinA + fleeDir.z * cosA;
+				fleeDir.x = newX;
+				fleeDir.z = newZ;
+			}
+
+			// エネミーから離れる方向へダッシュ
+			m_stateMachine->SetActionInput(fleeDir, false, true, false, false);
+			return true;
+		}
+
+
 		void ChildPenguinAIController::ForceEjectFromIgloo(const Vector3& iglooPos)
 		{
 			// 1. 各種イベントフラグを強制解除（通常のAI処理に戻すため）
@@ -500,6 +608,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 
@@ -564,6 +676,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
@@ -737,6 +853,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
@@ -761,6 +881,8 @@ namespace app
 
 					manager->UnregisterAttempting(m_owner);
 					m_scoldCooldown = SCOLD_COOLDOWN_DURATION;
+
+					StopLivelyEffect();
 				}
 
 				if (m_isFollowing)
@@ -783,6 +905,7 @@ namespace app
 				m_naughtyStateMachine->SetHasFinishedWaking(false);
 				manager->UnregisterAttempting(m_owner); // 問題行動リストから外れる
 				m_scoldCooldown = SCOLD_COOLDOWN_DURATION; // SCOLD_COOLDOWN_DURATION秒間は満足してシロクマを無視する
+				StopLivelyEffect();
 			}
 
 			if (m_scoldCooldown > 0.0f)
@@ -877,6 +1000,7 @@ namespace app
 					// 巻き込まれたフラグを立てて、入力はゼロにしてシステムに身を任せる
 					m_wasSwallowedByWhirlpool = true;
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					PlayLivelyEffect();
 					return;
 				}
 				else
@@ -889,6 +1013,7 @@ namespace app
 						m_wasSwallowedByWhirlpool = false;
 						manager->UnregisterAttempting(m_owner);
 						m_scoldCooldown = SCOLD_COOLDOWN_DURATION; // 満足して親の元へ帰る
+						StopLivelyEffect();
 						return;
 					}
 
@@ -902,12 +1027,16 @@ namespace app
 						m_naughtyStateMachine->SetIsGoingToWhirlpool(false);
 						manager->UnregisterAttempting(m_owner);
 						m_scoldCooldown = WHIRLPOOL_MISS_COOLDOWN_DURATION; // 少し反省して帰る
+						StopLivelyEffect();
+						return;
 					}
 					else
 					{
 						Vector3 dir = CalculateDirectionToTarget(targetPos);
 						m_stateMachine->SetActionInput(dir, false, true, false, false); // ダッシュで向かう
 					}
+
+					PlayLivelyEffect();
 					return;
 				}
 			}
@@ -925,6 +1054,8 @@ namespace app
 					m_naughtyStateMachine->SetIsAtBear(false);
 					manager->UnregisterAttempting(m_owner);
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					
+					StopLivelyEffect();
 					return;
 				}
 
@@ -945,6 +1076,8 @@ namespace app
 					m_stateMachine->SetActionInput(dir, true, false, false, false);
 				}
 
+				// エフェクトを再生する。
+				PlayLivelyEffect();
 				// シロクマに対処している間は、この後の「追従・待機の通常ロジック」を無視する
 				return;
 			}
@@ -958,6 +1091,8 @@ namespace app
 					/** 徘徊登録を解除する */
 					manager->UnregisterRoaming(m_owner);
 
+					StopLivelyEffect();
+
 					if (!m_isFollowing)
 					{
 						manager->AddFollower(m_owner);
@@ -970,6 +1105,8 @@ namespace app
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
+
+					PlayLivelyEffect();
 				}
 
 				/** 隊列に参加していない状態（＝まだ遠くにいる）なら徘徊を継続する */
@@ -991,6 +1128,7 @@ namespace app
 					}
 
 					BuildInputToTarget(m_roamTarget);
+					PlayLivelyEffect();
 					return;
 				}
 
@@ -1027,6 +1165,7 @@ namespace app
 				}
 
 				BuildInputToTarget(m_roamTarget);
+				PlayLivelyEffect();
 				return;
 			}
 
@@ -1055,6 +1194,56 @@ namespace app
 
 			/** 最大試行回数を超えた場合は現在地をそのまま目標にする */
 			m_roamTarget = currentPos;
+		}
+
+
+		void NaughtyChildPenguinAI::PlayLivelyEffect()
+		{
+			// 時間計測。
+			m_livelyInterval += g_gameTime->GetFrameDeltaTime();
+
+			// 子ペンギンの座標を取得。
+			const Vector3 effectPos = m_owner->GetTransform().m_position;
+			// 子ペンギンのスケールを取得。
+			const Vector3 effectScl = m_owner->GetTransform().m_scale + NAUGHTY_LIVELY_EFFECT_SCALE;
+
+
+			if (m_livelyInterval > LIVELY_INTERVAL)
+			{
+				// エフェクトの再生。
+				m_livelyEffectHandle = EffectManager::Get().PlayEffect(
+					EnEffectKind::NaughtyPenguinLively
+					, effectPos
+					, Quaternion::Identity
+					, effectScl
+				);
+
+				// インターバルをリセット。
+				m_livelyInterval = 0.0f;
+			}
+
+			auto* effect = EffectManager::Get().FindEffect(m_livelyEffectHandle);
+			// エフェクトが存在しているなら
+			if (effect != nullptr)
+			{
+				// 子ペンギンの頭上にエフェクトを表示。
+				effect->SetPosition(effectPos);
+			}
+		}
+
+
+		void NaughtyChildPenguinAI::StopLivelyEffect()
+		{
+			// エフェクトハンドルが有効なら
+			if (m_livelyEffectHandle != INVALID_EFFECT_HANDLE)
+			{
+				// エフェクトを停止。
+				EffectManager::Get().StopEffect(m_livelyEffectHandle);
+				// ハンドルを無効化。
+				m_livelyEffectHandle = INVALID_EFFECT_HANDLE;
+				// インターバルをリセット。
+				m_livelyInterval = 0.0f;
+			}
 		}
 
 
@@ -1095,6 +1284,9 @@ namespace app
 				m_wasSliding = false;
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
 
 			/** 待機命令のとき */
 			if (!isFollowCmd)
@@ -1200,6 +1392,10 @@ namespace app
 				UpdateIglooEvent();
 				return;
 			}
+
+			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
+			if (CheckAndFlee()) return;
+
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 
