@@ -12,22 +12,47 @@
                 "rotation":0,
                 "color":[255,255,255,255]
             },
+
+            {
+                "type" : "UIIcon",
+                "name" : "StageSelectBG",
+                "asset" : "Assets/spriteData/UI/Icon/BGIcon.dds",
+                "width" : 550,
+                "height" : 70,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
             {
                 "type":"UIIcon",
-                "name":"StageSelect",
-                "asset":"Assets/spriteData/UI/StageSelect/StageSelect.dds",
+                "name":"StageSelectText",
+                "asset":"Assets/spriteData/UI/StageSelect/StageSelectText.dds",
                 "width": 400,
                 "height": 50,
-                "position":[-500,350,0],
+                "position":[0, 0, 0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
+            },
+
+
+            {
+                "type" : "UIIcon",
+                "name" : "TutorialBubble",
+                "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
+                "width" : 280,
+                "height" : 100,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
             },
             {
                 "type" : "UIIcon",
                 "name" : "EasyBubble",
                 "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
-                "width" : 300,
+                "width" : 280,
                 "height" : 100,
                 "position" : [0, 0, 0],
                 "scale" : [1, 1, 1],
@@ -38,7 +63,7 @@
                 "type" : "UIIcon",
                 "name" : "NormalBubble",
                 "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
-                "width" : 300,
+                "width" : 280,
                 "height" : 100,
                 "position" : [0, 0, 0],
                 "scale" : [1, 1, 1],
@@ -49,30 +74,21 @@
                 "type" : "UIIcon",
                 "name" : "HardBubble",
                 "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
-                "width" : 300,
+                "width" : 280,
                 "height" : 100,
                 "position" : [0, 0, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
             },
-            {
-                "type" : "UIIcon",
-                "name" : "BackBubble",
-                "asset" : "Assets/spriteData/UI/StageSelect/BackBubble.dds",
-                "width" : 400,
-                "height" : 250,
-                "position" : [0, 0, 0],
-                "scale" : [1, 1, 1],
-                "rotation" : 0,
-                "color" : [255, 255, 255, 255]
-            },
+
+
             {
                 "type" : "UIIcon",
                 "name" : "FrameBG",
                 "asset" : "Assets/spriteData/UI/Frame/FrameBackGround.dds",
-                "width" : 303,
-                "height" : 103,
+                "width" : 293,
+                "height" : 113,
                 "position" : [0, 0, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
@@ -82,30 +98,21 @@
                 "type" : "UIIcon",
                 "name" : "Frame",
                 "asset" : "Assets/spriteData/UI/Frame/Frame.dds",
-                "width" : 306,
-                "height" : 106,
+                "width" : 296,
+                "height" : 116,
                 "position" : [0, 0, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
             },
+
+
             {
                 "type" : "UIIcon",
-                "name" : "BackFrameBG",
-                "asset" : "Assets/spriteData/UI/StageSelect/BackBubbleFrameBG.dds",
-                "width" : 400,
-                "height" : 250,
-                "position" : [0, 0, 0],
-                "scale" : [1, 1, 1],
-                "rotation" : 0,
-                "color" : [255, 255, 255, 255]
-            },
-            {
-                "type" : "UIIcon",
-                "name" : "BackFrame",
-                "asset" : "Assets/spriteData/UI/StageSelect/BackBubbleFrame.dds",
-                "width" : 330,
-                "height" : 186,
+                "name" : "TutorialText",
+                "asset" : "Assets/spriteData/UI/StageSelect/TutorialText.dds",
+                "width": 180,
+                "height":80,
                 "position" : [0, 0, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
@@ -113,21 +120,21 @@
             },
             {
                 "type":"UIIcon",
-                "name":"Easy",
-                "asset":"Assets/spriteData/UI/StageSelect/Easy.dds",
-                "width": 150,
-                "height":50,
-                "position":[-400,0,0],
+                "name":"EasyText",
+                "asset":"Assets/spriteData/UI/StageSelect/EasyText.dds",
+                "width": 180,
+                "height":80,
+                "position":[0,0,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
-            },
+            },            
             {
                 "type":"UIIcon",
-                "name":"Normal",
-                "asset":"Assets/spriteData/UI/StageSelect/Normal.dds",
-                "width": 150,
-                "height":50,
+                "name":"NormalText",
+                "asset":"Assets/spriteData/UI/StageSelect/NormalText.dds",
+                "width": 180,
+                "height":80,
                 "position":[0,0,0],
                 "scale":[1,1,1],
                 "rotation":0,
@@ -135,25 +142,94 @@
             },
             {
                 "type":"UIIcon",
-                "name":"Hard",
-                "asset":"Assets/spriteData/UI/StageSelect/Hard.dds",
-                "width": 150,
-                "height":50,
-                "position":[400,0,0],
+                "name":"HardText",
+                "asset":"Assets/spriteData/UI/StageSelect/HardText.dds",
+                "width": 180,
+                "height":80,
+                "position":[0,0,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
             },
+
+
+
             {
-                "type":"UIIcon",
-                "name":"Back",
-                "asset":"Assets/spriteData/UI/StageSelect/Back.dds",
-                "width": 150,
-                "height":50,
-                "position":[400,-200,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
+                "type" : "UIIcon",
+                "name" : "ButtonBG",
+                "asset" : "Assets/spriteData/UI/Icon/BGIcon.dds",
+                "width" : 530,
+                "height" : 90,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "BackButton",
+                "asset" : "Assets/spriteData/UI/icon/ButtonIcon/xbox_button_color_b.dds",
+                "width" : 50,
+                "height" : 50,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "BackText",
+                "asset" : "Assets/spriteData/UI/StageSelect/BackText.dds",
+                "width" : 80,
+                "height" : 60,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "SelectButton",
+                "asset" : "Assets/spriteData/UI/icon/ButtonIcon/xbox_stick_l_horizontal.dds",
+                "width" : 50,
+                "height" : 50,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "SelectText",
+                "asset" : "Assets/spriteData/UI/StageSelect/SelectText.dds",
+                "width" : 80,
+                "height" : 60,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "DecideButton",
+                "asset" : "Assets/spriteData/UI/icon/ButtonIcon/xbox_button_color_a.dds",
+                "width" : 50,
+                "height" : 50,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "DecideText",
+                "asset" : "Assets/spriteData/UI/StageSelect/decideText.dds",
+                "width" : 80,
+                "height" : 60,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
             }
         ]
     }
