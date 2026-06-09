@@ -129,6 +129,9 @@
     <ClCompile Include="Graphics\Video\VideoRender.cpp">
       <Filter>Graphics\Video</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Video\stb_image_impl.cpp">
+      <Filter>Graphics\Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />

@@ -11,71 +11,108 @@
 
 namespace nsBeastEngine
 {
-	/**
-	 * @brief 映像クリップのフレームデータを管理するクラス
-	 * @details
-	 *   フォルダパス（末尾 / or \）→ コマ撮り（PNG/JPG/BMP/TGA）
-	 *   .mp4 拡張子             → 将来対応
-	 */
 	class VideoClip
 	{
 	public:
+		VideoClip() = default;
+		~VideoClip();
 		/**
-		 * @brief クリップを読み込む
-		 * @param path フォルダパス（"Assets/video/tutorial/"）または動画ファイルパス
-		 * @return 読み込み成功なら true
+		 * @brief 動画ファイルパス（例: "C:/video.mp4"）またはコマ撮りフォルダパス（例 : "C:/frames/"）を指定してロード
+		 * @param path 動画ファイルパスまたはコマ撮りフォルダパス
 		 */
 		bool Load(const char* path);
 		/**
 		 * @brief 幅を取得
-		 * @return 幅（ピクセル）
+		 * @return 動画の幅（ピクセル）
 		 */
 		inline int GetWidth() const { return m_width; }
 		/**
 		 * @brief 高さを取得
-		 * @return 高さ（ピクセル）
+		 * @return 動画の高さ（ピクセル）
 		 */
 		inline int GetHeight() const { return m_height; }
 		/**
 		 * @brief フレーム数を取得
-		 * @return フレーム数
+		 * @return 動画のフレーム数
 		 */
-		inline int GetFrameCount() const { return static_cast<int>(m_frames.size()); }
+		inline int GetFrameCount() const { return m_frameCount; }
 		/**
-		 * @brief FPS を取得
-		 * @return FPS
+		 * @brief フレームレートを取得
+		 * @return 動画のフレームレート（fps）
 		 */
 		inline float GetFPS() const { return m_fps; }
 		/**
-		 * @brief クリップが有効か
-		 * @return フレームが1枚以上あれば true
+		 * @brief 動画が有効にロードされているか
+		 * @return フレーム数が1以上ならtrue、それ以外はfalse
 		 */
-		inline bool IsValid() const { return !m_frames.empty(); }
+		inline bool IsValid() const { return m_frameCount > 0; }
 		/**
-		 * @brief FPS を上書き（コマ撮り用）
-		 * @param fps FPS
+		 * @brief フレームレートを設定（MP4の場合は無視される）
+		 * @param fps フレームレート（fps）
 		 */
 		inline void SetFPS(float fps) { m_fps = fps; }
 		/**
-		 * @brief 指定フレームの RGBA ピクセルデータを返す
-		 * @param frameIndex フレーム番号
-		 * @return RGBA バイト列の先頭ポインタ、無効なら nullptr
+		 * @brief 指定したフレームのピクセルデータを取得
+		 * @param frameIndex フレームインデックス（0からframeCount-1の範囲）
+		 * @return RGBA32形式のピクセルデータへのポインタ。インデックスが範囲外の場合はnullptr。
 		 */
 		const uint8_t* GetFramePixels(int frameIndex) const;
 
-
 	private:
 		/**
-		 * @brief コマ撮りフレームを読み込む
-		 * @param folderPath フォルダパス（末尾 / or \）
+		 * @brief 動画の種類
+		 */
+		enum class ClipType
+		{
+			None = 0,		/** 無効な状態 */
+			FrameSequence,	/* コマ撮りフレームシーケンス */
+			MP4				/* MP4動画ファイル */
+		};
+		/**
+		 * @brief コマ撮りフレームシーケンスをロード
+		 * @param folderPath コマ撮りフレームが格納されたフォルダのパス
 		 */
 		bool LoadFrameSequence(const std::string& folderPath);
+		/**
+		 * @brief MP4動画ファイルをロード
+		 * @param filePath MP4動画ファイルのパス
+		 */
+		bool LoadMP4(const std::string& filePath);
+		/**
+		 * @brief MP4関連のリソースを解放
+		 */
+		void CleanupMP4();
+		/**
+		 * @brief MP4動画から次のフレームをデコードしてピクセルデータを更新
+		 * @return デコード成功ならtrue、動画の終端に達したかエラーが発生した場合はfalse
+		 */
+		bool ReadNextMP4Frame() const;
+		/**
+		 * @brief MP4動画の再生位置を先頭にリセット
+		 * @return 成功ならtrue、失敗した場合はfalse
+		 */
+		bool SeekMP4ToBeginning() const;
 
 
 	private:
-		int   m_width = 0;		/** フレームの幅（ピクセル） */
-		int   m_height = 0;		/** フレームの高さ（ピクセル） */
-		float m_fps = 24.0f;	/** コマ撮りの FPS */
-		std::vector<std::vector<uint8_t>> m_frames;	/** RGBA バイト列のフレームデータ */
+		int       m_width = 0;					/** 動画の幅（ピクセル） */
+		int       m_height = 0;					/** 動画の高さ（ピクセル） */
+		int       m_frameCount = 0;				/** 動画のフレーム数 */
+		float     m_fps = 24.0f;				/** 動画のフレームレート（fps） */
+		ClipType  m_clipType = ClipType::None;	/* 動画の種類 */
+
+		/** コマ撮り: 全フレームを事前ロード*/
+		std::vector<std::vector<uint8_t>> m_frames;
+
+		/** MP4: Media Foundation によるストリーミングデコード */
+		/**
+		 * IMFSourceReader* を格納
+		 * （void* で宣言しているのは、ヘッダーファイルで Windows.h をインクルードせずに済ませるため）
+		 */
+		mutable void* m_mfReader = nullptr;
+		mutable std::vector<uint8_t> m_mp4FrameBuffer;			/** MP4の現在フレームのピクセルデータを格納するバッファ */
+		mutable int                  m_mp4CurrentFrame = -1;	/** MP4の現在フレームインデックス（0からframeCount-1の範囲） */
+		mutable bool                 m_mp4Eos = false;			/** MP4の終端に達したかどうか */
+		mutable bool                 m_coInitialized = false;	/** < COMが初期化されているかどうか */
 	};
 }
