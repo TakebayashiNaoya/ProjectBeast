@@ -1,6 +1,6 @@
 ﻿/**
- * @file InGameScene.h
- * @brief インゲームシーン
+ * @file InGameSceneBase.h
+ * @brief インゲームシーン基底クラス
  * @author 立山、竹林
  */
 #pragma once
@@ -28,16 +28,29 @@ namespace app
 	class InGameUIManager;
 
 
-	/**
-	 * @brief インゲームシーン
-	 */
-	class InGameScene : public IScene
+	/** 子ペンギン生成設定 */
+	struct PenguinSpawnConfig
 	{
-		appScene(InGameScene);
+		int serious = 0;
+		int clingy = 0;
+		int naughty = 0;
+		int clumsy = 0;
+		int caring = 0;
+		float spawnRadius = 3000.0f;
+	};
 
+
+	/**
+	 * @brief インゲームシーン基底クラス
+	 * @detail 各ステージクラスはこのクラスを継承し、
+	 *         純粋仮想関数でステージ固有のパラメータを返す。
+	 *         共通のロード・ゲームフェーズ処理はこのクラスが担う。
+	 */
+	class InGameSceneBase : public IScene
+	{
 	public:
-		InGameScene();
-		~InGameScene();
+		InGameSceneBase();
+		~InGameSceneBase() override;
 
 		bool Start() override;
 		void Update() override;
@@ -46,7 +59,40 @@ namespace app
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
-		bool IsLoaded() const { return m_loadPhase == LoadPhase::Done; }
+		bool IsLoaded() const override { return m_loadPhase == LoadPhase::Done; }
+
+
+	protected:
+		//------------------------------------------------------------
+		// ステージ固有パラメータ（派生クラスが実装する）
+		//------------------------------------------------------------
+		/** 制限時間（秒） */
+		virtual float GetTimeLimit() const = 0;
+		/** 子ペンギン生成設定 */
+		virtual PenguinSpawnConfig GetPenguinConfig() const = 0;
+		/** ステージの配置JSONパス */
+		virtual const char* GetStageJsonPath() const = 0;
+		/** 敵の配置JSONパス */
+		virtual const char* GetEnemyJsonPath() const = 0;
+		/** 渦潮の配置JSONパス */
+		virtual const char* GetWhirlpoolPositionsJsonPath() const = 0;
+		/** 渦潮のパラメーターJSONパス */
+		virtual const char* GetWhirlpoolParameterJsonPath() const = 0;
+		/** 海のパラメーターJSONパス */
+		virtual const char* GetOceanParameterJsonPath() const = 0;
+
+		//------------------------------------------------------------
+		// フック（必要なステージだけオーバーライドする）
+		//------------------------------------------------------------
+		/** ロード完了時の追加処理 */
+		virtual void OnLoadComplete() {}
+		/** Playing フェーズの追加更新（TutorialController などを想定） */
+		virtual void OnUpdatePlaying() {}
+		/** Playing フェーズの追加描画（矢印UIなどを想定） */
+		virtual void OnRenderPlaying(RenderContext& /*rc*/) {}
+
+		/** 派生クラスからプレイヤー参照が必要になるケースに備えて protected */
+		actor::DaddyPenguin* m_daddyPenguin = nullptr;
 
 
 	private:
@@ -71,16 +117,11 @@ namespace app
 		};
 		GamePhase m_gamePhase = GamePhase::CountDown;
 
-		/** ロード完了後のゲームフェーズ更新をまとめた関数 */
 		void UpdateGamePhase();
 
 		//------------------------------------------------------------
 		// アクター
 		//------------------------------------------------------------
-		static constexpr int CHILD_PENGUIN_NUM = 100;
-		actor::DaddyPenguin* m_daddyPenguin = nullptr;
-		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
-
 		camera::CameraSteering m_cameraSteering;
 
 		SkyCube* m_skyCube = nullptr;
@@ -92,7 +133,6 @@ namespace app
 		enum class PauseState { Pause, SoundOption, Tutorial };
 		PauseState m_pauseState = PauseState::Pause;
 
-		/** ポーズ開始フレームかどうか（SEの停止を1回だけ行うためのフラグ） */
 		bool m_isPauseEntered = false;
 
 		//------------------------------------------------------------
@@ -106,6 +146,5 @@ namespace app
 
 		/** ホイッスルを鳴らしたかどうか（Finishing フェーズで1回だけ鳴らすためのフラグ） */
 		bool m_isWhistlePlayed = false;
-
 	};
 }

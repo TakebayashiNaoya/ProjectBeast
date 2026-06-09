@@ -22,10 +22,6 @@ namespace app
 
 		namespace
 		{
-			/** 渦潮の座標JSONのパス */
-			const char* WHIRLPOOL_POSITIONS_JSON_PATH = "Assets/parameter/stage/whirlpoolPositions.json";
-			/** 渦潮のパラメーターJSONのパス */
-			const char* WHIRLPOOL_PARAMETER_JSON_PATH = "Assets/parameter/nature/whirlpoolParameter.json";
 
 			/** 渦潮の位置のキー */
 			const char* WHIRLPOOL_POSITIONS_KEY = "whirlpoolPositions";
@@ -68,11 +64,13 @@ namespace app
 		}
 
 
-		void WhirlpoolManager::Start()
+		void WhirlpoolManager::Start(const char* positionsJsonPath, const char* parameterJsonPath)
 		{
+			m_positionsJsonPath = positionsJsonPath;
+
 			// 渦潮のパラメーターJSONを読み込む
 			core::ParameterManager::Get()->LoadParameter<MasterWhirlpoolParameter>(
-				WHIRLPOOL_PARAMETER_JSON_PATH,
+				parameterJsonPath,
 				[](const nlohmann::json& j, MasterWhirlpoolParameter& p)
 				{
 					p.whirlpoolRadius = j["whirlpoolRadius"].get<float>();
@@ -91,7 +89,7 @@ namespace app
 
 			// 渦潮の座標JSONを読み込む
 			nlohmann::json json;
-			if (!util::JsonConverter::IsLoadJsonFile(json, WHIRLPOOL_POSITIONS_JSON_PATH))
+			if (!util::JsonConverter::IsLoadJsonFile(json, m_positionsJsonPath.c_str()))
 			{
 				K2_ASSERT(false, "whirlpoolPositions.jsonの読み込みに失敗しました");
 				return;
@@ -101,7 +99,7 @@ namespace app
 
 			// 座標JSONの最終更新時刻を記録する（デバッグビルドのみ）
 #ifdef APP_DEBUG
-			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(WHIRLPOOL_POSITIONS_JSON_PATH);
+			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(m_positionsJsonPath.c_str());
 #endif // APP_DEBUG
 
 			// RenderingEngineに自身を登録する
@@ -114,7 +112,7 @@ namespace app
 			// 座標JSONのホットリロードを試みる（デバッグビルドのみ）
 #ifdef APP_DEBUG
 			nlohmann::json posJson;
-			if (TryReloadJsonFile(posJson, WHIRLPOOL_POSITIONS_JSON_PATH, m_posLastWriteTime))
+			if (TryReloadJsonFile(posJson, m_positionsJsonPath.c_str(), m_posLastWriteTime))
 			{
 				LoadPositionMap(posJson);
 			}

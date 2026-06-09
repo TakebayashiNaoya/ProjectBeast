@@ -1,0 +1,15 @@
+[
+  {
+    "whirlpoolRadius":       200.0,
+    "attractSpeed":           30.0,
+    "rotateSpeed":             3.0,
+    "uvRotationSpeed":         1.5,
+    "scaleChangeTime":         2.5,
+    "stayTime":               10.0,
+    "createInterval":          2.0,
+    "orbitRadius":            80.0,
+    "orbitRadiusVariation":   20.0,
+    "orbitOffsetVariation":   30.0,
+    "rotateScaleVariation":    0.3
+  }
+]
