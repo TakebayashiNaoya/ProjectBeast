@@ -160,12 +160,24 @@ namespace nsBeastEngine
 			return false;
 		}
 
-		const int wlen = MultiByteToWideChar(CP_UTF8, 0, filePath.c_str(), -1, nullptr, 0);
+		// 相対パス → 絶対パス（MFCreateSourceReaderFromURL は絶対パスが必要）
+		char absPathBuf[MAX_PATH] = {};
+		GetFullPathNameA(filePath.c_str(), MAX_PATH, absPathBuf, nullptr);
+		K2_LOG("VideoClip: opening %s\n", absPathBuf);
+
+		const int wlen = MultiByteToWideChar(CP_ACP, 0, absPathBuf, -1, nullptr, 0);
 		std::vector<wchar_t> wpath(wlen);
-		MultiByteToWideChar(CP_UTF8, 0, filePath.c_str(), -1, wpath.data(), wlen);
+		MultiByteToWideChar(CP_ACP, 0, absPathBuf, -1, wpath.data(), wlen);
+
+		// MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING を有効にすることで
+		// H.264(NV12) → ARGB32 への変換 MFT が自動挿入される
+		IMFAttributes* readerAttrs = nullptr;
+		MFCreateAttributes(&readerAttrs, 1);
+		readerAttrs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE);
 
 		IMFSourceReader* reader = nullptr;
-		hr = MFCreateSourceReaderFromURL(wpath.data(), nullptr, &reader);
+		hr = MFCreateSourceReaderFromURL(wpath.data(), readerAttrs, &reader);
+		readerAttrs->Release();
 		if (FAILED(hr))
 		{
 			K2_LOG("VideoClip: cannot open: %s hr=0x%08X\n", filePath.c_str(), hr);
@@ -177,21 +189,29 @@ namespace nsBeastEngine
 			return false;
 		}
 
-		// 出力フォーマットを ARGB32（メモリ上は BGRA）に設定
-		IMFMediaType* outType = nullptr;
-		MFCreateMediaType(&outType);
-		outType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video);
-		outType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_ARGB32);
-		hr = reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, nullptr, outType);
-		outType->Release();
-		if (FAILED(hr))
+		// 映像ストリームのみ選択
+		reader->SetStreamSelection(MF_SOURCE_READER_ALL_STREAMS, FALSE);
+		reader->SetStreamSelection(MF_SOURCE_READER_FIRST_VIDEO_STREAM, TRUE);
+
+		// ARGB32 → RGB32 の順で試行（環境によって対応フォーマットが異なる）
+		static const GUID kTryFormats[] = { MFVideoFormat_ARGB32, MFVideoFormat_RGB32 };
+		bool fmtOk = false;
+		for (int fi = 0; fi < 2 && !fmtOk; ++fi)
 		{
-			K2_LOG("VideoClip: SetCurrentMediaType failed hr=0x%08X\n", hr);
+			IMFMediaType* outType = nullptr;
+			MFCreateMediaType(&outType);
+			outType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video);
+			outType->SetGUID(MF_MT_SUBTYPE, kTryFormats[fi]);
+			hr = reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, nullptr, outType);
+			outType->Release();
+			K2_LOG("VideoClip: SetCurrentMediaType[%d] hr=0x%08X\n", fi, hr);
+			if (SUCCEEDED(hr)) fmtOk = true;
+		}
+		if (!fmtOk)
+		{
+			K2_LOG("VideoClip: no usable output format\n");
 			reader->Release(); MFShutdown();
-			if (m_coInitialized) {
-				CoUninitialize();
-				m_coInitialized = false;
-			}
+			if (m_coInitialized) { CoUninitialize(); m_coInitialized = false; }
 			return false;
 		}
 
@@ -220,6 +240,13 @@ namespace nsBeastEngine
 		{
 			const float durSec = static_cast<float>(varDur.uhVal.QuadPart) / 10000000.0f;
 			m_frameCount = static_cast<int>(durSec * m_fps);
+		}
+
+		// フレーム数が 0 の場合は代替として大きな値を設定（EndOfStream で停止する）
+		if (m_frameCount <= 0)
+		{
+			K2_LOG("VideoClip: duration not available, using fallback frameCount=100000\n");
+			m_frameCount = 100000;
 		}
 
 		m_mp4FrameBuffer.resize(m_width * m_height * 4, 0);
@@ -293,10 +320,10 @@ namespace nsBeastEngine
 					uint8_t* dst = m_mp4FrameBuffer.data() + dstY * m_width * 4;
 					for (int x = 0; x < m_width; ++x)
 					{
-						dst[x * 4 + 0] = row[x * 4 + 2]; // R
+						dst[x * 4 + 0] = row[x * 4 + 2]; // R (BGRx → RGBA)
 						dst[x * 4 + 1] = row[x * 4 + 1]; // G
 						dst[x * 4 + 2] = row[x * 4 + 0]; // B
-						dst[x * 4 + 3] = row[x * 4 + 3]; // A
+						dst[x * 4 + 3] = 0xFF;            // A (RGB32 は X=0 なので強制不透明)
 					}
 				}
 				buf2D->Unlock2D();
@@ -322,7 +349,7 @@ namespace nsBeastEngine
 						dst[x * 4 + 0] = row[x * 4 + 2];
 						dst[x * 4 + 1] = row[x * 4 + 1];
 						dst[x * 4 + 2] = row[x * 4 + 0];
-						dst[x * 4 + 3] = row[x * 4 + 3];
+						dst[x * 4 + 3] = 0xFF;
 					}
 				}
 				buf->Unlock();

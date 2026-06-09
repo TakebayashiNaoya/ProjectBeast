@@ -39,8 +39,9 @@ namespace nsBeastEngine
 		void SetLoop(bool loop) { m_player.SetLoop(loop); }
 		void SetPlaybackSpeed(float speed) { m_player.SetPlaybackSpeed(speed); }
 		void SetOnFinished(std::function<void()> cb) { m_player.onFinished = cb; }
-		bool IsPlaying()  const { return m_player.IsPlaying(); }
-		bool IsFinished() const { return m_player.IsFinished(); }
+		bool IsPlaying()     const { return m_player.IsPlaying(); }
+		bool IsFinished()    const { return m_player.IsFinished(); }
+		bool IsInitialized() const { return m_isInitialized; }
 
 		/**
 		 * @brief 描画パラメータの設定
