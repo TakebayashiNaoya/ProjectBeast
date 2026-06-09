@@ -28,16 +28,40 @@ namespace app
 			float inputInterval;
 			/** 入力閾値 */
 			float inputThreshold;
-			/* イージー選択肢の位置 */
-			Vector3 easyPosition;
-			/* ノーマル選択肢の位置 */
-			Vector3 normalPosition;
-			/* ハード選択肢の位置 */
-			Vector3 hardPosition;
-			/* 戻る選択肢の位置 */
-			Vector3 backPosition;
+
+
+			/** ステージ選択肢のテキストの位置 */
+			Vector3 stageSelectPosition;
+
+
+			/** 選択肢のYオフセット */
+			float choicesYOffset;
+			/** チュートリアル選択肢のX位置 */
+			float tutorialPositionX;
+			/** イージー選択肢のX位置 */
+			float easyPositionX;
+			/** ノーマル選択肢のX位置 */
+			float normalPositionX;
+			/** ハード選択肢のX位置 */
+			float hardPositionX;
 			/** テキストの色 */
-			Vector4 textColor;
+			Vector4 choicesTextColor;
+
+			/** ボタンの背景の位置 */
+			Vector3 buttonBGPosition;
+			/** ボタンのXオフセット */
+			float buttonXOffset;
+			/** ボタンのYオフセット */
+			float buttonYOffset;
+			/** もどるボタンのX位置 */
+			float backButtonPositionX;
+			/** 決定ボタンのX位置 */
+			float decideButtonPositionX;
+			/** 選択ボタンのX位置 */
+			float selectButtonPositionX;
+
+			/** テキストの背景色 */
+			Vector4 textBGColor;
 		};
 	}
 }
