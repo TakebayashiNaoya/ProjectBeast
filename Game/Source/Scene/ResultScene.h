@@ -35,7 +35,7 @@ namespace app
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
-		// InGameScene から遷移前に呼ぶ
+		// インゲームシーンから遷移前に呼ぶ
 		static void SetResult(float clearTime, int collectedPenguin)
 		{
 			s_clearTime = clearTime;

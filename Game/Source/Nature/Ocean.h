@@ -287,9 +287,9 @@ namespace app
 		public:
 			/**
 			 * @brief 初期化処理
-			 * @details OceanMeshを初期化し、RenderingEngineに自身を登録する
+			 * @param parameterJsonPath 海のパラメーターJSONパス
 			 */
-			void Start();
+			void Start(const char* parameterJsonPath);
 
 			/**
 			 * @brief 更新処理

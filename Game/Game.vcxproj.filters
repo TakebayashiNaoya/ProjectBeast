@@ -186,7 +186,7 @@
     <ClCompile Include="Source\Scene\TitleScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scene\InGameScene.cpp">
+    <ClCompile Include="Source\Scene\NormalInGameScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scene\ResultScene.cpp">
@@ -484,6 +484,12 @@
     <ClCompile Include="Source\UI\DangerArrow\DangerArrowSystem.cpp">
       <Filter>Source\UI\DangerArrow</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scene\InGameSceneBase.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\TutorialInGameScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -575,7 +581,7 @@
     <ClInclude Include="Source\Scene\TitleScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scene\InGameScene.h">
+    <ClInclude Include="Source\Scene\NormalInGameScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\ResultScene.h">
@@ -890,6 +896,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h">
       <Filter>Source\UI\DangerArrow</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\InGameSceneBase.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\TutorialInGameScene.h">
+      <Filter>Source\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

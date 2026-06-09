@@ -1,10 +1,10 @@
 ﻿/**
- * @file InGameScene.cpp
- * @brief インゲームシーン
- * @author 立山
+ * @file InGameSceneBase.cpp
+ * @brief インゲームシーン基底クラス
+ * @author 立山、竹林
  */
 #include "stdafx.h"
-#include "InGameScene.h"
+#include "InGameSceneBase.h"
 #include "ResultScene.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Graphics/PBRStatus.h"
@@ -45,30 +45,15 @@
 
 #include "Source/Nature/Ocean.h"
 #include "Source/Nature/WhirlpoolManager.h"
-#include <random>
 
 
 namespace app
 {
-	namespace
-	{
-		/** 子ペンギンのスポーン半径 */
-		constexpr float CHILD_SPAWN_RADIUS = 3000.0f;
-
-		/** タイプ別の生成数 */
-		constexpr int SERIOUS_NUM = 20;
-		constexpr int CLINGY_NUM = 20;
-		constexpr int NAUGHTY_NUM = 20;
-		constexpr int CLUMSY_NUM = 20;
-		constexpr int CARING_NUM = 20;
-	}
-
-
-	InGameScene::InGameScene()
+	InGameSceneBase::InGameSceneBase()
 	{}
 
 
-	InGameScene::~InGameScene()
+	InGameSceneBase::~InGameSceneBase()
 	{
 #ifdef DEBUG
 		// デバッグ描画を止めてから破棄する（破棄済みShapeへのアクセスを防ぐ）
@@ -108,18 +93,23 @@ namespace app
 		}
 
 		/** 2周目以降のために GameCamera の登録を解除する。
-		 *  次の InGameScene::LoadPhase::Camera で新しいインスタンスを Register できるようにする。 */
+		 *  次の LoadPhase::Camera で新しいインスタンスを Register できるようにする。 */
 		camera::CameraManager::Get().Unregister(camera::GameCamera::ID());
 	}
 
 
-	bool InGameScene::Start()
+	bool InGameSceneBase::Start()
 	{
 		/** マネージャー生成 */
 		app::core::ParameterManager::CreateInstance();
 		BattleManager::CreateInstance();
 		ScoreManager::CreateInstance();
 		TimeManager::CreateInstance();
+
+		/** ステージ固有の制限時間を設定する */
+		TimeManager::GetInstance().SetMaxTime(GetTimeLimit());
+		TimeManager::GetInstance().ResetTime();
+
 		app::achievement::AchievementManager::CreateInstance();
 		app::achievement::AchievementManager::GetInstance()->Start();
 
@@ -143,7 +133,7 @@ namespace app
 	}
 
 
-	void InGameScene::Update()
+	void InGameSceneBase::Update()
 	{
 		//------------------------------------------------------------
 		// ロードフェーズ
@@ -153,7 +143,7 @@ namespace app
 		case LoadPhase::Stage:
 		{
 			nlohmann::json json;
-			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/stage/stageObject.json");
+			util::JsonConverter::IsLoadJsonFile(json, GetStageJsonPath());
 			actor::StageSystem::GetInstance()->CreateStageObject(json);
 			m_loadPhase = LoadPhase::StageWait;
 			break;
@@ -189,21 +179,22 @@ namespace app
 
 		case LoadPhase::Children:
 		{
-			/** タイプ別数とスポーン半径を指定して一括生成 */
+			/** ステージ固有の生成設定を取得して一括生成 */
+			const PenguinSpawnConfig cfg = GetPenguinConfig();
 			actor::ChildPenguinManager::GetInstance()->CreateChildPenguins(
-				SERIOUS_NUM,
-				CLINGY_NUM,
-				NAUGHTY_NUM,
-				CLUMSY_NUM,
-				CARING_NUM,
-				CHILD_SPAWN_RADIUS
+				cfg.serious,
+				cfg.clingy,
+				cfg.naughty,
+				cfg.clumsy,
+				cfg.caring,
+				cfg.spawnRadius
 			);
 
 			auto* manager = actor::ChildPenguinManager::GetInstance();
 			manager->SetDaddyPenguin(m_daddyPenguin);
 
 			/** ステージ上の総ペンギン数をセット */
-			const int totalNum = SERIOUS_NUM + CLINGY_NUM + NAUGHTY_NUM + CLUMSY_NUM + CARING_NUM;
+			const int totalNum = cfg.serious + cfg.clingy + cfg.naughty + cfg.clumsy + cfg.caring;
 			ScoreManager::GetInstance().SetTotalCount(totalNum);
 
 			m_loadPhase = LoadPhase::Enemy;
@@ -213,7 +204,7 @@ namespace app
 		case LoadPhase::Enemy:
 		{
 			nlohmann::json json;
-			util::JsonConverter::IsLoadJsonFile(json, "Assets/parameter/character/enemy/EnemyLayout.json");
+			util::JsonConverter::IsLoadJsonFile(json, GetEnemyJsonPath());
 			actor::EnemyManager::GetInstance()->LoadEnemies(json);
 
 			/** エネミー1体につき探索UIを1つ生成 */
@@ -241,7 +232,6 @@ namespace app
 		}
 
 		case LoadPhase::Ocean:
-
 			/**
 			 * NOTE:SkyCubeは後で生み出す場所を変えるかもしれない。
 			 */
@@ -251,10 +241,13 @@ namespace app
 			m_skyCube->SetLuminance(0.8f);
 
 			nature::Ocean::CreateInstance();
-			nature::Ocean::GetInstance()->Start();
+			nature::Ocean::GetInstance()->Start(GetOceanParameterJsonPath());
 
 			nature::WhirlpoolManager::CreateInstance();
-			nature::WhirlpoolManager::GetInstance()->Start();
+			nature::WhirlpoolManager::GetInstance()->Start(
+				GetWhirlpoolPositionsJsonPath(),
+				GetWhirlpoolParameterJsonPath()
+			);
 
 			m_loadPhase = LoadPhase::Done;
 
@@ -264,6 +257,8 @@ namespace app
 				InGameUIManager::GetInstance()->GetCountDownMenu()->SetIsDelay(true);
 				SoundManager::Get().PlayBGM(enSoundKind_InGame);
 			}
+
+			OnLoadComplete();
 			break;
 
 		case LoadPhase::Done:
@@ -277,7 +272,7 @@ namespace app
 	}
 
 
-	void InGameScene::UpdateGamePhase()
+	void InGameSceneBase::UpdateGamePhase()
 	{
 		/** カメラは常に更新 */
 		auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
@@ -388,6 +383,8 @@ namespace app
 			/** ノイズリストをクリア */
 			NoiseManager::GetInstance().ClearNoises();
 
+			OnUpdatePlaying();
+
 			/** 終了判定 */
 			if (BattleManager::GetInstance().GetBattleState() == BattleManager::EnBattleState::Finished)
 			{
@@ -435,7 +432,7 @@ namespace app
 	}
 
 
-	void InGameScene::PauseUpdate()
+	void InGameSceneBase::PauseUpdate()
 	{
 		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする */
 		if (!m_isPauseEntered)
@@ -542,7 +539,7 @@ namespace app
 	}
 
 
-	void InGameScene::Render(RenderContext& rc)
+	void InGameSceneBase::Render(RenderContext& rc)
 	{
 		actor::StageSystem::GetInstance()->Render(rc);
 
@@ -580,6 +577,7 @@ namespace app
 				break;
 			case GamePhase::Playing:
 				uiMngr->RenderPlaying(rc);
+				OnRenderPlaying(rc);
 				break;
 			case GamePhase::Finishing:
 				uiMngr->RenderFinishing(rc);
@@ -589,7 +587,7 @@ namespace app
 	}
 
 
-	bool InGameScene::RequesutScene(uint32_t& id, float& waitTime)
+	bool InGameSceneBase::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		/** タイトルへ戻る */
 		if (m_goTitle)
