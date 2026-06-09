@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file InGameSceneBase.h
  * @brief インゲームシーン基底クラス
  * @author 立山、竹林
@@ -31,11 +31,11 @@ namespace app
 	/** 子ペンギン生成設定 */
 	struct PenguinSpawnConfig
 	{
-		int serious    = 0;
-		int clingy     = 0;
-		int naughty    = 0;
-		int clumsy     = 0;
-		int caring     = 0;
+		int serious = 0;
+		int clingy = 0;
+		int naughty = 0;
+		int clumsy = 0;
+		int caring = 0;
 		float spawnRadius = 3000.0f;
 	};
 
@@ -66,26 +66,20 @@ namespace app
 		//------------------------------------------------------------
 		// ステージ固有パラメータ（派生クラスが実装する）
 		//------------------------------------------------------------
+		/** 制限時間（秒） */
 		virtual float GetTimeLimit() const = 0;
-		virtual const char* GetStageJsonPath() const = 0;
-		virtual const char* GetEnemyJsonPath() const = 0;
+		/** 子ペンギン生成設定 */
 		virtual PenguinSpawnConfig GetPenguinConfig() const = 0;
-
+		/** ステージの配置JSONパス */
+		virtual const char* GetStageJsonPath() const = 0;
+		/** 敵の配置JSONパス */
+		virtual const char* GetEnemyJsonPath() const = 0;
 		/** 渦潮の配置JSONパス */
-		virtual const char* GetWhirlpoolPositionsJsonPath() const
-		{
-			return "Assets/parameter/stage/whirlpoolPositions.json";
-		}
+		virtual const char* GetWhirlpoolPositionsJsonPath() const = 0;
 		/** 渦潮のパラメーターJSONパス */
-		virtual const char* GetWhirlpoolParameterJsonPath() const
-		{
-			return "Assets/parameter/nature/whirlpoolParameter.json";
-		}
+		virtual const char* GetWhirlpoolParameterJsonPath() const = 0;
 		/** 海のパラメーターJSONパス */
-		virtual const char* GetOceanParameterJsonPath() const
-		{
-			return "Assets/parameter/nature/oceanParameter.json";
-		}
+		virtual const char* GetOceanParameterJsonPath() const = 0;
 
 		//------------------------------------------------------------
 		// フック（必要なステージだけオーバーライドする）
@@ -128,9 +122,6 @@ namespace app
 		//------------------------------------------------------------
 		// アクター
 		//------------------------------------------------------------
-		static constexpr int CHILD_PENGUIN_NUM = 100;
-		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
-
 		camera::CameraSteering m_cameraSteering;
 
 		SkyCube* m_skyCube = nullptr;
@@ -148,7 +139,7 @@ namespace app
 		// シーン遷移
 		//------------------------------------------------------------
 		bool m_nextScene = false;
-		bool m_goTitle   = false;
+		bool m_goTitle = false;
 
 		/** 前フレームのカウントダウンタイプを保持（初期値は None） */
 		ui::EnCountDownType m_lastCountType = ui::EnCountDownType::None;

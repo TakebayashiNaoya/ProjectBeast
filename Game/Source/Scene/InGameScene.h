@@ -21,6 +21,11 @@ namespace app
 	protected:
 		float GetTimeLimit() const override { return 180.0f; }
 
+		PenguinSpawnConfig GetPenguinConfig() const override
+		{
+			return { 20, 20, 20, 20, 20, 3000.0f };
+		}
+
 		const char* GetStageJsonPath() const override
 		{
 			return "Assets/parameter/stage/StageObject_Normal.json";
@@ -44,11 +49,6 @@ namespace app
 		const char* GetOceanParameterJsonPath() const override
 		{
 			return "Assets/parameter/nature/oceanParameter_Normal.json";
-		}
-
-		PenguinSpawnConfig GetPenguinConfig() const override
-		{
-			return { 20, 20, 20, 20, 20, 3000.0f };
 		}
 	};
 }
