@@ -1,0 +1,14 @@
+{
+    "animations" : [
+        {
+            "comment" : "選択中のカーソル点滅",
+            "key" : "SelectingBlinking",
+            "valueType" : "Vector4",
+            "startValue" : {"x" : 1, "y" : 1, "z" : 1, "w" : 1},
+            "endValue" : {"x" : 1, "y" : 1, "z" : 1, "w" : 0},
+            "duration" : 0.5,
+            "easing" : "EaseInOut",
+            "loop" : "PingPong"
+        }
+    ]
+}

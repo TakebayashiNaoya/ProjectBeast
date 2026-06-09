@@ -1,0 +1,160 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"BG",
+                "asset":"Assets/spriteData/UI/StageSelect/BG.dds",
+                "width":1920,
+                "height":1080,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"StageSelect",
+                "asset":"Assets/spriteData/UI/StageSelect/StageSelect.dds",
+                "width": 400,
+                "height": 50,
+                "position":[-500,350,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "EasyBubble",
+                "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
+                "width" : 300,
+                "height" : 100,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "NormalBubble",
+                "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
+                "width" : 300,
+                "height" : 100,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "HardBubble",
+                "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
+                "width" : 300,
+                "height" : 100,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "BackBubble",
+                "asset" : "Assets/spriteData/UI/StageSelect/BackBubble.dds",
+                "width" : 400,
+                "height" : 250,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "FrameBG",
+                "asset" : "Assets/spriteData/UI/Frame/FrameBackGround.dds",
+                "width" : 303,
+                "height" : 103,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "Frame",
+                "asset" : "Assets/spriteData/UI/Frame/Frame.dds",
+                "width" : 306,
+                "height" : 106,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "BackFrameBG",
+                "asset" : "Assets/spriteData/UI/StageSelect/BackBubbleFrameBG.dds",
+                "width" : 400,
+                "height" : 250,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "BackFrame",
+                "asset" : "Assets/spriteData/UI/StageSelect/BackBubbleFrame.dds",
+                "width" : 330,
+                "height" : 186,
+                "position" : [0, 0, 0],
+                "scale" : [1, 1, 1],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"Easy",
+                "asset":"Assets/spriteData/UI/StageSelect/Easy.dds",
+                "width": 150,
+                "height":50,
+                "position":[-400,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"Normal",
+                "asset":"Assets/spriteData/UI/StageSelect/Normal.dds",
+                "width": 150,
+                "height":50,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"Hard",
+                "asset":"Assets/spriteData/UI/StageSelect/Hard.dds",
+                "width": 150,
+                "height":50,
+                "position":[400,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"Back",
+                "asset":"Assets/spriteData/UI/StageSelect/Back.dds",
+                "width": 150,
+                "height":50,
+                "position":[400,-200,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            }
+        ]
+    }
+}
