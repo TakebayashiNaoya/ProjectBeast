@@ -356,14 +356,15 @@ namespace nsBeastEngine
 		}
 		else
 		{
-			// 1D フォールバック（ストライドをバッファサイズから推定）
+			// 1D フォールバック
+			// H.264 は高さを 16 の倍数に揃えるため curLen が m_height より多い行分を含む場合がある。
+			// curLen / m_height で計算すると行ストライドが狂うため、水平パディングのない
+			// MF ARGB32 出力を前提に m_width * 4 を使用する。
 			BYTE* data = nullptr;
 			DWORD maxLen = 0, curLen = 0;
 			if (SUCCEEDED(buf->Lock(&data, &maxLen, &curLen)))
 			{
-				const int stride = (m_height > 0)
-					? static_cast<int>(curLen / m_height)
-					: m_width * 4;
+				const int stride = m_width * 4;
 				for (int y = 0; y < m_height; ++y)
 				{
 					const BYTE* row = data + y * stride;
