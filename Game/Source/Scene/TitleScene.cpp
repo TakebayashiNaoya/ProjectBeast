@@ -178,34 +178,41 @@ namespace app
 
 		// 選択済みなら抜ける
 		if (menu->IsSelected()) return;
+
 		// Aボタンが押されていなければ抜ける
-		if (!g_pad[0]->IsTrigger(enButtonA)) return;
-
-		SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-
-		// ステートを選択済みにする
-		menu->SetIsSelected(true);
-
-		switch (menu->GetSelectingStage())
+		if (g_pad[0]->IsTrigger(enButtonA))
 		{
-		case ui::EnStageChoices::Back:
+			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+
+			// ステートを選択済みにする
+			menu->SetIsSelected(true);
+
+			switch (menu->GetSelectingStage())
+			{
+			case ui::EnStageChoices::Tutorial:
+			{
+				break;
+			}
+			case ui::EnStageChoices::Easy:
+			{
+				break;
+			}
+			case ui::EnStageChoices::Normal:
+			{
+				break;
+			}
+			case ui::EnStageChoices::Hard:
+			{
+				break;
+			}
+			}
+		}
+		else if (g_pad[0]->IsTrigger(enButtonB))
 		{
-			m_state = TitleState::Title;
+			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			// ステートを選択済みにする
 			menu->Reset();
-			break;
-		}
-		case ui::EnStageChoices::Easy:
-		{
-			break;
-		}
-		case ui::EnStageChoices::Normal:
-		{
-			break;
-		}
-		case ui::EnStageChoices::Hard:
-		{
-			break;
-		}
+			m_state = TitleState::Title;
 		}
 	}
 
