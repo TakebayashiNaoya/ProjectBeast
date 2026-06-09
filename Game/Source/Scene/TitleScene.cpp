@@ -11,6 +11,7 @@
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
+#include "Source/UI/StageSelect/StageSelectMenu.h"
 #include "TitleScene.h"
 
 
@@ -61,7 +62,7 @@ namespace app
 		);
 		m_tutorialMenu = m_tutorialLayout->GetMenu<ui::TutorialMenu>();
 
-		ui::InitUIPacket(m_stageSelectPacket, "Assets/parameter/stageSelect/StageSelect.json");
+		ui::InitUIPacket(m_stageSelectPacket, "Assets/parameter/UI/stageSelect/StageSelect.json");
 
 		SoundManager::Get().PlayBGM(enSoundKind_Title);
 
@@ -141,44 +142,20 @@ namespace app
 
 	void TitleScene::TitleUpdate()
 	{
-		if (!m_titleLayout)
-		{
-			m_titleLayout = new ui::Layout;
-			m_titleLayout->Initialize<ui::TitleEventMenu>(
-				"Assets/parameter/title/Title.json"
-			);
-			m_titleEventMenu = m_titleLayout->GetMenu<ui::TitleEventMenu>();
-		}
-
-
 		if (g_pad[0]->IsTrigger(enButtonA))
 		{
 			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
 
 			const uint32_t selectKey = m_titleEventMenu->GetSelectKey();
-			if (selectKey == Hash32("StartFrameBackIcon"))
+			if (selectKey == Hash32("StartIcon"))
 			{
 				m_state = TitleState::StageSelect;
-
-				if (!m_stageSelectPacket)
-				{
-					ui::InitUIPacket(m_stageSelectPacket, "Assets/parameter/stageSelect/StageSelect.json");
-				}
 			}
-			else if (selectKey == Hash32("OptionFrameBackIcon"))
+			else if (selectKey == Hash32("SoundIcon"))
 			{
 				m_state = TitleState::SoundOption;
-				// オプション画面。
-				if (!m_soundOption)
-				{
-					m_soundOptionLayout = new ui::Layout;
-					m_soundOptionLayout->Initialize<ui::SoundOptionMenu>(
-						"Assets/parameter/sound/SoundOption.json"
-					);
-					m_soundOption = m_soundOptionLayout->GetMenu<ui::SoundOptionMenu>();
-				}
 			}
-			else if (selectKey == Hash32("RuleFrameBackIcon"))
+			else if (selectKey == Hash32("RuleIcon"))
 			{
 				// ルール画面。
 				m_state = TitleState::Tutorial;
@@ -187,7 +164,7 @@ namespace app
 					m_tutorialMenu->SetClosed(false);
 				}
 			}
-			else if (selectKey == Hash32("EndFrameBackIcon"))
+			else if (selectKey == Hash32("EndIcon"))
 			{
 				// ゲームを終了する。
 				PostQuitMessage(0);
@@ -195,7 +172,10 @@ namespace app
 			}
 		}
 
-		m_titleLayout->Update();
+		if (m_titleLayout)
+		{
+			m_titleLayout->Update();
+		}
 	}
 
 
@@ -205,18 +185,45 @@ namespace app
 
 		m_stageSelectPacket->Update();
 
-		if (g_pad[0]->IsTrigger(enButtonB))
+		auto* menu = m_stageSelectPacket->GetMenu();
+		if (m_stageSelectPacket->GetMenu()->IsFinishedSelectAnimation())
 		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-			m_state = TitleState::Title;
+			menu->Reset();
+			SoundManager::Get().StopBGM();
+			m_nextScene = true;
+			return;
 		}
 
-		if (g_pad[0]->IsTrigger(enButtonA))
-		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
-			SoundManager::Get().StopBGM();
+		// 選択済みなら抜ける
+		if (menu->IsSelected()) return;
+		// Aボタンが押されていなければ抜ける
+		if (!g_pad[0]->IsTrigger(enButtonA)) return;
 
-			m_nextScene = true;
+		SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+
+		// ステートを選択済みにする
+		menu->SetIsSelected(true);
+
+		switch (menu->GetSelectingStage())
+		{
+		case ui::EnStageChoices::Back:
+		{
+			m_state = TitleState::Title;
+			menu->Reset();
+			break;
+		}
+		case ui::EnStageChoices::Easy:
+		{
+			break;
+		}
+		case ui::EnStageChoices::Normal:
+		{
+			break;
+		}
+		case ui::EnStageChoices::Hard:
+		{
+			break;
+		}
 		}
 	}
 
