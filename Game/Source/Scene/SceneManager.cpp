@@ -7,6 +7,7 @@
 
 #include "DebugScene.h"
 #include "InGameScene.h"
+#include "TutorialInGameScene.h"
 #include "ResultScene.h"
 #include "SceneManager.h"
 #include "TitleScene.h"
@@ -27,6 +28,7 @@ namespace app
 		AddSceneMap<app::DebugScene>();
 		AddSceneMap<app::TitleScene>();
 		AddSceneMap<app::InGameScene>();
+		AddSceneMap<app::TutorialInGameScene>();
 		AddSceneMap<app::ResultScene>();
 
 		// 初期シーン生成

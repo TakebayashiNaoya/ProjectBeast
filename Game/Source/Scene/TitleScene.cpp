@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "DebugScene.h"
+#include "TutorialInGameScene.h"
 #include "InGameScene.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Layout.h"

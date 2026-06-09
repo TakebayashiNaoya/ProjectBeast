@@ -22,9 +22,10 @@ namespace app
 		public:
 			/**
 			 * @brief 初期化処理
-			 * @details whirlpoolPositions.jsonを読み込み座標マップを構築する
+			 * @param positionsJsonPath 渦潮の配置JSONパス
+			 * @param parameterJsonPath 渦潮のパラメーターJSONパス
 			 */
-			void Start();
+			void Start(const char* positionsJsonPath, const char* parameterJsonPath);
 			/**
 			 * @brief 更新処理
 			 */
@@ -69,6 +70,8 @@ namespace app
 			std::unordered_map<uint8_t, Vector3> m_positionMap;
 			/** 渦潮の生成タイマー */
 			float m_timer;
+			/** 渦潮の配置JSONパス（ホットリロード用に保持） */
+			std::string m_positionsJsonPath;
 			/** 座標JSONの最終更新時刻（ホットリロード用） */
 			time_t m_posLastWriteTime;
 

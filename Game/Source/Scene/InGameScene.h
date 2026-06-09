@@ -1,111 +1,54 @@
 ﻿/**
  * @file InGameScene.h
- * @brief インゲームシーン
+ * @brief インゲームシーン（ノーマルステージ）
  * @author 立山、竹林
  */
 #pragma once
-#include "IScene.h"
-#include "Source/Camera/CameraSteering.h"
-#include "Source/UI/Menus/CountDownMenu.h"
+#include "InGameSceneBase.h"
 
 
 namespace app
 {
-	/** 前方宣言 */
-	namespace actor
-	{
-		class DaddyPenguin;
-		class ChildPenguin;
-	}
-	namespace ui
-	{
-		class CountDownMenu;
-		class FinishMenu;
-		class PauseScreenMenu;
-		class SoundOptionMenu;
-	}
-
-	class InGameUIManager;
-
-
 	/**
-	 * @brief インゲームシーン
+	 * @brief ノーマルステージ
+	 * @detail ステージ固有のパラメータを返す。
+	 *         ゲームロジックは InGameSceneBase が担う。
 	 */
-	class InGameScene : public IScene
+	class InGameScene : public InGameSceneBase
 	{
 		appScene(InGameScene);
 
-	public:
-		InGameScene();
-		~InGameScene();
+	protected:
+		float GetTimeLimit() const override { return 180.0f; }
 
-		bool Start() override;
-		void Update() override;
-		void PauseUpdate() override;
-		void Render(RenderContext& rc) override;
-
-		bool RequesutScene(uint32_t& id, float& waitTime) override;
-
-		bool IsLoaded() const { return m_loadPhase == LoadPhase::Done; }
-
-
-	private:
-		//------------------------------------------------------------
-		// ロードフェーズ
-		//------------------------------------------------------------
-		enum class LoadPhase
+		const char* GetStageJsonPath() const override
 		{
-			None, Stage, StageWait, Daddy, Children, Enemy, Camera, Ocean, Done
-		};
-		LoadPhase m_loadPhase = LoadPhase::None;
-		int m_childIndex = 0;
+			return "Assets/parameter/stage/StageObject_Normal.json";
+		}
 
-		//------------------------------------------------------------
-		// ゲームフェーズ
-		//------------------------------------------------------------
-		enum class GamePhase
+		const char* GetEnemyJsonPath() const override
 		{
-			CountDown,  /** カウントダウン中（プレイヤー・AI・シロクマ停止） */
-			Playing,    /** プレイ中 */
-			Finishing,  /** FINISH演出中 */
-		};
-		GamePhase m_gamePhase = GamePhase::CountDown;
+			return "Assets/parameter/character/enemy/EnemyLayout_Normal.json";
+		}
 
-		/** ロード完了後のゲームフェーズ更新をまとめた関数 */
-		void UpdateGamePhase();
+		const char* GetWhirlpoolPositionsJsonPath() const override
+		{
+			return "Assets/parameter/stage/whirlpoolPositions_Normal.json";
+		}
 
-		//------------------------------------------------------------
-		// アクター
-		//------------------------------------------------------------
-		static constexpr int CHILD_PENGUIN_NUM = 100;
-		actor::DaddyPenguin* m_daddyPenguin = nullptr;
-		actor::ChildPenguin* m_childPenguins[CHILD_PENGUIN_NUM] = {};
+		const char* GetWhirlpoolParameterJsonPath() const override
+		{
+			return "Assets/parameter/nature/whirlpoolParameter_Normal.json";
+		}
 
-		camera::CameraSteering m_cameraSteering;
+		const char* GetOceanParameterJsonPath() const override
+		{
+			return "Assets/parameter/nature/oceanParameter_Normal.json";
+		}
 
-		SkyCube* m_skyCube = nullptr;
-
-
-		//------------------------------------------------------------
-		// ポーズ
-		//------------------------------------------------------------
-		enum class PauseState { Pause, SoundOption, Tutorial };
-		PauseState m_pauseState = PauseState::Pause;
-
-		/** ポーズ開始フレームかどうか（SEの停止を1回だけ行うためのフラグ） */
-		bool m_isPauseEntered = false;
-
-		//------------------------------------------------------------
-		// シーン遷移
-		//------------------------------------------------------------
-		bool m_nextScene = false;
-		bool m_goTitle = false;
-
-		/** 前フレームのカウントダウンタイプを保持（初期値は None） */
-		ui::EnCountDownType m_lastCountType = ui::EnCountDownType::None;
-
-		/** ホイッスルを鳴らしたかどうか（Finishing フェーズで1回だけ鳴らすためのフラグ） */
-		bool m_isWhistlePlayed = false;
-
+		PenguinSpawnConfig GetPenguinConfig() const override
+		{
+			return { 20, 20, 20, 20, 20, 3000.0f };
+		}
 	};
 }
