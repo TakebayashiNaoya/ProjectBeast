@@ -8,6 +8,9 @@
         "radius": 100.0,
         "height": 100.0,
         "swimSpeed": 100.0,
-        "maxEat":3
+        "maxEat":3,
+        "maxStamina":30.0,
+        "staminaDrainRate": 1.0,
+        "lostChaseDistance": 700.0
     }
 ]

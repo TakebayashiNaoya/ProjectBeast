@@ -70,7 +70,7 @@ namespace app
 			auto* sm = m_enemy->GetEnemyStateMachine();
 
 			// 索敵状態と追跡状態の取得。
-			const bool isSearching = sm->IsSeach();
+			const bool isSearching = sm->IsSearch();
 			const bool isChasing = sm->IsActionButtonB();
 			const bool showAny = m_isActive && (isSearching || isChasing);
 
