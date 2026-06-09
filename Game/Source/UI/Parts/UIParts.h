@@ -544,12 +544,12 @@ namespace app
 		/** @brief UIVideo の初期化データ */
 		struct UIVideoInitData
 		{
-			const char* clipPath = "";      ///< フォルダパス（末尾 /）または動画ファイルパス
-			float       width    = 1920.0f; ///< 表示幅（ピクセル）
-			float       height   = 1080.0f; ///< 表示高さ（ピクセル）
-			float       fps      = 24.0f;   ///< コマ撮りの FPS
-			bool        loop     = false;   ///< ループ再生
-			bool        autoPlay = true;    ///< 初期化後すぐに再生開始
+			std::string clipPath;           /** フォルダパス（末尾 /）または動画ファイルパス */
+			float       width    = 1920.0f; /** 表示幅（ピクセル） */
+			float       height   = 1080.0f; /** 表示高さ（ピクセル） */
+			float       fps      = 24.0f;   /** コマ撮りの FPS */
+			bool        loop     = false;   /** ループ再生 */
+			bool        autoPlay = true;    /** 初期化後すぐに再生開始 */
 		};
 
 
@@ -565,18 +565,53 @@ namespace app
 			UIVideo();
 			~UIVideo();
 
+			/** 更新処理 */
 			void Update() override;
+			/** 描画処理 */
 			void Render(RenderContext& rc) override;
 
+			/**
+			 * @brief 初期化
+			 * @param data 初期化データ
+			 */
 			void Initialize(const UIVideoInitData& data);
 
+			/**
+			 * @brief 再生開始
+			 */
 			void Play()  { m_videoRender.Play(); }
+			/**
+			 * @brief 再生一時停止
+			 */
 			void Pause() { m_videoRender.Pause(); }
+			/**
+			 * @brief 再生停止（先頭に戻る）
+			 */
 			void Stop()  { m_videoRender.Stop(); }
+			/**
+			 * @brief ループ再生の設定
+			 * @param loop ループ再生する場合は true
+			 */
 			void SetLoop(bool loop)            { m_videoRender.SetLoop(loop); }
+			/**
+			 * @brief 再生速度の設定（1.0 = 等速）
+			 * @param speed 再生速度倍率
+			 */
 			void SetPlaybackSpeed(float speed) { m_videoRender.SetPlaybackSpeed(speed); }
+			/**
+			 * @brief 再生終了コールバックの設定
+			 * @param cb 再生終了時に呼び出すコールバック
+			 */
 			void SetOnFinished(std::function<void()> cb) { m_videoRender.SetOnFinished(cb); }
+			/**
+			 * @brief 再生中かどうかを取得
+			 * @return 再生中なら true
+			 */
 			bool IsPlaying()  const { return m_videoRender.IsPlaying(); }
+			/**
+			 * @brief 再生終了しているかどうかを取得
+			 * @return 再生終了しているなら true
+			 */
 			bool IsFinished() const { return m_videoRender.IsFinished(); }
 
 		private:

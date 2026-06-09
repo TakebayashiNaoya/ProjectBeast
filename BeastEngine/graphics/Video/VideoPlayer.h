@@ -46,39 +46,39 @@ namespace nsBeastEngine
 		 * @brief ループ再生の設定
 		 * @param loop ループ再生する場合は true
 		 */
-		inline void SetLoop(bool loop) { m_loop = loop; }
+		void SetLoop(bool loop) { m_loop = loop; }
 		/**
 		 * @brief 再生速度の設定（1.0 = 等速）
 		 * @param speed 再生速度倍率
 		 */
-		inline void SetPlaybackSpeed(float speed) { m_speed = speed; }
+		void SetPlaybackSpeed(float speed) { m_speed = speed; }
 		/**
 		 * @brief 現在のフレームインデックスを取得
 		 * @return フレームインデックス（0 からフレーム数 - 1）
 		 */
-		inline int  GetCurrentFrameIndex() const { return m_currentFrame; }
+		int GetCurrentFrameIndex() const { return m_currentFrame; }
 		/**
 		 * @brief 現在の再生状態を取得
 		 * @return 再生中なら true
 		 */
-		inline bool IsPlaying() const { return m_isPlaying; }
+		bool IsPlaying() const { return m_isPlaying; }
 		/**
 		 * @brief 再生終了状態を取得
 		 * @return 再生終了しているなら true
 		 */
-		inline bool IsFinished() const { return m_isFinished; }
+		bool IsFinished() const { return m_isFinished; }
 
 		/** @brief 再生終了時コールバック */
-		std::function<void()> onFinished;
+		std::function<void()> m_onFinished;
 
 
 	private:
-		VideoClip* m_clip = nullptr;		/** 再生するクリップへのポインタ（nullptr でクリップなし） */
-		float      m_elapsed = 0.0f;		/** フレームタイマーの経過時間（秒） */
-		int        m_currentFrame = 0;		/** 現在のフレームインデックス（0 からフレーム数 - 1） */
-		bool       m_isPlaying = false;		/** 再生中フラグ */
-		bool       m_isFinished = false;	/** 再生終了フラグ */
-		bool       m_loop = true;			/** ループ再生するかどうか */
-		float      m_speed = 1.0f;			/** 再生速度倍率（1.0 = 等速） */
+		VideoClip* m_clip = nullptr;     /** 再生するクリップへのポインタ（nullptr でクリップなし） */
+		float      m_elapsed = 0.0f;     /** フレームタイマーの経過時間（秒） */
+		int        m_currentFrame = 0;   /** 現在のフレームインデックス（0 からフレーム数 - 1） */
+		bool       m_isPlaying = false;  /** 再生中フラグ */
+		bool       m_isFinished = false; /** 再生終了フラグ */
+		bool       m_loop = true;        /** ループ再生するかどうか */
+		float      m_speed = 1.0f;       /** 再生速度倍率（1.0 = 等速） */
 	};
 }

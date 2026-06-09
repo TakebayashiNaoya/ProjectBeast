@@ -71,12 +71,14 @@ namespace nsBeastEngine
 
 		// パスの末尾が「/」の場合はフォルダなのでコマ撮りで処理する
 		std::string p = path;
-		if (p.back() == '/' || p.back() == '\\') {
+		if (p.back() == '/' || p.back() == '\\')
+		{
 			return LoadFrameSequence(p);
 		}
 		// 動画の拡張子の場合は動画として処理する
 		const std::string ext = GetLowerExtension(p);
-		if (ext == ".mp4" || ext == ".wmv" || ext == ".avi" || ext == ".mov") {
+		if (ext == ".mp4" || ext == ".wmv" || ext == ".avi" || ext == ".mov")
+		{
 			return LoadMP4(p);
 		}
 		// それ以外はフォルダとみなしてコマ撮りで処理する
@@ -161,6 +163,9 @@ namespace nsBeastEngine
 
 	bool VideoClip::LoadMP4(const std::string& filePath)
 	{
+		// フレーム数が取得できなかった場合のフォールバック値（EndOfStream で停止する）
+		constexpr int k_fallbackFrameCount = 100000;
+
 		// Media Foundation を初期化してビデオファイルを開く
 		HRESULT hrCo = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 		m_coInitialized = SUCCEEDED(hrCo);
@@ -169,7 +174,8 @@ namespace nsBeastEngine
 		if (FAILED(hr))
 		{
 			K2_LOG("VideoClip: MFStartup failed hr=0x%08X\n", hr);
-			if (m_coInitialized) {
+			if (m_coInitialized)
+			{
 				CoUninitialize();
 				m_coInitialized = false;
 			}
@@ -187,18 +193,18 @@ namespace nsBeastEngine
 
 		// MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING を有効にすることで
 		// H.264(NV12) → ARGB32 への変換 MFT が自動挿入される
-		IMFAttributes* readerAttrs = nullptr;
+		ComPtr<IMFAttributes> readerAttrs;
 		MFCreateAttributes(&readerAttrs, 1);
 		readerAttrs->SetUINT32(MF_SOURCE_READER_ENABLE_VIDEO_PROCESSING, TRUE);
 
-		IMFSourceReader* reader = nullptr;
-		hr = MFCreateSourceReaderFromURL(wpath.data(), readerAttrs, &reader);
-		readerAttrs->Release();
+		ComPtr<IMFSourceReader> reader;
+		hr = MFCreateSourceReaderFromURL(wpath.data(), readerAttrs.Get(), &reader);
 		if (FAILED(hr))
 		{
 			K2_LOG("VideoClip: cannot open: %s hr=0x%08X\n", filePath.c_str(), hr);
 			MFShutdown();
-			if (m_coInitialized) {
+			if (m_coInitialized)
+			{
 				CoUninitialize();
 				m_coInitialized = false;
 			}
@@ -212,41 +218,43 @@ namespace nsBeastEngine
 		// ARGB32 → RGB32 の順で試行（環境によって対応フォーマットが異なる）
 		static const GUID kTryFormats[] = { MFVideoFormat_ARGB32, MFVideoFormat_RGB32 };
 		bool fmtOk = false;
-		for (int fi = 0; fi < 2 && !fmtOk; ++fi)
+		for (int fi = 0; fi < _countof(kTryFormats) && !fmtOk; ++fi)
 		{
-			IMFMediaType* outType = nullptr;
+			ComPtr<IMFMediaType> outType;
 			MFCreateMediaType(&outType);
 			outType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video);
 			outType->SetGUID(MF_MT_SUBTYPE, kTryFormats[fi]);
-			hr = reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, nullptr, outType);
-			outType->Release();
+			hr = reader->SetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, nullptr, outType.Get());
 			K2_LOG("VideoClip: SetCurrentMediaType[%d] hr=0x%08X\n", fi, hr);
 			if (SUCCEEDED(hr)) fmtOk = true;
 		}
 		if (!fmtOk)
 		{
 			K2_LOG("VideoClip: no usable output format\n");
-			reader->Release(); MFShutdown();
-			if (m_coInitialized) { CoUninitialize(); m_coInitialized = false; }
+			MFShutdown();
+			if (m_coInitialized)
+			{
+				CoUninitialize();
+				m_coInitialized = false;
+			}
 			return false;
 		}
 
 		// メタデータ取得
-		IMFMediaType* actualType = nullptr;
+		ComPtr<IMFMediaType> actualType;
 		reader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, &actualType);
 
 		UINT32 w = 0, h = 0;
-		MFGetAttributeSize(actualType, MF_MT_FRAME_SIZE, &w, &h);
+		MFGetAttributeSize(actualType.Get(), MF_MT_FRAME_SIZE, &w, &h);
 		m_width = static_cast<int>(w);
 		m_height = static_cast<int>(h);
 
 		UINT32 fpsNum = 0, fpsDen = 1;
-		if (SUCCEEDED(MFGetAttributeRatio(actualType, MF_MT_FRAME_RATE, &fpsNum, &fpsDen))
+		if (SUCCEEDED(MFGetAttributeRatio(actualType.Get(), MF_MT_FRAME_RATE, &fpsNum, &fpsDen))
 			&& fpsDen > 0 && fpsNum > 0)
 		{
 			m_fps = static_cast<float>(fpsNum) / static_cast<float>(fpsDen);
 		}
-		actualType->Release();
 
 		// 再生時間 → フレーム数
 		PROPVARIANT varDur;
@@ -258,15 +266,14 @@ namespace nsBeastEngine
 			m_frameCount = static_cast<int>(durSec * m_fps);
 		}
 
-		// フレーム数が 0 の場合は代替として大きな値を設定（EndOfStream で停止する）
 		if (m_frameCount <= 0)
 		{
-			K2_LOG("VideoClip: duration not available, using fallback frameCount=100000\n");
-			m_frameCount = 100000;
+			K2_LOG("VideoClip: duration not available, using fallback frameCount=%d\n", k_fallbackFrameCount);
+			m_frameCount = k_fallbackFrameCount;
 		}
 
 		m_mp4FrameBuffer.resize(m_width * m_height * 4, 0);
-		m_mfReader = reader;
+		m_mfReader = reader.Detach(); // void* に所有権を移譲
 		m_mp4CurrentFrame = -1;
 		m_mp4Eos = false;
 		m_clipType = ClipType::MP4;
@@ -309,7 +316,8 @@ namespace nsBeastEngine
 		if (FAILED(hr) || (flags & MF_SOURCE_READERF_ENDOFSTREAM))
 		{
 			m_mp4Eos = true;
-			if (sample) {
+			if (sample)
+			{
 				sample->Release();
 			}
 			return false;

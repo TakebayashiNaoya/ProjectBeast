@@ -452,7 +452,7 @@ namespace app
 		void UIVideo::Initialize(const UIVideoInitData& data)
 		{
 			m_videoRender.SetLoop(data.loop);
-			m_videoRender.Init(data.clipPath, data.width, data.height, data.fps);
+			m_videoRender.Init(data.clipPath.c_str(), data.width, data.height, data.fps);
 
 			if (data.autoPlay)
 				m_videoRender.Play();

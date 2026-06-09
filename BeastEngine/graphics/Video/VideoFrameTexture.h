@@ -39,19 +39,20 @@ namespace nsBeastEngine
 		void UploadFrame(const uint8_t* rgbaPixels);
 		/**
 		 * @brief Sprite の SpriteInitData::m_textures に渡す k2EngineLow::Texture 参照
-		 * @returns k2EngineLow::Texture への参照
+		 * @return k2EngineLow::Texture への参照
 		 */
 		nsK2EngineLow::Texture& GetK2Texture() { return m_k2Texture; }
 		/**
 		 * @brief 初期化完了しているか
-		 * @returns 初期化完了している場合は true
+		 * @return 初期化完了している場合は true
 		 */
-		inline bool IsInitialized() const { return m_isInitialized; }
+		bool IsInitialized() const { return m_isInitialized; }
 
 
 	private:
-		ID3D12Resource* m_gpuTexture = nullptr;					/** GPU 用テクスチャリソース（DEFAULT ヒープ） */
-		ID3D12Resource* m_uploadBuffer = nullptr;				/** CPU→GPU 転送用バッファ（UPLOAD ヒープ） */
+		// GPU の遅延解放（ReleaseD3D12Object）のため ComPtr を使わず生ポインタで管理する
+		ID3D12Resource* m_gpuTexture = nullptr;   /** GPU 用テクスチャリソース（DEFAULT ヒープ） */
+		ID3D12Resource* m_uploadBuffer = nullptr; /** CPU→GPU 転送用バッファ（UPLOAD ヒープ） */
 		nsK2EngineLow::Texture m_k2Texture;						/** k2EngineLow 側から参照するテクスチャラッパー */
 		D3D12_PLACED_SUBRESOURCE_FOOTPRINT m_footprint = {};	/** GetCopyableFootprints で取得したレイアウト情報 */
 		int  m_width = 0;				/** テクスチャ幅（ピクセル） */

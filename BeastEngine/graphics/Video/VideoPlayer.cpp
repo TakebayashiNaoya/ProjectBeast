@@ -66,7 +66,7 @@ namespace nsBeastEngine
 					m_currentFrame = m_clip->GetFrameCount() - 1;
 					m_isFinished = true;
 					m_isPlaying = false;
-					if (onFinished) onFinished();
+					if (m_onFinished) m_onFinished();
 					return;
 				}
 			}

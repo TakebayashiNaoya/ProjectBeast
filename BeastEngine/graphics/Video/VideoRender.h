@@ -31,25 +31,72 @@ namespace nsBeastEngine
 		void Init(const char* clipPath, float dispWidth, float dispHeight, float fps = 24.0f);
 
 		/**
-		 * @brief VideoPlayer へのアクセス（再生制御や状態の取得に）
+		 * @brief 再生開始
 		 */
 		void Play() { m_player.Play(); }
+		/**
+		 * @brief 再生一時停止
+		 */
 		void Pause() { m_player.Pause(); }
+		/**
+		 * @brief 再生停止（先頭に戻る）
+		 */
 		void Stop() { m_player.Stop(); }
+		/**
+		 * @brief ループ再生の設定
+		 * @param loop ループ再生する場合は true
+		 */
 		void SetLoop(bool loop) { m_player.SetLoop(loop); }
+		/**
+		 * @brief 再生速度の設定（1.0 = 等速）
+		 * @param speed 再生速度倍率
+		 */
 		void SetPlaybackSpeed(float speed) { m_player.SetPlaybackSpeed(speed); }
-		void SetOnFinished(std::function<void()> cb) { m_player.onFinished = cb; }
+		/**
+		 * @brief 再生終了コールバックの設定
+		 * @param cb 再生終了時に呼び出すコールバック
+		 */
+		void SetOnFinished(std::function<void()> cb) { m_player.m_onFinished = cb; }
+		/**
+		 * @brief 再生中かどうかを取得
+		 * @return 再生中なら true
+		 */
 		bool IsPlaying()     const { return m_player.IsPlaying(); }
+		/**
+		 * @brief 再生終了しているかどうかを取得
+		 * @return 再生終了しているなら true
+		 */
 		bool IsFinished()    const { return m_player.IsFinished(); }
+		/**
+		 * @brief 初期化完了しているかどうかを取得
+		 * @return 初期化完了している場合は true
+		 */
 		bool IsInitialized() const { return m_isInitialized; }
 
 		/**
-		 * @brief 描画パラメータの設定
+		 * @brief 座標の設定
+		 * @param pos 座標
 		 */
 		void SetPosition(const Vector3& pos) { m_position = pos; }
+		/**
+		 * @brief 拡大率の設定
+		 * @param scale 拡大率
+		 */
 		void SetScale(const Vector3& scale) { m_scale = scale; }
+		/**
+		 * @brief 回転の設定
+		 * @param rot 回転
+		 */
 		void SetRotation(const Quaternion& rot) { m_rotation = rot; }
+		/**
+		 * @brief ピボットの設定
+		 * @param pivot ピボット
+		 */
 		void SetPivot(const Vector2& pivot) { m_pivot = pivot; }
+		/**
+		 * @brief 乗算カラーの設定
+		 * @param color 乗算カラー
+		 */
 		void SetMulColor(const Vector4& color) { m_mulColor = color; }
 
 		/**
@@ -65,21 +112,19 @@ namespace nsBeastEngine
 	private:
 		void OnRender2D(RenderContext& rc) override;
 
+		VideoClip         m_clip;     /** 再生する映像クリップ */
+		VideoPlayer       m_player;   /** プレイヤー */
+		VideoFrameTexture m_frameTex; /** GPU テクスチャ管理 */
+		Sprite            m_sprite;   /** 描画用スプライト */
 
-	private:
-		VideoClip         m_clip;		/** 再生する映像クリップ */
-		VideoPlayer       m_player;		/** プレイヤー */
-		VideoFrameTexture m_frameTex;	/** GPU テクスチャ管理 */
-		Sprite            m_sprite;		/** 描画用スプライト */
+		Vector3    m_position = Vector3::Zero;        /** 座標 */
+		Vector3    m_scale = Vector3::One;             /** 拡大率 */
+		Quaternion m_rotation = Quaternion::Identity; /** 回転 */
+		Vector2    m_pivot = Sprite::DEFAULT_PIVOT;   /** ピボット */
+		Vector4    m_mulColor = Vector4::White;        /** 乗算カラー */
 
-		Vector3    m_position = Vector3::Zero;			/** 座標 */
-		Vector3    m_scale = Vector3::One;				/** 拡大率 */
-		Quaternion m_rotation = Quaternion::Identity;	/** 回転 */
-		Vector2    m_pivot = Sprite::DEFAULT_PIVOT;		/** ピボット */
-		Vector4    m_mulColor = Vector4::White;			/** 乗算カラー */
-
-		/** 前回描画したフレーム番号（変化した時だけ GPU 転送） */
-		int  m_lastFrameIdx = -1;		/** フレーム番号は 0 から始まるため、-1 で「まだ描画していない」状態を表す */
-		bool m_isInitialized = false;	/** 初期化完了フラグ */
+		/** 前回描画したフレーム番号。-1 は「まだ描画していない」状態を表す。フレームが変化した時だけ GPU 転送する */
+		int  m_lastFrameIdx = -1;
+		bool m_isInitialized = false; /** 初期化完了フラグ */
 	};
 }

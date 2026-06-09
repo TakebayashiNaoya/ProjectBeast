@@ -90,14 +90,24 @@ namespace nsBeastEngine
 		{
 			ComPtr<ID3D12CommandAllocator>  allocator;
 			ComPtr<ID3D12GraphicsCommandList> cmdList;
-			device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator));
-			device->CreateCommandList(
+			hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&allocator));
+			if (FAILED(hr))
+			{
+				K2_LOG("VideoFrameTexture::Init: コマンドアロケータの作成に失敗しました (hr=0x%08X)\n", hr);
+				return;
+			}
+			hr = device->CreateCommandList(
 				0,
 				D3D12_COMMAND_LIST_TYPE_DIRECT,
 				allocator.Get(),
 				nullptr,
 				IID_PPV_ARGS(&cmdList)
 			);
+			if (FAILED(hr))
+			{
+				K2_LOG("VideoFrameTexture::Init: コマンドリストの作成に失敗しました (hr=0x%08X)\n", hr);
+				return;
+			}
 
 			// ゼロクリアデータをアップロードバッファに書き込む
 			uint8_t* mapped = nullptr;

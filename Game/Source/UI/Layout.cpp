@@ -181,10 +181,8 @@ void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
 
 void InitializeUIParts(app::ui::UIVideo* video, const nlohmann::json& item)
 {
-	const std::string clipPath = item.value("clipPath", std::string(""));
-
 	app::ui::UIVideoInitData data;
-	data.clipPath = clipPath.c_str();
+	data.clipPath = item.value("clipPath", std::string(""));
 	data.width    = item.value("width",    1920.0f);
 	data.height   = item.value("height",   1080.0f);
 	data.fps      = item.value("fps",      24.0f);
