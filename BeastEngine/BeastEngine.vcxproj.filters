@@ -117,6 +117,21 @@
     <ClCompile Include="Graphics\Camera\SubCameraManager.cpp">
       <Filter>Graphics\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Video\VideoClip.cpp">
+      <Filter>Graphics\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Video\VideoFrameTexture.cpp">
+      <Filter>Graphics\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Video\VideoPlayer.cpp">
+      <Filter>Graphics\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Video\VideoRender.cpp">
+      <Filter>Graphics\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Video\stb_image_impl.cpp">
+      <Filter>Graphics\Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -265,6 +280,21 @@
     <ClInclude Include="Graphics\RenderViewContext.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Video\stb_image.h">
+      <Filter>Graphics\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Video\VideoClip.h">
+      <Filter>Graphics\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Video\VideoFrameTexture.h">
+      <Filter>Graphics\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Video\VideoPlayer.h">
+      <Filter>Graphics\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Video\VideoRender.h">
+      <Filter>Graphics\Video</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -293,6 +323,9 @@
     </Filter>
     <Filter Include="Graphics\Camera">
       <UniqueIdentifier>{dd545e6b-93f7-4982-9eee-6b29d68b62e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Video">
+      <UniqueIdentifier>{2134a0d6-619f-48b1-897b-1aa542ef354b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
