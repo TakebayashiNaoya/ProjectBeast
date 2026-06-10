@@ -23,19 +23,6 @@ namespace app
 {
 	// ---------- 静的メンバー定義 ----------
 
-	const EnTutorialTarget TutorialController::ARROW_TARGETS[ARROW_COUNT] =
-	{
-		EnTutorialTarget::PenguinSerious,
-		EnTutorialTarget::PenguinClingy,
-		EnTutorialTarget::PenguinNaughty,
-		EnTutorialTarget::PenguinClumsy,
-		EnTutorialTarget::PenguinCaring,
-		EnTutorialTarget::Bear,
-		EnTutorialTarget::BearNest,
-		EnTutorialTarget::Igloo,
-		EnTutorialTarget::Whirlpool,
-	};
-
 	const char* const TutorialController::WINDOW_JSON_PATHS[TARGET_COUNT] =
 	{
 		"Assets/parameter/Tutorial/TutorialWindow_PenguinSerious.json",
@@ -69,12 +56,87 @@ namespace app
 	{
 		if (!m_daddy) return;
 
-		CheckProximityTriggers();
+		auto& mainCamera = CameraSystem::Get().GetMainCamera();
+		const Vector3 camPos = mainCamera.GetPosition();
+		const Vector3 camFwd = mainCamera.GetForward();
+		const Frustum& frustum = g_renderingEngine->GetFrustum();
+		const Vector3 daddyPos = m_daddy->GetTransform().m_position;
+		const float triggerRadSq = TRIGGER_RADIUS * TRIGGER_RADIUS;
+
+		// Ocean トリガー（矢印なし）: 水中に入ったとき
+		{
+			const int oi = static_cast<int>(EnTutorialTarget::Ocean);
+			if (!m_triggered[oi])
+			{
+				auto* sm = m_daddy->GetStateMachine();
+				if (sm && sm->IsSwimming())
+				{
+					m_triggered[oi] = true;
+					m_queue.push(EnTutorialTarget::Ocean);
+				}
+			}
+		}
+
+		// 矢印ありターゲット: 近接トリガー検知と矢印更新を一括処理
+		// （GetNearestTargetPosition の二重呼び出しを防ぐためループを統合）
+		for (int i = 0; i < ARROW_COUNT; i++)
+		{
+			const auto target = ARROW_TARGETS[i];
+			const int  idx = static_cast<int>(target);
+			auto* menu = m_arrowPackets[i].GetMenu();
+
+			Vector3 targetPos;
+			const bool found = GetNearestTargetPosition(target, targetPos);
+
+			// 近接トリガー
+			if (!m_triggered[idx] && found)
+			{
+				const Vector3 diff = daddyPos - targetPos;
+				if (diff.LengthSq() < triggerRadSq)
+				{
+					m_triggered[idx] = true;
+					m_queue.push(target);
+				}
+			}
+
+			// 矢印更新
+			if (!menu) continue;
+
+			if (m_completed[idx] || !found)
+			{
+				menu->SetVisible(false);
+				m_arrowPackets[i].Update();
+				continue;
+			}
+
+			Vector2 screenPos;
+			mainCamera.CalcScreenPositionFromWorldPosition(screenPos, targetPos);
+
+			// カメラ背後の符号反転補正
+			const Vector3 toTarget = targetPos - camPos;
+			if (toTarget.Dot(camFwd) < 0.0f)
+			{
+				screenPos.x = -screenPos.x;
+				screenPos.y = -screenPos.y;
+			}
+
+			if (frustum.IsPointInside(targetPos))
+			{
+				menu->SetArrowScreenPos(ui::CalcOverheadArrowScreenPos(screenPos));
+				menu->SetArrowAngleRad(ui::ARROW_OVERHEAD_ANGLE);
+			}
+			else
+			{
+				menu->SetArrowScreenPos(ui::CalcEdgeArrowScreenPos(screenPos));
+				menu->SetArrowAngleRad(ui::CalcEdgeArrowAngle(screenPos));
+			}
+			menu->SetVisible(true);
+			menu->SetPulsing(false);
+			m_arrowPackets[i].Update();
+		}
 
 		if (!m_isWindowOpen && !m_queue.empty())
 			TryOpenNextWindow();
-
-		UpdateArrows();
 	}
 
 
@@ -98,13 +160,9 @@ namespace app
 			m_isWindowOpen = false;
 
 			if (!m_queue.empty())
-			{
 				TryOpenNextWindow();
-			}
 			else
-			{
 				SceneManager::GetInstance()->SetPause(false);
-			}
 		}
 
 		return true;
@@ -122,40 +180,6 @@ namespace app
 
 	// ---------- 非公開実装 ----------
 
-	void TutorialController::CheckProximityTriggers()
-	{
-		const Vector3 daddyPos = m_daddy->GetTransform().m_position;
-
-		for (int i = 0; i < TARGET_COUNT; i++)
-		{
-			if (m_triggered[i]) continue;
-
-			const auto target = static_cast<EnTutorialTarget>(i);
-			bool triggered = false;
-
-			if (target == EnTutorialTarget::Ocean)
-			{
-				triggered = m_daddy->GetStateMachine()->IsSwimming();
-			}
-			else
-			{
-				Vector3 nearestPos;
-				if (GetNearestTargetPosition(target, nearestPos))
-				{
-					const Vector3 diff = daddyPos - nearestPos;
-					triggered = diff.LengthSq() < TRIGGER_RADIUS * TRIGGER_RADIUS;
-				}
-			}
-
-			if (triggered)
-			{
-				m_triggered[i] = true;
-				m_queue.push(target);
-			}
-		}
-	}
-
-
 	bool TutorialController::GetNearestTargetPosition(EnTutorialTarget type, Vector3& outPos) const
 	{
 		// ペンギン5種
@@ -164,14 +188,13 @@ namespace app
 			const auto penguinType = static_cast<actor::EnChildPenguinType>(
 				static_cast<int>(type) - static_cast<int>(EnTutorialTarget::PenguinSerious));
 
-			const Vector3  from = m_daddy->GetTransform().m_position;
-			float          minDistSq = FLT_MAX;
-			bool           found = false;
+			const Vector3 from = m_daddy->GetTransform().m_position;
+			float minDistSq = FLT_MAX;
+			bool  found = false;
 
 			for (auto* p : actor::ChildPenguinManager::GetInstance()->GetChildPenguin())
 			{
 				if (!p || p->GetChildPenguinType() != penguinType) continue;
-
 				const float dSq = (from - p->GetTransform().m_position).LengthSq();
 				if (dSq < minDistSq) { minDistSq = dSq; outPos = p->GetTransform().m_position; found = true; }
 			}
@@ -181,25 +204,13 @@ namespace app
 		switch (type)
 		{
 		case EnTutorialTarget::Bear:
-		{
-			const auto positions = actor::EnemyManager::GetInstance()->GetPositionList();
-			if (positions.empty()) return false;
-
-			const Vector3 from = m_daddy->GetTransform().m_position;
-			float         minDistSq = FLT_MAX;
-
-			for (const auto& pos : positions)
-			{
-				const float dSq = (from - pos).LengthSq();
-				if (dSq < minDistSq) { minDistSq = dSq; outPos = pos; }
-			}
-			return true;
-		}
+			return actor::EnemyManager::GetInstance()->GetNearestEnemyPosition(
+				m_daddy->GetTransform().m_position, outPos);
 
 		case EnTutorialTarget::BearNest:
 		{
-			const Vector3 from = m_daddy->GetTransform().m_position;
-			const Vector3 pos = actor::StageSystem::GetInstance()->GetNearestBearNestPosition(from);
+			const Vector3 pos = actor::StageSystem::GetInstance()->GetNearestBearNestPosition(
+				m_daddy->GetTransform().m_position);
 			if (pos.LengthSq() < 0.001f) return false;
 			outPos = pos;
 			return true;
@@ -207,8 +218,8 @@ namespace app
 
 		case EnTutorialTarget::Igloo:
 		{
-			const Vector3 from = m_daddy->GetTransform().m_position;
-			const Vector3 pos = actor::StageSystem::GetInstance()->GetNearestIglooPosition(from);
+			const Vector3 pos = actor::StageSystem::GetInstance()->GetNearestIglooPosition(
+				m_daddy->GetTransform().m_position);
 			if (pos.LengthSq() < 0.001f) return false;
 			outPos = pos;
 			return true;
@@ -217,8 +228,8 @@ namespace app
 		case EnTutorialTarget::Whirlpool:
 		{
 			const Vector3 from = m_daddy->GetTransform().m_position;
-			float         minDistSq = FLT_MAX;
-			bool          found = false;
+			float minDistSq = FLT_MAX;
+			bool  found = false;
 
 			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* w)
 				{
@@ -250,90 +261,10 @@ namespace app
 			m_isWindowOpen = true;
 			SceneManager::GetInstance()->SetPause(true);
 		}
-	}
-
-
-	void TutorialController::UpdateArrows()
-	{
-		auto& mainCamera = CameraSystem::Get().GetMainCamera();
-		const Vector3 camPos = mainCamera.GetPosition();
-		const Vector3 camFwd = mainCamera.GetForward();
-		const Frustum& frustum = g_renderingEngine->GetFrustum();
-
-		for (int i = 0; i < ARROW_COUNT; i++)
+		else
 		{
-			const auto target = ARROW_TARGETS[i];
-			auto* menu = m_arrowPackets[i].GetMenu();
-			if (!menu) continue;
-
-			const int idx = static_cast<int>(target);
-
-			if (m_completed[idx])
-			{
-				menu->SetVisible(false);
-				m_arrowPackets[i].Update();
-				continue;
-			}
-
-			Vector3 targetPos;
-			if (!GetNearestTargetPosition(target, targetPos))
-			{
-				menu->SetVisible(false);
-				m_arrowPackets[i].Update();
-				continue;
-			}
-
-			// ワールド座標 → スクリーン座標
-			Vector2 screenPos;
-			mainCamera.CalcScreenPositionFromWorldPosition(screenPos, targetPos);
-
-			// カメラ背後の符号反転補正
-			const Vector3 toTarget = targetPos - camPos;
-			if (toTarget.Dot(camFwd) < 0.0f)
-			{
-				screenPos.x = -screenPos.x;
-				screenPos.y = -screenPos.y;
-			}
-
-			const bool inFrustum = frustum.IsPointInside(targetPos);
-			const ArrowInfo info = inFrustum
-				? CalcOverheadArrow(screenPos)
-				: CalcEdgeArrow(screenPos);
-
-			menu->SetArrowScreenPos(info.screenPos);
-			menu->SetArrowAngleRad(info.angleRad);
-			menu->SetVisible(info.visible);
-			menu->SetPulsing(false);
-
-			m_arrowPackets[i].Update();
+			// Layout 初期化失敗（JSON 欠損など） — エントリをスキップして完了済みにする
+			m_completed[m_currentTargetIdx] = true;
 		}
-	}
-
-
-	TutorialController::ArrowInfo TutorialController::CalcEdgeArrow(
-		const Vector2& worldScreenPos) const
-	{
-		ArrowInfo info;
-		info.visible = true;
-
-		const float angle = atan2f(worldScreenPos.y, worldScreenPos.x);
-		info.screenPos = Vector2(
-			CIRCLE_RADIUS * cosf(angle),
-			CIRCLE_CENTER_Y + CIRCLE_RADIUS * sinf(angle)
-		);
-		info.angleRad = angle + ARROW_ROT_OFFSET;
-
-		return info;
-	}
-
-
-	TutorialController::ArrowInfo TutorialController::CalcOverheadArrow(
-		const Vector2& worldScreenPos) const
-	{
-		ArrowInfo info;
-		info.visible = true;
-		info.screenPos = Vector2(worldScreenPos.x, worldScreenPos.y + OVERHEAD_OFFSET_Y);
-		info.angleRad = OVERHEAD_ANGLE;
-		return info;
 	}
 }

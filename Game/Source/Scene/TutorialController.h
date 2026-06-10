@@ -9,6 +9,7 @@
 #include "Source/UI/Layout.h"
 #include "Source/UI/Menus/TutorialWindowMenu.h"
 #include "Source/UI/DangerArrow/DangerArrowMenu.h"
+#include "Source/UI/DangerArrow/DangerArrowCalc.h"
 #include "Source/UI/System/SystemPacket.h"
 
 
@@ -81,9 +82,6 @@ namespace app
 
 
 	private:
-		/** 近接トリガーをチェックしてキューに積む */
-		void CheckProximityTriggers();
-
 		/**
 		 * @brief ターゲット種別の最近傍インスタンス座標を取得
 		 * @return 座標が取得できたら true（Ocean は常に false）
@@ -93,46 +91,35 @@ namespace app
 		/** キューの先頭ウィンドウを開いてポーズをかける */
 		void TryOpenNextWindow();
 
-		/** 矢印の位置・角度・表示状態を計算して反映する */
-		void UpdateArrows();
-
-
-	private:
-		/** 矢印の情報 */
-		struct ArrowInfo
-		{
-			Vector2 screenPos;
-			float   angleRad = 0.0f;
-			bool    visible = false;
-		};
-
-		ArrowInfo CalcEdgeArrow(const Vector2& worldScreenPos) const;
-		ArrowInfo CalcOverheadArrow(const Vector2& worldScreenPos) const;
-
 
 	private:
 		static constexpr int TARGET_COUNT = static_cast<int>(EnTutorialTarget::Max);
 
-		/** 矢印を持つターゲット（Ocean を除く 9 種） */
-		static constexpr int ARROW_COUNT = TARGET_COUNT - 1;
-		static const EnTutorialTarget ARROW_TARGETS[ARROW_COUNT];
+		/**
+		 * @brief 矢印を持つターゲットの一覧（Ocean を除く）
+		 * @details この配列を変更した場合、WINDOW_JSON_PATHS も必ず更新すること。
+		 *          ARROW_COUNT はこの配列から自動計算されるため手動更新不要。
+		 */
+		static constexpr EnTutorialTarget ARROW_TARGETS[] = {
+			EnTutorialTarget::PenguinSerious,
+			EnTutorialTarget::PenguinClingy,
+			EnTutorialTarget::PenguinNaughty,
+			EnTutorialTarget::PenguinClumsy,
+			EnTutorialTarget::PenguinCaring,
+			EnTutorialTarget::Bear,
+			EnTutorialTarget::BearNest,
+			EnTutorialTarget::Igloo,
+			EnTutorialTarget::Whirlpool,
+		};
+		/** ARROW_TARGETS の要素数（自動計算） */
+		static constexpr int ARROW_COUNT = static_cast<int>(
+			sizeof(ARROW_TARGETS) / sizeof(EnTutorialTarget));
 
 		/** ターゲットごとのウィンドウ JSON パス */
 		static const char* const WINDOW_JSON_PATHS[TARGET_COUNT];
 
 		/** プレイヤーとの距離がこれ以下でトリガー（ワールド単位） */
 		static constexpr float TRIGGER_RADIUS = 200.0f;
-
-		/** 2D矢印の配置円半径（スクリーン座標px） */
-		static constexpr float CIRCLE_RADIUS = 300.0f;
-		/** 2D矢印の円中心Yオフセット */
-		static constexpr float CIRCLE_CENTER_Y = -80.0f;
-		/**	頭上矢印の上方向オフセット（スクリーン座標px） */
-		static constexpr float OVERHEAD_OFFSET_Y = 50.0f;
-		/** 上向きDDSをターゲット方向へ向けるZ回転オフセット（ = -π/2） */
-		static constexpr float ARROW_ROT_OFFSET = -1.5707963f;
-		/** 頭上矢印の回転（下向き = π） */
-		static constexpr float OVERHEAD_ANGLE = 3.1415927f;
 
 
 	private:
@@ -153,7 +140,7 @@ namespace app
 		/** ターゲットごとのウィンドウ Layout */
 		ui::Layout m_windowLayouts[TARGET_COUNT];
 
-		/** 矢印 UI パケット（9 本） */
+		/** 矢印 UI パケット（ARROW_COUNT 本） */
 		std::array<ui::SystemPacket<ui::DangerArrowMenu>, ARROW_COUNT> m_arrowPackets;
 	};
 }

@@ -912,6 +912,9 @@
     <ClInclude Include="Source\UI\CPReaction\MasterCPReactionParameter.h">
       <Filter>Source\UI\CPReaction</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\DangerArrow\DangerArrowCalc.h">
+      <Filter>Source\UI\DangerArrow</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowMenu.h">
       <Filter>Source\UI\DangerArrow</Filter>
     </ClInclude>

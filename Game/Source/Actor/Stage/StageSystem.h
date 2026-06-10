@@ -154,6 +154,13 @@ namespace app
 
 
 		private:
+			/**
+			 * @brief キーが prefix で始まるオブジェクトの中から from に最も近いエントリを返す
+			 * @return 見つかった場合はそのイテレータ。なければ m_objectMap.end()
+			 */
+			ObjectMap::const_iterator FindNearestByPrefix(
+				const char* prefix, const Vector3& from) const;
+
 			/** シングルトンインスタンス */
 			static StageSystem* m_instance;
 		};

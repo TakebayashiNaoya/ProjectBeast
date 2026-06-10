@@ -466,6 +466,7 @@
     <ClInclude Include="Source\UI\CPReaction\CPReactionStatus.h" />
     <ClInclude Include="Source\UI\CPReaction\CPReactionSystem.h" />
     <ClInclude Include="Source\UI\CPReaction\MasterCPReactionParameter.h" />
+    <ClInclude Include="Source\UI\DangerArrow\DangerArrowCalc.h" />
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowMenu.h" />
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />

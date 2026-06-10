@@ -313,63 +313,45 @@ namespace app
 		}
 
 
-		Vector3 StageSystem::GetNearestIglooPosition(const Vector3& from) const
+		StageSystem::ObjectMap::const_iterator StageSystem::FindNearestByPrefix(
+			const char* prefix, const Vector3& from) const
 		{
-			const IStageObject* nearest = nullptr;
+			auto nearest = m_objectMap.end();
 			float minDistSq = FLT_MAX;
 
-			for (const auto& obj : m_objectMap)
+			for (auto it = m_objectMap.begin(); it != m_objectMap.end(); ++it)
 			{
-				// キー名が "igloo" で始まるオブジェクトのみ対象とする
-				if (obj.first.find(IGLOO_KEY_PREFIX) != 0) continue;
+				if (it->first.find(prefix) != 0) continue;
 
-				const Vector3& pos = obj.second->GetTransform().m_position;
-				const Vector3 diff = pos - from;
+				const Vector3 diff = it->second->GetTransform().m_position - from;
 				const float distSq = diff.LengthSq();
 
 				if (distSq < minDistSq)
 				{
 					minDistSq = distSq;
-					nearest = obj.second.get();
+					nearest   = it;
 				}
 			}
 
-			if (nearest == nullptr)
-			{
-				return Vector3::Zero;
-			}
+			return nearest;
+		}
 
-			return nearest->GetTransform().m_position;
+
+		Vector3 StageSystem::GetNearestIglooPosition(const Vector3& from) const
+		{
+			auto it = FindNearestByPrefix(IGLOO_KEY_PREFIX, from);
+			return (it != m_objectMap.end())
+				? it->second->GetTransform().m_position
+				: Vector3::Zero;
 		}
 
 
 		Quaternion StageSystem::GetNearestIglooRotation(const Vector3& from) const
 		{
-			const IStageObject* nearest = nullptr;
-			float minDistSq = FLT_MAX;
-
-			for (const auto& obj : m_objectMap)
-			{
-				// キー名が "igloo" で始まるオブジェクトのみ対象とする
-				if (obj.first.find(IGLOO_KEY_PREFIX) != 0) continue;
-
-				const Vector3& pos = obj.second->GetTransform().m_position;
-				const Vector3 diff = pos - from;
-				const float distSq = diff.LengthSq();
-
-				if (distSq < minDistSq)
-				{
-					minDistSq = distSq;
-					nearest = obj.second.get();
-				}
-			}
-
-			if (nearest == nullptr)
-			{
-				return Quaternion::Identity;
-			}
-
-			return nearest->GetTransform().m_rotation;
+			auto it = FindNearestByPrefix(IGLOO_KEY_PREFIX, from);
+			return (it != m_objectMap.end())
+				? it->second->GetTransform().m_rotation
+				: Quaternion::Identity;
 		}
 
 
@@ -411,48 +393,17 @@ namespace app
 
 		std::string StageSystem::GetNearestIglooKey(const Vector3& from) const
 		{
-			std::string nearestKey;
-			float minDistSq = FLT_MAX;
-
-			for (const auto& obj : m_objectMap)
-			{
-				if (obj.first.find(IGLOO_KEY_PREFIX) != 0) continue;
-
-				const Vector3& pos = obj.second->GetTransform().m_position;
-				const Vector3 diff = pos - from;
-				const float distSq = diff.LengthSq();
-
-				if (distSq < minDistSq)
-				{
-					minDistSq = distSq;
-					nearestKey = obj.first;
-				}
-			}
-
-			return nearestKey;
+			auto it = FindNearestByPrefix(IGLOO_KEY_PREFIX, from);
+			return (it != m_objectMap.end()) ? it->first : std::string{};
 		}
+
+
 		Vector3 StageSystem::GetNearestBearNestPosition(const Vector3& from) const
 		{
-			const IStageObject* nearest = nullptr;
-			float minDistSq = FLT_MAX;
-
-			for (const auto& obj : m_objectMap)
-			{
-				if (obj.first.find("bearHome") != 0) continue;
-
-				const Vector3& pos = obj.second->GetTransform().m_position;
-				const Vector3 diff = pos - from;
-				const float distSq = diff.LengthSq();
-
-				if (distSq < minDistSq)
-				{
-					minDistSq = distSq;
-					nearest = obj.second.get();
-				}
-			}
-
-			if (nearest == nullptr) return Vector3::Zero;
-			return nearest->GetTransform().m_position;
+			auto it = FindNearestByPrefix("bearHome", from);
+			return (it != m_objectMap.end())
+				? it->second->GetTransform().m_position
+				: Vector3::Zero;
 		}
 
 

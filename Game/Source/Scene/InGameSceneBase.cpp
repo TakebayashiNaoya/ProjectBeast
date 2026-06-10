@@ -262,6 +262,13 @@ namespace app
 			break;
 
 		case LoadPhase::Done:
+			/** ポーズ終了後の初回フレームでポーズ入場フラグとサブビューをリセットする
+			 *  通常ポーズ解除（IsRetry）と異なりチュートリアルポーズはここでリセットされる */
+			if (m_isPauseEntered)
+			{
+				nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(false);
+				m_isPauseEntered = false;
+			}
 			/** ゲームフェーズへ移譲 */
 			UpdateGamePhase();
 			break;
@@ -434,16 +441,18 @@ namespace app
 
 	void InGameSceneBase::PauseUpdate()
 	{
-		/** 派生クラスが独自ポーズを処理する場合は通常ポーズをスキップ */
-		if (OnPauseUpdate()) return;
-
-		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする */
+		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする
+		 *  チュートリアルポーズを含むすべてのポーズ種別に適用するため
+		 *  OnPauseUpdate() の前に実行する */
 		if (!m_isPauseEntered)
 		{
 			SoundManager::Get().StopAllSE();
 			nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(true);
 			m_isPauseEntered = true;
 		}
+
+		/** 派生クラスが独自ポーズを処理する場合は通常ポーズをスキップ */
+		if (OnPauseUpdate()) return;
 
 		switch (m_pauseState)
 		{

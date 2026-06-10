@@ -132,8 +132,9 @@ namespace app
 			if (m_state == State::Opening)
 			{
 				// 開くアニメーションが終わったらコンテンツを表示して動画を再生
+				// アニメーションが見つからない場合は即座に Opened へ遷移する
 				auto* anim = bg->FindAnimation(ANIM_OPEN);
-				if (anim && !anim->IsPlayAnimation())
+				if (!anim || !anim->IsPlayAnimation())
 				{
 					m_state = State::Opened;
 					SetContentVisible(true);
@@ -149,8 +150,9 @@ namespace app
 			else if (m_state == State::Closing)
 			{
 				// 閉じるアニメーションが終わったら全非表示にして完了通知
+				// アニメーションが見つからない場合は即座に Closed へ遷移する
 				auto* anim = bg->FindAnimation(ANIM_CLOSE);
-				if (anim && !anim->IsPlayAnimation())
+				if (!anim || !anim->IsPlayAnimation())
 				{
 					m_state = State::Closed;
 					m_closedByUser = true;
