@@ -4,16 +4,15 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include "TitleScene.h"
+
 #include "DebugScene.h"
-#include "TutorialInGameScene.h"
 #include "NormalInGameScene.h"
 #include "Source/Sound/SoundManager.h"
-#include "Source/UI/Layout.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
 #include "Source/UI/StageSelect/StageSelectMenu.h"
-#include "TitleScene.h"
 
 
 namespace app

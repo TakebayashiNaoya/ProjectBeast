@@ -20,12 +20,13 @@ namespace app
 		const bool JsonConverter::InvalidBool = false;
 		const int JsonConverter::InvalidInt = -1;
 		const uint32_t JsonConverter::InvalidUInt32 = 0;
-		const float JsonConverter::InvalidFloat = FLT_MAX;
+		const float JsonConverter::InvalidFloat = 0.0f;
 		const std::string JsonConverter::InvalidString = "";
-		const Vector2 JsonConverter::InvalidVector2 = Vector2(FLT_MAX, FLT_MAX);
-		const Vector3 JsonConverter::InvalidVector3 = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
-		const Vector4 JsonConverter::InvalidVector4 = Vector4(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
-		const FloatRange JsonConverter::InvalidFloatRange = FloatRange{ FLT_MAX, FLT_MAX };
+		const Vector2 JsonConverter::InvalidVector2 = Vector2::Zero;
+		const Vector3 JsonConverter::InvalidVector3 = Vector3::Zero;
+		const Vector3 JsonConverter::InvalidScaleVector3 = Vector3::One;
+		const Vector4 JsonConverter::InvalidVector4 = Vector4::White;
+		const FloatRange JsonConverter::InvalidFloatRange = FloatRange{ 0.0f, 0.0f };
 
 
 		bool JsonConverter::IsLoadJsonFile(nlohmann::json& json, const std::string& filePath)
@@ -60,7 +61,7 @@ namespace app
 		}
 
 
-		bool JsonConverter::ToBool(const nlohmann::json& json, const char* key)
+		bool JsonConverter::ToBool(const nlohmann::json& json, const char* key, bool invalid)
 		{
 			if (!json.contains(key)) NO_CONTAINS;
 			if (!json[key].is_boolean()) VALUE_DIFFER;
@@ -69,11 +70,11 @@ namespace app
 
 			if (result) return json[key].get<bool>();
 
-			return InvalidBool;
+			return invalid;
 		}
 
 
-		int JsonConverter::ToInt(const nlohmann::json& json, const char* key)
+		int JsonConverter::ToInt(const nlohmann::json& json, const char* key, int invalid)
 		{
 			if (!json.contains(key)) NO_CONTAINS;
 			if (!json[key].is_number_integer()) VALUE_DIFFER;
@@ -82,11 +83,11 @@ namespace app
 
 			if (result) return json[key].get<int>();
 
-			return InvalidInt;
+			return invalid;
 		}
 
 
-		uint32_t JsonConverter::ToUInt32(const nlohmann::json& json, const char* key)
+		uint32_t JsonConverter::ToUInt32(const nlohmann::json& json, const char* key, uint32_t invalid)
 		{
 			if (!json.contains(key)) NO_CONTAINS;
 			if (!json[key].is_number_unsigned()) VALUE_DIFFER;
@@ -95,11 +96,11 @@ namespace app
 
 			if (result) return json[key].get<uint32_t>();
 
-			return InvalidUInt32;
+			return invalid;
 		}
 
 
-		float JsonConverter::ToFloat(const nlohmann::json& json, const char* key)
+		float JsonConverter::ToFloat(const nlohmann::json& json, const char* key, float invalid)
 		{
 			if (!json.contains(key)) NO_CONTAINS;
 			if (!json[key].is_number()) VALUE_DIFFER;
@@ -108,11 +109,11 @@ namespace app
 
 			if (result) return json[key].get<float>();
 
-			return InvalidFloat;
+			return invalid;
 		}
 
 
-		std::string JsonConverter::ToString(const nlohmann::json& json, const char* key)
+		std::string JsonConverter::ToString(const nlohmann::json& json, const char* key, std::string invalid)
 		{
 			if (!json.contains(key)) NO_CONTAINS;
 			if (!json[key].is_string()) VALUE_DIFFER;
@@ -121,11 +122,11 @@ namespace app
 
 			if (result) return json[key].get<std::string>();
 
-			return InvalidString;
+			return invalid;
 		}
 
 
-		Vector2 JsonConverter::ToVector2(const nlohmann::json& json, const char* key)
+		Vector2 JsonConverter::ToVector2(const nlohmann::json& json, const char* key, Vector2 invalid)
 		{
 			if (!json.contains(key)) NO_CONTAINS;
 			if (!json[key].is_array() || json[key].size() != 2) VALUE_DIFFER;
@@ -145,11 +146,11 @@ namespace app
 				array[1].get<float>()
 			);
 
-			return InvalidVector2;
+			return invalid;
 		}
 
 
-		Vector3 JsonConverter::ToVector3(const nlohmann::json& json, const char* key)
+		Vector3 JsonConverter::ToVector3(const nlohmann::json& json, const char* key, bool isScale, Vector3 invalid)
 		{
 			if (!json.contains(key)) NO_CONTAINS;
 			if (!json[key].is_array() || json[key].size() != 3) VALUE_DIFFER;
@@ -170,11 +171,11 @@ namespace app
 				array[2].get<float>()
 			);
 
-			return InvalidVector3;
+			return invalid;
 		}
 
 
-		Vector3 JsonConverter::ToVector3(const nlohmann::json& json)
+		Vector3 JsonConverter::ToVector3(const nlohmann::json& json, bool isScale, Vector3 invalid)
 		{
 			if (!json.is_array() || json.size() != 3) VALUE_DIFFER;
 
@@ -193,7 +194,7 @@ namespace app
 				json[2].get<float>()
 			);
 
-			return InvalidVector3;
+			return invalid;
 		}
 
 
