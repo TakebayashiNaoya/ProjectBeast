@@ -36,6 +36,12 @@ namespace
  */
 Quaternion ParseRotation(const float rotation)
 {
+	// 回転が無効な値の場合は単位クォータニオン初期値を返す
+	if (fabsf(rotation - app::util::JsonConverter::InvalidFloat) < FLT_EPSILON)
+	{
+		return Quaternion::Identity;
+	}
+
 	Quaternion q;
 	q.SetRotationDegZ(rotation);
 	return q;
@@ -139,21 +145,21 @@ void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
 void InitializeUIParts(app::ui::UIVideo* video, const nlohmann::json& item)
 {
 	app::ui::UIVideoInitData data;
-	data.clipPath = item.value("clipPath", std::string(""));
-	data.width    = item.value("width",    1920.0f);
-	data.height   = item.value("height",   1080.0f);
-	data.fps      = item.value("fps",      24.0f);
-	data.loop     = item.value("loop",     false);
-	data.autoPlay = item.value("autoPlay", true);
+	data.clipPath = app::util::JsonConverter::ToString(item, "clipPath");
+	data.width = app::util::JsonConverter::ToFloat(item, "width", 1920.0f);
+	data.height = app::util::JsonConverter::ToFloat(item, "height", 1080.0f);
+	data.fps = app::util::JsonConverter::ToFloat(item, "fps", 24.0f);
+	data.loop = app::util::JsonConverter::ToBool(item, "loop", false);
+	data.autoPlay = app::util::JsonConverter::ToBool(item, "autoPlay", true);
 
-	const Vector3    position = item.contains("position") ? ParseVector3(item["position"]) : Vector3::Zero;
-	const Vector3    scale    = item.contains("scale")    ? ParseVector3(item["scale"])    : Vector3::One;
-	const Quaternion rotation = item.contains("rotation") ? ParseRotation(item["rotation"].get<float>()) : Quaternion::Identity;
-	const Vector4    color    = item.contains("color")    ? ParseColor(item["color"])      : Vector4::White;
+	const Vector3    position = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3    scale = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector4    color = app::util::JsonConverter::ToVector4(item, "color");
 
 	video->Initialize(data);
 	video->m_transform.m_localTransform.m_position = position;
-	video->m_transform.m_localTransform.m_scale    = scale;
+	video->m_transform.m_localTransform.m_scale = scale;
 	video->m_transform.m_localTransform.m_rotation = rotation;
 	video->m_color = color;
 }
