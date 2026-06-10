@@ -490,6 +490,9 @@
     <ClCompile Include="Source\Scene\InGameSceneBase.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scene\TutorialController.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Scene\TutorialInGameScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
@@ -916,6 +919,9 @@
       <Filter>Source\UI\DangerArrow</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\InGameSceneBase.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\TutorialController.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\TutorialInGameScene.h">

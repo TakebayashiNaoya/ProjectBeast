@@ -1,12 +1,11 @@
-﻿/**
+/**
  * @file TutorialInGameScene.h
  * @brief チュートリアルステージ
  * @author 竹林
  */
 #pragma once
 #include "InGameSceneBase.h"
-#include "Source/UI/Layout.h"
-#include "Source/UI/Menus/TutorialWindowMenu.h"
+#include "TutorialController.h"
 
 
 namespace app
@@ -14,16 +13,14 @@ namespace app
 	/**
 	 * @brief チュートリアルステージ
 	 *
-	 * ■ チュートリアルウィンドウの流れ
-	 *   1. Playing フェーズ初回: window[0] を Open() してゲームをポーズ。
-	 *   2. OnPauseUpdate() でウィンドウのアニメーション・入力を更新。
-	 *   3. IsClosedByUser() で次のウィンドウへ進み、全部終わったらポーズ解除。
-	 *   4. 通常プレイへ移行。
+	 * ■ チュートリアルの流れ
+	 *   - プレイヤーが各ギミックに近づいたとき（海は水中接触）、
+	 *     そのギミック種別の初回のみチュートリアルウィンドウを表示する。
+	 *   - 複数同時トリガー時はキューに積んで順番に表示。
+	 *   - 未表示ターゲット（海以外）には guide.DDS の方向矢印を表示し、
+	 *     チュートリアル完了後に消える。
 	 *
-	 * ■ ウィンドウを増やすには
-	 *   1. WINDOW_COUNT を増やす。
-	 *   2. OnLoadComplete() に Initialize の行を追加。
-	 *   3. JSON を複製して clipPath / asset だけ変える。
+	 * ■ 詳細は TutorialController を参照
 	 */
 	class TutorialInGameScene : public InGameSceneBase
 	{
@@ -37,7 +34,7 @@ namespace app
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 2, 2, 2, 2, 2, 3000.0f };
+			return { 3, 3, 3, 3, 3, 3000.0f };
 		}
 
 		const char* GetStageJsonPath() const override
@@ -68,25 +65,13 @@ namespace app
 		//------------------------------------------------------------
 		// フックのオーバーライド
 		//------------------------------------------------------------
-		void OnLoadComplete() override;
-		void OnUpdatePlaying() override;
-		bool OnPauseUpdate() override;
-		bool OnPauseRender(RenderContext& rc) override;
+		void OnLoadComplete()                    override;
+		void OnUpdatePlaying()                   override;
+		void OnRenderPlaying(RenderContext& rc)  override;
+		bool OnPauseUpdate()                     override;
+		bool OnPauseRender(RenderContext& rc)    override;
 
 	private:
-		/** ウィンドウの数。増やす場合は OnLoadComplete() の初期化行も追加する */
-		static constexpr int WINDOW_COUNT = 2;
-
-		/** 各ウィンドウの Layout（所有権を持つ） */
-		ui::Layout m_windowLayouts[WINDOW_COUNT];
-
-		/** 現在表示中のウィンドウインデックス（-1 = まだ開始していない） */
-		int m_currentWindowIndex = -1;
-
-		/** すべてのウィンドウを表示し終えたか */
-		bool m_allWindowsDone = false;
-
-		/** チュートリアルウィンドウ用ポーズ中か（通常ポーズと区別） */
-		bool m_isTutorialWindowPause = false;
+		TutorialController m_tutorialController;
 	};
 }

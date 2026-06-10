@@ -431,6 +431,31 @@ namespace app
 
 			return nearestKey;
 		}
+		Vector3 StageSystem::GetNearestBearNestPosition(const Vector3& from) const
+		{
+			const IStageObject* nearest = nullptr;
+			float minDistSq = FLT_MAX;
+
+			for (const auto& obj : m_objectMap)
+			{
+				if (obj.first.find("bearHome") != 0) continue;
+
+				const Vector3& pos = obj.second->GetTransform().m_position;
+				const Vector3 diff = pos - from;
+				const float distSq = diff.LengthSq();
+
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					nearest = obj.second.get();
+				}
+			}
+
+			if (nearest == nullptr) return Vector3::Zero;
+			return nearest->GetTransform().m_position;
+		}
+
+
 		/** インスタンスを初期化 */
 		StageSystem* StageSystem::m_instance = nullptr;
 	}

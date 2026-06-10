@@ -145,6 +145,12 @@ namespace app
 			 */
 			std::string GetNearestIglooKey(const Vector3& from) const;
 
+			/**
+			 * @brief "bearHome" で始まるオブジェクトの中から from に最も近い座標を返す
+			 * @param from 基準座標（プレイヤーの現在位置）
+			 * @return 最近傍シロクマの巣の座標。該当なしの場合は Vector3::Zero
+			 */
+			Vector3 GetNearestBearNestPosition(const Vector3& from) const;
 
 
 		private:
