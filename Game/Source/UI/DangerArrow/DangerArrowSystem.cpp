@@ -205,22 +205,11 @@ namespace app
 		) const
 		{
 			ArrowInfo info;
-			info.distSq = distSq;
+			info.distSq     = distSq;
 			info.isOverhead = false;
-			info.visible = true;
-
-			// スクリーン中央 → 目標方向の角度
-			const float angle = atan2f(screenPos.y, screenPos.x);
-
-			// 円縁に配置（中心を CIRCLE_CENTER_Y だけオフセット）
-			info.screenPos = Vector2(
-				CIRCLE_RADIUS * cosf(angle),
-				CIRCLE_CENTER_Y + CIRCLE_RADIUS * sinf(angle)
-			);
-
-			// DDSが上向き基準: ターゲット方向へ向けるために -π/2 オフセット
-			info.angleRad = angle + ARROW_ROTATION_OFFSET;
-
+			info.visible    = true;
+			info.screenPos  = CalcEdgeArrowScreenPos(screenPos);
+			info.angleRad   = CalcEdgeArrowAngle(screenPos);
 			return info;
 		}
 
@@ -231,16 +220,11 @@ namespace app
 		) const
 		{
 			ArrowInfo info;
-			info.distSq = distSq;
+			info.distSq     = distSq;
 			info.isOverhead = true;
-			info.visible = true;
-
-			// ペンギンの真上に配置
-			info.screenPos = Vector2(screenPos.x, screenPos.y + OVERHEAD_OFFSET_Y);
-
-			// 下向き（DDSが上向き基準なのでπ回転）
-			info.angleRad = OVERHEAD_ANGLE_RAD;
-
+			info.visible    = true;
+			info.screenPos  = CalcOverheadArrowScreenPos(screenPos);
+			info.angleRad   = ARROW_OVERHEAD_ANGLE;
 			return info;
 		}
 	}

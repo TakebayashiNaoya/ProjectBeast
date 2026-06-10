@@ -1,0 +1,53 @@
+{
+    "canvas": {
+        "elements": [
+            {
+                "type":     "UIIcon",
+                "name":     "TutorialWindowBg",
+                "asset":    "Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseBackGroundIcon.dds",
+                "width":    960,
+                "height":   600,
+                "position": [0, 0, 0],
+                "scale":    [0, 0, 1],
+                "rotation": 0,
+                "color":    [0, 0, 0, 220]
+            },
+            {
+                "type":     "UIVideo",
+                "name":     "TutorialWindowVideo",
+                "clipPath": "Assets/Video/Tutorial_PenguinClingy.mp4",
+                "width":    750,
+                "height":   420,
+                "position": [0, 78, 0],
+                "scale":    [1, 1, 1],
+                "rotation": 0,
+                "color":    [255, 255, 255, 255],
+                "fps":      24.0,
+                "loop":     false,
+                "autoPlay": false
+            },
+            {
+                "type":     "UIIcon",
+                "name":     "TutorialWindowDesc",
+                "asset":    "Assets/spriteData/UI/Tutorial/Tutorial_PenguinClingy.DDS",
+                "width":    820,
+                "height":   70,
+                "position": [0, -178, 0],
+                "scale":    [1, 1, 1],
+                "rotation": 0,
+                "color":    [255, 255, 255, 255]
+            },
+            {
+                "type":     "UIIcon",
+                "name":     "TutorialWindowClosePrompt",
+                "asset":    "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_b.dds",
+                "width":    55,
+                "height":   55,
+                "position": [0, -265, 0],
+                "scale":    [1, 1, 1],
+                "rotation": 0,
+                "color":    [255, 255, 255, 255]
+            }
+        ]
+    }
+}

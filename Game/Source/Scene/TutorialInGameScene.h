@@ -1,31 +1,40 @@
-﻿/**
+/**
  * @file TutorialInGameScene.h
  * @brief チュートリアルステージ
  * @author 竹林
  */
 #pragma once
 #include "InGameSceneBase.h"
+#include "TutorialController.h"
 
 
 namespace app
 {
 	/**
 	 * @brief チュートリアルステージ
-	 * @detail ステージ固有のパラメータを返す。
-	 *         ゲームロジックは InGameSceneBase が担う。
-	 *         今後 OnLoadComplete / OnUpdatePlaying / OnRenderPlaying を
-	 *         オーバーライドして TutorialController などを追加する。
+	 *
+	 * ■ チュートリアルの流れ
+	 *   - プレイヤーが各ギミックに近づいたとき（海は水中接触）、
+	 *     そのギミック種別の初回のみチュートリアルウィンドウを表示する。
+	 *   - 複数同時トリガー時はキューに積んで順番に表示。
+	 *   - 未表示ターゲット（海以外）には guide.DDS の方向矢印を表示し、
+	 *     チュートリアル完了後に消える。
+	 *
+	 * ■ 詳細は TutorialController を参照
 	 */
 	class TutorialInGameScene : public InGameSceneBase
 	{
 		appScene(TutorialInGameScene);
 
 	protected:
+		//------------------------------------------------------------
+		// ステージ固有パラメータ
+		//------------------------------------------------------------
 		float GetTimeLimit() const override { return 300.0f; }
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 2, 2, 2, 2, 2, 3000.0f };
+			return { 3, 3, 3, 3, 3, 3000.0f };
 		}
 
 		const char* GetStageJsonPath() const override
@@ -52,5 +61,17 @@ namespace app
 		{
 			return "Assets/parameter/nature/oceanParameter_Tutorial.json";
 		}
+
+		//------------------------------------------------------------
+		// フックのオーバーライド
+		//------------------------------------------------------------
+		void OnLoadComplete()                    override;
+		void OnUpdatePlaying()                   override;
+		void OnRenderPlaying(RenderContext& rc)  override;
+		bool OnPauseUpdate()                     override;
+		bool OnPauseRender(RenderContext& rc)    override;
+
+	private:
+		TutorialController m_tutorialController;
 	};
 }
