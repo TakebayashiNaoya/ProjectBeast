@@ -7,6 +7,7 @@
 #include <array>
 #include <vector>
 #include "DangerArrowMenu.h"
+#include "DangerArrowCalc.h"
 #include "Source/UI/System/SystemPacket.h"
 
 
@@ -71,20 +72,11 @@ namespace app
 		private:
 			/** 矢印の最大本数（EnemyManagerのエネミー数上限に合わせる） */
 			static constexpr int MAX_ARROWS = 3;
-			/** edge矢印の配置円半径（スクリーン座標px） */
-			static constexpr float CIRCLE_RADIUS = 300.0f;
-			/** edge矢印の円中心Yオフセット */
-			static constexpr float CIRCLE_CENTER_Y = -80.0f;
-			/** overhead矢印の上方向オフセット（スクリーン座標px） */
-			static constexpr float OVERHEAD_OFFSET_Y = 50.0f;
 			/** これ以下の距離（ワールド単位）かつフラスタム内ならサブビューを非表示 */
 			static constexpr float SUB_VIEW_HIDE_DIST = 1000.0f;
 			/** サブビューの表示スケール（1.0 = 480x270px 原寸） */
 			static constexpr float SUB_VIEW_SCALE = 1.0f;
-			/** 上向きDDSをターゲット方向へ向けるZ回転オフセット（ = -π/2） */
-			static constexpr float ARROW_ROTATION_OFFSET = -1.5707963f;
-			/** overhead矢印の回転（下向き = π） */
-			static constexpr float OVERHEAD_ANGLE_RAD = 3.1415927f;
+			/** 矢印の配置・回転定数は DangerArrowCalc.h に一元化 */
 
 
 		private:

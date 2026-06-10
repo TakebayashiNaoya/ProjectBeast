@@ -4,7 +4,7 @@
  * @author 竹林
  */
 #pragma once
-#include <vector>
+#include "Source/UI/System/SystemPacket.h"
 
 
 namespace app
@@ -119,19 +119,24 @@ namespace app
 		//------------------------------------------------------------
 
 		/** @brief カウントダウンMenuを取得 */
-		inline ui::CountDownMenu* GetCountDownMenu() const { return m_countDownMenu; }
+		//inline ui::CountDownMenu* GetCountDownMenu() const { return m_countDownMenu; }
+		inline ui::CountDownMenu* GetCountDownMenu() const { return m_countDownPacket->GetMenu(); }
 		/** @brief フィニッシュMenuを取得 */
-		inline ui::FinishMenu* GetFinishMenu() const { return m_finishMenu; }
+		//inline ui::FinishMenu* GetFinishMenu() const { return m_finishMenu; }
+		inline ui::FinishMenu* GetFinishMenu() const { return m_finishPacket->GetMenu(); }
 		/** @brief ポーズMenuを取得 */
-		inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pauseMenu; }
+		//inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pauseMenu; }
+		inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pausePacket->GetMenu(); }
 		/** @brief サウンドオプションMenuを取得 */
-		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionMenu; }
+		//inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionMenu; }
+		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionPacket->GetMenu(); }
 		/** @brief チュートリアルMenuを取得 */
-		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
+		//inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
+		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialPacket->GetMenu(); }
 		/** @brief 子ペンギンリアクションシステムを取得 */
-		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem; }
+		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem.get(); }
 		/** @brief WpWarningSystemを取得 */
-		inline ui::WpWarningSystem* GetWpWarningSystem() const { return m_wpWarningSystem; }
+		inline ui::WpWarningSystem* GetWpWarningSystem() const { return m_wpWarningSystem.get(); }
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
@@ -151,50 +156,28 @@ namespace app
 
 	private:
 		//------------------------------------------------------------
-		// Layout（所有権を持つ）
+		// Packet（所有権を持つ）
 		//------------------------------------------------------------
-		ui::Layout* m_countDownLayout = nullptr;
-		ui::Layout* m_timerLayout = nullptr;
-		ui::Layout* m_finishLayout = nullptr;
-		ui::Layout* m_remainingChildLayout = nullptr;
-		ui::Layout* m_pauseLayout = nullptr;
-		ui::Layout* m_soundOptionLayout = nullptr;
-		ui::Layout* m_tutorialLayout = nullptr;
-		ui::Layout* m_enemySleepingLayout = nullptr;
-		ui::Layout* m_pbWakingUpTimerLayout = nullptr;
-		ui::Layout* m_iglooPromptLayout = nullptr;
-		ui::Layout* m_achievementLayout = nullptr;
-		ui::Layout* m_miniMapLayout = nullptr;
-		ui::Layout* m_titleEventLayout = nullptr;
-		ui::Layout* m_achievementNotificationLayout = nullptr;
-		ui::Layout* m_inGameButtonLayout = nullptr;
-		std::vector<ui::Layout*> m_searchLayouts;
+		ui::UIPacket<ui::CountDownMenu> m_countDownPacket;
+		ui::UIPacket<ui::InGameTimerMenu> m_timerPacket;
+		ui::UIPacket<ui::FinishMenu> m_finishPacket;
+		ui::UIPacket<ui::RemainingChildMenu> m_remainingChildPacket;
+		ui::UIPacket<ui::PauseScreenMenu> m_pausePacket;
+		ui::UIPacket<ui::SoundOptionMenu> m_soundOptionPacket;
+		ui::UIPacket<ui::TutorialMenu> m_tutorialPacket;
+		ui::UIPacket<ui::EnemySleepingMenu> m_enemySleepingPacket;
+		ui::UIPacket<ui::PBWakingUpTimerMenu> m_pbWakingUpTimerPacket;
+		ui::UIPacket<ui::IglooPromptMenu> m_iglooPromptPacket;
+		ui::UIPacket<ui::InGameAchievementMenu> m_achievementPacket;
+		ui::UIPacket<ui::MiniMapMenu> m_miniMapPacket;
+		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
+		ui::UIPacket<ui::AchievementNotificationMenu> m_achievementNotificationPacket;
+		ui::UIPacket<ui::InGameButtonMenu> m_inGameButtonPacket;
+		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
-
-		ui::CPReactionSystem* m_cpReactionSystem = nullptr;
-		ui::WpWarningSystem* m_wpWarningSystem = nullptr;
-		ui::DangerArrowSystem* m_dangerArrowSystem = nullptr;
-
-
-		//------------------------------------------------------------
-		// Menu（Layoutから取得したポインタ。所有権はLayoutが持つ）
-		//------------------------------------------------------------
-		ui::CountDownMenu* m_countDownMenu = nullptr;
-		ui::InGameTimerMenu* m_timerMenu = nullptr;
-		ui::FinishMenu* m_finishMenu = nullptr;
-		ui::RemainingChildMenu* m_remainingChildMenu = nullptr;
-		ui::PauseScreenMenu* m_pauseMenu = nullptr;
-		ui::SoundOptionMenu* m_soundOptionMenu = nullptr;
-		ui::TutorialMenu* m_tutorialMenu = nullptr;
-		ui::EnemySleepingMenu* m_enemySleepingMenu = nullptr;
-		ui::PBWakingUpTimerMenu* m_pbWakingUpTimerMenu = nullptr;
-		ui::IglooPromptMenu* m_iglooPromptMenu = nullptr;
-		ui::InGameAchievementMenu* m_achievementMenu = nullptr;
-		ui::MiniMapMenu* m_miniMapMenu = nullptr;
-		ui::TitleEventMenu* m_titleEventMenu = nullptr;
-		ui::AchievementNotificationMenu* m_achievementNotificationMenu = nullptr;
-		ui::InGameButtonMenu* m_inGameButtonMenu = nullptr;
-		std::vector<ui::SearchMenu*> m_searchMenus;
+		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;
+		std::unique_ptr<ui::WpWarningSystem> m_wpWarningSystem;
+		std::unique_ptr<ui::DangerArrowSystem> m_dangerArrowSystem;
 
 
 		//============================================//

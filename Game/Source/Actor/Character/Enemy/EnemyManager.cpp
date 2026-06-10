@@ -123,6 +123,27 @@ namespace app
 		}
 
 
+		bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const
+		{
+			float minDistSq = FLT_MAX;
+			bool  found     = false;
+
+			for (const auto& data : m_enemyList)
+			{
+				if (!data.enemy) continue;
+				const Vector3 diff = from - data.enemy->GetTransform().m_position;
+				const float distSq = diff.LengthSq();
+				if (distSq < minDistSq)
+				{
+					minDistSq = distSq;
+					outPos    = data.enemy->GetTransform().m_position;
+					found     = true;
+				}
+			}
+			return found;
+		}
+
+
 		Enemy* EnemyManager::GetNearestSleepingEnemy(const Vector3& fromPosition, float maxRange) const
 		{
 			const float maxRangeSq = maxRange * maxRange;

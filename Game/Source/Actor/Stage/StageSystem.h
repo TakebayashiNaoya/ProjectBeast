@@ -145,9 +145,22 @@ namespace app
 			 */
 			std::string GetNearestIglooKey(const Vector3& from) const;
 
+			/**
+			 * @brief "bearHome" で始まるオブジェクトの中から from に最も近い座標を返す
+			 * @param from 基準座標（プレイヤーの現在位置）
+			 * @return 最近傍シロクマの巣の座標。該当なしの場合は Vector3::Zero
+			 */
+			Vector3 GetNearestBearNestPosition(const Vector3& from) const;
 
 
 		private:
+			/**
+			 * @brief キーが prefix で始まるオブジェクトの中から from に最も近いエントリを返す
+			 * @return 見つかった場合はそのイテレータ。なければ m_objectMap.end()
+			 */
+			ObjectMap::const_iterator FindNearestByPrefix(
+				const char* prefix, const Vector3& from) const;
+
 			/** シングルトンインスタンス */
 			static StageSystem* m_instance;
 		};

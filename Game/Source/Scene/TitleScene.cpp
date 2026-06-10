@@ -4,16 +4,16 @@
  * @author 立山
  */
 #include "stdafx.h"
+#include "TitleScene.h"
+
 #include "DebugScene.h"
-#include "TutorialInGameScene.h"
 #include "NormalInGameScene.h"
+#include "TutorialInGameScene.h"
 #include "Source/Sound/SoundManager.h"
-#include "Source/UI/Layout.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
 #include "Source/UI/StageSelect/StageSelectMenu.h"
-#include "TitleScene.h"
 
 
 namespace app
@@ -115,7 +115,7 @@ namespace app
 	bool TitleScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
 		if (m_nextScene) {
-			id = NormalInGameScene::ID();
+			id = m_nextSceneId;
 			waitTime = 3.0f;
 			return true;
 		}
@@ -191,21 +191,18 @@ namespace app
 			switch (menu->GetSelectingStage())
 			{
 			case ui::EnStageChoices::Tutorial:
-			{
+				m_nextSceneId = TutorialInGameScene::ID();
 				break;
-			}
-			case ui::EnStageChoices::Easy:
-			{
-				break;
-			}
 			case ui::EnStageChoices::Normal:
-			{
+				m_nextSceneId = NormalInGameScene::ID();
 				break;
-			}
+			case ui::EnStageChoices::Easy:
 			case ui::EnStageChoices::Hard:
-			{
+				m_nextSceneId = NormalInGameScene::ID();
 				break;
-			}
+			default:
+				m_nextSceneId = NormalInGameScene::ID();
+				break;
 			}
 		}
 		else if (g_pad[0]->IsTrigger(enButtonB))

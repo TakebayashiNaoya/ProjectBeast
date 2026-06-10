@@ -262,6 +262,13 @@ namespace app
 			break;
 
 		case LoadPhase::Done:
+			/** ポーズ終了後の初回フレームでポーズ入場フラグとサブビューをリセットする
+			 *  通常ポーズ解除（IsRetry）と異なりチュートリアルポーズはここでリセットされる */
+			if (m_isPauseEntered)
+			{
+				nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(false);
+				m_isPauseEntered = false;
+			}
 			/** ゲームフェーズへ移譲 */
 			UpdateGamePhase();
 			break;
@@ -434,13 +441,18 @@ namespace app
 
 	void InGameSceneBase::PauseUpdate()
 	{
-		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする */
+		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする
+		 *  チュートリアルポーズを含むすべてのポーズ種別に適用するため
+		 *  OnPauseUpdate() の前に実行する */
 		if (!m_isPauseEntered)
 		{
 			SoundManager::Get().StopAllSE();
 			nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(true);
 			m_isPauseEntered = true;
 		}
+
+		/** 派生クラスが独自ポーズを処理する場合は通常ポーズをスキップ */
+		if (OnPauseUpdate()) return;
 
 		switch (m_pauseState)
 		{
@@ -550,18 +562,22 @@ namespace app
 		/** ポーズ中の描画 */
 		if (SceneManager::GetInstance()->IsPause())
 		{
-			auto* uiMngr = InGameUIManager::GetInstance();
-			switch (m_pauseState)
+			if (!OnPauseRender(rc))
 			{
-			case PauseState::Pause:
-				uiMngr->RenderPause(rc);
-				break;
-			case PauseState::SoundOption:
-				uiMngr->RenderSoundOption(rc);
-				break;
-			case PauseState::Tutorial:
-				uiMngr->RenderTutorial(rc);
-				break;
+				/** 通常ポーズ画面の描画（派生クラスが処理しない場合） */
+				auto* uiMngr = InGameUIManager::GetInstance();
+				switch (m_pauseState)
+				{
+				case PauseState::Pause:
+					uiMngr->RenderPause(rc);
+					break;
+				case PauseState::SoundOption:
+					uiMngr->RenderSoundOption(rc);
+					break;
+				case PauseState::Tutorial:
+					uiMngr->RenderTutorial(rc);
+					break;
+				}
 			}
 			return;
 		}

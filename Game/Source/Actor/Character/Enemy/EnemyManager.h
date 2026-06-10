@@ -70,6 +70,14 @@ namespace app
 			std::vector<Vector3> GetPositionList() const;
 
 			/**
+			 * @brief 最も近いエネミーの座標を返す（vector コピーを避けた軽量版）
+			 * @param from   基準座標
+			 * @param outPos 最近傍エネミーの座標（出力）
+			 * @return エネミーが存在すれば true
+			 */
+			bool GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const;
+
+			/**
 			 * @brief 指定ペンギンを追跡中の最近接エネミー座標を返す
 			 * @param penguin   チェック対象ペンギン
 			 * @param outPos    追跡中エネミーの座標（出力）
