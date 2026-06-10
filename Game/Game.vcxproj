@@ -330,6 +330,7 @@
     <ClCompile Include="Source\UI\Menus\InGameAchievementMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
+    <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
@@ -485,6 +486,7 @@
     <ClInclude Include="Source\UI\Menus\SoundOptionMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
+    <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h" />

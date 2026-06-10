@@ -1,0 +1,182 @@
+﻿/**
+ * @file TutorialWindowMenu.cpp
+ * @brief チュートリアルポップアップウィンドウ（ひな型）
+ * @author 竹林
+ */
+#include "stdafx.h"
+#include "TutorialWindowMenu.h"
+#include "Source/Util/CRC32.h"
+
+
+namespace app
+{
+	namespace ui
+	{
+		namespace
+		{
+			/** JSON の "name" フィールドと必ず一致させること */
+			constexpr uint32_t KEY_BG = Hash32("TutorialWindowBg");
+			constexpr uint32_t KEY_VIDEO = Hash32("TutorialWindowVideo");
+			constexpr uint32_t KEY_DESC = Hash32("TutorialWindowDesc");
+			constexpr uint32_t KEY_CLOSE_PROMPT = Hash32("TutorialWindowClosePrompt");
+		}
+
+
+		TutorialWindowMenu::TutorialWindowMenu()
+			: m_state(State::Closed)
+			, m_closedByUser(false)
+		{}
+
+
+		void TutorialWindowMenu::InitializeLogic()
+		{
+			SetAllVisible(false);
+
+			auto* bg = GetUI<UIIcon>(KEY_BG);
+			if (!bg) return;
+
+			// 開くアニメーション: スケール (0,0,1) → (1,1,1)
+			auto openAnim = std::make_unique<UIScaleAnimation>();
+			openAnim->SetParameter(
+				Vector3(0.0f, 0.0f, 1.0f),
+				Vector3(1.0f, 1.0f, 1.0f),
+				OPEN_DURATION,
+				util::EasingType::EaseOut,
+				util::LoopMode::Once
+			);
+			bg->AddAnimation(ANIM_OPEN, std::move(openAnim));
+
+			// 閉じるアニメーション: スケール (1,1,1) → (0,0,1)
+			auto closeAnim = std::make_unique<UIScaleAnimation>();
+			closeAnim->SetParameter(
+				Vector3(1.0f, 1.0f, 1.0f),
+				Vector3(0.0f, 0.0f, 1.0f),
+				CLOSE_DURATION,
+				util::EasingType::EaseIn,
+				util::LoopMode::Once
+			);
+			bg->AddAnimation(ANIM_CLOSE, std::move(closeAnim));
+		}
+
+
+		void TutorialWindowMenu::Update()
+		{
+			m_closedByUser = false;
+
+			if (m_state == State::Opened)
+			{
+				UpdateInput();
+			}
+
+			// UIScaleAnimation を含む UI 全体を更新
+			Base::Update();
+
+			// アニメーション完了チェック（Base::Update() の後で行う）
+			CheckAnimationComplete();
+		}
+
+
+		void TutorialWindowMenu::Open()
+		{
+			m_state = State::Opening;
+
+			// BG のみ表示してスケールをゼロにリセット
+			if (auto* bg = GetUI<UIIcon>(KEY_BG))
+			{
+				bg->SetIsDraw(true);
+				bg->m_transform.m_localTransform.m_scale = Vector3(0.0f, 0.0f, 1.0f);
+
+				if (auto* anim = bg->FindAnimation(ANIM_OPEN))
+					anim->PlayAnimation();
+			}
+
+			SetContentVisible(false);
+		}
+
+
+		void TutorialWindowMenu::Close()
+		{
+			m_state = State::Closed;
+			SetAllVisible(false);
+
+			if (auto* video = GetUI<UIVideo>(KEY_VIDEO))
+				video->Stop();
+		}
+
+
+		void TutorialWindowMenu::UpdateInput()
+		{
+			if (!g_pad[0]->IsTrigger(enButtonB)) return;
+
+			// コンテンツを即非表示にして閉じるアニメーション開始
+			SetContentVisible(false);
+
+			if (auto* video = GetUI<UIVideo>(KEY_VIDEO))
+				video->Stop();
+
+			if (auto* bg = GetUI<UIIcon>(KEY_BG))
+			{
+				if (auto* anim = bg->FindAnimation(ANIM_CLOSE))
+					anim->PlayAnimation();
+			}
+
+			m_state = State::Closing;
+		}
+
+
+		void TutorialWindowMenu::CheckAnimationComplete()
+		{
+			auto* bg = GetUI<UIIcon>(KEY_BG);
+			if (!bg) return;
+
+			if (m_state == State::Opening)
+			{
+				// 開くアニメーションが終わったらコンテンツを表示して動画を再生
+				auto* anim = bg->FindAnimation(ANIM_OPEN);
+				if (anim && !anim->IsPlayAnimation())
+				{
+					m_state = State::Opened;
+					SetContentVisible(true);
+
+					if (auto* video = GetUI<UIVideo>(KEY_VIDEO))
+					{
+						video->Stop();
+						video->Play();
+						video->SetLoop(true);
+					}
+				}
+			}
+			else if (m_state == State::Closing)
+			{
+				// 閉じるアニメーションが終わったら全非表示にして完了通知
+				auto* anim = bg->FindAnimation(ANIM_CLOSE);
+				if (anim && !anim->IsPlayAnimation())
+				{
+					m_state = State::Closed;
+					m_closedByUser = true;
+					SetAllVisible(false);
+				}
+			}
+		}
+
+
+		void TutorialWindowMenu::SetContentVisible(bool visible)
+		{
+			for (const auto key : { KEY_VIDEO, KEY_DESC, KEY_CLOSE_PROMPT })
+			{
+				if (auto* ui = GetUI<UIBase>(key))
+					ui->SetIsDraw(visible);
+			}
+		}
+
+
+		void TutorialWindowMenu::SetAllVisible(bool visible)
+		{
+			for (const auto key : { KEY_BG, KEY_VIDEO, KEY_DESC, KEY_CLOSE_PROMPT })
+			{
+				if (auto* ui = GetUI<UIBase>(key))
+					ui->SetIsDraw(visible);
+			}
+		}
+	}
+}

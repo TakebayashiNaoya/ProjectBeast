@@ -90,6 +90,17 @@ namespace app
 		virtual void OnUpdatePlaying() {}
 		/** Playing フェーズの追加描画（矢印UIなどを想定） */
 		virtual void OnRenderPlaying(RenderContext& /*rc*/) {}
+		/**
+		 * @brief ポーズ中の追加更新
+		 * @return true を返すと通常ポーズ画面の更新をスキップする
+		 * @detail チュートリアルウィンドウなど独自ポーズを持つ派生クラス向け
+		 */
+		virtual bool OnPauseUpdate() { return false; }
+		/**
+		 * @brief ポーズ中の追加描画
+		 * @return true を返すと通常ポーズ画面の描画をスキップする
+		 */
+		virtual bool OnPauseRender(RenderContext& /*rc*/) { return false; }
 
 		/** 派生クラスからプレイヤー参照が必要になるケースに備えて protected */
 		actor::DaddyPenguin* m_daddyPenguin = nullptr;

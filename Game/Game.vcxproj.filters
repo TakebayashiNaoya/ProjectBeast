@@ -505,6 +505,9 @@
     <ClCompile Include="Source\Core\IStatus.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -929,6 +932,9 @@
     </ClInclude>
     <ClInclude Include="Source\Core\IStatus.h">
       <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h">
+      <Filter>Source\UI\Menus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

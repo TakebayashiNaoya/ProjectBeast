@@ -434,6 +434,9 @@ namespace app
 
 	void InGameSceneBase::PauseUpdate()
 	{
+		/** 派生クラスが独自ポーズを処理する場合は通常ポーズをスキップ */
+		if (OnPauseUpdate()) return;
+
 		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする */
 		if (!m_isPauseEntered)
 		{
@@ -550,18 +553,22 @@ namespace app
 		/** ポーズ中の描画 */
 		if (SceneManager::GetInstance()->IsPause())
 		{
-			auto* uiMngr = InGameUIManager::GetInstance();
-			switch (m_pauseState)
+			if (!OnPauseRender(rc))
 			{
-			case PauseState::Pause:
-				uiMngr->RenderPause(rc);
-				break;
-			case PauseState::SoundOption:
-				uiMngr->RenderSoundOption(rc);
-				break;
-			case PauseState::Tutorial:
-				uiMngr->RenderTutorial(rc);
-				break;
+				/** 通常ポーズ画面の描画（派生クラスが処理しない場合） */
+				auto* uiMngr = InGameUIManager::GetInstance();
+				switch (m_pauseState)
+				{
+				case PauseState::Pause:
+					uiMngr->RenderPause(rc);
+					break;
+				case PauseState::SoundOption:
+					uiMngr->RenderSoundOption(rc);
+					break;
+				case PauseState::Tutorial:
+					uiMngr->RenderTutorial(rc);
+					break;
+				}
 			}
 			return;
 		}

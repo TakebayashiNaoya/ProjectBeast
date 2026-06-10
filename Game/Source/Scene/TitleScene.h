@@ -59,7 +59,8 @@ namespace app
 		TitleState m_state;
 
 	private:
-		bool m_nextScene = false;
+		bool     m_nextScene   = false;
+		uint32_t m_nextSceneId = 0;
 
 
 	private:
