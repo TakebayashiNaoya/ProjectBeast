@@ -57,6 +57,17 @@ namespace app
 			ChildPenguinStateMachine(ChildPenguin* ownerChildPenguin, EnChildPenguinType type);
 			~ChildPenguinStateMachine() = default;
 
+			/**
+			 * @brief 死亡終了後にステートマシンを終了させるかどうか
+			 * @param finish trueなら死亡終了後にステートマシンを終了させる
+			 */
+			void SetFinishAfterDeath(bool finish) { m_isFinishAfterDeath = finish; }
+
+			/**
+			 * @brief 死亡終了したかどうか
+			 * @return 死亡終了したかどうか
+			 */
+			bool IsFinishAfterDeath() const { return m_isFinishAfterDeath; }
 
 		protected:
 			/**
@@ -72,6 +83,8 @@ namespace app
 			ChildPenguin* m_ownerChildPenguin;
 			/** タイプを保持 */
 			EnChildPenguinType m_type;
+			/** 死亡終了時 */
+			bool m_isFinishAfterDeath;
 		};
 	}
 }
