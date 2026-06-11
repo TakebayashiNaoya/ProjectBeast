@@ -719,6 +719,15 @@ namespace app
 		void PenguinInWhirlpoolState::Enter()
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
+
+			if (auto* lm = GameLogManager::GetInstance())
+			{
+				if (auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase()))
+				{
+					if (ChildPenguinManager::GetInstance().IsFollower(child))
+						lm->QueueEvent({{"ev", "whirlpool_capture"}, {"penguin_id", child->GetLogId()}});
+				}
+			}
 		}
 
 

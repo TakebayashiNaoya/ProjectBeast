@@ -50,5 +50,7 @@ namespace app
 		{
 			return "Assets/parameter/nature/oceanParameter_Normal.json";
 		}
+
+		const char* GetStageName() const override { return "Normal"; }
 	};
 }

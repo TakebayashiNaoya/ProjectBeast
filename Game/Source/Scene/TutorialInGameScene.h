@@ -62,6 +62,8 @@ namespace app
 			return "Assets/parameter/nature/oceanParameter_Tutorial.json";
 		}
 
+		const char* GetStageName() const override { return "Tutorial"; }
+
 		//------------------------------------------------------------
 		// フックのオーバーライド
 		//------------------------------------------------------------

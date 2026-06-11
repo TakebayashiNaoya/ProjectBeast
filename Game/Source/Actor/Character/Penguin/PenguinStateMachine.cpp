@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "PenguinBase.h"
 #include "PenguinStateMachine.h"
+#include "PenguinIState.h"
 
 
 namespace app
@@ -50,6 +51,23 @@ namespace app
 		core::IState* PenguinStateMachine::GetChangeState()
 		{
 			return nullptr;
+		}
+
+
+		const char* PenguinStateMachine::GetStateNameForLog() const
+		{
+			if (IsEqualCurrentState(PenguinDeadState::ID()))         return "Dead";
+			if (IsEqualCurrentState(PenguinDiyingState::ID()))       return "Dying";
+			if (IsEqualCurrentState(PenguinInWhirlpoolState::ID()))  return "InWhirlpool";
+			if (IsEqualCurrentState(PenguinSwimmingState::ID()))     return "Swim";
+			if (IsEqualCurrentState(PenguinDamagedState::ID()))      return "Damaged";
+			if (IsEqualCurrentState(PenguinRunState::ID()))          return "Run";
+			if (IsEqualCurrentState(PenguinSneakState::ID()))        return "Sneak";
+			if (IsEqualCurrentState(PenguinJumpState::ID()))         return "Jump";
+			if (IsEqualCurrentState(PenguinSlidingState::ID()))      return "Slide";
+			if (IsEqualCurrentState(PenguinSlideStartState::ID()))   return "SlideStart";
+			if (IsEqualCurrentState(PenguinSlideEndState::ID()))     return "SlideEnd";
+			return "Idle";
 		}
 	}
 }

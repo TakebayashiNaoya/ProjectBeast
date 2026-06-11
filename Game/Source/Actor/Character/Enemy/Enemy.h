@@ -38,6 +38,9 @@ namespace app
 			 */
 			EnemyStateMachine* GetEnemyStateMachine() { return m_stateMachine.get(); }
 
+			inline int  GetLogId() const          { return m_logId; }
+			inline void SetLogId(int id)           { m_logId = id;   }
+
 
 		public:
 			Enemy();
@@ -55,6 +58,8 @@ namespace app
 			std::unique_ptr<EnemyStateMachine>m_stateMachine;
 			/** 自分の巣の座標 */
 			Vector3 m_homePosition;
+			/** ログ用の連番ID（EnemyManager が生成順に割り当てる） */
+			int m_logId = -1;
 		};
 	}
 }

@@ -80,6 +80,8 @@ namespace app
 		virtual const char* GetWhirlpoolParameterJsonPath() const = 0;
 		/** 海のパラメーターJSONパス */
 		virtual const char* GetOceanParameterJsonPath() const = 0;
+		/** ログ用ステージ名 ("Tutorial" / "Normal" / "Easy" / "Hard") */
+		virtual const char* GetStageName() const = 0;
 
 		//------------------------------------------------------------
 		// フック（必要なステージだけオーバーライドする）
@@ -157,5 +159,8 @@ namespace app
 
 		/** ホイッスルを鳴らしたかどうか（Finishing フェーズで1回だけ鳴らすためのフラグ） */
 		bool m_isWhistlePlayed = false;
+
+		/** ログの毎秒ティック用タイマー */
+		float m_logTickTimer = 0.0f;
 	};
 }

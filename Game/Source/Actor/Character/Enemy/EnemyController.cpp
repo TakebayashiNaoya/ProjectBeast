@@ -808,6 +808,8 @@ namespace app
 					// 実際に壊す
 					StageSystem::GetInstance()->BreakIgloo(enemy->m_targetIglooKeyAtStart);
 					IglooManager::GetInstance().EjectAllPenguins(iglooPos);
+					if (auto* lm = GameLogManager::GetInstance())
+						lm->QueueEvent({{"ev", "igloo_broken"}, {"key", enemy->m_targetIglooKeyAtStart}, {"bear_id", enemy->m_target->GetLogId()}});
 				}
 				else
 				{
@@ -827,7 +829,15 @@ namespace app
 				// 開始時にかまくらの中に「いなかった」場合のみ、即座にやられモーションに入れて足を止める
 				if (!enemy->m_isTargetInsideIglooAtStart)
 				{
+					const int bearId    = enemy->m_target->GetLogId();
+					const int penguinId = enemy->m_foundPenguin->GetLogId();
 					enemy->m_foundPenguin->GetStateMachine()->Damage();
+					if (auto* lm = GameLogManager::GetInstance())
+					{
+						lm->QueueEvent({{"ev", "bear_attack"}, {"bear_id", bearId}, {"penguin_id", penguinId}});
+						if (enemy->m_foundPenguin->GetStateMachine()->GetChildPenguinStatus()->IsDead())
+							lm->QueueEvent({{"ev", "bear_kill"}, {"bear_id", bearId}, {"penguin_id", penguinId}});
+					}
 				}
 
 				// どちらにせよ一度攻撃態勢に入ったので、ターゲットはリセットして安全にする

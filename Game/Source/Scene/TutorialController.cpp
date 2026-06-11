@@ -23,6 +23,12 @@ namespace app
 {
 	// ---------- 静的メンバー定義 ----------
 
+	static constexpr const char* TUTORIAL_STEP_NAMES[] = {
+		"PenguinSerious", "PenguinClingy", "PenguinNaughty", "PenguinClumsy",
+		"PenguinCaring",  "Bear",          "BearNest",        "Igloo",
+		"Ocean",          "Whirlpool"
+	};
+
 	const char* const TutorialController::WINDOW_JSON_PATHS[TARGET_COUNT] =
 	{
 		"Assets/parameter/Tutorial/TutorialWindow_PenguinSerious.json",
@@ -158,6 +164,8 @@ namespace app
 		{
 			m_completed[m_currentTargetIdx] = true;
 			m_isWindowOpen = false;
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
 
 			if (!m_queue.empty())
 				TryOpenNextWindow();
@@ -265,6 +273,8 @@ namespace app
 		{
 			// Layout 初期化失敗（JSON 欠損など） — エントリをスキップして完了済みにする
 			m_completed[m_currentTargetIdx] = true;
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
 		}
 	}
 }

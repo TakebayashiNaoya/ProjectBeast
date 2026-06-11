@@ -443,5 +443,8 @@ ASALocalRun/
 /Game/.github/
 /.claude/
 
+# ゲームプレイログ（実行時生成・リポジトリ管理対象外）
+Logs/
+
 # SDF フォントアトラス生成物
 # sdf_atlas.png / sdf_atlas.json は git 管理（Tools/update_font.bat はフォント変更時のみ使用）

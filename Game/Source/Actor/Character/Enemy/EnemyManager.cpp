@@ -76,7 +76,10 @@ namespace app
 					}
 				}
 
+				data.enemy->SetLogId(static_cast<int>(m_enemyList.size()));
 				m_enemyList.push_back(data);
+				if (auto* lm = GameLogManager::GetInstance())
+					lm->RecordSpawn("bear", data.enemy->GetLogId());
 			}
 		}
 

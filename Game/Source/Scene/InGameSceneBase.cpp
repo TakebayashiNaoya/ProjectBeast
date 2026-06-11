@@ -113,6 +113,8 @@ namespace app
 		app::achievement::AchievementManager::CreateInstance();
 		app::achievement::AchievementManager::GetInstance()->Start();
 
+		GameLogManager::CreateInstance();
+
 		/** PBRStatus生成 */
 		graphics::PBRStatus::CreateInstance();
 
@@ -387,6 +389,15 @@ namespace app
 
 			app::achievement::AchievementManager::GetInstance()->Update();
 
+			/** ログ毎秒ティック */
+			m_logTickTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_logTickTimer >= 0.1f)
+			{
+				m_logTickTimer -= 0.1f;
+				if (auto* lm = GameLogManager::GetInstance())
+					lm->RecordTick(m_daddyPenguin);
+			}
+
 			/** ノイズリストをクリア */
 			NoiseManager::GetInstance().ClearNoises();
 
@@ -428,10 +439,17 @@ namespace app
 			{
 				SoundManager::Get().StopBGM();
 				m_nextScene = true;
-				ResultScene::SetResult(
-					TimeManager::GetInstance().GetCurTime(),
-					actor::ChildPenguinManager::GetInstance()->GetRescuedNum()
-				);
+
+				const float clearTime = TimeManager::GetInstance().GetCurTime();
+				const int   rescued   = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
+				ResultScene::SetResult(clearTime, rescued);
+
+				/** ログをファイルへ書き出し */
+				if (auto* lm = GameLogManager::GetInstance())
+				{
+					lm->Flush(GetStageName(), clearTime, rescued, 0.0f);
+					GameLogManager::DestroyInstance();
+				}
 			}
 			break;
 		}

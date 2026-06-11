@@ -960,6 +960,8 @@ namespace app
 					m_naughtyStateMachine->SetIsGoingToWakeBear(true);
 					m_naughtyStateMachine->SetTargetBear(targetBear);
 					m_naughtyStateMachine->SetBearTargetPos(targetBear->GetTransform().m_position);
+					if (auto* lm = GameLogManager::GetInstance())
+						lm->QueueEvent({{"ev", "naughty_disobey"}, {"penguin_id", m_owner->GetLogId()}, {"toward", "bear"}, {"bear_id", targetBear->GetLogId()}});
 
 					// シロクマに向かうため、隊列や徘徊からは離脱する
 					if (m_isFollowing)
@@ -979,6 +981,8 @@ namespace app
 				{
 					m_naughtyStateMachine->SetIsGoingToWhirlpool(true);
 					m_naughtyStateMachine->SetWhirlpoolTargetPos(whirlpoolPos);
+					if (auto* lm = GameLogManager::GetInstance())
+						lm->QueueEvent({{"ev", "naughty_disobey"}, {"penguin_id", m_owner->GetLogId()}, {"toward", "whirlpool"}});
 
 					if (m_isFollowing) { manager->RemoveFollower(m_owner); m_isFollowing = false; }
 					if (manager->IsRoaming(m_owner)) { manager->UnregisterRoaming(m_owner); }

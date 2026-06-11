@@ -208,6 +208,10 @@ namespace app
 			}
 
 
+			/** ログ用：現在の状態名を返す（PenguinStateMachine.cpp で定義） */
+			const char* GetStateNameForLog() const;
+
+
 		public:
 			PenguinStateMachine(PenguinBase* ownerPenguinBase);
 			virtual ~PenguinStateMachine() override = default;
