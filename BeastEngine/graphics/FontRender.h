@@ -55,6 +55,11 @@ namespace nsBeastEngine
 		 */
 		void SetScale(const float scale)
 		{
+			m_scale = { scale, scale };
+		}
+
+		void SetScale(const Vector2& scale)
+		{
 			m_scale = scale;
 		}
 
@@ -94,7 +99,7 @@ namespace nsBeastEngine
 		FontRender()
 			: m_position(Vector3::Zero)
 			, m_rotation(0.0f)
-			, m_scale(1.0f)
+			, m_scale(1.0f, 1.0f)
 			, m_pivot(Sprite::DEFAULT_PIVOT)
 			, m_text(L"")
 			, m_color(Vector4::White)
@@ -127,8 +132,8 @@ namespace nsBeastEngine
 		Vector3	m_position;
 		/** 回転 */
 		float	m_rotation;
-		/** 大きさ */
-		float	m_scale;
+		/** 大きさ (x=横幅, y=縦幅) */
+		Vector2	m_scale;
 		/** 基点 */
 		Vector2	m_pivot;
 		/** 描画する文字列 */

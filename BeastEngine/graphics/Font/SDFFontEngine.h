@@ -60,7 +60,7 @@ namespace nsBeastEngine
 			const Vector2& position,
 			const Vector4& color,
 			float           rotation,
-			float           scale,
+			Vector2         scale,
 			Vector2         pivot
 		);
 
@@ -87,7 +87,7 @@ namespace nsBeastEngine
 			const wchar_t* text,
 			const Vector2& screenPos,
 			const Vector4& color,
-			float           scale,
+			Vector2         scale,
 			Vector2         pivot
 		);
 

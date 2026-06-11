@@ -144,16 +144,18 @@ void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
 
 void InitializeUIParts(app::ui::UIText* text, const nlohmann::json& item)
 {
-	const std::string content  = app::util::JsonConverter::ToString(item, "text");
-	const float       fontSize = app::util::JsonConverter::ToFloat(item, "fontSize", 1.0f);
-	const Vector3     position = app::util::JsonConverter::ToVector3(item, "position");
-	const Vector3     scale    = app::util::JsonConverter::ToVector3(item, "scale");
-	const Quaternion  rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
-	const Vector4     color    = app::util::JsonConverter::ToVector4(item, "color");
-	const Vector2     pivot    = app::util::JsonConverter::ToVector2(item, "pivot");
+	const std::string content    = app::util::JsonConverter::ToString(item, "text");
+	const float       fontSize   = app::util::JsonConverter::ToFloat(item, "fontSize", 1.0f);
+	const float       fontScaleX = app::util::JsonConverter::ToFloat(item, "fontScaleX", fontSize);
+	const float       fontScaleY = app::util::JsonConverter::ToFloat(item, "fontScaleY", fontSize);
+	const Vector3     position   = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3     scale      = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion  rotation   = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector4     color      = app::util::JsonConverter::ToVector4(item, "color");
+	const Vector2     pivot      = app::util::JsonConverter::ToVector2(item, "pivot");
 
 	text->SetText(content);
-	text->SetScale(fontSize);
+	text->SetScale(Vector2(fontScaleX, fontScaleY));
 	text->m_transform.m_localTransform.m_position = position;
 	text->m_transform.m_localTransform.m_scale    = scale;
 	text->m_transform.m_localTransform.m_rotation = rotation;

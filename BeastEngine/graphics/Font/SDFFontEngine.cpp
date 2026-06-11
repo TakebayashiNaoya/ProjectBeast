@@ -274,26 +274,25 @@ namespace nsBeastEngine
 		const wchar_t* text,
 		const Vector2& screenPos,
 		const Vector4& color,
-		float           scale,
+		Vector2         scale,
 		Vector2         pivot)
 	{
 		if (!text || m_glyphs.empty()) return;
 
-		float fontSize = m_emSize * scale;
+		float fontSizeX = m_emSize * scale.x;
+		float fontSizeY = m_emSize * scale.y;
 
-		// テキスト全体の幅を計算 (ピボット補正用)
 		float totalWidth = 0.0f;
 		for (const wchar_t* ch = text; *ch != L'\0'; ++ch) {
 			auto it = m_glyphs.find((uint32_t)*ch);
 			if (it != m_glyphs.end())
-				totalWidth += it->second.advance * fontSize;
+				totalWidth += it->second.advance * fontSizeX;
 		}
 
-		// ベースライン位置: pivot.y=0 で ascender が screenPos.y に来るよう補正
-		float totalHeight = m_lineHeight * fontSize;
+		float totalHeight = m_lineHeight * fontSizeY;
 		float cursorX = screenPos.x - totalWidth * pivot.x;
 		float baselineY = screenPos.y
-			+ m_ascender * fontSize        // ascender 分だけ下に移動
+			+ m_ascender * fontSizeY
 			- totalHeight * pivot.y;
 
 		XMUINT2 texSize = { m_atlasWidth, m_atlasHeight };
@@ -302,27 +301,24 @@ namespace nsBeastEngine
 		{
 			auto it = m_glyphs.find((uint32_t)*ch);
 			if (it == m_glyphs.end()) {
-				cursorX += fontSize * 0.5f;  // 未登録文字は半角分進める
+				cursorX += fontSizeX * 0.5f;
 				continue;
 			}
 			const SDFGlyph& g = it->second;
 
-			// アトラスに絵がある文字だけ描画
 			if (g.atlasRight > g.atlasLeft && g.atlasTop > g.atlasBottom)
 			{
-				// atlasBounds は yOrigin:bottom のためY反転して DX テクスチャ座標に変換
 				RECT srcRect;
-				srcRect.left = (LONG)std::round(g.atlasLeft);
-				srcRect.right = (LONG)std::round(g.atlasRight);
-				srcRect.top = (LONG)std::round(m_atlasHeight - g.atlasTop);
+				srcRect.left   = (LONG)std::round(g.atlasLeft);
+				srcRect.right  = (LONG)std::round(g.atlasRight);
+				srcRect.top    = (LONG)std::round(m_atlasHeight - g.atlasTop);
 				srcRect.bottom = (LONG)std::round(m_atlasHeight - g.atlasBottom);
 
-				// planeBounds は Y上が正のため符号反転してスクリーン座標に変換
 				RECT dstRect;
-				dstRect.left = (LONG)(cursorX + g.planeLeft * fontSize);
-				dstRect.right = (LONG)(cursorX + g.planeRight * fontSize);
-				dstRect.top = (LONG)(baselineY - g.planeTop * fontSize);
-				dstRect.bottom = (LONG)(baselineY - g.planeBottom * fontSize);
+				dstRect.left   = (LONG)(cursorX + g.planeLeft   * fontSizeX);
+				dstRect.right  = (LONG)(cursorX + g.planeRight  * fontSizeX);
+				dstRect.top    = (LONG)(baselineY - g.planeTop    * fontSizeY);
+				dstRect.bottom = (LONG)(baselineY - g.planeBottom * fontSizeY);
 
 				m_spriteBatch->Draw(
 					m_gpuHandle,
@@ -333,7 +329,7 @@ namespace nsBeastEngine
 				);
 			}
 
-			cursorX += g.advance * fontSize;
+			cursorX += g.advance * fontSizeX;
 		}
 	}
 
@@ -345,16 +341,15 @@ namespace nsBeastEngine
 		const wchar_t* text,
 		const Vector2& position,
 		const Vector4& color,
-		float           /*rotation*/,   // TODO: 将来実装
-		float           scale,
+		float           /*rotation*/,
+		Vector2         scale,
 		Vector2         pivot)
 	{
-		// Font.cpp と同じ座標変換: 中心原点 → スクリーン座標
 		Vector2 screenPos;
-		screenPos.x = position.x + UI_SPACE_WIDTH * 0.5f;
+		screenPos.x =  position.x + UI_SPACE_WIDTH  * 0.5f;
 		screenPos.y = -position.y + UI_SPACE_HEIGHT * 0.5f;
 
-		pivot.y = 1.0f - pivot.y;  // Font.cpp に合わせて Y ピボットを反転
+		pivot.y = 1.0f - pivot.y;
 
 		if (m_isDrawShadow)
 		{
