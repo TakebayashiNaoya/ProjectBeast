@@ -535,6 +535,13 @@ namespace app
 			void SetScale(const float& scale) { m_scale = { scale, scale }; }
 			void SetScale(const Vector2& scale) { m_scale = scale; }
 
+			/** 影の設定 */
+			void SetShadowParam(bool enable, float offset, const Vector4& color)
+			{
+				m_fontRender.SetShadowParam(enable, offset, color);
+			}
+
+
 		private:
 			nsBeastEngine::FontRender m_fontRender;
 			Vector2 m_scale;
@@ -614,6 +621,7 @@ namespace app
 			 * @return 再生終了しているなら true
 			 */
 			bool IsFinished() const { return m_videoRender.IsFinished(); }
+
 
 		private:
 			nsBeastEngine::VideoRender m_videoRender;

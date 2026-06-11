@@ -1,5 +1,9 @@
-﻿#pragma once
-
+﻿/**
+ * @file SDFFontEngine.h
+ * @brief SDF フォント描画エンジンのクラス定義
+ * @author 竹林
+ */
+#pragma once
 #include <unordered_map>
 
 namespace nsBeastEngine
@@ -81,6 +85,7 @@ namespace nsBeastEngine
 			m_shadowColor = color;
 		}
 
+
 	private:
 		/**
 		 * @brief 実際に SpriteBatch::Draw を呼ぶ内部実装
@@ -98,27 +103,30 @@ namespace nsBeastEngine
 		 */
 		bool LoadAtlas();
 
+
 	private:
+		/** アセットパス(変更する場合はここを編集) */
 		static constexpr const wchar_t* ATLAS_PNG_PATH = L"Assets/font/sdf_atlas.png";
 		static constexpr const char* ATLAS_JSON_PATH = "Assets/font/sdf_atlas.json";
 		static constexpr const char* SHADER_PATH = "Assets/shader/SDFFont.fx";
 
-		std::unique_ptr<DirectX::SpriteBatch>           m_spriteBatch;
-		Microsoft::WRL::ComPtr<ID3D12Resource>          m_sdfTexture;
+		/** アトラステクスチャとグリフデータを読み込んで、SRV を作成する */
+		std::unique_ptr<DirectX::SpriteBatch>       m_spriteBatch;
+		Microsoft::WRL::ComPtr<ID3D12Resource>		m_sdfTexture;
 		ID3D12DescriptorHeap* m_srvHeap = nullptr;
-		D3D12_GPU_DESCRIPTOR_HANDLE                     m_gpuHandle = {};
-		UINT                                            m_atlasWidth = 0;
-		UINT                                            m_atlasHeight = 0;
-		float                                           m_emSize = 48.0f;
-		float                                           m_lineHeight = 1.0f;
-		float                                           m_ascender = 0.8f;
-		std::unordered_map<uint32_t, SDFGlyph>          m_glyphs;
+		D3D12_GPU_DESCRIPTOR_HANDLE                 m_gpuHandle = {};		/** SRV の GPU ハンドル */
+		UINT                                        m_atlasWidth = 0;		/** 幅 (ピクセル) */
+		UINT                                        m_atlasHeight = 0;		/** 高さ (ピクセル) */
+		float                                       m_emSize = 48.0f;		/** em スケール (ピクセル) */
+		float                                       m_lineHeight = 1.0f;	/** 行の高さ (em スケール) */
+		float                                       m_ascender = 0.8f;		/** ベースラインから上端までの距離 (em スケール) */
+		std::unordered_map<uint32_t, SDFGlyph>      m_glyphs;				/** Unicode コードポイントをキーとするグリフデータのマップ */
 
-		nsK2EngineLow::Shader                           m_psShader;
+		nsK2EngineLow::Shader                       m_psShader;				/** ピクセルシェーダー (SDFFont.fx) */
 
-		bool    m_isDrawShadow = false;
-		float   m_shadowOffset = 0.0f;
-		Vector4 m_shadowColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+		bool    m_isDrawShadow = false;						/** 影を描画するかどうか */
+		float   m_shadowOffset = 0.0f;						/** 影のオフセット (em スケール) */
+		Vector4 m_shadowColor = { 0.0f, 0.0f, 0.0f, 0.0f };	/** 影のカラー */
 	};
 
 	/**

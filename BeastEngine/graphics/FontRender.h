@@ -92,6 +92,19 @@ namespace nsBeastEngine
 			m_color = color;
 		}
 
+		/**
+		 * @brief 影のパラメーターを設定
+		 * @param enable  影を描画するか
+		 * @param offset  影のオフセット (ピクセル)
+		 * @param color   影の色
+		 */
+		void SetShadowParam(bool enable, float offset, const Vector4& color)
+		{
+			m_isDrawShadow = enable;
+			m_shadowOffset = offset;
+			m_shadowColor = color;
+		}
+
 
 	public:
 		static const int MAX_TEXT_SIZE = 256;
@@ -103,6 +116,9 @@ namespace nsBeastEngine
 			, m_pivot(Sprite::DEFAULT_PIVOT)
 			, m_text(L"")
 			, m_color(Vector4::White)
+			, m_isDrawShadow(false)
+			, m_shadowOffset(0.0f)
+			, m_shadowColor({ 0.0f,0.0f,0.0f,0.0f })
 		{}
 		~FontRender() = default;
 
@@ -121,6 +137,7 @@ namespace nsBeastEngine
 		void OnRender2D(RenderContext& rc)override
 		{
 			auto& sdfFont = GetSDFFontEngine();
+			sdfFont.SetShadowParam(m_isDrawShadow, m_shadowOffset, m_shadowColor);
 			sdfFont.BeginDraw(rc, m_rotation, Vector2(m_position.x, m_position.y));
 			sdfFont.Draw(m_text, Vector2(m_position.x, m_position.y), m_color, m_rotation, m_scale, m_pivot);
 			sdfFont.EndDraw(rc);
@@ -128,18 +145,14 @@ namespace nsBeastEngine
 
 
 	private:
-		/** 位置 */
-		Vector3	m_position;
-		/** 回転 */
-		float	m_rotation;
-		/** 大きさ (x=横幅, y=縦幅) */
-		Vector2	m_scale;
-		/** 基点 */
-		Vector2	m_pivot;
-		/** 描画する文字列 */
-		wchar_t	m_text[MAX_TEXT_SIZE];
-		/** 色 */
-		Vector4	m_color;
+		Vector3	m_position;				/** 位置 */
+		float	m_rotation;				/** 回転 */
+		Vector2	m_scale;				/** 大きさ (x=横幅, y=縦幅) */
+		Vector2	m_pivot;				/** 基点 */
+		wchar_t	m_text[MAX_TEXT_SIZE];	/** 描画する文字列 */
+		Vector4	m_color;				/** 色 */
+		bool    m_isDrawShadow;			/** 影を描画するか */
+		float   m_shadowOffset;			/** 影のオフセット */
+		Vector4 m_shadowColor;			/** 影の色 */
 	};
 }
-

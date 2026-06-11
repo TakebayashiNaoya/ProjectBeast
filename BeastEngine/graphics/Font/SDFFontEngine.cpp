@@ -1,4 +1,9 @@
-﻿#include "BeastEnginePreCompile.h"
+﻿/**
+ * @file SDFFontEngine.cpp
+ * @brief SDF フォント描画エンジンの実装
+ * @author 竹林
+ */
+#include "BeastEnginePreCompile.h"
 #include "SDFFontEngine.h"
 
 #include "DirectXTK/Inc/WICTextureLoader.h"
@@ -224,9 +229,12 @@ namespace nsBeastEngine
 		auto uploadFuture = uploadBatch.End(g_graphicsEngine->GetCommandQueue());
 		uploadFuture.wait();
 
+		// --- グリフデータを先に読み込んでアトラスサイズを確定 ---
+		LoadAtlas();
+
 		// --- SRV を作成 ---
 		D3D12_RESOURCE_DESC texDesc = m_sdfTexture->GetDesc();
-		// テクスチャサイズを実リソースから取得 (JSON 値で上書きされる場合もある)
+		// JSON にサイズ情報がなかった場合のフォールバック
 		if (m_atlasWidth == 0) m_atlasWidth = (UINT)texDesc.Width;
 		if (m_atlasHeight == 0) m_atlasHeight = (UINT)texDesc.Height;
 
@@ -243,9 +251,6 @@ namespace nsBeastEngine
 			m_srvHeap->GetCPUDescriptorHandleForHeapStart()
 		);
 		m_gpuHandle = m_srvHeap->GetGPUDescriptorHandleForHeapStart();
-
-		// --- グリフデータを読み込む ---
-		LoadAtlas();
 	}
 
 	// -----------------------------------------------------------------------
@@ -262,12 +267,12 @@ namespace nsBeastEngine
 		if (fabsf(rotation) > 0.0001f)
 		{
 			// ゲーム座標をスクリーン座標に変換して回転中心とする
-			float pivotX =  gameSpacePos.x + UI_SPACE_WIDTH  * 0.5f;
+			float pivotX = gameSpacePos.x + UI_SPACE_WIDTH * 0.5f;
 			float pivotY = -gameSpacePos.y + UI_SPACE_HEIGHT * 0.5f;
 			transform =
 				DirectX::XMMatrixTranslation(-pivotX, -pivotY, 0.0f) *
 				DirectX::XMMatrixRotationZ(rotation) *
-				DirectX::XMMatrixTranslation( pivotX,  pivotY, 0.0f);
+				DirectX::XMMatrixTranslation(pivotX, pivotY, 0.0f);
 		}
 
 		m_spriteBatch->Begin(commandList, SpriteSortMode_Deferred, transform);
@@ -322,16 +327,16 @@ namespace nsBeastEngine
 			if (g.atlasRight > g.atlasLeft && g.atlasTop > g.atlasBottom)
 			{
 				RECT srcRect;
-				srcRect.left   = (LONG)std::round(g.atlasLeft);
-				srcRect.right  = (LONG)std::round(g.atlasRight);
-				srcRect.top    = (LONG)std::round(m_atlasHeight - g.atlasTop);
+				srcRect.left = (LONG)std::round(g.atlasLeft);
+				srcRect.right = (LONG)std::round(g.atlasRight);
+				srcRect.top = (LONG)std::round(m_atlasHeight - g.atlasTop);
 				srcRect.bottom = (LONG)std::round(m_atlasHeight - g.atlasBottom);
 
 				RECT dstRect;
-				dstRect.left   = (LONG)(cursorX + g.planeLeft   * fontSizeX);
-				dstRect.right  = (LONG)(cursorX + g.planeRight  * fontSizeX);
-				dstRect.top    = (LONG)(baselineY - g.planeTop    * fontSizeY);
-				dstRect.bottom = (LONG)(baselineY - g.planeBottom * fontSizeY);
+				dstRect.left = (LONG)std::round(cursorX + g.planeLeft * fontSizeX);
+				dstRect.right = (LONG)std::round(cursorX + g.planeRight * fontSizeX);
+				dstRect.top = (LONG)std::round(baselineY - g.planeTop * fontSizeY);
+				dstRect.bottom = (LONG)std::round(baselineY - g.planeBottom * fontSizeY);
 
 				m_spriteBatch->Draw(
 					m_gpuHandle,
@@ -359,7 +364,7 @@ namespace nsBeastEngine
 		Vector2         pivot)
 	{
 		Vector2 screenPos;
-		screenPos.x =  position.x + UI_SPACE_WIDTH  * 0.5f;
+		screenPos.x = position.x + UI_SPACE_WIDTH * 0.5f;
 		screenPos.y = -position.y + UI_SPACE_HEIGHT * 0.5f;
 
 		pivot.y = 1.0f - pivot.y;
