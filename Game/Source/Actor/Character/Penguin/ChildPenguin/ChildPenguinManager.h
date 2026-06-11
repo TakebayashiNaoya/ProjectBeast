@@ -6,6 +6,7 @@
 #pragma once
 #include <unordered_set>
 #include "ChildPenguinTypes.h"
+#include "Source/Util/Curve.h"
 
 
 namespace app
@@ -402,9 +403,62 @@ namespace app
 			std::unordered_set<ChildPenguin*> m_roamingPenguins;
 			/** いずれかの世話焼きが担当しているペンギンの集合 */
 			std::unordered_set<ChildPenguin*> m_assignedTargets;
+			
+
+			//============================================//
+			// ゴーストペンギン関連
+			//============================================//
+
+			private:
+			/**
+			 * @brief ゴーストペンギンの情報構造体
+			 */
+				struct GhostPenguinInfo
+				{
+					ModelRender modelRender;
+					util::FloatCurve floatCurve;
+				};
+
+						
+		public:
+			using GhostPenguins = std::vector<std::unique_ptr<GhostPenguinInfo>>;
+
+			/**
+			 * @brief ゴーストペンギンを登録する
+			 * @param penguin 登録するペンギンのポインタ
+			 */
+			void RegisterGhostPenguin(ChildPenguin* penguin);
+
+			/**
+			 * @brief ゴーストペンギンを更新する
+			 */
+			void UpdateGhostPenguins();
+
+			/**
+			 * @brief ゴーストペンギンを描画する
+			 */
+			void RenderGhostPenguins(RenderContext& rc);
+
+			/**
+			 * @brief ゴーストペンギンの数を取得する
+			 * @return ゴーストペンギンの数
+			 */
+			uint8_t GetGhostPenguinNum() const { return m_ghostPenguinNum; }
+
+			/**
+			 * @brief ゴーストペンギンのリストを取得する
+			 * @return ゴーストペンギンのリスト
+			 */
+			const GhostPenguins& GetGhostPenguins() const { return m_ghostPenguins; }
 
 
+		private:
+			/** ゴーストペンギンの数 */
+			uint8_t m_ghostPenguinNum;
+			/** ゴーストペンギンのリスト */
+			GhostPenguins m_ghostPenguins;
 
+			
 
 			//============================================//
 			// シングルトン関連

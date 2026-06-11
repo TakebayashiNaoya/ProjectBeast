@@ -73,8 +73,14 @@ namespace app
 
 		void ChildPenguinStateMachine::OnDead()
 		{
+			// 子ペンギンのマネージャーのシングルトンインスタンスを取得。
+			auto* cpMng = ChildPenguinManager::GetInstance();
+
+			// ゴーストペンギンを登録して表示する。
+			cpMng->RegisterGhostPenguin(m_ownerChildPenguin);
+
 			// ChildPenguinManagerからの削除とdeleteを行う。
-			ChildPenguinManager::GetInstance()->RemoveAndDestroy(m_ownerChildPenguin);
+			cpMng->RemoveAndDestroy(m_ownerChildPenguin);
 		}
 
 

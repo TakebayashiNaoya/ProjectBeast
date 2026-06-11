@@ -36,6 +36,7 @@ namespace app
 
 
 		ChildPenguinManager::ChildPenguinManager()
+			: m_ghostPenguinNum(0)
 		{}
 
 
@@ -60,6 +61,8 @@ namespace app
 				if (!cp) continue;
 				cp->UpdateWrapper();
 			}
+
+			UpdateGhostPenguins();
 
 			/** 陣形の更新処理 */
 			if (m_daddyPenguin != nullptr && !m_followers.empty())
@@ -98,6 +101,8 @@ namespace app
 				if (!cp) continue;
 				cp->RenderWrapper(rc);
 			}
+
+			RenderGhostPenguins(rc);
 		}
 
 
@@ -647,6 +652,55 @@ namespace app
 			checkSet(m_roamingPenguins);
 
 			return nearest;
+		}
+
+
+		void ChildPenguinManager::RegisterGhostPenguin(ChildPenguin* penguin)
+		{
+			constexpr const char* GHOST_MODEL_PATH = "Assets/modelData/penguin/childPenguin/GhostChildPenguin.tkm";
+			constexpr float POSITION_OFFSET_Y = 0.2f;
+			constexpr float ANIM_DURATION = 3.0f;
+			constexpr float SCALE_UP = 2.0f;
+
+			const Vector3 dethPos = penguin->GetTransform().m_position;
+			const Quaternion dethRot = penguin->GetTransform().m_rotation;
+			const Vector3 dethScale = penguin->GetTransform().m_scale * SCALE_UP;
+
+			auto info = std::make_unique<GhostPenguinInfo>();
+			info->modelRender.Init(GHOST_MODEL_PATH);
+			
+			info->floatCurve.Initialize(0.0f, POSITION_OFFSET_Y, ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
+			info->floatCurve.Play();
+			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
+			info->modelRender.Update();
+
+			m_ghostPenguins.push_back(std::move(info));
+			m_ghostPenguinNum = static_cast<uint8_t>(m_ghostPenguins.size());
+		}
+
+
+		void ChildPenguinManager::UpdateGhostPenguins()
+		{
+			for (auto& info : m_ghostPenguins)
+			{
+				if (!info->floatCurve.IsPlaying()) continue;
+
+				info->floatCurve.Update(g_gameTime->GetFrameDeltaTime());
+				const Vector3 currentPosition = info->modelRender.GetPosition();
+				const Vector3 translate = Vector3::Up * info->floatCurve.GetCurrentValue();
+				const Vector3 nextPosition = currentPosition + translate;
+				info->modelRender.SetPosition(nextPosition);
+				info->modelRender.Update();
+			}
+		}
+
+
+		void ChildPenguinManager::RenderGhostPenguins(RenderContext& rc)
+		{
+			for (auto& it : m_ghostPenguins)
+			{
+				it->modelRender.Draw(rc);
+			}
 		}
 	}
 }
