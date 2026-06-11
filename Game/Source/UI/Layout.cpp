@@ -172,10 +172,10 @@ void InitializeUIParts(app::ui::UIVideo* video, const nlohmann::json& item)
 	data.loop = app::util::JsonConverter::ToBool(item, "loop", false);
 	data.autoPlay = app::util::JsonConverter::ToBool(item, "autoPlay", true);
 
-	const Vector3    position = app::util::JsonConverter::ToVector3(item, "position");
-	const Vector3    scale = app::util::JsonConverter::ToVector3(item, "scale");
-	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
-	const Vector4    color = app::util::JsonConverter::ToVector4(item, "color");
+	const Vector3    position = item.contains("position") ? app::util::JsonConverter::ToVector3(item["position"])      : Vector3::Zero;
+	const Vector3    scale    = item.contains("scale")    ? app::util::JsonConverter::ToVector3(item["scale"])		   : Vector3::One;
+	const Quaternion rotation = item.contains("rotation") ? ParseRotation(item["rotation"].get<float>())			   : Quaternion::Identity;
+	const Vector4    color    = item.contains("color")    ? app::util::JsonConverter::ToVector4(item,"color", false)  : Vector4::White;
 
 	video->Initialize(data);
 	video->m_transform.m_localTransform.m_position = position;
