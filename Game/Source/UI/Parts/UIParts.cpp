@@ -391,7 +391,7 @@ namespace app
 		/*************************************/
 
 
-		UIText::UIText() : m_scale(1.0f)
+		UIText::UIText() : m_scale(1.0f, 1.0f)
 		{}
 
 
@@ -405,7 +405,9 @@ namespace app
 			m_transform.UpdateTransform();
 
 			m_fontRender.SetPosition(m_transform.m_localTransform.m_position.x, m_transform.m_localTransform.m_position.y);
-			m_fontRender.SetRotation(m_transform.m_localTransform.m_rotation.x);
+			// クォータニオンのZ・W成分からZ軸回転角(ラジアン)を抽出する
+			const auto& q = m_transform.m_localTransform.m_rotation;
+			m_fontRender.SetRotation(2.0f * atan2f(q.z, q.w));
 			m_fontRender.SetScale(m_scale);
 			m_fontRender.SetColor(m_color);
 			m_fontRender.SetPivot(m_pivot);

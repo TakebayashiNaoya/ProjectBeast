@@ -252,12 +252,25 @@ namespace nsBeastEngine
 	// 描画開始・終了
 	// -----------------------------------------------------------------------
 
-	void SDFFontEngine::BeginDraw(RenderContext& rc)
+	void SDFFontEngine::BeginDraw(RenderContext& rc, float rotation, Vector2 gameSpacePos)
 	{
 		if (!m_spriteBatch) return;
 		auto* commandList = g_graphicsEngine->GetCommandList();
 		commandList->SetDescriptorHeaps(1, &m_srvHeap);
-		m_spriteBatch->Begin(commandList, SpriteSortMode_Deferred, g_matIdentity);
+
+		DirectX::XMMATRIX transform = DirectX::XMMatrixIdentity();
+		if (fabsf(rotation) > 0.0001f)
+		{
+			// ゲーム座標をスクリーン座標に変換して回転中心とする
+			float pivotX =  gameSpacePos.x + UI_SPACE_WIDTH  * 0.5f;
+			float pivotY = -gameSpacePos.y + UI_SPACE_HEIGHT * 0.5f;
+			transform =
+				DirectX::XMMatrixTranslation(-pivotX, -pivotY, 0.0f) *
+				DirectX::XMMatrixRotationZ(rotation) *
+				DirectX::XMMatrixTranslation( pivotX,  pivotY, 0.0f);
+		}
+
+		m_spriteBatch->Begin(commandList, SpriteSortMode_Deferred, transform);
 	}
 
 	void SDFFontEngine::EndDraw(RenderContext& rc)
@@ -341,7 +354,7 @@ namespace nsBeastEngine
 		const wchar_t* text,
 		const Vector2& position,
 		const Vector4& color,
-		float           /*rotation*/,
+		float           rotation,
 		Vector2         scale,
 		Vector2         pivot)
 	{

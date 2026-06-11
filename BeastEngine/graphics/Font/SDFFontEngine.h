@@ -43,15 +43,17 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief 描画開始 (フレーム内で SpriteBatch::Begin を呼ぶ)
+		 * @param rotation      Z軸回転 (ラジアン)。0 で無回転。
+		 * @param gameSpacePos  回転の中心となるゲーム座標。FontRender の位置を渡す。
 		 */
-		void BeginDraw(RenderContext& rc);
+		void BeginDraw(RenderContext& rc, float rotation = 0.0f, Vector2 gameSpacePos = Vector2(0.0f, 0.0f));
 
 		/**
 		 * @brief テキスト描画リクエスト
 		 * @param text      描画するワイド文字列
 		 * @param position  中心原点座標系での位置 (Font.cpp と同じ座標系)
 		 * @param color     RGBA カラー
-		 * @param rotation  回転 (現在未対応・将来実装)
+		 * @param rotation  回転 (BeginDraw に渡した値と同じ値を渡すこと)
 		 * @param scale     スケール倍率
 		 * @param pivot     ピボット (0,0=左上 / 0.5,0.5=中央 / 1,1=右下)
 		 */

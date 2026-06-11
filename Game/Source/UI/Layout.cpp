@@ -146,11 +146,11 @@ void InitializeUIParts(app::ui::UIText* text, const nlohmann::json& item)
 {
 	const std::string content    = app::util::JsonConverter::ToString(item, "text");
 	const float       fontSize   = app::util::JsonConverter::ToFloat(item, "fontSize", 1.0f);
-	const float       fontScaleX = app::util::JsonConverter::ToFloat(item, "fontScaleX", fontSize);
-	const float       fontScaleY = app::util::JsonConverter::ToFloat(item, "fontScaleY", fontSize);
+	const float       fontScaleX = app::util::JsonConverter::ToFloat(item, "fontScaleX", 1.0f) * fontSize;
+	const float       fontScaleY = app::util::JsonConverter::ToFloat(item, "fontScaleY", 1.0f) * fontSize;
 	const Vector3     position   = app::util::JsonConverter::ToVector3(item, "position");
-	const Vector3     scale      = app::util::JsonConverter::ToVector3(item, "scale");
-	const Quaternion  rotation   = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector3     scale      = item.contains("scale")    ? app::util::JsonConverter::ToVector3(item["scale"]) : Vector3::One;
+	const Quaternion  rotation   = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation", app::util::JsonConverter::InvalidFloat));
 	const Vector4     color      = app::util::JsonConverter::ToVector4(item, "color");
 	const Vector2     pivot      = app::util::JsonConverter::ToVector2(item, "pivot");
 

@@ -255,18 +255,18 @@ namespace app
 			 * @param outerRadius ゲージの外径
 			 */
 			void Initialize(
-					const char* assetName
-				,	const char* fxName
-				,	const float width
-				,	const float height
-				,	const Vector3& position
-				,	const Vector3& scale
-				,	const Quaternion& rotation
-				,	const Vector2& pivot
-				,	const Vector4& gaugeColor
-				,	const Vector4& bgColor
-				,	const float innerRadius
-				,	const float outerRadius
+				const char* assetName
+				, const char* fxName
+				, const float width
+				, const float height
+				, const Vector3& position
+				, const Vector3& scale
+				, const Quaternion& rotation
+				, const Vector2& pivot
+				, const Vector4& gaugeColor
+				, const Vector4& bgColor
+				, const float innerRadius
+				, const float outerRadius
 			);
 
 
@@ -308,7 +308,7 @@ namespace app
 			 * @param color 色
 			 */
 			void SetGaugeColor(const Vector4& color) { m_gaugeRender.SetMulColor(color); }
-			
+
 			//void SetGaugeColor(const Vector4& color) { m_gaugeRender.SetGaugeColor(color); }
 			/**
 			 * @brief リング部分の色を設定
@@ -448,8 +448,8 @@ namespace app
 
 
 		// ============================================
-        // UI桁表示(スコア表示などで使用)
-        // ============================================
+		// UI桁表示(スコア表示などで使用)
+		// ============================================
 		class UIDigit : public UIBase
 		{
 		private:
@@ -532,11 +532,12 @@ namespace app
 			void SetText(const std::string& text);
 
 			/** スケールの設定 */
-			void SetScale(float scale) { m_scale = scale; }
+			void SetScale(const float& scale) { m_scale = { scale, scale }; }
+			void SetScale(const Vector2& scale) { m_scale = scale; }
 
 		private:
 			nsBeastEngine::FontRender m_fontRender;
-			float m_scale;
+			Vector2 m_scale;
 		};
 
 
@@ -545,10 +546,10 @@ namespace app
 		struct UIVideoInitData
 		{
 			std::string clipPath;           /** フォルダパス（末尾 /）または動画ファイルパス */
-			float       width    = 1920.0f; /** 表示幅（ピクセル） */
-			float       height   = 1080.0f; /** 表示高さ（ピクセル） */
-			float       fps      = 24.0f;   /** コマ撮りの FPS */
-			bool        loop     = false;   /** ループ再生 */
+			float       width = 1920.0f; /** 表示幅（ピクセル） */
+			float       height = 1080.0f; /** 表示高さ（ピクセル） */
+			float       fps = 24.0f;   /** コマ撮りの FPS */
+			bool        loop = false;   /** ループ再生 */
 			bool        autoPlay = true;    /** 初期化後すぐに再生開始 */
 		};
 
@@ -579,7 +580,7 @@ namespace app
 			/**
 			 * @brief 再生開始
 			 */
-			void Play()  { m_videoRender.Play(); }
+			void Play() { m_videoRender.Play(); }
 			/**
 			 * @brief 再生一時停止
 			 */
@@ -587,12 +588,12 @@ namespace app
 			/**
 			 * @brief 再生停止（先頭に戻る）
 			 */
-			void Stop()  { m_videoRender.Stop(); }
+			void Stop() { m_videoRender.Stop(); }
 			/**
 			 * @brief ループ再生の設定
 			 * @param loop ループ再生する場合は true
 			 */
-			void SetLoop(bool loop)            { m_videoRender.SetLoop(loop); }
+			void SetLoop(bool loop) { m_videoRender.SetLoop(loop); }
 			/**
 			 * @brief 再生速度の設定（1.0 = 等速）
 			 * @param speed 再生速度倍率
