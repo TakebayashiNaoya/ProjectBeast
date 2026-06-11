@@ -33,6 +33,7 @@
     <ClCompile Include="Graphics\Camera\SubCameraManager.cpp" />
     <ClCompile Include="Graphics\Effect\BeastEffectEmitter.cpp" />
     <ClCompile Include="Graphics\FontRender.cpp" />
+    <ClCompile Include="Graphics\Font\SDFFontEngine.cpp" />
     <ClCompile Include="graphics\Light\HemisphereLight.cpp" />
     <ClCompile Include="graphics\Light\PointLight.cpp" />
     <ClCompile Include="Graphics\Light\SceneLight.cpp" />
@@ -84,6 +85,7 @@
     <ClInclude Include="Graphics\Camera\SubCameraManager.h" />
     <ClInclude Include="Graphics\Effect\BeastEffectEmitter.h" />
     <ClInclude Include="Graphics\FontRender.h" />
+    <ClInclude Include="Graphics\Font\SDFFontEngine.h" />
     <ClInclude Include="graphics\GraphicsEnums.h" />
     <ClInclude Include="graphics\IRenderer.h" />
     <ClInclude Include="graphics\Light\HemisphereLight.h" />

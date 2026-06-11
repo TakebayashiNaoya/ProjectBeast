@@ -115,15 +115,14 @@ namespace nsBeastEngine
 		 */
 		void OnRender2D(RenderContext& rc)override
 		{
-			m_font.Begin(rc);
-			m_font.Draw(m_text, Vector2(m_position.x, m_position.y), m_color, m_rotation, m_scale, m_pivot);
-			m_font.End(rc);
+			auto& sdfFont = GetSDFFontEngine();
+			sdfFont.BeginDraw(rc);
+			sdfFont.Draw(m_text, Vector2(m_position.x, m_position.y), m_color, m_rotation, m_scale, m_pivot);
+			sdfFont.EndDraw(rc);
 		}
 
 
 	private:
-		/** フォント */
-		Font	m_font;
 		/** 位置 */
 		Vector3	m_position;
 		/** 回転 */
