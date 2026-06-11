@@ -36,6 +36,7 @@ namespace app
 
 
 		ChildPenguinManager::ChildPenguinManager()
+			: m_ghostPenguinNum(0)
 		{}
 
 
