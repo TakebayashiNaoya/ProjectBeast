@@ -485,6 +485,33 @@ namespace app
 		/*************************************/
 
 
+
+		UIDummy::UIDummy()
+		{}
+
+
+		UIDummy::~UIDummy()
+		{}
+
+
+		void UIDummy::Update()
+		{
+			UpdateAnimation();
+			m_transform.UpdateTransform();
+		}
+
+
+		void UIDummy::Render(RenderContext& rc)
+		{
+			// 描画なし
+		}
+
+
+
+
+		/*************************************/
+
+
 		UICanvas::UICanvas()
 		{
 			uiList_.clear();
