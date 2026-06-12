@@ -111,7 +111,7 @@ namespace app
 		TimeManager::GetInstance().ResetTime();
 
 		app::achievement::AchievementManager::CreateInstance();
-		app::achievement::AchievementManager::GetInstance()->Start();
+		app::achievement::AchievementManager::GetInstance()->Start(GetAchievementJsonPath());
 
 		GameLogManager::CreateInstance();
 
@@ -444,6 +444,10 @@ namespace app
 				const int   rescued   = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
 				ResultScene::SetResult(clearTime, rescued);
 
+				/** アチーブメント最終判定（FinalCondition 型を評価） */
+				if (auto* am = app::achievement::AchievementManager::GetInstance())
+					am->FinalizeAchievements();
+
 				/** ログをファイルへ書き出し */
 				if (auto* lm = GameLogManager::GetInstance())
 				{
@@ -467,6 +471,16 @@ namespace app
 			SoundManager::Get().StopAllSE();
 			nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(true);
 			m_isPauseEntered = true;
+		}
+
+		/** ポーズ中もアチーブメントJSONのホットリロードとUI反映を行う */
+		if (auto* am = app::achievement::AchievementManager::GetInstance())
+		{
+			am->CheckHotReload();
+		}
+		if (auto* uiMngr = InGameUIManager::GetInstance())
+		{
+			uiMngr->UpdateAchievementHotReload();
 		}
 
 		/** 派生クラスが独自ポーズを処理する場合は通常ポーズをスキップ */

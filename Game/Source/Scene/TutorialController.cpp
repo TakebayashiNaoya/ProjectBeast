@@ -17,6 +17,7 @@
 #include "Source/Nature/Whirlpool.h"
 
 #include "Graphics/Camera/CameraSystem.h"
+#include "Source/Achivement/AchievementManager.h"
 
 
 namespace app
@@ -166,6 +167,12 @@ namespace app
 			m_isWindowOpen = false;
 			if (auto* lm = GameLogManager::GetInstance())
 				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
+			if (auto* am = app::achievement::AchievementManager::GetInstance())
+			{
+				auto* base = am->GetAchievement(Hash32(TUTORIAL_STEP_NAMES[m_currentTargetIdx]));
+				if (auto* ev = dynamic_cast<app::achievement::EventAchievement*>(base))
+					ev->Unlock();
+			}
 
 			if (!m_queue.empty())
 				TryOpenNextWindow();
@@ -275,6 +282,12 @@ namespace app
 			m_completed[m_currentTargetIdx] = true;
 			if (auto* lm = GameLogManager::GetInstance())
 				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
+			if (auto* am = app::achievement::AchievementManager::GetInstance())
+			{
+				auto* base = am->GetAchievement(Hash32(TUTORIAL_STEP_NAMES[m_currentTargetIdx]));
+				if (auto* ev = dynamic_cast<app::achievement::EventAchievement*>(base))
+					ev->Unlock();
+			}
 		}
 	}
 }

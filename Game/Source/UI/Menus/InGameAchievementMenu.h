@@ -42,16 +42,18 @@ namespace app
 			/** 1アチーブメントぶんの表示情報 */
 			struct AchievementUIEntry
 			{
-				/** 対応するアチーブメントへのポインタ */
 				app::achievement::AchievementBase* achieve = nullptr;
-				/** チェックアイコン（達成時に表示） */
-				UIIcon* checkIcon = nullptr;
-				/** 前フレームの達成状態（表示切り替えのエッジ検出用） */
-				bool wasAchieved = false;
+				UIText* nameText   = nullptr;
+				UIIcon* boxIcon    = nullptr;
+				UIIcon* checkIcon  = nullptr;
+				bool wasAchieved   = false;
 			};
 
 			/** アチーブメントごとのUI情報リスト */
 			std::vector<AchievementUIEntry> m_entries;
+
+			/** 最後に確認したリロードバージョン */
+			int m_lastReloadVersion = -1;
 		};
 	}
 }

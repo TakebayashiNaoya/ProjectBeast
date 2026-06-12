@@ -5,20 +5,14 @@
  */
 #include "stdafx.h"
 #include "AchievementManager.h"
-#include "Source/Actor/Character/Enemy/Enemy.h"
-#include "Source/Actor/Character/Enemy/EnemyController.h"
-#include "Source/Actor/Character/Enemy/EnemyManager.h"
-#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/UI/Layout.h"
 #include "Source/Util/CRC32.h"
 #include "Source/Util/JsonConverter.h"
 
 
 namespace
 {
-	/** アチーブメントのデータファイルのパス */
-	const char* JSON_FILE_PATH = "Assets/parameter/achievement/AchievementList.json";
-
 	/** アチーブメントリストのキー */
 	const char* ACHIEVE_LIST_KEY = "AchievementList";
 	/** アチーブメントのキー */
@@ -30,11 +24,14 @@ namespace app
 {
 	namespace achievement
 	{
-		void AchievementManager::Start()
+		void AchievementManager::Start(const char* jsonPath)
 		{
+			m_jsonPath = jsonPath;
+			m_lastUpdateTime = app::util::JsonConverter::GetFileLastWriteTime(jsonPath);
+
 			nlohmann::json json;
 			// JSONの読み込みを試す
-			if (!app::util::JsonConverter::IsLoadJsonFile(json, JSON_FILE_PATH))
+			if (!app::util::JsonConverter::IsLoadJsonFile(json, jsonPath))
 			{
 				// 読み込み失敗
 				return;
@@ -49,8 +46,36 @@ namespace app
 		}
 
 
+		void AchievementManager::CheckHotReload()
+		{
+#ifdef APP_ENABLE_LAYOUT_HOTRELOAD
+			if (!m_jsonPath.empty() && app::util::JsonConverter::CheckFileModified(m_jsonPath, m_lastUpdateTime))
+			{
+				m_lastUpdateTime = app::util::JsonConverter::GetFileLastWriteTime(m_jsonPath.c_str());
+
+				m_achievementList.clear();
+				m_achievementMap.clear();
+				m_bearKillCount         = 0;
+				m_whirlpoolCaptureCount = 0;
+
+				nlohmann::json json;
+				if (app::util::JsonConverter::IsLoadJsonFile(json, m_jsonPath))
+				{
+					if (json.contains(ACHIEVE_LIST_KEY) && json[ACHIEVE_LIST_KEY].contains(ACHIEVE_KEY))
+					{
+						CreateAchievement(json[ACHIEVE_LIST_KEY][ACHIEVE_KEY]);
+					}
+				}
+				m_reloadVersion++;
+			}
+#endif
+		}
+
+
 		void AchievementManager::Update()
 		{
+			CheckHotReload();
+
 			for (auto& pair : m_achievementMap)
 			{
 				if (pair.second)
@@ -83,13 +108,15 @@ namespace app
 				// タイプのキーが存在しない場合はエラー
 				K2_ASSERT(achieveData.contains("type"), "typeが未設定");
 
-				// ★ json ではなく achieveData から取得するように修正
-				// type、condition、targetValueを取得
 				std::string type = app::util::JsonConverter::ToString(achieveData, "type");
 
-				std::string conditionStr = app::util::JsonConverter::ToString(achieveData, "condition");
+				std::string conditionStr;
+				if (achieveData.contains("condition"))
+					conditionStr = app::util::JsonConverter::ToString(achieveData, "condition");
 
-				uint32_t targetValue = app::util::JsonConverter::ToUInt32(achieveData, "targetValue");
+				uint32_t targetValue = 0;
+				if (achieveData.contains("targetValue"))
+					targetValue = app::util::JsonConverter::ToUInt32(achieveData, "targetValue");
 
 				Achieve newAchieve; // std::unique_ptr<AchievementBase> と同義
 
@@ -100,85 +127,34 @@ namespace app
 
 					if (conditionStr == "CheckRescuedCount")
 					{
-						// 子ペンギンを90匹以上集めたか判定
+						// 子ペンギンを規定数以上集めたか判定
 						conditionAchieve->SetCondition([targetValue]() {
 							return app::actor::ChildPenguinManager::GetInstance()->GetRescuedNum() >= static_cast<int>(targetValue);
 							});
 					}
-					else if (conditionStr == "CheckSimultaneousChase")
-					{
-						// 2頭以上のシロクマに【同時に】隊列ペンギンを追われているか判定
-						// GetEnemies() と GetControllers() は同じ順序で返るため、
-						// インデックスを合わせてエネミーとコントローラーを対応させる
-						conditionAchieve->SetCondition([targetValue]() {
-							auto* em = app::actor::EnemyManager::GetInstance();
-							auto* cm = app::actor::ChildPenguinManager::GetInstance();
-							if (!em || !cm) return false;
-
-							auto enemies = em->GetEnemies();
-							auto controllers = em->GetControllers();
-							const size_t count = enemies.size();
-
-							int chaseCount = 0;
-							for (size_t idx = 0; idx < count; ++idx)
-							{
-								auto* enemy = enemies[idx];
-								auto* controller = (idx < controllers.size()) ? controllers[idx] : nullptr;
-								if (!enemy || !controller) continue;
-
-								auto* sm = enemy->GetEnemyStateMachine();
-								if (!sm) continue;
-
-								// Chase中かつ追跡対象が隊列ペンギンであるものだけカウント
-								if (sm->IsChasing())
-								{
-									const auto* found = controller->GetFoundPenguin();
-									if (found != nullptr && cm->IsFollower(found))
-									{
-										chaseCount++;
-									}
-								}
-							}
-							return chaseCount >= static_cast<int>(targetValue);
-							});
-					}
 					newAchieve = std::move(conditionAchieve);
-				}
-				else if (type == "Counter" || type == "counter")
-				{
-					auto counterAchieve = std::make_unique<CounterAchievement>();
-
-					if (conditionStr == "CheckIndividualChase")
-					{
-						// 3頭それぞれが一度でも隊列ペンギンを追跡したかをカウント
-						counterAchieve->SetCondition([targetValue]() {
-							auto* em = app::actor::EnemyManager::GetInstance();
-							if (!em) return false;
-
-							uint32_t chasedCount = 0;
-							for (auto* controller : em->GetControllers())
-							{
-								if (controller && controller->HasChased())
-								{
-									chasedCount++;
-								}
-							}
-							return chasedCount >= targetValue;
-							});
-					}
-					newAchieve = std::move(counterAchieve);
 				}
 				else if (type == "Event")
 				{
 					newAchieve = std::make_unique<EventAchievement>();
 				}
-				else if (type == "Record")
+				else if (type == "FinalCondition")
 				{
-					newAchieve = std::make_unique<RecordAchievement>();
-				}
-				else if (type == "Location" || type == "location")
-				{
-					newAchieve = std::make_unique<LocationAchievement>();
+					auto finalAchieve = std::make_unique<FinalConditionAchievement>();
+
+					if (conditionStr == "CheckBearKillsAtMost")
+					{
+						finalAchieve->SetCondition([this, targetValue]() {
+							return m_bearKillCount <= static_cast<int>(targetValue);
+						});
+					}
+					else if (conditionStr == "CheckWhirlpoolCapturesAtMost")
+					{
+						finalAchieve->SetCondition([this, targetValue]() {
+							return m_whirlpoolCaptureCount <= static_cast<int>(targetValue);
+						});
+					}
+					newAchieve = std::move(finalAchieve);
 				}
 
 				// アチーブメントを初期化して登録
@@ -217,6 +193,15 @@ namespace app
 				return it->second;
 			}
 			return nullptr;
+		}
+
+
+		void AchievementManager::FinalizeAchievements()
+		{
+			for (auto& pair : m_achievementMap)
+			{
+				if (pair.second) pair.second->Finalize();
+			}
 		}
 
 

@@ -23,17 +23,32 @@ namespace app
 		public:
 			/**
 			 * @brief 初期化処理
+			 * @param jsonPath ステージ別アチーブメント定義JSONのパス
 			 */
-			void Start();
+			void Start(const char* jsonPath);
 			/**
 			 * @brief 更新処理
 			 */
 			void Update();
 			/**
 			 * @brief 描画処理
-			 * @note もしかすると必要ないかもしれない
 			 */
 			void Render(RenderContext& rc);
+
+			/**
+			 * @brief ゲーム終了時に FinalConditionAchievement を一括評価する
+			 */
+			void FinalizeAchievements();
+
+			/**
+			 * @brief シロクマに倒された回数を1増やす
+			 */
+			void AddBearKill()       { m_bearKillCount++; }
+
+			/**
+			 * @brief 渦潮に飲まれた回数を1増やす
+			 */
+			void AddWhirlpoolCapture() { m_whirlpoolCaptureCount++; }
 
 			/**
 			 * @brief 達成済みのアチーブメントの配列を取得する
@@ -63,9 +78,24 @@ namespace app
 			using Achieve = std::unique_ptr<AchievementBase>;
 
 
+		public:
+			/** ホットリロードのたびに増加するカウンター。各UIメニューが自分の見たバージョンと比較して再初期化する */
+			int GetReloadVersion() const { return m_reloadVersion; }
+
+			/** JSONファイルの変更を検知してリロードする（ポーズ中など Update() が止まる状況でも呼べる） */
+			void CheckHotReload();
+
+
 		private:
-			std::vector<Achieve> m_achievementList; // JSON順を保持
-			std::unordered_map<AchieveKey, AchievementBase*> m_achievementMap; // IDから検索用
+			std::vector<Achieve> m_achievementList;
+			std::unordered_map<AchieveKey, AchievementBase*> m_achievementMap;
+
+			int m_bearKillCount       = 0;
+			int m_whirlpoolCaptureCount = 0;
+
+			std::string m_jsonPath;
+			time_t      m_lastUpdateTime = 0;
+			int         m_reloadVersion  = 0;
 
 
 			/** シングルトン関係 */

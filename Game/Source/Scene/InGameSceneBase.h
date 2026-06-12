@@ -82,6 +82,8 @@ namespace app
 		virtual const char* GetOceanParameterJsonPath() const = 0;
 		/** ログ用ステージ名 ("Tutorial" / "Normal" / "Easy" / "Hard") */
 		virtual const char* GetStageName() const = 0;
+		/** ステージ別アチーブメント定義JSONのパス */
+		virtual const char* GetAchievementJsonPath() const = 0;
 
 		//------------------------------------------------------------
 		// フック（必要なステージだけオーバーライドする）

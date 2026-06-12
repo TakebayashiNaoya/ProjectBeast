@@ -12,6 +12,7 @@
 #include "PenguinStatus.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Achivement/AchievementManager.h"
 #include "Source/Effect/EffectManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Sound/SoundManager.h"
@@ -720,12 +721,14 @@ namespace app
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
 
-			if (auto* lm = GameLogManager::GetInstance())
+			if (auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase()))
 			{
-				if (auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase()))
+				if (ChildPenguinManager::GetInstance()->IsFollower(child))
 				{
-					if (ChildPenguinManager::GetInstance().IsFollower(child))
-						lm->QueueEvent({{"ev", "whirlpool_capture"}, {"penguin_id", child->GetLogId()}});
+					if (auto* lm = GameLogManager::GetInstance())
+						lm->QueueEvent({ {"ev", "whirlpool_capture"}, {"penguin_id", child->GetLogId()} });
+					if (auto* am = app::achievement::AchievementManager::GetInstance())
+						am->AddWhirlpoolCapture();
 				}
 			}
 		}

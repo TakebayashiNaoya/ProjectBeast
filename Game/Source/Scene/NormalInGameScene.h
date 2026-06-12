@@ -52,5 +52,6 @@ namespace app
 		}
 
 		const char* GetStageName() const override { return "Normal"; }
+		const char* GetAchievementJsonPath() const override { return "Assets/parameter/achievement/AchievementList_Normal.json"; }
 	};
 }
