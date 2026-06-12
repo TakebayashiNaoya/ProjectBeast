@@ -55,6 +55,8 @@ namespace app
 
 				m_achievementList.clear();
 				m_achievementMap.clear();
+				// デバッグ専用のホットリロードのため、ゲーム中のカウンタもリセットして
+				// 再読み込みしたアチーブメント定義を最初から評価し直す
 				m_bearKillCount         = 0;
 				m_whirlpoolCaptureCount = 0;
 

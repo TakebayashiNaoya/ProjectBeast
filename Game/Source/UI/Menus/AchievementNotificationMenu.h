@@ -51,8 +51,6 @@ namespace app
 
 			bool m_isPlaying;
 
-			bool m_isInitialized;
-
 			std::unique_ptr<AchievementAnimStatus> m_animStatus;
 
 			std::vector<bool> m_wasAchievedList; // 各アチーブメントの過去の達成状態をメモするリスト

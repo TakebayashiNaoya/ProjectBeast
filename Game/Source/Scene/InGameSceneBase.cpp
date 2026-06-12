@@ -445,13 +445,32 @@ namespace app
 				ResultScene::SetResult(clearTime, rescued);
 
 				/** アチーブメント最終判定（FinalCondition 型を評価） */
+				float logScore = 0.0f;
 				if (auto* am = app::achievement::AchievementManager::GetInstance())
+				{
 					am->FinalizeAchievements();
+
+					// ResultScene::CalcTotalScore() と同じ式でスコアを算出してログに記録する
+					int achievedCount = 0;
+					for (auto* achieve : am->GetAllAchievements())
+					{
+						if (achieve && achieve->IsAchieved()) achievedCount++;
+					}
+					constexpr int   MIN_ACHIEVE_MULTIPLIER  = 1;
+					constexpr float BASE_TIME_MULTIPLIER    = 1.0f;
+					constexpr float SCORE_TIME_DIVISOR      = 100.0f;
+					constexpr float SCORE_BASE_MULTIPLIER   = 100.0f;
+
+					const int   achieveMultiplier = (achievedCount > 0) ? achievedCount : MIN_ACHIEVE_MULTIPLIER;
+					const float timeMultiplier    = BASE_TIME_MULTIPLIER + (clearTime / SCORE_TIME_DIVISOR);
+					logScore = static_cast<float>(rescued) * SCORE_BASE_MULTIPLIER
+						* static_cast<float>(achieveMultiplier) * timeMultiplier;
+				}
 
 				/** ログをファイルへ書き出し */
 				if (auto* lm = GameLogManager::GetInstance())
 				{
-					lm->Flush(GetStageName(), clearTime, rescued, 0.0f);
+					lm->Flush(GetStageName(), clearTime, rescued, logScore);
 					GameLogManager::DestroyInstance();
 				}
 			}

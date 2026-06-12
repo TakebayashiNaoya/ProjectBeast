@@ -60,6 +60,12 @@ namespace app
 			 */
 			AchievementBase* GetAchievement(uint32_t id);
 
+			/** ホットリロードのたびに増加するカウンター。各UIメニューが自分の見たバージョンと比較して再初期化する */
+			int GetReloadVersion() const { return m_reloadVersion; }
+
+			/** JSONファイルの変更を検知してリロードする（ポーズ中など Update() が止まる状況でも呼べる） */
+			void CheckHotReload();
+
 
 		public:
 			AchievementManager();
@@ -76,14 +82,6 @@ namespace app
 
 			using AchieveKey = uint32_t;
 			using Achieve = std::unique_ptr<AchievementBase>;
-
-
-		public:
-			/** ホットリロードのたびに増加するカウンター。各UIメニューが自分の見たバージョンと比較して再初期化する */
-			int GetReloadVersion() const { return m_reloadVersion; }
-
-			/** JSONファイルの変更を検知してリロードする（ポーズ中など Update() が止まる状況でも呼べる） */
-			void CheckHotReload();
 
 
 		private:

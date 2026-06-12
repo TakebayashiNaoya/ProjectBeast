@@ -836,7 +836,8 @@ namespace app
 					if (auto* lm = GameLogManager::GetInstance())
 					{
 						lm->QueueEvent({ {"ev", "bear_attack"}, {"bear_id", bearId}, {"penguin_id", penguinId} });
-						if (enemy->m_foundPenguin->GetStateMachine()->GetChildPenguinStatus()->IsDead())
+						auto* status = enemy->m_foundPenguin->GetStateMachine()->GetChildPenguinStatus();
+						if (status && status->IsDead())
 						{
 							lm->QueueEvent({ {"ev", "bear_kill"}, {"bear_id", bearId}, {"penguin_id", penguinId} });
 							if (auto* am = app::achievement::AchievementManager::GetInstance())

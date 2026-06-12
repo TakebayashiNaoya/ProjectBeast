@@ -30,7 +30,7 @@ namespace app
 		//------------------------------------------------------------
 		// ステージ固有パラメータ
 		//------------------------------------------------------------
-		float GetTimeLimit() const override { return 300.0f; }
+		float GetTimeLimit() const override { return 1.0f; }
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{

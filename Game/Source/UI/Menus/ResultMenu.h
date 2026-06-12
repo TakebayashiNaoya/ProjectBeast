@@ -23,7 +23,7 @@ namespace app
 			float   achieveOffsetXName  =   60.0f;
 			float   achieveOffsetXBack  =   60.0f;
 			float   achieveNameFontSize =    0.5f;
-		float   achieveNamePivotX   =    0.0f;
+			float   achieveNamePivotX   =    0.0f;
 			float   achieveBackW        = 780.0f;
 			float   achieveBackH        = 120.0f;
 			float   achieveBoxW         =  60.0f;

@@ -25,13 +25,13 @@ namespace app
 
 		AchievementNotificationMenu::AchievementNotificationMenu()
 			: m_isPlaying(false)
-			, m_isInitialized(false)
 			, m_animState(AnimState::Idle)
 			, m_animTimer(0.0f)
 			, m_defaultBgPos(Vector3::Zero)
 			, m_defaultCheckPos(Vector3::Zero)
 			, m_defaultStampPos(Vector3::Zero)
 			, m_defaultNameTextPos(Vector3::Zero)
+
 		{
 			m_animStatus = std::make_unique<AchievementAnimStatus>();
 		}
@@ -268,10 +268,9 @@ namespace app
 		{
 			m_notificationQueue = std::queue<NotificationData>();
 			m_wasAchievedList.clear();
-			m_isPlaying  = false;
-			m_isInitialized = false;
-			m_animTimer  = 0.0f;
-			m_animState  = AnimState::Idle;
+			m_isPlaying = false;
+			m_animTimer = 0.0f;
+			m_animState = AnimState::Idle;
 
 			auto* bgIcon    = GetUI<UIIcon>(Hash32("AchieveBackGroundIcon"));
 			auto* checkBox  = GetUI<UIIcon>(Hash32("CheckBoxIcon"));
