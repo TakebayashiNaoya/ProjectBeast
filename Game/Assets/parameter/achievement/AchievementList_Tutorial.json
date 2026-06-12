@@ -1,0 +1,16 @@
+{
+  "AchievementList": {
+    "Achievement": [
+      { "name": "PenguinSerious", "description": "まじめペンギン",    "type": "Event", "spriteIndex": 0, "spriteName": "tutorial_serious"  },
+      { "name": "PenguinClingy",  "description": "甘えん坊ペンギン",  "type": "Event", "spriteIndex": 1, "spriteName": "tutorial_clingy"   },
+      { "name": "PenguinNaughty", "description": "やんちゃペンギン",  "type": "Event", "spriteIndex": 2, "spriteName": "tutorial_naughty"  },
+      { "name": "PenguinClumsy",  "description": "おっちょこちょい",  "type": "Event", "spriteIndex": 3, "spriteName": "tutorial_clumsy"   },
+      { "name": "PenguinCaring",  "description": "世話焼きペンギン",  "type": "Event", "spriteIndex": 4, "spriteName": "tutorial_caring"   },
+      { "name": "Bear",           "description": "シロクマ",          "type": "Event", "spriteIndex": 5, "spriteName": "tutorial_bear"     },
+      { "name": "BearNest",       "description": "シロクマの巣",      "type": "Event", "spriteIndex": 6, "spriteName": "tutorial_bearnest" },
+      { "name": "Igloo",          "description": "かまくら",          "type": "Event", "spriteIndex": 7, "spriteName": "tutorial_igloo"    },
+      { "name": "Ocean",          "description": "海",                "type": "Event", "spriteIndex": 8, "spriteName": "tutorial_ocean"    },
+      { "name": "Whirlpool",      "description": "渦潮",              "type": "Event", "spriteIndex": 9, "spriteName": "tutorial_whirlpool"}
+    ]
+  }
+}
