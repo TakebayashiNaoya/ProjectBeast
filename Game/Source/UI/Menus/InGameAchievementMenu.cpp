@@ -12,6 +12,12 @@ namespace app
 {
 	namespace ui
 	{
+		namespace
+		{
+			constexpr int MAX_ACHIEVEMENT_ROWS = 10;
+		}
+
+
 		InGameAchievementMenu::InGameAchievementMenu()
 		{}
 
@@ -24,34 +30,53 @@ namespace app
 			if (!am) return;
 
 			auto achieveList = am->GetAllAchievements();
-			if (achieveList.empty()) return;
 
-			for (size_t i = 0; i < achieveList.size(); ++i)
+			for (int i = 0; i < MAX_ACHIEVEMENT_ROWS; ++i)
 			{
-				auto* achieve = achieveList[i];
-				if (!achieve) continue;
+				const std::string idxStr    = std::to_string(i);
+				auto* nameText  = GetUI<UIText> (Hash32(("AchieveName_"  + idxStr).c_str()));
+				auto* boxIcon   = GetUI<UIIcon> (Hash32(("AchieveBox_"   + idxStr).c_str()));
+				auto* checkIcon = GetUI<UIIcon> (Hash32(("AchieveCheck_" + idxStr).c_str()));
 
-				// JSONのelementsで定義したキー名でUIを取得する
-				const std::string checkKeyName = "AchieveCheck_" + std::to_string(i);
-				auto* checkIcon = GetUI<UIIcon>(Hash32(checkKeyName.c_str()));
-
-				// 達成済みなら最初から表示、未達成なら非表示
-				if (checkIcon)
+				if (i < static_cast<int>(achieveList.size()))
 				{
-					checkIcon->m_isDraw = achieve->IsAchieved();
-				}
+					auto* achieve = achieveList[i];
+					// JSONのelementsで定義したキー名でUIを取得する
+					if (nameText)
+					{
+						nameText->SetText(achieve->GetDescription());
+						nameText->m_isDraw = true;
+					}
+					if (boxIcon)   boxIcon->m_isDraw   = true;
+					if (checkIcon) checkIcon->m_isDraw = achieve->IsAchieved();
 
-				AchievementUIEntry entry;
-				entry.achieve = achieve;
-				entry.checkIcon = checkIcon;
-				entry.wasAchieved = achieve->IsAchieved();
-				m_entries.push_back(entry);
+					AchievementUIEntry entry;
+					entry.achieve     = achieve;
+					entry.nameText    = nameText;
+					entry.boxIcon     = boxIcon;
+					entry.checkIcon   = checkIcon;
+					entry.wasAchieved = achieve->IsAchieved();
+					m_entries.push_back(entry);
+				}
+				else
+				{
+					if (nameText)  nameText->m_isDraw  = false;
+					if (boxIcon)   boxIcon->m_isDraw   = false;
+					if (checkIcon) checkIcon->m_isDraw = false;
+				}
 			}
 		}
 
 
 		void InGameAchievementMenu::Update()
 		{
+			auto* am = app::achievement::AchievementManager::GetInstance();
+			if (am && am->GetReloadVersion() != m_lastReloadVersion)
+			{
+				m_lastReloadVersion = am->GetReloadVersion();
+				InitializeLogic();
+			}
+
 			// 毎フレーム達成状態を確認し、未達成→達成の瞬間にチェックアイコンを表示する
 			for (auto& entry : m_entries)
 			{

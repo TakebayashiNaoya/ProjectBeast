@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file TutorialInGameScene.h
  * @brief チュートリアルステージ
  * @author 竹林
@@ -30,7 +30,7 @@ namespace app
 		//------------------------------------------------------------
 		// ステージ固有パラメータ
 		//------------------------------------------------------------
-		float GetTimeLimit() const override { return 300.0f; }
+		float GetTimeLimit() const override { return 1.0f; }
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
@@ -61,6 +61,9 @@ namespace app
 		{
 			return "Assets/parameter/nature/oceanParameter_Tutorial.json";
 		}
+
+		const char* GetStageName() const override { return "Tutorial"; }
+		const char* GetAchievementJsonPath() const override { return "Assets/parameter/achievement/AchievementList_Tutorial.json"; }
 
 		//------------------------------------------------------------
 		// フックのオーバーライド

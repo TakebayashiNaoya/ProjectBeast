@@ -79,8 +79,8 @@ using namespace Microsoft::WRL;
 
 const UINT FRAME_BUFFER_W = 1600;	// フレームバッファの幅。
 const UINT FRAME_BUFFER_H = 900;	// フレームバッファの高さ。
-const UINT UI_SPACE_WIDTH = 1920;	// UI空間の幅。
-const UINT UI_SPACE_HEIGHT = 1080;	// UI空間の高さ。
+const UINT UI_SPACE_WIDTH = 1600;	// UI空間の幅。
+const UINT UI_SPACE_HEIGHT = 900;	// UI空間の高さ。
 static const int MAX_BONE = 512;	// ボーンの最大数。
 
 #define USE_FPS_LIMITTER	// 有効でFPSに上限を設ける。

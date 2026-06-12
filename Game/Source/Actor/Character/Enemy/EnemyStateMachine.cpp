@@ -238,5 +238,21 @@ namespace app
 		{
 			return m_owner->GetStatus<EnemyStatus>();
 		}
+
+
+		const char* EnemyStateMachine::GetStateNameForLog() const
+		{
+			if (IsEqualCurrentState(EnemyCoolDownState::ID())) return "Sleep";
+			if (IsEqualCurrentState(EnemyChaseState::ID()))    return "Chase";
+			if (IsEqualCurrentState(EnemyAttackState::ID()))   return "Attack";
+			if (IsEqualCurrentState(EnemyRoarState::ID()))     return "Roar";
+			if (IsEqualCurrentState(EnemyStunState::ID()))     return "Stun";
+			if (IsEqualCurrentState(EnemySearchState::ID()))   return "Search";
+			if (IsEqualCurrentState(EnemyWalkState::ID()))     return "Walk";
+			if (IsEqualCurrentState(EnemySwimState::ID()))     return "Swim";
+			if (IsEqualCurrentState(EnemyJumpState::ID()))     return "Jump";
+			if (IsEqualCurrentState(EnemyReturnHomeState::ID())) return "Return";
+			return "Idle";
+		}
 	}
 }

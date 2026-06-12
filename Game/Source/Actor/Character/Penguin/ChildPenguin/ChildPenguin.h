@@ -46,6 +46,23 @@ namespace app
 			 * @return 子ペンギンのタイプ
 			 */
 			inline EnChildPenguinType GetChildPenguinType() const { return m_type; }
+
+			inline int  GetLogId() const   { return m_logId; }
+			inline void SetLogId(int id)   { m_logId = id;   }
+
+			/** ログ用：タイプ名を文字列で返す */
+			const char* GetChildPenguinTypeStr() const
+			{
+				switch (m_type)
+				{
+				case EnChildPenguinType::Serious: return "Serious";
+				case EnChildPenguinType::Clingy:  return "Clingy";
+				case EnChildPenguinType::Naughty: return "Naughty";
+				case EnChildPenguinType::Clumsy:  return "Clumsy";
+				case EnChildPenguinType::Caring:  return "Caring";
+				default:                          return "Unknown";
+				}
+			}
 			/**
 			 * @brief 目標座標を取得する（AIコントローラーが移動処理に使う）
 			 * @return 目標座標
@@ -105,6 +122,8 @@ namespace app
 			std::unique_ptr<ChildPenguinAIController> m_aiController;
 			/** 子ペンギンのタイプ */
 			EnChildPenguinType m_type = EnChildPenguinType::Serious;
+			/** ログ用の連番ID（ChildPenguinManager が生成順に割り当てる） */
+			int m_logId = -1;
 			/** 陣形における自身の目標座標 */
 			Vector3 m_formationTarget;
 			/** タイプ別乗算カラー */

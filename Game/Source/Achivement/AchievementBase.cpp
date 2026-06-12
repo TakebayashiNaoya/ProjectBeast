@@ -22,13 +22,11 @@ namespace app
 
 		void AchievementBase::InitAchievementBase(const nlohmann::json& json)
 		{
-			m_name = app::util::JsonConverter::ToString(json, "name");
-
-			m_id = Hash32(m_name.c_str());
-
-			m_index = app::util::JsonConverter::ToInt(json, "spriteIndex");
-
-			m_spriteName = app::util::JsonConverter::ToString(json, "spriteName");
+			m_name        = app::util::JsonConverter::ToString(json, "name");
+			m_description = app::util::JsonConverter::ToString(json, "description");
+			m_id          = Hash32(m_name.c_str());
+			m_index       = app::util::JsonConverter::ToInt(json, "spriteIndex", -1);
+			m_spriteName  = app::util::JsonConverter::ToString(json, "spriteName");
 		}
 
 
@@ -181,6 +179,28 @@ namespace app
 			{
 				m_recordValue = value;
 				// 記録が更新された時点で「達成」扱いにする（0以上の記録があるかどうかの判定用）
+				m_isAchieved = true;
+			}
+		}
+
+
+
+
+		/*************************************************/
+
+
+		FinalConditionAchievement::FinalConditionAchievement()
+		{}
+
+
+		FinalConditionAchievement::~FinalConditionAchievement()
+		{}
+
+
+		void FinalConditionAchievement::Finalize()
+		{
+			if (!m_isAchieved && m_conditionFunc && m_conditionFunc())
+			{
 				m_isAchieved = true;
 			}
 		}

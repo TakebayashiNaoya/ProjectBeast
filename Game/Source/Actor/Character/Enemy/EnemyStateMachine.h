@@ -213,6 +213,9 @@ namespace app
 
 			bool IsSwim() const;
 
+			/** ログ用：現在の状態名を返す（EnemyStateMachine.cpp で定義） */
+			const char* GetStateNameForLog() const;
+
 
 		private:
 			// --- マジックナンバー排除用の内部定数 ---
