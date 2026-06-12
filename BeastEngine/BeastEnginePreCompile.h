@@ -20,6 +20,7 @@ using namespace nsK2EngineLow;
 
 #include "Graphics/ModelRender.h"
 #include "Graphics/SpriteRender.h"
+#include "Graphics/Font/SDFFontEngine.h"
 #include "Graphics/FontRender.h"
 
 //#include "Physics/ICollider.h"

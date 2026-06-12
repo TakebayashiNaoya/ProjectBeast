@@ -132,6 +132,9 @@
     <ClCompile Include="Graphics\Video\stb_image_impl.cpp">
       <Filter>Graphics\Video</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Font\SDFFontEngine.cpp">
+      <Filter>Graphics\Font</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BeastEngine.h" />
@@ -295,6 +298,9 @@
     <ClInclude Include="Graphics\Video\VideoRender.h">
       <Filter>Graphics\Video</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Font\SDFFontEngine.h">
+      <Filter>Graphics\Font</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -326,6 +332,9 @@
     </Filter>
     <Filter Include="Graphics\Video">
       <UniqueIdentifier>{2134a0d6-619f-48b1-897b-1aa542ef354b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Font">
+      <UniqueIdentifier>{c7b5324c-c82f-4ed0-a507-5465002ead2c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
