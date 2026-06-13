@@ -50,7 +50,7 @@ namespace app
 			/** ずらす間隔 */
 			constexpr float SWEAT_INTERVAL = 0.3f;
 			/** 秒数判定 */
-			constexpr float LIVELY_INTERVAL = 0.7f;
+			constexpr float LIVELY_INTERVAL = 1.5f;
 
 
 			/** シロクマを起こすための距離 */
@@ -670,6 +670,15 @@ namespace app
 		{}
 
 
+		ClingyChildPenguinAI::~ClingyChildPenguinAI()
+		{
+			if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
+			{
+				EffectManager::Get().StopEffect(m_clingyEffectHandle);
+			}
+		}
+
+
 		void ClingyChildPenguinAI::Update()
 		{
 			if (m_isEnterIglooMode) {
@@ -749,15 +758,16 @@ namespace app
 
 				if (m_isFollowing)
 				{
-					updateClingyEffect();
-				}
-
-				else if (m_isFollowing && distDaddy > m_giveUpDistance)
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
-
-					stopEffect();
+					if (distDaddy > m_giveUpDistance)
+					{
+						manager->RemoveFollower(m_owner);
+						m_isFollowing = false;
+						stopEffect();
+					}
+					else
+					{
+						updateClingyEffect();
+					}
 				}
 
 				if (!m_isFollowing)
@@ -782,6 +792,7 @@ namespace app
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
+				stopEffect();
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
@@ -849,6 +860,12 @@ namespace app
 			const auto& td = GetTypeData(EnChildPenguinType::Naughty);
 			m_roamTriggerDistance = RollRange(td.roamTriggerDistance);
 			m_roamRadius = RollRange(td.roamRadius);
+		}
+
+
+		NaughtyChildPenguinAI::~NaughtyChildPenguinAI()
+		{
+			StopLivelyEffect();
 		}
 
 
@@ -1213,13 +1230,6 @@ namespace app
 
 			if (m_livelyInterval > LIVELY_INTERVAL)
 			{
-				// 古いエフェクトを停止してから新しいものを生成する（取り残し防止）。
-				if (m_livelyEffectHandle != INVALID_EFFECT_HANDLE)
-				{
-					EffectManager::Get().StopEffect(m_livelyEffectHandle);
-					m_livelyEffectHandle = INVALID_EFFECT_HANDLE;
-				}
-
 				const Vector3 effectPos = m_owner->GetTransform().m_position;
 				const Vector3 effectScl = m_owner->GetTransform().m_scale + NAUGHTY_LIVELY_EFFECT_SCALE;
 
@@ -1389,10 +1399,16 @@ namespace app
 
 		CaringChildPenguinAI::CaringChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Caring)
-			, m_caringEffectHandle(INVALID_EFFECT_HANDLE)
+			, m_caringEffectHandles({ INVALID_EFFECT_HANDLE, INVALID_EFFECT_HANDLE, INVALID_EFFECT_HANDLE })
 		{
 			const auto& td = GetTypeData(EnChildPenguinType::Caring);
 			m_interventionRange = td.interventionRange;
+		}
+
+
+		CaringChildPenguinAI::~CaringChildPenguinAI()
+		{
+			StopAllCaringEffects();
 		}
 
 
@@ -1451,8 +1467,7 @@ namespace app
 						manager->UnregisterAssigned(m_interventionTarget);
 						m_interventionTarget = nullptr;
 
-						m_sweatEffectCount = 0;
-						m_sweatEffectCoolTime = 0.0f;
+						StopAllCaringEffects();
 					}
 				}
 				else if (m_interventionTarget != nullptr)
@@ -1584,8 +1599,7 @@ namespace app
 					/** 起き上がり完了 → 介入終了 */
 					manager->UnregisterAssigned(m_interventionTarget);
 					m_interventionTarget = nullptr;
-					m_sweatEffectCount = 0;
-					m_sweatEffectCoolTime = 0.0f;
+					StopAllCaringEffects();
 				}
 			}
 			else if (m_interventionTarget != nullptr &&
@@ -1701,8 +1715,8 @@ namespace app
 			const Vector3 sweatPos = m_owner->GetTransform().m_position + CARING_SWEAT_EFFECT_POSITION;
 			// 汗エフェクトの大きさ。
 			const Vector3 sweatScl = m_owner->GetTransform().m_scale + CARING_SWEAT_EFFECT_SCALE;
-			// 汗エフェクトの再生。
-			m_caringEffectHandle = EffectManager::Get().PlayEffect(
+			// 汗エフェクトの再生。インデックスはカウント増加前の値を使う。
+			m_caringEffectHandles[m_sweatEffectCount] = EffectManager::Get().PlayEffect(
 				EnEffectKind::CaringPenguinSweat
 				, sweatPos
 				, Quaternion::Identity
@@ -1710,13 +1724,28 @@ namespace app
 			);
 			// キャラクターに追従させる。
 			EffectManager::Get().AttachEffect(
-				m_caringEffectHandle,
+				m_caringEffectHandles[m_sweatEffectCount],
 				&m_owner->GetTransform().m_position,
 				CARING_SWEAT_EFFECT_POSITION
 			);
 			// カウントを増やす。
 			m_sweatEffectCount++;
 			// 値のリセット。
+			m_sweatEffectCoolTime = 0.0f;
+		}
+
+
+		void CaringChildPenguinAI::StopAllCaringEffects() const
+		{
+			for (auto& handle : m_caringEffectHandles)
+			{
+				if (handle != INVALID_EFFECT_HANDLE)
+				{
+					EffectManager::Get().StopEffect(handle);
+					handle = INVALID_EFFECT_HANDLE;
+				}
+			}
+			m_sweatEffectCount = 0;
 			m_sweatEffectCoolTime = 0.0f;
 		}
 
