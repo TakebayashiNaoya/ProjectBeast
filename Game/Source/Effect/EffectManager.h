@@ -37,6 +37,10 @@ namespace app
 			nsBeastEngine::BeastEffectEmitter* emitter = nullptr;
 			/** エフェクトの種類（バウンディング半径の参照に使用） */
 			EnEffectKind kind = EnEffectKind::None;
+			/** 追従先の座標ポインタ（nullptrの場合は追従しない） */
+			const Vector3* followTarget = nullptr;
+			/** 追従先からのオフセット */
+			Vector3 followOffset = Vector3::Zero;
 		};
 
 		/** エフェクトインスタンスを保持 */
@@ -90,6 +94,18 @@ namespace app
 			}
 			return nullptr;
 		}
+
+		/**
+		 * @brief エフェクトをキャラクターに追従させる
+		 * @details
+		 *   毎フレーム *target + offset の座標にエフェクト位置を自動更新する。
+		 *   StopEffect() を呼ぶと追従が解除される。
+		 *   target はエフェクト再生中に解放してはいけない（必ず StopEffect() を先に呼ぶこと）。
+		 * @param handle  追従させるエフェクトのハンドル
+		 * @param target  追従先の座標へのポインタ
+		 * @param offset  追従先からのオフセット（省略時はゼロ）
+		 */
+		void AttachEffect(EffectHandle handle, const Vector3* target, const Vector3& offset = Vector3::Zero);
 
 		/**
 		 * @brief ハンドルをm_effectListから除外する
