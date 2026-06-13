@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file TutorialInGameScene.h
  * @brief チュートリアルステージ
  * @author 竹林
@@ -61,6 +61,9 @@ namespace app
 		{
 			return "Assets/parameter/nature/oceanParameter_Tutorial.json";
 		}
+
+		const char* GetStageName() const override { return "Tutorial"; }
+		const char* GetAchievementJsonPath() const override { return "Assets/parameter/achievement/AchievementList_Tutorial.json"; }
 
 		//------------------------------------------------------------
 		// フックのオーバーライド

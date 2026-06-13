@@ -1,0 +1,33 @@
+{
+  "AchievementList": {
+    "Achievement": [
+      {
+        "name": "RescuePenguins10",
+        "description": "集めた子ペンギン：10匹以上",
+        "type": "Condition",
+        "condition": "CheckRescuedCount",
+        "targetValue": 10,
+        "spriteIndex": 0,
+        "spriteName": "penguin_rescue10"
+      },
+      {
+        "name": "WhirlpoolGuardianEasy",
+        "description": "渦潮に飲み込まれた：10回以内",
+        "type": "FinalCondition",
+        "condition": "CheckWhirlpoolCapturesAtMost",
+        "targetValue": 10,
+        "spriteIndex": 1,
+        "spriteName": "whirlpool_guardian_easy"
+      },
+      {
+        "name": "BearProtectorEasy",
+        "description": "シロクマに襲われた：10回以内",
+        "type": "FinalCondition",
+        "condition": "CheckBearKillsAtMost",
+        "targetValue": 10,
+        "spriteIndex": 2,
+        "spriteName": "bear_protector_easy"
+      }
+    ]
+  }
+}

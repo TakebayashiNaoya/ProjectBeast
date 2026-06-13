@@ -4,6 +4,7 @@
  * @author 藤谷、竹林
  */
 #pragma once
+#include <array>
 #include "ChildPenguinTypes.h"
 #include "Source/Effect/EffectManager.h"
 
@@ -265,7 +266,7 @@ namespace app
 
 		public:
 			ClingyChildPenguinAI(ChildPenguin* owner);
-			~ClingyChildPenguinAI() override = default;
+			~ClingyChildPenguinAI() override;
 
 		private:
 			/** 世話焼きペンギンに制止されているかどうか */
@@ -311,7 +312,7 @@ namespace app
 
 		public:
 			NaughtyChildPenguinAI(ChildPenguin* owner);
-			~NaughtyChildPenguinAI() override = default;
+			~NaughtyChildPenguinAI() override;
 
 		private:
 			/**
@@ -403,7 +404,7 @@ namespace app
 
 		public:
 			CaringChildPenguinAI(ChildPenguin* owner);
-			~CaringChildPenguinAI() override = default;
+			~CaringChildPenguinAI() override;
 
 		private:
 			/**
@@ -433,6 +434,11 @@ namespace app
 			 */
 			void PlayCaringEffect() const;
 
+			/**
+			 * @brief 再生中の汗エフェクトをすべて停止し、カウンターをリセットする
+			 */
+			void StopAllCaringEffects() const;
+
 			/** 現在介入中の対象ペンギン */
 			ChildPenguin* m_interventionTarget = nullptr;
 			/**
@@ -444,8 +450,8 @@ namespace app
 			static constexpr float INTERVENTION_REACH_DISTANCE = 25.0f;
 			/** 複数回連続で流すための制御値 */
 			mutable float m_sweatEffectCoolTime = 0.0f;
-			/** 汗エフェクトハンドル */
-			mutable EffectHandle m_caringEffectHandle;
+			/** 汗エフェクトハンドル（MAX_SWEAT_COUNT 本分を保持） */
+			mutable std::array<EffectHandle, 3> m_caringEffectHandles;
 			/** 汗エフェクトの回数制御値 */
 			mutable int m_sweatEffectCount = 0;
 		};

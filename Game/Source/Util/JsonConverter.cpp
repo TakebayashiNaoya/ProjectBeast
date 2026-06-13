@@ -63,7 +63,7 @@ namespace app
 
 		bool JsonConverter::ToBool(const nlohmann::json& json, const char* key, bool invalid)
 		{
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_boolean()) VALUE_DIFFER;
 
 			bool result = json.contains(key) && json[key].is_boolean();
@@ -76,7 +76,7 @@ namespace app
 
 		int JsonConverter::ToInt(const nlohmann::json& json, const char* key, int invalid)
 		{
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_number_integer()) VALUE_DIFFER;
 
 			bool result = json.contains(key) && json[key].is_number_integer();
@@ -89,7 +89,7 @@ namespace app
 
 		uint32_t JsonConverter::ToUInt32(const nlohmann::json& json, const char* key, uint32_t invalid)
 		{
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_number_unsigned()) VALUE_DIFFER;
 
 			bool result = json.contains(key) && json[key].is_number_unsigned();
@@ -102,7 +102,7 @@ namespace app
 
 		float JsonConverter::ToFloat(const nlohmann::json& json, const char* key, float invalid)
 		{
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_number()) VALUE_DIFFER;
 
 			bool result = json.contains(key) && json[key].is_number();
@@ -115,7 +115,7 @@ namespace app
 
 		std::string JsonConverter::ToString(const nlohmann::json& json, const char* key, std::string invalid)
 		{
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_string()) VALUE_DIFFER;
 
 			bool result = json.contains(key) && json[key].is_string();
@@ -128,7 +128,7 @@ namespace app
 
 		Vector2 JsonConverter::ToVector2(const nlohmann::json& json, const char* key, Vector2 invalid)
 		{
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_array() || json[key].size() != 2) VALUE_DIFFER;
 
 			const auto& array = json[key];
@@ -152,7 +152,7 @@ namespace app
 
 		Vector3 JsonConverter::ToVector3(const nlohmann::json& json, const char* key, bool isScale, Vector3 invalid)
 		{
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_array() || json[key].size() != 3) VALUE_DIFFER;
 
 			const auto& array = json[key];
@@ -198,13 +198,13 @@ namespace app
 		}
 
 
-		Vector4 JsonConverter::ToVector4(const nlohmann::json& json, const char* key, bool isConvert)
+		Vector4 JsonConverter::ToVector4(const nlohmann::json& json, const char* key, bool isConvert, Vector4 invalid)
 		{
 			constexpr float minValue = 0.0f;
 			constexpr float maxValue = 1.0f;
 			constexpr float convertValue = 255.0f;
 
-			if (!json.contains(key)) NO_CONTAINS;
+			if (!json.contains(key)) return invalid;
 			if (!json[key].is_array() || json[key].size() != 4) VALUE_DIFFER;
 
 			const auto& array = json[key];

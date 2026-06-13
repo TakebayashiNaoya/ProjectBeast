@@ -51,6 +51,12 @@ namespace app
 				continue;
 			}
 
+			// 追従処理：followTarget が設定されている場合、毎フレーム位置を同期する
+			if (it->second.followTarget != nullptr)
+			{
+				emitter->SetPosition(*it->second.followTarget + it->second.followOffset);
+			}
+
 			// フラスタムカリング判定
 			// エフェクト種別の基準半径にスケールの最大成分を乗算して実効半径を求める
 			const uint8_t kindIndex = static_cast<uint8_t>(it->second.kind);
@@ -93,11 +99,24 @@ namespace app
 
 	void EffectManager::StopEffect(const EffectHandle handle)
 	{
-		auto* emitter = FindEffect(handle);
-		if (emitter == nullptr) {
+		auto it = m_effectList.find(handle);
+		if (it == m_effectList.end() || it->second.emitter == nullptr) {
 			return;
 		}
-		emitter->Stop();
+		// ダングリングポインタアクセスを防ぐため、停止前に追従を解除する
+		it->second.followTarget = nullptr;
+		it->second.emitter->Stop();
+	}
+
+
+	void EffectManager::AttachEffect(const EffectHandle handle, const Vector3* target, const Vector3& offset)
+	{
+		auto it = m_effectList.find(handle);
+		if (it == m_effectList.end()) {
+			return;
+		}
+		it->second.followTarget = target;
+		it->second.followOffset = offset;
 	}
 
 

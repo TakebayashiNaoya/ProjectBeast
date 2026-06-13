@@ -2,157 +2,56 @@
   "canvas": {
     "elements": [
       {
-        "type":"UIIcon",
-        "name":"AchieveBackGroundIcon",
-        "asset":"Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.dds",
-        "width":420,
-        "height":250,
-        "position":[ 580, 240, 0],
-        "scale":[ 1, 1, 1],
-        "rotation":0,
-        "color":[ 255, 255, 255, 120]
-      },
-      {
         "type": "UIIcon",
-        "name": "AchieveName_0",
-        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/penguin_rescue50.DDS",
-        "width": 400.0,
-        "height": 40.0,
-        "position": [650.0, 340.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveBox_0",
-        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 340.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveCheck_0",
-        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 340.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
+        "name": "AchieveBackGroundIcon",
+        "asset": "Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.dds",
+        "width": 450,
+        "height": 550,
+        "position": [570, 70, 0],
+        "scale": [1, 1, 1],
+        "rotation": 0,
+        "color": [255, 255, 255, 100]
       },
 
+      { "type": "UIText",  "name": "AchieveName_0",  "text": "", "fontSize": 0.5, "position": [430, 300, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_0",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, 300, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_0", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, 300, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
 
+      { "type": "UIText",  "name": "AchieveName_1",  "text": "", "fontSize": 0.5, "position": [430, 250, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_1",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, 250, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_1", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, 250, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
 
-      {
-        "type": "UIIcon",
-        "name": "AchieveName_1",
-        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_chase_2.DDS",
-        "width": 400.0,
-        "height": 40.0,
-        "position": [650.0, 280.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveBox_1",
-        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 280.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveCheck_1",
-        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 280.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
+      { "type": "UIText",  "name": "AchieveName_2",  "text": "", "fontSize": 0.5, "position": [430, 200, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_2",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, 200, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_2", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, 200, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
 
+      { "type": "UIText",  "name": "AchieveName_3",  "text": "", "fontSize": 0.5, "position": [430, 150, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_3",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, 150, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_3", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, 150, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
 
+      { "type": "UIText",  "name": "AchieveName_4",  "text": "", "fontSize": 0.5, "position": [430, 100, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_4",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, 100, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_4", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, 100, 0], "scale": [1,1,1], "rotation": 0,"color": [255,255,255,255] },
 
-      {
-        "type": "UIIcon",
-        "name": "AchieveName_2",
-        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_chase_all.DDS",
-        "width": 400.0,
-        "height": 40.0,
-        "position": [650.0, 220.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveBox_2",
-        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 220.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveCheck_2",
-        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 220.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
+      { "type": "UIText",  "name": "AchieveName_5",  "text": "", "fontSize": 0.5, "position": [430, 50, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_5",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, 50, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_5", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, 50, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
 
+      { "type": "UIText",  "name": "AchieveName_6",  "text": "", "fontSize": 0.5, "position": [430, 0, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_6",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, 0, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_6", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, 0, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
 
+      { "type": "UIText",  "name": "AchieveName_7",  "text": "", "fontSize": 0.5, "position": [430, -50, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_7",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, -50, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_7", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, -50, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
 
-      {
-        "type": "UIIcon",
-        "name": "AchieveName_3",
-        "asset": "Assets/spriteData/UI/Achievement/AchieveName_/bear_wakeup.DDS",
-        "width": 400.0,
-        "height": 40.0,
-        "position": [650.0, 160.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveBox_3",
-        "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 160.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      },
-      {
-        "type": "UIIcon",
-        "name": "AchieveCheck_3",
-        "asset": "Assets/spriteData/UI/Achievement/check.DDS",
-        "width": 40.0,
-        "height": 40.0,
-        "position": [420.0, 160.0, 0.0],
-        "scale": [1.0, 1.0, 1.0],
-        "rotation": 0.0,
-        "color": [255, 255, 255, 255]
-      }
+      { "type": "UIText",  "name": "AchieveName_8",  "text": "", "fontSize": 0.5, "position": [430, -100, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_8",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, -100, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_8", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, -100, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+
+      { "type": "UIText",  "name": "AchieveName_9",  "text": "", "fontSize": 0.5, "position": [430, -150, 0], "color": [255, 255, 255, 255], "pivot": [0.0, 0.5] },
+      { "type": "UIIcon",  "name": "AchieveBox_9",   "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS", "width": 40, "height": 40, "position": [400, -150, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] },
+      { "type": "UIIcon",  "name": "AchieveCheck_9", "asset": "Assets/spriteData/UI/Achievement/check.DDS",    "width": 40, "height": 40, "position": [400, -150, 0], "scale": [1,1,1], "rotation": 0, "color": [255,255,255,255] }
     ]
   }
 }

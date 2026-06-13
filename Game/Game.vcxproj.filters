@@ -106,6 +106,9 @@
     <Filter Include="Source\UI\StageSelect">
       <UniqueIdentifier>{0e8316af-6b6d-4fd9-82de-016416ea7344}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GameLog">
+      <UniqueIdentifier>{9ed61377-067e-46fb-b431-ad3cf0abcdde}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -510,6 +513,9 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameLog\GameLogManager.cpp">
+      <Filter>Source\GameLog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -944,6 +950,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h">
       <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameLog\GameLogManager.h">
+      <Filter>Source\GameLog</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

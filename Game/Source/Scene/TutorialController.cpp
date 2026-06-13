@@ -17,11 +17,18 @@
 #include "Source/Nature/Whirlpool.h"
 
 #include "Graphics/Camera/CameraSystem.h"
+#include "Source/Achivement/AchievementManager.h"
 
 
 namespace app
 {
 	// ---------- 静的メンバー定義 ----------
+
+	static constexpr const char* TUTORIAL_STEP_NAMES[] = {
+		"PenguinSerious", "PenguinClingy", "PenguinNaughty", "PenguinClumsy",
+		"PenguinCaring",  "Bear",          "BearNest",        "Igloo",
+		"Ocean",          "Whirlpool"
+	};
 
 	const char* const TutorialController::WINDOW_JSON_PATHS[TARGET_COUNT] =
 	{
@@ -158,6 +165,14 @@ namespace app
 		{
 			m_completed[m_currentTargetIdx] = true;
 			m_isWindowOpen = false;
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
+			if (auto* am = app::achievement::AchievementManager::GetInstance())
+			{
+				auto* base = am->GetAchievement(Hash32(TUTORIAL_STEP_NAMES[m_currentTargetIdx]));
+				if (auto* ev = dynamic_cast<app::achievement::EventAchievement*>(base))
+					ev->Unlock();
+			}
 
 			if (!m_queue.empty())
 				TryOpenNextWindow();
@@ -265,6 +280,14 @@ namespace app
 		{
 			// Layout 初期化失敗（JSON 欠損など） — エントリをスキップして完了済みにする
 			m_completed[m_currentTargetIdx] = true;
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
+			if (auto* am = app::achievement::AchievementManager::GetInstance())
+			{
+				auto* base = am->GetAchievement(Hash32(TUTORIAL_STEP_NAMES[m_currentTargetIdx]));
+				if (auto* ev = dynamic_cast<app::achievement::EventAchievement*>(base))
+					ev->Unlock();
+			}
 		}
 	}
 }

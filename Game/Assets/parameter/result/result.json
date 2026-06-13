@@ -40,7 +40,7 @@
                 "asset": "Assets/spriteData/UI/TextSprite/Result/TotalUI.DDS",
                 "width": 640,
                 "height": 360,
-                "position": [13, -275, 0],
+                "position": [460, 0, 0],
                 "scale": [1, 1, 1],
                 "rotation": 0,
                 "color": [255, 255, 255, 255]
@@ -57,5 +57,31 @@
                 "color": [255, 255, 255, 255]
             }
         ]
+    },
+    "dynamic_layout": {
+        "achieve_start_pos":      [-300, 150, 0],
+        "achieve_offset_y":       -80,
+        "achieve_offset_x_check": -400,
+        "achieve_offset_x_name":   60,
+        "achieve_offset_x_back":   60,
+        "achieve_name_font_size":   0.6,
+        "achieve_name_pivot_x":     0.5,
+        "achieve_back_w":  780,
+        "achieve_back_h":  120,
+        "achieve_box_w":    60,
+        "achieve_box_h":    60,
+        "achieve_check_w":  60,
+        "achieve_check_h":  60,
+        "top_digit_w":      64,
+        "top_digit_h":      80,
+        "time_colon_w":     15,
+        "time_colon_h":     50,
+        "time_digit_center_x":  -320,
+        "score_digit_center_x":  320,
+        "top_digit_y":       280,
+        "total_digit_w":     80,
+        "total_digit_h":    100,
+        "total_digit_center_x": 450,
+        "total_digit_y":      -20
     }
 }

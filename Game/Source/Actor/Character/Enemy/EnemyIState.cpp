@@ -553,6 +553,9 @@ namespace app
 			{
 				mutableStatus->FullRecoverStamina();
 			}
+
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "bear_sleep_start"}, {"bear_id", m_owner->GetOwner()->GetLogId()}});
 		}
 
 
@@ -610,6 +613,9 @@ namespace app
 		void EnemyCoolDownState::Exit()
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
+
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "bear_sleep_end"}, {"bear_id", m_owner->GetOwner()->GetLogId()}, {"woken_by_noise", m_owner->IsSearch()}});
 		}
 
 
