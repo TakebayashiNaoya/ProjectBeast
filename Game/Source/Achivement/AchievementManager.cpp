@@ -27,7 +27,9 @@ namespace app
 		void AchievementManager::Start(const char* jsonPath)
 		{
 			m_jsonPath = jsonPath;
+#ifdef APP_DEBUG
 			m_lastUpdateTime = app::util::JsonConverter::GetFileLastWriteTime(jsonPath);
+#endif
 
 			nlohmann::json json;
 			// JSONの読み込みを試す
