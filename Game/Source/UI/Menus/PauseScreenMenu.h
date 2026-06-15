@@ -30,13 +30,13 @@ namespace app
 		public:
 			PauseScreenIcon(PauseScreenType type);
 			~PauseScreenIcon();
-			void SetUIIcon(UIIcon* icon);
+			void SetUIText(UIText* text);
 			void UpdateSelect(PauseScreenType currentType);
 
 
 		private:
 			PauseScreenType m_type;
-			UIIcon* m_icon;
+			UIText* m_text;
 			GamePad* m_gamePad;
 		};
 

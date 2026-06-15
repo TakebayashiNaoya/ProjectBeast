@@ -516,8 +516,7 @@ namespace app
 			auto* pauseMenu = uiMngr->GetPauseMenu();
 			if (!pauseMenu) break;
 
-			pauseMenu->Update();
-			pauseMenu->EnterType();
+			uiMngr->UpdatePause();
 
 			/** ゲームに戻る */
 			if (pauseMenu->IsRetry())

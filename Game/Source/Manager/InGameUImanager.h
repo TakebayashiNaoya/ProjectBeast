@@ -84,6 +84,12 @@ namespace app
 		void UpdateAchievementHotReload();
 
 		/**
+		 * @brief ポーズフェーズの更新（ホットリロード対応）
+		 * @detail Layout::Update() を経由することでJSONのホットリロードを有効にする
+		 */
+		void UpdatePause();
+
+		/**
 		 * @brief カウントダウンフェーズの描画
 		 * @param rc レンダーコンテキスト
 		 */

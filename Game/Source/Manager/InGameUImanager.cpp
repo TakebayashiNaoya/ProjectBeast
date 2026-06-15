@@ -280,6 +280,12 @@ namespace app
 	}
 
 
+	void InGameUIManager::UpdatePause()
+	{
+		if (m_pausePacket) m_pausePacket->Update();
+	}
+
+
 	//============================================//
 	// 描画処理
 	//============================================//
