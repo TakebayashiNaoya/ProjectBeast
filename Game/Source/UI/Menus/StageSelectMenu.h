@@ -11,10 +11,6 @@ namespace app
 {
 	namespace ui
 	{
-		/** 前方宣言 */
-		class StageSelectStatus;
-
-
 		/**
 		 * @brief ステージ選択肢の列挙体
 		 * @detail もどる、イージー、ノーマル、ハード
@@ -117,8 +113,8 @@ namespace app
 			/** ステージ選択肢のデータ構造体 */
 			struct StageChoicesData
 			{
-				/** テキストアイコン */
-				UIIcon* m_textIcon;
+				/** テキスト */
+				UIText* m_text;
 				/** バブルアイコン */
 				UIIcon* m_bubbleIcon;
 
@@ -138,8 +134,8 @@ namespace app
 			{
 				/** ボタンアイコン */
 				UIIcon* m_button;
-				/** テキストアイコン */
-				UIIcon* m_textIcon;
+				/** テキスト */
+				UIText* m_text;
 
 
 				StageButtonData();
@@ -148,8 +144,6 @@ namespace app
 
 
 		private:
-			/** ステージ選択のステータス */
-			std::unique_ptr<StageSelectStatus> m_status;
 			/** ステージ選択状態 */
 			EnStageSelectState m_state;
 			/** 選択中のステージ選択肢 */
@@ -158,8 +152,8 @@ namespace app
 
 			/** 背景アイコン */
 			UIIcon* m_bgIcon;
-			/** "ステージセレクト"のアイコン */
-			UIIcon* m_stageSelectTextIcon;
+			/** "ステージセレクト"のテキスト */
+			UIText* m_stageSelectText;
 			/** "ステージセレクト"の背景アイコン */
 			UIIcon* m_stageSelectTextBGIcon;
 

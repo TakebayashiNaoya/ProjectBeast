@@ -19,21 +19,22 @@
                 "asset" : "Assets/spriteData/UI/Icon/BGIcon.dds",
                 "width" : 550,
                 "height" : 70,
-                "position" : [0, 0, 0],
+                "position" : [-500, 400, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
-                "color" : [255, 255, 255, 255]
+                "color" : [128, 128, 128, 225]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"StageSelectText",
-                "asset":"Assets/spriteData/UI/StageSelect/StageSelectText.dds",
-                "width": 400,
-                "height": 50,
-                "position":[0, 0, 0],
-                "scale":[1,1,1],
+                "text":"ステージセレクト",
+                "fontSize":1.0,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[-500, 400, 0],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
             },
 
 
@@ -43,7 +44,7 @@
                 "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
                 "width" : 280,
                 "height" : 100,
-                "position" : [0, 0, 0],
+                "position" : [-450, -280, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
@@ -54,7 +55,7 @@
                 "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
                 "width" : 280,
                 "height" : 100,
-                "position" : [0, 0, 0],
+                "position" : [-150, -280, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
@@ -65,7 +66,7 @@
                 "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
                 "width" : 280,
                 "height" : 100,
-                "position" : [0, 0, 0],
+                "position" : [150, -280, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
@@ -76,7 +77,7 @@
                 "asset" : "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
                 "width" : 280,
                 "height" : 100,
-                "position" : [0, 0, 0],
+                "position" : [450, -280, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
@@ -89,7 +90,7 @@
                 "asset" : "Assets/spriteData/UI/Frame/FrameBackGround.dds",
                 "width" : 293,
                 "height" : 113,
-                "position" : [0, 0, 0],
+                "position" : [-450, -280, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
@@ -100,7 +101,7 @@
                 "asset" : "Assets/spriteData/UI/Frame/Frame.dds",
                 "width" : 296,
                 "height" : 116,
-                "position" : [0, 0, 0],
+                "position" : [-450, -280, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
@@ -108,50 +109,53 @@
 
 
             {
-                "type" : "UIIcon",
+                "type" : "UIText",
                 "name" : "TutorialText",
-                "asset" : "Assets/spriteData/UI/StageSelect/TutorialText.dds",
-                "width": 180,
-                "height":80,
-                "position" : [0, 0, 0],
-                "scale" : [1, 1, 1],
+                "text" : "チュートリアル",
+                "fontSize" : 1.0,
+                "fontScaleX" : 0.7,
+                "fontScaleY" : 1.0,
+                "position" : [-450, -280, 0],
                 "rotation" : 0,
-                "color" : [255, 255, 255, 255]
+                "color" : [0, 0, 0, 255],
+                "pivot" : [0.5, 0.5]
             },
             {
-                "type":"UIIcon",
-                "name":"EasyText",
-                "asset":"Assets/spriteData/UI/StageSelect/EasyText.dds",
-                "width": 180,
-                "height":80,
-                "position":[0,0,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
-            },            
-            {
-                "type":"UIIcon",
-                "name":"NormalText",
-                "asset":"Assets/spriteData/UI/StageSelect/NormalText.dds",
-                "width": 180,
-                "height":80,
-                "position":[0,0,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
+                "type" : "UIText",
+                "name" : "EasyText",
+                "text" : "かんたん",
+                "fontSize" : 1.0,
+                "fontScaleX" : 1.0,
+                "fontScaleY" : 1.0,
+                "position" : [-150, -280, 0],
+                "rotation" : 0,
+                "color" : [0, 0, 0, 255],
+                "pivot" : [0.5, 0.5]
             },
             {
-                "type":"UIIcon",
-                "name":"HardText",
-                "asset":"Assets/spriteData/UI/StageSelect/HardText.dds",
-                "width": 180,
-                "height":80,
-                "position":[0,0,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
+                "type" : "UIText",
+                "name" : "NormalText",
+                "text" : "ふつう",
+                "fontSize" : 1.0,
+                "fontScaleX" : 1.0,
+                "fontScaleY" : 1.0,
+                "position" : [150, -280, 0],
+                "rotation" : 0,
+                "color" : [0, 0, 0, 255],
+                "pivot" : [0.5, 0.5]
             },
-
+            {
+                "type" : "UIText",
+                "name" : "HardText",
+                "text" : "むずかしい",
+                "fontSize" : 1.0,
+                "fontScaleX" : 1.0,
+                "fontScaleY" : 1.0,
+                "position" : [450, -280, 0],
+                "rotation" : 0,
+                "color" : [0, 0, 0, 255],
+                "pivot" : [0.5, 0.5]
+            },
 
 
             {
@@ -160,32 +164,10 @@
                 "asset" : "Assets/spriteData/UI/Icon/BGIcon.dds",
                 "width" : 530,
                 "height" : 90,
-                "position" : [0, 0, 0],
+                "position" : [530, -400, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
-                "color" : [255, 255, 255, 255]
-            },
-            {
-                "type" : "UIIcon",
-                "name" : "BackButton",
-                "asset" : "Assets/spriteData/UI/icon/ButtonIcon/xbox_button_color_b.dds",
-                "width" : 50,
-                "height" : 50,
-                "position" : [0, 0, 0],
-                "scale" : [1, 1, 1],
-                "rotation" : 0,
-                "color" : [255, 255, 255, 255]
-            },
-            {
-                "type" : "UIIcon",
-                "name" : "BackText",
-                "asset" : "Assets/spriteData/UI/StageSelect/BackText.dds",
-                "width" : 80,
-                "height" : 60,
-                "position" : [0, 0, 0],
-                "scale" : [1, 1, 1],
-                "rotation" : 0,
-                "color" : [255, 255, 255, 255]
+                "color" : [128, 128, 128, 225]
             },
             {
                 "type" : "UIIcon",
@@ -193,21 +175,22 @@
                 "asset" : "Assets/spriteData/UI/icon/ButtonIcon/xbox_stick_l_horizontal.dds",
                 "width" : 50,
                 "height" : 50,
-                "position" : [0, 0, 0],
+                "position" : [320, -400, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
             },
             {
-                "type" : "UIIcon",
+                "type" : "UIText",
                 "name" : "SelectText",
-                "asset" : "Assets/spriteData/UI/StageSelect/SelectText.dds",
-                "width" : 80,
-                "height" : 60,
-                "position" : [0, 0, 0],
-                "scale" : [1, 1, 1],
+                "text" : "えらぶ",
+                "fontSize" : 0.6,
+                "fontScaleX" : 1.0,
+                "fontScaleY" : 1.0,
+                "position" : [345, -400, 0],
                 "rotation" : 0,
-                "color" : [255, 255, 255, 255]
+                "color" : [255, 255, 255, 255],
+                "pivot" : [0.0, 0.5]
             },
             {
                 "type" : "UIIcon",
@@ -215,21 +198,45 @@
                 "asset" : "Assets/spriteData/UI/icon/ButtonIcon/xbox_button_color_a.dds",
                 "width" : 50,
                 "height" : 50,
-                "position" : [0, 0, 0],
+                "position" : [470, -400, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
             },
             {
-                "type" : "UIIcon",
+                "type" : "UIText",
                 "name" : "DecideText",
-                "asset" : "Assets/spriteData/UI/StageSelect/decideText.dds",
-                "width" : 80,
-                "height" : 60,
-                "position" : [0, 0, 0],
+                "text" : "けってい",
+                "fontSize" : 0.6,
+                "fontScaleX" : 1.0,
+                "fontScaleY" : 1.0,
+                "position" : [495, -400, 0],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255],
+                "pivot" : [0.0, 0.5]
+            },
+            {
+                "type" : "UIIcon",
+                "name" : "BackButton",
+                "asset" : "Assets/spriteData/UI/icon/ButtonIcon/xbox_button_color_b.dds",
+                "width" : 50,
+                "height" : 50,
+                "position" : [650, -400, 0],
                 "scale" : [1, 1, 1],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
+            },
+            {
+                "type" : "UIText",
+                "name" : "BackText",
+                "text" : "もどる",
+                "fontSize" : 0.6,
+                "fontScaleX" : 1.0,
+                "fontScaleY" : 1.0,
+                "position" : [675, -400, 0],
+                "rotation" : 0,
+                "color" : [255, 255, 255, 255],
+                "pivot" : [0.0, 0.5]
             }
         ]
     }

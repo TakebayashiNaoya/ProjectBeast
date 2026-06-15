@@ -6,9 +6,7 @@
 #include "stdafx.h"
 #include "StageSelectMenu.h"
 
-#include "StageSelectStatus.h"
-
-#include "Source/UI/Animation/UIAnimationParameter.h"
+#include "Source/UI/Animation/UIAnimation.h"
 
 
 namespace app
@@ -32,10 +30,16 @@ namespace app
 				"Select",
 			};
 
-			/** アニメーションパラメーターのパス */
-			constexpr const char* ANIMATION_PARAMETER_PATH = "Assets/parameter/UI/stageSelect/StageSelectAnimationParameter.json";
 			/** 選択中のアニメーションのキー */
 			constexpr uint32_t SELECTING_CURSOR_ANIMATION_KEY = Hash32("SelectingBlinking");
+
+			constexpr float INPUT_INTERVAL  = 0.2f;
+			constexpr float INPUT_THRESHOLD = 0.5f;
+
+			/** カーソル点滅アニメーションのパラメーター */
+			const Vector4 CURSOR_BLINK_START    = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+			const Vector4 CURSOR_BLINK_END      = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+			constexpr float CURSOR_BLINK_DURATION = 0.5f;
 		}
 
 
@@ -43,7 +47,7 @@ namespace app
 
 		/************************************************************************************/
 		StageSelectMenu::StageChoicesData::StageChoicesData()
-			: m_textIcon(nullptr)
+			: m_text(nullptr)
 			, m_bubbleIcon(nullptr)
 		{}
 
@@ -54,7 +58,7 @@ namespace app
 
 		StageSelectMenu::StageButtonData::StageButtonData()
 			: m_button(nullptr)
-			, m_textIcon(nullptr)
+			, m_text(nullptr)
 		{}
 
 
@@ -64,11 +68,10 @@ namespace app
 
 
 		StageSelectMenu::StageSelectMenu()
-			: m_status(nullptr)
-			, m_state(EnStageSelectState::Selecting)
+			: m_state(EnStageSelectState::Selecting)
 			, m_selectingStage(EnStageChoices::Tutorial)
 			, m_bgIcon(nullptr)
-			, m_stageSelectTextIcon(nullptr)
+			, m_stageSelectText(nullptr)
 			, m_stageSelectTextBGIcon(nullptr)
 			, m_choices()
 			, m_buttons()
@@ -86,18 +89,30 @@ namespace app
 
 		void StageSelectMenu::InitializeLogic()
 		{
-			m_status.reset();
-			m_status = std::make_unique<StageSelectStatus>();
-			m_status->SetUp();
-
-			K2_ASSERT(m_status.get(), "ステータス生成失敗です。");
+			// Reload後に古いポインタが残らないようリセット
+			m_bgIcon = nullptr;
+			m_stageSelectText = nullptr;
+			m_stageSelectTextBGIcon = nullptr;
+			m_buttonBGIcon = nullptr;
+			m_cursorFrame = nullptr;
+			m_cursorFrameBG = nullptr;
+			for (auto& choice : m_choices)
+			{
+				choice.m_text = nullptr;
+				choice.m_bubbleIcon = nullptr;
+			}
+			for (auto& button : m_buttons)
+			{
+				button.m_button = nullptr;
+				button.m_text = nullptr;
+			}
 
 			// パーツを取得
 			GetUIParts();
 
-			std::vector<UIIcon*> icons = {
+			std::vector<UIBase*> icons = {
 				m_bgIcon,
-				m_stageSelectTextIcon,
+				m_stageSelectText,
 				m_stageSelectTextBGIcon,
 				m_cursorFrame,
 				m_cursorFrameBG,
@@ -106,14 +121,14 @@ namespace app
 
 			for (auto& choice : m_choices)
 			{
-				icons.push_back(choice.m_textIcon);
+				icons.push_back(choice.m_text);
 				icons.push_back(choice.m_bubbleIcon);
 			}
 
 			for (auto& button : m_buttons)
 			{
 				icons.push_back(button.m_button);
-				icons.push_back(button.m_textIcon);
+				icons.push_back(button.m_text);
 			}
 
 			for (const auto& icon : icons)
@@ -123,18 +138,11 @@ namespace app
 				icon->m_isDraw = false;
 			}
 
-			UIAnimationParameter::Get().Load(ANIMATION_PARAMETER_PATH);
 		}
 
 
 		void StageSelectMenu::Update()
 		{
-			if (!m_status->IsSetUp())
-			{
-				m_status->SetUp();
-				return;
-			}
-
 			// ステージ選択状態によって処理を分ける
 			switch (m_state)
 			{
@@ -205,24 +213,19 @@ namespace app
 				}
 			}
 
-			// 入力のインターバル
-			const float inputInterval = m_status->GetInputInterval();
-			// スティックの閾値
-			const float inputThreshold = m_status->GetInputThreshold();
-			// スティックの入力値
 			const float stickLXF = g_pad[0]->GetLStickXF();
 
 			// 左にスティックを倒した場合
 			const auto current = static_cast<uint8_t>(m_selectingStage);
 			const auto max = static_cast<uint8_t>(EnStageChoices::Max);
-			if (stickLXF < -inputThreshold && current > 0)
+			if (stickLXF < -INPUT_THRESHOLD && current > 0)
 			{
-				m_selectInputInterval = inputInterval;
+				m_selectInputInterval = INPUT_INTERVAL;
 				m_selectingStage = static_cast<EnStageChoices>(current - 1);
 			}
-			else if (stickLXF > inputThreshold && current < max - 1)
+			else if (stickLXF > INPUT_THRESHOLD && current < max - 1)
 			{
-				m_selectInputInterval = inputInterval;
+				m_selectInputInterval = INPUT_INTERVAL;
 				m_selectingStage = static_cast<EnStageChoices>(current + 1);
 			}
 		}
@@ -240,19 +243,19 @@ namespace app
 		void StageSelectMenu::UpdateDrawFlag()
 		{
 			m_bgIcon->SetIsDraw(true);
-			m_stageSelectTextIcon->SetIsDraw(true);
+			m_stageSelectText->SetIsDraw(true);
 			m_stageSelectTextBGIcon->SetIsDraw(true);
 
 			for (auto& it : m_choices)
 			{
-				it.m_textIcon->SetIsDraw(true);
+				it.m_text->SetIsDraw(true);
 				it.m_bubbleIcon->SetIsDraw(true);
 			}
 
 			for (auto& it : m_buttons)
 			{
 				it.m_button->SetIsDraw(true);
-				it.m_textIcon->SetIsDraw(true);
+				it.m_text->SetIsDraw(true);
 			}
 
 			m_buttonBGIcon->SetIsDraw(true);
@@ -264,53 +267,9 @@ namespace app
 
 		void StageSelectMenu::UpdateIcons()
 		{
-			const auto textBGColor = m_status->GetTextBGColor();
-
-			const auto textPosition = m_status->GetStageSelectPosition();
-			m_stageSelectTextIcon->m_transform.m_localTransform.m_position = textPosition;
-			m_stageSelectTextBGIcon->m_transform.m_localTransform.m_position = textPosition;
-			m_stageSelectTextBGIcon->m_color = textBGColor;
-
-
-			m_buttonBGIcon->m_transform.m_localTransform.m_position = m_status->GetButtonBGPosition();
-			m_buttonBGIcon->m_color = textBGColor;
-
-
-			// 選択肢の位置と色を更新
-			for (uint8_t i = 0; i < m_choices.size(); ++i)
-			{
-				auto& it = m_choices.at(i);
-
-				const auto x = m_status->GetChoicePositionX(static_cast<EnStageChoices>(i));
-				const auto y = m_status->GetChoicesYOffset();
-				const Vector3 position = Vector3(x, y, 0.0f);
-
-				const auto color = m_status->GetChoicesTextColor();
-				it.m_textIcon->m_transform.m_localTransform.m_position = position;
-				it.m_textIcon->m_color = color;
-
-				it.m_bubbleIcon->m_transform.m_localTransform.m_position = position;
-			}
-
-
-			// ボタンの位置を更新
-			for (uint8_t i = 0; i < m_buttons.size(); ++i)
-			{
-				auto& it = m_buttons.at(i);
-				const auto x = m_status->GetButtonPositionX(static_cast<EnStageButtonTypes>(i));
-				const auto y = m_status->GetButtonYOffset();
-				const Vector3 iconPosition = Vector3(x, y, 0.0f);
-				const Vector3 textPosition = Vector3(x + m_status->GetButtonXOffset(), y, 0.0f);
-				it.m_button->m_transform.m_localTransform.m_position = iconPosition;
-				it.m_textIcon->m_transform.m_localTransform.m_position = textPosition;
-			}
-
-
-			// カーソルの位置を更新
-
-			const auto x = m_status->GetChoicePositionX(m_selectingStage);
-			const auto y = m_status->GetChoicesYOffset();
-			const Vector3 position = Vector3(x, y, 0.0f);
+			// カーソルの位置を選択中のバブルに合わせる
+			const auto& selected = m_choices.at(static_cast<uint8_t>(m_selectingStage));
+			const Vector3 position = selected.m_bubbleIcon->m_transform.m_localTransform.m_position;
 			m_cursorFrame->m_transform.m_localTransform.m_position = position;
 			m_cursorFrameBG->m_transform.m_localTransform.m_position = position;
 		}
@@ -321,7 +280,7 @@ namespace app
 			// すでに取得している場合は取得しない
 
 			if (!m_bgIcon) m_bgIcon = GetUI<UIIcon>(Hash32("BG"));
-			if (!m_stageSelectTextIcon) m_stageSelectTextIcon = GetUI<UIIcon>(Hash32("StageSelectText"));
+			if (!m_stageSelectText) m_stageSelectText = GetUI<UIText>(Hash32("StageSelectText"));
 			if (!m_stageSelectTextBGIcon) m_stageSelectTextBGIcon = GetUI<UIIcon>(Hash32("StageSelectBG"));
 
 
@@ -330,7 +289,7 @@ namespace app
 				auto& it = m_choices.at(i);
 				const auto textKey = CHOICES_NAME.at(i) + "Text";
 				const auto bubbleKey = CHOICES_NAME.at(i) + "Bubble";
-				if (!it.m_textIcon) it.m_textIcon = GetUI<UIIcon>(Hash32(textKey.c_str()));
+				if (!it.m_text) it.m_text = GetUI<UIText>(Hash32(textKey.c_str()));
 				if (!it.m_bubbleIcon) it.m_bubbleIcon = GetUI<UIIcon>(Hash32(bubbleKey.c_str()));
 			}
 
@@ -341,7 +300,7 @@ namespace app
 				const auto buttonKey = BUTTON_NAME.at(i) + "Button";
 				const auto textKey = BUTTON_NAME.at(i) + "Text";
 				if (!it.m_button) it.m_button = GetUI<UIIcon>(Hash32(buttonKey.c_str()));
-				if (!it.m_textIcon) it.m_textIcon = GetUI<UIIcon>(Hash32(textKey.c_str()));
+				if (!it.m_text) it.m_text = GetUI<UIText>(Hash32(textKey.c_str()));
 			}
 
 			if (!m_buttonBGIcon) m_buttonBGIcon = GetUI<UIIcon>(Hash32("ButtonBG"));
@@ -355,16 +314,13 @@ namespace app
 		{
 			if (m_cursorFrameBG->FindAnimation(animationKey)) return;
 
-			auto param = UIAnimationParameter::Get().Find(animationKey);
-			if (!param) return;
 			auto anim = std::make_unique<UIColorAnimation>();
-
 			anim->SetParameter(
-				param->startV4,
-				param->endV4,
-				param->duration,
-				param->easingType,
-				param->loopMode
+				CURSOR_BLINK_START,
+				CURSOR_BLINK_END,
+				CURSOR_BLINK_DURATION,
+				util::EasingType::EaseInOut,
+				util::LoopMode::PingPong
 			);
 			m_cursorFrameBG->AddAnimation(animationKey, std::move(anim));
 		}

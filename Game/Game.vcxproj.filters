@@ -103,9 +103,6 @@
     <Filter Include="Source\UI\DangerArrow">
       <UniqueIdentifier>{62914d05-498f-48ae-bbd7-1f6000ebc36a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI\StageSelect">
-      <UniqueIdentifier>{0e8316af-6b6d-4fd9-82de-016416ea7344}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\GameLog">
       <UniqueIdentifier>{9ed61377-067e-46fb-b431-ad3cf0abcdde}</UniqueIdentifier>
     </Filter>
@@ -499,15 +496,6 @@
     <ClCompile Include="Source\Scene\TutorialInGameScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\StageSelect\StageSelectMenu.cpp">
-      <Filter>Source\UI\StageSelect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\StageSelect\MasterStageSelectParameter.cpp">
-      <Filter>Source\UI\StageSelect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\StageSelect\StageSelectStatus.cpp">
-      <Filter>Source\UI\StageSelect</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\IStatus.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -516,6 +504,9 @@
     </ClCompile>
     <ClCompile Include="Source\GameLog\GameLogManager.cpp">
       <Filter>Source\GameLog</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -936,15 +927,6 @@
     <ClInclude Include="Source\Scene\TutorialInGameScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\StageSelect\StageSelectMenu.h">
-      <Filter>Source\UI\StageSelect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\StageSelect\MasterStageSelectParameter.h">
-      <Filter>Source\UI\StageSelect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\StageSelect\StageSelectStatus.h">
-      <Filter>Source\UI\StageSelect</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Core\IStatus.h">
       <Filter>Source\Core</Filter>
     </ClInclude>
@@ -953,6 +935,9 @@
     </ClInclude>
     <ClInclude Include="Source\GameLog\GameLogManager.h">
       <Filter>Source\GameLog</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\StageSelectMenu.h">
+      <Filter>Source\UI\Menus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
