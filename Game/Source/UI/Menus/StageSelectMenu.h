@@ -98,6 +98,10 @@ namespace app
 			 * @brief アニメーションを設定する
 			 */
 			void SetAnimations(const uint32_t animationKey);
+			/**
+			 * @brief JSONからメニューパラメーターを読み込む
+			 */
+			void LoadMenuParam();
 
 
 		private:
@@ -106,6 +110,18 @@ namespace app
 			{
 				Selecting,
 				Selected,
+			};
+
+
+			/** JSONから読み込むメニューパラメーター */
+			struct StageSelectParam
+			{
+				float   inputInterval        = 0.2f;
+				float   inputThreshold       = 0.5f;
+				float   tutorialCursorScaleX = 400.0f / 280.0f;
+				float   cursorBlinkDuration  = 0.5f;
+				Vector4 cursorBlinkStartColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+				Vector4 cursorBlinkEndColor   = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 			};
 
 
@@ -174,6 +190,8 @@ namespace app
 			float m_selectInputInterval;
 			/** 選択されたかどうか */
 			bool m_isSelected;
+			/** JSONから読み込んだメニューパラメーター */
+			StageSelectParam m_param;
 		};
 	}
 }

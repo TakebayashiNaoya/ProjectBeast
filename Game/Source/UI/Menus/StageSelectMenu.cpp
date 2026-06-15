@@ -7,6 +7,7 @@
 #include "StageSelectMenu.h"
 
 #include "Source/UI/Animation/UIAnimation.h"
+#include "Source/Util/JsonConverter.h"
 
 
 namespace app
@@ -33,16 +34,8 @@ namespace app
 			/** 選択中のアニメーションのキー */
 			constexpr uint32_t SELECTING_CURSOR_ANIMATION_KEY = Hash32("SelectingBlinking");
 
-			constexpr float INPUT_INTERVAL  = 0.2f;
-			constexpr float INPUT_THRESHOLD = 0.5f;
-
-			// チュートリアルのバブル幅(400) / 通常バブル幅(280) のスケール比
-			constexpr float TUTORIAL_CURSOR_SCALE_X = 400.0f / 280.0f;
-
-			/** カーソル点滅アニメーションのパラメーター */
-			const Vector4 CURSOR_BLINK_START    = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-			const Vector4 CURSOR_BLINK_END      = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
-			constexpr float CURSOR_BLINK_DURATION = 0.5f;
+			constexpr const char* STAGE_SELECT_JSON_PATH = "Assets/parameter/UI/stageSelect/StageSelect.json";
+			constexpr const char* MENU_PARAM_KEY         = "menuParam";
 		}
 
 
@@ -109,6 +102,9 @@ namespace app
 				button.m_button = nullptr;
 				button.m_text = nullptr;
 			}
+
+			// JSONパラメーターを読み込む
+			LoadMenuParam();
 
 			// パーツを取得
 			GetUIParts();
@@ -218,27 +214,27 @@ namespace app
 
 			const float stickLXF = g_pad[0]->GetLStickXF();
 			const float stickLYF = g_pad[0]->GetLStickYF();
-			const bool leftInput  = stickLXF < -INPUT_THRESHOLD || g_pad[0]->IsTrigger(enButtonLeft);
-			const bool rightInput = stickLXF > INPUT_THRESHOLD  || g_pad[0]->IsTrigger(enButtonRight);
-			const bool upInput    = stickLYF > INPUT_THRESHOLD  || g_pad[0]->IsTrigger(enButtonUp);
-			const bool downInput  = stickLYF < -INPUT_THRESHOLD || g_pad[0]->IsTrigger(enButtonDown);
+			const bool leftInput  = stickLXF < -m_param.inputThreshold || g_pad[0]->IsTrigger(enButtonLeft);
+			const bool rightInput = stickLXF > m_param.inputThreshold  || g_pad[0]->IsTrigger(enButtonRight);
+			const bool upInput    = stickLYF > m_param.inputThreshold  || g_pad[0]->IsTrigger(enButtonUp);
+			const bool downInput  = stickLYF < -m_param.inputThreshold || g_pad[0]->IsTrigger(enButtonDown);
 
 			if (m_selectingStage == EnStageChoices::Tutorial)
 			{
 				// チュートリアルから上段への移動：左→イージー、上→ノーマル、右→ハード
 				if (leftInput)
 				{
-					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Easy;
 				}
 				else if (upInput)
 				{
-					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Normal;
 				}
 				else if (rightInput)
 				{
-					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Hard;
 				}
 			}
@@ -249,17 +245,17 @@ namespace app
 				constexpr uint8_t HARD_INDEX = static_cast<uint8_t>(EnStageChoices::Hard);
 				if (leftInput && current > 0)
 				{
-					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = static_cast<EnStageChoices>(current - 1);
 				}
 				else if (rightInput && current < HARD_INDEX)
 				{
-					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = static_cast<EnStageChoices>(current + 1);
 				}
 				else if (downInput)
 				{
-					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Tutorial;
 				}
 			}
@@ -277,26 +273,25 @@ namespace app
 
 		void StageSelectMenu::UpdateDrawFlag()
 		{
-			m_bgIcon->SetIsDraw(true);
-			m_stageSelectText->SetIsDraw(true);
-			m_stageSelectTextBGIcon->SetIsDraw(true);
+			if (m_bgIcon)              m_bgIcon->SetIsDraw(true);
+			if (m_stageSelectText)     m_stageSelectText->SetIsDraw(true);
+			if (m_stageSelectTextBGIcon) m_stageSelectTextBGIcon->SetIsDraw(true);
 
 			for (auto& it : m_choices)
 			{
-				it.m_text->SetIsDraw(true);
-				it.m_bubbleIcon->SetIsDraw(true);
+				if (it.m_text)       it.m_text->SetIsDraw(true);
+				if (it.m_bubbleIcon) it.m_bubbleIcon->SetIsDraw(true);
 			}
 
 			for (auto& it : m_buttons)
 			{
-				it.m_button->SetIsDraw(true);
-				it.m_text->SetIsDraw(true);
+				if (it.m_button) it.m_button->SetIsDraw(true);
+				if (it.m_text)   it.m_text->SetIsDraw(true);
 			}
 
-			m_buttonBGIcon->SetIsDraw(true);
-
-			m_cursorFrame->SetIsDraw(true);
-			m_cursorFrameBG->SetIsDraw(true);
+			if (m_buttonBGIcon)  m_buttonBGIcon->SetIsDraw(true);
+			if (m_cursorFrame)   m_cursorFrame->SetIsDraw(true);
+			if (m_cursorFrameBG) m_cursorFrameBG->SetIsDraw(true);
 		}
 
 
@@ -310,7 +305,7 @@ namespace app
 
 			// チュートリアルのバブルは横幅が広いのでカーソルを拡大する
 			const Vector3 cursorScale = (m_selectingStage == EnStageChoices::Tutorial)
-				? Vector3(TUTORIAL_CURSOR_SCALE_X, 1.0f, 1.0f)
+				? Vector3(m_param.tutorialCursorScaleX, 1.0f, 1.0f)
 				: Vector3::One;
 			m_cursorFrame->m_transform.m_localTransform.m_scale = cursorScale;
 			m_cursorFrameBG->m_transform.m_localTransform.m_scale = cursorScale;
@@ -358,13 +353,31 @@ namespace app
 
 			auto anim = std::make_unique<UIColorAnimation>();
 			anim->SetParameter(
-				CURSOR_BLINK_START,
-				CURSOR_BLINK_END,
-				CURSOR_BLINK_DURATION,
+				m_param.cursorBlinkStartColor,
+				m_param.cursorBlinkEndColor,
+				m_param.cursorBlinkDuration,
 				util::EasingType::EaseInOut,
 				util::LoopMode::PingPong
 			);
 			m_cursorFrameBG->AddAnimation(animationKey, std::move(anim));
+		}
+
+
+		void StageSelectMenu::LoadMenuParam()
+		{
+			nlohmann::json json;
+			if (!app::util::JsonConverter::IsLoadJsonFile(json, STAGE_SELECT_JSON_PATH)) return;
+			if (!json.contains(MENU_PARAM_KEY)) return;
+
+			const auto& p = json[MENU_PARAM_KEY];
+			using JC = app::util::JsonConverter;
+
+			m_param.inputInterval        = JC::ToFloat(p, "inputInterval",        m_param.inputInterval);
+			m_param.inputThreshold       = JC::ToFloat(p, "inputThreshold",       m_param.inputThreshold);
+			m_param.tutorialCursorScaleX = JC::ToFloat(p, "tutorialCursorScaleX", m_param.tutorialCursorScaleX);
+			m_param.cursorBlinkDuration  = JC::ToFloat(p, "cursorBlinkDuration",  m_param.cursorBlinkDuration);
+			m_param.cursorBlinkStartColor = JC::ToVector4(p, "cursorBlinkStartColor", true, m_param.cursorBlinkStartColor);
+			m_param.cursorBlinkEndColor   = JC::ToVector4(p, "cursorBlinkEndColor",   true, m_param.cursorBlinkEndColor);
 		}
 
 	}

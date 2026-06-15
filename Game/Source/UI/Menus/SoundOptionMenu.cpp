@@ -36,7 +36,7 @@ namespace app
 			};
 
 			/** サウンド数値テキストの配列 */
-			constexpr std::array<SoundInfo, SOUND_SIZE> SOUND_DIGIT_KEYS =
+			constexpr std::array<SoundInfo, SOUND_SIZE> SOUND_TEXT_KEYS =
 			{
 				{
 					{ Hash32("SoundMasterDigit"), SoundType::Master }
@@ -272,7 +272,7 @@ namespace app
 
 		void SoundOptionMenu::UpdateDigits()
 		{
-			for (const auto& info : SOUND_DIGIT_KEYS)
+			for (const auto& info : SOUND_TEXT_KEYS)
 			{
 				auto* text = GetUI<UIText>(info.key);
 				if (!text) continue;

@@ -239,5 +239,13 @@
                 "pivot" : [0.0, 0.5]
             }
         ]
+    },
+    "menuParam": {
+        "inputInterval": 0.2,
+        "inputThreshold": 0.5,
+        "tutorialCursorScaleX": 1.4286,
+        "cursorBlinkDuration": 0.5,
+        "cursorBlinkStartColor": [255, 255, 255, 255],
+        "cursorBlinkEndColor": [255, 255, 255, 0]
     }
 }
