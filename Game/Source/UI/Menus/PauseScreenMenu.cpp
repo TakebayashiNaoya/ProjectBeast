@@ -58,7 +58,7 @@ namespace app
 
 		PauseScreenIcon::PauseScreenIcon(PauseScreenType type)
 			: m_gamePad(g_pad[0])
-			, m_icon(nullptr)
+			, m_text(nullptr)
 			, m_type(type)
 		{}
 
@@ -71,23 +71,23 @@ namespace app
 		{
 			if (m_type == currentType)
 			{
-				m_icon->m_transform.m_localTransform.m_scale.x = PAUSE_SCREEN_ICON_SELECT_SCALE;
-				m_icon->m_transform.m_localTransform.m_scale.y = PAUSE_SCREEN_ICON_SELECT_SCALE;
-				m_icon->m_transform.m_localTransform.m_scale.z = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
+				m_text->m_transform.m_localTransform.m_scale.x = PAUSE_SCREEN_ICON_SELECT_SCALE;
+				m_text->m_transform.m_localTransform.m_scale.y = PAUSE_SCREEN_ICON_SELECT_SCALE;
+				m_text->m_transform.m_localTransform.m_scale.z = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
 			}
 			else
 			{
-				m_icon->m_transform.m_localTransform.m_scale.x = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
-				m_icon->m_transform.m_localTransform.m_scale.y = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
-				m_icon->m_transform.m_localTransform.m_scale.z = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
+				m_text->m_transform.m_localTransform.m_scale.x = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
+				m_text->m_transform.m_localTransform.m_scale.y = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
+				m_text->m_transform.m_localTransform.m_scale.z = PAUSE_SCREEN_ICON_UNSELECT_SCALE;
 			}
 		}
 
 
-		void PauseScreenIcon::SetUIIcon(UIIcon* icon)
+		void PauseScreenIcon::SetUIText(UIText* text)
 		{
-			m_icon = icon;
-			K2_ASSERT(m_icon != nullptr, "登録失敗です。");
+			m_text = text;
+			K2_ASSERT(m_text != nullptr, "登録失敗です。");
 		}
 
 
@@ -242,8 +242,8 @@ namespace app
 				// ポーズアイコンの生成。
 				Icon pauseIcon = std::make_unique<PauseScreenIcon>(info.type);
 
-				// UIからアイコンを取得して、アイコンに設定する。
-				pauseIcon->SetUIIcon(GetUI<UIIcon>(info.key));
+				// UIからテキストを取得して、アイコンに設定する。
+				pauseIcon->SetUIText(GetUI<UIText>(info.key));
 				// ポーズアイコンマップにアイコンを追加する。
 				m_pauseIconMap.emplace(info.key, std::move(pauseIcon));
 			}
