@@ -52,7 +52,7 @@ def pack_daddy_penguin(data):
     # i : int (4 bytes) × 1
     # 計 44 bytes
     return struct.pack(
-        "<iiffffffffi",
+        "<iifffffffff",
         int(data.get("maxHp", 0)),
         int(data.get("hp", 0)),
         float(data.get("walkSpeed", 0.0)),
@@ -63,7 +63,7 @@ def pack_daddy_penguin(data):
         float(data.get("jumpPower", 0.0)),
         float(data.get("radius", 0.0)),
         float(data.get("height", 0.0)),
-        int(data.get("enableCommandRange", 0))
+        float(data.get("enableCommandRange", 0))
     )
 
 def pack_penguin_effect_parameter(data):
