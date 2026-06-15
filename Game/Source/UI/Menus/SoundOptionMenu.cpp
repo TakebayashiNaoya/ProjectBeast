@@ -35,7 +35,7 @@ namespace app
 				}
 			};
 
-			/** サウンドDigitの配列 */
+			/** サウンド数値テキストの配列 */
 			constexpr std::array<SoundInfo, SOUND_SIZE> SOUND_DIGIT_KEYS =
 			{
 				{
@@ -274,12 +274,12 @@ namespace app
 		{
 			for (const auto& info : SOUND_DIGIT_KEYS)
 			{
-				auto* digit = GetUI<UIDigit>(info.key);
-				if (!digit) continue;
+				auto* text = GetUI<UIText>(info.key);
+				if (!text) continue;
 
 				// SoundManagerから取得した音量を0〜100の整数に変換して表示する。
 				const float volume = GetCurrentVolumeFromManager(info.type);
-				digit->SetNumber(static_cast<int>(volume * VOLUME_VALUE_CONVERTER));
+				text->SetText(std::to_string(static_cast<int>(volume * VOLUME_VALUE_CONVERTER)));
 			}
 		}
 

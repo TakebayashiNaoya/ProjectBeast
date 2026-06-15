@@ -36,17 +36,6 @@
             },
             {
                 "type":"UIIcon",
-                "name":"BbuttonIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/xbox_button_color_b.dds",
-                "width":60,
-                "height":60,
-                "position":[ 590, -360, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
-            },
-            {
-                "type":"UIIcon",
                 "name":"XbuttonIcon",
                 "asset":"Assets/spriteData/UI/SoundOption/xbox_button_color_x.dds",
                 "width":60,
@@ -56,100 +45,119 @@
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
             },
+            {
+                "type":"UIIcon",
+                "name":"BbuttonIcon",
+                "asset":"Assets/spriteData/UI/SoundOption/xbox_button_color_b.dds",
+                "width":60,
+                "height":60,
+                "position":[ 610, -360, 0],
+                "scale":[ 1, 1, 1],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255]
+            },
 
 
 
 
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"SelectTextIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/SelectIcon.dds",
-                "width":90,
-                "height":50,
-                "position":[ 150, -360, 0],
-                "scale":[ 1, 1, 1],
+                "text":"選択",
+                "fontSize":0.7,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 100, -360, 0],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.0, 0.5]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"MoveTextIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/LeftorRightIcon.dds",
-                "width":90,
-                "height":50,
-                "position":[ 320, -360, 0],
-                "scale":[ 1, 1, 1],
+                "text":"調整",
+                "fontSize":0.7,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 270, -360, 0],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.0, 0.5]
             },
             {
-                "type":"UIIcon",
-                "name":"CloseIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/CloseIcon.dds",
-                "width":95,
-                "height":50,
-                "position":[ 680, -360, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[255,255,255,255]
-            },
-            {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"DefaultIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/DefaultIcon.dds",
-                "width":95,
-                "height":50,
-                "position":[ 500, -360, 0],
-                "scale":[ 1, 1, 1],
+                "text":"初期化",
+                "fontSize":0.7,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 440, -360, 0],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.0, 0.5]
+            },
+            {
+                "type":"UIText",
+                "name":"CloseIcon",
+                "text":"閉じる",
+                "fontSize":0.7,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 640, -360, 0],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.0, 0.5]
             },
 
 
 
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"MasterVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/MasterIcon.dds",
-                "width":200,
-                "height":55,
-                "position":[ -545, 130, 0],
-                "scale":[ 1, 1, 1],
+                "text":"Master",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ -500, 130, 0],
                 "rotation":0,
-                "color":[ 0, 0, 0, 255]
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 1.0, 0.5]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"VoiceVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/VoiceIcon.dds",
-                "width":155,
-                "height":58,
-                "position":[ -555, 20, 0],
-                "scale":[ 1, 1, 1],
+                "text":"Voice",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ -500, 20, 0],
                 "rotation":0,
-                "color":[ 0, 0, 0, 255]
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 1.0, 0.5]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"SEVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/SEIcon.dds",
-                "width":90,
-                "height":48,
-                "position":[ -555, -92, 0],
-                "scale":[ 1, 1, 1],
+                "text":"SE",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ -500, -92, 0],
                 "rotation":0,
-                "color":[ 0, 0, 0, 255]
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 1.0, 0.5]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"BGMVolumeTextIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/BGMIcon.dds",
-                "width":150,
-                "height":50,
-                "position":[ -552, -200, 0],
-                "scale":[ 1, 1, 1],
+                "text":"BGM",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ -500, -200, 0],
                 "rotation":0,
-                "color":[ 0, 0, 0, 255]  
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 1.0, 0.5]
             },
             {
                 "type":"UIIcon",
@@ -163,15 +171,16 @@
                 "color":[ 255, 255, 255, 120]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"SoundOptionTitleIcon",
-                "asset":"Assets/spriteData/UI/SoundOption/SubTitleIcon.dds",
-                "width":600,
-                "height":70,
+                "text":"SoundOption",
+                "fontSize":1.7,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
                 "position":[ -330, 320, 0],
-                "scale":[ 1, 1, 1],
                 "rotation":0,
-                "color":[ 0, 0, 0, 255]
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 0.5, 0.5]
             },
 
 
@@ -183,7 +192,7 @@
                 "asset":"Assets/spriteData/UI/SoundOption/VolumeBarIcon.dds",
                 "width":1000,
                 "height":40,
-                "position":[ -420, 123, 0],
+                "position":[ -420, 125, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255],
@@ -256,7 +265,7 @@
                 "asset":"Assets/spriteData/UI/SoundOption/knobFrameIcon.dds",
                 "width":40,
                 "height":85,
-                "position":[ 580, 20, 0],
+                "position":[ 580, 15, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -267,7 +276,7 @@
                 "asset":"Assets/spriteData/UI/SoundOption/knobIconStick.dds",
                 "width":30,
                 "height":70,
-                "position":[ 580, 20, 0],
+                "position":[ 580, 15, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
@@ -321,52 +330,52 @@
 
 
             {
-                "type":"UIDigit",
+                "type":"UIText",
                 "name":"SoundMasterDigit",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit":3,
-                "number":50,
-                "width":45,
-                "height":45,
-                "position":[ 730, 130, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0
+                "text":"0",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 700, 125, 0],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.5, 0.5]
             },
             {
-                "type":"UIDigit",
+                "type":"UIText",
                 "name":"SoundVoiceDigit",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit":3,
-                "number":50,
-                "width":45,
-                "height":45,
-                "position":[ 730, 20, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0
+                "text":"0",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 700, 15, 0],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.5, 0.5]
             },
             {
-                "type":"UIDigit",
+                "type":"UIText",
                 "name":"SoundSEDigit",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit":3,
-                "number":50,
-                "width":45,
-                "height":45,
-                "position":[ 730, -90, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0
+                "text":"0",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 700, -90, 0],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.5, 0.5]
             },
             {
-                "type":"UIDigit",
+                "type":"UIText",
                 "name":"SoundBGMDigit",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit":3,
-                "number":50,
-                "width":45,
-                "height":45,
-                "position":[ 730, -200, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0
+                "text":"0",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 700, -200, 0],
+                "rotation":0,
+                "color":[ 255, 255, 255, 255],
+                "pivot":[ 0.5, 0.5]
             }
         ]
     }
