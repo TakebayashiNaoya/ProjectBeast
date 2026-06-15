@@ -32,8 +32,10 @@ namespace app
 				m_startingAnimLogic.Initialize(
 					this,
 					{ "ChildPenguinIcon", "SlashIcon", "BgIcon" },
-					{ "RemainingNum", "TotalNum" },
-					Vector3(-400.0f, 0.0f, 0.0f)
+					{},
+					Vector3(-400.0f, 0.0f, 0.0f),
+					1.0f,
+					{ "RemainingNum", "TotalNum" }
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())
@@ -55,17 +57,17 @@ namespace app
 			if (bgIcon) bgIcon->m_isDraw = isVisible;
 
 			// 残り子ペンギンの数更新
-			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
+			auto* digit = GetUI<UIText>(Hash32("RemainingNum"));
 			if (digit) {
 				digit->m_isDraw = isVisible;
-				digit->SetNumber(m_childNum);
+				digit->SetText(std::to_string(m_childNum));
 			}
 
 			// ステージ上の総ペンギン数更新
-			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
+			auto* totalDigit = GetUI<UIText>(Hash32("TotalNum"));
 			if (totalDigit) {
 				totalDigit->m_isDraw = isVisible;
-				totalDigit->SetNumber(m_totalNum);
+				totalDigit->SetText(std::to_string(m_totalNum));
 			}
 
 			// 配列の中のアニメーションシーケンスを更新する。
@@ -85,10 +87,8 @@ namespace app
 
 		void RemainingChildMenu::SetChildNum(const int num)
 		{
-			// UIDigitを取得。
-			auto* remainDigit = GetUI<UIDigit>(Hash32("RemainingNum"));
+			auto* remainDigit = GetUI<UIText>(Hash32("RemainingNum"));
 
-			// Digitがなかったら処理しない。
 			if (!remainDigit) return;
 
 			// 今の救助数と異なっていたら
@@ -179,10 +179,8 @@ namespace app
 
 		void RemainingChildMenu::SetTotalNum(const int num)
 		{
-			// 総数のDigitを取得。
-			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
+			auto* totalDigit = GetUI<UIText>(Hash32("TotalNum"));
 
-			// Digitがないなら処理しない。
 			if (!totalDigit) return;
 
 			// 今の総数と異なっていたら
@@ -258,10 +256,10 @@ namespace app
 			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
 			if (bgIcon) bgIcon->m_isDraw = false;
 
-			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
+			auto* digit = GetUI<UIText>(Hash32("RemainingNum"));
 			if (digit) digit->m_isDraw = false;
 
-			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
+			auto* totalDigit = GetUI<UIText>(Hash32("TotalNum"));
 			if (totalDigit) totalDigit->m_isDraw = false;
 		}
 	}
