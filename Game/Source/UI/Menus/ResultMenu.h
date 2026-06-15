@@ -30,17 +30,7 @@ namespace app
 			float   achieveBoxH         =  60.0f;
 			float   achieveCheckW       =  60.0f;
 			float   achieveCheckH       =  60.0f;
-			float   topDigitW           =  64.0f;
-			float   topDigitH           =  80.0f;
-			float   timeColonW          =  15.0f;
-			float   timeColonH          =  50.0f;
-			float   timeDigitCenterX    = -320.0f;
-			float   scoreDigitCenterX   =  320.0f;
-			float   topDigitY           =  280.0f;
-			float   totalDigitW         =   80.0f;
-			float   totalDigitH         =  100.0f;
-			float   totalDigitCenterX   =    0.0f;
-			float   totalDigitY         =    0.0f;
+
 		};
 
 
@@ -85,7 +75,6 @@ namespace app
 			bool m_dataSet = false;               // SetResultData が呼ばれたか
 			ResultDynamicLayout m_dynLayout;      // JSON から読み込んだレイアウト設定
 			std::vector<UIIcon*> m_checkIconList; // 達成済みチェックアイコン（表示順）
-			UIDigit* m_totalDigit;                // トータルスコア表示用
 
 			// 演出用タイマーとフラグ
 			float m_checkRevealTimer;
