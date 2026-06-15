@@ -13,14 +13,13 @@ namespace app
 	{
 		/**
 		 * @brief ステージ選択肢の列挙体
-		 * @detail もどる、イージー、ノーマル、ハード
 		 */
 		enum class EnStageChoices : uint8_t
 		{
-			Tutorial,
 			Easy,
 			Normal,
 			Hard,
+			Tutorial,
 			Max,
 		};
 

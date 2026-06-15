@@ -17,10 +17,10 @@ namespace app
 		{
 			const std::array<std::string, static_cast<uint8_t>(EnStageChoices::Max)> CHOICES_NAME =
 			{
-				"Tutorial",
 				"Easy",
 				"Normal",
 				"Hard",
+				"Tutorial",
 			};
 
 			const std::array<std::string, static_cast<uint8_t>(EnStageButtonTypes::Max)> BUTTON_NAME =
@@ -35,6 +35,9 @@ namespace app
 
 			constexpr float INPUT_INTERVAL  = 0.2f;
 			constexpr float INPUT_THRESHOLD = 0.5f;
+
+			// チュートリアルのバブル幅(400) / 通常バブル幅(280) のスケール比
+			constexpr float TUTORIAL_CURSOR_SCALE_X = 400.0f / 280.0f;
 
 			/** カーソル点滅アニメーションのパラメーター */
 			const Vector4 CURSOR_BLINK_START    = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -69,7 +72,7 @@ namespace app
 
 		StageSelectMenu::StageSelectMenu()
 			: m_state(EnStageSelectState::Selecting)
-			, m_selectingStage(EnStageChoices::Tutorial)
+			, m_selectingStage(EnStageChoices::Easy)
 			, m_bgIcon(nullptr)
 			, m_stageSelectText(nullptr)
 			, m_stageSelectTextBGIcon(nullptr)
@@ -171,7 +174,7 @@ namespace app
 		void StageSelectMenu::Reset()
 		{
 			m_state = EnStageSelectState::Selecting;
-			m_selectingStage = EnStageChoices::Tutorial;
+			m_selectingStage = EnStageChoices::Easy;
 
 			m_cursorFrameBG->StopAnimation();
 
@@ -214,19 +217,51 @@ namespace app
 			}
 
 			const float stickLXF = g_pad[0]->GetLStickXF();
+			const float stickLYF = g_pad[0]->GetLStickYF();
+			const bool leftInput  = stickLXF < -INPUT_THRESHOLD || g_pad[0]->IsTrigger(enButtonLeft);
+			const bool rightInput = stickLXF > INPUT_THRESHOLD  || g_pad[0]->IsTrigger(enButtonRight);
+			const bool upInput    = stickLYF > INPUT_THRESHOLD  || g_pad[0]->IsTrigger(enButtonUp);
+			const bool downInput  = stickLYF < -INPUT_THRESHOLD || g_pad[0]->IsTrigger(enButtonDown);
 
-			// 左にスティックを倒した場合
-			const auto current = static_cast<uint8_t>(m_selectingStage);
-			const auto max = static_cast<uint8_t>(EnStageChoices::Max);
-			if (stickLXF < -INPUT_THRESHOLD && current > 0)
+			if (m_selectingStage == EnStageChoices::Tutorial)
 			{
-				m_selectInputInterval = INPUT_INTERVAL;
-				m_selectingStage = static_cast<EnStageChoices>(current - 1);
+				// チュートリアルから上段への移動：左→イージー、上→ノーマル、右→ハード
+				if (leftInput)
+				{
+					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectingStage = EnStageChoices::Easy;
+				}
+				else if (upInput)
+				{
+					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectingStage = EnStageChoices::Normal;
+				}
+				else if (rightInput)
+				{
+					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectingStage = EnStageChoices::Hard;
+				}
 			}
-			else if (stickLXF > INPUT_THRESHOLD && current < max - 1)
+			else
 			{
-				m_selectInputInterval = INPUT_INTERVAL;
-				m_selectingStage = static_cast<EnStageChoices>(current + 1);
+				// 上段（イージー・ノーマル・ハード）の横移動と下段への移動
+				const auto current = static_cast<uint8_t>(m_selectingStage);
+				constexpr uint8_t HARD_INDEX = static_cast<uint8_t>(EnStageChoices::Hard);
+				if (leftInput && current > 0)
+				{
+					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectingStage = static_cast<EnStageChoices>(current - 1);
+				}
+				else if (rightInput && current < HARD_INDEX)
+				{
+					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectingStage = static_cast<EnStageChoices>(current + 1);
+				}
+				else if (downInput)
+				{
+					m_selectInputInterval = INPUT_INTERVAL;
+					m_selectingStage = EnStageChoices::Tutorial;
+				}
 			}
 		}
 
@@ -272,6 +307,13 @@ namespace app
 			const Vector3 position = selected.m_bubbleIcon->m_transform.m_localTransform.m_position;
 			m_cursorFrame->m_transform.m_localTransform.m_position = position;
 			m_cursorFrameBG->m_transform.m_localTransform.m_position = position;
+
+			// チュートリアルのバブルは横幅が広いのでカーソルを拡大する
+			const Vector3 cursorScale = (m_selectingStage == EnStageChoices::Tutorial)
+				? Vector3(TUTORIAL_CURSOR_SCALE_X, 1.0f, 1.0f)
+				: Vector3::One;
+			m_cursorFrame->m_transform.m_localTransform.m_scale = cursorScale;
+			m_cursorFrameBG->m_transform.m_localTransform.m_scale = cursorScale;
 		}
 
 
