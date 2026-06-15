@@ -65,7 +65,6 @@ namespace app
 				"InGameTimerFrameIcon",
 				"InGameTimerFrameBackGroundIcon",
 				"TimeClockIcon",
-				"CloneIcon"
 			};
 
 			for (const auto& iconName : iconNames)
@@ -77,11 +76,9 @@ namespace app
 			}
 
 
-			const std::vector<std::string> digitNames =
+			const std::vector<std::string> textNames =
 			{
-				"MinutesDigits",
-				"TensPlaceDigits",
-				"OnesPlaceDigits",
+				"TimerText",
 			};
 
 
@@ -90,8 +87,10 @@ namespace app
 				m_gameStartingAnimLogic.Initialize(
 					this,
 					iconNames,
-					digitNames,
-					Vector3(0.0f, 200.0f, 0.0f)
+					{},
+					Vector3(0.0f, 200.0f, 0.0f),
+					1.0f,
+					textNames
 				);
 			}
 			if (!m_gameStartingAnimLogic.IsAnimationFinished())
@@ -121,7 +120,6 @@ namespace app
 				"InGameTimerFrameBackGroundIcon",
 				"InGameTimerFrameIcon",
 				"TimeClockIcon",
-				"CloneIcon",
 			};
 
 			for (const auto& iconName : iconNames)
@@ -133,20 +131,9 @@ namespace app
 			}
 
 
-			constexpr const char* digitNames[] =
+			if (auto* text = GetUI<UIText>(Hash32("TimerText")))
 			{
-				"MinutesDigits",
-				"CloneIcon",
-				"TensPlaceDigits",
-				"OnesPlaceDigits",
-			};
-
-			for (const auto& digitName : digitNames)
-			{
-				if (auto* digit = GetUI<UIDigit>(Hash32(digitName)))
-				{
-					digit->m_isDraw = false;
-				}
+				text->m_isDraw = false;
 			}
 		}
 
@@ -162,15 +149,17 @@ namespace app
 			// 秒の1の位を計算。
 			const int onesPlace = (totalSec % 60) % 10;
 
+			auto* timerText = GetUI<UIText>(Hash32("TimerText"));
 
-			auto* minutesDigits = GetUI<UIDigit>(Hash32("MinutesDigits"));
-			auto* tensPlaceDigits = GetUI<UIDigit>(Hash32("TensPlaceDigits"));
-			auto* onesPlaceDigits = GetUI<UIDigit>(Hash32("OnesPlaceDigits"));
-
-			/** 数値の設定 */
-			if (minutesDigits) { minutesDigits->m_isDraw = true; minutesDigits->SetNumber(minutes); }
-			if (tensPlaceDigits) { tensPlaceDigits->m_isDraw = true; tensPlaceDigits->SetNumber(tensPlace); }
-			if (onesPlaceDigits) { onesPlaceDigits->m_isDraw = true; onesPlaceDigits->SetNumber(onesPlace); }
+			/** 数値の設定（例: "3:05"） */
+			if (timerText)
+			{
+				timerText->m_isDraw = true;
+				timerText->SetText(
+					std::to_string(minutes) + ":" +
+					std::to_string(tensPlace) + std::to_string(onesPlace)
+				);
+			}
 
 
 			// 残り30秒以下の時に赤く点滅させる。
@@ -179,30 +168,25 @@ namespace app
 				// 点滅アニメーションが再生されていないときに初回のみ登録して再生させる。
 				if (!m_isBlinkAnimationPlaying)
 				{
-					Vector4 startColor = Vector4::White;
-					Vector4 endColor(BLINK_TEXT_COLOR);
-					// 各Digitにカラーアニメーションを登録して再生させる。
-					auto SetColorAnim = [&](UIDigit* digit)
-						{
-							if (digit == nullptr)return;
-							auto colorAnim = std::make_unique<UIColorAnimation>();
-							colorAnim->SetParameter(
-								startColor
-								, endColor
-								, BLINK_INTERVAL
-								, util::EasingType::EaseOut
-								, util::LoopMode::PingPong
-							);
-							colorAnim->SetFunc([digit](const Vector4& color)
-								{
-									digit->m_color = color;
-								});
-							digit->AddAnimation(Hash32("TimerColorAnim"), std::move(colorAnim));
-							digit->PlayAnimation();
-						};
-					SetColorAnim(minutesDigits);
-					SetColorAnim(tensPlaceDigits);
-					SetColorAnim(onesPlaceDigits);
+					if (timerText)
+					{
+						Vector4 startColor = Vector4::White;
+						Vector4 endColor(BLINK_TEXT_COLOR);
+						auto colorAnim = std::make_unique<UIColorAnimation>();
+						colorAnim->SetParameter(
+							startColor
+							, endColor
+							, BLINK_INTERVAL
+							, util::EasingType::EaseOut
+							, util::LoopMode::PingPong
+						);
+						colorAnim->SetFunc([timerText](const Vector4& color)
+							{
+								timerText->m_color = color;
+							});
+						timerText->AddAnimation(Hash32("TimerColorAnim"), std::move(colorAnim));
+						timerText->PlayAnimation();
+					}
 					m_isBlinkAnimationPlaying = true;
 				}
 			}
@@ -211,17 +195,11 @@ namespace app
 				/** 通常時はアニメーションを停止して白色にする */
 				if (m_isBlinkAnimationPlaying)
 				{
-					const Vector4 white = Vector4::White;
-					auto StopColorAnim = [&](UIDigit* digit)
-						{
-							if (digit == nullptr)return;
-							digit->StopAnimation();
-							digit->m_color = white;
-						};
-
-					StopColorAnim(minutesDigits);
-					StopColorAnim(tensPlaceDigits);
-					StopColorAnim(onesPlaceDigits);
+					if (timerText)
+					{
+						timerText->StopAnimation();
+						timerText->m_color = Vector4::White;
+					}
 					m_blinkTime = 0.0f;
 					m_isBlink = true;
 					m_isBlinkAnimationPlaying = false;

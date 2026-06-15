@@ -25,19 +25,20 @@ namespace app
 		public:
 			/**
 			 * @brief 初期化
-			 * @details 現在はアイコンと数字のみ使用しているので、実装を省く
 			 * @param menu メニュークラスのポインタ
 			 * @param iconNames アイコンUIの名前
 			 * @param digitNames 数字UIの名前
 			 * @param startOffset 開始位置のオフセット
 			 * @param duration アニメーションの持続時間
+			 * @param textNames テキストUIの名前
 			 */
 			void Initialize(
 				MenuBase* menu,
 				const std::vector<std::string> iconNames,
 				const std::vector<std::string> digitNames,
 				const Vector3 startOffset,
-				float duration = 1.0f
+				float duration = 1.0f,
+				const std::vector<std::string> textNames = {}
 			);
 
 			/**
@@ -62,6 +63,8 @@ namespace app
 			std::vector<std::string> m_iconNames;
 			/** 数字UIの名前 */
 			std::vector<std::string> m_digitNames;
+			/** テキストUIの名前 */
+			std::vector<std::string> m_textNames;
 			/** UIパーツのリスト */
 			std::vector<UIBase*> m_uiParts;
 			/** メニュークラスのポインタ */
