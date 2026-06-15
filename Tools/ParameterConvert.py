@@ -211,43 +211,68 @@ def convert_enemy_layout(json_path, bin_path):
 
     print(f"  -> [成功] {len(enemies)}体のエネミーデータを書き出しました。")
 
-def pack_achievement(data):
-    # 型の根拠: AchievementBase.cpp の JsonConverter 呼び出しより
-    #
-    # name:         ToString → str    → 32s  ( 32バイト固定)
-    # description:  ToString → str    → 128s (128バイト固定) ※日本語UTF-8は3バイト/文字
-    # type:         ToString → str    → 16s  ( 16バイト固定)
-    # condition:    ToString → str    → 32s  ( 32バイト固定)
-    # targetValue:  ToUInt32 → uint32 → I    (  4バイト, 符号なし整数)
-    # spriteIndex:  ToInt    → int    → i    (  4バイト, 符号付き整数)
-    # spriteName:   ToString → str    → 32s  ( 32バイト固定)
-    # 合計: 32+128+16+32+4+4+32 = 248バイト / エントリ
-
-    def enc(s, size):
-        """文字列をUTF-8エンコードして固定長バイト列にする"""
-        return s.encode("utf-8")[:size].ljust(size, b"\x00")
-
+def pack_ocean_parameter(data):
+    # 全フィールドが float のみ
+    # "<8f" = float(4) × 8 = 32 bytes
     return struct.pack(
-        "<32s128s16s32sIi32s",
-        enc(data.get("name",        ""), 32),   # 32s : name        (string)
-        enc(data.get("description", ""), 128),  # 128s: description (string)
-        enc(data.get("type",        ""), 16),   # 16s : type        (string)
-        enc(data.get("condition",   ""), 32),   # 32s : condition   (string)
-        int(data.get("targetValue", 0)),         # I   : targetValue (uint32_t)
-        int(data.get("spriteIndex", 0)),         # i   : spriteIndex (int)
-        enc(data.get("spriteName",  ""), 32),   # 32s : spriteName  (string)
+        "<8f",
+        float(data.get("baseReflectance", 0.0)),  # f : baseReflectance（基本反射率）
+        float(data.get("wave1Amplitude",  0.0)),  # f : wave1Amplitude（波①の振幅）
+        float(data.get("wave1Frequency",  0.0)),  # f : wave1Frequency（波①の空間周波数）
+        float(data.get("wave2Amplitude",  0.0)),  # f : wave2Amplitude（波②の振幅）
+        float(data.get("wave2Frequency",  0.0)),  # f : wave2Frequency（波②の空間周波数）
+        float(data.get("specularPower",   0.0)),  # f : specularPower（Phong指数）
+        float(data.get("specularScale",   0.0)),  # f : specularScale（スペキュラ強度倍率）
+        float(data.get("ambientScale",    0.0)),  # f : ambientScale（アンビエント強度倍率）
     )
+
+def pack_pbr_parameter(data):
+    # name     : char[32] = 32 bytes（固定長文字列）
+    # 残4フィールド : float × 4   = 16 bytes
+    # 合計 48 bytes
+    name = data.get("name", "").encode("utf-8")[:32].ljust(32, b"\x00")
+    return struct.pack(
+        "<32s4f",
+        name,                                           # 32s : name（オブジェクト識別名）
+        float(data.get("dirLightScale",  0.0)),         # f   : dirLightScale（ディレクションライト強度倍率）
+        float(data.get("ambientScale",   0.0)),         # f   : ambientScale（環境光強度倍率）
+        float(data.get("metallicOffset", 0.0)),         # f   : metallicOffset（メタリックオフセット）
+        float(data.get("smoothOffset",   0.0)),         # f   : smoothOffset（スムーズオフセット）
+    )
+
+def pack_whirlpool_parameter(data):
+    # 全フィールドが float のみ
+    # "<11f" = float(4) × 11 = 44 bytes
+    return struct.pack(
+        "<11f",
+        float(data.get("whirlpoolRadius",      0.0)),  # f : whirlpoolRadius（影響範囲半径）
+        float(data.get("attractSpeed",         0.0)),  # f : attractSpeed（引き寄せ速度）
+        float(data.get("rotateSpeed",          0.0)),  # f : rotateSpeed（渦巻き回転速度 rad/s）
+        float(data.get("uvRotationSpeed",      0.0)),  # f : uvRotationSpeed（UV回転速度 rad/s）
+        float(data.get("scaleChangeTime",      0.0)),  # f : scaleChangeTime（拡大率変化時間）
+        float(data.get("stayTime",             0.0)),  # f : stayTime（最大スケール維持時間）
+        float(data.get("createInterval",       0.0)),  # f : createInterval（生成間隔）
+        float(data.get("orbitRadius",          0.0)),  # f : orbitRadius（子ペンギン軌道半径）
+        float(data.get("orbitRadiusVariation", 0.0)),  # f : orbitRadiusVariation（軌道半径ランダム変動幅）
+        float(data.get("orbitOffsetVariation", 0.0)),  # f : orbitOffsetVariation（個体軌道オフセット最大幅）
+        float(data.get("rotateScaleVariation", 0.0)),  # f : rotateScaleVariation（個体回転速度倍率変動幅）
+    )
+
+
+
 
 # ---------------------------------------------------------
 # ルールブック（目次）
 # ファイル名の一部と、上で作った関数を紐づけます
 # ---------------------------------------------------------
 RULE_BOOK = {
-    "DaddyPenguinParameter": pack_daddy_penguin,
-     "PenguinEffectParameter": pack_penguin_effect_parameter,
-    "ChildPenguinParameter":  pack_child_penguin_parameter, 
-    "EnemyParameter": pack_enemy_parameter,
-    "AchievementList":       pack_achievement,
+    "DaddyPenguinParameter":    pack_daddy_penguin,
+    "PenguinEffectParameter":   pack_penguin_effect_parameter,
+    "ChildPenguinParameter":    pack_child_penguin_parameter,
+    "EnemyParameter":           pack_enemy_parameter,
+    "oceanParameter":           pack_ocean_parameter,
+    "PBRParameter":             pack_pbr_parameter,
+    "whirlpoolParameter":       pack_whirlpool_parameter,
 }
 
 # ファイル全体を処理する特殊な変換テーブル（可変長データを持つ構造向け）
@@ -263,8 +288,9 @@ FILE_RULE_BOOK = {
 # 2. 汎用コンバート処理（ここのコードは基本的に変更不要）
 # =========================================================
 
-def convert_all(input_root_dir, output_root_dir):
-    os.makedirs(output_root_dir, exist_ok=True)
+# def convert_all(input_root_dir, output_root_dir):
+#     os.makedirs(output_root_dir, exist_ok=True)
+def convert_all(input_root_dir):
     
     # os.walk を使って、フォルダの中のフォルダも全て自動で探す
     for current_dir, dirs, files in os.walk(input_root_dir):
@@ -282,10 +308,7 @@ def convert_all(input_root_dir, output_root_dir):
 
             if file_func is not None:
                 json_path = os.path.join(current_dir, filename)
-                relative_path = os.path.relpath(current_dir, input_root_dir)
-                out_folder = os.path.join(output_root_dir, relative_path)
-                os.makedirs(out_folder, exist_ok=True)
-                bin_path = os.path.join(out_folder, filename.replace(".json", ".bin"))
+                bin_path = os.path.join(current_dir, filename.replace(".json", ".bin"))
                 print(f"変換中: {json_path} -> {bin_path}")
                 file_func(json_path, bin_path)
                 continue  # 通常のRULE_BOOKには進まない
@@ -305,12 +328,7 @@ def convert_all(input_root_dir, output_root_dir):
 
             # 入出力のパス設定（フォルダ階層をそのまま維持する）
             json_path = os.path.join(current_dir, filename)
-            relative_path = os.path.relpath(current_dir, input_root_dir)
-            out_folder = os.path.join(output_root_dir, relative_path)
-            os.makedirs(out_folder, exist_ok=True)
-            
-            bin_name = filename.replace(".json", ".bin")
-            bin_path = os.path.join(out_folder, bin_name)
+            bin_path = os.path.join(current_dir, filename.replace(".json", ".bin"))
             
             print(f"変換中: {json_path} -> {bin_path}")
             
@@ -340,10 +358,5 @@ def convert_all(input_root_dir, output_root_dir):
 
 if __name__ == "__main__":
     # 画像のパス構造に合わせるなら以下のように指定します
-    # Assets/parameter 以下の全フォルダを調べ、bin フォルダに出力
     input_folder = "../Game/Assets/parameter"
-    
-    # 出力先（コンバーターと同じ階層に bin フォルダが作られます）
-    output_folder = "bin" 
-    
-    convert_all(input_folder, output_folder)
+    convert_all(input_folder)
