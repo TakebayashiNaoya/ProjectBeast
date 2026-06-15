@@ -48,48 +48,52 @@
 
 
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"StartIcon",
-                "asset":"Assets/spriteData/UI/Title/Text/StartTextIcon.dds",
-                "width":240,
-                "height":65,
+                "text":"スタート",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "rotation":0,
                 "position":[ -500, -310, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 0.5, 0.5]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"SoundIcon",
-                "asset":"Assets/spriteData/UI/Title/Text/SoundTextIcon.dds",
-                "width":240,
-                "height":65,
+                "text":"サウンド",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "rotation":0,
                 "position":[ -175, -310, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                  "color":[ 0, 0, 0, 255],
+                "pivot":[ 0.5, 0.5]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"RuleIcon",
-                "asset":"Assets/spriteData/UI/Title/Text/RuleTextIcon.dds",
-                "width":180,
-                "height":65,
-                "position":[ 175, -310, 0],
-                "scale":[ 1, 1, 1],
+                "text":"チュートリアル",
+                "fontSize":1.2,
+                "fontScaleX":0.6,
+                "fontScaleY":1.0,
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "position":[ 175, -310, 0],
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 0.5, 0.5]
             },
             {
-                "type":"UIIcon",
+                "type":"UIText",
                 "name":"EndIcon",
-                "asset":"Assets/spriteData/UI/Title/Text/EndTextIcon.dds",
-                "width":180,
-                "height":65,
-                "position":[ 500, -310, 0],
-                "scale":[ 1, 1, 1],
+                "text":"オワリ",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
+                "position":[ 500, -310, 0],
+                "color":[ 0, 0, 0, 255],
+                "pivot":[ 0.5, 0.5]
             }
         ]
     }

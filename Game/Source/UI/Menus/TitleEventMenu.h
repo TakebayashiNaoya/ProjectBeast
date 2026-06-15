@@ -78,8 +78,8 @@ namespace app
 			UIIcon* m_frameIcon;
 			/** フレームの背景アイコン */
 			UIIcon* m_frameBackIcon;
-			/** イベントアイコン */
-			std::array<UIIcon*, static_cast<uint8_t>(EnEventType::Num)> m_eventIcon;
+			/** イベントテキスト */
+			std::array<UIText*, static_cast<uint8_t>(EnEventType::Num)> m_eventIcon;
 		};
 	}
 }
