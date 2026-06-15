@@ -74,9 +74,9 @@
             {
                 "type":"UIText",
                 "name":"RuleIcon",
-                "text":"チュートリアル",
+                "text":"ヒント",
                 "fontSize":1.2,
-                "fontScaleX":0.6,
+                "fontScaleX":1.0,
                 "fontScaleY":1.0,
                 "rotation":0,
                 "position":[ 175, -310, 0],
