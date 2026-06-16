@@ -99,14 +99,6 @@ namespace app
 
 			// RenderingEngineに自身を登録する
 			g_renderingEngine->RegisterNatureObject(this);
-
-			// 座標JSONの最終更新時刻を記録する（デバッグビルドのみ）
-#ifdef APP_DEBUG
-			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(m_positionsJsonPath.c_str());
-#endif // APP_DEBUG
-
-			// RenderingEngineに自身を登録する
-			g_renderingEngine->RegisterNatureObject(this);
 		}
 
 
