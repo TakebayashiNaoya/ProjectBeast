@@ -33,11 +33,13 @@ namespace app
 			Vector3 targetPosition = m_targetCharacter->GetTransform().m_position;
 			targetPosition.Add(TARGET_OFFSET);
 
-			// 右スティックで回転
-			Vector3 rotationVector = Vector3(g_pad[0]->GetRStickXF(), g_pad[0]->GetRStickYF(), 0.0f);
+			// 右スティックで回転（二乗カーブで少し倒したときは緩やか、深く倒したときは速くなる）
+			const float rawX = g_pad[0]->GetRStickXF();
+			const float rawY = g_pad[0]->GetRStickYF();
+			Vector3 rotationVector = Vector3(rawX * fabsf(rawX), rawY * fabsf(rawY), 0.0f);
 			if (rotationVector.LengthSq() > FLT_EPSILON) {
-				rotationVector.x *= m_config.rotationSpeedX;
-				rotationVector.y *= m_config.rotationSpeedY;
+				rotationVector.x *= m_config.rotationSpeedX * deltaTime;
+				rotationVector.y *= m_config.rotationSpeedY * deltaTime;
 
 				// 【修正1】インバート修正（元のマイナス符号を外して回転方向を逆にしました）
 				float rotX = rotationVector.x;
