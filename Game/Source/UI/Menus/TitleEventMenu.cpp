@@ -42,13 +42,13 @@ namespace app
 
 		void TitleEventMenu::Update()
 		{
-			// 左スティックのY軸の値を取得。
-			const float stickY = m_gamePad->GetLStickXF();
+			// 左スティックのX軸の値を取得。
+			const float stickX = m_gamePad->GetLStickXF();
 
-			// 入力の闘値を超えているか。
+			// 入力の閾値を超えているか。
 			const float InputThreshold = 0.5f;
-			// X軸の入力がある場合。
-			if (fabsf(stickY) < InputThreshold)
+			// スティックが中立に戻っているか。
+			if (fabsf(stickX) < InputThreshold)
 			{
 				m_isStickNeutral = true;
 			}
@@ -57,15 +57,15 @@ namespace app
 			{
 				const int eventNum = static_cast<int>(EnEventType::Num);
 
-				// 右に入力がある場合。
-				if (stickY > InputThreshold)
+				// 右に入力がある場合（スティックまたは十字キー）。
+				if (stickX > InputThreshold || m_gamePad->IsTrigger(enButtonRight))
 				{
 					m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) + 1) % eventNum);
 					m_isStickNeutral = false;
 					SelectVisual();
 				}
-				// 左に入力がある場合。
-				if (stickY < -InputThreshold)
+				// 左に入力がある場合（スティックまたは十字キー）。
+				if (stickX < -InputThreshold || m_gamePad->IsTrigger(enButtonLeft))
 				{
 					m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) - 1 + eventNum) % eventNum);
 					m_isStickNeutral = false;

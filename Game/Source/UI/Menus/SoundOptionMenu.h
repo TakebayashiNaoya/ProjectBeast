@@ -97,6 +97,10 @@ namespace app
 			/** 戻るボタンのフラグ */
 			bool m_isBack;
 			SoundType m_currentSoundType;
+			/** スティック上下ニュートラル判定 */
+			bool m_isStickNeutralY;
+			/** スティック左右ニュートラル判定 */
+			bool m_isStickNeutralX;
 		};
 	}
 }
