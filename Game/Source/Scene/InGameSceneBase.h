@@ -74,8 +74,6 @@ namespace app
 		virtual const char* GetStageJsonPath() const = 0;
 		/** 敵の配置JSONパス */
 		virtual const char* GetEnemyJsonPath() const = 0;
-		/** 敵の配置バイナリパス */
-		virtual const char* GetEnemyBinaryPath() const = 0;
 		/** 渦潮の配置JSONパス */
 		virtual const char* GetWhirlpoolPositionsJsonPath() const = 0;
 		/** 渦潮のパラメーターJSONパス */

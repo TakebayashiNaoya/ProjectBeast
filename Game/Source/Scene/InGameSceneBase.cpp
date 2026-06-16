@@ -205,11 +205,9 @@ namespace app
 
 		case LoadPhase::Enemy:
 		{
-			//nlohmann::json json;
-			//util::JsonConverter::IsLoadJsonFile(json, GetEnemyJsonPath());
-			//actor::EnemyManager::GetInstance()->LoadEnemies(json);
-
-			actor::EnemyManager::GetInstance()->LoadEnemiesBinary(GetEnemyBinaryPath());
+			nlohmann::json json;
+			util::JsonConverter::IsLoadJsonFile(json, GetEnemyJsonPath());
+			actor::EnemyManager::GetInstance()->LoadEnemies(json);
 
 			/** エネミー1体につき探索UIを1つ生成 */
 			for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())

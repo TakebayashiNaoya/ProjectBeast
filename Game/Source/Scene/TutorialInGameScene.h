@@ -47,11 +47,6 @@ namespace app
 			return "Assets/parameter/character/enemy/EnemyLayout_Tutorial.json";
 		}
 
-		const char* GetEnemyBinaryPath() const override
-		{
-			return "Assets/parameter/character/enemy/EnemyLayout_Tutorial.bin";
-		}
-
 		const char* GetWhirlpoolPositionsJsonPath() const override
 		{
 			return "Assets/parameter/stage/whirlpoolPositions_Tutorial.json";
