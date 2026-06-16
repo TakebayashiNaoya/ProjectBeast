@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "SoundOptionMenu.h"
+#include "UIMenuConstants.h"
 #include "Source/Sound/SoundManager.h"
 
 
@@ -81,7 +82,6 @@ namespace app
 			const float POSITION_RANGE = fabsf(RIGHT_LIMITE - LEFT_LIMITE);
 			/** 音量の変化に対するポジションの変化の値 */
 			const float VOLUME_STEP = POSITION_RANGE / VOLUME_VALUE_CONVERTER;
-			constexpr float STICK_THRESHOLD = 0.5f;
 
 			/**
 			 * @brief タイプに対応する SoundManager の現在音量を取得する

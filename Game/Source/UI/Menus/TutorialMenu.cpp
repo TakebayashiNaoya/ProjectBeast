@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "TutorialMenu.h"
+#include "UIMenuConstants.h"
 #include "Source/Util/CRC32.h"
 
 
@@ -36,8 +37,6 @@ namespace app
 
 			/** スラッシュアイコンのUIIconキー */
 			constexpr uint32_t TUTORIAL_SLASH_ICON_KEY = Hash32("TutorialSlashIcon");
-
-			constexpr float STICK_THRESHOLD = 0.5f;
 		}
 
 

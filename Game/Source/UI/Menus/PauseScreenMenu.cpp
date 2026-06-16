@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "PauseScreenMenu.h"
+#include "UIMenuConstants.h"
 #include "Source/Util/CRC32.h"
 #include "SoundOptionMenu.h"
 
@@ -55,7 +56,6 @@ namespace app
 				,	{ Hash32("PauseFourPartsButton"),  PauseScreenType::GoBackTitleType}
 			};
 
-			constexpr float STICK_THRESHOLD = 0.5f;
 		}
 
 		PauseScreenIcon::PauseScreenIcon(PauseScreenType type)
@@ -196,7 +196,7 @@ namespace app
 				currentType = (currentType - PAUSE_SCREEN_ONE_VALUE < typeMin) ? typeMax : currentType - PAUSE_SCREEN_ONE_VALUE;
 				m_isStickNeutralY = false;
 			}
-			if (g_pad[0]->IsTrigger(enButtonDown) || (m_isStickNeutralY && stickY < -STICK_THRESHOLD)) {
+			else if (g_pad[0]->IsTrigger(enButtonDown) || (m_isStickNeutralY && stickY < -STICK_THRESHOLD)) {
 				currentType = (currentType + PAUSE_SCREEN_ONE_VALUE > typeMax) ? typeMin : currentType + PAUSE_SCREEN_ONE_VALUE;
 				m_isStickNeutralY = false;
 			}

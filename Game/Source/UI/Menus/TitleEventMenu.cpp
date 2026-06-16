@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "TitleEventMenu.h"
+#include "UIMenuConstants.h"
 
 
 namespace app
@@ -42,35 +43,35 @@ namespace app
 
 		void TitleEventMenu::Update()
 		{
-			// 左スティックのX軸の値を取得。
 			const float stickX = m_gamePad->GetLStickXF();
+			if (fabsf(stickX) < STICK_THRESHOLD) m_isStickNeutral = true;
 
-			// 入力の閾値を超えているか。
-			const float InputThreshold = 0.5f;
-			// スティックが中立に戻っているか。
-			if (fabsf(stickX) < InputThreshold)
+			const int eventNum = static_cast<int>(EnEventType::Num);
+
+			// スティック入力（ニュートラル復帰後のみ）。
+			if (m_isStickNeutral && stickX > STICK_THRESHOLD)
 			{
-				m_isStickNeutral = true;
+				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) + 1) % eventNum);
+				m_isStickNeutral = false;
+				SelectVisual();
+			}
+			if (m_isStickNeutral && stickX < -STICK_THRESHOLD)
+			{
+				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) - 1 + eventNum) % eventNum);
+				m_isStickNeutral = false;
+				SelectVisual();
 			}
 
-			if (m_isStickNeutral)
+			// 十字キー入力（IsTriggerで独立して一発判定）。
+			if (m_gamePad->IsTrigger(enButtonRight))
 			{
-				const int eventNum = static_cast<int>(EnEventType::Num);
-
-				// 右に入力がある場合（スティックまたは十字キー）。
-				if (stickX > InputThreshold || m_gamePad->IsTrigger(enButtonRight))
-				{
-					m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) + 1) % eventNum);
-					m_isStickNeutral = false;
-					SelectVisual();
-				}
-				// 左に入力がある場合（スティックまたは十字キー）。
-				if (stickX < -InputThreshold || m_gamePad->IsTrigger(enButtonLeft))
-				{
-					m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) - 1 + eventNum) % eventNum);
-					m_isStickNeutral = false;
-					SelectVisual();
-				}
+				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) + 1) % eventNum);
+				SelectVisual();
+			}
+			if (m_gamePad->IsTrigger(enButtonLeft))
+			{
+				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) - 1 + eventNum) % eventNum);
+				SelectVisual();
 			}
 
 			UpdateDrawFlag();
