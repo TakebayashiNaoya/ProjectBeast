@@ -166,10 +166,13 @@ namespace app
 			/** 子ペンギンを生成してタイプと座標をセット */
 			CreateChildPenguin();
 			auto* child = m_childPenguinList.back();
+			child->SetLogId(m_nextLogId++);
 			child->SetChildPenguinType(type);
 			child->SetPosition(spawnPos);
 			child->GetStateMachine()->SetPosition(spawnPos);
 			child->StartWrapper();
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->RecordSpawn("penguin", child->GetLogId(), {{"type", child->GetChildPenguinTypeStr()}});
 		}
 
 
@@ -220,6 +223,12 @@ namespace app
 
 		void ChildPenguinManager::RemoveAndDestroy(ChildPenguin* penguin)
 		{
+			if (auto* lm = GameLogManager::GetInstance())
+			{
+				lm->QueueEvent({{"ev", "penguin_die"}, {"penguin_id", penguin->GetLogId()}});
+				lm->RecordDespawn("penguin", penguin->GetLogId(), "dead");
+			}
+
 			/** 隊列から取り除く */
 			RemoveFollower(penguin);
 
@@ -253,6 +262,8 @@ namespace app
 				m_followers.push_back(penguin);
 				ScoreManager::GetInstance().AddCollectedCount();
 				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Happy);
+				if (auto* lm = GameLogManager::GetInstance())
+					lm->QueueEvent({{"ev", "penguin_join"}, {"penguin_id", penguin->GetLogId()}});
 			}
 			/** メンバーが増えたので次フレームで再ソート・再割り当てが走る */
 		}
@@ -266,6 +277,8 @@ namespace app
 				m_followers.erase(it);
 				ScoreManager::GetInstance().SubCollectedCount();
 				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Trouble);
+				if (auto* lm = GameLogManager::GetInstance())
+					lm->QueueEvent({{"ev", "penguin_leave"}, {"penguin_id", penguin->GetLogId()}});
 			}
 			/** メンバーが減ったので外側の子が内側に詰める処理が次フレームで自然に行われる */
 		}

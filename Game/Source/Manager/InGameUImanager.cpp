@@ -274,6 +274,18 @@ namespace app
 	}
 
 
+	void InGameUIManager::UpdateAchievementHotReload()
+	{
+		if (m_achievementPacket) m_achievementPacket->Update();
+	}
+
+
+	void InGameUIManager::UpdatePause()
+	{
+		if (m_pausePacket) m_pausePacket->Update();
+	}
+
+
 	//============================================//
 	// 描画処理
 	//============================================//

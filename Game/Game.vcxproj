@@ -286,6 +286,7 @@
     <ClCompile Include="Source\Core\StateMachineBase.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
+    <ClCompile Include="Source\GameLog\GameLogManager.cpp" />
     <ClCompile Include="Source\Graphics\PBRStatus.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
     <ClCompile Include="Source\Manager\IglooManager.cpp" />
@@ -331,6 +332,7 @@
     <ClCompile Include="Source\UI\Menus\InGameAchievementMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
+    <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp" />
@@ -350,9 +352,6 @@
     <ClCompile Include="Source\UI\Parts\UIParts.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingAnimStatus.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp" />
-    <ClCompile Include="Source\UI\StageSelect\MasterStageSelectParameter.cpp" />
-    <ClCompile Include="Source\UI\StageSelect\StageSelectMenu.cpp" />
-    <ClCompile Include="Source\UI\StageSelect\StageSelectStatus.cpp" />
     <ClCompile Include="Source\UI\WpWarning\MasterWpWarningParameter.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningAnimStatus.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningMenu.cpp" />
@@ -436,6 +435,7 @@
     <ClInclude Include="Source\Core\Transform.h" />
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
+    <ClInclude Include="Source\GameLog\GameLogManager.h" />
     <ClInclude Include="Source\Graphics\PBRParameter.h" />
     <ClInclude Include="Source\Graphics\PBRStatus.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
@@ -493,6 +493,7 @@
     <ClInclude Include="Source\UI\Menus\ResultMenu.h" />
     <ClInclude Include="Source\UI\Menus\SearchMenu.h" />
     <ClInclude Include="Source\UI\Menus\SoundOptionMenu.h" />
+    <ClInclude Include="Source\UI\Menus\StageSelectMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h" />
@@ -510,9 +511,6 @@
     <ClInclude Include="Source\UI\Parts\UIParts.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingChildMenu.h" />
-    <ClInclude Include="Source\UI\StageSelect\MasterStageSelectParameter.h" />
-    <ClInclude Include="Source\UI\StageSelect\StageSelectMenu.h" />
-    <ClInclude Include="Source\UI\StageSelect\StageSelectStatus.h" />
     <ClInclude Include="Source\UI\System\SystemPacket.h" />
     <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h" />

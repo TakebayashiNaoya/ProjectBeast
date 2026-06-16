@@ -35,9 +35,9 @@ namespace app
 			 */
 			inline const std::string& GetDescription() const { return m_description; }
 			/**
-			  * @brief アチーブメントのIDを取得
-			  * @return アチーブメントのIDを取得
-			  */
+			 * @brief アチーブメントのIDを取得
+			 * @return アチーブメントのIDを取得
+			 */
 			inline uint32_t GetID() const { return m_id; }
 			/**
 			 * @brief アチーブメントが達成されているかどうかを設定
@@ -60,6 +60,12 @@ namespace app
 			 * @brief 更新処理
 			 */
 			virtual void Update() = 0;
+
+			/**
+			 * @brief ゲーム終了時に一度だけ呼ばれる評価処理
+			 * @details FinalConditionAchievement のみオーバーライドする
+			 */
+			virtual void Finalize() {}
 
 
 		public:
@@ -284,6 +290,31 @@ namespace app
 
 		private:
 			uint32_t m_recordValue; // 保持する記録（今回の場合は最大マーキング数）
+		};
+		/*************************************************/
+
+		/**
+		 * @brief ゲーム終了時評価タイプのアチーブメントクラス
+		 * @details 「撃破数 ≤ N」など、ゲーム開始直後は常に成立してしまう条件に使う。
+		 *          Update() では評価せず、AchievementManager::FinalizeAchievements() で
+		 *          Finalize() が呼ばれたときだけ条件を評価する。
+		 */
+		class FinalConditionAchievement : public AchievementBase
+		{
+		public:
+			FinalConditionAchievement();
+			~FinalConditionAchievement() override;
+
+			void SetCondition(std::function<bool()> cond) { m_conditionFunc = cond; }
+
+			/** ゲーム中は評価しない */
+			void Update() override final {}
+
+			/** ゲーム終了時に一度だけ評価する */
+			void Finalize() override final;
+
+		private:
+			void InitAchievementImpl(const nlohmann::json&) override final {}
 		};
 	}
 }

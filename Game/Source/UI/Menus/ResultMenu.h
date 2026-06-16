@@ -14,6 +14,26 @@ namespace app
 {
 	namespace ui
 	{
+		/** @brief result.json の dynamic_layout セクションに対応する構造体 */
+		struct ResultDynamicLayout
+		{
+			Vector3 achieveStartPos     = { -200.0f, 150.0f, 0.0f };
+			float   achieveOffsetY      = -80.0f;
+			float   achieveOffsetXCheck = -400.0f;
+			float   achieveOffsetXName  =   60.0f;
+			float   achieveOffsetXBack  =   60.0f;
+			float   achieveNameFontSize =    0.5f;
+			float   achieveNamePivotX   =    0.0f;
+			float   achieveBackW        = 780.0f;
+			float   achieveBackH        = 120.0f;
+			float   achieveBoxW         =  60.0f;
+			float   achieveBoxH         =  60.0f;
+			float   achieveCheckW       =  60.0f;
+			float   achieveCheckH       =  60.0f;
+
+		};
+
+
 		/**
 		 * @brief リザルト画面の動的処理クラス
 		 */
@@ -39,6 +59,9 @@ namespace app
 		private:
 			void SetupAchievementUI();
 			void UpdateRevealSequence();
+			void BuildDynamicUI();
+			void ClearDynamicElements();
+			void LoadDynamicLayout();
 
 
 		private:
@@ -49,8 +72,9 @@ namespace app
 
 			app::SEHandle m_drumRollHandle;
 
+			bool m_dataSet = false;               // SetResultData が呼ばれたか
+			ResultDynamicLayout m_dynLayout;      // JSON から読み込んだレイアウト設定
 			std::vector<UIIcon*> m_checkIconList; // 達成済みチェックアイコン（表示順）
-			UIDigit* m_totalDigit;                // トータルスコア表示用
 
 			// 演出用タイマーとフラグ
 			float m_checkRevealTimer;

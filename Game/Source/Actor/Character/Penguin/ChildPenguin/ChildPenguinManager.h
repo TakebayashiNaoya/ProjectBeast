@@ -523,6 +523,8 @@ namespace app
 
 			/** かまくらに入ろうとしている子ペンギンの残り数 */
 			int m_iglooEnteringCount = 0;
+			/** ログ用IDの連番カウンタ */
+			int m_nextLogId = 0;
 		};
 	}
 }

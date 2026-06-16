@@ -138,7 +138,8 @@ namespace app
 				m_isSlide = isSlide;
 				m_isSwimming = IsInWater();
 			}
-
+			/** ログ用：現在の状態名を返す（PenguinStateMachine.cpp で定義） */
+			const char* GetStateNameForLog() const;
 
 		protected:
 			/**

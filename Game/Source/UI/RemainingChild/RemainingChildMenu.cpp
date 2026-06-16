@@ -32,8 +32,10 @@ namespace app
 				m_startingAnimLogic.Initialize(
 					this,
 					{ "ChildPenguinIcon", "SlashIcon", "BgIcon" },
-					{ "RemainingNum", "TotalNum" },
-					Vector3(-400.0f, 0.0f, 0.0f)
+					{},
+					Vector3(-400.0f, 0.0f, 0.0f),
+					1.0f,
+					{ "RemainingNum", "TotalNum" }
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())
@@ -55,17 +57,17 @@ namespace app
 			if (bgIcon) bgIcon->m_isDraw = isVisible;
 
 			// 残り子ペンギンの数更新
-			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
-			if (digit) {
-				digit->m_isDraw = isVisible;
-				digit->SetNumber(m_childNum);
+			auto* text = GetUI<UIText>(Hash32("RemainingNum"));
+			if (text) {
+				text->m_isDraw = isVisible;
+				text->SetText(std::to_string(m_childNum));
 			}
 
 			// ステージ上の総ペンギン数更新
-			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
-			if (totalDigit) {
-				totalDigit->m_isDraw = isVisible;
-				totalDigit->SetNumber(m_totalNum);
+			auto* totalText = GetUI<UIText>(Hash32("TotalNum"));
+			if (totalText) {
+				totalText->m_isDraw = isVisible;
+				totalText->SetText(std::to_string(m_totalNum));
 			}
 
 			// 配列の中のアニメーションシーケンスを更新する。
@@ -85,11 +87,9 @@ namespace app
 
 		void RemainingChildMenu::SetChildNum(const int num)
 		{
-			// UIDigitを取得。
-			auto* remainDigit = GetUI<UIDigit>(Hash32("RemainingNum"));
+			auto* remainText = GetUI<UIText>(Hash32("RemainingNum"));
 
-			// Digitがなかったら処理しない。
-			if (!remainDigit) return;
+			if (!remainText) return;
 
 			// 今の救助数と異なっていたら
 			if (m_childNum != num)
@@ -101,13 +101,13 @@ namespace app
 					auto& seq = m_sequences[static_cast<int>(SeqType::RemainPlus)];
 
 					// 救助数増加アニメーションを消去。
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
+					remainText->RemoveAnimation(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
+					remainText->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
 
 					// 座標アニメーションを登録。
-					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
+					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
 					// 座標アニメーションを登録。(バウンドあり)
-					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
+					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
 
 
 					// シーケンスをクリア。
@@ -117,7 +117,7 @@ namespace app
 					seq
 						// アニメーション開始時にSEを再生する。
 						.Add(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY, 0.0f
-							, [remainDigit]()
+							, [remainText]()
 							{
 								// SEを再生。
 								SoundManager::Get().PlaySE(enSoundKind_RemainPlus);
@@ -130,7 +130,7 @@ namespace app
 						);
 
 					// シーケンスを再生。
-					seq.Play(remainDigit);
+					seq.Play(remainText);
 				}
 
 				/** 減るアニメーション */
@@ -140,13 +140,13 @@ namespace app
 					auto& seq = m_sequences[static_cast<int>(SeqType::RemainMinus)];
 
 					// 救助数減少アニメーションを消去。
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
-					remainDigit->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
+					remainText->RemoveAnimation(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
+					remainText->RemoveAnimation(animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
 
 					// 座標アニメーションを登録。
-					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
+					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY);
 					// 座標アニメーションを登録。(バウンドなし)
-					UIAnimationFactory::Attach<UITranslateAnimation>(remainDigit, animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
+					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_BOUNCE_DOWN_UP_ANIM_KEY);
 
 
 					// シーケンスをクリア。
@@ -156,7 +156,7 @@ namespace app
 					seq
 						// アニメーション開始時にSEを再生する。
 						.Add(animKey::RESCUE_REMAIN_SINK_DOWN_ANIM_KEY, 0.0f
-							, [remainDigit]()
+							, [remainText]()
 							{
 								// SEを再生。
 								SoundManager::Get().PlaySE(enSoundKind_RemainORTotalMinus);
@@ -169,7 +169,7 @@ namespace app
 						);
 
 					// シーケンスを再生。
-					seq.Play(remainDigit);
+					seq.Play(remainText);
 				}
 
 				m_childNum = num;
@@ -179,11 +179,9 @@ namespace app
 
 		void RemainingChildMenu::SetTotalNum(const int num)
 		{
-			// 総数のDigitを取得。
-			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
+			auto* totalText = GetUI<UIText>(Hash32("TotalNum"));
 
-			// Digitがないなら処理しない。
-			if (!totalDigit) return;
+			if (!totalText) return;
 
 			// 今の総数と異なっていたら
 			if (m_totalNum != num)
@@ -195,13 +193,13 @@ namespace app
 					auto& seq = m_sequences[static_cast<int>(SeqType::TotalMinus)];
 
 					// 使うアニメーションキーを消去。
-					totalDigit->RemoveAnimation(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY);
-					totalDigit->RemoveAnimation(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY);
+					totalText->RemoveAnimation(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY);
+					totalText->RemoveAnimation(animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY);
 
 					// 座標アニメーションを登録。
-					UIAnimationFactory::Attach<UITranslateAnimation>(totalDigit, animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY);
+					UIAnimationFactory::Attach<UITranslateAnimation>(totalText, animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY);
 					// 座標アニメーションを登録。(バウンドなし)
-					UIAnimationFactory::Attach<UITranslateAnimation>(totalDigit, animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY);
+					UIAnimationFactory::Attach<UITranslateAnimation>(totalText, animKey::RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY);
 
 					// シーケンスを削除。
 					seq.Clear();
@@ -210,7 +208,7 @@ namespace app
 					seq
 						// アニメーション開始時にSEを再生する。
 						.Add(animKey::RESCUE_TOTAL_SINK_DOWN_ANIM_KEY, 0.0f
-							, [totalDigit]()
+							, [totalText]()
 							{
 								// SEを再生。
 								SoundManager::Get().PlaySE(enSoundKind_RemainORTotalMinus);
@@ -223,7 +221,7 @@ namespace app
 						);
 
 					// シーケンスを再生。
-					seq.Play(totalDigit);
+					seq.Play(totalText);
 				}
 
 				m_totalNum = num;
@@ -258,11 +256,11 @@ namespace app
 			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
 			if (bgIcon) bgIcon->m_isDraw = false;
 
-			auto* digit = GetUI<UIDigit>(Hash32("RemainingNum"));
-			if (digit) digit->m_isDraw = false;
+			auto* text = GetUI<UIText>(Hash32("RemainingNum"));
+			if (text) text->m_isDraw = false;
 
-			auto* totalDigit = GetUI<UIDigit>(Hash32("TotalNum"));
-			if (totalDigit) totalDigit->m_isDraw = false;
+			auto* totalText = GetUI<UIText>(Hash32("TotalNum"));
+			if (totalText) totalText->m_isDraw = false;
 		}
 	}
 }

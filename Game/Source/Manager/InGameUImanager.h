@@ -78,6 +78,18 @@ namespace app
 		void UpdateFinishing();
 
 		/**
+		 * @brief ポーズ中のアチーブメントホットリロード反映
+		 * @detail ポーズ中は UpdatePlaying() が止まるため、achievementPacket だけ別途更新する
+		 */
+		void UpdateAchievementHotReload();
+
+		/**
+		 * @brief ポーズフェーズの更新（ホットリロード対応）
+		 * @detail Layout::Update() を経由することでJSONのホットリロードを有効にする
+		 */
+		void UpdatePause();
+
+		/**
 		 * @brief カウントダウンフェーズの描画
 		 * @param rc レンダーコンテキスト
 		 */

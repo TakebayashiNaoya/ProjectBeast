@@ -111,7 +111,9 @@ namespace app
 		TimeManager::GetInstance().ResetTime();
 
 		app::achievement::AchievementManager::CreateInstance();
-		app::achievement::AchievementManager::GetInstance()->Start();
+		app::achievement::AchievementManager::GetInstance()->Start(GetAchievementJsonPath());
+
+		GameLogManager::CreateInstance();
 
 		/** PBRStatus生成 */
 		graphics::PBRStatus::CreateInstance();
@@ -387,6 +389,15 @@ namespace app
 
 			app::achievement::AchievementManager::GetInstance()->Update();
 
+			/** ログ毎秒ティック */
+			m_logTickTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_logTickTimer >= 0.1f)
+			{
+				m_logTickTimer -= 0.1f;
+				if (auto* lm = GameLogManager::GetInstance())
+					lm->RecordTick(m_daddyPenguin);
+			}
+
 			/** ノイズリストをクリア */
 			NoiseManager::GetInstance().ClearNoises();
 
@@ -428,10 +439,40 @@ namespace app
 			{
 				SoundManager::Get().StopBGM();
 				m_nextScene = true;
-				ResultScene::SetResult(
-					TimeManager::GetInstance().GetCurTime(),
-					actor::ChildPenguinManager::GetInstance()->GetRescuedNum()
-				);
+
+				const float clearTime = TimeManager::GetInstance().GetCurTime();
+				const int   rescued   = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
+				ResultScene::SetResult(clearTime, rescued);
+
+				/** アチーブメント最終判定（FinalCondition 型を評価） */
+				float logScore = 0.0f;
+				if (auto* am = app::achievement::AchievementManager::GetInstance())
+				{
+					am->FinalizeAchievements();
+
+					// ResultScene::CalcTotalScore() と同じ式でスコアを算出してログに記録する
+					int achievedCount = 0;
+					for (auto* achieve : am->GetAllAchievements())
+					{
+						if (achieve && achieve->IsAchieved()) achievedCount++;
+					}
+					constexpr int   MIN_ACHIEVE_MULTIPLIER  = 1;
+					constexpr float BASE_TIME_MULTIPLIER    = 1.0f;
+					constexpr float SCORE_TIME_DIVISOR      = 100.0f;
+					constexpr float SCORE_BASE_MULTIPLIER   = 100.0f;
+
+					const int   achieveMultiplier = (achievedCount > 0) ? achievedCount : MIN_ACHIEVE_MULTIPLIER;
+					const float timeMultiplier    = BASE_TIME_MULTIPLIER + (clearTime / SCORE_TIME_DIVISOR);
+					logScore = static_cast<float>(rescued) * SCORE_BASE_MULTIPLIER
+						* static_cast<float>(achieveMultiplier) * timeMultiplier;
+				}
+
+				/** ログをファイルへ書き出し */
+				if (auto* lm = GameLogManager::GetInstance())
+				{
+					lm->Flush(GetStageName(), clearTime, rescued, logScore);
+					GameLogManager::DestroyInstance();
+				}
 			}
 			break;
 		}
@@ -451,6 +492,16 @@ namespace app
 			m_isPauseEntered = true;
 		}
 
+		/** ポーズ中もアチーブメントJSONのホットリロードとUI反映を行う */
+		if (auto* am = app::achievement::AchievementManager::GetInstance())
+		{
+			am->CheckHotReload();
+		}
+		if (auto* uiMngr = InGameUIManager::GetInstance())
+		{
+			uiMngr->UpdateAchievementHotReload();
+		}
+
 		/** 派生クラスが独自ポーズを処理する場合は通常ポーズをスキップ */
 		if (OnPauseUpdate()) return;
 
@@ -465,8 +516,7 @@ namespace app
 			auto* pauseMenu = uiMngr->GetPauseMenu();
 			if (!pauseMenu) break;
 
-			pauseMenu->Update();
-			pauseMenu->EnterType();
+			uiMngr->UpdatePause();
 
 			/** ゲームに戻る */
 			if (pauseMenu->IsRetry())

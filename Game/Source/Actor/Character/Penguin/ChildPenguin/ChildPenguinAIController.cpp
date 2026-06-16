@@ -50,7 +50,7 @@ namespace app
 			/** ずらす間隔 */
 			constexpr float SWEAT_INTERVAL = 0.3f;
 			/** 秒数判定 */
-			constexpr float LIVELY_INTERVAL = 0.7f;
+			constexpr float LIVELY_INTERVAL = 1.5f;
 
 
 			/** シロクマを起こすための距離 */
@@ -670,6 +670,15 @@ namespace app
 		{}
 
 
+		ClingyChildPenguinAI::~ClingyChildPenguinAI()
+		{
+			if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
+			{
+				EffectManager::Get().StopEffect(m_clingyEffectHandle);
+			}
+		}
+
+
 		void ClingyChildPenguinAI::Update()
 		{
 			if (m_isEnterIglooMode) {
@@ -689,12 +698,18 @@ namespace app
 				{
 					// 計測時間。
 					m_effectInterval += g_gameTime->GetFrameDeltaTime();
-					// ハートエフェクトの生み出される地点。
-					const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
 
 					// 1秒を超えたらエフェクトを再生。
 					if (m_effectInterval > 1.0f)
 					{
+						// 古いエフェクトを停止してから新しいものを生成する（取り残し防止）。
+						if (m_clingyEffectHandle != INVALID_EFFECT_HANDLE)
+						{
+							EffectManager::Get().StopEffect(m_clingyEffectHandle);
+							m_clingyEffectHandle = INVALID_EFFECT_HANDLE;
+						}
+
+						const Vector3 hartPos = m_owner->GetTransform().m_position + CLINGY_HART_EFFECT_POSITION;
 						const Vector3 hartScl = m_owner->GetTransform().m_scale + CLINGY_HART_EFFECT_SCALE;
 						m_clingyEffectHandle = EffectManager::Get().PlayEffect(
 							EnEffectKind::ClingyPenguinHart
@@ -702,15 +717,14 @@ namespace app
 							, Quaternion::Identity
 							, hartScl
 						);
+						// キャラクターに追従させる。
+						EffectManager::Get().AttachEffect(
+							m_clingyEffectHandle,
+							&m_owner->GetTransform().m_position,
+							CLINGY_HART_EFFECT_POSITION
+						);
 						// インターバルをリセット。
 						m_effectInterval = 0.0f;
-					}
-
-					// エフェクトの位置を子ペンギンの頭上に固定更新。
-					auto* effect = EffectManager::Get().FindEffect(m_clingyEffectHandle);
-					if (effect != nullptr)
-					{
-						effect->SetPosition(hartPos);
 					}
 				};
 
@@ -744,15 +758,16 @@ namespace app
 
 				if (m_isFollowing)
 				{
-					updateClingyEffect();
-				}
-
-				else if (m_isFollowing && distDaddy > m_giveUpDistance)
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
-
-					stopEffect();
+					if (distDaddy > m_giveUpDistance)
+					{
+						manager->RemoveFollower(m_owner);
+						m_isFollowing = false;
+						stopEffect();
+					}
+					else
+					{
+						updateClingyEffect();
+					}
 				}
 
 				if (!m_isFollowing)
@@ -777,6 +792,7 @@ namespace app
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
+				stopEffect();
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
 			}
@@ -844,6 +860,12 @@ namespace app
 			const auto& td = GetTypeData(EnChildPenguinType::Naughty);
 			m_roamTriggerDistance = RollRange(td.roamTriggerDistance);
 			m_roamRadius = RollRange(td.roamRadius);
+		}
+
+
+		NaughtyChildPenguinAI::~NaughtyChildPenguinAI()
+		{
+			StopLivelyEffect();
 		}
 
 
@@ -960,6 +982,8 @@ namespace app
 					m_naughtyStateMachine->SetIsGoingToWakeBear(true);
 					m_naughtyStateMachine->SetTargetBear(targetBear);
 					m_naughtyStateMachine->SetBearTargetPos(targetBear->GetTransform().m_position);
+					if (auto* lm = GameLogManager::GetInstance())
+						lm->QueueEvent({ {"ev", "naughty_disobey"}, {"penguin_id", m_owner->GetLogId()}, {"toward", "bear"}, {"bear_id", targetBear->GetLogId()} });
 
 					// シロクマに向かうため、隊列や徘徊からは離脱する
 					if (m_isFollowing)
@@ -979,6 +1003,8 @@ namespace app
 				{
 					m_naughtyStateMachine->SetIsGoingToWhirlpool(true);
 					m_naughtyStateMachine->SetWhirlpoolTargetPos(whirlpoolPos);
+					if (auto* lm = GameLogManager::GetInstance())
+						lm->QueueEvent({ {"ev", "naughty_disobey"}, {"penguin_id", m_owner->GetLogId()}, {"toward", "whirlpool"} });
 
 					if (m_isFollowing) { manager->RemoveFollower(m_owner); m_isFollowing = false; }
 					if (manager->IsRoaming(m_owner)) { manager->UnregisterRoaming(m_owner); }
@@ -1054,7 +1080,7 @@ namespace app
 					m_naughtyStateMachine->SetIsAtBear(false);
 					manager->UnregisterAttempting(m_owner);
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
-					
+
 					StopLivelyEffect();
 					return;
 				}
@@ -1202,14 +1228,11 @@ namespace app
 			// 時間計測。
 			m_livelyInterval += g_gameTime->GetFrameDeltaTime();
 
-			// 子ペンギンの座標を取得。
-			const Vector3 effectPos = m_owner->GetTransform().m_position;
-			// 子ペンギンのスケールを取得。
-			const Vector3 effectScl = m_owner->GetTransform().m_scale + NAUGHTY_LIVELY_EFFECT_SCALE;
-
-
 			if (m_livelyInterval > LIVELY_INTERVAL)
 			{
+				const Vector3 effectPos = m_owner->GetTransform().m_position;
+				const Vector3 effectScl = m_owner->GetTransform().m_scale + NAUGHTY_LIVELY_EFFECT_SCALE;
+
 				// エフェクトの再生。
 				m_livelyEffectHandle = EffectManager::Get().PlayEffect(
 					EnEffectKind::NaughtyPenguinLively
@@ -1217,17 +1240,14 @@ namespace app
 					, Quaternion::Identity
 					, effectScl
 				);
+				// キャラクターに追従させる。
+				EffectManager::Get().AttachEffect(
+					m_livelyEffectHandle,
+					&m_owner->GetTransform().m_position
+				);
 
 				// インターバルをリセット。
 				m_livelyInterval = 0.0f;
-			}
-
-			auto* effect = EffectManager::Get().FindEffect(m_livelyEffectHandle);
-			// エフェクトが存在しているなら
-			if (effect != nullptr)
-			{
-				// 子ペンギンの頭上にエフェクトを表示。
-				effect->SetPosition(effectPos);
 			}
 		}
 
@@ -1379,10 +1399,16 @@ namespace app
 
 		CaringChildPenguinAI::CaringChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Caring)
-			, m_caringEffectHandle(INVALID_EFFECT_HANDLE)
+			, m_caringEffectHandles({ INVALID_EFFECT_HANDLE, INVALID_EFFECT_HANDLE, INVALID_EFFECT_HANDLE })
 		{
 			const auto& td = GetTypeData(EnChildPenguinType::Caring);
 			m_interventionRange = td.interventionRange;
+		}
+
+
+		CaringChildPenguinAI::~CaringChildPenguinAI()
+		{
+			StopAllCaringEffects();
 		}
 
 
@@ -1441,8 +1467,7 @@ namespace app
 						manager->UnregisterAssigned(m_interventionTarget);
 						m_interventionTarget = nullptr;
 
-						m_sweatEffectCount = 0;
-						m_sweatEffectCoolTime = 0.0f;
+						StopAllCaringEffects();
 					}
 				}
 				else if (m_interventionTarget != nullptr)
@@ -1574,8 +1599,7 @@ namespace app
 					/** 起き上がり完了 → 介入終了 */
 					manager->UnregisterAssigned(m_interventionTarget);
 					m_interventionTarget = nullptr;
-					m_sweatEffectCount = 0;
-					m_sweatEffectCoolTime = 0.0f;
+					StopAllCaringEffects();
 				}
 			}
 			else if (m_interventionTarget != nullptr &&
@@ -1691,24 +1715,38 @@ namespace app
 			const Vector3 sweatPos = m_owner->GetTransform().m_position + CARING_SWEAT_EFFECT_POSITION;
 			// 汗エフェクトの大きさ。
 			const Vector3 sweatScl = m_owner->GetTransform().m_scale + CARING_SWEAT_EFFECT_SCALE;
-			// 汗エフェクトの再生。
-			m_caringEffectHandle = EffectManager::Get().PlayEffect(
+			// 汗エフェクトの再生。インデックスはカウント増加前の値を使う。
+			m_caringEffectHandles[m_sweatEffectCount] = EffectManager::Get().PlayEffect(
 				EnEffectKind::CaringPenguinSweat
 				, sweatPos
 				, Quaternion::Identity
 				, sweatScl
 			);
+			// キャラクターに追従させる。
+			EffectManager::Get().AttachEffect(
+				m_caringEffectHandles[m_sweatEffectCount],
+				&m_owner->GetTransform().m_position,
+				CARING_SWEAT_EFFECT_POSITION
+			);
 			// カウントを増やす。
 			m_sweatEffectCount++;
 			// 値のリセット。
 			m_sweatEffectCoolTime = 0.0f;
+		}
 
-			// エフェクトの位置を子ペンギンの頭上に固定更新。
-			auto* effect = EffectManager::Get().FindEffect(m_caringEffectHandle);
-			if (effect != nullptr)
+
+		void CaringChildPenguinAI::StopAllCaringEffects() const
+		{
+			for (auto& handle : m_caringEffectHandles)
 			{
-				effect->SetPosition(sweatPos);
+				if (handle != INVALID_EFFECT_HANDLE)
+				{
+					EffectManager::Get().StopEffect(handle);
+					handle = INVALID_EFFECT_HANDLE;
+				}
 			}
+			m_sweatEffectCount = 0;
+			m_sweatEffectCoolTime = 0.0f;
 		}
 
 

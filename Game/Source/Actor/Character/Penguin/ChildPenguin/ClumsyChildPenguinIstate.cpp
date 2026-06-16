@@ -12,7 +12,7 @@
 #include "Source/Effect/EffectManager.h"
 #include "Source/Sound/SoundManager.h"
 
-#include "Source/Noise/NoiseManager.h" 
+#include "Source/Noise/NoiseManager.h"
 
 
 namespace app
@@ -42,6 +42,8 @@ namespace app
 			m_owner->SetMoveSpeed(0.0f);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Trip);
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "trip"}});
 		}
 
 
@@ -122,6 +124,8 @@ namespace app
 
 			/** Managerに転倒中であることを登録する */
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->QueueEvent({{"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "slip"}});
 		}
 
 
