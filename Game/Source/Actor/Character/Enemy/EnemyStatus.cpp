@@ -23,20 +23,8 @@ namespace app
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameterBinary<MasterEnemyParameter>(
-				PARAMETER_BINARY_FILE_PATH,
-				[](std::istream& stream, MasterEnemyParameter& parameter)
-				{
-					stream.seekg(sizeof(int) * 2, std::ios::cur);
-					stream.read(reinterpret_cast<char*>(&parameter.walkSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.runSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.radius), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.height), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.swimSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.maxEat), sizeof(int));
-					stream.read(reinterpret_cast<char*>(&parameter.maxStamina), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.staminaDrainRate), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.lostChaseDistance), sizeof(float));
-				});
+				PARAMETER_BINARY_FILE_PATH
+			);
 		}
 
 

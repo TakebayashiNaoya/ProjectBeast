@@ -140,20 +140,17 @@ def pack_child_penguin_parameter(data):
     )
 
 def pack_enemy_parameter(data):
-    # i(2), f(5), i(1), f(3)  計44 bytes
     return struct.pack(
-        "<iifffffifff",
-        int(data.get("maxHp", 0)),
-        int(data.get("hp", 0)),
-        float(data.get("walkSpeed", 0.0)),
-        float(data.get("runSpeed", 0.0)),
-        float(data.get("radius", 0.0)),
-        float(data.get("height", 0.0)),
-        float(data.get("swimSpeed", 0.0)),
-        int(data.get("maxEat", 0)),
-        float(data.get("maxStamina", 0.0)),
-        float(data.get("staminaDrainRate", 0.0)),
-        float(data.get("lostChaseDistance", 0.0))
+       "<fffffifff",
+        float(data.get("runSpeed", 0.0)),         
+        float(data.get("swimSpeed", 0.0)),        
+        float(data.get("radius", 0.0)),           
+        float(data.get("height", 0.0)),           
+        float(data.get("walkSpeed", 0.0)),        
+        int(data.get("maxEat", 0)),               
+        float(data.get("maxStamina", 0.0)),       
+        float(data.get("staminaDrainRate", 0.0)), 
+        float(data.get("lostChaseDistance", 0.0)) 
     )
 
 def convert_enemy_layout(json_path, bin_path):
@@ -278,9 +275,6 @@ RULE_BOOK = {
 # ファイル全体を処理する特殊な変換テーブル（可変長データを持つ構造向け）
 # 引数は (json_path, bin_path) を受け取る関数を登録する
 FILE_RULE_BOOK = {
-    "EnemyLayout": convert_enemy_layout,
-    # 新しいレイアウト系JSONを追加する場合はここに1行追記する
-    # "WhirlpoolPositions": convert_whirlpool_positions,
 }
 
 
