@@ -14,20 +14,46 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/enemy/EnemyParameter.bin";
+		}
+
 		EnemyStatus::EnemyStatus()
 		{
 			// 外部ファイルを読み込み
-			core::ParameterManager::Get()->LoadParameter<MasterEnemyParameter>("Assets/parameter/character/enemy/EnemyParameter.json", [](const nlohmann::json& j, MasterEnemyParameter& parameter)
+			//core::ParameterManager::Get()->LoadParameter<MasterEnemyParameter>("Assets/parameter/character/enemy/EnemyParameter.json", [](const nlohmann::json& j, MasterEnemyParameter& parameter)
+			//	{
+			//		parameter.walkSpeed = util::JsonConverter::ToFloat(j, "walkSpeed");
+			//		parameter.runSpeed = util::JsonConverter::ToFloat(j, "runSpeed");
+			//		parameter.radius = util::JsonConverter::ToFloat(j, "radius");
+			//		parameter.height = util::JsonConverter::ToFloat(j, "height");
+			//		parameter.swimSpeed = util::JsonConverter::ToFloat(j, "swimSpeed");
+			//		parameter.maxEat = util::JsonConverter::ToInt(j, "maxEat");
+			//		parameter.maxStamina = util::JsonConverter::ToFloat(j, "maxStamina");
+			//		parameter.staminaDrainRate = util::JsonConverter::ToFloat(j, "staminaDrainRate");
+			//		parameter.lostChaseDistance = util::JsonConverter::ToFloat(j, "lostChaseDistance");
+			//	});
+
+			core::ParameterManager::Get()->LoadParameterBinary<MasterEnemyParameter>(
+				PARAMETER_BINARY_FILE_PATH,
+				[](std::istream& stream, MasterEnemyParameter& parameter)
 				{
-					parameter.walkSpeed = util::JsonConverter::ToFloat(j, "walkSpeed");
-					parameter.runSpeed = util::JsonConverter::ToFloat(j, "runSpeed");
-					parameter.radius = util::JsonConverter::ToFloat(j, "radius");
-					parameter.height = util::JsonConverter::ToFloat(j, "height");
-					parameter.swimSpeed = util::JsonConverter::ToFloat(j, "swimSpeed");
-					parameter.maxEat = util::JsonConverter::ToInt(j, "maxEat");
-					parameter.maxStamina = util::JsonConverter::ToFloat(j, "maxStamina");
-					parameter.staminaDrainRate = util::JsonConverter::ToFloat(j, "staminaDrainRate");
-					parameter.lostChaseDistance = util::JsonConverter::ToFloat(j, "lostChaseDistance");
+					// Python側で最初に書き出されている maxHp(int), hp(int) は使わないので8バイト分読み飛ばす
+					stream.seekg(sizeof(int) * 2, std::ios::cur);
+
+					stream.read(reinterpret_cast<char*>(&parameter.walkSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.runSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.radius), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.height), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.swimSpeed), sizeof(float));
+
+					// ここだけ int 型なので注意
+					stream.read(reinterpret_cast<char*>(&parameter.maxEat), sizeof(int));
+
+					stream.read(reinterpret_cast<char*>(&parameter.maxStamina), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.staminaDrainRate), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.lostChaseDistance), sizeof(float));
 				});
 		}
 

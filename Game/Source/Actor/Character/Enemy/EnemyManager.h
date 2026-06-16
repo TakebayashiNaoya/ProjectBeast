@@ -28,6 +28,12 @@ namespace app
 			void LoadEnemies(const nlohmann::json& json);
 
 			/**
+			 * @brief バイナリからエネミーを一括生成
+			 * @param filePath エネミーの配置データ
+			 */
+			void LoadEnemiesBinary(const char* filePath);
+
+			/**
 			 * @brief エネミーの全削除
 			 */
 			void ClearEnemies();

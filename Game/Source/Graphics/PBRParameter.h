@@ -4,8 +4,8 @@
  * @author 竹林
  */
 #pragma once
-#include "Source/Core/IMasterParameter.h"
 #include "Graphics/ModelRender.h"
+#include "Source/Core/IMasterParameter.h"
 
 
 namespace app
@@ -24,6 +24,11 @@ namespace app
 			void Load(const nlohmann::json& j) override
 			{
 				load(j, *this);
+			}
+
+			void Load(std::istream& stream) override
+			{
+				loadBinary(stream, *this);
 			}
 #endif // APP_PARAM_HOT_RELOAD
 

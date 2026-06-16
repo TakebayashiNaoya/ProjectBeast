@@ -24,6 +24,10 @@ namespace app
 			{
 				load(j, *this);
 			}
+			void Load(std::istream& stream) override
+			{
+				loadBinary(stream, *this);
+			}
 #endif // APP_PARAM_HOT_RELOAD
 
 			// ペンギン固有のパラメーターをここに追加していく

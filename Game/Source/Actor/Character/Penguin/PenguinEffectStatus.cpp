@@ -15,7 +15,9 @@ namespace app
 	{
 		namespace
 		{
-			const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/PenguinEffectParameter.json";
+			//const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/PenguinEffectParameter.json";
+
+			const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/PenguinEffectParameter.bin";
 		}
 
 
@@ -37,38 +39,43 @@ namespace app
 			, m_slideLineOffsetForward(0.0f)
 		{
 			// 外部ファイルを読み込み
-			core::ParameterManager::Get()->LoadParameter<MasterPenguinEffectParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterPenguinEffectParameter& parameter)
+			core::ParameterManager::Get()->LoadParameterBinary<MasterPenguinEffectParameter>(
+				PARAMETER_BINARY_FILE_PATH,
+				[](std::istream& stream, MasterPenguinEffectParameter& parameter)
 				{
-					parameter.splashEffectScale.x = j["splashEffectScale"]["x"].get<float>();
-					parameter.splashEffectScale.y = j["splashEffectScale"]["y"].get<float>();
-					parameter.splashEffectScale.z = j["splashEffectScale"]["z"].get<float>();
+					// Vector3: splashEffectScale
+					stream.read(reinterpret_cast<char*>(&parameter.splashEffectScale.x), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.splashEffectScale.y), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.splashEffectScale.z), sizeof(float));
 
-					parameter.effectOffsetForward = j["effectOffsetForward"].get<float>();
-					parameter.splashEffectInterval = j["splashEffectInterval"].get<float>();
-					parameter.minMoveVelocitySq = j["minMoveVelocitySq"].get<float>();
-					parameter.minSplashScaleRatio = j["minSplashScaleRatio"].get<float>();
-					parameter.maxSplashScaleRatio = j["maxSplashScaleRatio"].get<float>();
-					parameter.minSpeed = j["minSpeed"].get<float>();
-					parameter.maxSpeed = j["maxSpeed"].get<float>();
+					stream.read(reinterpret_cast<char*>(&parameter.effectOffsetForward), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.splashEffectInterval), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.minMoveVelocitySq), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.minSplashScaleRatio), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.maxSplashScaleRatio), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.minSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.maxSpeed), sizeof(float));
 
-					parameter.landingEffectScale.x = j["landingEffectScale"]["x"].get<float>();
-					parameter.landingEffectScale.y = j["landingEffectScale"]["y"].get<float>();
-					parameter.landingEffectScale.z = j["landingEffectScale"]["z"].get<float>();
+					// Vector3: landingEffectScale
+					stream.read(reinterpret_cast<char*>(&parameter.landingEffectScale.x), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.landingEffectScale.y), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.landingEffectScale.z), sizeof(float));
 
-					parameter.slideFrostEffectScale.x = j["slideFrostEffectScale"]["x"].get<float>();
-					parameter.slideFrostEffectScale.y = j["slideFrostEffectScale"]["y"].get<float>();
-					parameter.slideFrostEffectScale.z = j["slideFrostEffectScale"]["z"].get<float>();
+					// Vector3: slideFrostEffectScale
+					stream.read(reinterpret_cast<char*>(&parameter.slideFrostEffectScale.x), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.slideFrostEffectScale.y), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.slideFrostEffectScale.z), sizeof(float));
 
-					parameter.slideEffectInterval = j["slideEffectInterval"].get<float>();
+					stream.read(reinterpret_cast<char*>(&parameter.slideEffectInterval), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.minSlideFrostScaleRatio), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.maxSlideFrostScaleRatio), sizeof(float));
 
-					parameter.minSlideFrostScaleRatio = j["minSlideFrostScaleRatio"].get<float>();
-					parameter.maxSlideFrostScaleRatio = j["maxSlideFrostScaleRatio"].get<float>();
+					// Vector3: slideLineEffectScale
+					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectScale.x), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectScale.y), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectScale.z), sizeof(float));
 
-					parameter.slideLineEffectScale.x = j["slideLineEffectScale"]["x"].get<float>();
-					parameter.slideLineEffectScale.y = j["slideLineEffectScale"]["y"].get<float>();
-					parameter.slideLineEffectScale.z = j["slideLineEffectScale"]["z"].get<float>();
-
-					parameter.slideLineEffectOffsetForward = j["slideLineEffectOffsetForward"].get<float>();
+					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectOffsetForward), sizeof(float));
 				});
 		}
 

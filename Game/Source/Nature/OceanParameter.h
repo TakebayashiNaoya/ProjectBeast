@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file OceanParameter.h
  * @brief 海のパラメーター
  * @author 竹林
@@ -23,6 +23,11 @@ namespace app
 			void Load(const nlohmann::json& j) override
 			{
 				load(j, *this);
+			}
+
+			void Load(std::istream& stream) override
+			{
+				loadBinary(stream, *this);
 			}
 #endif // APP_PARAM_HOT_RELOAD
 

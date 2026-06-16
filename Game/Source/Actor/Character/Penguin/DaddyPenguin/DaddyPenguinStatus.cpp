@@ -16,7 +16,7 @@ namespace app
 		namespace
 		{
 			/** 親ペンギンのパラメーターのファイルパス */
-			const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/daddyPenguin/DaddyPenguinParameter.json";
+			const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/daddyPenguin/DaddyPenguinParameter.bin";
 		}
 
 
@@ -24,18 +24,21 @@ namespace app
 			: m_enableCommandRange(0.0f)
 		{
 			// 外部ファイルを読み込み
-			core::ParameterManager::Get()->LoadParameter<MasterDaddyPenguinParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterDaddyPenguinParameter& parameter)
+			core::ParameterManager::Get()->LoadParameterBinary<MasterDaddyPenguinParameter>(
+				PARAMETER_BINARY_FILE_PATH,
+				[](std::istream& stream, MasterDaddyPenguinParameter& parameter)
 				{
-					parameter.maxHp = j["maxHp"].get<int>();
-					parameter.hp = j["hp"].get<int>();
-					parameter.runSpeed = j["runSpeed"].get<float>();
-					parameter.swimSpeed = j["swimSpeed"].get<float>();
-					parameter.sneakSpeed = j["sneakSpeed"].get<float>();
-					parameter.slideSpeed = j["slideSpeed"].get<float>();
-					parameter.jumpPower = j["jumpPower"].get<float>();
-					parameter.radius = j["radius"].get<float>();
-					parameter.height = j["height"].get<float>();
-					parameter.enableCommandRange = j["enableCommandRange"].get<float>();
+					stream.read(reinterpret_cast<char*>(&parameter.maxHp), sizeof(int));
+					stream.read(reinterpret_cast<char*>(&parameter.hp), sizeof(int));
+					stream.seekg(sizeof(float), std::ios::cur);
+					stream.read(reinterpret_cast<char*>(&parameter.runSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.swimSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.sneakSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.slideSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.jumpPower), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.radius), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.height), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&parameter.enableCommandRange), sizeof(float));
 				});
 		}
 

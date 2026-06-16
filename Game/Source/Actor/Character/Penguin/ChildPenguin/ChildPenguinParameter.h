@@ -4,8 +4,8 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/Actor/Character/Penguin/PenguinParameter.h"
 #include "ChildPenguinTypes.h"
+#include "Source/Actor/Character/Penguin/PenguinParameter.h"
 
 
 namespace app
@@ -24,6 +24,11 @@ namespace app
 			void Load(const nlohmann::json& j) override
 			{
 				load(j, *this);
+			}
+
+			void Load(std::istream& stream) override
+			{
+				loadBinary(stream, *this);
 			}
 #endif // APP_PARAM_HOT_RELOAD
 

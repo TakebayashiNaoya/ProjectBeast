@@ -4,11 +4,11 @@
  * @author 藤谷、竹林
  */
 #include "stdafx.h"
+#include "Source/Core/ParameterManager.h"
+#include "Source/Util/JsonConverter.h"
 #include "Whirlpool.h"
 #include "WhirlpoolManager.h"
 #include "WhirlpoolParameter.h"
-#include "Source/Util/JsonConverter.h"
-#include "Source/Core/ParameterManager.h"
 #include <algorithm>
 #include <random>
 #include <sys/stat.h>
@@ -64,38 +64,44 @@ namespace app
 		}
 
 
-		void WhirlpoolManager::Start(const char* positionsJsonPath, const char* parameterJsonPath)
+		void WhirlpoolManager::Start(const char* positionsJsonPath, const char* parameterPath)
 		{
 			m_positionsJsonPath = positionsJsonPath;
 
-			// 渦潮のパラメーターJSONを読み込む
-			core::ParameterManager::Get()->LoadParameter<MasterWhirlpoolParameter>(
-				parameterJsonPath,
-				[](const nlohmann::json& j, MasterWhirlpoolParameter& p)
+			// ① 渦潮の配置（ポジション）はJSONから読み込む
+			nlohmann::json json; // 👈 変数名を「json」で定義しました
+			if (util::JsonConverter::IsLoadJsonFile(json, positionsJsonPath))
+			{
+				LoadPositionMap(json);
+			}
+
+			// 座標JSONの最終更新時刻を記録する（デバッグビルドのみ）
+#ifdef APP_DEBUG
+			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(m_positionsJsonPath.c_str());
+#endif // APP_DEBUG
+
+			// ② パラメーターはバイナリファイルから読み込む
+			core::ParameterManager::Get()->LoadParameterBinary<MasterWhirlpoolParameter>(
+				parameterPath,
+				[](std::istream& stream, MasterWhirlpoolParameter& p)
 				{
-					p.whirlpoolRadius = j["whirlpoolRadius"].get<float>();
-					p.attractSpeed = j["attractSpeed"].get<float>();
-					p.rotateSpeed = j["rotateSpeed"].get<float>();
-					p.uvRotationSpeed = j["uvRotationSpeed"].get<float>();
-					p.scaleChangeTime = j["scaleChangeTime"].get<float>();
-					p.stayTime = j["stayTime"].get<float>();
-					p.createInterval = j["createInterval"].get<float>();
-					p.orbitRadius = j["orbitRadius"].get<float>();
-					p.orbitRadiusVariation = j["orbitRadiusVariation"].get<float>();
-					p.orbitOffsetVariation = j["orbitOffsetVariation"].get<float>();
-					p.rotateScaleVariation = j["rotateScaleVariation"].get<float>();
+					// 11個の float を順番に読み込む
+					stream.read(reinterpret_cast<char*>(&p.whirlpoolRadius), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.attractSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.rotateSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.uvRotationSpeed), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.scaleChangeTime), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.stayTime), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.createInterval), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.orbitRadius), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.orbitRadiusVariation), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.orbitOffsetVariation), sizeof(float));
+					stream.read(reinterpret_cast<char*>(&p.rotateScaleVariation), sizeof(float));
 				}
 			);
 
-			// 渦潮の座標JSONを読み込む
-			nlohmann::json json;
-			if (!util::JsonConverter::IsLoadJsonFile(json, m_positionsJsonPath.c_str()))
-			{
-				K2_ASSERT(false, "whirlpoolPositions.jsonの読み込みに失敗しました");
-				return;
-			}
-
-			LoadPositionMap(json);
+			// RenderingEngineに自身を登録する
+			g_renderingEngine->RegisterNatureObject(this);
 
 			// 座標JSONの最終更新時刻を記録する（デバッグビルドのみ）
 #ifdef APP_DEBUG

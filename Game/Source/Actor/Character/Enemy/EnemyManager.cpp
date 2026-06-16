@@ -11,6 +11,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Util/JsonConverter.h"
+#include <fstream>
 
 
 namespace app
@@ -84,6 +85,59 @@ namespace app
 		}
 
 
+		void EnemyManager::LoadEnemiesBinary(const char* filePath)
+		{
+			std::ifstream ifs(filePath, std::ios::binary);
+			if (!ifs.is_open()) return;
+
+			int enemyCount = 0;
+			ifs.read(reinterpret_cast<char*>(&enemyCount), sizeof(int));
+
+			for (int i = 0; i < enemyCount; ++i)
+			{
+				EnemyData data;
+
+				/** 1. エネミーの生成（座標はfloat3つ分） */
+				data.enemy = new Enemy();
+				Vector3 spawnPos;
+				ifs.read(reinterpret_cast<char*>(&spawnPos.x), sizeof(float));
+				ifs.read(reinterpret_cast<char*>(&spawnPos.y), sizeof(float));
+				ifs.read(reinterpret_cast<char*>(&spawnPos.z), sizeof(float));
+				data.enemy->SetPosition(spawnPos);
+
+				/** 2. 巣の座標を設定（文字列は32バイト固定） */
+				char nestNameBuffer[32] = { 0 };
+				ifs.read(nestNameBuffer, 32);
+				std::string homeName(nestNameBuffer); // ヌル文字までを自動で文字列化
+				Vector3 homePos = actor::StageSystem::GetInstance()->GetObjectPosition(homeName);
+				data.enemy->SetHomePosition(homePos);
+
+				data.enemy->StartWrapper();
+
+				/** 3. コントローラーの生成とターゲット設定 */
+				data.controller = new EnemyController();
+				data.controller->SetTarget(data.enemy);
+
+				/** 4. 徘徊ルート(複数)の設定 */
+				int patrolCount = 0;
+				ifs.read(reinterpret_cast<char*>(&patrolCount), sizeof(int));
+				for (int j = 0; j < patrolCount; ++j)
+				{
+					Vector3 patrolPos;
+					ifs.read(reinterpret_cast<char*>(&patrolPos.x), sizeof(float));
+					ifs.read(reinterpret_cast<char*>(&patrolPos.y), sizeof(float));
+					ifs.read(reinterpret_cast<char*>(&patrolPos.z), sizeof(float));
+					data.controller->AddTargetPos(patrolPos);
+				}
+
+				data.enemy->SetLogId(static_cast<int>(m_enemyList.size()));
+				m_enemyList.push_back(data);
+				if (auto* lm = GameLogManager::GetInstance())
+					lm->RecordSpawn("bear", data.enemy->GetLogId());
+			}
+		}
+
+
 		void EnemyManager::Update()
 		{
 			for (auto& data : m_enemyList)
@@ -129,7 +183,7 @@ namespace app
 		bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const
 		{
 			float minDistSq = FLT_MAX;
-			bool  found     = false;
+			bool  found = false;
 
 			for (const auto& data : m_enemyList)
 			{
@@ -139,8 +193,8 @@ namespace app
 				if (distSq < minDistSq)
 				{
 					minDistSq = distSq;
-					outPos    = data.enemy->GetTransform().m_position;
-					found     = true;
+					outPos = data.enemy->GetTransform().m_position;
+					found = true;
 				}
 			}
 			return found;

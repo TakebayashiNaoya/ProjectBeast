@@ -36,6 +36,11 @@ namespace app
 			return "Assets/parameter/character/enemy/EnemyLayout_Normal.json";
 		}
 
+		const char* GetEnemyBinaryPath() const override
+		{
+			return "Assets/parameter/character/enemy/EnemyLayout_Normal.bin";
+		}
+
 		const char* GetWhirlpoolPositionsJsonPath() const override
 		{
 			return "Assets/parameter/stage/whirlpoolPositions_Normal.json";
@@ -46,9 +51,19 @@ namespace app
 			return "Assets/parameter/nature/whirlpoolParameter_Normal.json";
 		}
 
+		const char* GetWhirlpoolParameterBinaryPath() const override
+		{
+			return "Assets/parameter/nature/whirlpoolParameter_Normal.bin";
+		}
+
 		const char* GetOceanParameterJsonPath() const override
 		{
 			return "Assets/parameter/nature/oceanParameter_Normal.json";
+		}
+
+		const char* GetOceanParameterBinaryPath() const override
+		{
+			return "Assets/parameter/nature/oceanParameter_Normal.bin";
 		}
 
 		const char* GetStageName() const override { return "Normal"; }
