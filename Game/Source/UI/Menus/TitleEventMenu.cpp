@@ -80,6 +80,13 @@ namespace app
 
 		void TitleEventMenu::InitializeLogic()
 		{
+			// Reload後に古いポインタが残らないようリセット
+			m_bgIcon = nullptr;
+			m_rogoIcon = nullptr;
+			m_frameIcon = nullptr;
+			m_frameBackIcon = nullptr;
+			m_eventIcon.fill(nullptr);
+
 			// UIパーツを取得
 			GetUIParts();
 
@@ -163,7 +170,7 @@ namespace app
 			{
 				if (!m_eventIcon.at(i))
 				{
-					m_eventIcon.at(i) = GetUI<UIIcon>(EVENT_ICON_KEYS.at(i));
+					m_eventIcon.at(i) = GetUI<UIText>(EVENT_ICON_KEYS.at(i));
 				}
 			}
 		}

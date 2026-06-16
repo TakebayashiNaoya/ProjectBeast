@@ -13,7 +13,7 @@
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
-#include "Source/UI/StageSelect/StageSelectMenu.h"
+#include "Source/UI/Menus/StageSelectMenu.h"
 
 
 namespace app

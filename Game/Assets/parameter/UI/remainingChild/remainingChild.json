@@ -24,16 +24,16 @@
                 "color":[255,255,255,255]
             },
             {
-                "type":"UIDigit",
+                "type":"UIText",
                 "name":"RemainingNum",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit": 3,
-                "number": 100,
-                "width":30,
-                "height":30,
+                "text":"0",
+                "fontSize":0.9,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
                 "position":[-644,95,0],
-                "scale":[1,1,1],
-                "rotation":0
+                "rotation":0,
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
             },
             {
                 "type":"UIIcon",
@@ -47,16 +47,16 @@
                 "color":[255,255,255,255]
             },
             {
-                "type":"UIDigit",
+                "type":"UIText",
                 "name":"TotalNum",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit": 3,
-                "number": 100,
-                "width":30,
-                "height":30,
+                "text":"0",
+                "fontSize":0.9,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
                 "position":[-515,95,0],
-                "scale":[1,1,1],
-                "rotation":0
+                "rotation":0,
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
             }
         ]
     }

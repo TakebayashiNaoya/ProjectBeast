@@ -27,51 +27,16 @@
 
 
             {
-                "type":"UIDigit",
-                "name":"MinutesDigits",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit":1,
-                "number":3,
-                "width":50,
-                "height":50,
-                "position":[ -35, 370, 0],
-                "scale":[1,1,1],
-                "rotation":0
-            },
-            {
-                "type":"UIDigit",
-                "name":"TensPlaceDigits",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit":1,
-                "number":0,
-                "width":50,
-                "height":50,
-                "position":[ 30, 370, 0],
-                "scale":[1,1,1],
-                "rotation":0
-            },
-            {
-                "type":"UIIcon",
-                "name":"CloneIcon",
-                "asset":"Assets/spriteData/UI/Icon/InGameTimerIcon/Clone.dds",
-                "width":15,
-                "height":50,
-                "position":[ 0, 370, 0],
-                "scale":[ 1, 1, 1],
+                "type":"UIText",
+                "name":"TimerText",
+                "text":"3:00",
+                "fontSize":1.2,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[ 30, 365, 0],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255]
-            },
-            {
-                "type":"UIDigit",
-                "name":"OnesPlaceDigits",
-                "asset":"Assets/spriteData/UI/Number/White",
-                "digit":1,
-                "number":0,
-                "width":50,
-                "height":50,
-                "position":[ 75, 370, 0],
-                "scale":[1,1,1],
-                "rotation":0
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
             },
 
 
