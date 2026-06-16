@@ -68,8 +68,7 @@ namespace app
 		{
 			m_positionsJsonPath = positionsJsonPath;
 
-			// ① 渦潮の配置（ポジション）はJSONから読み込む
-			nlohmann::json json; // 👈 変数名を「json」で定義しました
+			nlohmann::json json;
 			if (util::JsonConverter::IsLoadJsonFile(json, positionsJsonPath))
 			{
 				LoadPositionMap(json);
@@ -80,12 +79,10 @@ namespace app
 			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(m_positionsJsonPath.c_str());
 #endif // APP_DEBUG
 
-			// ② パラメーターはバイナリファイルから読み込む
 			core::ParameterManager::Get()->LoadParameterBinary<MasterWhirlpoolParameter>(
 				parameterPath,
 				[](std::istream& stream, MasterWhirlpoolParameter& p)
 				{
-					// 11個の float を順番に読み込む
 					stream.read(reinterpret_cast<char*>(&p.whirlpoolRadius), sizeof(float));
 					stream.read(reinterpret_cast<char*>(&p.attractSpeed), sizeof(float));
 					stream.read(reinterpret_cast<char*>(&p.rotateSpeed), sizeof(float));
