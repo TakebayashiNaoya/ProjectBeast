@@ -28,7 +28,6 @@
 public:\
 static constexpr uint32_t ID() {return Hash32(#name);}\
 std::function<void(const nlohmann::json& j, name& p)> load;\
-std::function<void(std::istream& stream, name& p)> loadBinary;
 
 #else
 
@@ -108,10 +107,9 @@ namespace app
 			 * @brief パラメーター読み込み（バイナリ）
 			 * @tparam T パラメーター型
 			 * @param path ファイルパス
-			 * @param func ストリームからパラメーター型に変換する関数
 			 */
 			template <typename T>
-			void LoadParameterBinary(const char* path, const std::function<void(std::istream& stream, T& p)>& func)
+			void LoadParameterBinary(const char* path)
 			{
 				std::ifstream ifs(path, std::ios::binary);
 				if (!ifs.is_open()) return;
@@ -120,17 +118,22 @@ namespace app
 				ifs.read(reinterpret_cast<char*>(&count), sizeof(count));
 				if (ifs.fail()) return;
 
+				constexpr size_t BASE_SIZE = sizeof(core::IMasterParameter);
+				constexpr size_t DATA_SIZE = sizeof(T) - BASE_SIZE;
+
 				ParameterVector parameters;
 				for (uint32_t i = 0; i < count; ++i) {
-					auto parameter = new T;
+					auto* parameter = new T;
 
 #ifdef APP_PARAM_HOT_RELOAD
 					parameter->m_path = std::string(path);
 					parameter->m_lastWriteTime = util::JsonConverter::GetFileLastWriteTime(path);
-					parameter->loadBinary = func;
 #endif
+					// vptrやホットリロード用の変数（std::string等）を上書きしないように、
+					// ベースクラスのサイズ分だけポインタを進めた位置からデータを丸呑みする
+					char* dataHead = reinterpret_cast<char*>(parameter) + BASE_SIZE;
+					ifs.read(dataHead, DATA_SIZE);
 
-					func(ifs, *parameter);
 					parameters.push_back(parameter);
 				}
 
