@@ -72,6 +72,8 @@ namespace app
 			int m_currentPage;
 			/** 閉じるフラグ */
 			bool m_isClosed;
+			/** スティック左右ニュートラル判定 */
+			bool m_isStickNeutralX;
 		};
 	}
 }

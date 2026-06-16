@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "SoundOptionMenu.h"
+#include "UIMenuConstants.h"
 #include "Source/Sound/SoundManager.h"
 
 
@@ -142,6 +143,8 @@ namespace app
 			: m_currentSoundType(SoundType::Master)
 			, m_isBack(false)
 			, m_currentValue(0.0f)
+			, m_isStickNeutralY(true)
+			, m_isStickNeutralX(true)
 		{
 			// シーン遷移後も現在の音量設定が維持されるよう、SoundManagerの現在値で初期化する。
 			m_currentValue = GetCurrentVolumeFromManager(m_currentSoundType);
@@ -161,11 +164,21 @@ namespace app
 				Reset();
 			}
 
-			// 上方向に入力があったら
-			if (g_pad[0]->IsTrigger(enButtonUp))   add = 3;
+			const float stickY = g_pad[0]->GetLStickYF();
+			if (fabsf(stickY) < STICK_THRESHOLD) m_isStickNeutralY = true;
 
+			// 上方向に入力があったら
+			if (g_pad[0]->IsTrigger(enButtonUp) || (m_isStickNeutralY && stickY > STICK_THRESHOLD))
+			{
+				add = 3;
+				m_isStickNeutralY = false;
+			}
 			// 下方向に入力があったら
-			if (g_pad[0]->IsTrigger(enButtonDown))  add = 1;
+			else if (g_pad[0]->IsTrigger(enButtonDown) || (m_isStickNeutralY && stickY < -STICK_THRESHOLD))
+			{
+				add = 1;
+				m_isStickNeutralY = false;
+			}
 
 			// addが0でなければ
 			if (add != 0)
@@ -177,8 +190,9 @@ namespace app
 				UpdateColorAnim();
 			}
 
-			// 十字キーの左右どちらかの入力フラグ。
-			const bool isTrigger = g_pad[0]->IsTrigger(enButtonLeft) || g_pad[0]->IsTrigger(enButtonRight);
+			// 十字キーまたはスティック左右どちらかの入力フラグ。
+			const bool isTrigger = g_pad[0]->IsTrigger(enButtonLeft) || g_pad[0]->IsTrigger(enButtonRight)
+				|| fabsf(g_pad[0]->GetLStickXF()) > STICK_THRESHOLD;
 
 			// 現在選択中のノブアイコンを取得する。
 			const uint32_t knobKey = SOUND_ICON_KEYS[static_cast<uint8_t>(m_currentSoundType)].key;
@@ -237,17 +251,22 @@ namespace app
 			int volumeInt = static_cast<int>(currentVolume * 100.0f);
 			bool isChange = false;
 
-			// 十字キー右を押したとき
-			if (g_pad[0]->IsTrigger(enButtonRight))
+			const float stickX = g_pad[0]->GetLStickXF();
+			if (fabsf(stickX) < STICK_THRESHOLD) m_isStickNeutralX = true;
+
+			// 右入力（十字キーまたはスティック右）
+			if (g_pad[0]->IsTrigger(enButtonRight) || (m_isStickNeutralX && stickX > STICK_THRESHOLD))
 			{
 				volumeInt += VOLUME_STEP;
 				isChange = true;
+				m_isStickNeutralX = false;
 			}
-			// 十字キー左を押したとき
-			else if (g_pad[0]->IsTrigger(enButtonLeft))
+			// 左入力（十字キーまたはスティック左）
+			else if (g_pad[0]->IsTrigger(enButtonLeft) || (m_isStickNeutralX && stickX < -STICK_THRESHOLD))
 			{
 				volumeInt -= VOLUME_STEP;
 				isChange = true;
+				m_isStickNeutralX = false;
 			}
 
 			// ノブのX座標とフレームのX座標への参照。

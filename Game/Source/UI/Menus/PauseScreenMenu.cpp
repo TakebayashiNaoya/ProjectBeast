@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "PauseScreenMenu.h"
+#include "UIMenuConstants.h"
 #include "Source/Util/CRC32.h"
 #include "SoundOptionMenu.h"
 
@@ -54,6 +55,7 @@ namespace app
 				,	{ Hash32("PauseThreePartsButton"), PauseScreenType::RuleType       }
 				,	{ Hash32("PauseFourPartsButton"),  PauseScreenType::GoBackTitleType}
 			};
+
 		}
 
 		PauseScreenIcon::PauseScreenIcon(PauseScreenType type)
@@ -147,6 +149,7 @@ namespace app
 			, m_isGoTitle(false)
 			, m_isSound(false)
 			, m_isRule(false)
+			, m_isStickNeutralY(true)
 		{}
 
 
@@ -186,11 +189,16 @@ namespace app
 			int typeMax = static_cast<int>(PauseScreenType::GoBackTitleType);
 			int typeMin = PAUSE_SCREEN_MIN_VALUE;
 
-			if (g_pad[0]->IsTrigger(enButtonUp)) {
+			const float stickY = g_pad[0]->GetLStickYF();
+			if (fabsf(stickY) < STICK_THRESHOLD) m_isStickNeutralY = true;
+
+			if (g_pad[0]->IsTrigger(enButtonUp) || (m_isStickNeutralY && stickY > STICK_THRESHOLD)) {
 				currentType = (currentType - PAUSE_SCREEN_ONE_VALUE < typeMin) ? typeMax : currentType - PAUSE_SCREEN_ONE_VALUE;
+				m_isStickNeutralY = false;
 			}
-			if (g_pad[0]->IsTrigger(enButtonDown)) {
+			else if (g_pad[0]->IsTrigger(enButtonDown) || (m_isStickNeutralY && stickY < -STICK_THRESHOLD)) {
 				currentType = (currentType + PAUSE_SCREEN_ONE_VALUE > typeMax) ? typeMin : currentType + PAUSE_SCREEN_ONE_VALUE;
+				m_isStickNeutralY = false;
 			}
 			m_currentType = static_cast<PauseScreenType>(currentType);
 		}
