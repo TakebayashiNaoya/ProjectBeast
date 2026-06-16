@@ -6,6 +6,7 @@
 #pragma once
 #include "Source/Core/AppParameterMacro.h"
 #include "Source/Util/JsonConverter.h"
+#include <fstream>
 
 
  /**
@@ -26,7 +27,8 @@
 #define appParameter(name)\
 public:\
 static constexpr uint32_t ID() {return Hash32(#name);}\
-std::function<void(const nlohmann::json& j, name& p)> load;
+std::function<void(const nlohmann::json& j, name& p)> load;\
+std::function<void(std::istream& stream, name& p)> loadBinary;
 
 #else
 
@@ -103,6 +105,40 @@ namespace app
 
 
 			/**
+			 * @brief パラメーター読み込み（バイナリ）
+			 * @tparam T パラメーター型
+			 * @param path ファイルパス
+			 * @param func ストリームからパラメーター型に変換する関数
+			 */
+			template <typename T>
+			void LoadParameterBinary(const char* path, const std::function<void(std::istream& stream, T& p)>& func)
+			{
+				std::ifstream ifs(path, std::ios::binary);
+				if (!ifs.is_open()) return;
+
+				uint32_t count = 0;
+				ifs.read(reinterpret_cast<char*>(&count), sizeof(count));
+				if (ifs.fail()) return;
+
+				ParameterVector parameters;
+				for (uint32_t i = 0; i < count; ++i) {
+					auto parameter = new T;
+
+#ifdef APP_PARAM_HOT_RELOAD
+					parameter->m_path = std::string(path);
+					parameter->m_lastWriteTime = util::JsonConverter::GetFileLastWriteTime(path);
+					parameter->loadBinary = func;
+#endif
+
+					func(ifs, *parameter);
+					parameters.push_back(parameter);
+				}
+
+				m_parameterMap.emplace(T::ID(), parameters);
+			}
+
+
+			/**
 			 * @brief パラメーターアンロード
 			 * @tparam T パラメーター型
 			 */
@@ -111,7 +147,7 @@ namespace app
 			{
 				// 確保済みのパラメーターがあれば解放。
 				auto it = m_parameterMap.find(T::ID());
-				if (it != m_parameterMap.end()){
+				if (it != m_parameterMap.end()) {
 					auto& parameters = it->second;
 					for (auto* p : parameters) {
 						delete p;
