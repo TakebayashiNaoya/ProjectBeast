@@ -129,7 +129,7 @@ namespace app
 			 * @param r 範囲
 			 * @return 生成された乱数値
 			 */
-			float RollRange(const MasterChildPenguinParameter::Range& r)
+			float RollRange(const MasterChildPenguinTypeParameter::Range& r)
 			{
 				std::uniform_real_distribution<float> dist(r.min, r.max);
 				return dist(GetRandomEngine());
@@ -147,16 +147,17 @@ namespace app
 
 			/**
 			 * @brief タイプに対応する TypeData を取得する
-			 * @details LoadParameter はJSON配列の要素ごとに別インスタンスを生成するため、
-			 * インデックスはタイプの値と対応する。
+			 * @details MasterChildPenguinTypeParameter はJSON配列の要素ごとに別インスタンスとして
+			 * ロードされる。GetParameter() に type の値をそのまま渡すと、該当レコードへの
+			 * ポインタが直接返ってくる。
 			 * @param type 子ペンギンのタイプ
 			 * @return タイプ別パラメーター
 			 */
-			const MasterChildPenguinParameter::ChildPenguinTypeData& GetTypeData(EnChildPenguinType type)
+			const MasterChildPenguinTypeParameter& GetTypeData(EnChildPenguinType type)
 			{
 				const int index = static_cast<int>(type);
-				const auto* param = core::ParameterManager::Get()->GetParameter<MasterChildPenguinParameter>(index);
-				return param->typeData[index];
+				const auto* param = core::ParameterManager::Get()->GetParameter<MasterChildPenguinTypeParameter>(static_cast<int>(type));
+				return *param;
 			}
 		}
 
