@@ -1,112 +1,13 @@
 ﻿[
   {
-    "comment": "まじめ",
-    "type": 0,
-    "color": [0.55, 0.68, 0.86, 1.0],
-    "maxHp": 1,
-    "hp": 1,
-    "radius": 10.0,
-    "height": 70.0,
-    "randomRanges": {
-      "runSpeed":          [100.0, 130.0],
-      "swimSpeed":         [180.0, 220.0],
-      "sneakSpeed":        [70.0,  90.0],
-      "slideSpeed":        [130.0, 170.0],
-      "jumpPower":         [250.0, 290.0],
-      "stopDistance":      [14.0,  18.0],
-      "walkDistance":      [38.0,  45.0],
-      "runDistance":       [75.0,  90.0],
-      "joinDistance":      [380.0, 420.0],
-      "giveUpDistance":    [570.0, 630.0]
-    }
-  },
-  {
-    "comment": "甘えん坊",
-    "type": 1,
-    "color": [1.0, 0.76, 0.82, 1.0],
-    "maxHp": 1,
-    "hp": 1,
-    "radius": 10.0,
-    "height": 70.0,
-    "randomRanges": {
-      "runSpeed":          [100.0, 130.0],
-      "swimSpeed":         [180.0, 220.0],
-      "sneakSpeed":        [70.0,  90.0],
-      "slideSpeed":        [130.0, 170.0],
-      "jumpPower":         [250.0, 290.0],
-      "stopDistance":      [12.0,  16.0],
-      "walkDistance":      [32.0,  38.0],
-      "runDistance":       [55.0,  65.0],
-      "joinDistance":      [380.0, 420.0],
-      "giveUpDistance":    [570.0, 630.0]
-    }
-  },
-  {
-    "comment": "やんちゃ",
-    "type": 2,
-    "color": [1.0, 0.98, 0.61, 1.0],
-    "maxHp": 1,
-    "hp": 1,
-    "radius": 10.0,
-    "height": 70.0,
-    "randomRanges": {
-      "runSpeed":             [100.0, 130.0],
-      "swimSpeed":            [180.0, 220.0],
-      "sneakSpeed":           [70.0,  90.0],
-      "slideSpeed":           [130.0, 170.0],
-      "jumpPower":            [250.0, 290.0],
-      "stopDistance":         [16.0,  22.0],
-      "walkDistance":         [42.0,  52.0],
-      "runDistance":          [80.0,  100.0],
-      "joinDistance":         [380.0, 420.0],
-      "giveUpDistance":       [570.0, 630.0],
-      "roamTriggerDistance":  [150.0, 200.0],
-      "roamRadius":           [100.0, 150.0]
-    }
-  },
-  {
-    "comment": "おっちょこちょい",
-    "type": 3,
-    "color": [1.0, 0.82, 0.63, 1.0],
-    "maxHp": 1,
-    "hp": 1,
-    "radius": 10.0,
-    "height": 70.0,
-    "tripChancePerSec": 0.05,
-    "slipChance": 0.5,
-    "randomRanges": {
-      "runSpeed":          [100.0, 130.0],
-      "swimSpeed":         [180.0, 220.0],
-      "sneakSpeed":        [70.0,  90.0],
-      "slideSpeed":        [130.0, 170.0],
-      "jumpPower":         [250.0, 290.0],
-      "stopDistance":      [10.0,  22.0],
-      "walkDistance":      [34.0,  52.0],
-      "runDistance":       [65.0,  100.0],
-      "joinDistance":      [350.0, 450.0],
-      "giveUpDistance":    [540.0, 660.0]
-    }
-  },
-  {
-    "comment": "世話焼き",
-    "type": 4,
-    "color": [0.66, 0.92, 0.74, 1.0],
-    "maxHp": 1,
-    "hp": 1,
-    "radius": 10.0,
-    "height": 70.0,
-    "interventionRange": 300.0,
-    "randomRanges": {
-      "runSpeed":          [100.0, 130.0],
-      "swimSpeed":         [220.0, 260.0],
-      "sneakSpeed":        [70.0,  90.0],
-      "slideSpeed":        [130.0, 170.0],
-      "jumpPower":         [250.0, 290.0],
-      "stopDistance":      [14.0,  18.0],
-      "walkDistance":      [38.0,  45.0],
-      "runDistance":       [75.0,  90.0],
-      "joinDistance":      [380.0, 420.0],
-      "giveUpDistance":    [570.0, 630.0]
-    }
-  }
+  "runSpeed": 100.0,
+  "swimSpeed": 180.0,
+  "radius": 10.0,
+  "height": 70.0,
+  "maxHp": 1,
+  "hp": 1,
+  "sneakSpeed": 70.0,
+  "slideSpeed": 130.0,
+  "jumpPower": 250.0
+}
 ]

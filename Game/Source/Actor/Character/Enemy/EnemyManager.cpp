@@ -11,6 +11,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Util/JsonConverter.h"
+#include <fstream>
 
 
 namespace app
@@ -129,7 +130,7 @@ namespace app
 		bool EnemyManager::GetNearestEnemyPosition(const Vector3& from, Vector3& outPos) const
 		{
 			float minDistSq = FLT_MAX;
-			bool  found     = false;
+			bool  found = false;
 
 			for (const auto& data : m_enemyList)
 			{
@@ -139,8 +140,8 @@ namespace app
 				if (distSq < minDistSq)
 				{
 					minDistSq = distSq;
-					outPos    = data.enemy->GetTransform().m_position;
-					found     = true;
+					outPos = data.enemy->GetTransform().m_position;
+					found = true;
 				}
 			}
 			return found;

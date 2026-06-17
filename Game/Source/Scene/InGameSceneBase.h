@@ -78,8 +78,12 @@ namespace app
 		virtual const char* GetWhirlpoolPositionsJsonPath() const = 0;
 		/** 渦潮のパラメーターJSONパス */
 		virtual const char* GetWhirlpoolParameterJsonPath() const = 0;
+		/** 渦潮のパラメーターバイナリパス */
+		virtual const char* GetWhirlpoolParameterBinaryPath() const = 0;
 		/** 海のパラメーターJSONパス */
 		virtual const char* GetOceanParameterJsonPath() const = 0;
+		/** 海のパラメーターバイナリパス */
+		virtual const char* GetOceanParameterBinaryPath() const = 0;
 		/** ログ用ステージ名 ("Tutorial" / "Normal" / "Easy" / "Hard") */
 		virtual const char* GetStageName() const = 0;
 		/** ステージ別アチーブメント定義JSONのパス */

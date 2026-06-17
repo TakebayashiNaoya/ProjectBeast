@@ -4,8 +4,8 @@
  * @author 竹林
  */
 #pragma once
-#include "Source/Core/IMasterParameter.h"
 #include "Graphics/ModelRender.h"
+#include "Source/Core/IMasterParameter.h"
 
 
 namespace app
@@ -28,7 +28,7 @@ namespace app
 #endif // APP_PARAM_HOT_RELOAD
 
 			/** オブジェクト識別名 */
-			std::string name;
+			char name[32];
 			/** PBR補正値 */
 			nsBeastEngine::PBRParam pbrParam;
 		};
