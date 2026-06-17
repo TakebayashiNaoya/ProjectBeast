@@ -138,6 +138,8 @@ namespace app
 				}
 
 				m_parameterMap.emplace(T::ID(), parameters);
+
+				printf("DATA_SIZE = %zu\n", DATA_SIZE);
 			}
 
 

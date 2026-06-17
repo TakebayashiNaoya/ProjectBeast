@@ -60,7 +60,7 @@ namespace app
 						time_t newTime = util::JsonConverter::GetFileLastWriteTime(path.c_str());
 
 						// 【修正】ファイル内の要素数とメモリ上の要素数の小さい方に合わせて同期更新
-						size_t readCount = std::min(paramPair.second.size(), static_cast<size_t>(count));
+						size_t readCount = (std::min)(paramPair.second.size(), static_cast<size_t>(count));
 						for (size_t i = 0; i < readCount; ++i)
 						{
 							auto param = paramPair.second[i];
@@ -76,7 +76,7 @@ namespace app
 
 						time_t newTime = util::JsonConverter::GetFileLastWriteTime(path.c_str());
 
-						size_t readCount = std::min(paramPair.second.size(), jsonRoot.size());
+						size_t readCount = (std::min)(paramPair.second.size(), jsonRoot.size());
 						for (size_t i = 0; i < readCount; ++i)
 						{
 							auto param = paramPair.second[i];
