@@ -207,8 +207,10 @@ namespace nsBeastEngine
 	{
 		ModelInitData gBufferInitData = baseInitData;
 
-		// GBuffer書き込み用シェーダーに差し替える
-		gBufferInitData.m_fxFilePath = "Assets/shader/RenderToGBuffer.fx";
+		// GBuffer書き込み用シェーダーに差し替える（カスタムパスが指定されていればそちらを使用）
+		gBufferInitData.m_fxFilePath = m_customGBufferFxPath.empty()
+			? "Assets/shader/RenderToGBuffer.fx"
+			: m_customGBufferFxPath.c_str();
 
 		// エントリーポイントを明示的に設定する
 		gBufferInitData.m_vsEntryPointFunc = "VSMain";

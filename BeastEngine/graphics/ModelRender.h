@@ -213,6 +213,15 @@ namespace nsBeastEngine
 		inline void SetForwardRendering(const bool isForward) { m_isForwardRender = isForward; }
 
 		/**
+		 * @brief GBuffer描画パスで使用するシェーダーのパスを上書きする
+		 * @details 未設定時は RenderToGBuffer.fx が使用される。
+		 *          地形など独自のGBufferシェーダーが必要なモデルに使用する。
+		 *          Init() / InitFromLoaded() より前に呼ぶこと。
+		 * @param path シェーダーファイルパス（例: "Assets/shader/Terrain.fx"）
+		 */
+		inline void SetGBufferFxFilePath(const std::string& path) { m_customGBufferFxPath = path; }
+
+		/**
 		 * @brief アニメーションが再生中か
 		 * @return 再生中ならtrue
 		 */
@@ -620,5 +629,8 @@ namespace nsBeastEngine
 
 		/** 全モデル共通のトゥーン有効フラグ（staticで全インスタンスに共有） */
 		static bool s_isToonGlobalEnabled;
+
+		/** GBuffer描画パスで使用するカスタムシェーダーパス（空文字時はRenderToGBuffer.fxを使用） */
+		std::string    m_customGBufferFxPath;
 	};
 }

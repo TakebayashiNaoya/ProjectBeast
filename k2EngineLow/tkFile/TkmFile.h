@@ -1,9 +1,9 @@
 /// <summary>
-/// tkmƒtƒ@ƒCƒ‹B
+/// tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½B
 /// </summary>
 /// <remarks>
-/// tkmƒtƒ@ƒCƒ‹‚Í3Dƒ‚ƒfƒ‹ƒtƒH[ƒ}ƒbƒg‚Å‚·B
-/// ‚±‚ÌƒNƒ‰ƒX‚ğ—˜—p‚·‚é‚±‚Æ‚Åtkmƒtƒ@ƒCƒ‹‚ğˆµ‚¤‚±‚Æ‚ª‚Å‚«‚Ü‚·BB
+/// tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½3Dï¿½ï¿½ï¿½fï¿½ï¿½ï¿½tï¿½Hï¿½[ï¿½}ï¿½bï¿½gï¿½Å‚ï¿½ï¿½B
+/// ï¿½ï¿½ï¿½ÌƒNï¿½ï¿½ï¿½Xï¿½ğ—˜—pï¿½ï¿½ï¿½é‚±ï¿½Æ‚ï¿½tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½Å‚ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½B
 /// </remarks>
 #pragma once
 
@@ -12,91 +12,91 @@
 namespace nsK2EngineLow {
 
 	struct LowTexture {
-		std::string filePath;			// ƒtƒ@ƒCƒ‹ƒpƒXB
-		std::unique_ptr<char[]> data;	// ¶ƒf[ƒ^(ddsƒtƒ@ƒCƒ‹)
-		unsigned int dataSize;			// ƒf[ƒ^‚ÌƒTƒCƒYB
+		std::string filePath;			// ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½B
+		std::unique_ptr<char[]> data;	// ï¿½ï¿½ï¿½fï¿½[ï¿½^(ddsï¿½tï¿½@ï¿½Cï¿½ï¿½)
+		unsigned int dataSize;			// ï¿½fï¿½[ï¿½^ï¿½ÌƒTï¿½Cï¿½Yï¿½B
 	};
 	/// <summary>
-	/// tkmƒtƒ@ƒCƒ‹ƒNƒ‰ƒXB
+	/// tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½B
 	/// </summary>
 	class  TkmFile : public Noncopyable {
 	public:
 		/// <summary>
-		/// ƒ}ƒeƒŠƒAƒ‹
+		/// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½
 		/// </summary>
 		struct  SMaterial{
-			int uniqID;								// ƒeƒNƒXƒ`ƒƒƒtƒ@ƒCƒ‹–¼‚©‚çì¬‚³‚ê‚éƒ†ƒj[ƒNIDB
-			std::string albedoMapFileName;			// ƒAƒ‹ƒxƒhƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹–¼B
-			std::string normalMapFileName;			// –@üƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹–¼B
-			std::string specularMapFileName;		// ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹–¼B
-			std::string reflectionMapFileName;		// ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹–¼B
-			std::string refractionMapFileName;		// ‹üÜƒ}ƒbƒv‚Ìƒtƒ@ƒCƒ‹–¼B
-			LowTexture*	albedoMap;					// ƒ[ƒh‚³‚ê‚½ƒAƒ‹ƒxƒhƒ}ƒbƒv‚Ì¶ƒeƒNƒXƒ`ƒƒƒf[ƒ^B(ddsƒtƒ@ƒCƒ‹)
-			LowTexture*	normalMap;					// ƒ[ƒh‚³‚ê‚½–@üƒ}ƒbƒv‚Ì¶ƒeƒNƒXƒ`ƒƒƒf[ƒ^B(ddsƒtƒ@ƒCƒ‹9
-			LowTexture* specularMap;				// ƒ[ƒh‚³‚ê‚½ƒXƒyƒLƒ…ƒ‰ƒ}ƒbƒv‚Ì¶ƒeƒNƒXƒ`ƒƒƒf[ƒ^B(ddsƒtƒ@ƒCƒ‹)
-			LowTexture*	reflectionMap;				// ƒ[ƒh‚³‚ê‚½ƒŠƒtƒŒƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚Ì¶ƒeƒNƒXƒ`ƒƒƒf[ƒ^B(ddsƒtƒ@ƒCƒ‹)
-			LowTexture*	refractionMap;				// ƒ[ƒh‚³‚ê‚½‹üÜƒ}ƒbƒv‚Ì¶ƒeƒNƒXƒ`ƒƒƒf[ƒ^B(ddsƒtƒ@ƒCƒ‹)
+			int uniqID;								// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì¬ï¿½ï¿½ï¿½ï¿½éƒ†ï¿½jï¿½[ï¿½NIDï¿½B
+			std::string albedoMapFileName;			// ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½}ï¿½bï¿½vï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½B
+			std::string normalMapFileName;			// ï¿½@ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½B
+			std::string specularMapFileName;		// ï¿½Xï¿½yï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½B
+			std::string reflectionMapFileName;		// ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½B
+			std::string refractionMapFileName;		// ï¿½ï¿½ï¿½Üƒ}ï¿½bï¿½vï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½B
+			LowTexture*	albedoMap;					// ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ê‚½ï¿½Aï¿½ï¿½ï¿½xï¿½hï¿½}ï¿½bï¿½vï¿½Ìï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½B(ddsï¿½tï¿½@ï¿½Cï¿½ï¿½)
+			LowTexture*	normalMap;					// ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ê‚½ï¿½@ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½Ìï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½B(ddsï¿½tï¿½@ï¿½Cï¿½ï¿½9
+			LowTexture* specularMap;				// ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ê‚½ï¿½Xï¿½yï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½Ìï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½B(ddsï¿½tï¿½@ï¿½Cï¿½ï¿½)
+			LowTexture*	reflectionMap;				// ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½}ï¿½bï¿½vï¿½Ìï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½B(ddsï¿½tï¿½@ï¿½Cï¿½ï¿½)
+			LowTexture*	refractionMap;				// ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½Üƒ}ï¿½bï¿½vï¿½Ìï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½B(ddsï¿½tï¿½@ï¿½Cï¿½ï¿½)
 		};
 		/// <summary>
-		/// ’¸“_B
+		/// ï¿½ï¿½ï¿½_ï¿½B
 		/// </summary>
 		/// <remarks>
-		/// ‚±‚±‚ğ•ÒW‚µ‚½‚çAƒŒƒCƒgƒŒ‚ÌƒVƒF[ƒ_[‚Å’è‹`‚³‚ê‚Ä‚¢‚é’¸“_\‘¢‘Ì‚à•ÏX‚·‚é•K—v‚ª‚ ‚éB
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒWï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Cï¿½gï¿½ï¿½ï¿½ÌƒVï¿½Fï¿½[ï¿½_ï¿½[ï¿½Å’ï¿½`ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é’¸ï¿½_ï¿½\ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ÏXï¿½ï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 		/// </remarks>
 		struct SVertex {
-			Vector3 pos;			//À•WB
-			Vector3 normal;		//–@üB
-			Vector3 tangent;		//ÚƒxƒNƒgƒ‹B
-			Vector3 binormal;		//]ƒxƒNƒgƒ‹B
-			Vector2 uv;			//UVÀ•WB
-			int indices[4];			//ƒXƒLƒ“ƒCƒ“ƒfƒbƒNƒXB
-			Vector4 skinWeights;	//ƒXƒLƒ“ƒEƒFƒCƒgB
+			Vector3 pos;			//ï¿½ï¿½ï¿½Wï¿½B
+			Vector3 normal;		//ï¿½@ï¿½ï¿½ï¿½B
+			Vector3 tangent;		//ï¿½Úƒxï¿½Nï¿½gï¿½ï¿½ï¿½B
+			Vector3 binormal;		//ï¿½]ï¿½xï¿½Nï¿½gï¿½ï¿½ï¿½B
+			Vector2 uv;			//UVï¿½ï¿½ï¿½Wï¿½B
+			int indices[4];			//ï¿½Xï¿½Lï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½B
+			Vector4 skinWeights;	//ï¿½Xï¿½Lï¿½ï¿½ï¿½Eï¿½Fï¿½Cï¿½gï¿½B
 		};
 		/// <summary>
-		/// 32ƒrƒbƒg‚ÌƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@B
+		/// 32ï¿½rï¿½bï¿½gï¿½ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½oï¿½bï¿½tï¿½@ï¿½B
 		/// </summary>
 		struct SIndexBuffer32 {
-			std::vector< uint32_t > indices;	//ƒCƒ“ƒfƒbƒNƒXB
+			std::vector< uint32_t > indices;	//ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½B
 		};
 		/// <summary>
-		/// 16ƒrƒbƒg‚ÌƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@B
+		/// 16ï¿½rï¿½bï¿½gï¿½ÌƒCï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½oï¿½bï¿½tï¿½@ï¿½B
 		/// </summary>
 		struct SIndexbuffer16 {
-			std::vector< uint16_t > indices;	//ƒCƒ“ƒfƒbƒNƒXB
+			std::vector< uint16_t > indices;	//ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½B
 		};
 		/// <summary>
-		/// ƒƒbƒVƒ…ƒp[ƒcB
+		/// ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½pï¿½[ï¿½cï¿½B
 		/// </summary>
 		struct SMesh {
-			bool isFlatShading;									// ƒtƒ‰ƒbƒgƒVƒF[ƒfƒBƒ“ƒOH
-			std::vector< SMaterial > materials;					// ƒ}ƒeƒŠƒAƒ‹‚Ì”z—ñB
-			std::vector< SVertex >	vertexBuffer;				// ’¸“_ƒoƒbƒtƒ@B
-			std::vector<SIndexBuffer32> indexBuffer32Array;		// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Ì”z—ñBƒ}ƒeƒŠƒAƒ‹‚Ì”•ª‚¾‚¯ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Í‚ ‚é‚æB
+			bool isFlatShading;									// ï¿½tï¿½ï¿½ï¿½bï¿½gï¿½Vï¿½Fï¿½[ï¿½fï¿½Bï¿½ï¿½ï¿½Oï¿½H
+			std::vector< SMaterial > materials;					// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Ì”zï¿½ï¿½B
+			std::vector< SVertex >	vertexBuffer;				// ï¿½ï¿½ï¿½_ï¿½oï¿½bï¿½tï¿½@ï¿½B
+			std::vector<SIndexBuffer32> indexBuffer32Array;		// ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½oï¿½bï¿½tï¿½@ï¿½Ì”zï¿½ï¿½Bï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½oï¿½bï¿½tï¿½@ï¿½Í‚ï¿½ï¿½ï¿½ï¿½B
 			std::vector< SIndexbuffer16> indexBuffer16Array;
 		};
 
 		/// <summary>
-		/// 3Dƒ‚ƒfƒ‹‚ğƒ[ƒhB
+		/// 3Dï¿½ï¿½ï¿½fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½B
 		/// </summary>
-		/// <param name="filePath">ƒtƒ@ƒCƒ‹ƒpƒXB</param>
-		/// <param name="isOptimize">Å“K‰»ƒtƒ‰ƒOB</param>
+		/// <param name="filePath">ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½B</param>
+		/// <param name="isOptimize">ï¿½Å“Kï¿½ï¿½ï¿½tï¿½ï¿½ï¿½Oï¿½B</param>
 		/// <param name="isLoadTexture">
-		/// ƒeƒNƒXƒ`ƒƒ‚ğƒ[ƒh‚·‚éH
-		/// ƒRƒŠƒWƒ‡ƒ“‚Ì\’z‚Ì‚½‚ß‚È‚Ç‚Étkmƒtƒ@ƒCƒ‹‚ğƒ[ƒh‚·‚é‚È‚Ç‚Æ‚¢‚Á‚½A
-		/// ƒeƒNƒXƒ`ƒƒ‚ª•s—v‚Ìê‡‚É‚ÍA‚±‚Ìˆø”‚ğfalse‚É‚µ‚Ä‚­‚¾‚³‚¢B
-		/// ‚·‚é‚ÆAƒƒ‚ƒŠg—p—ÊAƒ[ƒhŠÔ‚È‚Ç‚ªíŒ¸‚³‚ê‚Ü‚·B
+		/// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½H
+		/// ï¿½Rï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½Ì\ï¿½zï¿½Ì‚ï¿½ï¿½ß‚È‚Ç‚ï¿½tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½È‚Ç‚Æ‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½A
+		/// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½vï¿½Ìê‡ï¿½É‚ÍAï¿½ï¿½ï¿½Ìˆï¿½ï¿½ï¿½ï¿½ï¿½falseï¿½É‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+		/// ï¿½ï¿½ï¿½ï¿½ÆAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½pï¿½ÊAï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½Ô‚È‚Ç‚ï¿½ï¿½íŒ¸ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B
 		/// </param>
-		/// <param name="isOutputMsgTTY">ƒƒbƒZ[ƒW‚ğ•W€“üo—ÍƒfƒoƒCƒX‚Éo—Í‚·‚éH</param>
+		/// <param name="isOutputMsgTTY">ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½Wï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½oï¿½Íƒfï¿½oï¿½Cï¿½Xï¿½Éoï¿½Í‚ï¿½ï¿½ï¿½H</param>
 		bool Load(const char* filePath, bool isOptimize, bool isLoadTexture = true, bool isOutputErrorCodeTTY = false);
 		/// <summary>
-		/// tkmƒtƒ@ƒCƒ‹‚ğ•Û‘¶B
+		/// tkmï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½Û‘ï¿½ï¿½B
 		/// </summary>
-		/// <param name="filePath">•Û‘¶æ‚Ìƒtƒ@ƒCƒ‹ƒpƒXB</param>
+		/// <param name="filePath">ï¿½Û‘ï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½B</param>
 		bool Save(const char* filePath);
 		/// <summary>
-		/// ƒƒbƒVƒ…ƒp[ƒc‚É‘Î‚µ‚ÄƒNƒGƒŠ‚ğs‚¤B
+		/// ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½pï¿½[ï¿½cï¿½É‘Î‚ï¿½ï¿½ÄƒNï¿½Gï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½B
 		/// </summary>
-		/// <param name="func">ƒNƒGƒŠŠÖ”</param>
+		/// <param name="func">ï¿½Nï¿½Gï¿½ï¿½ï¿½Öï¿½</param>
 		void QueryMeshParts(std::function<void(const SMesh& mesh)> func) const
 		{
 			for (auto& mesh : m_meshParts) {
@@ -104,7 +104,7 @@ namespace nsK2EngineLow {
 			}
 		}
 		/// <summary>
-		/// ƒƒbƒVƒ…ƒp[ƒc‚ğæ“¾B
+		/// ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½pï¿½[ï¿½cï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		const std::vector< SMesh>& GetMeshParts() const
@@ -112,44 +112,51 @@ namespace nsK2EngineLow {
 			return m_meshParts;
 		}
 		/// <summary>
-		/// ƒƒbƒVƒ…‚Ì”‚ğæ“¾B
+		/// ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½æ“¾ï¿½B
 		/// </summary>
 		/// <returns></returns>
 		int GetNumMesh() const
 		{
 			return (int)(m_meshParts.size());
 		}
+		/// <summary>
+		/// ã‚³ãƒ¼ãƒ‰ã‹ã‚‰ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿ã‚’ç›´æ¥è¨­å®šã™ã‚‹ï¼ˆãƒã‚¤ãƒˆãƒãƒƒãƒ—åœ°å½¢ãªã©æ‰‹ç¶šãç”Ÿæˆç”¨ï¼‰
+		/// </summary>
+		void Build(std::vector<SMesh> meshes)
+		{
+			m_meshParts = std::move(meshes);
+		}
 	private:
 		/// <summary>
-		/// ƒeƒNƒXƒ`ƒƒ–¼‚ğƒ[ƒhB
+		/// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½B
 		/// </summary>
 		/// <param name="fp"></param>
 		/// <returns></returns>
 		std::string LoadTextureFileName(FILE* fp);
 		/// <summary>
-		/// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ğƒ[ƒhB
+		/// ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½Xï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½B
 		/// </summary>
 		template<class T>
 		void LoadIndexBuffer(std::vector<T>& indexBuffer, int numIndex, FILE* fp);
 		/// <summary>
-		/// ƒ}ƒeƒŠƒAƒ‹‚ğ\’zB
+		/// ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½zï¿½B
 		/// </summary>
 		/// <param name="tkmMat"></param>
 		void BuildMaterial(SMaterial& tkmMat, FILE* fp, const char* filePath, bool isLoadTexture, bool isOutputErrorCodeTTY);
 		/// <summary>
-		/// ÚƒxƒNƒgƒ‹‚Æ]ƒxƒNƒgƒ‹‚ğŒvZ‚·‚éB
+		/// ï¿½Úƒxï¿½Nï¿½gï¿½ï¿½ï¿½Æ]ï¿½xï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½vï¿½Zï¿½ï¿½ï¿½ï¿½B
 		/// </summary>
 		/// <remarks>
-		/// 3dsMaxScript‚Å‚â‚é‚×‚«‚È‚ñ‚¾‚ë‚¤‚¯‚ÇAƒfƒoƒbƒO‚µ‚½‚¢‚Ì‚Å¡‚Í‚±‚¿‚ç‚Å‚â‚éB
+		/// 3dsMaxScriptï¿½Å‚ï¿½ï¿½×‚ï¿½ï¿½È‚ñ‚¾‚ë‚¤ï¿½ï¿½ï¿½ÇAï¿½fï¿½oï¿½bï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚Åï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½B
 		/// </remarks>
 		void BuildTangentAndBiNormal();
 	private:
 		/// <summary>
-		/// TKMƒtƒ@ƒCƒ‹‚ÌÅ“K‰»B
+		/// TKMï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ÌÅ“Kï¿½ï¿½ï¿½B
 		/// </summary>
 		void Optimize();
 	private:
-		BSP m_bpsOnVertexPosition;				// ’¸“_À•W‚ğg‚Á‚½BSPƒcƒŠ[B
-		std::vector< SMesh >	m_meshParts;		// ƒƒbƒVƒ…ƒp[ƒcB
+		BSP m_bpsOnVertexPosition;				// ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½BSPï¿½cï¿½ï¿½ï¿½[ï¿½B
+		std::vector< SMesh >	m_meshParts;		// ï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½pï¿½[ï¿½cï¿½B
 	};
 }

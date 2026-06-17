@@ -508,6 +508,9 @@
     <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp">
+      <Filter>Source\Actor\Stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -938,6 +941,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\StageSelectMenu.h">
       <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\TerrainObject.h">
+      <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
