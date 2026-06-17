@@ -25,21 +25,8 @@ namespace app
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameterBinary<MasterDaddyPenguinParameter>(
-				PARAMETER_BINARY_FILE_PATH,
-				[](std::istream& stream, MasterDaddyPenguinParameter& parameter)
-				{
-					stream.read(reinterpret_cast<char*>(&parameter.maxHp), sizeof(int));
-					stream.read(reinterpret_cast<char*>(&parameter.hp), sizeof(int));
-					stream.seekg(sizeof(float), std::ios::cur);
-					stream.read(reinterpret_cast<char*>(&parameter.runSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.swimSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.sneakSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.slideSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.jumpPower), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.radius), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.height), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.enableCommandRange), sizeof(float));
-				});
+				PARAMETER_BINARY_FILE_PATH
+			);
 		}
 
 
