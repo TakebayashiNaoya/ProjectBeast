@@ -46,24 +46,23 @@ import struct
 # ─────────────────────────────────────────────────────────────────
 
 def pack_daddy_penguin(data):
-    # < : リトルエンディアン
-    # i : int (4 bytes) × 2
-    # f : float (4 bytes) × 8
-    # i : int (4 bytes) × 1
-    # 計 44 bytes
+    # 継承順（Character -> Penguin -> DaddyPenguin）のメモリレイアウトに合わせる
+    # Character: runSpeed(f), swimSpeed(f), radius(f), height(f)
+    # Penguin  : maxHp(i), hp(i), sneakSpeed(f), slideSpeed(f), jumpPower(f)
+    # Daddy    : enableCommandRange(f)
+    # 計: float×4, int×2, float×4 = 40 bytes
     return struct.pack(
-        "<iifffffffff",
-        int(data.get("maxHp", 0)),
-        int(data.get("hp", 0)),
-        float(data.get("walkSpeed", 0.0)),
-        float(data.get("runSpeed", 0.0)),
-        float(data.get("swimSpeed", 0.0)),
-        float(data.get("sneakSpeed", 0.0)),
-        float(data.get("slideSpeed", 0.0)),
-        float(data.get("jumpPower", 0.0)),
-        float(data.get("radius", 0.0)),
-        float(data.get("height", 0.0)),
-        float(data.get("enableCommandRange", 0))
+        "<ffffiiffff",
+        float(data.get("runSpeed", 0.0)),         # CharacterParameter
+        float(data.get("swimSpeed", 0.0)),        # CharacterParameter
+        float(data.get("radius", 0.0)),           # CharacterParameter
+        float(data.get("height", 0.0)),           # CharacterParameter
+        int(data.get("maxHp", 0)),                # PenguinParameter
+        int(data.get("hp", 0)),                   # PenguinParameter
+        float(data.get("sneakSpeed", 0.0)),       # PenguinParameter
+        float(data.get("slideSpeed", 0.0)),       # PenguinParameter
+        float(data.get("jumpPower", 0.0)),        # PenguinParameter
+        float(data.get("enableCommandRange", 0))  # DaddyPenguinParameter
     )
 
 def pack_penguin_effect_parameter(data):
@@ -102,42 +101,54 @@ def pack_penguin_effect_parameter(data):
 
 
 def pack_child_penguin_parameter(data):
-    # type / maxHp / hp : get<int>()   → i
-    # それ以外           : get<float>() → f
-    # タイプ固有の任意フィールドは存在しない型では 0.0 で埋める
-    # 合計: int×3 + float×33 = 144 bytes / エントリ（5エントリ分 = 720 bytes + count 4 bytes）
+     # MasterChildPenguinParameter（MasterPenguinParameter継承分のみ。配列は持たない）
+     # "<ffffiifff" = f×4 + i×2 + f×3 = 36 bytes
+     return struct.pack(
+         "<ffffiifff",
+         float(data.get("runSpeed",   0.0)),  # Character
+         float(data.get("swimSpeed",  0.0)),  # Character
+         float(data.get("radius",     0.0)),  # Character
+         float(data.get("height",     0.0)),  # Character
+         int(data.get("maxHp",        0)),    # Penguin
+         int(data.get("hp",           0)),    # Penguin
+         float(data.get("sneakSpeed", 0.0)),  # Penguin
+         float(data.get("slideSpeed", 0.0)),  # Penguin
+         float(data.get("jumpPower",  0.0)),  # Penguin
+     )
 
-    r = data.get("randomRanges", {})
-    color = data.get("color", [0.0, 0.0, 0.0, 1.0])
 
-    def rmin(key): return float(r.get(key, [0.0, 0.0])[0])
-    def rmax(key): return float(r.get(key, [0.0, 0.0])[1])
+def pack_child_penguin_type_parameter(data):
+    r = data.get("randomRanges", data)
+    color = data.get("color", [1.0, 1.0, 1.0, 1.0])
+
+    def rmin(key):
+        val = r.get(key, [0.0, 0.0])
+        return float(val[0]) if isinstance(val, list) else float(val)
+    def rmax(key):
+        val = r.get(key, [0.0, 0.0])
+        return float(val[1]) if isinstance(val, list) and len(val) > 1 else float(val)
 
     return struct.pack(
-        "<iii33f",
-        int(data.get("type",   0)),                     # i  : type (0=まじめ 1=甘えん坊 2=やんちゃ 3=おっちょこちょい 4=世話焼き)
-        int(data.get("maxHp",  0)),                     # i  : maxHp
-        int(data.get("hp",     0)),                     # i  : hp
-        float(data.get("radius", 0.0)),                 # f  : radius
-        float(data.get("height", 0.0)),                 # f  : height
-        float(color[0]), float(color[1]),               # ff : colorR, colorG
-        float(color[2]), float(color[3]),               # ff : colorB, colorA
-        rmin("runSpeed"),       rmax("runSpeed"),        # ff : runSpeed.min/max
-        rmin("swimSpeed"),      rmax("swimSpeed"),       # ff : swimSpeed.min/max
-        rmin("sneakSpeed"),     rmax("sneakSpeed"),      # ff : sneakSpeed.min/max
-        rmin("slideSpeed"),     rmax("slideSpeed"),      # ff : slideSpeed.min/max
-        rmin("jumpPower"),      rmax("jumpPower"),       # ff : jumpPower.min/max
-        rmin("stopDistance"),   rmax("stopDistance"),    # ff : stopDistance.min/max
-        rmin("walkDistance"),   rmax("walkDistance"),    # ff : walkDistance.min/max
-        rmin("runDistance"),    rmax("runDistance"),     # ff : runDistance.min/max
-        rmin("joinDistance"),   rmax("joinDistance"),    # ff : joinDistance.min/max
-        rmin("giveUpDistance"), rmax("giveUpDistance"),  # ff : giveUpDistance.min/max
-        rmin("roamTriggerDistance"), rmax("roamTriggerDistance"),  # ff : やんちゃのみ（他は 0.0）
-        rmin("roamRadius"),     rmax("roamRadius"),      # ff : やんちゃのみ（他は 0.0）
-        float(data.get("tripChancePerSec",   0.0)),      # f  : おっちょこちょいのみ（他は 0.0）
-        float(data.get("slipChance",         0.0)),      # f  : おっちょこちょいのみ（他は 0.0）
-        float(data.get("interventionRange",  0.0)),      # f  : 世話焼きのみ（他は 0.0）
+        "<32f",
+        float(color[0]), float(color[1]), float(color[2]), float(color[3]),  # colorR/G/B/A
+        rmin("runSpeed"),       rmax("runSpeed"),
+        rmin("swimSpeed"),      rmax("swimSpeed"),
+        rmin("sneakSpeed"),     rmax("sneakSpeed"),
+        rmin("slideSpeed"),     rmax("slideSpeed"),
+        rmin("jumpPower"),      rmax("jumpPower"),
+        rmin("stopDistance"),   rmax("stopDistance"),
+        rmin("walkDistance"),   rmax("walkDistance"),
+        rmin("runDistance"),    rmax("runDistance"),
+        rmin("joinDistance"),   rmax("joinDistance"),
+        rmin("giveUpDistance"), rmax("giveUpDistance"),
+        rmin("roamTriggerDistance"), rmax("roamTriggerDistance"),  # やんちゃのみ（他は0.0）
+        rmin("roamRadius"),     rmax("roamRadius"),                # やんちゃのみ（他は0.0）
+        float(data.get("tripChancePerSec",  0.0)),  # おっちょこちょいのみ
+        float(data.get("slipChance",        0.0)),  # おっちょこちょいのみ
+        float(data.get("interventionRange", 0.0)),  # 世話焼きのみ
+        0.0
     )
+
 
 def pack_enemy_parameter(data):
     return struct.pack(
@@ -153,60 +164,6 @@ def pack_enemy_parameter(data):
         float(data.get("lostChaseDistance", 0.0)) 
     )
 
-def convert_enemy_layout(json_path, bin_path):
-    """
-    EnemyLayout 系 JSON 専用コンバーター
-    可変長のパトロールポイントに対応するため、FILE_RULE_BOOK 経由で呼ばれる。
-
-    バイナリ構造:
-      [int:  エネミー数]
-      per enemy:
-        [float: spawnX, spawnY, spawnZ]   ← spawnPosition (Vector3)
-        [char[32]: nestName]              ← 固定長文字列
-        [int:  パトロール点数]
-        [float: x, y, z] × n             ← patrolPoints (Vector3 × n)
-    """
-    try:
-        with open(json_path, "r", encoding="utf-8-sig") as f:
-            root = json.load(f)
-    except Exception as e:
-        print(f"  [エラー] 読み込み失敗: {e}")
-        return
-
-    enemies = root.get("enemies", [])
-    buf = bytearray()
-
-    # エネミー総数
-    buf += struct.pack("<i", len(enemies))
-
-    for enemy in enemies:
-        # スポーン位置 (float × 3)
-        pos = enemy.get("spawnPosition", [0, 0, 0])
-        buf += struct.pack("<fff",
-            float(pos[0]),  # f : spawnPosition.x (float)
-            float(pos[1]),  # f : spawnPosition.y (float)
-            float(pos[2]),  # f : spawnPosition.z (float)
-        )
-
-        # 巣の名前 (32バイト固定文字列)
-        nest = enemy.get("nestName", "").encode("utf-8")[:32].ljust(32, b"\x00")
-        buf += nest  # 32s
-
-        # パトロールポイント（可変長）
-        points = enemy.get("patrolPoints", [])
-        buf += struct.pack("<i", len(points))  # i : パトロール点数
-
-        for pt in points:
-            buf += struct.pack("<fff",
-                float(pt[0]),  # f : patrolPoint.x (float)
-                float(pt[1]),  # f : patrolPoint.y (float)
-                float(pt[2]),  # f : patrolPoint.z (float)
-            )
-
-    with open(bin_path, "wb") as f:
-        f.write(buf)
-
-    print(f"  -> [成功] {len(enemies)}体のエネミーデータを書き出しました。")
 
 def pack_ocean_parameter(data):
     # 全フィールドが float のみ
@@ -265,7 +222,8 @@ def pack_whirlpool_parameter(data):
 RULE_BOOK = {
     "DaddyPenguinParameter":    pack_daddy_penguin,
     "PenguinEffectParameter":   pack_penguin_effect_parameter,
-    "ChildPenguinParameter":    pack_child_penguin_parameter,
+    "ChildPenguinParameter":     pack_child_penguin_parameter,
+    "ChildPenguinTypeParameter": pack_child_penguin_type_parameter,
     "EnemyParameter":           pack_enemy_parameter,
     "oceanParameter":           pack_ocean_parameter,
     "PBRParameter":             pack_pbr_parameter,
