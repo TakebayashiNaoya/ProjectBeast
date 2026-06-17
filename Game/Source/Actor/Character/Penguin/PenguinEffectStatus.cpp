@@ -40,43 +40,8 @@ namespace app
 		{
 			// 外部ファイルを読み込み
 			core::ParameterManager::Get()->LoadParameterBinary<MasterPenguinEffectParameter>(
-				PARAMETER_BINARY_FILE_PATH,
-				[](std::istream& stream, MasterPenguinEffectParameter& parameter)
-				{
-					// Vector3: splashEffectScale
-					stream.read(reinterpret_cast<char*>(&parameter.splashEffectScale.x), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.splashEffectScale.y), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.splashEffectScale.z), sizeof(float));
-
-					stream.read(reinterpret_cast<char*>(&parameter.effectOffsetForward), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.splashEffectInterval), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.minMoveVelocitySq), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.minSplashScaleRatio), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.maxSplashScaleRatio), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.minSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.maxSpeed), sizeof(float));
-
-					// Vector3: landingEffectScale
-					stream.read(reinterpret_cast<char*>(&parameter.landingEffectScale.x), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.landingEffectScale.y), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.landingEffectScale.z), sizeof(float));
-
-					// Vector3: slideFrostEffectScale
-					stream.read(reinterpret_cast<char*>(&parameter.slideFrostEffectScale.x), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.slideFrostEffectScale.y), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.slideFrostEffectScale.z), sizeof(float));
-
-					stream.read(reinterpret_cast<char*>(&parameter.slideEffectInterval), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.minSlideFrostScaleRatio), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.maxSlideFrostScaleRatio), sizeof(float));
-
-					// Vector3: slideLineEffectScale
-					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectScale.x), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectScale.y), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectScale.z), sizeof(float));
-
-					stream.read(reinterpret_cast<char*>(&parameter.slideLineEffectOffsetForward), sizeof(float));
-				});
+				PARAMETER_BINARY_FILE_PATH
+			);
 		}
 
 
