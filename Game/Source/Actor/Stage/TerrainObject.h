@@ -4,6 +4,7 @@
  */
 #pragma once
 #include "Source/Actor/Actor.h"
+#include "Physics/PhysicalBody.h"
 
 
 namespace app
@@ -88,6 +89,8 @@ namespace app
 			nsK2EngineLow::Texture m_terrainTextures[4];  // [0]=snow [1]=glass [2]=rock [3]=snow fallback
 			nsK2EngineLow::Texture m_snowNormal;           // 雪ノーマルマップ    (t15)
 			nsK2EngineLow::Texture m_snowRoughness;        // 雪ラフネスマップ    (t16)
+
+			nsBeastEngine::nsCollision::PhysicalBody m_physicalBody;
 
 			TerrainConfig m_config;
 			TerrainCb     m_terrainCb;

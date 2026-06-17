@@ -336,6 +336,15 @@ namespace app
 			initData.m_expandShaderResoruceView[6] = &m_snowRoughness;
 
 			m_modelRender.InitFromLoaded(initData);
+
+			// ワールド行列を確定させてから当たり判定を生成
+			m_modelRender.SetTRS(Vector3::Zero, Quaternion::Identity, Vector3::One);
+			m_modelRender.Update();
+			m_physicalBody.CreateFromModel(
+				m_modelRender.GetModel(),
+				m_modelRender.GetModel().GetWorldMatrix(),
+				nsBeastEngine::nsCollision::CollisionAttribute::Ground
+			);
 		}
 	}
 }
