@@ -17,6 +17,7 @@ namespace app
 		{
 #ifdef APP_PARAM_HOT_RELOAD
 			virtual void Load(const nlohmann::json& j) {};
+			virtual void Load(std::istream& stream) {};
 			std::string m_path;         // パラメーターのファイルパス（ホットリロード用）
 			time_t m_lastWriteTime;     // 最終更新時刻
 #endif // APP_PARAM_HOT_RELOAD

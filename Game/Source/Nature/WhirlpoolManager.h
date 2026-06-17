@@ -25,7 +25,7 @@ namespace app
 			 * @param positionsJsonPath 渦潮の配置JSONパス
 			 * @param parameterJsonPath 渦潮のパラメーターJSONパス
 			 */
-			void Start(const char* positionsJsonPath, const char* parameterJsonPath);
+			void Start(const char* positionsJsonPath, const char* parameterPath);
 			/**
 			 * @brief 更新処理
 			 */

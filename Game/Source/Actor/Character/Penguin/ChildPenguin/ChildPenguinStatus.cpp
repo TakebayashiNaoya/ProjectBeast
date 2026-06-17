@@ -16,77 +16,21 @@ namespace app
 		namespace
 		{
 			/** 子ペンギンのパラメーターのファイルパス */
-			const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinParameter.json";
+			constexpr  const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinParameter.bin";
+			/** 子ペンギンのタイプ別パラメーターのファイルパス */
+			constexpr  const char* TYPE_PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinTypeParameter.bin";
 		}
 
 
 		ChildPenguinStatus::ChildPenguinStatus()
 		{
 			/** 外部ファイルを読み込み */
-			core::ParameterManager::Get()->LoadParameter<MasterChildPenguinParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterChildPenguinParameter& parameter)
-				{
-					parameter.maxHp = j["maxHp"].get<int>();
-					parameter.hp = j["hp"].get<int>();
-					parameter.radius = j["radius"].get<float>();
-					parameter.height = j["height"].get<float>();
-
-					/** タイプ別個体差パラメーター範囲を読み込む */
-					const auto& jRange = j["randomRanges"];
-					const int typeIndex = j["type"].get<int>();
-					auto& td = parameter.typeData[typeIndex];
-					td.colorR = j["color"][0].get<float>();
-					td.colorG = j["color"][1].get<float>();
-					td.colorB = j["color"][2].get<float>();
-					td.colorA = j["color"][3].get<float>();
-					td.runSpeed.min = jRange["runSpeed"][0].get<float>();
-					td.runSpeed.max = jRange["runSpeed"][1].get<float>();
-					td.swimSpeed.min = jRange["swimSpeed"][0].get<float>();
-					td.swimSpeed.max = jRange["swimSpeed"][1].get<float>();
-					td.sneakSpeed.min = jRange["sneakSpeed"][0].get<float>();
-					td.sneakSpeed.max = jRange["sneakSpeed"][1].get<float>();
-					td.slideSpeed.min = jRange["slideSpeed"][0].get<float>();
-					td.slideSpeed.max = jRange["slideSpeed"][1].get<float>();
-					td.jumpPower.min = jRange["jumpPower"][0].get<float>();
-					td.jumpPower.max = jRange["jumpPower"][1].get<float>();
-					td.stopDistance.min = jRange["stopDistance"][0].get<float>();
-					td.stopDistance.max = jRange["stopDistance"][1].get<float>();
-					td.walkDistance.min = jRange["walkDistance"][0].get<float>();
-					td.walkDistance.max = jRange["walkDistance"][1].get<float>();
-					td.runDistance.min = jRange["runDistance"][0].get<float>();
-					td.runDistance.max = jRange["runDistance"][1].get<float>();
-					td.joinDistance.min = jRange["joinDistance"][0].get<float>();
-					td.joinDistance.max = jRange["joinDistance"][1].get<float>();
-					td.giveUpDistance.min = jRange["giveUpDistance"][0].get<float>();
-					td.giveUpDistance.max = jRange["giveUpDistance"][1].get<float>();
-
-					/** やんちゃペンギン固有パラメーターの読み込み（他タイプはデフォルト値のまま） */
-					if (jRange.contains("roamTriggerDistance"))
-					{
-						td.roamTriggerDistance.min = jRange["roamTriggerDistance"][0].get<float>();
-						td.roamTriggerDistance.max = jRange["roamTriggerDistance"][1].get<float>();
-					}
-					if (jRange.contains("roamRadius"))
-					{
-						td.roamRadius.min = jRange["roamRadius"][0].get<float>();
-						td.roamRadius.max = jRange["roamRadius"][1].get<float>();
-					}
-
-					/** おっちょこちょいペンギン固有パラメーターの読み込み（他タイプはデフォルト値のまま） */
-					if (j.contains("tripChancePerSec"))
-					{
-						td.tripChancePerSec = j["tripChancePerSec"].get<float>();
-					}
-					if (j.contains("slipChance"))
-					{
-						td.slipChance = j["slipChance"].get<float>();
-					}
-
-					/** 世話焼きペンギン固有パラメーターの読み込み（他タイプはデフォルト値のまま） */
-					if (j.contains("interventionRange"))
-					{
-						td.interventionRange = j["interventionRange"].get<float>();
-					}
-				});
+			core::ParameterManager::Get()->LoadParameterBinary<MasterChildPenguinParameter>(
+				PARAMETER_BINARY_FILE_PATH
+			);
+			core::ParameterManager::Get()->LoadParameterBinary<MasterChildPenguinTypeParameter>(
+				TYPE_PARAMETER_BINARY_FILE_PATH
+			);
 		}
 
 
@@ -94,6 +38,7 @@ namespace app
 		{
 			/** 使用終了 */
 			core::ParameterManager::Get()->UnloadParameter<MasterChildPenguinParameter>();
+			core::ParameterManager::Get()->UnloadParameter<MasterChildPenguinTypeParameter>();
 		}
 
 

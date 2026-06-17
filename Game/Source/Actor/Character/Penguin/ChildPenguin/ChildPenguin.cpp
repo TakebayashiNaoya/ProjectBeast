@@ -52,9 +52,8 @@ namespace app
 
 			/** タイプ別乗算カラーをJSONパラメーターから設定 */
 			const int typeIndex = static_cast<int>(type);
-			const auto* param = core::ParameterManager::Get()->GetParameter<MasterChildPenguinParameter>(typeIndex);
-			const auto& td = param->typeData[typeIndex];
-			m_typeColor = Vector4(td.colorR, td.colorG, td.colorB, td.colorA);
+			const auto* param = core::ParameterManager::Get()->GetParameter<MasterChildPenguinTypeParameter>(typeIndex);
+			m_typeColor = Vector4(param->colorR, param->colorG, param->colorB, param->colorA);
 
 			/** タイプ変更に伴いステートマシンを作成 */
 			/** おっちょこちょいタイプは固有ステートを持つため専用クラスを使う */

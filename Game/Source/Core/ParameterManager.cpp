@@ -40,19 +40,48 @@ namespace app
 #ifdef APP_PARAM_HOT_RELOAD
 			for (auto paramPair : m_parameterMap)
 			{
-				for (const auto& param : paramPair.second)
+				if (paramPair.second.empty()) continue;
+
+				// 配列の先頭要素のパスとタイムスタンプでファイルが更新されたかチェック
+				auto firstParam = paramPair.second.front();
+				if (util::JsonConverter::CheckFileModified(firstParam->m_path, firstParam->m_lastWriteTime))
 				{
-					if (util::JsonConverter::CheckFileModified(param->m_path, param->m_lastWriteTime))
+					const std::string& path = firstParam->m_path;
+					const bool isBinary = path.size() > 4 && path.compare(path.size() - 4, 4, ".bin") == 0;
+
+					if (isBinary)
 					{
-						nlohmann::json jsonRoot;
-						if (!util::JsonConverter::IsLoadJsonFile(jsonRoot, param->m_path.c_str())) return;
+						std::ifstream ifs(path, std::ios::binary);
+						if (!ifs.is_open()) continue;
 
-						ParameterVector parameters;
+						uint32_t count = 0;
+						ifs.read(reinterpret_cast<char*>(&count), sizeof(count));
 
-						for (auto& j : jsonRoot)
+						time_t newTime = util::JsonConverter::GetFileLastWriteTime(path.c_str());
+
+						// ファイル内の要素数とメモリ上の要素数の小さい方に合わせて同期更新
+						size_t readCount = (std::min)(paramPair.second.size(), static_cast<size_t>(count));
+						for (size_t i = 0; i < readCount; ++i)
 						{
-							param->m_lastWriteTime = util::JsonConverter::GetFileLastWriteTime(param->m_path.c_str());
-							param->Load(j);
+							auto param = paramPair.second[i];
+							param->m_lastWriteTime = newTime;
+							param->Load(ifs);
+						}
+					}
+					else
+					{
+						// JSONの場合
+						nlohmann::json jsonRoot;
+						if (!util::JsonConverter::IsLoadJsonFile(jsonRoot, path.c_str())) continue;
+
+						time_t newTime = util::JsonConverter::GetFileLastWriteTime(path.c_str());
+
+						size_t readCount = (std::min)(paramPair.second.size(), jsonRoot.size());
+						for (size_t i = 0; i < readCount; ++i)
+						{
+							auto param = paramPair.second[i];
+							param->m_lastWriteTime = newTime;
+							param->Load(jsonRoot[i]);
 						}
 					}
 				}

@@ -195,7 +195,7 @@ namespace app
 
 			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
 			IndexBuffer    m_indexBuffer;					/** 元インデックスバッファ（カリングなし描画用） */
-			IndexBuffer*   m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
+			IndexBuffer* m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
 			int            m_indexCount = 0;			/** 元インデックスの総数 */
 
 			/** 元インデックス配列（BuildChunkAABBs・カリング描画用CPUキャッシュ） */
@@ -289,7 +289,7 @@ namespace app
 			 * @brief 初期化処理
 			 * @param parameterJsonPath 海のパラメーターJSONパス
 			 */
-			void Start(const char* parameterJsonPath);
+			void Start(const char* parameterPath);
 
 			/**
 			 * @brief 更新処理
