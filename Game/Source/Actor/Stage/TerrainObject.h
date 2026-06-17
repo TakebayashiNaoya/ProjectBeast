@@ -1,6 +1,7 @@
 ﻿/**
  * @file TerrainObject.h
  * @brief ハイトマップから生成する地形オブジェクト
+ * @author 竹林
  */
 #pragma once
 #include "Source/Actor/Actor.h"
@@ -33,6 +34,7 @@ namespace app
 				float albedoScale = 1.0f;     ///< アルベド明度スケール（1.0=そのまま、小さくすると暗くなる）
 				float yOffset     = 0.0f;     ///< 地形全体の Y 座標オフセット（負=下げる、正=上げる）
 				float minHeight   = 0.0f;     ///< この高さ未満の頂点を含むクワッドはポリゴンを生成しない（ワールド単位）
+				nsBeastEngine::PBRParam pbrParam;  ///< PBR補正パラメータ（ModelRender::SetPBRParam に渡す）
 			};
 
 			/**
@@ -44,7 +46,7 @@ namespace app
 				float halfWidth   = 0.0f;   // 地形の X 方向半幅（ワールド単位）
 				float halfDepth   = 0.0f;   // 地形の Z 方向半奥行き（ワールド単位）
 				float albedoScale = 1.0f;   // アルベド明度スケール
-				float pad         = {};
+				float pad         = {};     // パディング（16バイトアライメント）
 			};
 
 		public:
@@ -86,9 +88,14 @@ namespace app
 			nsK2EngineLow::TkmFile* m_tkmFile = nullptr;
 
 			nsK2EngineLow::Texture m_splatmap;
-			nsK2EngineLow::Texture m_terrainTextures[4];  // [0]=snow [1]=glass [2]=rock [3]=snow fallback
-			nsK2EngineLow::Texture m_snowNormal;           // 雪ノーマルマップ    (t15)
-			nsK2EngineLow::Texture m_snowRoughness;        // 雪ラフネスマップ    (t16)
+			nsK2EngineLow::Texture m_terrainTextures[3];  // [0]=snow [1]=glass [2]=rock
+			nsK2EngineLow::Texture m_snowNormal;           // 雪ノーマルマップ     (t15)
+			nsK2EngineLow::Texture m_snowRoughness;        // 雪ラフネスマップ     (t16)
+			nsK2EngineLow::Texture m_glassNormal;          // ガラスノーマルマップ (t17)
+			nsK2EngineLow::Texture m_glassRoughness;       // ガラスラフネスマップ (t18)
+			nsK2EngineLow::Texture m_rockNormal;           // 岩ノーマルマップ     (t19)
+			nsK2EngineLow::Texture m_rockRoughness;        // 岩ラフネスマップ     (t20)
+
 
 			nsBeastEngine::nsCollision::PhysicalBody m_physicalBody;
 

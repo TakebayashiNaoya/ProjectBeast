@@ -1,6 +1,7 @@
 ﻿/**
  * @file TerrainObject.cpp
  * @brief ハイトマップから生成する地形オブジェクト
+ * @author 竹林
  */
 #include "stdafx.h"
 #include "TerrainObject.h"
@@ -12,18 +13,22 @@ namespace
 	static const wchar_t* HEIGHTMAP_PATH  = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";
 	/** スプラットマップ */
 	static const wchar_t* SPLATMAP_PATH   = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";
+
+	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
+	static const char* TERRAIN_TKM_KEY = "terrain_generated";
+
 	/** 地形テクスチャ（スプラットマップの R=snow, G=glass, B=rock, A=snow fallback） */
 	static const wchar_t* TEX_PATH_SNOW   = L"Assets/modelData/stage/Terrain/snow.DDS";
 	static const wchar_t* TEX_PATH_GLASS  = L"Assets/modelData/stage/Terrain/glass.DDS";
 	static const wchar_t* TEX_PATH_ROCK   = L"Assets/modelData/stage/Terrain/rock.DDS";
 
-	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
-	static const char*    TERRAIN_TKM_KEY = "terrain_generated";
-
-	/** 雪 PBR テクスチャ */
+	/** PBR テクスチャ */
 	static const wchar_t* TEX_PATH_SNOW_NORMAL     = L"Assets/modelData/stage/Terrain/snow_Normal.DDS";
 	static const wchar_t* TEX_PATH_SNOW_ROUGHNESS  = L"Assets/modelData/stage/Terrain/snow_Roughness.DDS";
-
+	static const wchar_t* TEX_PATH_GLASS_NORMAL    = L"Assets/modelData/stage/Terrain/glass_Normal.DDS";
+	static const wchar_t* TEX_PATH_GLASS_ROUGHNESS = L"Assets/modelData/stage/Terrain/glass_Roughness.DDS";
+	static const wchar_t* TEX_PATH_ROCK_NORMAL     = L"Assets/modelData/stage/Terrain/rock_Normal.DDS";
+	static const wchar_t* TEX_PATH_ROCK_ROUGHNESS  = L"Assets/modelData/stage/Terrain/rock_Roughness.DDS";
 }
 
 
@@ -31,7 +36,6 @@ namespace app
 {
 	namespace actor
 	{
-		// -----------------------------------------------------------------------
 		void TerrainObject::Init(const TerrainConfig& config)
 		{
 			m_config = config;
@@ -43,7 +47,6 @@ namespace app
 		}
 
 
-		// -----------------------------------------------------------------------
 		void TerrainObject::Update()
 		{
 			if (!m_isInited) return;
@@ -53,7 +56,6 @@ namespace app
 		}
 
 
-		// -----------------------------------------------------------------------
 		void TerrainObject::Render(RenderContext& rc)
 		{
 			if (!m_isInited) return;
@@ -61,18 +63,19 @@ namespace app
 		}
 
 
-		// -----------------------------------------------------------------------
 		void TerrainObject::LoadHeightmap()
 		{
+			// DDS ファイルを開いてヘッダを読み、
+			// R16_UNORM/BGRA8/RGBA8/R8/L8 のいずれかに対応して CPU に読み込む
 			FILE* fp = nullptr;
 			_wfopen_s(&fp, HEIGHTMAP_PATH, L"rb");
-			if (!fp)
-			{
+			if (!fp) {
 				m_heightmap.width = m_heightmap.height = 2;
 				m_heightmap.pixels.assign(4, 0);
 				return;
 			}
 
+			// DDS ヘッダ構造体（DDSURFACEDESC2 と同等のレイアウト）
 			struct DdsHeader
 			{
 				uint32_t dwSize;
@@ -97,19 +100,24 @@ namespace app
 				uint32_t dwCaps4;
 				uint32_t dwReserved2;
 			};
+			// DDSURFACEDESC2 のサイズは 124 バイトで、これに合わせる
 			static_assert(sizeof(DdsHeader) == 124, "DDS_HEADER size mismatch");
 
+			// DDS ファイルの先頭 4 バイトは "DDS " のマジックナンバー、その後にヘッダが続く
 			uint32_t magic = 0;
 			fread(&magic, 4, 1, fp);
 			DdsHeader header = {};
 			fread(&header, sizeof(header), 1, fp);
 
+			// ヘッダから幅・高さを取得
 			const int srcW = static_cast<int>(header.dwWidth);
 			const int srcH = static_cast<int>(header.dwHeight);
 
+			// DX10 ヘッダがある場合はさらに 20 バイトスキップ（DXGI_FORMAT を読む必要はない）
 			constexpr uint32_t FOURCC_DX10 = ('D') | ('X' << 8) | ('1' << 16) | ('0' << 24);
-			if (header.ddspfFourCC == FOURCC_DX10)
+			if (header.ddspfFourCC == FOURCC_DX10) {
 				fseek(fp, 20, SEEK_CUR);
+			}
 
 			// bpp と R チャンネルのバイトオフセットを判定
 			// BGRA8/RGBA8: RGBBitCount==32, FourCC==0
@@ -171,7 +179,6 @@ namespace app
 		}
 
 
-		// -----------------------------------------------------------------------
 		void TerrainObject::GenerateMesh()
 		{
 			const int W = m_heightmap.width;
@@ -301,19 +308,22 @@ namespace app
 		}
 
 
-		// -----------------------------------------------------------------------
 		void TerrainObject::InitRenderer()
 		{
-			// BaseColor テクスチャ
+			// BaseColor
 			m_splatmap.InitFromDDSFile(SPLATMAP_PATH);
 			m_terrainTextures[0].InitFromDDSFile(TEX_PATH_SNOW);
 			m_terrainTextures[1].InitFromDDSFile(TEX_PATH_GLASS);
 			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);
-			m_terrainTextures[3].InitFromDDSFile(TEX_PATH_SNOW);
 
-			// 雪 PBR テクスチャ（DDS 変換済みファイルを使用）
+			// PBR テクスチャ（Normal / Roughness）
 			m_snowNormal.InitFromDDSFile(TEX_PATH_SNOW_NORMAL);
 			m_snowRoughness.InitFromDDSFile(TEX_PATH_SNOW_ROUGHNESS);
+			m_glassNormal.InitFromDDSFile(TEX_PATH_GLASS_NORMAL);
+			m_glassRoughness.InitFromDDSFile(TEX_PATH_GLASS_ROUGHNESS);
+			m_rockNormal.InitFromDDSFile(TEX_PATH_ROCK_NORMAL);
+			m_rockRoughness.InitFromDDSFile(TEX_PATH_ROCK_ROUGHNESS);
+
 
 			// GBuffer パスを Terrain.fx に変更（Init より前に呼ぶ必要がある）
 			m_modelRender.SetGBufferFxFilePath("Assets/shader/Terrain.fx");
@@ -326,16 +336,28 @@ namespace app
 			initData.m_expandConstantBuffer     = &m_terrainCb;
 			initData.m_expandConstantBufferSize = static_cast<int>(sizeof(TerrainCb));
 
-			// 拡張 SRV: t10〜t14=BaseColor 系、t15=雪ノーマル、t16=雪ラフネス
-			initData.m_expandShaderResoruceView[0] = &m_splatmap;
-			initData.m_expandShaderResoruceView[1] = &m_terrainTextures[0];
-			initData.m_expandShaderResoruceView[2] = &m_terrainTextures[1];
-			initData.m_expandShaderResoruceView[3] = &m_terrainTextures[2];
-			initData.m_expandShaderResoruceView[4] = &m_terrainTextures[3];
-			initData.m_expandShaderResoruceView[5] = &m_snowNormal;
-			initData.m_expandShaderResoruceView[6] = &m_snowRoughness;
+			// 拡張 SRV レジスタ対応表:
+			//  [0]=t10 splatmap  [1]=t11 snow  [2]=t12 glass  [3]=t13 rock
+			//  [4]=t14 (未使用)
+			//  [5]=t15 snowNormal  [6]=t16 snowRoughness
+			//  [7]=t17 glassNormal [8]=t18 glassRoughness
+			//  [9]=t19 rockRoughness
+			initData.m_expandShaderResoruceView[0]  = &m_splatmap;
+			initData.m_expandShaderResoruceView[1]  = &m_terrainTextures[0];  // snow
+			initData.m_expandShaderResoruceView[2]  = &m_terrainTextures[1];  // glass
+			initData.m_expandShaderResoruceView[3]  = &m_terrainTextures[2];  // rock
+			// [4] は t14 に対応するが未使用のため nullptr のまま
+			initData.m_expandShaderResoruceView[5]  = &m_snowNormal;
+			initData.m_expandShaderResoruceView[6]  = &m_snowRoughness;
+			initData.m_expandShaderResoruceView[7]  = &m_glassNormal;
+			initData.m_expandShaderResoruceView[8]  = &m_glassRoughness;
+			initData.m_expandShaderResoruceView[9]  = &m_rockNormal;
+			initData.m_expandShaderResoruceView[10] = &m_rockRoughness;
 
 			m_modelRender.InitFromLoaded(initData);
+
+			// 他モデルと同じ per-model PBR パラメータ制御（b2 PBRParamCb に反映される）
+			m_modelRender.SetPBRParam(m_config.pbrParam);
 
 			// ワールド行列を確定させてから当たり判定を生成
 			m_modelRender.SetTRS(Vector3::Zero, Quaternion::Identity, Vector3::One);

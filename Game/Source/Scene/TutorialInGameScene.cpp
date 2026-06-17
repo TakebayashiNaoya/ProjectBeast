@@ -23,6 +23,12 @@ namespace app
 		terrainConfig.yOffset     = -50.0f;   // 地形全体を下げる（海面に合わせて調整）
 		terrainConfig.minHeight   = 5.0f;     // この高さ未満のクワッドはメッシュを生成しない
 
+		// PBR 補正パラメータ（"ground" プリセットと同等）
+		terrainConfig.pbrParam.m_dirLightScale  = 1.0f;
+		terrainConfig.pbrParam.m_ambientScale   = 1.0f;
+		terrainConfig.pbrParam.m_metallicOffset = -1.0f;  // metallic=0 強制（非金属）
+		terrainConfig.pbrParam.m_smoothOffset   = -1.0f;  // smooth=0 強制（マット面）
+
 		actor::StageSystem::GetInstance()->InitTerrain(terrainConfig);
 		m_tutorialController.Initialize(m_daddyPenguin);
 	}
