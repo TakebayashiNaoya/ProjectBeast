@@ -16,7 +16,7 @@ namespace app
 		namespace
 		{
 			/** 親ペンギンのパラメーターのファイルパス */
-			const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/daddyPenguin/DaddyPenguinParameter.bin";
+			constexpr const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/daddyPenguin/DaddyPenguinParameter.bin";
 		}
 
 

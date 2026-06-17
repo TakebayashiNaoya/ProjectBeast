@@ -156,7 +156,7 @@ namespace app
 			const MasterChildPenguinTypeParameter& GetTypeData(EnChildPenguinType type)
 			{
 				const int index = static_cast<int>(type);
-				const auto* param = core::ParameterManager::Get()->GetParameter<MasterChildPenguinTypeParameter>(static_cast<int>(type));
+				const auto* param = core::ParameterManager::Get()->GetParameter<MasterChildPenguinTypeParameter>(index);
 				return *param;
 			}
 		}

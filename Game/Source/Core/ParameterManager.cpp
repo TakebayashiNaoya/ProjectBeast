@@ -52,14 +52,14 @@ namespace app
 					if (isBinary)
 					{
 						std::ifstream ifs(path, std::ios::binary);
-						if (!ifs.is_open()) continue; // 【修正】returnではなくcontinue
+						if (!ifs.is_open()) continue;
 
 						uint32_t count = 0;
 						ifs.read(reinterpret_cast<char*>(&count), sizeof(count));
 
 						time_t newTime = util::JsonConverter::GetFileLastWriteTime(path.c_str());
 
-						// 【修正】ファイル内の要素数とメモリ上の要素数の小さい方に合わせて同期更新
+						// ファイル内の要素数とメモリ上の要素数の小さい方に合わせて同期更新
 						size_t readCount = (std::min)(paramPair.second.size(), static_cast<size_t>(count));
 						for (size_t i = 0; i < readCount; ++i)
 						{
@@ -70,9 +70,9 @@ namespace app
 					}
 					else
 					{
-						// JSONの場合の修正
+						// JSONの場合
 						nlohmann::json jsonRoot;
-						if (!util::JsonConverter::IsLoadJsonFile(jsonRoot, path.c_str())) continue; // 【修正】returnではなくcontinue
+						if (!util::JsonConverter::IsLoadJsonFile(jsonRoot, path.c_str())) continue;
 
 						time_t newTime = util::JsonConverter::GetFileLastWriteTime(path.c_str());
 

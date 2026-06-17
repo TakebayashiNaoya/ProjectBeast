@@ -16,9 +16,9 @@ namespace app
 		namespace
 		{
 			/** 子ペンギンのパラメーターのファイルパス */
-			const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinParameter.bin";
+			constexpr  const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinParameter.bin";
 			/** 子ペンギンのタイプ別パラメーターのファイルパス */
-			const char* TYPE_PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinTypeParameter.bin";
+			constexpr  const char* TYPE_PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/childPenguin/ChildPenguinTypeParameter.bin";
 		}
 
 

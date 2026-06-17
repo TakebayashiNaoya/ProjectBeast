@@ -9,36 +9,6 @@
 #include <fstream>
 
 
- /**
- * @brief ホットリロード有効化マクロ
-  * @note デバッグビルド時のみ有効化
-  */
-#ifdef APP_DEBUG
-#define APP_PARAM_HOT_RELOAD
-#endif
-
-
-  /**
-  * @brief パラメーター用マクロ定義
-  * @note ホットリロード対応版
-  */
-#ifdef APP_PARAM_HOT_RELOAD
-
-#define appParameter(name)\
-public:\
-static constexpr uint32_t ID() {return Hash32(#name);}\
-std::function<void(const nlohmann::json& j, name& p)> load;\
-
-#else
-
-#define appParameter(name)\
-public:\
-static constexpr uint32_t ID() {return Hash32(#name);}
-
-#endif
-
-
-
 namespace app
 {
 	namespace core
@@ -51,18 +21,6 @@ namespace app
 		 */
 		class ParameterManager : public Noncopyable
 		{
-		private:
-
-			using ParameterVector = std::vector<IMasterParameter*>;
-
-			using ParameterMap = std::map<uint32_t, ParameterVector>;
-
-
-		private:
-			ParameterManager();
-			~ParameterManager();
-
-
 		public:
 			/**
 			 * パラメーターを更新
@@ -139,7 +97,7 @@ namespace app
 
 				m_parameterMap.emplace(T::ID(), parameters);
 
-				printf("DATA_SIZE = %zu\n", DATA_SIZE);
+				//printf("DATA_SIZE = %zu\n", DATA_SIZE);
 			}
 
 
@@ -172,7 +130,7 @@ namespace app
 			{
 				const auto parameters = GetParameters<T>();
 				if (parameters.size() == 0) { return nullptr; }
-				if (parameters.size() < index) { return nullptr; }
+				if (parameters.size() <= index) { return nullptr; }
 				return parameters[index];
 			}
 			/**
@@ -202,11 +160,6 @@ namespace app
 					func(*paramter);
 				}
 			}
-
-
-		private:
-			/** パラメーターマップ */
-			ParameterMap m_parameterMap;
 
 
 		public:
@@ -243,7 +196,23 @@ namespace app
 				}
 			}
 
+
 		private:
+
+			using ParameterVector = std::vector<IMasterParameter*>;
+
+			using ParameterMap = std::map<uint32_t, ParameterVector>;
+
+
+		private:
+			ParameterManager();
+			~ParameterManager();
+
+
+			/** パラメーターマップ */
+			ParameterMap m_parameterMap;
+
+
 			/** シングルトンインスタンス */
 			static ParameterManager* m_instance;
 		};

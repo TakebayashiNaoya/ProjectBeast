@@ -15,7 +15,7 @@ namespace app
 		namespace
 		{
 			/** PBR補正パラメーターのファイルパス */
-			const char* PARAMETER_FILE_PATH = "Assets/parameter/Graphics/PBRParameter.bin";
+			constexpr const char* PARAMETER_FILE_PATH = "Assets/parameter/Graphics/PBRParameter.bin";
 		}
 
 		/** シングルトンインスタンス初期化 */

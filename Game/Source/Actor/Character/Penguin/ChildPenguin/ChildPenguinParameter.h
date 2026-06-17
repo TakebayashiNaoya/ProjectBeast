@@ -33,6 +33,9 @@ namespace app
 
 
 
+		/***************************************/
+
+
 		/**
 		 * @brief タイプごとの個体差パラメーター範囲
 		 * @details インデックスは EnChildPenguinType の値と対応する
