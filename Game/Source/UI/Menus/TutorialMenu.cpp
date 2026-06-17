@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "TutorialMenu.h"
+#include "UIMenuConstants.h"
 #include "Source/Util/CRC32.h"
 
 
@@ -42,6 +43,7 @@ namespace app
 		TutorialMenu::TutorialMenu()
 			: m_currentPage(0)
 			, m_isClosed(false)
+			, m_isStickNeutralX(true)
 		{}
 
 
@@ -123,16 +125,20 @@ namespace app
 				return;
 			}
 
-			// 右入力で次のページへ。
-			if (g_pad[0]->IsTrigger(enButtonRight))
+			const float stickX = g_pad[0]->GetLStickXF();
+			if (fabsf(stickX) < STICK_THRESHOLD) m_isStickNeutralX = true;
+
+			// 右入力（十字キーまたはスティック右）で次のページへ。
+			if (g_pad[0]->IsTrigger(enButtonRight) || (m_isStickNeutralX && stickX > STICK_THRESHOLD))
 			{
 				m_currentPage = (m_currentPage + 1) % TUTORIAL_PAGE_COUNT;
+				m_isStickNeutralX = false;
 			}
-
-			// 左入力で前のページへ。
-			if (g_pad[0]->IsTrigger(enButtonLeft))
+			// 左入力（十字キーまたはスティック左）で前のページへ。
+			else if (g_pad[0]->IsTrigger(enButtonLeft) || (m_isStickNeutralX && stickX < -STICK_THRESHOLD))
 			{
 				m_currentPage = (m_currentPage - 1 + TUTORIAL_PAGE_COUNT) % TUTORIAL_PAGE_COUNT;
+				m_isStickNeutralX = false;
 			}
 		}
 
