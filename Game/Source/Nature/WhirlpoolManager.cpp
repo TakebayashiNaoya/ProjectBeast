@@ -79,23 +79,7 @@ namespace app
 			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(m_positionsJsonPath.c_str());
 #endif // APP_DEBUG
 
-			core::ParameterManager::Get()->LoadParameterBinary<MasterWhirlpoolParameter>(
-				parameterPath,
-				[](std::istream& stream, MasterWhirlpoolParameter& p)
-				{
-					stream.read(reinterpret_cast<char*>(&p.whirlpoolRadius), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.attractSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.rotateSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.uvRotationSpeed), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.scaleChangeTime), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.stayTime), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.createInterval), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.orbitRadius), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.orbitRadiusVariation), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.orbitOffsetVariation), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.rotateScaleVariation), sizeof(float));
-				}
-			);
+			core::ParameterManager::Get()->LoadParameterBinary<MasterWhirlpoolParameter>(parameterPath);
 
 			// RenderingEngineに自身を登録する
 			g_renderingEngine->RegisterNatureObject(this);

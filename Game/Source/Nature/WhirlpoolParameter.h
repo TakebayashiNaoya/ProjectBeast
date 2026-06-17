@@ -23,10 +23,6 @@ namespace app
 			{
 				load(j, *this);
 			}
-			void Load(std::istream& stream) override
-			{
-				loadBinary(stream, *this);
-			}
 #endif // APP_PARAM_HOT_RELOAD
 
 			float whirlpoolRadius;			/** 渦潮の影響範囲半径 */
