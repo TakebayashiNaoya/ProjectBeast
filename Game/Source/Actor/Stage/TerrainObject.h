@@ -88,13 +88,13 @@ namespace app
 			nsK2EngineLow::TkmFile* m_tkmFile = nullptr;
 
 			nsK2EngineLow::Texture m_splatmap;
-			nsK2EngineLow::Texture m_terrainTextures[3];  // [0]=snow [1]=glass [2]=rock
-			nsK2EngineLow::Texture m_snowNormal;           // 雪ノーマルマップ     (t15)
-			nsK2EngineLow::Texture m_snowRoughness;        // 雪ラフネスマップ     (t16)
-			nsK2EngineLow::Texture m_glassNormal;          // ガラスノーマルマップ (t17)
-			nsK2EngineLow::Texture m_glassRoughness;       // ガラスラフネスマップ (t18)
-			nsK2EngineLow::Texture m_rockNormal;           // 岩ノーマルマップ     (t19)
-			nsK2EngineLow::Texture m_rockRoughness;        // 岩ラフネスマップ     (t20)
+			nsK2EngineLow::Texture m_terrainTextures[3];  // [0]=snow [1]=grass [2]=rock
+			nsK2EngineLow::Texture m_snowNormal;           // 雪ノーマルマップ (t15)
+			nsK2EngineLow::Texture m_snowRoughness;        // 雪ラフネスマップ (t16)
+			nsK2EngineLow::Texture m_grassNormal;          // 草ノーマルマップ (t17)
+			nsK2EngineLow::Texture m_grassRoughness;       // 草ラフネスマップ (t18)
+			nsK2EngineLow::Texture m_rockNormal;           // 岩ノーマルマップ (t19)
+			nsK2EngineLow::Texture m_rockRoughness;        // 岩ラフネスマップ (t20)
 
 
 			nsBeastEngine::nsCollision::PhysicalBody m_physicalBody;

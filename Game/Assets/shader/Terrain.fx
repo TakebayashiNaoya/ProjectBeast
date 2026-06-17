@@ -10,7 +10,7 @@
  *   b4 : ModelDitherCb
  *   t10: splatmap          [0]
  *   t11: snow BaseColor    [1]
- *   t12: glass BaseColor   [2]
+ *   t12: grass BaseColor   [2]
  *   t13: rock BaseColor    [3]
  *   t14: (未使用)          [4]
  *   t15: snow Normal       [5]
@@ -88,13 +88,13 @@ cbuffer ModelDitherCb : register(b4)
 
 Texture2D<float4> g_splatmap       : register(t10);  // スプラットマップ (R=雪, G=草, B=岩)
 Texture2D<float4> g_snowBase       : register(t11);  // 雪のベースカラー
-Texture2D<float4> g_glassBase      : register(t12);  // 草のベースカラー
+Texture2D<float4> g_grassBase      : register(t12);  // 草のベースカラー
 Texture2D<float4> g_rockBase       : register(t13);  // 岩のベースカラー
 // t14: αは未使用
 Texture2D<float4> g_snowNormal     : register(t15);  // 雪のノーマルマップ
 Texture2D<float4> g_snowRoughness  : register(t16);  // 雪のラフネスマップ
-Texture2D<float4> g_glassNormal    : register(t17);  // 草のノーマルマップ
-Texture2D<float4> g_glassRoughness : register(t18);  // 草のラフネスマップ
+Texture2D<float4> g_grassNormal    : register(t17);  // 草のノーマルマップ
+Texture2D<float4> g_grassRoughness : register(t18);  // 草のラフネスマップ
 Texture2D<float4> g_rockNormal     : register(t19);  // 岩のノーマルマップ
 Texture2D<float4> g_rockRoughness  : register(t20);  // 岩のラフネスマップ
 
@@ -175,7 +175,7 @@ static const int g_bayerPattern[4][4] =
 float3 SampleNormal(Texture2D normalTex, float2 uv, float3x3 tbn)
 {
     float3 normalMap = normalTex.Sample(g_sampler, uv).xyz;
-    normalMap = pow(normalMap, 1.0f / 2.2f);   // sRGB → linear（RenderToGBuffer.fx と同じ）
+    //normalMap = pow(normalMap, 1.0f / 2.2f);   // sRGB → linear（RenderToGBuffer.fx と同じ）
     normalMap = (normalMap - 0.5f) * 2.0f;
     return normalize(mul(normalMap, tbn));
 }
@@ -254,24 +254,24 @@ SPSOut PSMain(SPSIn psIn)
 
     // ------ BaseColor ブレンド ------
     float4 albedo = g_snowBase.Sample (g_sampler, psIn.uv) * weights.r
-                  + g_glassBase.Sample(g_sampler, psIn.uv) * weights.g
+                  + g_grassBase.Sample(g_sampler, psIn.uv) * weights.g
                   + g_rockBase.Sample (g_sampler, psIn.uv) * weights.b;
     albedo.a = 1.0f;
 
     // ------ Normal ブレンド ------
     float3 snowNorm  = SampleNormal(g_snowNormal,  psIn.uv, tbn);
-    float3 glassNorm = SampleNormal(g_glassNormal, psIn.uv, tbn);
+    float3 grassNorm = SampleNormal(g_grassNormal, psIn.uv, tbn);
     float3 rockNorm  = SampleNormal(g_rockNormal,  psIn.uv, tbn);
 
     float3 finalNormal = normalize(
         snowNorm  * weights.r +
-        glassNorm * weights.g +
+        grassNorm * weights.g +
         rockNorm  * weights.b
     );
 
     // ------ Roughness → Smooth ブレンド ------
     float finalSmooth = SampleSmooth(g_snowRoughness,  psIn.uv) * weights.r
-                      + SampleSmooth(g_glassRoughness, psIn.uv) * weights.g
+                      + SampleSmooth(g_grassRoughness, psIn.uv) * weights.g
                       + SampleSmooth(g_rockRoughness,  psIn.uv) * weights.b;
 
     // ------ GBuffer 出力 ------

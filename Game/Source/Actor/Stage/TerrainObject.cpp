@@ -18,16 +18,16 @@ namespace
 	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
 	static const char* TERRAIN_TKM_KEY = "terrain_generated";
 
-	/** 地形テクスチャ（スプラットマップの R=snow, G=glass, B=rock, A=snow fallback） */
+	/** 地形テクスチャ（スプラットマップの R=snow, G=grass, B=rock） */
 	static const wchar_t* TEX_PATH_SNOW   = L"Assets/modelData/stage/Terrain/snow.DDS";
-	static const wchar_t* TEX_PATH_GLASS  = L"Assets/modelData/stage/Terrain/glass.DDS";
+	static const wchar_t* TEX_PATH_GRASS  = L"Assets/modelData/stage/Terrain/grass.DDS";
 	static const wchar_t* TEX_PATH_ROCK   = L"Assets/modelData/stage/Terrain/rock.DDS";
 
 	/** PBR テクスチャ */
 	static const wchar_t* TEX_PATH_SNOW_NORMAL     = L"Assets/modelData/stage/Terrain/snow_Normal.DDS";
 	static const wchar_t* TEX_PATH_SNOW_ROUGHNESS  = L"Assets/modelData/stage/Terrain/snow_Roughness.DDS";
-	static const wchar_t* TEX_PATH_GLASS_NORMAL    = L"Assets/modelData/stage/Terrain/glass_Normal.DDS";
-	static const wchar_t* TEX_PATH_GLASS_ROUGHNESS = L"Assets/modelData/stage/Terrain/glass_Roughness.DDS";
+	static const wchar_t* TEX_PATH_GRASS_NORMAL    = L"Assets/modelData/stage/Terrain/grass_Normal.DDS";
+	static const wchar_t* TEX_PATH_GRASS_ROUGHNESS = L"Assets/modelData/stage/Terrain/grass_Roughness.DDS";
 	static const wchar_t* TEX_PATH_ROCK_NORMAL     = L"Assets/modelData/stage/Terrain/rock_Normal.DDS";
 	static const wchar_t* TEX_PATH_ROCK_ROUGHNESS  = L"Assets/modelData/stage/Terrain/rock_Roughness.DDS";
 }
@@ -39,6 +39,7 @@ namespace app
 	{
 		void TerrainObject::Init(const TerrainConfig& config)
 		{
+			if (m_isInited) return;
 			m_config = config;
 			LoadHeightmap();
 			GenerateMesh();
@@ -51,8 +52,6 @@ namespace app
 		void TerrainObject::Update()
 		{
 			if (!m_isInited) return;
-			// 地形は常に原点固定
-			m_modelRender.SetTRS(Vector3::Zero, Quaternion::Identity, Vector3::One);
 			m_modelRender.Update();
 		}
 
@@ -287,14 +286,14 @@ namespace app
 			// BaseColor
 			m_splatmap.InitFromDDSFile(SPLATMAP_PATH);
 			m_terrainTextures[0].InitFromDDSFile(TEX_PATH_SNOW);
-			m_terrainTextures[1].InitFromDDSFile(TEX_PATH_GLASS);
+			m_terrainTextures[1].InitFromDDSFile(TEX_PATH_GRASS);
 			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);
 
 			// PBR テクスチャ（Normal / Roughness）
 			m_snowNormal.    InitFromDDSFile(TEX_PATH_SNOW_NORMAL);
 			m_snowRoughness. InitFromDDSFile(TEX_PATH_SNOW_ROUGHNESS);
-			m_glassNormal.   InitFromDDSFile(TEX_PATH_GLASS_NORMAL);
-			m_glassRoughness.InitFromDDSFile(TEX_PATH_GLASS_ROUGHNESS);
+			m_grassNormal.   InitFromDDSFile(TEX_PATH_GRASS_NORMAL);
+			m_grassRoughness.InitFromDDSFile(TEX_PATH_GRASS_ROUGHNESS);
 			m_rockNormal.    InitFromDDSFile(TEX_PATH_ROCK_NORMAL);
 			m_rockRoughness. InitFromDDSFile(TEX_PATH_ROCK_ROUGHNESS);
 
@@ -311,20 +310,20 @@ namespace app
 			initData.m_expandConstantBufferSize = static_cast<int>(sizeof(TerrainCb));
 
 			// 拡張 SRV レジスタ対応表:
-			//  [0]=t10 splatmap  [1]=t11 snow  [2]=t12 glass  [3]=t13 rock
+			//  [0]=t10 splatmap  [1]=t11 snow  [2]=t12 grass  [3]=t13 rock
 			//  [4]=t14 (未使用)
 			//  [5]=t15 snowNormal  [6]=t16 snowRoughness
-			//  [7]=t17 glassNormal [8]=t18 glassRoughness
-			//  [9]=t19 rockRoughness
+			//  [7]=t17 grassNormal [8]=t18 grassRoughness
+			//  [9]=t19 rockNormal  [10]=t20 rockRoughness
 			initData.m_expandShaderResoruceView[0]  = &m_splatmap;
 			initData.m_expandShaderResoruceView[1]  = &m_terrainTextures[0];  // snow
-			initData.m_expandShaderResoruceView[2]  = &m_terrainTextures[1];  // glass
+			initData.m_expandShaderResoruceView[2]  = &m_terrainTextures[1];  // grass
 			initData.m_expandShaderResoruceView[3]  = &m_terrainTextures[2];  // rock
 			// [4] は t14 に対応するが未使用のため nullptr のまま
 			initData.m_expandShaderResoruceView[5]  = &m_snowNormal;
 			initData.m_expandShaderResoruceView[6]  = &m_snowRoughness;
-			initData.m_expandShaderResoruceView[7]  = &m_glassNormal;
-			initData.m_expandShaderResoruceView[8]  = &m_glassRoughness;
+			initData.m_expandShaderResoruceView[7]  = &m_grassNormal;
+			initData.m_expandShaderResoruceView[8]  = &m_grassRoughness;
 			initData.m_expandShaderResoruceView[9]  = &m_rockNormal;
 			initData.m_expandShaderResoruceView[10] = &m_rockRoughness;
 
