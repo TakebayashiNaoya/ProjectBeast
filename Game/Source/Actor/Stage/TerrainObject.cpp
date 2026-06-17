@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "TerrainObject.h"
+#include "DirectXTK/Inc/DDSTextureLoader.h"
 
 
 namespace
@@ -65,117 +66,88 @@ namespace app
 
 		void TerrainObject::LoadHeightmap()
 		{
-			// DDS ファイルを開いてヘッダを読み、
-			// R16_UNORM/BGRA8/RGBA8/R8/L8 のいずれかに対応して CPU に読み込む
-			FILE* fp = nullptr;
-			_wfopen_s(&fp, HEIGHTMAP_PATH, L"rb");
-			if (!fp) {
+			// DirectXTK で DDS を解析（DX10拡張ヘッダー・DXGI_FORMAT 判定を自動処理）
+			
+			// GPU リソース（LoadDDSTextureFromFile 内で自動確保されるが、今回は CPU メモリ上のデータだけ欲しいので即解放する）
+			ID3D12Resource* texResource = nullptr;
+			// CPU メモリ上の DDS データ（LoadDDSTextureFromFile 内で自動確保される）
+			std::unique_ptr<uint8_t[]> ddsData;
+			// サブリソースデータ（LoadDDSTextureFromFile 内で自動確保される）
+			std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+
+			// DDS ファイルを読み込んで GPU リソースとサブリソースデータを取得
+			const HRESULT hr = DirectX::LoadDDSTextureFromFile(
+				g_graphicsEngine->GetD3DDevice(),	// D3D12 デバイス
+				HEIGHTMAP_PATH,						// DDS ファイルパス
+				&texResource,						// 読み込んだテクスチャの GPU リソース（今回は不要）
+				ddsData,							// CPU メモリ上の DDS データ（今回は不要）
+				subresources						// サブリソースデータ（DDS のミップレベルやアレイスライスごとのデータ）
+			);
+
+			// 読み込み失敗やサブリソースデータが空の場合は、2x2 のフラットな地形を生成して終了
+			if (FAILED(hr) || subresources.empty())
+			{
+				if (texResource) texResource->Release();
 				m_heightmap.width = m_heightmap.height = 2;
 				m_heightmap.pixels.assign(4, 0);
 				return;
 			}
 
-			// DDS ヘッダ構造体（DDSURFACEDESC2 と同等のレイアウト）
-			struct DdsHeader
-			{
-				uint32_t dwSize;
-				uint32_t dwFlags;
-				uint32_t dwHeight;
-				uint32_t dwWidth;
-				uint32_t dwPitchOrLinearSize;
-				uint32_t dwDepth;
-				uint32_t dwMipMapCount;
-				uint32_t dwReserved1[11];
-				uint32_t ddspfSize;
-				uint32_t ddspfFlags;
-				uint32_t ddspfFourCC;
-				uint32_t ddspfRGBBitCount;
-				uint32_t ddspfRBitMask;
-				uint32_t ddspfGBitMask;
-				uint32_t ddspfBBitMask;
-				uint32_t ddspfABitMask;
-				uint32_t dwCaps;
-				uint32_t dwCaps2;
-				uint32_t dwCaps3;
-				uint32_t dwCaps4;
-				uint32_t dwReserved2;
-			};
-			// DDSURFACEDESC2 のサイズは 124 バイトで、これに合わせる
-			static_assert(sizeof(DdsHeader) == 124, "DDS_HEADER size mismatch");
+			// サブリソースデータからテクスチャの幅・高さ・フォーマットを取得して、CPU メモリ上のピクセルデータを m_heightmap にコピー
+			const D3D12_RESOURCE_DESC desc = texResource->GetDesc();
+			texResource->Release();  // GPU リソースは不要なので即解放
 
-			// DDS ファイルの先頭 4 バイトは "DDS " のマジックナンバー、その後にヘッダが続く
-			uint32_t magic = 0;
-			fread(&magic, 4, 1, fp);
-			DdsHeader header = {};
-			fread(&header, sizeof(header), 1, fp);
+			const int   srcW     = static_cast<int>(desc.Width);						// 元のテクスチャの幅
+			const int   srcH     = static_cast<int>(desc.Height);						// 元のテクスチャの高さ
+			const auto  fmt      = desc.Format;											// 元のテクスチャのフォーマット（DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R8_UNORM など）
+			const auto* src      = static_cast<const uint8_t*>(subresources[0].pData);  // CPU メモリ上のピクセルデータの先頭アドレス
+			const int   rowPitch = static_cast<int>(subresources[0].RowPitch);			// 1 行分のバイト数（ピクセルデータの横幅にピクセルあたりのバイト数を掛けた値）
 
-			// ヘッダから幅・高さを取得
-			const int srcW = static_cast<int>(header.dwWidth);
-			const int srcH = static_cast<int>(header.dwHeight);
-
-			// DX10 ヘッダがある場合はさらに 20 バイトスキップ（DXGI_FORMAT を読む必要はない）
-			constexpr uint32_t FOURCC_DX10 = ('D') | ('X' << 8) | ('1' << 16) | ('0' << 24);
-			if (header.ddspfFourCC == FOURCC_DX10) {
-				fseek(fp, 20, SEEK_CUR);
-			}
-
-			// bpp と R チャンネルのバイトオフセットを判定
-			// BGRA8/RGBA8: RGBBitCount==32, FourCC==0
-			// R16_UNORM : RGBBitCount==16 or DX10 format
-			int bpp        = 2;   // デフォルト: R16_UNORM
-			int rByteOff   = 0;   // R チャンネルがあるバイト位置
-			if (header.ddspfFourCC == 0 && header.ddspfRGBBitCount == 32)
-			{
-				bpp = 4;  // BGRA8 / RGBA8
-				// Rマスクの下位バイト位置を計算（0x00FF0000 → byte 2）
-				uint32_t m = header.ddspfRBitMask;
-				rByteOff = (m & 0xFF) ? 0 : (m & 0xFF00) ? 1 : (m & 0xFF0000) ? 2 : 3;
-			}
-			else if (header.ddspfRGBBitCount == 8)
-			{
-				bpp = 1;
-			}
-
-			// サブサンプリング後の解像度
+			// m_config.subsample ごとにサンプリングして m_heightmap にコピー
 			m_heightmap.width  = srcW / m_config.subsample;
 			m_heightmap.height = srcH / m_config.subsample;
 			m_heightmap.pixels.assign(m_heightmap.width * m_heightmap.height, 0);
 
-			// 1行ずつ読み込み、サブサンプリングして格納
-			std::vector<uint8_t> rowBuf(srcW * bpp);
+			// フォーマットに応じてピクセルデータを uint16_t の高さ値に変換してコピー
 			for (int srcZ = 0; srcZ < srcH; ++srcZ)
 			{
-				fread(rowBuf.data(), bpp, srcW, fp);
-
+				// m_config.subsample ごとにサンプリング（例: subsample=4 なら 4x4 ピクセルごとに 1 サンプル）
 				if (srcZ % m_config.subsample != 0) continue;
-				const int dstZ = srcZ / m_config.subsample;
-				if (dstZ >= m_heightmap.height) break;
-
+				const int      dstZ = srcZ / m_config.subsample;
+				const uint8_t* row  = src + srcZ * rowPitch;
+				// フォーマットに応じてピクセルデータを uint16_t の高さ値に変換してコピー
 				for (int srcX = 0; srcX < srcW; srcX += m_config.subsample)
 				{
-					const int dstX = srcX / m_config.subsample;
-					if (dstX >= m_heightmap.width) break;
-
 					uint16_t h = 0;
-					if (bpp == 2)
+					switch (fmt)
 					{
-						// R16_UNORM: そのまま読む
-						h = *reinterpret_cast<const uint16_t*>(&rowBuf[srcX * 2]);
-					}
-					else if (bpp == 4)
+					case DXGI_FORMAT_R16_UNORM:
 					{
-						// BGRA8/RGBA8: R チャンネルを 16bit にスケール
-						h = static_cast<uint16_t>(rowBuf[srcX * 4 + rByteOff]) * 257u;
+						h = reinterpret_cast<const uint16_t*>(row)[srcX];
+						break;
 					}
-					else
+					case DXGI_FORMAT_R32_FLOAT:
 					{
-						// R8/L8: 8bit → 16bit
-						h = static_cast<uint16_t>(rowBuf[srcX]) * 257u;
+						const float f = reinterpret_cast<const float*>(row)[srcX];
+						h = static_cast<uint16_t>(std::clamp(f, 0.0f, 1.0f) * 65535.0f);
+						break;
 					}
-					m_heightmap.pixels[dstZ * m_heightmap.width + dstX] = h;
+					case DXGI_FORMAT_R8_UNORM:
+					case DXGI_FORMAT_A8_UNORM:
+					{
+						h = static_cast<uint16_t>(row[srcX]) * 257u;
+						break;
+					}
+					default:
+					{
+						// BGRA8 / RGBA8 等 32bit 系: 先頭バイト（B or R）を高さとして使用
+						h = static_cast<uint16_t>(row[srcX * 4]) * 257u;
+						break;
+					}
+					}
+					m_heightmap.pixels[dstZ * m_heightmap.width + srcX / m_config.subsample] = h;
 				}
 			}
-			fclose(fp);
 		}
 
 
@@ -207,9 +179,11 @@ namespace app
 
 			// 高さキャッシュ（インデックス生成時の minHeight チェックに使う）
 			std::vector<float> heights(W * H);
-			for (int z = 0; z < H; ++z)
-				for (int x = 0; x < W; ++x)
+			for (int z = 0; z < H; ++z) {
+				for (int x = 0; x < W; ++x) {
 					heights[z * W + x] = getH(x, z);
+				}
+			}
 
 			// ------ 頂点生成 ------
 			std::vector<TkmFile::SVertex> vertices;
@@ -280,10 +254,10 @@ namespace app
 			// マテリアルの LowTexture ポインタを nullptr にすると
 			// Material::InitTexture がエンジン内のヌルテクスチャマップを自動使用する
 			TkmFile::SMaterial mat = {};
-			mat.uniqID       = 0;
-			mat.albedoMap    = nullptr;
-			mat.normalMap    = nullptr;
-			mat.specularMap  = nullptr;
+			mat.uniqID         = 0;
+			mat.albedoMap      = nullptr;
+			mat.normalMap      = nullptr;
+			mat.specularMap    = nullptr;
 			mat.reflectionMap  = nullptr;
 			mat.refractionMap  = nullptr;
 
@@ -317,12 +291,12 @@ namespace app
 			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);
 
 			// PBR テクスチャ（Normal / Roughness）
-			m_snowNormal.InitFromDDSFile(TEX_PATH_SNOW_NORMAL);
-			m_snowRoughness.InitFromDDSFile(TEX_PATH_SNOW_ROUGHNESS);
-			m_glassNormal.InitFromDDSFile(TEX_PATH_GLASS_NORMAL);
+			m_snowNormal.    InitFromDDSFile(TEX_PATH_SNOW_NORMAL);
+			m_snowRoughness. InitFromDDSFile(TEX_PATH_SNOW_ROUGHNESS);
+			m_glassNormal.   InitFromDDSFile(TEX_PATH_GLASS_NORMAL);
 			m_glassRoughness.InitFromDDSFile(TEX_PATH_GLASS_ROUGHNESS);
-			m_rockNormal.InitFromDDSFile(TEX_PATH_ROCK_NORMAL);
-			m_rockRoughness.InitFromDDSFile(TEX_PATH_ROCK_ROUGHNESS);
+			m_rockNormal.    InitFromDDSFile(TEX_PATH_ROCK_NORMAL);
+			m_rockRoughness. InitFromDDSFile(TEX_PATH_ROCK_ROUGHNESS);
 
 
 			// GBuffer パスを Terrain.fx に変更（Init より前に呼ぶ必要がある）

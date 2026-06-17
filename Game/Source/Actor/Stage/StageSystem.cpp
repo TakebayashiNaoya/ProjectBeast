@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file Actor.cpp
  * @brief ステージ上のオブジェクトを管理するシステム
  * @author 藤谷
