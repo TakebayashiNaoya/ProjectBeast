@@ -15,7 +15,6 @@ namespace app
 		namespace
 		{
 			/** PBR補正パラメーターのファイルパス */
-			//const char* PARAMETER_FILE_PATH = "Assets/parameter/Graphics/PBRParameter.json";
 			const char* PARAMETER_FILE_PATH = "Assets/parameter/Graphics/PBRParameter.bin";
 		}
 
@@ -25,28 +24,7 @@ namespace app
 
 		PBRStatus::PBRStatus()
 		{
-			// 外部ファイルを読み込み
-			//core::ParameterManager::Get()->LoadParameter<MasterPBRParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterPBRParameter& parameter)
-			//	{
-			//		parameter.name = j["name"].get<std::string>();
-			//		parameter.pbrParam.m_dirLightScale = j["dirLightScale"].get<float>();
-			//		parameter.pbrParam.m_ambientScale = j["ambientScale"].get<float>();
-			//		parameter.pbrParam.m_metallicOffset = j["metallicOffset"].get<float>();
-			//		parameter.pbrParam.m_smoothOffset = j["smoothOffset"].get<float>();
-			//	});
-
-
-			core::ParameterManager::Get()->LoadParameterBinary<MasterPBRParameter>(PARAMETER_FILE_PATH, [](std::istream& stream, MasterPBRParameter& parameter)
-				{
-					// name の読み込み
-					char nameBuffer[32] = { 0 };
-					stream.read(nameBuffer, sizeof(nameBuffer));
-					parameter.name = std::string(nameBuffer);
-					stream.read(reinterpret_cast<char*>(&parameter.pbrParam.m_dirLightScale), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.pbrParam.m_ambientScale), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.pbrParam.m_metallicOffset), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&parameter.pbrParam.m_smoothOffset), sizeof(float));
-				});
+			core::ParameterManager::Get()->LoadParameterBinary<MasterPBRParameter>(PARAMETER_FILE_PATH);
 		}
 
 
@@ -63,6 +41,7 @@ namespace app
 			const auto parameters = core::ParameterManager::Get()->GetParameters<MasterPBRParameter>();
 			for (const auto* parameter : parameters)
 			{
+				// parameter->name が char[32] でも、std::string との比較は暗黙的に行われるため問題なし
 				if (parameter->name == name)
 				{
 					return parameter->pbrParam;

@@ -25,15 +25,10 @@ namespace app
 			{
 				load(j, *this);
 			}
-
-			void Load(std::istream& stream) override
-			{
-				loadBinary(stream, *this);
-			}
 #endif // APP_PARAM_HOT_RELOAD
 
 			/** オブジェクト識別名 */
-			std::string name;
+			char name[32];
 			/** PBR補正値 */
 			nsBeastEngine::PBRParam pbrParam;
 		};
