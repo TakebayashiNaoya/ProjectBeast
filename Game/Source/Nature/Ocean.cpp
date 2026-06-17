@@ -790,36 +790,7 @@ namespace app
 				DXGI_FORMAT_UNKNOWN
 			};
 
-			// JSONからパラメーターを読み込む
-			//core::ParameterManager::Get()->LoadParameter<MasterOceanParameter>(
-			//	parameterJsonPath,
-			//	[](const nlohmann::json& j, MasterOceanParameter& p)
-			//	{
-			//		p.baseReflectance = j["baseReflectance"].get<float>();
-			//		p.wave1Amplitude = j["wave1Amplitude"].get<float>();
-			//		p.wave1Frequency = j["wave1Frequency"].get<float>();
-			//		p.wave2Amplitude = j["wave2Amplitude"].get<float>();
-			//		p.wave2Frequency = j["wave2Frequency"].get<float>();
-			//		p.specularPower = j["specularPower"].get<float>();
-			//		p.specularScale = j["specularScale"].get<float>();
-			//		p.ambientScale = j["ambientScale"].get<float>();
-			//	}
-			//);
-
-			core::ParameterManager::Get()->LoadParameterBinary<MasterOceanParameter>(
-				parameterPath,
-				[](std::istream& stream, MasterOceanParameter& p)
-				{
-					stream.read(reinterpret_cast<char*>(&p.baseReflectance), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.wave1Amplitude), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.wave1Frequency), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.wave2Amplitude), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.wave2Frequency), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.specularPower), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.specularScale), sizeof(float));
-					stream.read(reinterpret_cast<char*>(&p.ambientScale), sizeof(float));
-				}
-			);
+			core::ParameterManager::Get()->LoadParameterBinary<MasterOceanParameter>(parameterPath);
 
 			// 読み込んだパラメーターを定数バッファに反映する
 			const auto* param = core::ParameterManager::Get()->GetParameter<MasterOceanParameter>();
