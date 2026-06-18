@@ -207,6 +207,27 @@ namespace app
             m_particles.resize(m_spawnModule.GetMaxParticles());
         }
 
+
+        /**
+         * @brief エミッターと発生済みのパーティクル全体を一緒に平行移動させる
+		 * @param offset 平行移動させるオフセット
+         */
+		void AddPositionOffset(const Vector3& offset)
+		{
+			m_emitterPosition.x += offset.x;
+			m_emitterPosition.y += offset.y;
+			m_emitterPosition.z += offset.z;
+
+			for (size_t i = 0; i < m_particles.size(); ++i) {
+				if (m_particles[i].isAlive) {
+					m_particles[i].position.x += offset.x;
+					m_particles[i].position.y += offset.y;
+					m_particles[i].position.z += offset.z;
+				}
+			}
+		}
+
+
     private:
         void SpawnParticle()
         {
@@ -222,6 +243,9 @@ namespace app
                             m_initModules[m]->OnParticleSpawn(p, m_rng);
                         }
                     }
+
+                    // 初期化が終わった時点の速度を記憶しておく。
+                    p.initialVelocity = p.velocity;
 
                     // InitPositionはローカル座標 → エミッター座標を加算
                     p.position.x += m_emitterPosition.x;

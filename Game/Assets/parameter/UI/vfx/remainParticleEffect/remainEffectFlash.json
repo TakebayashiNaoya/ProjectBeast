@@ -1,0 +1,64 @@
+{
+    "comment": "子ペンギンからUIへ吸い込まれる光",
+    "duration": 3.0,
+    "spawn": {
+        "maxParticles": 3,
+        "burstCount": 3,
+        "burstInterval":0.8,
+        "looping": false
+    },
+    "modules": [
+        {
+            "type": "InitLifetime",
+            "lifetime": { "mode": "fixed", "value": 3.0 }
+        },
+        {
+            "type": "InitColor",
+            "r": 1.0, 
+            "g": 0.9, 
+            "b": 0.2, 
+            "a": 1.0
+        },
+        {
+            "type":"InitPosition",
+            "position":{
+                "mode":"random",
+                "min":{"x":-100,"y":-100,"z":0},
+                "max":{"x":100,"y":100,"z":0}
+            }
+        },
+        {
+            "type":"InitVelocity",
+            "velocity":{
+                "mode":"random",
+                "min":{"x":-100,"y":-50,"z":0},
+                "max":{"x":100,"y":50,"z":0}
+            }
+        },
+        {
+            "type":"SpeedOverLife",
+            "startMultiplier":1.0,
+            "endMultiplier":0.5,
+            "easing":"EaseIn"
+        },
+        {
+            "type": "RotationOverLife",
+            "startAngle": 0.0,
+            "endAngle": 360.0,
+            "easing": "EaseInOut"
+        },
+        {
+            "type": "ScaleOverLife",
+            "uniform": true,
+            "startScale": 1.0,
+            "endScale": 0.5,
+            "easing": "EaseInOut"
+        },
+        {
+            "type": "AlphaOverLife",
+            "startAlpha": 1.0,
+            "endAlpha": 0.0,
+            "easing": "EaseInOut"
+        }
+    ]
+}

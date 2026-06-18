@@ -16,6 +16,7 @@
 #include "Source/Manager/InGameUIManager.h"
 #include "Source/UI/CPReaction/CPReactionMenu.h"
 #include "Source/UI/CPReaction/CPReactionSystem.h"
+#include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include <random>
 
 
@@ -262,6 +263,12 @@ namespace app
 				m_followers.push_back(penguin);
 				ScoreManager::GetInstance().AddCollectedCount();
 				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Happy);
+				
+				if (auto* menu = InGameUIManager::GetInstance()->GetRemainingChildMenu())
+				{
+					menu->SetTarget(penguin);
+				}
+
 				if (auto* lm = GameLogManager::GetInstance())
 					lm->QueueEvent({{"ev", "penguin_join"}, {"penguin_id", penguin->GetLogId()}});
 			}

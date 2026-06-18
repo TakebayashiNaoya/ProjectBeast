@@ -714,6 +714,11 @@ namespace app
 			p.speedCurveX.Play();
 			p.speedCurveY.Play();
 			p.hasSpeedCurve = true;
+
+
+			// 初期速度を基準にカーブで計算したマルチプライヤをかけて現在の速度にする。
+			p.velocity.x = p.initialVelocity.x * p.speedCurveX.GetCurrentValue();
+			p.velocity.y = p.initialVelocity.y * p.speedCurveY.GetCurrentValue();
 		}
 
 		/**

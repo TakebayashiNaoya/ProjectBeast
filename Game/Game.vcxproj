@@ -359,6 +359,7 @@
     <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
     <ClCompile Include="Source\Util\JsonConverter.cpp" />
+    <ClCompile Include="Source\Vfx\HomingParticleRender.cpp" />
     <ClCompile Include="Source\Vfx\Particle.cpp" />
     <ClCompile Include="Source\Vfx\ParticleEffectLoader.cpp" />
     <ClCompile Include="Source\Vfx\ParticleEffectRender.cpp" />
@@ -520,6 +521,7 @@
     <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />
     <ClInclude Include="Source\Util\JsonConverter.h" />
+    <ClInclude Include="Source\Vfx\HomingParticleRender.h" />
     <ClInclude Include="Source\Vfx\Particle.h" />
     <ClInclude Include="Source\Vfx\ParticleEffectLoader.h" />
     <ClInclude Include="Source\Vfx\ParticleEffectRender.h" />
