@@ -5,10 +5,9 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-
 #include "RemainingAnimStatus.h"
-
 #include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
+#include "Source/Vfx/HomingParticleRender.h"
 
 
 namespace app
@@ -22,6 +21,7 @@ namespace app
 
 			void Update() override;
 			void InitializeLogic() override;
+			void Render(RenderContext& rc) override;
 
 
 		public:
@@ -36,6 +36,12 @@ namespace app
 			 * @param num 総数
 			 */
 			void SetTotalNum(const int num);
+
+			/**
+			 * @brief 子ペンギンのポインタを設定
+			 * @param childPenguin 子ペンギンのポインタ
+			 */
+			void SetTarget(actor::ChildPenguin* childPenguin);
 
 
 		private:
@@ -58,11 +64,14 @@ namespace app
 			std::array<UIAnimationSequence, static_cast<int>(SeqType::Max)> m_sequences;
 			/** std::unique_ptrでステータスを所有 */
 			std::unique_ptr<RemainingAnimStatus> m_remainAnimStatus;
+			/** パーティクルエフェクトレンダーをユニークポインタで所有 */
+			std::unique_ptr<HomingParticleRender> m_homingRender;
 			/** 集めたペンギン数 */
 			int m_childNum;
 			/** ステージ上の総ペンギン数 */
 			int m_totalNum;
-
+			/** パーティクルのターゲット位置 */
+			Vector3 m_targetPosition;
 			/** ゲーム開始時のアニメーションロジック */
 			InGameStartingAnimLogic m_startingAnimLogic;
 		};

@@ -1,0 +1,70 @@
+{
+    "comment": "子ペンギンからUIへ吸い込まれる光",
+    "duration": 1.0,
+    "spawn": {
+        "maxParticles": 5,
+        "burstCount": 5,
+        "burstInterval":0.8,
+        "looping": false
+    },
+    "modules": [
+        {
+            "type": "InitLifetime",
+            "lifetime": { "mode": "fixed", "value": 1.0 }
+        },
+        {
+            "type": "InitColor",
+            "r": 1.0, 
+            "g": 0.9, 
+            "b": 0.0, 
+            "a": 1.0
+        },
+        {
+            "type":"InitPosition",
+            "position":{
+                "mode":"random",
+                "min":{"x":-100,"y":-100,"z":0},
+                "max":{"x":100,"y":100,"z":0}
+            }
+        },
+        {
+            "type":"InitVelocity",
+            "velocity":{
+                "mode":"random",
+                "min":{"x":-300,"y":-300,"z":0},
+                "max":{"x":300,"y":300,"z":0}
+            }
+        },
+        {
+            "type":"SpeedOverLife",
+            "startMultiplier":1.0,
+            "endMultiplier":0.5,
+            "easing":"EaseIn"
+        },
+        {
+            "type":"ConvergenceOverLife",
+            "startRatio":0.0,
+            "endRatio":0.5,
+            "easing":"EaseIn"
+        },
+        {
+            "type": "RotationOverLife",
+            "startAngle": 0.0,
+            "endAngle": 360.0,
+            "easing": "EaseIn"
+        },
+        {
+            "type": "ScaleOverLife",
+            "uniform": true,
+            "startScale": 1.0,
+            "endScale": 0.5,
+            "easing": "EaseIn"
+        },
+        {
+            "type": "AlphaOverLife",
+            "startAlpha": 1.0,
+            "endAlpha": 1.0,
+            "easing": "EaseIn"
+        }
+    ]
+}
