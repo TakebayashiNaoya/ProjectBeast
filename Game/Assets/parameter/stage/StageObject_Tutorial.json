@@ -1,7 +1,7 @@
 {
   "TerrainConfig": {
-    "totalWidth":  6000.0,
-    "totalDepth":  6000.0,
+    "totalWidth":  7000.0,
+    "totalDepth":  7000.0,
     "heightScale": 500.0,
     "subsample":   8,
     "uvTile":      0.05,
@@ -30,7 +30,7 @@
         "objectName" : "bearHome_1",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
         "isNeedCollision" : true,
-        "position" : [300, 45, 1100],
+        "position" : [300, 45, 1300],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
       },
@@ -38,7 +38,7 @@
         "objectName" : "igloo01",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
-        "position" : [-1200, 45, 50],
+        "position" : [-1400, 45, 50],
         "rotationDeg" : [0, 180, 0],
         "scale" : [4, 4, 4],
         "pbrName" : "igloo"

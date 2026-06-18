@@ -144,9 +144,7 @@ namespace app
 		{
 		case LoadPhase::Stage:
 		{
-			nlohmann::json json;
-			util::JsonConverter::IsLoadJsonFile(json, GetStageJsonPath());
-			actor::StageSystem::GetInstance()->CreateStageObject(json);
+			actor::StageSystem::GetInstance()->LoadStageObjectsFromJson(GetStageJsonPath());
 			m_loadPhase = LoadPhase::StageWait;
 			break;
 		}

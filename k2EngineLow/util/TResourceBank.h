@@ -25,6 +25,10 @@ namespace nsK2EngineLow {
 				);
 			}
 		}
+		void Replace(const char* filePath, TResource* resource)
+		{
+			m_resourceMap[filePath].reset(resource);
+		}
 	private:
 		using TResourcePtr = std::unique_ptr<TResource>;
 		std::map<std::string, TResourcePtr> m_resourceMap;

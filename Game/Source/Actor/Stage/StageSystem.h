@@ -30,6 +30,13 @@ namespace app
 			void CreateStageObject(const nlohmann::json& json);
 
 			/**
+			 * @brief JSON ファイルからステージオブジェクトを生成する
+			 * @details デバッグビルドではファイル監視によるホットリロードも有効になる。
+			 * @param jsonPath StageObject キーを含む JSON ファイルのパス
+			 */
+			void LoadStageObjectsFromJson(const std::string& jsonPath);
+
+			/**
 			 * @brief ステージオブジェクトを削除
 			 */
 			void DeleteStageObject(const nlohmann::json& json);
@@ -56,6 +63,13 @@ namespace app
 			 */
 			void InitTerrain(const TerrainObject::TerrainConfig& config = {});
 
+			/**
+			 * @brief JSON ファイルから地形パラメータを読み込んで地形を生成する
+			 * @details デバッグビルドではファイル監視によるホットリロードも有効になる。
+			 * @param jsonPath TerrainConfig キーを含む JSON ファイルのパス
+			 */
+			void InitTerrainFromJson(const std::string& jsonPath);
+
 
 		public:
 			StageSystem();
@@ -70,8 +84,11 @@ namespace app
 
 		private:
 #ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
-			time_t m_lastUpdateTime = 0;
-#endif // APP_ENABLE_OBJECT_LAYOUT_HOTRELOAD
+			time_t      m_lastUpdateTime        = 0;
+			time_t      m_lastTerrainUpdateTime = 0;
+			std::string m_terrainJsonPath;
+			std::string m_stageObjectJsonPath;
+#endif // ENABLE_OBJECT_LAYOUT_HOTRELOAD
 
 
 			using ObjectKey = std::string;
