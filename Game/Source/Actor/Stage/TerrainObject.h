@@ -35,6 +35,8 @@ namespace app
 				float yOffset     = 0.0f;     ///< 地形全体の Y 座標オフセット（負=下げる、正=上げる）
 				float minHeight   = 0.0f;     ///< この高さ未満の頂点を含むクワッドはポリゴンを生成しない（ワールド単位）
 				nsBeastEngine::PBRParam pbrParam;  ///< PBR補正パラメータ（ModelRender::SetPBRParam に渡す）
+				std::wstring heightmapPath = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";  ///< ハイトマップ DDS パス
+				std::wstring splatmapPath  = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";   ///< スプラットマップ DDS パス
 			};
 
 			/**

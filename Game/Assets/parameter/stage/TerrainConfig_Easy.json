@@ -1,5 +1,7 @@
 {
   "TerrainConfig": {
+    "heightmapPath": "Assets/modelData/stage/Terrain/EasyStageHeightMap.dds",
+    "splatmapPath":  "Assets/modelData/stage/Terrain/EasyStageSplatMap.dds",
     "totalWidth":  7000.0,
     "totalDepth":  7000.0,
     "heightScale": 500.0,

@@ -10,11 +10,6 @@
 
 namespace
 {
-	/** ハイトマップ */
-	static const wchar_t* HEIGHTMAP_PATH  = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";
-	/** スプラットマップ */
-	static const wchar_t* SPLATMAP_PATH   = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";
-
 	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
 	static const char* TERRAIN_TKM_KEY = "terrain_generated";
 
@@ -68,7 +63,7 @@ namespace app
 			// DirectXTex で DDS をロード（BC1〜BC7, BC6H を含む全圧縮フォーマット対応）
 			DirectX::ScratchImage image;
 			HRESULT hr = DirectX::LoadFromDDSFile(
-				HEIGHTMAP_PATH, DirectX::DDS_FLAGS_NONE, nullptr, image);
+				m_config.heightmapPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
 
 			if (FAILED(hr))
 			{
@@ -265,7 +260,7 @@ namespace app
 		void TerrainObject::InitRenderer()
 		{
 			// BaseColor
-			m_splatmap.InitFromDDSFile(SPLATMAP_PATH);
+			m_splatmap.InitFromDDSFile(m_config.splatmapPath.c_str());
 			m_terrainTextures[0].InitFromDDSFile(TEX_PATH_SNOW);
 			m_terrainTextures[1].InitFromDDSFile(TEX_PATH_GRASS);
 			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);
