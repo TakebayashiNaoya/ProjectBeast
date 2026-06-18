@@ -71,6 +71,10 @@ namespace nsBeastEngine
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
+		ImGuiIO& io = ImGui::GetIO();
+		// 日本語フォント（メイリオ）を読み込む設定を追加
+		io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\meiryo.ttc", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+
 		// Win32バックエンド初期化
 		ImGui_ImplWin32_Init(initData.hwnd);
 
@@ -92,6 +96,11 @@ namespace nsBeastEngine
 			m_imguiSrvHeap->GetCPUDescriptorHandleForHeapStart(),
 			m_imguiSrvHeap->GetGPUDescriptorHandleForHeapStart()
 		);
+
+		// 初回フレームでのクラッシュを防ぐため、フォントアトラスを事前に構築する
+		unsigned char* pixels;
+		int width, height;
+		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 	}
 
 
