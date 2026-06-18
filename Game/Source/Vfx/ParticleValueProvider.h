@@ -212,9 +212,13 @@ namespace app
 
 
 
+
+	/***********************************************/
+
+
 	/**
-		 * @brief Vector3用の値プロバイダ
-		 */
+	 * @brief Vector3用の値プロバイダ
+	 */
 	class Vector3ValueProvider
 	{
 	private:
@@ -286,6 +290,7 @@ namespace app
 	public:
 		/**
 		 * @brief 固定値を設定
+		 * @param value 固定値
 		 */
 		void SetFixed(const Vector3& value)
 		{
@@ -296,6 +301,8 @@ namespace app
 
 		/**
 		 * @brief ランダム値の範囲を設定
+		 * @param min 最小値
+		 * @param max 最大値
 		 */
 		void SetRandom(const Vector3& min, const Vector3& max)
 		{

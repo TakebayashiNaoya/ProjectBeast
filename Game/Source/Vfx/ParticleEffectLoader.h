@@ -15,7 +15,11 @@ using json = nlohmann::json;
 
 namespace ParticleJsonHelper
 {
-    /** EasingType文字列変換 */
+    /** 
+     * @brief EasingType文字列変換
+     * @param str 文字列
+     * @return EasingType
+     */
     inline app::util::EasingType ParseEasingType(const std::string& str)
     {
         if (str == "EaseIn")    return app::util::EasingType::EaseIn;
@@ -24,11 +28,14 @@ namespace ParticleJsonHelper
         return app::util::EasingType::Linear;
     }
 
-    /** FloatValueProviderをJSONから設定 */
+    /** 
+     * @brief FloatValueProviderをJSONから設定
+     * @param provider 設定先のプロバイダー
+     * @param j JSONオブジェクト
+     */
     inline void LoadFloatProvider(app::FloatValueProvider& provider, const json& j)
     {
         if (!j.is_object()) {
-            // 数値直指定 → Fixed
             provider.SetFixed(j.get<float>());
             return;
         }
@@ -64,7 +71,11 @@ namespace ParticleJsonHelper
         }
     }
 
-    /** Vector3ValueProviderをJSONから設定 */
+    /** 
+     * @brief Vector3ValueProviderをJSONから設定
+     * @param provider 設定先のプロバイダー
+     * @param j JSONオブジェクト
+     */
     inline void LoadVector3Provider(app::Vector3ValueProvider& provider, const json& j)
     {
         if (!j.is_object()) return;
@@ -108,7 +119,7 @@ namespace ParticleJsonHelper
 namespace app
 {
     /**
-     * パーティクルエフェクトローダー
+     * @brief パーティクルエフェクトローダー
      */
     class ParticleEffectLoader
     {
@@ -138,7 +149,10 @@ namespace app
         }
 
         /**
-         * JSON文字列からエミッターを構築
+         * @brief JSON文字列からエミッターを構築
+         * @param jsonStr JSON文字列
+         * @param emitter  構築先のエミッター
+         * @return 成功したらtrue
          */
         static bool LoadFromString(const std::string& jsonStr, ParticleEmitter& emitter)
         {
@@ -154,7 +168,10 @@ namespace app
         }
 
         /**
-         * JSONオブジェクトからエミッターを構築
+         * @brief JSONオブジェクトからエミッターを構築
+         * @param root JSONオブジェクト
+         * @param emitter  構築先のエミッター
+         * @return 成功したらtrue
          */
         static bool LoadFromJson(const json& root, ParticleEmitter& emitter)
         {

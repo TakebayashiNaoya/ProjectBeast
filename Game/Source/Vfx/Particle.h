@@ -73,7 +73,6 @@ namespace app
 			, hasConvergenceCurve(false)
 		{}
 
-
 		/**
 		 * @brief 正規化した寿命割合を取得する(0.0f ~ 1.0f)
 		 * @return 寿命の割合(0.0fから1.0fまでの寿命が尽きるまで)

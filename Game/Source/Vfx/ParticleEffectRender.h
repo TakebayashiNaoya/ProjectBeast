@@ -88,7 +88,7 @@ namespace app
         // ----- ホットリロード設定 -----
 
         /**
-         * ホットリロードを有効化
+         * @brief ホットリロードを有効化
          * @param intervalSec  ファイル変更チェック間隔（秒）
          */
         void EnableHotReload(float intervalSec = 1.0f)
@@ -98,14 +98,17 @@ namespace app
             m_hotReloadTimer = 0.0f;
         }
 
-        /** ホットリロードを無効化 */
+        /**
+         * @brief ホットリロードを無効化
+         */
         void DisableHotReload()
         {
             m_hotReloadEnabled = false;
         }
 
         /**
-         * 手動でJSONをリロード
+         * @brief 手動でJSONをリロード
+         * @return 成功したらtrue
          * 座標とプレイ状態は維持される
          */
         bool Reload()
@@ -142,17 +145,26 @@ namespace app
         }
 
         // ----- 制御 -----
-
+        
+        /**
+         * @brief エフェクトを再生
+         */
         void Play()
         {
             m_emitter.Play();
         }
 
+        /**
+         * @brief エフェクトを停止
+         */
         void Stop()
         {
             m_emitter.Stop();
         }
 
+        /**
+         * @brief エフェクトをリセット
+         */
         void Reset()
         {
             m_emitter.Reset();
@@ -160,19 +172,32 @@ namespace app
                 m_sprites[i]->SetScale(Vector3::Zero);
             }
         }
-
+        
+        /**
+         * @brief 位置を設定
+         * @param pos 位置
+         */
         void SetPosition(const Vector3& pos)
         {
             m_emitter.SetPosition(pos);
         }
 
+		/**
+		 * @brief 位置を取得
+		 * @return 位置
+		 */
         bool IsPlaying() const
         {
             return m_emitter.IsPlaying();
         }
 
+
         // ----- 更新・描画 -----
 
+        /**
+         * @brief 更新
+         * @param deltaTime 時間差分
+         */
         void Update(float deltaTime)
         {
             if (!m_isInitialized) return;
@@ -215,6 +240,10 @@ namespace app
             }
         }
 
+        /**
+         * @brief 描画
+         * @param rc 描画コンテキスト
+         */
         void Draw(RenderContext& rc)
         {
             if (!m_isInitialized) return;
@@ -228,7 +257,9 @@ namespace app
         }
 
     private:
-        /** スプライトプールを（再）初期化 */
+        /** 
+         * @brief スプライトプールを（再）初期化
+         */
         void InitSpritePool()
         {
             int maxParticles = m_emitter.GetSpawnModule().GetMaxParticles();
@@ -241,7 +272,11 @@ namespace app
             }
         }
 
-        /** ファイルの最終更新時刻を取得 */
+        /** 
+         * @brief ファイルの最終更新時刻を取得
+         * @param filePath ファイルパス
+         * @return 最終更新時刻
+         */
         static long long GetFileModifiedTime(const std::string& filePath)
         {
             struct stat fileStat;
@@ -251,7 +286,9 @@ namespace app
             return 0;
         }
 
-        /** ファイルが変更されていたらリロード */
+        /** 
+         * @brief ファイルが変更されていたらリロード 
+         */
         void CheckAndReload()
         {
             long long currentTime = GetFileModifiedTime(m_jsonFilePath);

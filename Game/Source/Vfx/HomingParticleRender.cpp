@@ -35,12 +35,12 @@ namespace app
 	{}
 	
 	
-	
 	HomingParticleRender::HomingParticleRender()
 		: m_goalPosition(Vector3::Zero)
 		, m_particleCount(0)
 		, m_maxParticles(MAX_PARTICLE_COUNT)
 	{}
+
 
 	void HomingParticleRender::Initialize()
 	{

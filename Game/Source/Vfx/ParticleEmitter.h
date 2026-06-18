@@ -64,8 +64,7 @@ namespace app
         }
 
         /**
-         * 全モジュールをクリアする（ホットリロード用）
-         * SpawnModuleはデフォルトにリセットされる
+         * @brief 全モジュールをクリアする（ホットリロード用）SpawnModuleはデフォルトにリセットされる
          */
         void ClearModules()
         {
@@ -77,8 +76,17 @@ namespace app
 
         // ----- モジュール追加 -----
 
+        /**
+         * @brief SpawnModuleを取得
+         * @return SpawnModuleの参照
+         */
         SpawnModule& GetSpawnModule() { return m_spawnModule; }
 
+        /**
+         * @brief モジュールを追加
+         * @tparam T モジュールの型
+         * @return 追加されたモジュールのポインタ
+         */
         template <typename T>
         T* AddModule()
         {
@@ -121,6 +129,9 @@ namespace app
 
         // ----- 制御 -----
 
+        /**
+         * @brief エフェクトを再生
+         */
         void Play()
         {
             m_isPlaying = true;
@@ -128,8 +139,14 @@ namespace app
             m_spawnModule.Reset();
         }
 
+        /**
+         * @brief エフェクトを停止
+         */
         void Stop() { m_isPlaying = false; }
 
+        /**
+         * @brief エフェクトをリセット
+         */
         void Reset()
         {
             m_isPlaying = false;
@@ -140,15 +157,39 @@ namespace app
                 m_particles[i].isAlive = false;
             }
         }
-
+        
+        /**
+         * @brief 位置を設定
+         * @param pos 位置
+         */
         void SetPosition(const Vector3& pos) { m_emitterPosition = pos; }
+        /**
+         * @brief 位置を取得
+         * @return 位置
+         */
         const Vector3& GetPosition() const { return m_emitterPosition; }
+        /**
+         * @brief 持続時間を設定
+         * @param duration 持続時間
+         */
         void SetDuration(float duration) { m_emitterDuration = duration; }
+        /**
+         * @brief 再生中かを取得
+         * @return 再生中ならtrue
+         */
         bool IsPlaying() const { return m_isPlaying; }
+        /**
+         * @brief 生存しているパーティクルの数を取得
+         * @return 生存しているパーティクルの数
+         */
         int GetAliveCount() const { return m_aliveCount; }
 
         // ----- 更新 -----
 
+        /**
+         * @brief エフェクトを更新
+         * @param deltaTime 時間差
+         */
         void Update(float deltaTime)
         {
             if (!m_isPlaying) return;
@@ -201,13 +242,19 @@ namespace app
             }
         }
 
+        /**
+         * @brief パーティクルのリストを取得
+         * @return パーティクルのリスト
+         */
         const std::vector<Particle>& GetParticles() const { return m_particles; }
 
+        /**
+         * @brief パーティクルプールのサイズを変更
+         */
         void ResizePool()
         {
             m_particles.resize(m_spawnModule.GetMaxParticles());
         }
-
 
         /**
          * @brief エミッターと発生済みのパーティクル全体を一緒に平行移動させる
@@ -230,6 +277,10 @@ namespace app
 
 
     private:
+        /**
+         * @brief パーティクルを生成
+         * @return 生成されたパーティクルの参照
+         */
         void SpawnParticle()
         {
             for (size_t i = 0; i < m_particles.size(); ++i) {

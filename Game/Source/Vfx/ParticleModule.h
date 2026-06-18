@@ -11,6 +11,13 @@
 #include <string>
 
 
+namespace
+{
+	/** 収束の強さ */
+	constexpr float PULL_STRENGTH = 10.0f;
+}
+
+
 namespace app
 {
 	/**
@@ -92,9 +99,9 @@ namespace app
 	};
 
 
-	//===============================================//
-	// スポーンモジュール							 //
-	//===============================================//
+
+
+	/***********************************************/
 
 
    /**
@@ -145,6 +152,12 @@ namespace app
 
 
 	public:
+		/**
+		 * @brief 生成するパーティクル数を計算
+		 * @param deltaTime 時間差
+		 * @param currentAliveCount 現在生存しているパーティクルの数
+		 * @return 生成するパーティクル数
+		 */
 		int CalcSpawnCount(float deltaTime, int currentAliveCount)
 		{
 			int spawnCount = 0;
@@ -181,7 +194,9 @@ namespace app
 			return spawnCount;
 		}
 
-
+		/**
+		 * @brief スポーンモジュールの状態をリセット
+		 */
 		void Reset()
 		{
 			m_spawnAccumulator = 0.0f;
@@ -192,10 +207,9 @@ namespace app
 
 
 
-	//===============================================//
-	//  初期化モジュール群                           //
-	//===============================================//
 
+	/***********************************************/
+	
 
 	/**
 	 * @brief 寿命初期化
@@ -232,6 +246,8 @@ namespace app
 	};
 
 
+	/***********************************************/
+
 	/**
 	 * @brief 初期座標
 	 */
@@ -262,6 +278,11 @@ namespace app
 			p.position = m_position.ResolveInitial(rng);
 		}
 	};
+
+
+
+
+	/***********************************************/
 
 
 	/**
@@ -296,6 +317,11 @@ namespace app
 	};
 
 
+
+
+	/***********************************************/
+
+
 	/**
 	 * @brief 初期スケール
 	 */
@@ -326,6 +352,11 @@ namespace app
 			p.scaleValue = m_scale.ResolveInitial(rng);
 		}
 	};
+
+
+
+
+	/***********************************************/
 
 
 	/**
@@ -368,6 +399,11 @@ namespace app
 			p.angularVelocity = m_angularVelocity.ResolveInitial(rng);
 		}
 	};
+
+
+
+
+	/***********************************************/
 
 
 	/**
@@ -417,9 +453,8 @@ namespace app
 
 
 
-	//===============================================//
-	// OverLifeTimeモジュール群                      //
-	//===============================================//
+
+	/***********************************************/
 
 
 	/**
@@ -546,6 +581,11 @@ namespace app
 	};
 
 
+
+
+	/***********************************************/
+
+
 	/**
 	 * @brief 寿命に応じた回転変化
 	 */
@@ -606,6 +646,11 @@ namespace app
 			p.rotationAngle = p.rotationCurve.GetCurrentValue();
 		}
 	};
+
+
+
+
+	/***********************************************/
 
 
 	/**
@@ -670,6 +715,11 @@ namespace app
 			p.color.w = p.alphaCurve.GetCurrentValue();
 		}
 	};
+
+
+
+
+	/***********************************************/
 
 
 	/**
@@ -743,6 +793,10 @@ namespace app
 
 
 
+
+	/***********************************************/
+
+
 	/**
 	 * @brief 加速度モジュール(重力等)
 	 */
@@ -782,6 +836,11 @@ namespace app
 			p.velocity.z += m_acceleration.z * deltaTime;
 		}
 	};
+
+
+
+
+	/***********************************************/
 
 
 	/**
@@ -826,6 +885,11 @@ namespace app
 			p.velocity.z *= factor;
 		}
 	};
+
+
+
+
+	/***********************************************/
 
 
 	/**
@@ -894,7 +958,7 @@ namespace app
 			if (ratio > 0.0f)
 			{
 				// 収束力の計算。
-				float pullStrength = ratio * deltaTime * 10.0f;
+				float pullStrength = ratio * deltaTime * PULL_STRENGTH;
 
 				// 引っ張る力が強くなり過ぎないように制限。
 				if (pullStrength > 1.0f) pullStrength = 1.0f;
