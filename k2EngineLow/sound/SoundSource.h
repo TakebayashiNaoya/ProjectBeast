@@ -1,5 +1,5 @@
-/// <summary>
-/// �����N���X�B
+﻿/// <summary>
+/// 音源クラス。
 /// </summary>
 #pragma once
 #include "WaveFile.h"
@@ -7,89 +7,93 @@
 
 namespace nsK2EngineLow {
 	/// <summary>
-	/// �����N���X�B
-	/// �T�E���h���Đ�����ɂ͂܂��Ag_soundEngine->ResistWaveFileBank()�Ŕg�`�f�[�^��ǂݍ���ł��������B
-	/// SoundSource::Init�œo�^�����ԍ����w�肵�āASoundSource::Play�Ń��[�v�t���O���w�肵�Ă��������B
-	/// ���̃N���X�̃C���X�^���X���Q�[���I�u�W�F�N�g�}�l�[�W���[�ɓo�^�����ꍇ�A���[�v�Đ��ł͂Ȃ��ꍇ�͍Đ�����������ƁB
-	/// �����I�ɓo�^��������܂��B���[�v�Đ��̏ꍇ�̓��[�U�[�������I�ɓo�^����������K�v������܂��B
+	/// 音源クラス。
+	/// サウンドを再生するにはまず、g_soundEngine->ResistWaveFileBank()で波形データを読み込んでください。
+	/// SoundSource::Initで登録した番号を指定して、SoundSource::Playでループフラグを指定してください。
+	/// このクラスのインスタンスをゲームオブジェクトマネージャーに登録した場合、ループ再生ではない場合は再生が完了すると。
+	/// 自動的に登録解除されます。ループ再生の場合はユーザーが明示的に登録を解除する必要があります。
 	/// </summary>
 	class SoundSource : public IGameObject {
 	public:
 		/// <summary>
-		/// �R���X�g���N�^�B
+		/// コンストラクタ。
 		/// </summary>
 		SoundSource();
 		/// <summary>
-		/// �f�X�g���N�^�B
+		/// デストラクタ。
 		/// </summary>
 		~SoundSource();
 		/// <summary>
-		/// �������B
+		/// 初期化。
 		/// </summary>
-		/// <param name="number">g_soundEngine->ResistWaveFileBank�œo�^�����g�`�f�[�^�̔ԍ��B</param>
-		/// <param name="is3DSound">3D�T�E���h�Ȃ�true�B</param>
+		/// <param name="number">g_soundEngine->ResistWaveFileBankで登録した波形データの番号。</param>
+		/// <param name="is3DSound">3Dサウンドならtrue。</param>
 		void Init(const int number, bool is3DSound = false);
 		/// <summary>
-		/// �J���B�f�X�g���N�^���玩���I�ɌĂ΂�܂��B�����I�ɊJ�����s�������ꍇ�͎g�p���ĉ������B
+		/// 開放。デストラクタから自動的に呼ばれます。明示的に開放を行いたい場合は使用して下さい。
 		/// </summary>
 		void Release();
 		/// <summary>
-		/// �Đ��B
-		/// ���[�v�t���O��false�ɂ����ꍇ�̓����V���b�g�Đ��ɂȂ�܂��B
-		/// �����V���b�g�Đ��̃C���X�^���X��ێ����Ă���ƁA�j�����ꂽ�C���X�^���X�ɁB
-		/// �A�N�Z�X���Ă��܂��\��������̂ŁA�ێ����Ȃ����Ƃ������߂��܂��B
-		/// �t�Ƀ��[�v�t���O��true�̏ꍇ�͖����I�ɃC���X�^���X��j������K�v������̂ŁB
-		/// �C���X�^���X��ێ�����K�v������܂��B
+		/// 再生。
+		/// ループフラグをfalseにした場合はワンショット再生になります。
+		/// ワンショット再生のインスタンスを保持していると、破棄されたインスタンスに。
+		/// アクセスしてしまう可能性があるので、保持しないことをお勧めします。
+		/// 逆にループフラグがtrueの場合は明示的にインスタンスを破棄する必要があるので。
+		/// インスタンスを保持する必要があります。
 		/// </summary>
-		/// <param name="isLoop">���[�v�t���O�B</param>
+		/// <param name="isLoop">ループフラグ。</param>
 		void Play(bool isLoop);
 		/// <summary>
-		/// ��~�B
+		/// 停止。
 		/// </summary>
 		void Stop()
 		{
+			//if (m_sourceVoice == nullptr) return;
 			m_sourceVoice->Stop();
 			m_isPlaying = false;
 		}
 		/// <summary>
-		/// �ꎞ��~�BSoundSource::Play�Œ񎦂����ӏ�����Đ�����܂��B
+		/// 一時停止。SoundSource::Playで提示した箇所から再生されます。
 		/// </summary>
 		void Pause()
 		{
+			//if (m_sourceVoice == nullptr) return;
 			m_sourceVoice->Stop(/*XAUDIO2_PLAY_TAILS*/);
 		}
 		/// <summary>
-		/// �Đ����H�B
+		/// 再生中？。
 		/// </summary>
-		/// <returns>true�Ȃ�Đ����B</returns>
+		/// <returns>trueなら再生中。</returns>
 		bool IsPlaying() const
 		{
 			return m_isPlaying;
 		}
 		/// <summary>
-		/// �{�����[����ݒ�B
+		/// ボリュームを設定。
 		/// </summary>
-		/// <param name="vol">�{�����[���B</param>
+		/// <param name="vol">ボリューム。</param>
 		void SetVolume(float vol)
 		{
+			//if (m_sourceVoice == nullptr) return;
 			m_sourceVoice->SetVolume(vol);
 		}
 		/// <summary>
-		/// �{�����[�����擾�B
+		/// ボリュームを取得。
 		/// </summary>
-		/// <returns>�{�����[���B</returns>
+		/// <returns>ボリューム。</returns>
 		float GetVolume() const
 		{
+			//if (m_sourceVoice == nullptr) return 0.0f;
 			float vol;
 			m_sourceVoice->GetVolume(&vol);
 			return vol;
 		}
 		/// <summary>
-		/// �����̍��W��ݒ�B
-		/// 3D�T�E���h�̎��ɕK�v�ɂȂ�܂��B
-		/// 2D�T�E���h�ł͖�������܂��B
+		/// 音源の座標を設定。
+		/// 3Dサウンドの時に必要になります。
+		/// 2Dサウンドでは無視されます。
 		/// </summary>
-		/// <param name="pos">�����̍��W�B</param>
+		/// <param name="pos">音源の座標。</param>
 		void SetPosition(const Vector3& pos)
 		{
 			m_position = pos;
@@ -99,34 +103,34 @@ namespace nsK2EngineLow {
 			}
 		}
 		/// <summary>
-		/// �����̍��W���擾�B
+		/// 音源の座標を取得。
 		/// </summary>
-		/// <returns>�����̍��W�B</returns>
+		/// <returns>音源の座標。</returns>
 		Vector3 GetPosition() const
 		{
 			return m_position;
 		}
 		/// <summary>
-		/// �����̈ړ����x���擾�B
+		/// 音源の移動速度を取得。
 		/// </summary>
-		/// <returns>�����̈ړ����x�B</returns>
+		/// <returns>音源の移動速度。</returns>
 		Vector3 GetVelocity() const
 		{
 			return m_velocity;
 		}
 		/// <summary>
-		/// ���[�v�t���O���擾�B
+		/// ループフラグを取得。
 		/// </summary>
-		/// <returns>true�Ȃ烋�[�v����B</returns>
+		/// <returns>trueならループする。</returns>
 		bool GetLoopFlag() const
 		{
 			return m_isLoop;
 		}
 		/// <summary>
-		/// �{�C�X�̎��g��������B
-		/// �ڍׂ�IXAudio2SourceVoice��SetFrequencyRatio���Q�Ƃ��Ă��������B
+		/// ボイスの周波数調整比。
+		/// 詳細はIXAudio2SourceVoiceのSetFrequencyRatioを参照してください。
 		/// </summary>
-		/// <param name="ratio">���g����B</param>
+		/// <param name="ratio">周波数比。</param>
 		void SetFrequencyRatio(float ratio)
 		{
 			if (m_sourceVoice != nullptr) {
@@ -138,9 +142,9 @@ namespace nsK2EngineLow {
 			return m_sourceVoice;
 		}
 		/// <summary>
-		/// ���̓`�����l�������擾�B
+		/// 入力チャンネル数を取得。
 		/// </summary>
-		/// <returns>���̓`�����l�����B</returns>
+		/// <returns>入力チャンネル数。</returns>
 		int GetNumInputChannel()const
 		{
 			return m_waveFile->GetFormat()->nChannels;
@@ -159,35 +163,35 @@ namespace nsK2EngineLow {
 		}
 	private:
 		/// <summary>
-		/// �������B
+		/// 初期化。
 		/// </summary>
 		void InitCommon();
 		/// <summary>
-		/// �I���������Đ����̍X�V�����B
+		/// オンメモリ再生中の更新処理。
 		/// </summary>
 		void UpdateOnMemory();
 		void Play(char* buff, unsigned int bufferSize);
 		void Remove3DSound();
 		/// <summary>
-		/// �X�V�B
+		/// 更新。
 		/// </summary>
 		void Update() override;
 	private:
-		std::shared_ptr<WaveFile>		m_waveFile;						//�g�`�f�[�^�B
-		IXAudio2SourceVoice* m_sourceVoice = nullptr;		//�\�[�X�{�C�X�B
-		bool							m_isLoop = false;				//���[�v�t���O�B
-		bool							m_isPlaying = false;			//�Đ����t���O�B
-		unsigned int					m_currentBufferingSize = 0;		//���݂̃o�b�t�@�����O�̃T�C�Y�B
-		unsigned int					m_readStartPos = 0;				//�ǂݍ��݊J�n�ʒu�B
-		unsigned int					m_ringBufferSize = 0;			//�����O�o�b�t�@�̃T�C�Y�B
-		bool							m_is3DSound = false;			//3D�T�E���h�H
-		Vector3							m_position = Vector3::Zero;		//�����̍��W�B3D�T�E���h�̎��ɕK�v�B
-		Vector3							m_lastFramePosition = Vector3::Zero;//������1�t���[���O�̍��W�B3D�T�E���h�̎��ɕK�v�B
-		Vector3							m_velocity = Vector3::Zero;		//���x�B3D�T�E���h�̎��ɕK�v�E
+		std::shared_ptr<WaveFile>		m_waveFile;						//波形データ。
+		IXAudio2SourceVoice* m_sourceVoice = nullptr;		//ソースボイス。
+		bool							m_isLoop = false;				//ループフラグ。
+		bool							m_isPlaying = false;			//再生中フラグ。
+		unsigned int					m_currentBufferingSize = 0;		//現在のバッファリングのサイズ。
+		unsigned int					m_readStartPos = 0;				//読み込み開始位置。
+		unsigned int					m_ringBufferSize = 0;			//リングバッファのサイズ。
+		bool							m_is3DSound = false;			//3Dサウンド？
+		Vector3							m_position = Vector3::Zero;		//音源の座標。3Dサウンドの時に必要。
+		Vector3							m_lastFramePosition = Vector3::Zero;//音源の1フレーム前の座標。3Dサウンドの時に必要。
+		Vector3							m_velocity = Vector3::Zero;		//速度。3Dサウンドの時に必要・
 		FLOAT32							m_emitterAzimuths[INPUTCHANNELS];
 		FLOAT32							m_matrixCoefficients[INPUTCHANNELS * OUTPUTCHANNELS];
 		X3DAUDIO_DSP_SETTINGS			m_dspSettings;
-		bool							m_isSetPositionFirst = true;	//��ԍŏ���setPosition?
-		bool							m_isAvailable = false;			//�C���X�^���X�����p�\�H
+		bool							m_isSetPositionFirst = true;	//一番最初のsetPosition?
+		bool							m_isAvailable = false;			//インスタンスが利用可能？
 	};
 }

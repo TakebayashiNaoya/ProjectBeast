@@ -1,5 +1,5 @@
-/*!
- * @brief	Noncopyƒ|ƒŠƒV[
+ï»¿/*!
+ * @brief	Noncopyãƒãƒªã‚·ãƒ¼
  */
 
 #pragma once 
