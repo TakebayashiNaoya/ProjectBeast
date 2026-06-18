@@ -16,7 +16,7 @@ namespace app
 		namespace
 		{
 			/** 親ペンギンのパラメーターのファイルパス */
-			const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/daddyPenguin/DaddyPenguinParameter.json";
+			constexpr const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/daddyPenguin/DaddyPenguinParameter.bin";
 		}
 
 
@@ -24,19 +24,9 @@ namespace app
 			: m_enableCommandRange(0.0f)
 		{
 			// 外部ファイルを読み込み
-			core::ParameterManager::Get()->LoadParameter<MasterDaddyPenguinParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterDaddyPenguinParameter& parameter)
-				{
-					parameter.maxHp = j["maxHp"].get<int>();
-					parameter.hp = j["hp"].get<int>();
-					parameter.runSpeed = j["runSpeed"].get<float>();
-					parameter.swimSpeed = j["swimSpeed"].get<float>();
-					parameter.sneakSpeed = j["sneakSpeed"].get<float>();
-					parameter.slideSpeed = j["slideSpeed"].get<float>();
-					parameter.jumpPower = j["jumpPower"].get<float>();
-					parameter.radius = j["radius"].get<float>();
-					parameter.height = j["height"].get<float>();
-					parameter.enableCommandRange = j["enableCommandRange"].get<float>();
-				});
+			core::ParameterManager::Get()->LoadParameterBinary<MasterDaddyPenguinParameter>(
+				PARAMETER_BINARY_FILE_PATH
+			);
 		}
 
 

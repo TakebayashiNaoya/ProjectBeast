@@ -34,7 +34,7 @@ namespace app
 #define appParameter(name)\
 public:\
 static constexpr uint32_t ID() {return Hash32(#name);}\
-std::function<void(const nlohmann::json& j, name& p)> load;
+static inline std::function<void(const nlohmann::json& j, name& p)> load;
 
 #else
 

@@ -4,11 +4,11 @@
  * @author 藤谷、竹林
  */
 #include "stdafx.h"
+#include "Source/Core/ParameterManager.h"
+#include "Source/Util/JsonConverter.h"
 #include "Whirlpool.h"
 #include "WhirlpoolManager.h"
 #include "WhirlpoolParameter.h"
-#include "Source/Util/JsonConverter.h"
-#include "Source/Core/ParameterManager.h"
 #include <algorithm>
 #include <random>
 #include <sys/stat.h>
@@ -64,43 +64,22 @@ namespace app
 		}
 
 
-		void WhirlpoolManager::Start(const char* positionsJsonPath, const char* parameterJsonPath)
+		void WhirlpoolManager::Start(const char* positionsJsonPath, const char* parameterPath)
 		{
 			m_positionsJsonPath = positionsJsonPath;
 
-			// 渦潮のパラメーターJSONを読み込む
-			core::ParameterManager::Get()->LoadParameter<MasterWhirlpoolParameter>(
-				parameterJsonPath,
-				[](const nlohmann::json& j, MasterWhirlpoolParameter& p)
-				{
-					p.whirlpoolRadius = j["whirlpoolRadius"].get<float>();
-					p.attractSpeed = j["attractSpeed"].get<float>();
-					p.rotateSpeed = j["rotateSpeed"].get<float>();
-					p.uvRotationSpeed = j["uvRotationSpeed"].get<float>();
-					p.scaleChangeTime = j["scaleChangeTime"].get<float>();
-					p.stayTime = j["stayTime"].get<float>();
-					p.createInterval = j["createInterval"].get<float>();
-					p.orbitRadius = j["orbitRadius"].get<float>();
-					p.orbitRadiusVariation = j["orbitRadiusVariation"].get<float>();
-					p.orbitOffsetVariation = j["orbitOffsetVariation"].get<float>();
-					p.rotateScaleVariation = j["rotateScaleVariation"].get<float>();
-				}
-			);
-
-			// 渦潮の座標JSONを読み込む
 			nlohmann::json json;
-			if (!util::JsonConverter::IsLoadJsonFile(json, m_positionsJsonPath.c_str()))
+			if (util::JsonConverter::IsLoadJsonFile(json, positionsJsonPath))
 			{
-				K2_ASSERT(false, "whirlpoolPositions.jsonの読み込みに失敗しました");
-				return;
+				LoadPositionMap(json);
 			}
-
-			LoadPositionMap(json);
 
 			// 座標JSONの最終更新時刻を記録する（デバッグビルドのみ）
 #ifdef APP_DEBUG
 			m_posLastWriteTime = util::JsonConverter::GetFileLastWriteTime(m_positionsJsonPath.c_str());
 #endif // APP_DEBUG
+
+			core::ParameterManager::Get()->LoadParameterBinary<MasterWhirlpoolParameter>(parameterPath);
 
 			// RenderingEngineに自身を登録する
 			g_renderingEngine->RegisterNatureObject(this);

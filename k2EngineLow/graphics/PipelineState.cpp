@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "PipelineState.h"
 
 namespace nsK2EngineLow {
@@ -16,7 +16,7 @@ namespace nsK2EngineLow {
 		auto d3dDevice = g_graphicsEngine->GetD3DDevice();
 		auto hr = d3dDevice->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&m_pipelineState));
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, "ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B\n", "ƒGƒ‰[", MB_OK);
+			MessageBoxA(nullptr, "ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n", "ã‚¨ãƒ©ãƒ¼", MB_OK);
 			std::abort();
 		}
 	}
@@ -26,7 +26,7 @@ namespace nsK2EngineLow {
 		auto d3dDevice = g_graphicsEngine->GetD3DDevice();
 		auto hr = d3dDevice->CreateComputePipelineState(&desc, IID_PPV_ARGS(&m_pipelineState));
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, "ƒpƒCƒvƒ‰ƒCƒ“ƒXƒe[ƒg‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½B\n", "ƒGƒ‰[", MB_OK);
+			MessageBoxA(nullptr, "ãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚\n", "ã‚¨ãƒ©ãƒ¼", MB_OK);
 			std::abort();
 		}
 	}

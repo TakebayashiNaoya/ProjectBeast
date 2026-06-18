@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "Texture.h"
 
 namespace nsK2EngineLow {
@@ -17,7 +17,7 @@ namespace nsK2EngineLow {
 	void Texture::InitFromDDSFile(const wchar_t* filePath)
 	{
 		Release();
-		//DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ðƒ[ƒhB
+		//DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 		LoadTextureFromDDSFile(filePath);
 
 	}
@@ -31,7 +31,7 @@ namespace nsK2EngineLow {
 	void Texture::InitFromMemory(const char* memory, unsigned int size)
 	{
 		Release();
-		//DDSƒtƒ@ƒCƒ‹‚©‚çƒeƒNƒXƒ`ƒƒ‚ðƒ[ƒhB
+		//DDSãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒ¼ãƒ‰ã€‚
 		LoadTextureFromMemory(memory, size);
 
 	}
@@ -56,7 +56,7 @@ namespace nsK2EngineLow {
 		re.End(g_graphicsEngine->GetCommandQueue());
 
 		if (FAILED(hr)) {
-			//ƒeƒNƒXƒ`ƒƒ‚Ìì¬‚ÉŽ¸”s‚µ‚Ü‚µ‚½B
+			//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚
 			return;
 		}
 
@@ -84,7 +84,7 @@ namespace nsK2EngineLow {
 		re.End(g_graphicsEngine->GetCommandQueue());
 
 		if (FAILED(hr)) {
-			//ƒeƒNƒXƒ`ƒƒ‚Ìì¬‚ÉŽ¸”s‚µ‚Ü‚µ‚½B
+			//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚
 			return;
 		}
 

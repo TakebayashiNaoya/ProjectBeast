@@ -26,8 +26,8 @@ namespace app
 			{
 				float distance = 200.0f;
 				float height = 100.0f;
-				float rotationSpeedX = 0.1f;
-				float rotationSpeedY = 0.1f;
+				float rotationSpeedX = 2.5f;
+				float rotationSpeedY = 2.5f;
 			};
 
 

@@ -30,7 +30,15 @@ namespace app
 		//------------------------------------------------------------
 		// ステージ固有パラメータ
 		//------------------------------------------------------------
-		float GetTimeLimit() const override { return 300.0f; }
+		float GetTimeLimit() const override 
+		{
+			return 300.0f; 
+		}
+
+		Vector3 GetDaddySpawnPos() const override
+		{
+			return { 0.0f, 100.0f, 0.0f };
+		}
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
@@ -57,9 +65,19 @@ namespace app
 			return "Assets/parameter/nature/whirlpoolParameter_Tutorial.json";
 		}
 
+		const char* GetWhirlpoolParameterBinaryPath() const override
+		{
+			return "Assets/parameter/nature/whirlpoolParameter_Tutorial.bin";
+		}
+
 		const char* GetOceanParameterJsonPath() const override
 		{
 			return "Assets/parameter/nature/oceanParameter_Tutorial.json";
+		}
+
+		const char* GetOceanParameterBinaryPath() const override
+		{
+			return "Assets/parameter/nature/oceanParameter_Tutorial.bin";
 		}
 
 		const char* GetStageName() const override { return "Tutorial"; }

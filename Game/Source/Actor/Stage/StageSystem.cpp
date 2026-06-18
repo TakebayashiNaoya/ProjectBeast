@@ -240,8 +240,17 @@ namespace app
 		}
 
 
+		void StageSystem::InitTerrain(const TerrainObject::TerrainConfig& config)
+		{
+			m_terrain = std::make_unique<TerrainObject>();
+			m_terrain->Init(config);
+		}
+
+
 		void StageSystem::Update()
 		{
+			if (m_terrain) { m_terrain->UpdateWrapper(); }
+
 			for (const auto& obj : m_objectMap)
 			{
 				obj.second->UpdateWrapper();
@@ -280,6 +289,8 @@ namespace app
 
 		void StageSystem::Render(RenderContext& rc)
 		{
+			if (m_terrain) { m_terrain->RenderWrapper(rc); }
+
 			for (const auto& obj : m_objectMap)
 			{
 				obj.second->RenderWrapper(rc);

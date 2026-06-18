@@ -15,7 +15,9 @@ namespace app
 	{
 		namespace
 		{
-			const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/PenguinEffectParameter.json";
+			//const char* PARAMETER_FILE_PATH = "Assets/parameter/character/penguin/PenguinEffectParameter.json";
+
+			const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/PenguinEffectParameter.bin";
 		}
 
 
@@ -37,39 +39,9 @@ namespace app
 			, m_slideLineOffsetForward(0.0f)
 		{
 			// 外部ファイルを読み込み
-			core::ParameterManager::Get()->LoadParameter<MasterPenguinEffectParameter>(PARAMETER_FILE_PATH, [](const nlohmann::json& j, MasterPenguinEffectParameter& parameter)
-				{
-					parameter.splashEffectScale.x = j["splashEffectScale"]["x"].get<float>();
-					parameter.splashEffectScale.y = j["splashEffectScale"]["y"].get<float>();
-					parameter.splashEffectScale.z = j["splashEffectScale"]["z"].get<float>();
-
-					parameter.effectOffsetForward = j["effectOffsetForward"].get<float>();
-					parameter.splashEffectInterval = j["splashEffectInterval"].get<float>();
-					parameter.minMoveVelocitySq = j["minMoveVelocitySq"].get<float>();
-					parameter.minSplashScaleRatio = j["minSplashScaleRatio"].get<float>();
-					parameter.maxSplashScaleRatio = j["maxSplashScaleRatio"].get<float>();
-					parameter.minSpeed = j["minSpeed"].get<float>();
-					parameter.maxSpeed = j["maxSpeed"].get<float>();
-
-					parameter.landingEffectScale.x = j["landingEffectScale"]["x"].get<float>();
-					parameter.landingEffectScale.y = j["landingEffectScale"]["y"].get<float>();
-					parameter.landingEffectScale.z = j["landingEffectScale"]["z"].get<float>();
-
-					parameter.slideFrostEffectScale.x = j["slideFrostEffectScale"]["x"].get<float>();
-					parameter.slideFrostEffectScale.y = j["slideFrostEffectScale"]["y"].get<float>();
-					parameter.slideFrostEffectScale.z = j["slideFrostEffectScale"]["z"].get<float>();
-
-					parameter.slideEffectInterval = j["slideEffectInterval"].get<float>();
-
-					parameter.minSlideFrostScaleRatio = j["minSlideFrostScaleRatio"].get<float>();
-					parameter.maxSlideFrostScaleRatio = j["maxSlideFrostScaleRatio"].get<float>();
-
-					parameter.slideLineEffectScale.x = j["slideLineEffectScale"]["x"].get<float>();
-					parameter.slideLineEffectScale.y = j["slideLineEffectScale"]["y"].get<float>();
-					parameter.slideLineEffectScale.z = j["slideLineEffectScale"]["z"].get<float>();
-
-					parameter.slideLineEffectOffsetForward = j["slideLineEffectOffsetForward"].get<float>();
-				});
+			core::ParameterManager::Get()->LoadParameterBinary<MasterPenguinEffectParameter>(
+				PARAMETER_BINARY_FILE_PATH
+			);
 		}
 
 

@@ -2,3 +2,6 @@ root = true
 
 [*]
 charset = utf-8-bom
+
+[*.fx]
+charset = utf-8

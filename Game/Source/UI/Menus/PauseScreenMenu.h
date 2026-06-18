@@ -159,6 +159,8 @@ namespace app
 			bool m_isRule;
 			/** タイトル */
 			bool m_isGoTitle;
+			/** スティック上下ニュートラル判定 */
+			bool m_isStickNeutralY;
 
 
 			using Icon = std::unique_ptr<PauseScreenIcon>;

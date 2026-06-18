@@ -19,7 +19,15 @@ namespace app
 		appScene(NormalInGameScene);
 
 	protected:
-		float GetTimeLimit() const override { return 180.0f; }
+		float GetTimeLimit() const override 
+		{
+			return 180.0f; 
+		}
+
+		Vector3 GetDaddySpawnPos() const override
+		{
+			return { 0.0f, 100.0f, 0.0f };
+		}
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
@@ -46,9 +54,19 @@ namespace app
 			return "Assets/parameter/nature/whirlpoolParameter_Normal.json";
 		}
 
+		const char* GetWhirlpoolParameterBinaryPath() const override
+		{
+			return "Assets/parameter/nature/whirlpoolParameter_Normal.bin";
+		}
+
 		const char* GetOceanParameterJsonPath() const override
 		{
 			return "Assets/parameter/nature/oceanParameter_Normal.json";
+		}
+
+		const char* GetOceanParameterBinaryPath() const override
+		{
+			return "Assets/parameter/nature/oceanParameter_Normal.bin";
 		}
 
 		const char* GetStageName() const override { return "Normal"; }

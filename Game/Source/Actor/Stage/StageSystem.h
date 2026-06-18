@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "IStage.h"
+#include "TerrainObject.h"
 #include "json/json.hpp"
 
 
@@ -48,6 +49,13 @@ namespace app
 			 */
 			bool IsAllLoaded() const;
 
+			/**
+			 * @brief ハイトマップ地形を生成する
+			 * @details チュートリアルなど地形が必要なシーンから明示的に呼ぶこと。
+			 * @param config 地形パラメータ（省略時はデフォルト値）
+			 */
+			void InitTerrain(const TerrainObject::TerrainConfig& config = {});
+
 
 		public:
 			StageSystem();
@@ -72,6 +80,9 @@ namespace app
 
 			/** オブジェクトのマップ */
 			ObjectMap m_objectMap;
+
+			/** ハイトマップ地形 */
+			std::unique_ptr<TerrainObject> m_terrain;
 
 
 		public:

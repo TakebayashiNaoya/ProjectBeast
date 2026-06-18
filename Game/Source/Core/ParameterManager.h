@@ -6,36 +6,7 @@
 #pragma once
 #include "Source/Core/AppParameterMacro.h"
 #include "Source/Util/JsonConverter.h"
-
-
- /**
- * @brief ホットリロード有効化マクロ
-  * @note デバッグビルド時のみ有効化
-  */
-#ifdef APP_DEBUG
-#define APP_PARAM_HOT_RELOAD
-#endif
-
-
-  /**
-  * @brief パラメーター用マクロ定義
-  * @note ホットリロード対応版
-  */
-#ifdef APP_PARAM_HOT_RELOAD
-
-#define appParameter(name)\
-public:\
-static constexpr uint32_t ID() {return Hash32(#name);}\
-std::function<void(const nlohmann::json& j, name& p)> load;
-
-#else
-
-#define appParameter(name)\
-public:\
-static constexpr uint32_t ID() {return Hash32(#name);}
-
-#endif
-
+#include <fstream>
 
 
 namespace app
@@ -50,18 +21,6 @@ namespace app
 		 */
 		class ParameterManager : public Noncopyable
 		{
-		private:
-
-			using ParameterVector = std::vector<IMasterParameter*>;
-
-			using ParameterMap = std::map<uint32_t, ParameterVector>;
-
-
-		private:
-			ParameterManager();
-			~ParameterManager();
-
-
 		public:
 			/**
 			 * パラメーターを更新
@@ -103,6 +62,46 @@ namespace app
 
 
 			/**
+			 * @brief パラメーター読み込み（バイナリ）
+			 * @tparam T パラメーター型
+			 * @param path ファイルパス
+			 */
+			template <typename T>
+			void LoadParameterBinary(const char* path)
+			{
+				std::ifstream ifs(path, std::ios::binary);
+				if (!ifs.is_open()) return;
+
+				uint32_t count = 0;
+				ifs.read(reinterpret_cast<char*>(&count), sizeof(count));
+				if (ifs.fail()) return;
+
+				constexpr size_t BASE_SIZE = sizeof(core::IMasterParameter);
+				constexpr size_t DATA_SIZE = sizeof(T) - BASE_SIZE;
+
+				ParameterVector parameters;
+				for (uint32_t i = 0; i < count; ++i) {
+					auto* parameter = new T;
+
+#ifdef APP_PARAM_HOT_RELOAD
+					parameter->m_path = std::string(path);
+					parameter->m_lastWriteTime = util::JsonConverter::GetFileLastWriteTime(path);
+#endif
+					// vptrやホットリロード用の変数（std::string等）を上書きしないように、
+					// ベースクラスのサイズ分だけポインタを進めた位置からデータを丸呑みする
+					char* dataHead = reinterpret_cast<char*>(parameter) + BASE_SIZE;
+					ifs.read(dataHead, DATA_SIZE);
+
+					parameters.push_back(parameter);
+				}
+
+				m_parameterMap.emplace(T::ID(), parameters);
+
+				//printf("DATA_SIZE = %zu\n", DATA_SIZE);
+			}
+
+
+			/**
 			 * @brief パラメーターアンロード
 			 * @tparam T パラメーター型
 			 */
@@ -111,7 +110,7 @@ namespace app
 			{
 				// 確保済みのパラメーターがあれば解放。
 				auto it = m_parameterMap.find(T::ID());
-				if (it != m_parameterMap.end()){
+				if (it != m_parameterMap.end()) {
 					auto& parameters = it->second;
 					for (auto* p : parameters) {
 						delete p;
@@ -131,7 +130,7 @@ namespace app
 			{
 				const auto parameters = GetParameters<T>();
 				if (parameters.size() == 0) { return nullptr; }
-				if (parameters.size() < index) { return nullptr; }
+				if (parameters.size() <= index) { return nullptr; }
 				return parameters[index];
 			}
 			/**
@@ -161,11 +160,6 @@ namespace app
 					func(*paramter);
 				}
 			}
-
-
-		private:
-			/** パラメーターマップ */
-			ParameterMap m_parameterMap;
 
 
 		public:
@@ -202,7 +196,23 @@ namespace app
 				}
 			}
 
+
 		private:
+
+			using ParameterVector = std::vector<IMasterParameter*>;
+
+			using ParameterMap = std::map<uint32_t, ParameterVector>;
+
+
+		private:
+			ParameterManager();
+			~ParameterManager();
+
+
+			/** パラメーターマップ */
+			ParameterMap m_parameterMap;
+
+
 			/** シングルトンインスタンス */
 			static ParameterManager* m_instance;
 		};

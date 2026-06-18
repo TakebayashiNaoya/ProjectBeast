@@ -39,9 +39,9 @@
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
 
+#include "Graphics/Camera/SubCameraManager.h"
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
-#include "Graphics/Camera/SubCameraManager.h"
 
 #include "Source/Nature/Ocean.h"
 #include "Source/Nature/WhirlpoolManager.h"
@@ -164,7 +164,7 @@ namespace app
 
 		case LoadPhase::Daddy:
 			m_daddyPenguin = new actor::DaddyPenguin();
-			m_daddyPenguin->SetPosition(Vector3(0.0f, 27.3f, 0.0f));
+			m_daddyPenguin->SetPosition(GetDaddySpawnPos());
 			m_daddyPenguin->StartWrapper();
 
 			// DaddyPenguinをディザリングのプレイヤーターゲットとして登録する
@@ -243,12 +243,12 @@ namespace app
 			m_skyCube->SetLuminance(0.8f);
 
 			nature::Ocean::CreateInstance();
-			nature::Ocean::GetInstance()->Start(GetOceanParameterJsonPath());
+			nature::Ocean::GetInstance()->Start(GetOceanParameterBinaryPath());
 
 			nature::WhirlpoolManager::CreateInstance();
 			nature::WhirlpoolManager::GetInstance()->Start(
 				GetWhirlpoolPositionsJsonPath(),
-				GetWhirlpoolParameterJsonPath()
+				GetWhirlpoolParameterBinaryPath()
 			);
 
 			m_loadPhase = LoadPhase::Done;
@@ -441,7 +441,7 @@ namespace app
 				m_nextScene = true;
 
 				const float clearTime = TimeManager::GetInstance().GetCurTime();
-				const int   rescued   = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
+				const int   rescued = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
 				ResultScene::SetResult(clearTime, rescued);
 
 				/** アチーブメント最終判定（FinalCondition 型を評価） */
@@ -456,13 +456,13 @@ namespace app
 					{
 						if (achieve && achieve->IsAchieved()) achievedCount++;
 					}
-					constexpr int   MIN_ACHIEVE_MULTIPLIER  = 1;
-					constexpr float BASE_TIME_MULTIPLIER    = 1.0f;
-					constexpr float SCORE_TIME_DIVISOR      = 100.0f;
-					constexpr float SCORE_BASE_MULTIPLIER   = 100.0f;
+					constexpr int   MIN_ACHIEVE_MULTIPLIER = 1;
+					constexpr float BASE_TIME_MULTIPLIER = 1.0f;
+					constexpr float SCORE_TIME_DIVISOR = 100.0f;
+					constexpr float SCORE_BASE_MULTIPLIER = 100.0f;
 
 					const int   achieveMultiplier = (achievedCount > 0) ? achievedCount : MIN_ACHIEVE_MULTIPLIER;
-					const float timeMultiplier    = BASE_TIME_MULTIPLIER + (clearTime / SCORE_TIME_DIVISOR);
+					const float timeMultiplier = BASE_TIME_MULTIPLIER + (clearTime / SCORE_TIME_DIVISOR);
 					logScore = static_cast<float>(rescued) * SCORE_BASE_MULTIPLIER
 						* static_cast<float>(achieveMultiplier) * timeMultiplier;
 				}
