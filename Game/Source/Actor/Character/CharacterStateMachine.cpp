@@ -91,7 +91,7 @@ namespace app
 			}
 
 			// --- 既存の波面追従処理 ---
-			if (!IsOnGround() && !m_isSwimming)
+			if (!m_isSwimming)
 			{
 				const float posY = m_transform.m_position.y;
 				if (posY < waveY + SEA_SURFACE_THRESHOLD)
