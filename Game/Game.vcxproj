@@ -127,6 +127,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +146,9 @@
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,6 +165,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -175,6 +184,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -195,6 +207,9 @@
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -215,6 +230,9 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

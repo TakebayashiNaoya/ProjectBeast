@@ -1,4 +1,4 @@
-#include "k2EngineLowPreCompile.h"
+ï»¿#include "k2EngineLowPreCompile.h"
 #include "RootSignature.h"
 
 namespace nsK2EngineLow {
@@ -57,7 +57,7 @@ namespace nsK2EngineLow {
 		D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
 		auto hr = d3dDevice->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature));
 		if (FAILED(hr)) {
-			//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ìì¬‚ÉŽ¸”s‚µ‚½B
+			//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®ä½œæˆã«å¤±æ•—ã—ãŸã€‚
 			return false;
 		}
 		return true;
@@ -94,13 +94,13 @@ namespace nsK2EngineLow {
 
 	bool RootSignature::Init(Shader& shader)
 	{
-		//ƒVƒF[ƒ_[‚©‚çƒ‹[ƒgƒVƒOƒlƒ`ƒƒî•ñ‚ðŽæ“¾
+		//ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã‹ã‚‰ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£æƒ…å ±ã‚’å–å¾—
 		ID3DBlob* sig = nullptr;
 		auto shaderBlob = shader.GetCompiledBlob();
 
 		auto hr = D3DGetBlobPart(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(),
 			D3D_BLOB_ROOT_SIGNATURE, 0, &sig);
-		//ƒ‹[ƒgƒVƒOƒlƒ`ƒƒ‚Ì¶¬
+		//ãƒ«ãƒ¼ãƒˆã‚·ã‚°ãƒãƒãƒ£ã®ç”Ÿæˆ
 		auto d3dDevice = g_graphicsEngine->GetD3DDevice();
 		hr = d3dDevice->CreateRootSignature(0, sig->GetBufferPointer(), sig->GetBufferSize(),
 			IID_PPV_ARGS(&m_rootSignature));

@@ -1,9 +1,9 @@
-/// <summary>
-/// tkm�t�@�C���B
+﻿/// <summary>
+/// tkm・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽB
 /// </summary>
 /// <remarks>
-/// tkm�t�@�C����3D���f���t�H�[�}�b�g�ł��B
-/// ���̃N���X�𗘗p���邱�Ƃ�tkm�t�@�C�����������Ƃ��ł��܂��B�B
+/// tkm・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ3D・ｽ・ｽ・ｽf・ｽ・ｽ・ｽt・ｽH・ｽ[・ｽ}・ｽb・ｽg・ｽﾅゑｿｽ・ｽB
+/// ・ｽ・ｽ・ｽﾌク・ｽ・ｽ・ｽX・ｽ・p・ｽ・ｽ・ｽ驍ｱ・ｽﾆゑｿｽtkm・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾆゑｿｽ・ｽﾅゑｿｽ・ｽﾜゑｿｽ・ｽB・ｽB
 /// </remarks>
 #pragma once
 
@@ -12,91 +12,91 @@
 namespace nsK2EngineLow {
 
 	struct LowTexture {
-		std::string filePath;			// �t�@�C���p�X�B
-		std::unique_ptr<char[]> data;	// ���f�[�^(dds�t�@�C��)
-		unsigned int dataSize;			// �f�[�^�̃T�C�Y�B
+		std::string filePath;			// ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽp・ｽX・ｽB
+		std::unique_ptr<char[]> data;	// ・ｽ・ｽ・ｽf・ｽ[・ｽ^(dds・ｽt・ｽ@・ｽC・ｽ・ｽ)
+		unsigned int dataSize;			// ・ｽf・ｽ[・ｽ^・ｽﾌサ・ｽC・ｽY・ｽB
 	};
 	/// <summary>
-	/// tkm�t�@�C���N���X�B
+	/// tkm・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽN・ｽ・ｽ・ｽX・ｽB
 	/// </summary>
 	class  TkmFile : public Noncopyable {
 	public:
 		/// <summary>
-		/// �}�e���A��
+		/// ・ｽ}・ｽe・ｽ・ｽ・ｽA・ｽ・ｽ
 		/// </summary>
 		struct  SMaterial{
-			int uniqID;								// �e�N�X�`���t�@�C��������쐬����郆�j�[�NID�B
-			std::string albedoMapFileName;			// �A���x�h�}�b�v�̃t�@�C�����B
-			std::string normalMapFileName;			// �@���}�b�v�̃t�@�C�����B
-			std::string specularMapFileName;		// �X�y�L�����}�b�v�̃t�@�C�����B
-			std::string reflectionMapFileName;		// ���t���N�V�����}�b�v�̃t�@�C�����B
-			std::string refractionMapFileName;		// ���܃}�b�v�̃t�@�C�����B
-			LowTexture*	albedoMap;					// ���[�h���ꂽ�A���x�h�}�b�v�̐��e�N�X�`���f�[�^�B(dds�t�@�C��)
-			LowTexture*	normalMap;					// ���[�h���ꂽ�@���}�b�v�̐��e�N�X�`���f�[�^�B(dds�t�@�C��9
-			LowTexture* specularMap;				// ���[�h���ꂽ�X�y�L�����}�b�v�̐��e�N�X�`���f�[�^�B(dds�t�@�C��)
-			LowTexture*	reflectionMap;				// ���[�h���ꂽ���t���N�V�����}�b�v�̐��e�N�X�`���f�[�^�B(dds�t�@�C��)
-			LowTexture*	refractionMap;				// ���[�h���ꂽ���܃}�b�v�̐��e�N�X�`���f�[�^�B(dds�t�@�C��)
+			int uniqID;								// ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｬ・ｽ・ｽ・ｽ・ｽ驛・ｿｽj・ｽ[・ｽNID・ｽB
+			std::string albedoMapFileName;			// ・ｽA・ｽ・ｽ・ｽx・ｽh・ｽ}・ｽb・ｽv・ｽﾌフ・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽB
+			std::string normalMapFileName;			// ・ｽ@・ｽ・ｽ・ｽ}・ｽb・ｽv・ｽﾌフ・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽB
+			std::string specularMapFileName;		// ・ｽX・ｽy・ｽL・ｽ・ｽ・ｽ・ｽ・ｽ}・ｽb・ｽv・ｽﾌフ・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽB
+			std::string reflectionMapFileName;		// ・ｽ・ｽ・ｽt・ｽ・ｽ・ｽN・ｽV・ｽ・ｽ・ｽ・ｽ・ｽ}・ｽb・ｽv・ｽﾌフ・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽB
+			std::string refractionMapFileName;		// ・ｽ・ｽ・ｽﾜマ・ｽb・ｽv・ｽﾌフ・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽB
+			LowTexture*	albedoMap;					// ・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽ黷ｽ・ｽA・ｽ・ｽ・ｽx・ｽh・ｽ}・ｽb・ｽv・ｽﾌ撰ｿｽ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽf・ｽ[・ｽ^・ｽB(dds・ｽt・ｽ@・ｽC・ｽ・ｽ)
+			LowTexture*	normalMap;					// ・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽ黷ｽ・ｽ@・ｽ・ｽ・ｽ}・ｽb・ｽv・ｽﾌ撰ｿｽ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽf・ｽ[・ｽ^・ｽB(dds・ｽt・ｽ@・ｽC・ｽ・ｽ9
+			LowTexture* specularMap;				// ・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽ黷ｽ・ｽX・ｽy・ｽL・ｽ・ｽ・ｽ・ｽ・ｽ}・ｽb・ｽv・ｽﾌ撰ｿｽ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽf・ｽ[・ｽ^・ｽB(dds・ｽt・ｽ@・ｽC・ｽ・ｽ)
+			LowTexture*	reflectionMap;				// ・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽ黷ｽ・ｽ・ｽ・ｽt・ｽ・ｽ・ｽN・ｽV・ｽ・ｽ・ｽ・ｽ・ｽ}・ｽb・ｽv・ｽﾌ撰ｿｽ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽf・ｽ[・ｽ^・ｽB(dds・ｽt・ｽ@・ｽC・ｽ・ｽ)
+			LowTexture*	refractionMap;				// ・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽ黷ｽ・ｽ・ｽ・ｽﾜマ・ｽb・ｽv・ｽﾌ撰ｿｽ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽf・ｽ[・ｽ^・ｽB(dds・ｽt・ｽ@・ｽC・ｽ・ｽ)
 		};
 		/// <summary>
-		/// ���_�B
+		/// ・ｽ・ｽ・ｽ_・ｽB
 		/// </summary>
 		/// <remarks>
-		/// ������ҏW������A���C�g���̃V�F�[�_�[�Œ�`����Ă��钸�_�\���̂��ύX����K�v������B
+		/// ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾒ集・ｽ・ｽ・ｽ・ｽ・ｽ・ｽA・ｽ・ｽ・ｽC・ｽg・ｽ・ｽ・ｽﾌシ・ｽF・ｽ[・ｽ_・ｽ[・ｽﾅ抵ｿｽ`・ｽ・ｽ・ｽ・ｽﾄゑｿｽ・ｽ髓ｸ・ｽ_・ｽ\・ｽ・ｽ・ｽﾌゑｿｽ・ｽﾏ更・ｽ・ｽ・ｽ・ｽK・ｽv・ｽ・ｽ・ｽ・ｽ・ｽ・ｽB
 		/// </remarks>
 		struct SVertex {
-			Vector3 pos;			//���W�B
-			Vector3 normal;		//�@���B
-			Vector3 tangent;		//�ڃx�N�g���B
-			Vector3 binormal;		//�]�x�N�g���B
-			Vector2 uv;			//UV���W�B
-			int indices[4];			//�X�L���C���f�b�N�X�B
-			Vector4 skinWeights;	//�X�L���E�F�C�g�B
+			Vector3 pos;			//・ｽ・ｽ・ｽW・ｽB
+			Vector3 normal;		//・ｽ@・ｽ・ｽ・ｽB
+			Vector3 tangent;		//・ｽﾚベ・ｽN・ｽg・ｽ・ｽ・ｽB
+			Vector3 binormal;		//・ｽ]・ｽx・ｽN・ｽg・ｽ・ｽ・ｽB
+			Vector2 uv;			//UV・ｽ・ｽ・ｽW・ｽB
+			int indices[4];			//・ｽX・ｽL・ｽ・ｽ・ｽC・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽB
+			Vector4 skinWeights;	//・ｽX・ｽL・ｽ・ｽ・ｽE・ｽF・ｽC・ｽg・ｽB
 		};
 		/// <summary>
-		/// 32�r�b�g�̃C���f�b�N�X�o�b�t�@�B
+		/// 32・ｽr・ｽb・ｽg・ｽﾌイ・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽo・ｽb・ｽt・ｽ@・ｽB
 		/// </summary>
 		struct SIndexBuffer32 {
-			std::vector< uint32_t > indices;	//�C���f�b�N�X�B
+			std::vector< uint32_t > indices;	//・ｽC・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽB
 		};
 		/// <summary>
-		/// 16�r�b�g�̃C���f�b�N�X�o�b�t�@�B
+		/// 16・ｽr・ｽb・ｽg・ｽﾌイ・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽo・ｽb・ｽt・ｽ@・ｽB
 		/// </summary>
 		struct SIndexbuffer16 {
-			std::vector< uint16_t > indices;	//�C���f�b�N�X�B
+			std::vector< uint16_t > indices;	//・ｽC・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽB
 		};
 		/// <summary>
-		/// ���b�V���p�[�c�B
+		/// ・ｽ・ｽ・ｽb・ｽV・ｽ・ｽ・ｽp・ｽ[・ｽc・ｽB
 		/// </summary>
 		struct SMesh {
-			bool isFlatShading;									// �t���b�g�V�F�[�f�B���O�H
-			std::vector< SMaterial > materials;					// �}�e���A���̔z��B
-			std::vector< SVertex >	vertexBuffer;				// ���_�o�b�t�@�B
-			std::vector<SIndexBuffer32> indexBuffer32Array;		// �C���f�b�N�X�o�b�t�@�̔z��B�}�e���A���̐��������C���f�b�N�X�o�b�t�@�͂����B
+			bool isFlatShading;									// ・ｽt・ｽ・ｽ・ｽb・ｽg・ｽV・ｽF・ｽ[・ｽf・ｽB・ｽ・ｽ・ｽO・ｽH
+			std::vector< SMaterial > materials;					// ・ｽ}・ｽe・ｽ・ｽ・ｽA・ｽ・ｽ・ｽﾌ配・ｽ・ｽB
+			std::vector< SVertex >	vertexBuffer;				// ・ｽ・ｽ・ｽ_・ｽo・ｽb・ｽt・ｽ@・ｽB
+			std::vector<SIndexBuffer32> indexBuffer32Array;		// ・ｽC・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽo・ｽb・ｽt・ｽ@・ｽﾌ配・ｽ・ｽB・ｽ}・ｽe・ｽ・ｽ・ｽA・ｽ・ｽ・ｽﾌ撰ｿｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽC・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽo・ｽb・ｽt・ｽ@・ｽﾍゑｿｽ・ｽ・ｽ・ｽB
 			std::vector< SIndexbuffer16> indexBuffer16Array;
 		};
 
 		/// <summary>
-		/// 3D���f�������[�h�B
+		/// 3D・ｽ・ｽ・ｽf・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽh・ｽB
 		/// </summary>
-		/// <param name="filePath">�t�@�C���p�X�B</param>
-		/// <param name="isOptimize">�œK���t���O�B</param>
+		/// <param name="filePath">・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽp・ｽX・ｽB</param>
+		/// <param name="isOptimize">・ｽﾅ適・ｽ・ｽ・ｽt・ｽ・ｽ・ｽO・ｽB</param>
 		/// <param name="isLoadTexture">
-		/// �e�N�X�`�������[�h����H
-		/// �R���W�����̍\�z�̂��߂Ȃǂ�tkm�t�@�C�������[�h����ȂǂƂ������A
-		/// �e�N�X�`�����s�v�̏ꍇ�ɂ́A���̈�����false�ɂ��Ă��������B
-		/// ����ƁA�������g�p�ʁA���[�h���ԂȂǂ��팸����܂��B
+		/// ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽ・ｽH
+		/// ・ｽR・ｽ・ｽ・ｽW・ｽ・ｽ・ｽ・ｽ・ｽﾌ構・ｽz・ｽﾌゑｿｽ・ｽﾟなどゑｿｽtkm・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽ・ｽﾈどとゑｿｽ・ｽ・ｽ・ｽ・ｽ・ｽA
+		/// ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽ・ｽ・ｽs・ｽv・ｽﾌ場合・ｽﾉは、・ｽ・ｽ・ｽﾌ茨ｿｽ・ｽ・ｽ・ｽ・ｽfalse・ｽﾉゑｿｽ・ｽﾄゑｿｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽB
+		/// ・ｽ・ｽ・ｽ・ｽﾆ、・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽg・ｽp・ｽﾊ、・ｽ・ｽ・ｽ[・ｽh・ｽ・ｽ・ｽﾔなどゑｿｽ・ｽ甯ｸ・ｽ・ｽ・ｽ・ｽﾜゑｿｽ・ｽB
 		/// </param>
-		/// <param name="isOutputMsgTTY">���b�Z�[�W��W�����o�̓f�o�C�X�ɏo�͂���H</param>
+		/// <param name="isOutputMsgTTY">・ｽ・ｽ・ｽb・ｽZ・ｽ[・ｽW・ｽ・ｽW・ｽ・ｽ・ｽ・ｽ・ｽo・ｽﾍデ・ｽo・ｽC・ｽX・ｽﾉ出・ｽﾍゑｿｽ・ｽ・ｽH</param>
 		bool Load(const char* filePath, bool isOptimize, bool isLoadTexture = true, bool isOutputErrorCodeTTY = false);
 		/// <summary>
-		/// tkm�t�@�C����ۑ��B
+		/// tkm・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽ・ｽﾛ托ｿｽ・ｽB
 		/// </summary>
-		/// <param name="filePath">�ۑ���̃t�@�C���p�X�B</param>
+		/// <param name="filePath">・ｽﾛ托ｿｽ・ｽ・ｽﾌフ・ｽ@・ｽC・ｽ・ｽ・ｽp・ｽX・ｽB</param>
 		bool Save(const char* filePath);
 		/// <summary>
-		/// ���b�V���p�[�c�ɑ΂��ăN�G�����s���B
+		/// ・ｽ・ｽ・ｽb・ｽV・ｽ・ｽ・ｽp・ｽ[・ｽc・ｽﾉ対ゑｿｽ・ｽﾄク・ｽG・ｽ・ｽ・ｽ・ｽ・ｽs・ｽ・ｽ・ｽB
 		/// </summary>
-		/// <param name="func">�N�G���֐�</param>
+		/// <param name="func">・ｽN・ｽG・ｽ・ｽ・ｽﾖ撰ｿｽ</param>
 		void QueryMeshParts(std::function<void(const SMesh& mesh)> func) const
 		{
 			for (auto& mesh : m_meshParts) {
@@ -104,7 +104,7 @@ namespace nsK2EngineLow {
 			}
 		}
 		/// <summary>
-		/// ���b�V���p�[�c���擾�B
+		/// ・ｽ・ｽ・ｽb・ｽV・ｽ・ｽ・ｽp・ｽ[・ｽc・ｽ・ｽ・ｽ謫ｾ・ｽB
 		/// </summary>
 		/// <returns></returns>
 		const std::vector< SMesh>& GetMeshParts() const
@@ -112,7 +112,7 @@ namespace nsK2EngineLow {
 			return m_meshParts;
 		}
 		/// <summary>
-		/// ���b�V���̐����擾�B
+		/// ・ｽ・ｽ・ｽb・ｽV・ｽ・ｽ・ｽﾌ撰ｿｽ・ｽ・ｽ・ｽ謫ｾ・ｽB
 		/// </summary>
 		/// <returns></returns>
 		int GetNumMesh() const
@@ -120,7 +120,7 @@ namespace nsK2EngineLow {
 			return (int)(m_meshParts.size());
 		}
 		/// <summary>
-		/// コードからメッシュデータを直接設定する（ハイトマップ地形など手続き生成用）
+		/// 繧ｳ繝ｼ繝峨°繧峨Γ繝・す繝･繝・・繧ｿ繧堤峩謗･險ｭ螳壹☆繧具ｼ医ワ繧､繝医・繝・・蝨ｰ蠖｢縺ｪ縺ｩ謇狗ｶ壹″逕滓・逕ｨ・・
 		/// </summary>
 		void Build(std::vector<SMesh> meshes)
 		{
@@ -128,35 +128,35 @@ namespace nsK2EngineLow {
 		}
 	private:
 		/// <summary>
-		/// �e�N�X�`���������[�h�B
+		/// ・ｽe・ｽN・ｽX・ｽ`・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽh・ｽB
 		/// </summary>
 		/// <param name="fp"></param>
 		/// <returns></returns>
 		std::string LoadTextureFileName(FILE* fp);
 		/// <summary>
-		/// �C���f�b�N�X�o�b�t�@�����[�h�B
+		/// ・ｽC・ｽ・ｽ・ｽf・ｽb・ｽN・ｽX・ｽo・ｽb・ｽt・ｽ@・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽh・ｽB
 		/// </summary>
 		template<class T>
 		void LoadIndexBuffer(std::vector<T>& indexBuffer, int numIndex, FILE* fp);
 		/// <summary>
-		/// �}�e���A�����\�z�B
+		/// ・ｽ}・ｽe・ｽ・ｽ・ｽA・ｽ・ｽ・ｽ・ｽ・ｽ\・ｽz・ｽB
 		/// </summary>
 		/// <param name="tkmMat"></param>
 		void BuildMaterial(SMaterial& tkmMat, FILE* fp, const char* filePath, bool isLoadTexture, bool isOutputErrorCodeTTY);
 		/// <summary>
-		/// �ڃx�N�g���Ə]�x�N�g�����v�Z����B
+		/// ・ｽﾚベ・ｽN・ｽg・ｽ・ｽ・ｽﾆ従・ｽx・ｽN・ｽg・ｽ・ｽ・ｽ・ｽ・ｽv・ｽZ・ｽ・ｽ・ｽ・ｽB
 		/// </summary>
 		/// <remarks>
-		/// 3dsMaxScript�ł��ׂ��Ȃ񂾂낤���ǁA�f�o�b�O�������̂ō��͂�����ł��B
+		/// 3dsMaxScript・ｽﾅゑｿｽ・ｽﾗゑｿｽ・ｽﾈんだろう・ｽ・ｽ・ｽﾇ、・ｽf・ｽo・ｽb・ｽO・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽﾌで搾ｿｽ・ｽﾍゑｿｽ・ｽ・ｽ・ｽ・ｽﾅゑｿｽ・ｽB
 		/// </remarks>
 		void BuildTangentAndBiNormal();
 	private:
 		/// <summary>
-		/// TKM�t�@�C���̍œK���B
+		/// TKM・ｽt・ｽ@・ｽC・ｽ・ｽ・ｽﾌ最適・ｽ・ｽ・ｽB
 		/// </summary>
 		void Optimize();
 	private:
-		BSP m_bpsOnVertexPosition;				// ���_���W���g����BSP�c���[�B
-		std::vector< SMesh >	m_meshParts;		// ���b�V���p�[�c�B
+		BSP m_bpsOnVertexPosition;				// ・ｽ・ｽ・ｽ_・ｽ・ｽ・ｽW・ｽ・ｽ・ｽg・ｽ・ｽ・ｽ・ｽBSP・ｽc・ｽ・ｽ・ｽ[・ｽB
+		std::vector< SMesh >	m_meshParts;		// ・ｽ・ｽ・ｽb・ｽV・ｽ・ｽ・ｽp・ｽ[・ｽc・ｽB
 	};
 }
