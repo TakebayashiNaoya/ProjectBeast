@@ -52,7 +52,7 @@ namespace app
 			{
 				m_config = config;
 
-				m_toVector.z = m_config.distance;
+				m_toVector.z = -m_config.distance;
 				m_toVector.y = m_config.height;
 			}
 			/**

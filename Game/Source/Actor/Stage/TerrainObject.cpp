@@ -258,7 +258,7 @@ namespace app
 			// エンジン終了時に delete が呼ばれ heap corruption になる
 			m_tkmFile = new TkmFile();
 			m_tkmFile->Build(std::move(meshes));
-			g_engine->RegistTkmFileToBank(TERRAIN_TKM_KEY, m_tkmFile);
+			g_engine->ReplaceTkmFileInBank(TERRAIN_TKM_KEY, m_tkmFile);
 		}
 
 
