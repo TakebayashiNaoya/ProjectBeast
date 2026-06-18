@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file EasyInGameScene.h
  * @brief インゲームシーン（イージーステージ）
  * @author 竹林
@@ -21,7 +21,7 @@ namespace app
 	protected:
 		float GetTimeLimit() const override
 		{
-			return 300.0f;
+			return 120.0f;
 		}
 
 		Vector3 GetDaddySpawnPos() const override
@@ -31,7 +31,7 @@ namespace app
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 8, 8, 8, 8, 8, 2000.0f };
+			return { 30, 30, 0, 0, 0, 4000.0f };
 		}
 
 		const char* GetStageJsonPath() const override

@@ -211,7 +211,7 @@ namespace app
 						const float h1 = heights[ z      * W + (x + 1)];
 						const float h2 = heights[(z + 1) * W +  x     ];
 						const float h3 = heights[(z + 1) * W + (x + 1)];
-						if (h0 < m_config.minHeight || h1 < m_config.minHeight || h2 < m_config.minHeight || h3 < m_config.minHeight)
+						if (h0 < m_config.minHeight && h1 < m_config.minHeight && h2 < m_config.minHeight && h3 < m_config.minHeight)
 							continue;
 					}
 
