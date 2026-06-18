@@ -55,6 +55,10 @@ namespace app
 
 	void Application::Render(RenderContext& rc)
 	{
+		ImGui::Begin("デバッグ");
+		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+		ImGui::End();
+
 		SceneManager::GetInstance()->Render(rc);
 		core::Fade::Get().Render(rc);
 	}

@@ -19,6 +19,10 @@ namespace nsBeastEngine
 
 	BeastEngine::~BeastEngine()
 	{
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+
 		SubCameraManager::DestroyInstance();
 		CameraSystem::DestroyInstance();
 		g_renderingEngine = nullptr;
@@ -61,6 +65,33 @@ namespace nsBeastEngine
 		ResourceManager::GetInstance().Start();
 		/** トゥーンシェーダーのグローバル設定を有効化 */
 		//ModelRender::SetToonGlobalEnabled(true);
+
+		 // ========== ImGui 初期化 ==========
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+
+		// Win32バックエンド初期化
+		ImGui_ImplWin32_Init(initData.hwnd);
+
+		// SRVヒープの作成（ImGui専用）
+		D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+		heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		heapDesc.NumDescriptors = 1;
+		heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		g_graphicsEngine->GetD3DDevice()->CreateDescriptorHeap(
+			&heapDesc, IID_PPV_ARGS(&m_imguiSrvHeap)
+		);
+
+		// DX12バックエンド初期化
+		ImGui_ImplDX12_Init(
+			g_graphicsEngine->GetD3DDevice(),
+			2,                              // フレームバッファ数
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			m_imguiSrvHeap.Get(),
+			m_imguiSrvHeap->GetCPUDescriptorHandleForHeapStart(),
+			m_imguiSrvHeap->GetGPUDescriptorHandleForHeapStart()
+		);
 	}
 
 
@@ -68,6 +99,11 @@ namespace nsBeastEngine
 	{
 		// フレーム開始
 		g_engine->BeginFrame();
+
+		// IMGUIの更新
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
 
 		// k2EngineLowの更新処理
 		g_engine->ExecuteUpdate();
@@ -92,6 +128,16 @@ namespace nsBeastEngine
 	{
 		// 描画処理
 		m_renderingEngine.Execute(g_graphicsEngine->GetRenderContext());
+
+		// ========== ImGui 描画 ==========
+		ImGui::Render();
+
+		// SRVヒープをセット
+		auto* cmdList = g_graphicsEngine->GetCommandList();
+		ID3D12DescriptorHeap* heaps[] = { m_imguiSrvHeap.Get() };
+		cmdList->SetDescriptorHeaps(1, heaps);
+
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
 
 		// 当たり判定描画
 		g_engine->DebubDrawWorld();
