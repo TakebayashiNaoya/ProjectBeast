@@ -149,6 +149,9 @@ namespace app
 		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem.get(); }
 		/** @brief WpWarningSystemを取得 */
 		inline ui::WpWarningSystem* GetWpWarningSystem() const { return m_wpWarningSystem.get(); }
+		/** @brief 救助数Menuを取得 */
+		inline ui::RemainingChildMenu* GetRemainingChildMenu() const { return m_remainingChildPacket->GetMenu(); }
+
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する

@@ -116,6 +116,7 @@ namespace
 		cfg.albedoScale = t.value("albedoScale", cfg.albedoScale);
 		cfg.yOffset     = t.value("yOffset",     cfg.yOffset);
 		cfg.minHeight   = t.value("minHeight",   cfg.minHeight);
+		cfg.chunkDivision = t.value("chunkDivision", cfg.chunkDivision);
 		if (t.contains("pbrParam"))
 		{
 			const auto& p             = t["pbrParam"];

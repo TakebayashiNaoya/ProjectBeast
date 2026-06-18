@@ -630,6 +630,21 @@ namespace app
 
 
 		/**
+		 * @brief UIのダミー(何も描画しない)
+		 */
+		class UIDummy : public UIBase
+		{
+		public:
+			UIDummy();
+			~UIDummy();
+
+			virtual void Update() override;
+			virtual void Render(RenderContext& rc) override;
+		};
+
+
+
+		/**
 		 * @brief UI作成時、UICanvasを追加する
 		 */
 		class UICanvas : public UIBase

@@ -106,6 +106,9 @@
     <Filter Include="Source\GameLog">
       <UniqueIdentifier>{9ed61377-067e-46fb-b431-ad3cf0abcdde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Vfx">
+      <UniqueIdentifier>{283f31a8-a0a6-437e-b46e-10de1f9b5c85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -502,11 +505,32 @@
     <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Vfx\Particle.cpp">
+      <Filter>Source\Vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vfx\ParticleValueProvider.cpp">
+      <Filter>Source\Vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vfx\ParticleModule.cpp">
+      <Filter>Source\Vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vfx\ParticleEmitter.cpp">
+      <Filter>Source\Vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vfx\ParticleEffectLoader.cpp">
+      <Filter>Source\Vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vfx\ParticleEffectRender.cpp">
+      <Filter>Source\Vfx</Filter>
+    </ClCompile>
     <ClCompile Include="Source\GameLog\GameLogManager.cpp">
       <Filter>Source\GameLog</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Vfx\HomingParticleRender.cpp">
+      <Filter>Source\Vfx</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp">
       <Filter>Source\Actor\Stage</Filter>
@@ -936,6 +960,24 @@
     <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Vfx\Particle.h">
+      <Filter>Source\Vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vfx\ParticleValueProvider.h">
+      <Filter>Source\Vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vfx\ParticleModule.h">
+      <Filter>Source\Vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vfx\ParticleEmitter.h">
+      <Filter>Source\Vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vfx\ParticleEffectLoader.h">
+      <Filter>Source\Vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vfx\ParticleEffectRender.h">
+      <Filter>Source\Vfx</Filter>
+    </ClInclude>
     <ClInclude Include="Source\GameLog\GameLogManager.h">
       <Filter>Source\GameLog</Filter>
     </ClInclude>
@@ -944,6 +986,9 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Stage\TerrainObject.h">
       <Filter>Source\Actor\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vfx\HomingParticleRender.h">
+      <Filter>Source\Vfx</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
