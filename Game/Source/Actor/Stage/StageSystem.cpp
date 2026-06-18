@@ -21,6 +21,8 @@ namespace
 	const char* JSON_FILE_PATH = "Assets/parameter/stage/stageObject.json";
 	/** ステージオブジェクトのキー */
 	const char* STAGE_OBJECT_KEY = "StageObject";
+	/** 地形設定のキー */
+	const char* TERRAIN_CONFIG_KEY = "TerrainConfig";
 	/** オブジェクト配列のキー */
 	const char* OBJECT_ARRAY_KEY = "object";
 	/** オブジェクトネームのキー */
@@ -95,6 +97,34 @@ namespace
 
 		LoadTransform(object, item);
 		object->StartWrapper();
+	}
+
+
+	/**
+	 * @brief JSON から TerrainConfig を解析する
+	 */
+	app::actor::TerrainObject::TerrainConfig ParseTerrainConfig(const nlohmann::json& j)
+	{
+		app::actor::TerrainObject::TerrainConfig cfg;
+		if (!j.contains(TERRAIN_CONFIG_KEY)) return cfg;
+		const auto& t = j[TERRAIN_CONFIG_KEY];
+		cfg.totalWidth  = t.value("totalWidth",  cfg.totalWidth);
+		cfg.totalDepth  = t.value("totalDepth",  cfg.totalDepth);
+		cfg.heightScale = t.value("heightScale", cfg.heightScale);
+		cfg.subsample   = t.value("subsample",   cfg.subsample);
+		cfg.uvTile      = t.value("uvTile",      cfg.uvTile);
+		cfg.albedoScale = t.value("albedoScale", cfg.albedoScale);
+		cfg.yOffset     = t.value("yOffset",     cfg.yOffset);
+		cfg.minHeight   = t.value("minHeight",   cfg.minHeight);
+		if (t.contains("pbrParam"))
+		{
+			const auto& p             = t["pbrParam"];
+			cfg.pbrParam.m_dirLightScale  = p.value("dirLightScale",  cfg.pbrParam.m_dirLightScale);
+			cfg.pbrParam.m_ambientScale   = p.value("ambientScale",   cfg.pbrParam.m_ambientScale);
+			cfg.pbrParam.m_metallicOffset = p.value("metallicOffset", cfg.pbrParam.m_metallicOffset);
+			cfg.pbrParam.m_smoothOffset   = p.value("smoothOffset",   cfg.pbrParam.m_smoothOffset);
+		}
+		return cfg;
 	}
 
 
@@ -240,10 +270,52 @@ namespace app
 		}
 
 
+		void StageSystem::LoadStageObjectsFromJson(const std::string& jsonPath)
+		{
+			nlohmann::json json;
+			if (app::util::JsonConverter::IsLoadJsonFile(json, jsonPath))
+			{
+				CreateStageObject(json);
+			}
+
+#ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
+			m_stageObjectJsonPath = jsonPath;
+			struct stat st;
+			if (stat(jsonPath.c_str(), &st) == 0)
+			{
+				m_lastUpdateTime = st.st_mtime;
+			}
+#endif
+		}
+
+
 		void StageSystem::InitTerrain(const TerrainObject::TerrainConfig& config)
 		{
 			m_terrain = std::make_unique<TerrainObject>();
 			m_terrain->Init(config);
+		}
+
+
+		void StageSystem::InitTerrainFromJson(const std::string& jsonPath)
+		{
+			nlohmann::json json;
+			if (!app::util::JsonConverter::IsLoadJsonFile(json, jsonPath))
+			{
+				return;
+			}
+
+			TerrainObject::TerrainConfig config = ParseTerrainConfig(json);
+
+#ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
+			m_terrainJsonPath = jsonPath;
+			struct stat st;
+			if (stat(jsonPath.c_str(), &st) == 0)
+			{
+				m_lastTerrainUpdateTime = st.st_mtime;
+			}
+#endif
+
+			InitTerrain(config);
 		}
 
 
@@ -258,30 +330,30 @@ namespace app
 
 #ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
 
-			nlohmann::json json;
-
-			// JSONの読み込みを試す
-			if (!TryRoadJsonFile(json, JSON_FILE_PATH, m_lastUpdateTime))
+			// ステージオブジェクトのホットリロード
+			if (!m_stageObjectJsonPath.empty())
 			{
-				// 失敗した場合処理しない
-				return;
+				nlohmann::json json;
+				if (TryRoadJsonFile(json, m_stageObjectJsonPath, m_lastUpdateTime))
+				{
+					if (json.contains(STAGE_OBJECT_KEY) && json[STAGE_OBJECT_KEY].contains(OBJECT_ARRAY_KEY))
+					{
+						DeleteStageObject(json);
+						CreateStageObject(json);
+						ReloadTransform(json);
+					}
+				}
 			}
 
-
-			// 必要なデータが存在するかチェック
-			if (!json.contains(STAGE_OBJECT_KEY)) return;
-			if (!json[STAGE_OBJECT_KEY].contains(OBJECT_ARRAY_KEY)) return;
-
-
-
-			// オブジェクトを削除
-			DeleteStageObject(json);
-
-			// オブジェクトを生成
-			CreateStageObject(json);
-
-			// トランスフォームの情報をリロード
-			ReloadTransform(json);
+			// 地形パラメータのホットリロード
+			if (!m_terrainJsonPath.empty())
+			{
+				nlohmann::json terrainJson;
+				if (TryRoadJsonFile(terrainJson, m_terrainJsonPath, m_lastTerrainUpdateTime))
+				{
+					InitTerrain(ParseTerrainConfig(terrainJson));
+				}
+			}
 
 #endif // ENABLE_OBJECT_LAYOUT_HOTRELOAD
 		}

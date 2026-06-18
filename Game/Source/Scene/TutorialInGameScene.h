@@ -37,12 +37,12 @@ namespace app
 
 		Vector3 GetDaddySpawnPos() const override
 		{
-			return { 0.0f, 100.0f, 0.0f };
+			return { 0.0f, 80.0f, 0.0f };
 		}
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 3, 3, 3, 3, 3, 3000.0f };
+			return { 3, 3, 3, 3, 3, 1500.0f };
 		}
 
 		const char* GetStageJsonPath() const override
@@ -80,8 +80,20 @@ namespace app
 			return "Assets/parameter/nature/oceanParameter_Tutorial.bin";
 		}
 
-		const char* GetStageName() const override { return "Tutorial"; }
-		const char* GetAchievementJsonPath() const override { return "Assets/parameter/achievement/AchievementList_Tutorial.json"; }
+		const char* GetStageName() const override 
+		{
+			return "Tutorial"; 
+		}
+
+		const char* GetAchievementJsonPath() const override 
+		{
+			return "Assets/parameter/achievement/AchievementList_Tutorial.json"; 
+		}
+
+		const char* GetTerrainJsonPath() const override
+		{
+			return "Assets/parameter/stage/TerrainConfig_Tutorial.json";
+		}
 
 		//------------------------------------------------------------
 		// フックのオーバーライド
@@ -91,6 +103,7 @@ namespace app
 		void OnRenderPlaying(RenderContext& rc)  override;
 		bool OnPauseUpdate()                     override;
 		bool OnPauseRender(RenderContext& rc)    override;
+
 
 	private:
 		TutorialController m_tutorialController;
