@@ -1,5 +1,5 @@
-/*!
- * @brief	ƒGƒtƒFƒNƒg
+ï»¿/*!
+ * @brief	ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
  */
 
 #include "k2EngineLowPreCompile.h"
@@ -23,9 +23,9 @@ namespace nsK2EngineLow {
 	}
 	void Effect::Play()
 	{
-		//Ä¶’†‚ÌƒGƒtƒFƒNƒg‚ð’âŽ~‚·‚éB
+		//å†ç”Ÿä¸­ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’åœæ­¢ã™ã‚‹ã€‚
 		EffectEngine::GetInstance()->Stop(m_handle);
-		//V‚µ‚­Ä¶B
+		//æ–°ã—ãå†ç”Ÿã€‚
 		m_handle = EffectEngine::GetInstance()->Play(m_effect);
 	}
 	void Effect::Update()
