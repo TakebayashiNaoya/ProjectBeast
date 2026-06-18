@@ -95,6 +95,10 @@ namespace nsK2EngineLow {
 		{
 			m_tkmFileBank.Regist(filePath, tkmFile);
 		}
+		void ReplaceTkmFileInBank(const char* filePath, TkmFile* tkmFile)
+		{
+			m_tkmFileBank.Replace(filePath, tkmFile);
+		}
 		/// <summary>
 		/// tkaファイルをバンクから取得。
 		/// </summary>
