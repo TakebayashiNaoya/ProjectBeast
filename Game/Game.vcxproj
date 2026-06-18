@@ -272,6 +272,7 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\Stage\IStage.cpp" />
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
+    <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera\CameraCommon.cpp" />
     <ClCompile Include="Source\Camera\CameraController.cpp" />
@@ -414,6 +415,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
+    <ClInclude Include="Source\Actor\Stage\TerrainObject.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera\CameraCommon.h" />
     <ClInclude Include="Source\Camera\CameraController.h" />
