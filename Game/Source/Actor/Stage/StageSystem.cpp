@@ -299,11 +299,12 @@ namespace app
 		void StageSystem::InitTerrainFromJson(const std::string& jsonPath)
 		{
 			nlohmann::json json;
-			TerrainObject::TerrainConfig config;
-			if (app::util::JsonConverter::IsLoadJsonFile(json, jsonPath))
+			if (!app::util::JsonConverter::IsLoadJsonFile(json, jsonPath))
 			{
-				config = ParseTerrainConfig(json);
+				return;
 			}
+
+			TerrainObject::TerrainConfig config = ParseTerrainConfig(json);
 
 #ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
 			m_terrainJsonPath = jsonPath;

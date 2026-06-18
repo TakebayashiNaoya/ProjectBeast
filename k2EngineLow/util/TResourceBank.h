@@ -25,6 +25,8 @@ namespace nsK2EngineLow {
 				);
 			}
 		}
+		// Regist と異なり、未登録キーでも新規作成し、登録済みなら即座に置き換える
+		// ホットリロードなど、初回登録と再登録を区別せず行う場合に使用する
 		void Replace(const char* filePath, TResource* resource)
 		{
 			m_resourceMap[filePath].reset(resource);

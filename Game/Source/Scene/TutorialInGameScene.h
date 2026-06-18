@@ -90,9 +90,9 @@ namespace app
 			return "Assets/parameter/achievement/AchievementList_Tutorial.json"; 
 		}
 
-		const char* GetTerrainJsonPath() const override 
+		const char* GetTerrainJsonPath() const override
 		{
-			return "Assets/parameter/stage/StageObject_Tutorial.json"; 
+			return "Assets/parameter/stage/TerrainConfig_Tutorial.json";
 		}
 
 		//------------------------------------------------------------
