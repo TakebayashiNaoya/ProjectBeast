@@ -358,11 +358,22 @@ namespace nsBeastEngine
 						float newY = hitCenterY - (m_height * 0.5f + m_radius);
 
 						if (callback.isGround) {
-							// 立てる床の場合：着地
-							m_position.y = newY;
-							m_isOnGround = true;
-							m_isJump = false;
-							m_verticalVelocity = 0.0f;
+							if (newY >= m_seaLevel) {
+								// 立てる床の場合：着地
+								m_position.y = newY;
+								m_isOnGround = true;
+								m_isJump = false;
+								m_verticalVelocity = 0.0f;
+							}
+							else {
+								// 着地点が海面より下の場合は水中地形とみなして接地しない
+								m_isOnGround = false;
+								m_position.y -= downAmount;
+								if (m_position.y < m_seaLevel) {
+									m_position.y = m_seaLevel;
+									m_verticalVelocity = 0.0f;
+								}
+							}
 						}
 						else if (callback.isSteepSlope) {
 							// 急斜面の場合：接地判定にせず、法線の外側に滑り落とす
