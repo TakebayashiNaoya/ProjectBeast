@@ -145,6 +145,10 @@ namespace app
 		case LoadPhase::Stage:
 		{
 			actor::StageSystem::GetInstance()->LoadStageObjectsFromJson(GetStageJsonPath());
+			if (const char* terrainPath = GetTerrainJsonPath())
+			{
+				actor::StageSystem::GetInstance()->InitTerrainFromJson(terrainPath);
+			}
 			m_loadPhase = LoadPhase::StageWait;
 			break;
 		}

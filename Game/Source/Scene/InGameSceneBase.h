@@ -90,6 +90,8 @@ namespace app
 		virtual const char* GetStageName() const = 0;
 		/** ステージ別アチーブメント定義JSONのパス */
 		virtual const char* GetAchievementJsonPath() const = 0;
+		/** ハイトマップ地形のJSONパス（不要なステージはnullptrを返す） */
+		virtual const char* GetTerrainJsonPath() const { return nullptr; }
 
 		//------------------------------------------------------------
 		// フック（必要なステージだけオーバーライドする）

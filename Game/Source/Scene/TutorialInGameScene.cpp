@@ -12,7 +12,6 @@ namespace app
 {
 	void TutorialInGameScene::OnLoadComplete()
 	{
-		actor::StageSystem::GetInstance()->InitTerrainFromJson("Assets/parameter/stage/StageObject_Tutorial.json");
 		m_tutorialController.Initialize(m_daddyPenguin);
 	}
 
