@@ -68,6 +68,8 @@ namespace app
 		//------------------------------------------------------------
 		/** 制限時間（秒） */
 		virtual float GetTimeLimit() const = 0;
+		/** プレイヤーのスポーン座標 */
+		virtual Vector3 GetDaddySpawnPos() const = 0;
 		/** 子ペンギン生成設定 */
 		virtual PenguinSpawnConfig GetPenguinConfig() const = 0;
 		/** ステージの配置JSONパス */

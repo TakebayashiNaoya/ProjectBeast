@@ -164,7 +164,7 @@ namespace app
 
 		case LoadPhase::Daddy:
 			m_daddyPenguin = new actor::DaddyPenguin();
-			m_daddyPenguin->SetPosition(Vector3(0.0f, 27.3f, 0.0f));
+			m_daddyPenguin->SetPosition(GetDaddySpawnPos());
 			m_daddyPenguin->StartWrapper();
 
 			// DaddyPenguinをディザリングのプレイヤーターゲットとして登録する
