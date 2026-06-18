@@ -5,7 +5,7 @@
  */
 #include "stdafx.h"
 #include "TerrainObject.h"
-#include "DirectXTK/Inc/DDSTextureLoader.h"
+#include "DirectXTex/DirectXTex.h"
 
 
 namespace
@@ -65,86 +65,68 @@ namespace app
 
 		void TerrainObject::LoadHeightmap()
 		{
-			// DirectXTK で DDS を解析（DX10拡張ヘッダー・DXGI_FORMAT 判定を自動処理）
-			
-			// GPU リソース（LoadDDSTextureFromFile 内で自動確保されるが、今回は CPU メモリ上のデータだけ欲しいので即解放する）
-			ID3D12Resource* texResource = nullptr;
-			// CPU メモリ上の DDS データ（LoadDDSTextureFromFile 内で自動確保される）
-			std::unique_ptr<uint8_t[]> ddsData;
-			// サブリソースデータ（LoadDDSTextureFromFile 内で自動確保される）
-			std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+			// DirectXTex で DDS をロード（BC1〜BC7, BC6H を含む全圧縮フォーマット対応）
+			DirectX::ScratchImage image;
+			HRESULT hr = DirectX::LoadFromDDSFile(
+				HEIGHTMAP_PATH, DirectX::DDS_FLAGS_NONE, nullptr, image);
 
-			// DDS ファイルを読み込んで GPU リソースとサブリソースデータを取得
-			const HRESULT hr = DirectX::LoadDDSTextureFromFile(
-				g_graphicsEngine->GetD3DDevice(),	// D3D12 デバイス
-				HEIGHTMAP_PATH,						// DDS ファイルパス
-				&texResource,						// 読み込んだテクスチャの GPU リソース（今回は不要）
-				ddsData,							// CPU メモリ上の DDS データ（今回は不要）
-				subresources						// サブリソースデータ（DDS のミップレベルやアレイスライスごとのデータ）
-			);
-
-			// 読み込み失敗やサブリソースデータが空の場合は、2x2 のフラットな地形を生成して終了
-			if (FAILED(hr) || subresources.empty())
+			if (FAILED(hr))
 			{
-				if (texResource) texResource->Release();
 				m_heightmap.width = m_heightmap.height = 2;
 				m_heightmap.pixels.assign(4, 0);
 				return;
 			}
 
-			// サブリソースデータからテクスチャの幅・高さ・フォーマットを取得して、CPU メモリ上のピクセルデータを m_heightmap にコピー
-			const D3D12_RESOURCE_DESC desc = texResource->GetDesc();
-			texResource->Release();  // GPU リソースは不要なので即解放
+			const DirectX::Image* img = image.GetImage(0, 0, 0);
 
-			const int   srcW     = static_cast<int>(desc.Width);						// 元のテクスチャの幅
-			const int   srcH     = static_cast<int>(desc.Height);						// 元のテクスチャの高さ
-			const auto  fmt      = desc.Format;											// 元のテクスチャのフォーマット（DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R8_UNORM など）
-			const auto* src      = static_cast<const uint8_t*>(subresources[0].pData);  // CPU メモリ上のピクセルデータの先頭アドレス
-			const int   rowPitch = static_cast<int>(subresources[0].RowPitch);			// 1 行分のバイト数（ピクセルデータの横幅にピクセルあたりのバイト数を掛けた値）
+			// ブロック圧縮フォーマット (BC1〜BC7, BC6H) はまず RGBA8 に展開する
+			DirectX::ScratchImage decompressed;
+			if (DirectX::IsCompressed(img->format))
+			{
+				hr = DirectX::Decompress(*img, DXGI_FORMAT_R8G8B8A8_UNORM, decompressed);
+				if (FAILED(hr))
+				{
+					m_heightmap.width = m_heightmap.height = 2;
+					m_heightmap.pixels.assign(4, 0);
+					return;
+				}
+				img = decompressed.GetImage(0, 0, 0);
+			}
 
-			// m_config.subsample ごとにサンプリングして m_heightmap にコピー
+			// R32_FLOAT 以外のフォーマットを R32_FLOAT に変換する（R チャンネルが高さ値）
+			DirectX::ScratchImage converted;
+			if (img->format != DXGI_FORMAT_R32_FLOAT)
+			{
+				hr = DirectX::Convert(
+					*img, DXGI_FORMAT_R32_FLOAT,
+					DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT,
+					converted
+				);
+				if (FAILED(hr))
+				{
+					m_heightmap.width = m_heightmap.height = 2;
+					m_heightmap.pixels.assign(4, 0);
+					return;
+				}
+				img = converted.GetImage(0, 0, 0);
+			}
+
+			// img は R32_FLOAT に統一済み（1 pixel = 4 bytes = float 1 個）
+			const int    srcW     = static_cast<int>(img->width);
+			const int    srcH     = static_cast<int>(img->height);
+			const int    rowPitch = static_cast<int>(img->rowPitch) / sizeof(float);
+			const float* pixels   = reinterpret_cast<const float*>(img->pixels);
+
 			m_heightmap.width  = srcW / m_config.subsample;
 			m_heightmap.height = srcH / m_config.subsample;
 			m_heightmap.pixels.assign(m_heightmap.width * m_heightmap.height, 0);
 
-			// フォーマットに応じてピクセルデータを uint16_t の高さ値に変換してコピー
-			for (int srcZ = 0; srcZ < srcH; ++srcZ)
+			for (int dstZ = 0; dstZ < m_heightmap.height; ++dstZ)
 			{
-				// m_config.subsample ごとにサンプリング（例: subsample=4 なら 4x4 ピクセルごとに 1 サンプル）
-				if (srcZ % m_config.subsample != 0) continue;
-				const int      dstZ = srcZ / m_config.subsample;
-				const uint8_t* row  = src + srcZ * rowPitch;
-				// フォーマットに応じてピクセルデータを uint16_t の高さ値に変換してコピー
-				for (int srcX = 0; srcX < srcW; srcX += m_config.subsample)
+				for (int dstX = 0; dstX < m_heightmap.width; ++dstX)
 				{
-					uint16_t h = 0;
-					switch (fmt)
-					{
-					case DXGI_FORMAT_R16_UNORM:
-					{
-						h = reinterpret_cast<const uint16_t*>(row)[srcX];
-						break;
-					}
-					case DXGI_FORMAT_R32_FLOAT:
-					{
-						const float f = reinterpret_cast<const float*>(row)[srcX];
-						h = static_cast<uint16_t>(std::clamp(f, 0.0f, 1.0f) * 65535.0f);
-						break;
-					}
-					case DXGI_FORMAT_R8_UNORM:
-					case DXGI_FORMAT_A8_UNORM:
-					{
-						h = static_cast<uint16_t>(row[srcX]) * 257u;
-						break;
-					}
-					default:
-					{
-						// BGRA8 / RGBA8 等 32bit 系: 先頭バイト（B or R）を高さとして使用
-						h = static_cast<uint16_t>(row[srcX * 4]) * 257u;
-						break;
-					}
-					}
-					m_heightmap.pixels[dstZ * m_heightmap.width + srcX / m_config.subsample] = h;
+					const float f = pixels[(dstZ * m_config.subsample) * rowPitch + (dstX * m_config.subsample)];
+					m_heightmap.pixels[dstZ * m_heightmap.width + dstX] = static_cast<uint16_t>(std::clamp(f, 0.0f, 1.0f) * 65535.0f);
 				}
 			}
 		}
@@ -234,8 +216,7 @@ namespace app
 						const float h1 = heights[ z      * W + (x + 1)];
 						const float h2 = heights[(z + 1) * W +  x     ];
 						const float h3 = heights[(z + 1) * W + (x + 1)];
-						if (h0 < m_config.minHeight || h1 < m_config.minHeight ||
-							h2 < m_config.minHeight || h3 < m_config.minHeight)
+						if (h0 < m_config.minHeight || h1 < m_config.minHeight || h2 < m_config.minHeight || h3 < m_config.minHeight)
 							continue;
 					}
 
