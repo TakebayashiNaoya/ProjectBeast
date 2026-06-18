@@ -21,7 +21,7 @@ namespace app
 		/** 高さ */
 		constexpr float HEIGHT = 80.0f;
 		/** 持続時間 */
-		constexpr float DURATION = 3.0f;
+		constexpr float DURATION = 1.0f;
 		/** 同時に飛ばすパーティクルの最大数 */
 		constexpr int MAX_PARTICLE_COUNT = 10;
 	}

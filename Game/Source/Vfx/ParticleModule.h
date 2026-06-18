@@ -18,19 +18,20 @@ namespace app
 	 */
 	enum class EnParticleModuleType
 	{
-		Spawn,				// 生成
-		InitLifeTime,		// 寿命初期化
-		InitPosition,		// 初期座標
-		InitVelocity,		// 初期速度
-		InitScale,			// 初期スケール
-		InitRotation,		// 初期回転
-		InitColor,			// 初期カラー
-		ScaleOverLife,		// 寿命に応じたスケール変化
-		RotationOverLife,	// 寿命に応じた回転変化
-		AlphaOverLife,		// 寿命に応じた透明度変化
-		SpeedOverLife,		// 寿命に応じた速度変化
-		Acceleration,		// 加速度(重力等)
-		VelocityDamping		// 速度減衰
+		Spawn,					// 生成
+		InitLifeTime,			// 寿命初期化
+		InitPosition,			// 初期座標
+		InitVelocity,			// 初期速度
+		InitScale,				// 初期スケール
+		InitRotation,			// 初期回転
+		InitColor,				// 初期カラー
+		ScaleOverLife,			// 寿命に応じたスケール変化
+		RotationOverLife,		// 寿命に応じた回転変化
+		AlphaOverLife,			// 寿命に応じた透明度変化
+		SpeedOverLife,			// 寿命に応じた速度変化
+		ConvergenceOverLife,	// 寿命に応じた収束
+		Acceleration,			// 加速度(重力等)
+		VelocityDamping,		// 速度減衰
 	};
 
 
@@ -85,8 +86,9 @@ namespace app
 		 * @brief マイフレーム呼ばれる(パーティクルが生存している限り毎フレーム呼ばれる)
 		 * @param p 更新するパーティクル
 		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
 		 */
-		virtual void OnParticleUpdate(Particle& p, float deltaTime) {}
+		virtual void OnParticleUpdate(Particle& p, float deltaTime,const Vector3& emitterPos) {}
 	};
 
 
@@ -530,8 +532,9 @@ namespace app
 		 * @brief パーティクルの更新
 		 * @param p 更新するパーティクル
 		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
 		 */
-		void OnParticleUpdate(Particle& p, float deltaTime) override
+		void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) override
 		{
 			if (!p.hasScaleCurve) return;
 
@@ -594,8 +597,9 @@ namespace app
 		 * @brief パーティクルの更新
 		 * @param p 更新するパーティクル
 		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
 		 */
-		void OnParticleUpdate(Particle& p, float deltaTime) override
+		void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) override
 		{
 			if (!p.hasRotationCurve) return;
 			p.rotationCurve.Update(deltaTime);
@@ -656,8 +660,9 @@ namespace app
 		 * @brief パーティクルの更新
 		 * @param p 更新するパーティクル
 		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
 		 */
-		void OnParticleUpdate(Particle& p, float deltaTime) override
+		void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) override
 		{
 			if (!p.hasAlphaCurve)return;
 
@@ -725,8 +730,9 @@ namespace app
 		 * @brief パーティクルの更新
 		 * @param p 更新するパーティクル
 		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
 		 */
-		void OnParticleUpdate(Particle& p, float deltaTime) override
+		void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) override
 		{
 			if (!p.hasSpeedCurve)return;
 
@@ -767,8 +773,9 @@ namespace app
 		 * @brief パーティクルの更新
 		 * @param p 更新するパーティクル
 		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
 		 */
-		void OnParticleUpdate(Particle& p, float deltaTime) override
+		void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) override
 		{
 			p.velocity.x += m_acceleration.x * deltaTime;
 			p.velocity.y += m_acceleration.y * deltaTime;
@@ -808,14 +815,95 @@ namespace app
 		 * @brief パーティクルの更新
 		 * @param p 更新するパーティクル
 		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
 		 */
-		void OnParticleUpdate(Particle& p, float deltaTime) override
+		void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) override
 		{
 			float factor = 1.0f - m_damping * deltaTime;
 			if (factor < 0.0f) factor = 0.0f;
 			p.velocity.x *= factor;
 			p.velocity.y *= factor;
 			p.velocity.z *= factor;
+		}
+	};
+
+
+	/**
+	 * @brief 寿命に応じた収束
+	 */
+	class ConvergenceOverLifeModule : public ParticleModule
+	{
+	private:
+		FloatValueProvider m_startRatio;		// 収束開始時の割合(0.0で収束なし、1.0で最初から収束)
+		FloatValueProvider m_endRatio;			// 収束終了時の割合(0.0で収束なし、1.0で完全に収束)
+		util::EasingType  m_easingType;
+
+
+	public:
+		ConvergenceOverLifeModule()
+			: ParticleModule(EnParticleModuleType::ConvergenceOverLife)
+		{
+			m_startRatio.SetFixed(0.0f);
+			m_endRatio.SetFixed(1.0f);
+			m_easingType = util::EasingType::Linear;
+		}
+
+		virtual ~ConvergenceOverLifeModule() {}
+
+		/**
+		 * @brief 開始 / 終了収束の割合の値プロバイダを取得
+		 * @return 開始 / 終了収束の割合の値プロバイダ
+		 */
+		FloatValueProvider& StartRatio() { return m_startRatio; }
+		FloatValueProvider& EndRatio() { return m_endRatio; }
+
+		/**
+		 * @brief イージングタイプの設定
+		 * @param type イージングタイプ
+		 */
+		void SetEasing(util::EasingType type) { m_easingType = type; }
+
+		/**
+		 * @brief パーティクルの収束を寿命に応じて変化させる
+		 * @param p 更新するパーティクル
+		 * @param rng 乱数生成器
+		 */
+		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		{
+			float s = m_startRatio.ResolveInitial(rng);
+			float e = m_endRatio.ResolveInitial(rng);
+			// 初期化。
+			p.convergenceCurve.Initialize(s, e, p.lifeTime, m_easingType, util::LoopMode::Once);
+			p.convergenceCurve.Play();
+			p.hasConvergenceCurve = true;
+		}
+
+		/**
+		 * @brief パーティクルの更新
+		 * @param p 更新するパーティクル
+		 * @param deltaTime 前フレームからの経過時間(秒)
+		 * @param emitterPos エミッターの位置
+		 */
+		void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) override
+		{
+			if (!p.hasConvergenceCurve) return;
+
+			p.convergenceCurve.Update(deltaTime);
+
+			float ratio = p.convergenceCurve.GetCurrentValue();
+			if (ratio > 0.0f)
+			{
+				// 収束力の計算。
+				float pullStrength = ratio * deltaTime * 10.0f;
+
+				// 引っ張る力が強くなり過ぎないように制限。
+				if (pullStrength > 1.0f) pullStrength = 1.0f;
+
+				// 現在位置 += (エミッター位置 - 現在位置) * 収束力。
+				p.position.x += (emitterPos.x - p.position.x) * pullStrength;
+				p.position.y += (emitterPos.y - p.position.y) * pullStrength;
+				p.position.z += (emitterPos.z - p.position.z) * pullStrength;
+			}
 		}
 	};
 };

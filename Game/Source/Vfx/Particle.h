@@ -24,6 +24,7 @@ namespace app
 		/** トランスフォーム系 */
 		Vector3 position;
 		Vector3 velocity;
+		Vector3 initialVelocity;
 		Vector3 acceleration;
 		Vector3 scaleValue;
 		util::FloatCurve scaleCurveX;
@@ -45,6 +46,10 @@ namespace app
 		util::FloatCurve speedCurveY;
 		bool hasSpeedCurve;
 
+		/** 収束カーブ */
+		util::FloatCurve convergenceCurve;
+		bool hasConvergenceCurve;
+
 
 		/**
 		 * @brief 構造体を初期化するコンストラクタ
@@ -55,6 +60,7 @@ namespace app
 			, age(0.0f)
 			, position(Vector3::Zero)
 			, velocity(Vector3::Zero)
+			, initialVelocity(Vector3::Zero)
 			, acceleration(Vector3::Zero)
 			, scaleValue(Vector3::One)
 			, hasScaleCurve(false)
@@ -64,6 +70,7 @@ namespace app
 			, color(Vector4::One)
 			, hasAlphaCurve(false)
 			, hasSpeedCurve(false)
+			, hasConvergenceCurve(false)
 		{}
 
 

@@ -101,6 +101,7 @@ namespace app
             case EnParticleModuleType::RotationOverLife:
             case EnParticleModuleType::AlphaOverLife:
             case EnParticleModuleType::SpeedOverLife:
+            case EnParticleModuleType::ConvergenceOverLife:
                 m_initModules.push_back(ptr);
                 m_updateModules.push_back(ptr);
                 break;
@@ -184,7 +185,7 @@ namespace app
 
                 for (size_t m = 0; m < m_updateModules.size(); ++m) {
                     if (m_updateModules[m]->IsEnabled()) {
-                        m_updateModules[m]->OnParticleUpdate(p, deltaTime);
+                        m_updateModules[m]->OnParticleUpdate(p, deltaTime, m_emitterPosition);
                     }
                 }
 

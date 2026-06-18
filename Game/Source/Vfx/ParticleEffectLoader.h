@@ -108,8 +108,8 @@ namespace ParticleJsonHelper
 namespace app
 {
     /**
- * パーティクルエフェクトローダー
- */
+     * パーティクルエフェクトローダー
+     */
     class ParticleEffectLoader
     {
     public:
@@ -252,6 +252,12 @@ namespace app
                         if (mod.count("endMultiplier"))   LoadFloatProvider(m->EndMultiplier(), mod["endMultiplier"]);
                         if (mod.count("easing"))          m->SetEasing(ParseEasingType(mod["easing"].get<std::string>()));
                     }
+                    else if (type == "ConvergenceOverLife") {
+                        auto* m = emitter.AddModule<ConvergenceOverLifeModule>();
+                        if (mod.count("startRatio")) LoadFloatProvider(m->StartRatio(), mod["startRatio"]);
+						if (mod.count("endRatio"))   LoadFloatProvider(m->EndRatio(), mod["endRatio"]);
+						if (mod.count("easing"))        m->SetEasing(ParseEasingType(mod["easing"].get<std::string>()));
+                    }
                     else if (type == "Acceleration")
                     {
                         auto* m = emitter.AddModule<AccelerationModule>();
@@ -268,7 +274,7 @@ namespace app
                     }
                 }
             }
+            return true;
         }
-
     };
 }
