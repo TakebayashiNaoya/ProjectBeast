@@ -1,0 +1,32 @@
+{
+  "StageObject": {
+    "object": [
+      {
+        "objectName" : "wall",
+        "fileName" : "Assets/modelData/stage/Wall/iceWall.tkm",
+        "isNeedCollision" : true,
+        "position" : [0, 1000, 0],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [0.5, 3, 0.5],
+        "pbrName" : "wall"
+      },
+      {
+        "objectName" : "bearHome_1",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [0, 100, 500],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "igloo01",
+        "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
+        "isNeedCollision" : true,
+        "position" : [0, 100, 500],
+        "rotationDeg" : [0, 0, 0],
+        "scale" : [4, 4, 4],
+        "pbrName" : "igloo"
+      }
+    ]
+  }
+}
