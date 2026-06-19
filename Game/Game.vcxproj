@@ -447,6 +447,7 @@
     <ClInclude Include="Source\Camera\CameraManager.h" />
     <ClInclude Include="Source\Camera\CameraSteering.h" />
     <ClInclude Include="Source\Core\AppParameterMacro.h" />
+    <ClInclude Include="Source\Core\DebugWindow.h" />
     <ClInclude Include="Source\Core\Fade.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
     <ClInclude Include="Source\Core\IMasterParameter.h" />

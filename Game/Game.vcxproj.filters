@@ -990,6 +990,9 @@
     <ClInclude Include="Source\Vfx\HomingParticleRender.h">
       <Filter>Source\Vfx</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Core\DebugWindow.h">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
