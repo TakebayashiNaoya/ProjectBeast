@@ -13,7 +13,7 @@ namespace
 {
 	const Vector3 TARGET_OFFSET = Vector3(0.0f, 50.0f, 0.0f);	// ターゲットの注視点オフセット（例: ターゲットの頭上50ユニット）
 	constexpr float MAX_VERTICAL_ANGLE = 80.0f;					// 上下の回転の最大角度（例: 80度）
-	constexpr float MIN_VERTICAL_ANGLE = -50.0f;					// 上下の回転の最小角度（例: 0度、地面にめり込まない程度）
+	constexpr float MIN_VERTICAL_ANGLE = 0.0f;					// 上下の回転の最小角度（例: 0度、地面にめり込まない程度）
 }
 
 
