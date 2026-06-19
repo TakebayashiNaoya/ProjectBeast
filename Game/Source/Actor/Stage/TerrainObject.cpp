@@ -388,7 +388,7 @@ namespace app
 				m_tkmFile    = AssembleChunkTkm(std::move(verts), std::move(indices), TERRAIN_TKM_KEY);
 			}
 
-			// ===チャンク別描画メッシュ===
+			// チャンク別描画メッシュ
 			{
 				//   頂点インデックス (vx, vz) : ハイトマップの画素単位。W×H 個存在する。
 				//   セルインデックス  (cx, cz) : 隣り合う 4 頂点が作るクワッド単位。(W-1)×(H-1) 個存在する。

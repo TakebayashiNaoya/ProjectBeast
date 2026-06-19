@@ -1,6 +1,16 @@
 {
   "whirlpoolPositions": [
-    { "index": 0, "position": [ -800, 0,   800] },
-    { "index": 1, "position": [ 1200, 0,   400] }
+    { "index": 0, "position": [  500, 0, 500] },
+    { "index": 1, "position": [ -500, 0, 500] },
+    { "index": 2, "position": [  500, 0,-500] },
+    { "index": 3, "position": [ -500, 0,-500] },
+    { "index": 4, "position": [  1500, 0, 1500] },
+    { "index": 5, "position": [ -1500, 0, 1500] },
+    { "index": 6, "position": [  1500, 0,-1500] },
+    { "index": 7, "position": [ -1500, 0,-1500] },
+    { "index": 8, "position": [  2000, 0, 0] },
+    { "index": 9, "position": [ -2000, 0, 0] },
+    { "index":10, "position": [  0, 0, 2000] },
+    { "index":11, "position": [  0, 0,-2000] }
   ]
 }
