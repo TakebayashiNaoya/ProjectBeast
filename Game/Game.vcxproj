@@ -476,6 +476,7 @@
     <ClInclude Include="Source\Scene\DebugScene.h" />
     <ClInclude Include="Source\Scene\EasyInGameScene.h" />
     <ClInclude Include="Source\Scene\NormalInGameScene.h" />
+    <ClInclude Include="Source\Scene\HardInGameScene.h" />
     <ClInclude Include="Source\Scene\InGameSceneBase.h" />
     <ClInclude Include="Source\Scene\IScene.h" />
     <ClInclude Include="Source\Scene\ResultScene.h" />
