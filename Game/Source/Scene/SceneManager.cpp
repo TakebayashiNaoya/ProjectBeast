@@ -8,6 +8,7 @@
 #include "DebugScene.h"
 #include "EasyInGameScene.h"
 #include "NormalInGameScene.h"
+#include "HardInGameScene.h"
 #include "TutorialInGameScene.h"
 #include "ResultScene.h"
 #include "SceneManager.h"
@@ -30,6 +31,7 @@ namespace app
 		AddSceneMap<app::TitleScene>();
 		AddSceneMap<app::EasyInGameScene>();
 		AddSceneMap<app::NormalInGameScene>();
+		AddSceneMap<app::HardInGameScene>();
 		AddSceneMap<app::TutorialInGameScene>();
 		AddSceneMap<app::ResultScene>();
 

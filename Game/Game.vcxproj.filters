@@ -635,6 +635,9 @@
     <ClInclude Include="Source\Scene\NormalInGameScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scene\HardInGameScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Scene\ResultScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>

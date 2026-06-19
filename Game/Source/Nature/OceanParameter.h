@@ -24,6 +24,13 @@ namespace app
 			{
 				load(j, *this);
 			}
+
+			void Load(std::istream& stream) override
+			{
+				constexpr size_t BASE_SIZE = sizeof(core::IMasterParameter);
+				constexpr size_t DATA_SIZE = sizeof(MasterOceanParameter) - BASE_SIZE;
+				stream.read(reinterpret_cast<char*>(this) + BASE_SIZE, DATA_SIZE);
+			}
 #endif // APP_PARAM_HOT_RELOAD
 
 			float baseReflectance;	/** 基本反射率 */
@@ -34,6 +41,8 @@ namespace app
 			float specularPower;	/** スペキュラのPhong指数（大きいほどハイライトが絞られる） */
 			float specularScale;	/** スペキュラ強度の倍率（0.0で照り返しを消せる） */
 			float ambientScale;		/** 海専用アンビエント強度倍率（他オブジェクトに影響しない） */
+			float sizeX = 12500.0f;	/** 海メッシュのX方向サイズ（ワールド単位） */
+			float sizeZ = 12500.0f;	/** 海メッシュのZ方向サイズ（ワールド単位） */
 		};
 	}
 }
