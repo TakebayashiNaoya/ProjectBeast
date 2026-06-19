@@ -316,12 +316,6 @@ namespace app
 		}
 
 
-		int ChildPenguinManager::GetClingyFollowersCount() const
-		{
-			return 0;
-		}
-
-
 		int ChildPenguinManager::GetRescuedNum() const
 		{
 			if (m_daddyPenguin == nullptr) return 0;

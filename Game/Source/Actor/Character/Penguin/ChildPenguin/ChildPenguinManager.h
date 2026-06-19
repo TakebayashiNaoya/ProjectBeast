@@ -182,11 +182,6 @@ namespace app
 			 */
 			int GetClingyCount() const;
 
-			/**
-			 * @brief 甘えん坊が何匹追従しているかの取得
-			 */
-			int GetClingyFollowersCount() const;
-
 
 		private:
 			/**
