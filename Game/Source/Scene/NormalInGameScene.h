@@ -26,7 +26,7 @@ namespace app
 
 		Vector3 GetDaddySpawnPos() const override
 		{
-			return { 0.0f, 100.0f, 0.0f };
+			return { 0.0f, 200.0f, 0.0f };
 		}
 
 		PenguinSpawnConfig GetPenguinConfig() const override
@@ -71,5 +71,10 @@ namespace app
 
 		const char* GetStageName() const override { return "Normal"; }
 		const char* GetAchievementJsonPath() const override { return "Assets/parameter/achievement/AchievementList_Normal.json"; }
+
+		const char* GetTerrainJsonPath() const override
+		{
+			return "Assets/parameter/stage/TerrainConfig_Normal.json";
+		}
 	};
 }
