@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <vector>
 
+
 namespace app
 {
 	/**
@@ -100,16 +101,13 @@ namespace app
 		// -----------------------------------------------
 
 		/**
-		 * @brief 「固定」チェックボックス付きスライダー
+		 * @brief 「固定」チェックボックス付きウィジェット
 		 * @details チェックをONにすると値が固定され、ゲーム側がリセットしても維持される
 		 *          チェックOFF時はゲームの現在値をリアルタイム表示する（操作不可）
-		 *
-		 * @param label        ImGuiのラベル
-		 * @param key          一意なキー（"クラス名/変数名" の形式を推奨）
-		 * @param currentValue 現在のゲーム側の値（固定OFF時に表示に使う）
-		 * @param min          スライダーの最小値
-		 * @param max          スライダーの最大値
-		 *
+		 * @tparam T            固定・表示する値の型
+		 * @param key           一意なキー（"クラス名/変数名" の形式を推奨）
+		 * @param currentValue  現在のゲーム側の値（固定OFF時に表示に使う）
+		 * @param drawWidget    値を描画するImGuiウィジェット関数
 		 * @note ラムダ式の中で呼ぶ。対応する TryGetOverride() を Update() で呼ぶこと
 		 */
 		template<typename T>
@@ -139,6 +137,13 @@ namespace app
 		}
 
 
+		/**
+		 * @brief 固定されている値を取得する
+		 * @tparam T       値の型
+		 * @param key      取得するエントリのキー
+		 * @param outValue 取得した値の出力先
+		 * @return 固定がONで値を取得できた場合 true、そうでない場合 false
+		 */
 		template<typename T>
 		bool TryGetOverride(const std::string& key, T& outValue) const
 		{
@@ -227,9 +232,13 @@ namespace app
 			ImGui::End();
 		}
 
+
 	private:
+		/** @brief シングルトンのためコンストラクタを非公開とする */
 		DebugWindow() = default;
 
+
+		/** @brief デバッグウィンドウの1エントリ（セクション名と描画関数のペア） */
 		struct DebugEntry
 		{
 			std::string label;
@@ -240,7 +249,10 @@ namespace app
 
 		bool m_visible = true;
 
-		// オーバーライドエントリ（固定機能）：型ごとに別物として保持する
+		/**
+		 * @brief 固定（Override）機能用エントリ
+		 * @tparam T 固定する値の型
+		 */
 		template<typename T>
 		struct OverrideEntry
 		{
@@ -251,6 +263,13 @@ namespace app
 		// キーごとに型が異なるエントリを1つのmapにまとめて保持するため std::any を使う
 		std::unordered_map<std::string, std::any> m_overrides;
 
+
+		/**
+		 * @brief キーに対応する OverrideEntry を取得または新規生成する
+		 * @tparam T  エントリの値の型
+		 * @param key エントリのキー
+		 * @return 該当する OverrideEntry の参照
+		 */
 		template<typename T>
 		OverrideEntry<T>& GetOrAddEntry(const std::string& key)
 		{

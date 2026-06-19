@@ -16,6 +16,13 @@ namespace nsBeastEngine
 	SceneLight* g_sceneLight = nullptr;
 	RenderingEngine* g_renderingEngine = nullptr;
 
+	namespace
+	{
+		constexpr float k_imguiFontSize = 18.0f;  ///< ImGuiフォントサイズ（px）
+		constexpr int   k_imguiFrameBufferCount = 2;      ///< スワップチェーンのフレームバッファ数
+		constexpr UINT  k_imguiSrvDescriptorCount = 1;      ///< ImGui専用SRVヒープのディスクリプタ数
+	}
+
 
 	BeastEngine::~BeastEngine()
 	{
@@ -73,7 +80,7 @@ namespace nsBeastEngine
 
 		ImGuiIO& io = ImGui::GetIO();
 		// 日本語フォント（メイリオ）を読み込む設定を追加
-		io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\meiryo.ttc", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+		io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\meiryo.ttc", k_imguiFontSize, NULL, io.Fonts->GetGlyphRangesJapanese());
 
 		// Win32バックエンド初期化
 		ImGui_ImplWin32_Init(initData.hwnd);
@@ -90,7 +97,7 @@ namespace nsBeastEngine
 		// DX12バックエンド初期化
 		ImGui_ImplDX12_Init(
 			g_graphicsEngine->GetD3DDevice(),
-			2,                              // フレームバッファ数
+			k_imguiFrameBufferCount,                              // フレームバッファ数
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			m_imguiSrvHeap.Get(),
 			m_imguiSrvHeap->GetCPUDescriptorHandleForHeapStart(),
