@@ -4,6 +4,9 @@
  * @author 竹林尚哉
  */
 #pragma once
+#include "imgui.h"
+#include "imgui_impl_dx12.h"
+#include "imgui_impl_win32.h"
 
 namespace nsBeastEngine
 {
@@ -55,6 +58,8 @@ namespace nsBeastEngine
 
 
 	private:
+		/** ImGui用のSRVヒープを追加 */
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_imguiSrvHeap;
 		/** K2EngineLowの実体 */
 		K2EngineLow m_k2EngineLow;
 		/** レンダリングエンジン */
