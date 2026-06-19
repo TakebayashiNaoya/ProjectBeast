@@ -298,6 +298,30 @@ namespace app
 		}
 
 
+		int ChildPenguinManager::GetClingyCount() const
+		{
+			// 甘えん坊の数をカウントする。
+			int clingyCount = 0;
+
+			// 現在の隊列の中に甘えん坊がいるかどうかをチェックする。
+			for (const auto& penguin : m_followers)
+			{
+				// 甘えん坊ならカウントアップ。
+				if (penguin->GetChildPenguinType() == EnChildPenguinType::Clingy)
+				{
+					clingyCount++;
+				}
+			}
+			return clingyCount;
+		}
+
+
+		int ChildPenguinManager::GetClingyFollowersCount() const
+		{
+			return 0;
+		}
+
+
 		int ChildPenguinManager::GetRescuedNum() const
 		{
 			if (m_daddyPenguin == nullptr) return 0;

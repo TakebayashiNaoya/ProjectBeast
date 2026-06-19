@@ -177,6 +177,16 @@ namespace app
 			 */
 			bool IsFollower(const ChildPenguin* penguin) const;
 
+			/**
+			 * @brief 隊列に参加している甘えん坊が何匹いるか
+			 */
+			int GetClingyCount() const;
+
+			/**
+			 * @brief 甘えん坊が何匹追従しているかの取得
+			 */
+			int GetClingyFollowersCount() const;
+
 
 		private:
 			/**
@@ -205,7 +215,7 @@ namespace app
 			const float FORMATION_BASE_RADIUS = 0.0f;  /** 一番内側の円の半径 */
 			const float FORMATION_RADIUS_STEP = 20.0f;
 			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
-
+			
 
 
 
