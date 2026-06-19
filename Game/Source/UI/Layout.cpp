@@ -187,6 +187,31 @@ void InitializeUIParts(app::ui::UIVideo* video, const nlohmann::json& item)
 }
 
 
+void InitializeUIParts(app::ui::UIDummy* dummy, const nlohmann::json& item)
+{
+	if (item.contains("position"))
+	{
+		const Vector3 position = app::util::JsonConverter::ToVector3(item["position"]);
+		dummy->m_transform.m_localTransform.m_position = position;
+	}
+	if (item.contains("scale"))
+	{
+		const Vector3 scale = app::util::JsonConverter::ToVector3(item["scale"]);
+		dummy->m_transform.m_localTransform.m_scale = scale;
+	}
+	if (item.contains("rotation"))
+	{
+		const Quaternion rotation = ParseRotation(item["rotation"].get<float>());
+		dummy->m_transform.m_localTransform.m_rotation = rotation;
+	}
+	if (item.contains("color"))
+	{
+		const Vector4 color = app::util::JsonConverter::ToVector4(item, "color", false);
+		dummy->m_color = color;
+	}
+}
+
+
 void InitializeUIParts(app::ui::UIDigit* digit, const nlohmann::json& item)
 {
 	const std::string asset = app::util::JsonConverter::ToString(item, "asset");
@@ -320,6 +345,13 @@ namespace app
 				auto* text = canvas->FindUI<UIText>(key);
 				InitializeUIParts(text, item);
 				return text;
+			}
+			if (type == "UIDummy")
+			{
+				canvas->CreateUI<UIDummy>(key);
+				auto* dummy = canvas->FindUI<UIDummy>(key);
+				InitializeUIParts(dummy, item);
+				return dummy;
 			}
 			return nullptr;
 		}

@@ -122,7 +122,7 @@ namespace app
 			std::vector<actor::ChildPenguin*> m_childPenguinList;
 			/** 削除待ちのペンギンを入れるリスト */
 			std::vector<ChildPenguin*> m_destroyList;
-
+			
 
 
 

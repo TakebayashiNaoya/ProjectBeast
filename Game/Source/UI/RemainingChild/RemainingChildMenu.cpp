@@ -6,6 +6,8 @@
 #include "stdafx.h"
 #include "RemainingChildMenu.h"
 #include "Source/Sound/SoundManager.h"
+#include "graphics/Camera/CameraSystem.h"
+#include "Source/Vfx/HomingParticleRender.h"
 
 
 namespace app
@@ -32,10 +34,8 @@ namespace app
 				m_startingAnimLogic.Initialize(
 					this,
 					{ "ChildPenguinIcon", "SlashIcon", "BgIcon" },
-					{},
-					Vector3(-400.0f, 0.0f, 0.0f),
-					1.0f,
-					{ "RemainingNum", "TotalNum" }
+					{ "RemainingNum", "TotalNum"},
+					Vector3(-400.0f, 0.0f, 0.0f)
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())
@@ -55,7 +55,7 @@ namespace app
 
 			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
 			if (bgIcon) bgIcon->m_isDraw = isVisible;
-
+			
 			// 残り子ペンギンの数更新
 			auto* text = GetUI<UIText>(Hash32("RemainingNum"));
 			if (text) {
@@ -80,14 +80,35 @@ namespace app
 				}
 			}
 
+			// パーティクルエフェクトを更新。
+			if (m_homingRender)
+			{
+				m_homingRender->Update();
+			}
+
 			// Menuの更新。
 			MenuBase::Update();
 		}
 
 
+		void RemainingChildMenu::Render(RenderContext& rc)
+		{
+			// メニューの描画。
+			MenuBase::Render(rc);
+			
+			// パーティクルエフェクトの描画。
+			if (m_homingRender)
+			{
+				m_homingRender->Render(rc);
+			}
+		}
+
+
 		void RemainingChildMenu::SetChildNum(const int num)
 		{
+			// UITextを取得。
 			auto* remainText = GetUI<UIText>(Hash32("RemainingNum"));
+			
 
 			if (!remainText) return;
 
@@ -108,8 +129,7 @@ namespace app
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
 					// 座標アニメーションを登録。(バウンドあり)
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
-
-
+					
 					// シーケンスをクリア。
 					seq.Clear();
 
@@ -117,7 +137,7 @@ namespace app
 					seq
 						// アニメーション開始時にSEを再生する。
 						.Add(animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY, 0.0f
-							, [remainText]()
+							, [remainText, this]()
 							{
 								// SEを再生。
 								SoundManager::Get().PlaySE(enSoundKind_RemainPlus);
@@ -229,6 +249,12 @@ namespace app
 		}
 
 
+		void RemainingChildMenu::SetTarget(actor::ChildPenguin* childPenguin)
+		{
+			m_homingRender->AddTarget(childPenguin);
+		}
+
+
 		void RemainingChildMenu::UpdateGameStartingAnimation()
 		{
 			const char* iconNames[] = {
@@ -246,6 +272,10 @@ namespace app
 
 		void RemainingChildMenu::InitializeLogic()
 		{
+			// パーティクルエフェクトレンダーを生成・初期化する。
+			m_homingRender = std::make_unique<HomingParticleRender>();
+			m_homingRender->Initialize();
+
 			// 生成直後は全て非表示にする（UIBaseのデフォルトがm_isDraw=trueのwため）
 			auto* icon = GetUI<UIIcon>(Hash32("ChildPenguinIcon"));
 			if (icon) icon->m_isDraw = false;
@@ -257,10 +287,17 @@ namespace app
 			if (bgIcon) bgIcon->m_isDraw = false;
 
 			auto* text = GetUI<UIText>(Hash32("RemainingNum"));
-			if (text) text->m_isDraw = false;
+			if (text)
+			{
+				text->m_isDraw = false;
+				m_homingRender->SetGoalPosition(text->m_transform.m_localTransform.m_position);
+			}
 
 			auto* totalText = GetUI<UIText>(Hash32("TotalNum"));
 			if (totalText) totalText->m_isDraw = false;
+
+			//auto* flashEffectA = GetUI<UIDummy>(Hash32("YellowFlash"));
+			//if (flashEffectA) flashEffectA->m_isDraw = false;
 		}
 	}
 }
