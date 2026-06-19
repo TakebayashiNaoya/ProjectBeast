@@ -192,6 +192,9 @@
     <ClCompile Include="Source\Scene\TitleScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scene\EasyInGameScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Scene\NormalInGameScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
@@ -624,6 +627,9 @@
       <Filter>Source\Achievement</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\TitleScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\EasyInGameScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\NormalInGameScene.h">

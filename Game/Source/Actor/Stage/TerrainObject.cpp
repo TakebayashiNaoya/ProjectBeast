@@ -15,7 +15,7 @@ namespace
 	/** スプラットマップ */
 	static const wchar_t* SPLATMAP_PATH   = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";
 
-	/** 物理コリジョン用フルメッシュのバンクキー */
+	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
 	static const char* TERRAIN_TKM_KEY = "terrain_generated";
 	/** チャンク描画用メッシュのバンクキープレフィックス（"terrain_chunk_0"〜） */
 	static const char* TERRAIN_CHUNK_KEY_PREFIX = "terrain_chunk";
@@ -39,6 +39,217 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/**
+			 * @brief ハイトマップ画素 (px, pz) → ワールド高さ値（境界外はクランプ）		
+			 * 
+			 * @param pixels      ハイトマップ画素配列（uint16_t）
+			 * @param W           ハイトマップ横幅（画素数）
+			 * @param H		      ハイトマップ縦幅（画素数）
+			 * @param heightScale ハイトマップの最大高さ（ワールド単位）
+			 * @param px		  ハイトマップ画素 X 座標
+			 * @param pz		  ハイトマップ画素 Z 座標
+			 * 
+			 * @return ワールド高さ値（ワールド単位）
+			 */
+			float SampleHeight(
+				const std::vector<uint16_t>& pixels, 
+				int W, 
+				int H, 
+				float heightScale,
+				int px, 
+				int pz
+			)
+			{
+				px = max(0, min(W - 1, px));
+				pz = max(0, min(H - 1, pz));
+				return pixels[pz * W + px] / 65535.0f * heightScale;
+			}
+
+
+			/**
+			 * @brief チャンク担当範囲の頂点バッファを生成する
+			 * 
+			 * @param heights ハイトマップの高さ値配列（ワールド単位）
+			 * @param hmPixels  ハイトマップの画素配列（uint16_t）
+			 * @param W         ハイトマップ横幅（画素数）
+			 * @param H		    ハイトマップ縦幅（画素数）
+			 * @param cellSizeX ワールド座標系でのセル幅（X 方向）
+			 * @param cellSizeZ ワールド座標系でのセル幅（Z 方向）
+			 * @param originX   ワールド座標系での原点 X 座標
+			 * @param originY   ワールド座標系での原点 Y 座標
+			 * @param cfg       地形設定
+			 * @param vxStart   チャンク担当範囲の頂点 X 開始インデックス
+			 * @param vxEnd     チャンク担当範囲の頂点 X 終了インデックス（非包含）
+			 * @param vzStart   チャンク担当範囲の頂点 Z 開始インデックス
+			 * @param vzEnd     チャンク担当範囲の頂点 Z 終了インデックス（非包含）
+			 * 
+			 * @return 頂点バッファ配列
+			 */
+			std::vector<TkmFile::SVertex> BuildChunkVertices(
+				const std::vector<float>& heights,
+				const std::vector<uint16_t>& hmPixels, 
+				int W, 
+				int H,
+				float cellSizeX, 
+				float cellSizeZ, 
+				float originX, 
+				float originY,
+				const TerrainObject::TerrainConfig& cfg,
+				int vxStart,
+				int vxEnd, 
+				int vzStart,
+				int vzEnd
+			)
+			{
+				const int localW = vxEnd - vxStart;  // チャンク内の頂点横方向数
+				std::vector<TkmFile::SVertex> vertices;
+				vertices.reserve(localW * (vzEnd - vzStart));
+
+				for (int vz = vzStart; vz < vzEnd; ++vz)
+				{
+					for (int vx = vxStart; vx < vxEnd; ++vx)
+					{
+						const float h  = heights[vz * W + vx];                                       // この頂点の高さ
+						const float hR = SampleHeight(hmPixels, W, H, cfg.heightScale, vx + 1, vz);  // 右隣 (Right)
+						const float hL = SampleHeight(hmPixels, W, H, cfg.heightScale, vx - 1, vz);  // 左隣 (Left)
+						const float hU = SampleHeight(hmPixels, W, H, cfg.heightScale, vx, vz + 1);  // 奥隣 (Up/Forward)
+						const float hD = SampleHeight(hmPixels, W, H, cfg.heightScale, vx, vz - 1);  // 手前 (Down/Back)
+
+						// 中心差分法で法線を計算（Z-up 座標系）
+						// X 方向接線: (2Cx, 0, hR-hL)、Y 方向接線: (0, 2Cz, hU-hD)
+						Vector3 dx = { 2.0f * cellSizeX, 0.0f, hR - hL };
+						Vector3 dy = { 0.0f, 2.0f * cellSizeZ, hU - hD };
+						Vector3 normal = Cross(dx, dy);
+						normal.Normalize();
+
+						TkmFile::SVertex v;
+						v.pos         = Vector3(originX + vx * cellSizeX, originY + vz * cellSizeZ, h + cfg.yOffset);
+						v.normal      = normal;
+						v.tangent     = Vector3(1.0f, 0.0f, 0.0f);
+						v.binormal    = Vector3(0.0f, 1.0f, 0.0f);
+						v.uv          = Vector2(vx * cfg.uvTile, vz * cfg.uvTile);
+						v.indices[0]  = v.indices[1] = v.indices[2] = v.indices[3] = 0;
+						v.skinWeights = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+						vertices.push_back(v);
+					}
+				}
+				return vertices;
+			}
+
+
+			/**
+			 * @brief チャンク担当範囲のインデックスバッファを生成する
+			 * 
+			 * @param heights   ハイトマップの高さ値配列（ワールド単位）
+			 * @param W         ハイトマップ横幅（画素数）
+			 * @param minHeight この高さ未満の頂点を含むクワッドはポリゴンを生成しない（ワールド単位）
+			 * @param cxStart   チャンク担当範囲のセル X 開始インデックス
+			 * @param cxEnd     チャンク担当範囲のセル X 終了インデックス（非包含）
+			 * @param czStart   チャンク担当範囲のセル Z 開始インデックス
+			 * @param czEnd     チャンク担当範囲のセル Z 終了インデックス（非包含）
+			 * @param vxStart   チャンク担当範囲の頂点 X 開始インデックス
+			 * @param vzStart   チャンク担当範囲の頂点 Z 開始インデックス
+			 * @param localW    チャンク内の頂点横方向数
+			 * 
+			 * @return インデックスバッファ配列
+			 */
+			std::vector<uint32_t> BuildChunkIndices(
+				const std::vector<float>& heights,
+				int W,
+				float minHeight,
+				int cxStart,
+				int cxEnd,
+				int czStart, 
+				int czEnd,
+				int vxStart,
+				int vzStart,
+				int localW
+			)
+			{
+				std::vector<uint32_t> indices;
+				indices.reserve((cxEnd - cxStart) * (czEnd - czStart) * 6);
+
+				for (int cz = czStart; cz < czEnd; ++cz)
+				{
+					for (int cx = cxStart; cx < cxEnd; ++cx)
+					{
+						// 全頂点が minHeight 未満のクワッドはスキップ（海面下のメッシュを除去）
+						if (minHeight > 0.0f)
+						{
+							// クワッドを構成する 4 頂点の高さ
+							//   h0(cz,cx)    h1(cz,cx+1)
+							//   h2(cz+1,cx)  h3(cz+1,cx+1)
+							const float h0 = heights[ cz      * W +  cx     ];
+							const float h1 = heights[ cz      * W + (cx + 1)];
+							const float h2 = heights[(cz + 1) * W +  cx     ];
+							const float h3 = heights[(cz + 1) * W + (cx + 1)];
+							if (h0 < minHeight && h1 < minHeight && h2 < minHeight && h3 < minHeight)
+								continue;
+						}
+
+						// チャンク内ローカル座標（vxStart/vzStart 基点）
+						const uint32_t lz = static_cast<uint32_t>(cz - vzStart);
+						const uint32_t lx = static_cast<uint32_t>(cx - vxStart);
+
+						// クワッドの 4 頂点インデックス（頂点バッファ内の位置）
+						//   i0---i1
+						//   |  \ |
+						//   i2---i3
+						const uint32_t i0 = lz * localW + lx;        // 左上
+						const uint32_t i1 = i0 + 1;                   // 右上
+						const uint32_t i2 = (lz + 1) * localW + lx;  // 左下
+						const uint32_t i3 = i2 + 1;                   // 右下
+
+						// 三角形 1: i0-i1-i2、三角形 2: i1-i3-i2
+						indices.push_back(i0); indices.push_back(i1); indices.push_back(i2);
+						indices.push_back(i1); indices.push_back(i3); indices.push_back(i2);
+					}
+				}
+				return indices;
+			}
+
+
+			/**
+			 * @brief チャンク担当範囲の頂点・インデックスバッファから TkmFile を組み立ててバンクに登録する
+			 *
+			 * @param vertices チャンク担当範囲の頂点バッファ
+			 * @param indices  チャンク担当範囲のインデックスバッファ
+			 * @param bankKey  エンジン内バンクに登録する際のキー
+			 *
+			 * @return 登録した TkmFile（登録失敗時は nullptr）
+			 */
+			nsK2EngineLow::TkmFile* AssembleChunkTkm(
+				std::vector<TkmFile::SVertex>&& vertices,
+				std::vector<uint32_t>&& indices,
+				const char* bankKey
+			)
+			{
+				if (indices.empty()) return nullptr;  // minHeight で全クワッドが除外された場合
+
+				TkmFile::SMaterial mat = {};
+
+				TkmFile::SIndexBuffer32 ib;
+				ib.indices = std::move(indices);
+
+				TkmFile::SMesh mesh;
+				mesh.isFlatShading = false;
+				mesh.materials.push_back(mat);
+				mesh.vertexBuffer  = std::move(vertices);
+				mesh.indexBuffer32Array.push_back(std::move(ib));
+
+				std::vector<TkmFile::SMesh> meshes;
+				meshes.push_back(std::move(mesh));
+
+				auto* tkm = new TkmFile();
+				tkm->Build(std::move(meshes));
+				g_engine->ReplaceTkmFileInBank(bankKey, tkm);
+				return tkm;
+			}
+		}// namespace
+
+
 		void TerrainObject::Init(const TerrainConfig& config)
 		{
 			if (m_isInited) return;
@@ -82,8 +293,7 @@ namespace app
 		{
 			// DirectXTex で DDS をロード（BC1〜BC7, BC6H を含む全圧縮フォーマット対応）
 			DirectX::ScratchImage image;
-			HRESULT hr = DirectX::LoadFromDDSFile(
-				HEIGHTMAP_PATH, DirectX::DDS_FLAGS_NONE, nullptr, image);
+			HRESULT hr = DirectX::LoadFromDDSFile(m_config.heightmapPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
 
 			if (FAILED(hr))
 			{
@@ -136,10 +346,8 @@ namespace app
 			m_heightmap.height = srcH / m_config.subsample;
 			m_heightmap.pixels.assign(m_heightmap.width * m_heightmap.height, 0);
 
-			for (int dstZ = 0; dstZ < m_heightmap.height; ++dstZ)
-			{
-				for (int dstX = 0; dstX < m_heightmap.width; ++dstX)
-				{
+			for (int dstZ = 0; dstZ < m_heightmap.height; ++dstZ) {
+				for (int dstX = 0; dstX < m_heightmap.width; ++dstX) {
 					const float f = pixels[(dstZ * m_config.subsample) * rowPitch + (dstX * m_config.subsample)];
 					m_heightmap.pixels[dstZ * m_heightmap.width + dstX] = static_cast<uint16_t>(std::clamp(f, 0.0f, 1.0f) * 65535.0f);
 				}
@@ -149,197 +357,102 @@ namespace app
 
 		void TerrainObject::GenerateMesh()
 		{
+			// ハイトマップの幅と高さ（画素数）
 			const int W = m_heightmap.width;
 			const int H = m_heightmap.height;
-
-			// totalWidth/totalDepth から頂点間隔を算出（3ds Max Z-up 座標系）
-			const float cellSizeX = (W > 1) ? m_config.totalWidth  / float(W - 1) : 1.0f;
-			const float cellSizeZ = (H > 1) ? m_config.totalDepth  / float(H - 1) : 1.0f;
-			const float originX   = -m_config.totalWidth  * 0.5f;
-			const float originY   = -m_config.totalDepth  * 0.5f;  // 3ds Max の奥行き軸
-
-			m_terrainCb.halfWidth   = m_config.totalWidth  * 0.5f;
-			m_terrainCb.halfDepth   = m_config.totalDepth  * 0.5f;
+			// 頂点間隔を算出（3ds Max Z-up 座標系）
+			const float cellSizeX = (W > 1) ? m_config.totalWidth / float(W - 1) : 1.0f;
+			const float cellSizeZ = (H > 1) ? m_config.totalDepth / float(H - 1) : 1.0f;
+			const float originX = -m_config.totalWidth * 0.5f;
+			const float originY = -m_config.totalDepth * 0.5f;  // 3ds Max の奥行き軸
+			// 地形定数バッファを設定
+			m_terrainCb.halfWidth = m_config.totalWidth * 0.5f;
+			m_terrainCb.halfDepth = m_config.totalDepth * 0.5f;
 			m_terrainCb.albedoScale = m_config.albedoScale;
 
-			auto getH = [&](int px, int pz) -> float
-			{
-				px = max(0, min(W - 1, px));
-				pz = max(0, min(H - 1, pz));
-				return m_heightmap.pixels[pz * W + px] / 65535.0f * m_config.heightScale;
-			};
-
-			// 高さキャッシュ
+			// 高さキャッシュ（全頂点の高さを事前計算して再利用）
 			std::vector<float> heights(W * H);
-			for (int z = 0; z < H; ++z)
-				for (int x = 0; x < W; ++x)
-					heights[z * W + x] = getH(x, z);
-
-			// --------- 共通の TkmFile 構築ヘルパー ---------
-			// [vxStart, vxEnd) × [vzStart, vzEnd) の頂点範囲と
-			// [cxStart, cxEnd) × [czStart, czEnd) のセル範囲からメッシュを生成してバンクに登録する
-			auto buildTkm = [&](
-				int vxStart, int vxEnd, int vzStart, int vzEnd,
-				int cxStart, int cxEnd, int czStart, int czEnd,
-				const char* bankKey) -> nsK2EngineLow::TkmFile*
-			{
-				const int localW = vxEnd - vxStart;
-
-				// ------ 頂点生成 ------
-				std::vector<TkmFile::SVertex> vertices;
-				vertices.reserve(localW * (vzEnd - vzStart));
-
-				for (int vz = vzStart; vz < vzEnd; ++vz)
-				{
-					for (int vx = vxStart; vx < vxEnd; ++vx)
-					{
-						const float h  = heights[vz * W + vx];
-						const float hR = getH(vx + 1, vz);
-						const float hL = getH(vx - 1, vz);
-						const float hU = getH(vx, vz + 1);
-						const float hD = getH(vx, vz - 1);
-
-						Vector3 dx = { 2.0f * cellSizeX, 0.0f, hR - hL };
-						Vector3 dy = { 0.0f, 2.0f * cellSizeZ, hU - hD };
-						Vector3 normal = Cross(dx, dy);
-						normal.Normalize();
-
-						TkmFile::SVertex v;
-						v.pos         = Vector3(originX + vx * cellSizeX, originY + vz * cellSizeZ, h + m_config.yOffset);
-						v.normal      = normal;
-						v.tangent     = Vector3(1.0f, 0.0f, 0.0f);
-						v.binormal    = Vector3(0.0f, 1.0f, 0.0f);
-						v.uv          = Vector2(vx * m_config.uvTile, vz * m_config.uvTile);
-						v.indices[0]  = v.indices[1] = v.indices[2] = v.indices[3] = 0;
-						v.skinWeights = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
-						vertices.push_back(v);
-					}
+			for (int z = 0; z < H; ++z) {
+				for (int x = 0; x < W; ++x) {
+					heights[z * W + x] = SampleHeight(m_heightmap.pixels, W, H, m_config.heightScale, x, z);
 				}
+			}
 
-				// ------ インデックス生成（各セル 2 三角形） ------
-				std::vector<uint32_t> indices;
-				indices.reserve((cxEnd - cxStart) * (czEnd - czStart) * 6);
-
-				for (int cz = czStart; cz < czEnd; ++cz)
-				{
-					for (int cx = cxStart; cx < cxEnd; ++cx)
-					{
-						if (m_config.minHeight > 0.0f)
-						{
-							const float h0 = heights[ cz      * W +  cx     ];
-							const float h1 = heights[ cz      * W + (cx + 1)];
-							const float h2 = heights[(cz + 1) * W +  cx     ];
-							const float h3 = heights[(cz + 1) * W + (cx + 1)];
-							if (h0 < m_config.minHeight || h1 < m_config.minHeight ||
-								h2 < m_config.minHeight || h3 < m_config.minHeight)
-								continue;
-						}
-
-						// ローカル頂点インデックス（vxStart/vzStart 基点）
-						const uint32_t lz = static_cast<uint32_t>(cz - vzStart);
-						const uint32_t lx = static_cast<uint32_t>(cx - vxStart);
-						const uint32_t i0 = lz * localW + lx;
-						const uint32_t i1 = i0 + 1;
-						const uint32_t i2 = (lz + 1) * localW + lx;
-						const uint32_t i3 = i2 + 1;
-
-						indices.push_back(i0); indices.push_back(i1); indices.push_back(i2);
-						indices.push_back(i1); indices.push_back(i3); indices.push_back(i2);
-					}
-				}
-
-				if (indices.empty()) return nullptr;  // minHeight で全クワッドが除外された場合
-
-				// ------ TkmFile 構築 ------
-				TkmFile::SMaterial mat = {};
-
-				TkmFile::SIndexBuffer32 ib;
-				ib.indices = std::move(indices);
-
-				TkmFile::SMesh mesh;
-				mesh.isFlatShading = false;
-				mesh.materials.push_back(mat);
-				mesh.vertexBuffer  = std::move(vertices);
-				mesh.indexBuffer32Array.push_back(std::move(ib));
-
-				std::vector<TkmFile::SMesh> meshes;
-				meshes.push_back(std::move(mesh));
-
-				auto* tkm = new TkmFile();
-				tkm->Build(std::move(meshes));
-				g_engine->ReplaceTkmFileInBank(bankKey, tkm);
-				return tkm;
-			};
-
-			// --------- 物理用フルメッシュ ---------
-			m_tkmFile = buildTkm(0, W, 0, H, 0, W - 1, 0, H - 1, TERRAIN_TKM_KEY);
-
-			// --------- チャンク別描画メッシュ ---------
-			const int chunkDiv    = m_config.chunkDivision;
-			const int numCellsX   = W - 1;
-			const int numCellsZ   = H - 1;
-			// ceiling division：端のチャンクが小さくなることを許容する
-			const int cpchX = (numCellsX + chunkDiv - 1) / chunkDiv;
-			const int cpchZ = (numCellsZ + chunkDiv - 1) / chunkDiv;
-			const int numChunks   = chunkDiv * chunkDiv;
-
-			m_chunkTkmFiles.assign(numChunks, nullptr);
-			m_chunkAABBs.resize(numChunks);
-
-			for (int chunkZ = 0; chunkZ < chunkDiv; ++chunkZ)
+			// 物理用フルメッシュ（描画には使わず当たり判定のみ）
 			{
-				for (int chunkX = 0; chunkX < chunkDiv; ++chunkX)
+				// チャンク担当範囲の頂点バッファを生成する（全頂点を使う）
+				auto verts   = BuildChunkVertices(heights, m_heightmap.pixels, W, H, cellSizeX, cellSizeZ, originX, originY, m_config, 0, W, 0, H);
+				// チャンク担当範囲のインデックスバッファを生成する（全セルを使う）
+				auto indices = BuildChunkIndices (heights, W, m_config.minHeight, 0, W - 1, 0, H - 1, 0, 0, W);
+				// TkmFile を組み立ててバンクに登録する
+				m_tkmFile    = AssembleChunkTkm(std::move(verts), std::move(indices), TERRAIN_TKM_KEY);
+			}
+
+			// チャンク別描画メッシュ
+			{
+				//   頂点インデックス (vx, vz) : ハイトマップの画素単位。W×H 個存在する。
+				//   セルインデックス  (cx, cz) : 隣り合う 4 頂点が作るクワッド単位。(W-1)×(H-1) 個存在する。
+				//   チャンク          : フラスタムカリング用に地形を chunkDiv×chunkDiv に分割した区画。
+				const int chunkDiv = m_config.chunkDivision;  // 縦横それぞれの分割数
+				const int numCellsX = W - 1;                   // X 方向の総セル数
+				const int numCellsZ = H - 1;                   // Z 方向の総セル数
+				// チャンクあたりのセル数（切り上げ除算：端のチャンクだけ小さくなることを許容）
+				const int cpchX = (numCellsX + chunkDiv - 1) / chunkDiv;  // cells per chunk X
+				const int cpchZ = (numCellsZ + chunkDiv - 1) / chunkDiv;  // cells per chunk Z
+				const int numChunks = chunkDiv * chunkDiv;                     // チャンク総数
+
+				m_chunkTkmFiles.assign(numChunks, nullptr);
+				m_chunkAABBs.resize(numChunks);
+
+				for (int chunkZ = 0; chunkZ < chunkDiv; ++chunkZ)
 				{
-					const int chunkIdx = chunkZ * chunkDiv + chunkX;
+					for (int chunkX = 0; chunkX < chunkDiv; ++chunkX)
+					{
+						const int chunkIdx = chunkZ * chunkDiv + chunkX;
 
-					// セル範囲
-					const int cxStart = chunkX * cpchX;
-					const int czStart = chunkZ * cpchZ;
-					const int cxEnd   = min(cxStart + cpchX, numCellsX);
-					const int czEnd   = min(czStart + cpchZ, numCellsZ);
+						// セル範囲
+						const int cxStart = chunkX * cpchX;
+						const int czStart = chunkZ * cpchZ;
+						const int cxEnd = min(cxStart + cpchX, numCellsX);
+						const int czEnd = min(czStart + cpchZ, numCellsZ);
 
-					// 頂点範囲（セル範囲より1大きい）
-					const int vxStart = cxStart;
-					const int vzStart = czStart;
-					const int vxEnd   = min(cxEnd + 1, W);
-					const int vzEnd   = min(czEnd + 1, H);
+						// 頂点範囲（セル範囲より各辺1大きい：セルの右端・下端の頂点も必要なため）
+						const int vxStart = cxStart;
+						const int vzStart = czStart;
+						const int vxEnd = min(cxEnd + 1, W);
+						const int vzEnd = min(czEnd + 1, H);
 
-					// ワールド空間 AABB を計算する
-					// BeastModel は MakeRotationX(-PI/2) で 3ds Max Z-up → DX Y-up に変換する。
-					// 変換後: world_x=src_x, world_y=src_z(高さ), world_z=-src_y(奥行き)
-					float minH = FLT_MAX, maxH = -FLT_MAX;
-					for (int vz = vzStart; vz < vzEnd; ++vz)
-						for (int vx = vxStart; vx < vxEnd; ++vx)
+						// ワールド空間 AABB を計算する
+						// BeastModel は MakeRotationX(-PI/2) で 3ds Max Z-up → DX Y-up に変換する。
+						// 変換後: world_x=src_x, world_y=src_z(高さ), world_z=-src_y(奥行き)
+						float minH = FLT_MAX, maxH = -FLT_MAX;
+						for (int vz = vzStart; vz < vzEnd; ++vz)
 						{
-							const float h = heights[vz * W + vx];
-							if (h < minH) minH = h;
-							if (h > maxH) maxH = h;
+							for (int vx = vxStart; vx < vxEnd; ++vx)
+							{
+								const float h = heights[vz * W + vx];
+								if (h < minH) minH = h;
+								if (h > maxH) maxH = h;
+							}
 						}
-					if (minH > maxH) { minH = maxH = 0.0f; }
+						if (minH > maxH) { minH = maxH = 0.0f; }
 
-					const float srcMinY = originY + vzStart * cellSizeZ;  // 3ds Max Y（世界 Z の元）
-					const float srcMaxY = originY + (vzEnd - 1) * cellSizeZ;
+						const float srcMinY = originY + vzStart * cellSizeZ;      // 3ds Max Y（世界 Z の元）
+						const float srcMaxY = originY + (vzEnd - 1) * cellSizeZ;
 
-					const Vector3 worldMin(
-						originX + vxStart * cellSizeX,
-						minH + m_config.yOffset,
-						-srcMaxY          // world_z = -src_y
-					);
-					const Vector3 worldMax(
-						originX + (vxEnd - 1) * cellSizeX,
-						maxH + m_config.yOffset,
-						-srcMinY
-					);
-					m_chunkAABBs[chunkIdx].Init(worldMax, worldMin);
+						const Vector3 worldMin(originX + vxStart * cellSizeX, minH + m_config.yOffset, -srcMaxY);
+						const Vector3 worldMax(originX + (vxEnd - 1) * cellSizeX, maxH + m_config.yOffset, -srcMinY);
+						m_chunkAABBs[chunkIdx].Init(worldMax, worldMin);
 
-					// チャンクメッシュ生成
-					char key[64];
-					snprintf(key, sizeof(key), "%s_%d", TERRAIN_CHUNK_KEY_PREFIX, chunkIdx);
-					m_chunkTkmFiles[chunkIdx] = buildTkm(
-						vxStart, vxEnd, vzStart, vzEnd,
-						cxStart, cxEnd, czStart, czEnd,
-						key
-					);
+						// チャンクメッシュ生成
+						const int localW = vxEnd - vxStart;  // チャンク内の頂点横方向数
+						auto verts = BuildChunkVertices(heights, m_heightmap.pixels, W, H, cellSizeX, cellSizeZ, originX, originY, m_config, vxStart, vxEnd, vzStart, vzEnd);
+						auto indices = BuildChunkIndices(heights, W, m_config.minHeight, cxStart, cxEnd, czStart, czEnd, vxStart, vzStart, localW);
+
+						char key[64];
+						snprintf(key, sizeof(key), "%s_%d", TERRAIN_CHUNK_KEY_PREFIX, chunkIdx);
+						m_chunkTkmFiles[chunkIdx] = AssembleChunkTkm(std::move(verts), std::move(indices), key);
+					}
 				}
 			}
 		}
@@ -348,7 +461,7 @@ namespace app
 		void TerrainObject::InitRenderer()
 		{
 			// BaseColor
-			m_splatmap.InitFromDDSFile(SPLATMAP_PATH);
+			m_splatmap.InitFromDDSFile(m_config.splatmapPath.c_str());
 			m_terrainTextures[0].InitFromDDSFile(TEX_PATH_SNOW);
 			m_terrainTextures[1].InitFromDDSFile(TEX_PATH_GRASS);
 			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);
@@ -384,7 +497,7 @@ namespace app
 				return initData;
 			};
 
-			// === 物理コリジョン用 ModelRender（描画には使わない） ===
+			// 物理コリジョン用 ModelRender（描画には使わない）
 			m_modelRender.SetGBufferFxFilePath("Assets/shader/Terrain.fx");
 			m_modelRender.InitFromLoaded(buildInitData(TERRAIN_TKM_KEY));
 			m_modelRender.SetPBRParam(m_config.pbrParam);
@@ -396,7 +509,7 @@ namespace app
 				nsBeastEngine::nsCollision::CollisionAttribute::Ground
 			);
 
-			// === チャンク別 ModelRender（フラスタムカリングで描画） ===
+			// チャンク別 ModelRender（フラスタムカリングで描画）
 			const int numChunks = static_cast<int>(m_chunkTkmFiles.size());
 			m_chunkRenders.resize(numChunks);
 

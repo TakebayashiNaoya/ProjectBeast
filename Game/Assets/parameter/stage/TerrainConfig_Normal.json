@@ -1,0 +1,21 @@
+{
+  "TerrainConfig": {
+    "heightmapPath": "Assets/modelData/stage/Terrain/NormalStageHeightMap.dds",
+    "splatmapPath":  "Assets/modelData/stage/Terrain/NormalStageSplatMap.dds",
+    "totalWidth":  22000.0,
+    "totalDepth":  22000.0,
+    "heightScale": 1000.0,
+    "subsample":   4,
+    "uvTile":      0.05,
+    "albedoScale": 1.0,
+    "yOffset":     -50.0,
+    "minHeight":   30.0,
+    "chunkDivision": 16,
+    "pbrParam": {
+      "dirLightScale":  1.0,
+      "ambientScale":   1.0,
+      "metallicOffset": -1.0,
+      "smoothOffset":   -1.0
+    }
+  }
+}

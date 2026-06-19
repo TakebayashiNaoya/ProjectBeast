@@ -7,6 +7,7 @@
 #include "TitleScene.h"
 
 #include "DebugScene.h"
+#include "EasyInGameScene.h"
 #include "NormalInGameScene.h"
 #include "TutorialInGameScene.h"
 #include "Source/Sound/SoundManager.h"
@@ -197,6 +198,8 @@ namespace app
 				m_nextSceneId = NormalInGameScene::ID();
 				break;
 			case ui::EnStageChoices::Easy:
+				m_nextSceneId = EasyInGameScene::ID();
+				break;
 			case ui::EnStageChoices::Hard:
 				m_nextSceneId = NormalInGameScene::ID();
 				break;
