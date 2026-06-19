@@ -34,7 +34,10 @@ namespace app
 				float albedoScale = 1.0f;     ///< アルベド明度スケール（1.0=そのまま、小さくすると暗くなる）
 				float yOffset     = 0.0f;     ///< 地形全体の Y 座標オフセット（負=下げる、正=上げる）
 				float minHeight   = 0.0f;     ///< この高さ未満の頂点を含むクワッドはポリゴンを生成しない（ワールド単位）
+				int   chunkDivision = 8;      ///< フラスタムカリング用チャンク分割数（縦横共通）
 				nsBeastEngine::PBRParam pbrParam;  ///< PBR補正パラメータ（ModelRender::SetPBRParam に渡す）
+				std::wstring heightmapPath = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";  ///< ハイトマップ DDS パス
+				std::wstring splatmapPath  = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";   ///< スプラットマップ DDS パス
 			};
 
 			/**
@@ -76,7 +79,7 @@ namespace app
 			/** DDS R16_UNORM をファイルから CPU に読み込む */
 			void LoadHeightmap();
 
-			/** HeightmapData から TkmFile を構築し、バンクに登録する */
+			/** HeightmapData からチャンク別 TkmFile を構築し、バンクに登録する */
 			void GenerateMesh();
 
 			/** テクスチャをロードし ModelRender を初期化する */
@@ -84,8 +87,14 @@ namespace app
 
 		private:
 			HeightmapData           m_heightmap;
-			// バンクに new で渡して所有権を委譲するため生ポインタで保持（delete 禁止）
+
+			// 物理コリジョン用フルメッシュ（描画には使わない）
 			nsK2EngineLow::TkmFile* m_tkmFile = nullptr;
+
+			// チャンク描画用（フラスタムカリング対象）
+			std::vector<nsK2EngineLow::TkmFile*>                       m_chunkTkmFiles;
+			std::vector<std::unique_ptr<nsBeastEngine::ModelRender>>   m_chunkRenders;
+			std::vector<nsK2EngineLow::AABB>                           m_chunkAABBs;
 
 			nsK2EngineLow::Texture m_splatmap;
 			nsK2EngineLow::Texture m_terrainTextures[3];  // [0]=snow [1]=grass [2]=rock
@@ -96,13 +105,12 @@ namespace app
 			nsK2EngineLow::Texture m_rockNormal;           // 岩ノーマルマップ (t19)
 			nsK2EngineLow::Texture m_rockRoughness;        // 岩ラフネスマップ (t20)
 
+			nsBeastEngine::nsCollision::PhysicalBody m_physicalBody;  // 当たり判定
 
-			nsBeastEngine::nsCollision::PhysicalBody m_physicalBody;
+			TerrainConfig m_config;		// 地形生成パラメータ
+			TerrainCb     m_terrainCb;	// 地形定数バッファ（b1 レジスタ）
 
-			TerrainConfig m_config;
-			TerrainCb     m_terrainCb;
-
-			bool m_isInited = false;
+			bool m_isInited = false;	// 初期化済みフラグ
 		};
 	}
 }

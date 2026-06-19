@@ -1,0 +1,21 @@
+{
+  "TerrainConfig": {
+    "heightmapPath": "Assets/modelData/stage/Terrain/EasyStageHeightMap.dds",
+    "splatmapPath":  "Assets/modelData/stage/Terrain/EasyStageSplatMap.dds",
+    "totalWidth":  12000.0,
+    "totalDepth":  12000.0,
+    "heightScale": 500.0,
+    "subsample":   4,
+    "uvTile":      0.05,
+    "albedoScale": 1.0,
+    "yOffset":     -50.0,
+    "minHeight":   30.0,
+    "chunkDivision": 16,
+    "pbrParam": {
+      "dirLightScale":  1.0,
+      "ambientScale":   1.0,
+      "metallicOffset": -1.0,
+      "smoothOffset":   -1.0
+    }
+  }
+}

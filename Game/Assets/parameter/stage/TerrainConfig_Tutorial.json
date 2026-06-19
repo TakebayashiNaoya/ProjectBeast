@@ -1,5 +1,7 @@
 {
   "TerrainConfig": {
+    "heightmapPath": "Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds",
+    "splatmapPath":  "Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds",
     "totalWidth":  7000.0,
     "totalDepth":  7000.0,
     "heightScale": 500.0,
@@ -8,6 +10,7 @@
     "albedoScale": 1.0,
     "yOffset":     -50.0,
     "minHeight":   5.0,
+    "chunkDivision": 8,
     "pbrParam": {
       "dirLightScale":  1.0,
       "ambientScale":   1.0,

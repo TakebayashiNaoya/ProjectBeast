@@ -116,6 +116,17 @@ namespace
 		cfg.albedoScale = t.value("albedoScale", cfg.albedoScale);
 		cfg.yOffset     = t.value("yOffset",     cfg.yOffset);
 		cfg.minHeight   = t.value("minHeight",   cfg.minHeight);
+		cfg.chunkDivision = t.value("chunkDivision", cfg.chunkDivision);
+		if (t.contains("heightmapPath"))
+		{
+			const std::string s = t["heightmapPath"].get<std::string>();
+			cfg.heightmapPath.assign(s.begin(), s.end());
+		}
+		if (t.contains("splatmapPath"))
+		{
+			const std::string s = t["splatmapPath"].get<std::string>();
+			cfg.splatmapPath.assign(s.begin(), s.end());
+		}
 		if (t.contains("pbrParam"))
 		{
 			const auto& p             = t["pbrParam"];

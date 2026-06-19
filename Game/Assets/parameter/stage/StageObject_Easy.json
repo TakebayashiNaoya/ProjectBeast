@@ -5,24 +5,41 @@
         "objectName" : "wall",
         "fileName" : "Assets/modelData/stage/Wall/iceWall.tkm",
         "isNeedCollision" : true,
-        "position" : [0, 1000, 0],
+        "position" : [0, 500, 0],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [0.3, 2, 0.3],
+        "scale" : [0.2, 0.6, 0.2],
         "pbrName" : "wall"
       },
       {
         "objectName" : "bearHome_1",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
         "isNeedCollision" : true,
-        "position" : [0, 100, 500],
+        "position" : [0, 30, 2650],
         "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_2",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [0, 40, -2750],
+        "rotationDeg" : [0, 45, 0],
         "scale" : [1, 1, 1]
       },
       {
         "objectName" : "igloo01",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
-        "position" : [0, 100, 500],
+        "position" : [-3200, 30, 0],
+        "rotationDeg" : [0, 180, 0],
+        "scale" : [4, 4, 4],
+        "pbrName" : "igloo"
+      },
+      {
+        "objectName" : "igloo02",
+        "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
+        "isNeedCollision" : true,
+        "position" : [3600, 20, 0],
         "rotationDeg" : [0, 0, 0],
         "scale" : [4, 4, 4],
         "pbrName" : "igloo"

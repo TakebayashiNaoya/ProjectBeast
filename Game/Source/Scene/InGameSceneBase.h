@@ -31,12 +31,12 @@ namespace app
 	/** 子ペンギン生成設定 */
 	struct PenguinSpawnConfig
 	{
-		int serious = 0;
-		int clingy = 0;
-		int naughty = 0;
-		int clumsy = 0;
-		int caring = 0;
-		float spawnRadius = 3000.0f;
+		int serious = 0;  // まじめ
+		int clingy = 0;   // 甘えん坊
+		int naughty = 0;  // やんちゃ
+		int clumsy = 0;   // おっちょこちょい
+		int caring = 0;   // 世話焼き
+		float spawnRadius = 3000.0f; // 生成半径
 	};
 
 
