@@ -187,21 +187,27 @@ namespace app
 		/**
 		 * @brief デバッグウィンドウを描画する
 		 * @details Application::Render() の先頭で呼ぶこと
+		 *          マウスの中クリックでウィンドウの表示/非表示を切り替えられる
 		 */
 		void Render()
 		{
-			// ── 常時表示する小さいメニューバー ──────────────
-	//    ここからデバッグウィンドウの表示/非表示を切り替える
-			if (ImGui::BeginMainMenuBar())
+			// ── 中クリックで表示/非表示を切り替え ──────────────
+			if (ImGui::GetIO().MouseClicked[ImGuiMouseButton_Middle])
 			{
-				DrawMenuItems();
-				ImGui::EndMainMenuBar();
+				m_visible = !m_visible;
 			}
 
 			// チェックが外れているときはウィンドウ本体を描画しない
 			if (!m_visible)
 			{
 				return;
+			}
+
+			// ── 常時表示する小さいメニューバー ──────────────────────
+			if (ImGui::BeginMainMenuBar())
+			{
+				DrawMenuItems();
+				ImGui::EndMainMenuBar();
 			}
 
 			ImGui::Begin(u8"デバッグ");
@@ -219,11 +225,10 @@ namespace app
 			{
 				for (auto& entry : m_entries)
 				{
-					// セクション名をクリックすると開閉できる
 					if (ImGui::CollapsingHeader(entry.label.c_str()))
 					{
-						ImGui::Indent();     // 少し右にずらして見やすく
-						entry.func();        // ← ここで各自のWidgetが呼ばれる
+						ImGui::Indent();
+						entry.func();
 						ImGui::Unindent();
 					}
 				}
