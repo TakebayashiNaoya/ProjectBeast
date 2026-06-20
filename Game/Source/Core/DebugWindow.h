@@ -187,6 +187,7 @@ namespace app
 		/**
 		 * @brief デバッグウィンドウを描画する
 		 * @details Application::Render() の先頭で呼ぶこと
+		 *          マウスの中クリックでウィンドウの表示/非表示を切り替えられる
 		 */
 		void Render()
 		{
