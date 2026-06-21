@@ -2,7 +2,7 @@
   "enemies": [
     {
       "spawnPosition": [ 0, 30, 2650 ],
-      "nestName": "bearHome_1",
+      "nestName": "bearHome_3",
       "patrolPoints": [
         [ -200,  30, 2450],
         [ -200,  30, 2850],
@@ -12,7 +12,7 @@
     },
     {
       "spawnPosition": [0, 30, -2650 ],
-      "nestName": "bearHome_2",
+      "nestName": "bearHome_4",
       "patrolPoints": [
         [ -200,  30, -2550],
         [ -200,  30, -2950],

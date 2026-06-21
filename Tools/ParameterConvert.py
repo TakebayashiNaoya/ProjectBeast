@@ -309,6 +309,7 @@ def convert_all(input_root_dir):
             print(f"  -> [成功] {count}件のデータを書き出しました。")
 
 if __name__ == "__main__":
-    # 画像のパス構造に合わせるなら以下のように指定します
-    input_folder = "../Game/Assets/parameter"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    input_folder = os.path.normpath(os.path.join(script_dir, "../Game/Assets/parameter"))
     convert_all(input_folder)
+ 

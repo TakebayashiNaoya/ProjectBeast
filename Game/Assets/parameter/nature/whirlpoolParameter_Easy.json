@@ -6,7 +6,7 @@
     "uvRotationSpeed":         0.8,
     "scaleChangeTime":         3.0,
     "stayTime":               15.0,
-    "createInterval":          3.0,
+    "createInterval":          1.0,
     "orbitRadius":            60.0,
     "orbitRadiusVariation":   10.0,
     "orbitOffsetVariation":   20.0,
