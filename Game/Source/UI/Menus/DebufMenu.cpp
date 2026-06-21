@@ -19,8 +19,8 @@ namespace app
 
 		DebufMenu::~DebufMenu()
 		{}
-		
-		
+
+
 		void DebufMenu::Update()
 		{
 			// アニメーションが開始していない場合は、設定する。
@@ -28,15 +28,15 @@ namespace app
 			{
 				m_startingAnimLogic.Initialize(
 					this,
-					{}, // アイコンUIはなし。
-					{}, // 数字UIはなし。
-					Vector3(-400.0f, 0.0f, 0.0f), // 開始位置のオフセット。画面上部から少し下にずらす。
-					1.0f, // アニメーションの持続時間。1秒。
-					{ "counterDigit", "percentDigit" } // テキストUIはなし。
+					{ "speedDownIcon" },
+					{},
+					Vector3(-400.0f, 0.0f, 0.0f),
+					1.0f,
+					{ "speedDownDigit", "percentMark" }
 				);
 			}
 
-			// アニメーションが開始している場合は、更新する。
+			// アニメーションが終了していない場合は、更新する。
 			if (!m_startingAnimLogic.IsAnimationFinished())
 			{
 				m_startingAnimLogic.Update();
@@ -45,39 +45,32 @@ namespace app
 			auto* pChildManager = app::actor::ChildPenguinManager::GetInstance();
 			if (pChildManager)
 			{
-				// 現在の甘えん坊の数を取得。
 				int clingyCount = pChildManager->GetClingyCount();
 
-				// 文字と数字を両方表示するもの。
-				auto* countText = GetUI<UIText>(Hash32("counterDigit"));
-				auto* percentText = GetUI<UIText>(Hash32("percentDigit"));
+				auto* digitText   = GetUI<UIText>(Hash32("speedDownDigit"));
+				auto* percentText = GetUI<UIText>(Hash32("percentMark"));
 
 				if (clingyCount > 0)
 				{
-					// 甘えん坊がいるのでメニュー自体を描画ONにする
 					m_isDraw = true;
 
-					// 表示するデバフ率の計算
-					int debuffPercent = clingyCount * 1;
+					// DaddyPenguinControllerと同じ計算式で減速率を求める
+					constexpr int MAX_SLOW_PERCENT = 20;
+					int slowPercent = min(clingyCount, MAX_SLOW_PERCENT);
 
-					if (countText)
+					if (digitText)
 					{
-						countText->SetText(std::to_string(clingyCount) + "匹");
-						countText->m_isDraw = true;
+						digitText->SetText(std::to_string(slowPercent));
+						digitText->m_isDraw = true;
 					}
 
-					if (percentText)
-					{
-						percentText->SetText(std::to_string(debuffPercent) + "%");
-						percentText->m_isDraw = true;
-					}
+					if (percentText) percentText->m_isDraw = true;
 				}
 				else
 				{
-					// 甘えん坊がいない時は、メニュー自体を非表示にする
 					m_isDraw = false;
 
-					if (countText)   countText->m_isDraw = false;
+					if (digitText)   digitText->m_isDraw   = false;
 					if (percentText) percentText->m_isDraw = false;
 				}
 			}
@@ -99,11 +92,11 @@ namespace app
 
 		void DebufMenu::InitializeLogic()
 		{
-			auto* textA = GetUI<UIText>(Hash32("counterDigit"));
-			if (textA) textA->m_isDraw = false;
+			auto* digitText = GetUI<UIText>(Hash32("speedDownDigit"));
+			if (digitText) digitText->m_isDraw = false;
 
-			auto* textB = GetUI<UIText>(Hash32("percentDigit"));
-			if (textB) textB->m_isDraw = false;
+			auto* percentText = GetUI<UIText>(Hash32("percentMark"));
+			if (percentText) percentText->m_isDraw = false;
 		}
 	}
 }

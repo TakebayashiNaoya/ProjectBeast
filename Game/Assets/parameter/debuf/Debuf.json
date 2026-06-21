@@ -2,28 +2,39 @@
     "canvas":{
         "elements":[
             {
-                "type":"UIText",
-                "name":"percentDigit",
-                "text":"0",
-                "fontSize":1.2,
-                "fontScaleX":1.0,
-                "fontScaleY":1.0,
-                "position":[ -400, 0, 0],
+                "type":"UIIcon",
+                "name":"speedDownIcon",
+                "asset":"Assets/spriteData/UI/Icon/SpeedDown.DDS",
+                "width":70,
+                "height":70,
+                "position":[360, -400, 0],
+                "scale":[1,1,1],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255],
-                "pivot":[ 0.5, 0.5]
+                "color":[255,255,255,255]
             },
             {
                 "type":"UIText",
-                "name":"counterDigit",
+                "name":"speedDownDigit",
                 "text":"0",
-                "fontSize":1.2,
+                "fontSize":1.0,
                 "fontScaleX":1.0,
                 "fontScaleY":1.0,
-                "position":[ -400, 0, 0],
+                "position":[450, -400, 0],
                 "rotation":0,
-                "color":[ 255, 255, 255, 255],
-                "pivot":[ 0.5, 0.5]
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
+            },
+            {
+                "type":"UIText",
+                "name":"percentMark",
+                "text":"%",
+                "fontSize":1.0,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[510, -400, 0],
+                "rotation":0,
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
             }
         ]
     }
