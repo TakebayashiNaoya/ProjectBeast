@@ -4,7 +4,7 @@
             {
                 "type": "UIVideo",
                 "name": "StagePreviewVideo",
-                "clipPath": "Assets/Video/TutorialStage.mp4",
+                "clipPath": "Assets/Video/EasyStage.mp4",
                 "width": 1920,
                 "height": 1080,
                 "position": [0, 0, 0],
@@ -262,9 +262,9 @@
         "cursorBlinkStartColor": [255, 255, 255, 255],
         "cursorBlinkEndColor": [255, 255, 255, 0],
         "stageVideoPaths": [
-            "Assets/Video/TutorialStage.mp4",
-            "Assets/Video/TutorialStage.mp4",
-            "Assets/Video/TutorialStage.mp4",
+            "Assets/Video/EasyStage.mp4",
+            "Assets/Video/NormalStage.mp4",
+            "Assets/Video/HardStage.mp4",
             "Assets/Video/TutorialStage.mp4"
         ]
     }
