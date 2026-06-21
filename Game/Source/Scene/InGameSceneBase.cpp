@@ -47,6 +47,11 @@
 #include "Source/Nature/WhirlpoolManager.h"
 
 
+namespace
+{
+	const Vector3 SKY_CUBE_SCALE = Vector3(1000.0f, 800.0f, 1000.0f);
+}
+
 namespace app
 {
 	InGameSceneBase::InGameSceneBase()
@@ -241,11 +246,11 @@ namespace app
 			 */
 			m_skyCube = NewGO<SkyCube>(0);
 			m_skyCube->SetType(enSkyCubeType_Clear);
-			m_skyCube->SetScale(Vector3(700.0f, 600.0f, 700.0f));
+			m_skyCube->SetScale(SKY_CUBE_SCALE);
 			m_skyCube->SetLuminance(0.8f);
 
 			nature::Ocean::CreateInstance();
-			nature::Ocean::GetInstance()->Start(GetOceanParameterBinaryPath());
+			nature::Ocean::GetInstance()->Start(GetOceanParameterBinaryPath(), GetOceanParameterJsonPath());
 
 			nature::WhirlpoolManager::CreateInstance();
 			nature::WhirlpoolManager::GetInstance()->Start(

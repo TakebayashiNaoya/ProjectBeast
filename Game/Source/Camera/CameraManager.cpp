@@ -22,8 +22,8 @@ namespace app
 
 
 			// カメラの初期化
-			CameraSystem::Get().GetMainCamera().SetNear(0.01f);
-			CameraSystem::Get().GetMainCamera().SetFar(5000.0f);
+			CameraSystem::Get().GetMainCamera().SetNear(1.0f);
+			CameraSystem::Get().GetMainCamera().SetFar(20000.0f);
 
 			Setup(&CameraSystem::Get().GetMainCamera());
 		}

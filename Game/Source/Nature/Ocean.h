@@ -287,9 +287,10 @@ namespace app
 		public:
 			/**
 			 * @brief 初期化処理
-			 * @param parameterJsonPath 海のパラメーターJSONパス
+			 * @param binaryPath バイナリパス（初期ロード用）
+			 * @param jsonPath   JSONパス（ホットリロード監視用）
 			 */
-			void Start(const char* parameterPath);
+			void Start(const char* binaryPath, const char* jsonPath);
 
 			/**
 			 * @brief 更新処理
@@ -308,6 +309,11 @@ namespace app
 			 * @brief 波のスクロール速度を設定
 			 */
 			inline void SetWaveSpeed(float speed) { m_waveSpeed = speed; }
+
+			/**
+			 * @brief スケールを設定
+			 */
+			inline void SetScale(const Vector3& scale) { m_scale = scale; }
 
 			/**
 			 * @brief 指定ワールドXZ座標における波面Yをバイリニア補間で取得する
@@ -339,6 +345,8 @@ namespace app
 				m_constantBuffer.waveScroll += deltaTime * m_waveSpeed;
 				m_constantBuffer.textureScroll += deltaTime * m_textureSpeed;
 			}
+
+			void ApplyParameter();
 
 			OceanMesh::SWaveConstantBuffer BuildWaveCb() const;
 
