@@ -3,6 +3,17 @@
         "elements":[
             {
                 "type":"UIIcon",
+                "name":"debufBgIcon",
+                "asset":"Assets/spriteData/UI/Icon/BgIcon.DDS",
+                "width":290,
+                "height":90,
+                "position":[420, -400, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[0,0,0,150]
+            },
+            {
+                "type":"UIIcon",
                 "name":"speedDownIcon",
                 "asset":"Assets/spriteData/UI/Icon/SpeedDown.DDS",
                 "width":70,
