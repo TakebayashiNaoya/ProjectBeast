@@ -17,7 +17,7 @@ namespace nsBeastEngine
 		 */
 		void SetText(const wchar_t* text)
 		{
-			swprintf_s(m_text, text);
+			swprintf_s(m_text, L"%s", text);
 		}
 
 		/**

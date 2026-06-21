@@ -34,6 +34,7 @@ namespace app
 		class TitleEventMenu;
 		class AchievementNotificationMenu;
 		class InGameButtonMenu;
+		class DebufMenu;
 
 		class CPReactionSystem;
 		class WpWarningSystem;
@@ -151,7 +152,8 @@ namespace app
 		inline ui::WpWarningSystem* GetWpWarningSystem() const { return m_wpWarningSystem.get(); }
 		/** @brief 救助数Menuを取得 */
 		inline ui::RemainingChildMenu* GetRemainingChildMenu() const { return m_remainingChildPacket->GetMenu(); }
-
+		/** @brief デバフMenuを取得 */
+		inline ui::DebufMenu* GetDebufMenu() const { return m_debufPacket->GetMenu(); }
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
@@ -188,6 +190,7 @@ namespace app
 		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
 		ui::UIPacket<ui::AchievementNotificationMenu> m_achievementNotificationPacket;
 		ui::UIPacket<ui::InGameButtonMenu> m_inGameButtonPacket;
+		ui::UIPacket<ui::DebufMenu> m_debufPacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;

@@ -1,0 +1,52 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "type":"UIIcon",
+                "name":"debufBgIcon",
+                "asset":"Assets/spriteData/UI/Icon/BgIcon.DDS",
+                "width":290,
+                "height":90,
+                "position":[420, -400, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[0,0,0,150]
+            },
+            {
+                "type":"UIIcon",
+                "name":"speedDownIcon",
+                "asset":"Assets/spriteData/UI/Icon/SpeedDown.DDS",
+                "width":70,
+                "height":70,
+                "position":[360, -400, 0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIText",
+                "name":"speedDownDigit",
+                "text":"0",
+                "fontSize":1.0,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[450, -400, 0],
+                "rotation":0,
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
+            },
+            {
+                "type":"UIText",
+                "name":"percentMark",
+                "text":"%",
+                "fontSize":1.0,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[510, -400, 0],
+                "rotation":0,
+                "color":[255,255,255,255],
+                "pivot":[0.5, 0.5]
+            }
+        ]
+    }
+}
