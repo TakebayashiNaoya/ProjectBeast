@@ -13,16 +13,16 @@
                 "color":    [0, 0, 0, 220]
             },
             {
-                "type":      "UIText",
-                "name":      "TutorialWindowTitle",
-                "text":      "ブルーペンギン",
-                "fontSize":  1.0,
+                "type":       "UIText",
+                "name":       "TutorialWindowTitle",
+                "text":       "ブルーペンギン",
+                "fontSize":   1.0,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
-                "position":  [0, 258, 0],
-                "rotation":  0,
-                "color":     [255, 255, 255, 255],
-                "pivot":     [0.5, 0.5]
+                "position":   [0, 258, 0],
+                "rotation":   0,
+                "color":      [255, 255, 255, 255],
+                "pivot":      [0.5, 0.5]
             },
             {
                 "type":     "UIVideo",
@@ -39,16 +39,16 @@
                 "autoPlay": false
             },
             {
-                "type":      "UIText",
-                "name":      "TutorialWindowDesc",
-                "text":      "とってもまじめで指示通り動いてくれる子ペンギン。",
-                "fontSize":  0.6,
+                "type":       "UIText",
+                "name":       "TutorialWindowDesc",
+                "text":       "とってもまじめで指示通り動いてくれる子ペンギン。",
+                "fontSize":   0.6,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
-                "position":  [0, -185, 0],
-                "rotation":  0,
-                "color":     [255, 255, 255, 255],
-                "pivot":     [0.5, 0.5]
+                "position":   [0, -185, 0],
+                "rotation":   0,
+                "color":      [255, 255, 255, 255],
+                "pivot":      [0.5, 0.5]
             },
             {
                 "type":     "UIIcon",
