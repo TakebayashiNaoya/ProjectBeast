@@ -144,18 +144,30 @@ void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
 
 void InitializeUIParts(app::ui::UIText* text, const nlohmann::json& item)
 {
-	const std::string content    = app::util::JsonConverter::ToString(item, "text");
-	const float       fontSize   = app::util::JsonConverter::ToFloat(item, "fontSize",   1.0f);
-	const float       fontScaleX = app::util::JsonConverter::ToFloat(item, "fontScaleX", 1.0f) * fontSize;
-	const float       fontScaleY = app::util::JsonConverter::ToFloat(item, "fontScaleY", 1.0f) * fontSize;
-	const Vector3     position   = app::util::JsonConverter::ToVector3(item, "position");
-	const Vector3     scale      = app::util::JsonConverter::ToVector3(item, "scale", false, Vector3::One);
-	const Quaternion  rotation   = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation", app::util::JsonConverter::InvalidFloat));
-	const Vector4     color      = app::util::JsonConverter::ToVector4(item, "color");
-	const Vector2     pivot      = app::util::JsonConverter::ToVector2(item, "pivot");
+	const std::string content     = app::util::JsonConverter::ToString(item, "text");
+	const float       fontSize    = app::util::JsonConverter::ToFloat(item, "fontSize",    1.0f);
+	const float       fontScaleX  = app::util::JsonConverter::ToFloat(item, "fontScaleX",  1.0f) * fontSize;
+	const float       fontScaleY  = app::util::JsonConverter::ToFloat(item, "fontScaleY",  1.0f) * fontSize;
+	const Vector3     position    = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3     scale       = app::util::JsonConverter::ToVector3(item, "scale", false, Vector3::One);
+	const Quaternion  rotation    = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation", app::util::JsonConverter::InvalidFloat));
+	const Vector4     color       = app::util::JsonConverter::ToVector4(item, "color");
+	const Vector2     pivot       = app::util::JsonConverter::ToVector2(item, "pivot");
+	const float       lineSpacing = app::util::JsonConverter::ToFloat(item, "lineSpacing", 1.2f);
+
+	// "align": "left" / "center" / "right" (省略時は left)
+	nsBeastEngine::TextAlign textAlign = nsBeastEngine::TextAlign::Left;
+	if (item.contains("align"))
+	{
+		const std::string alignStr = item["align"].get<std::string>();
+		if (alignStr == "center") textAlign = nsBeastEngine::TextAlign::Center;
+		else if (alignStr == "right")  textAlign = nsBeastEngine::TextAlign::Right;
+	}
 
 	text->SetText(content);
 	text->SetScale(Vector2(fontScaleX, fontScaleY));
+	text->SetTextAlign(textAlign);
+	text->SetLineSpacing(lineSpacing);
 	text->m_transform.m_localTransform.m_position = position;
 	text->m_transform.m_localTransform.m_scale = scale;
 	text->m_transform.m_localTransform.m_rotation = rotation;
@@ -177,7 +189,7 @@ void InitializeUIParts(app::ui::UIVideo* video, const nlohmann::json& item)
 	const Vector3    position = app::util::JsonConverter::ToVector3(item, "position", false, Vector3::Zero);
 	const Vector3    scale    = app::util::JsonConverter::ToVector3(item, "scale",    false, Vector3::One);
 	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation", app::util::JsonConverter::InvalidFloat));
-	const Vector4    color    = app::util::JsonConverter::ToVector4(item, "color", false, Vector4::White);
+	const Vector4    color    = app::util::JsonConverter::ToVector4(item, "color", true, Vector4::White);
 
 	video->Initialize(data);
 	video->m_transform.m_localTransform.m_position = position;

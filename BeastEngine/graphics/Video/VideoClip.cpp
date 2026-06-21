@@ -244,6 +244,24 @@ namespace nsBeastEngine
 		ComPtr<IMFMediaType> actualType;
 		reader->GetCurrentMediaType(MF_SOURCE_READER_FIRST_VIDEO_STREAM, &actualType);
 
+		// 実際に交渉された出力フォーマットを確認（ARGB32/RGB32 以外だと色化けする）
+		{
+			GUID subtypeActual = GUID_NULL;
+			actualType->GetGUID(MF_MT_SUBTYPE, &subtypeActual);
+			const bool isARGB32 = (subtypeActual == MFVideoFormat_ARGB32);
+			const bool isRGB32  = (subtypeActual == MFVideoFormat_RGB32);
+			const char* subtypeName = "";
+			if	    (isARGB32) { subtypeName = "ARGB32"; }
+			else if (isRGB32)  { subtypeName = "RGB32"; }
+			else               { subtypeName = "OTHER (color may be wrong)"; }
+			K2_LOG("VideoClip: actual output subtype = %s\n", subtypeName);
+			if (!isARGB32 && !isRGB32)
+			{
+				K2_LOG("VideoClip: WARNING – unsupported output format. "
+					   "Enable the Windows codec pack or re-encode the video as H.264 MP4.\n");
+			}
+		}
+
 		UINT32 w = 0, h = 0;
 		MFGetAttributeSize(actualType.Get(), MF_MT_FRAME_SIZE, &w, &h);
 		m_width = static_cast<int>(w);
@@ -311,15 +329,17 @@ namespace nsBeastEngine
 
 		HRESULT hr = reader->ReadSample(
 			MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-			0, &streamIdx, &flags, &timestamp, &sample);
+			0, 
+			&streamIdx,
+			&flags, 
+			&timestamp,
+			&sample
+		);
 
 		if (FAILED(hr) || (flags & MF_SOURCE_READERF_ENDOFSTREAM))
 		{
 			m_mp4Eos = true;
-			if (sample)
-			{
-				sample->Release();
-			}
+			if (sample) sample->Release();
 			return false;
 		}
 		if (!sample) return false;
@@ -347,7 +367,7 @@ namespace nsBeastEngine
 						dst[x * 4 + 0] = row[x * 4 + 2]; // R (BGRx → RGBA)
 						dst[x * 4 + 1] = row[x * 4 + 1]; // G
 						dst[x * 4 + 2] = row[x * 4 + 0]; // B
-						dst[x * 4 + 3] = 0xFF;            // A (RGB32 は X=0 なので強制不透明)
+						dst[x * 4 + 3] = 0xFF;           // A (RGB32 は X=0 なので強制不透明)
 					}
 				}
 				buf2D->Unlock2D();
@@ -382,6 +402,7 @@ namespace nsBeastEngine
 		}
 
 		buf->Release();
+
 		m_mp4CurrentFrame++;
 		return true;
 	}

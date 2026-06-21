@@ -37,6 +37,7 @@
 #include "Source/UI/MiniMap/MiniMapMenu.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
+#include "Source/UI/Menus/DebufMenu.h"
 
 
 namespace app
@@ -84,6 +85,10 @@ namespace app
 		ui::InitUIPacket(m_soundOptionPacket, "Assets/parameter/sound/SoundOption.json");
 		// 睡眠中クマの起床ゲージを生成
 		ui::InitUIPacket(m_enemySleepingPacket, "Assets/parameter/UI/enemySleepGauge/sleepGauge.json");
+		// デバフメニューを生成
+		ui::InitUIPacket(m_debufPacket, "Assets/parameter/debuf/Debuf.json");
+
+		if(auto* menu = m_debufPacket->GetMenu()) menu->SetDraw(false);
 
 		if (auto* menu = m_enemySleepingPacket->GetMenu())
 		{
@@ -265,6 +270,7 @@ namespace app
 		if (m_achievementPacket) m_achievementPacket->Update();
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Update();
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Update();
+		if (m_debufPacket) m_debufPacket->Update();
 	}
 
 
@@ -313,6 +319,7 @@ namespace app
 		if (m_remainingChildPacket) m_remainingChildPacket->Render(rc);
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Render(rc);
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Render(rc);
+		if (m_debufPacket) m_debufPacket->Render(rc);
 	}
 
 

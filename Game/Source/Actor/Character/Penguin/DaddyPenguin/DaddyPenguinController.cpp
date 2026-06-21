@@ -12,6 +12,7 @@
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include <algorithm> // std::min用
 
 
@@ -86,7 +87,40 @@ namespace app
 				if (inputDir.LengthSq() > FLT_EPSILON) {
 					inputDir.Normalize();
 				}
-				moveDirection = inputDir;
+
+
+				//===========================================================//
+				// 甘えん坊の数に応じて親ペンギンの移動速度を調整するロジック//
+				//===========================================================//
+				// 等倍スピード。
+				float speedMulpitler = 1.0f;
+				// ChildPenguinManagerから隊列の中に甘えん坊が何匹いるかを取得する。
+				int clingyCount = ChildPenguinManager::GetInstance()->GetClingyCount();
+
+				// 甘えん坊が1匹以上いる場合は、親ペンギンの移動速度を減速させる。
+				if (clingyCount > 0)
+				{
+					const int MAX_SLOW_PERCENT = 20;	// 最大減速率（%）
+					const int MAX_PERCENT = 100;		// 最大値（%）
+
+					// float計算だとずれが出るので、int計算で減速率を決める。
+					int slowPercent = min(clingyCount * 1, MAX_SLOW_PERCENT);
+					// 現在の減速率を計算。
+					int currentPercent = MAX_PERCENT - slowPercent;
+
+					// 減速率をfloatに変換して、最終的なスピード倍率を計算。
+					float maxMulpitler = currentPercent / static_cast<float>(MAX_PERCENT);
+
+					// 最小スピード倍率。
+					const float MIN_MULPITER = 1.0f;
+					// 最大減速率を適用したスピード倍率を計算。
+					speedMulpitler = MIN_MULPITER + (maxMulpitler - MIN_MULPITER) * speedMulpitler;
+				}
+
+				// 最終的なスティックの入力値。
+				float finalStickLength = util::clamp<float>(stickLength * speedMulpitler, 0.0f, 1.0f);
+
+				moveDirection = inputDir * finalStickLength;
 
 				/** Bボタンの状態でスニークかダッシュかを決める */
 				const float SNEAK_THRESHOLD = 0.9f;

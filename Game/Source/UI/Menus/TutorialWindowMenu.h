@@ -31,7 +31,8 @@ namespace app
 		 *   ■ JSON に必要な要素（name を変えないこと）
 		 *     TutorialWindowBg          : 背景パネル（UIIcon）※ scale を [0,0,1] にすること
 		 *     TutorialWindowVideo       : 動画（UIVideo）
-		 *     TutorialWindowDesc        : 説明画像（UIIcon）
+		 *     TutorialWindowTitle       : 見出しテキスト（UIText）省略可
+		 *     TutorialWindowDesc        : 説明テキスト（UIText または UIIcon）
 		 *     TutorialWindowClosePrompt : 操作案内画像（UIIcon）
 		 */
 		class TutorialWindowMenu : public MenuBase
