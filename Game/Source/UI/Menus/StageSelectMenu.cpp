@@ -113,6 +113,16 @@ namespace app
 			// パーツを取得
 			GetUIParts();
 
+			// 全ステージのクリップをここで先読みしておく（カーソル移動時の I/O を排除）
+			if (m_stagePreviewVideo)
+			{
+				m_stagePreviewVideo->ClearPreloadedClips();
+				for (const auto& path : m_param.stageVideoPaths)
+				{
+					if (!path.empty()) m_stagePreviewVideo->PreloadClip(path.c_str());
+				}
+			}
+
 			std::vector<UIBase*> icons = {
 				m_bgIcon,
 				m_stageSelectText,
@@ -265,17 +275,13 @@ namespace app
 				}
 			}
 
-			// ステージが変わったら背景映像を切り替える
+			// ステージが変わったら事前ロード済みクリップにポインタを切り替える（I/O なし）
 			if (m_selectingStage != m_prevSelectingStage)
 			{
 				m_prevSelectingStage = m_selectingStage;
 				if (m_stagePreviewVideo)
 				{
-					const auto& path = m_param.stageVideoPaths[static_cast<uint8_t>(m_selectingStage)];
-					if (!path.empty())
-					{
-						m_stagePreviewVideo->ChangeClip(path.c_str());
-					}
+					m_stagePreviewVideo->SwitchToPreloadedClip(static_cast<int>(m_selectingStage));
 				}
 			}
 		}

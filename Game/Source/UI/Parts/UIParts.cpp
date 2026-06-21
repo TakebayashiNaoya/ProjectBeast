@@ -482,6 +482,27 @@ namespace app
 		}
 
 
+		bool UIVideo::PreloadClip(const char* path, float fps)
+		{
+			auto clip = std::make_unique<nsBeastEngine::VideoClip>();
+			if (!clip->Load(path))
+			{
+				K2_LOG("UIVideo::PreloadClip: 読み込み失敗 %s\n", path);
+				return false;
+			}
+			clip->SetFPS(fps);
+			m_preloadedClips.push_back(std::move(clip));
+			return true;
+		}
+
+
+		void UIVideo::SwitchToPreloadedClip(int slotIndex)
+		{
+			if (slotIndex < 0 || slotIndex >= static_cast<int>(m_preloadedClips.size())) return;
+			m_videoRender.SwapClip(m_preloadedClips[slotIndex].get());
+		}
+
+
 		/*************************************/
 
 
