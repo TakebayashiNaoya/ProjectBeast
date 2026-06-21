@@ -179,7 +179,6 @@ namespace app
 		auto* menu = m_stageSelectPacket->GetMenu();
 		if (m_stageSelectPacket->GetMenu()->IsFinishedSelectAnimation())
 		{
-			menu->Reset();
 			SoundManager::Get().StopBGM();
 			m_nextScene = true;
 			return;
