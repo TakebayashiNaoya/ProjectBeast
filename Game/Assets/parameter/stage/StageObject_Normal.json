@@ -14,7 +14,63 @@
         "objectName" : "bearHome_1",
         "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
         "isNeedCollision" : true,
-        "position" : [0, 100, 500],
+        "position" : [215, 123, 1512],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_2",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [-229, 48, 3130],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_3",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [1621, 124, -1199],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_4",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [1880, 122, -700],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_5",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [2011, 39, 28],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_6",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [1095, 40, 1535],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_7",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [4072, 200, 16],
+        "rotationDeg" : [0, 90, 0],
+        "scale" : [1, 1, 1]
+      },
+      {
+        "objectName" : "bearHome_8",
+        "fileName" : "Assets/modelData/stage/BearHome/BearHome.tkm",
+        "isNeedCollision" : true,
+        "position" : [-1592, 128 , -896],
         "rotationDeg" : [0, 90, 0],
         "scale" : [1, 1, 1]
       },
@@ -22,8 +78,26 @@
         "objectName" : "igloo01",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
-        "position" : [0, 100, 500],
-        "rotationDeg" : [0, 0, 0],
+        "position" : [-725, 60, 1600],
+        "rotationDeg" : [0, 240, -20],
+        "scale" : [4, 4, 4],
+        "pbrName" : "igloo"
+      },
+      {
+        "objectName" : "igloo02",
+        "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
+        "isNeedCollision" : true,
+        "position" : [1440, 45, -1760],
+        "rotationDeg" : [0, 40, -20],
+        "scale" : [4, 4, 4],
+        "pbrName" : "igloo"
+      },
+      {
+        "objectName" : "igloo03",
+        "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
+        "isNeedCollision" : true,
+        "position" : [3219, 35, 1647],
+        "rotationDeg" : [0, 240, -20],
         "scale" : [4, 4, 4],
         "pbrName" : "igloo"
       }
