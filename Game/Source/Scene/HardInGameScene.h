@@ -26,7 +26,7 @@ namespace app
 
 		Vector3 GetDaddySpawnPos() const override
 		{
-			return { 0.0f, 425.0f, 100.0f };
+			return { 0.0f, 274.0f, 100.0f };
 		}
 
 		PenguinSpawnConfig GetPenguinConfig() const override

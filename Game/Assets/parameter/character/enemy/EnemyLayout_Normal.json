@@ -1,8 +1,16 @@
 {
   "enemies": [
     {
-      "spawnPosition": [0, 100, 500],
+      "spawnPosition": [-1717, 75, -1146],
       "nestName": "bearHome_1",
+      "patrolPoints": [
+        [-1717, 75, -1146],
+        [-1870, 82, -812]
+      ]
+    },
+    {
+      "spawnPosition": [-38, 119, 1491],
+      "nestName": "bearHome_3",
       "patrolPoints": [
         [-200, 100, 300],
         [ 200, 100, 300],
@@ -11,11 +19,11 @@
       ]
     },
     {
-      "spawnPosition" : [-1717, 75, -1146],
-      "nestName" : "bearHome_8",
-      "patrolPoints" : [
-        [-1717, 75, -1146],
-        [-1870, 82, -812]
+      "spawnPosition": [1893, 119, -867],
+      "nestName": "bearHome_6",
+      "patrolPoints": [
+        [1893, 119, -867],
+        [2000, 119, -867]
       ]
     }
   ]
