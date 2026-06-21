@@ -541,6 +541,18 @@ namespace app
 				m_fontRender.SetShadowParam(enable, offset, color);
 			}
 
+			/** 水平アライメントの設定 */
+			void SetTextAlign(nsBeastEngine::TextAlign align)
+			{
+				m_fontRender.SetTextAlign(align);
+			}
+
+			/** 行間倍率の設定 (1.0=隙間なし、1.2=デフォルト) */
+			void SetLineSpacing(float lineSpacing)
+			{
+				m_fontRender.SetLineSpacing(lineSpacing);
+			}
+
 
 		private:
 			nsBeastEngine::FontRender m_fontRender;
