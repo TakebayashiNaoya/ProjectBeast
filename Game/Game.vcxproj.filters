@@ -538,6 +538,12 @@
     <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp">
       <Filter>Source\Actor\Stage</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Vfx\FadeGravityParticleRender.cpp">
+      <Filter>Source\Vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\DebufMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -995,6 +1001,12 @@
     </ClInclude>
     <ClInclude Include="Source\Vfx\HomingParticleRender.h">
       <Filter>Source\Vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Vfx\FadeGravityParticleRender.h">
+      <Filter>Source\Vfx</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\DebufMenu.h">
+      <Filter>Source\UI\Menus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

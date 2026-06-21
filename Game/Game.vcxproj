@@ -344,6 +344,7 @@
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\CountDownMenu.cpp" />
+    <ClCompile Include="Source\UI\Menus\DebufMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\EnemySleepingMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\EventMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\FinishMenu.cpp" />
@@ -379,6 +380,7 @@
     <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
     <ClCompile Include="Source\Util\JsonConverter.cpp" />
+    <ClCompile Include="Source\Vfx\FadeGravityParticleRender.cpp" />
     <ClCompile Include="Source\Vfx\HomingParticleRender.cpp" />
     <ClCompile Include="Source\Vfx\Particle.cpp" />
     <ClCompile Include="Source\Vfx\ParticleEffectLoader.cpp" />
@@ -505,6 +507,7 @@
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h" />
     <ClInclude Include="Source\UI\Menus\CountDownMenu.h" />
+    <ClInclude Include="Source\UI\Menus\DebufMenu.h" />
     <ClInclude Include="Source\UI\Menus\EnemySleepingMenu.h" />
     <ClInclude Include="Source\UI\Menus\EventMenu.h" />
     <ClInclude Include="Source\UI\Menus\FinishMenu.h" />
@@ -543,6 +546,7 @@
     <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />
     <ClInclude Include="Source\Util\JsonConverter.h" />
+    <ClInclude Include="Source\Vfx\FadeGravityParticleRender.h" />
     <ClInclude Include="Source\Vfx\HomingParticleRender.h" />
     <ClInclude Include="Source\Vfx\Particle.h" />
     <ClInclude Include="Source\Vfx\ParticleEffectLoader.h" />
