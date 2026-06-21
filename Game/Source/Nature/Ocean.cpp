@@ -187,6 +187,10 @@ namespace app
 			const float cellSize = GRID_SIZE / static_cast<float>(GRID_DIVISION);
 			const int numVertsPerRow = GRID_DIVISION + 1;
 
+			// ワールド行列からXZ方向スケールを抽出する（視錐台判定をワールド座標で行うため）
+			const float sx = mWorld.m[0][0];
+			const float sz = mWorld.m[2][2];
+
 			for (int chunkZ = 0; chunkZ < m_chunkDivision; chunkZ++)
 			{
 				for (int chunkX = 0; chunkX < m_chunkDivision; chunkX++)
@@ -194,14 +198,15 @@ namespace app
 					const int chunkIndex = chunkZ * m_chunkDivision + chunkX;
 					const SChunkAABB& chunkAABB = m_chunkAABBs[static_cast<size_t>(chunkIndex)];
 
-					// チャンクAABBが視錐台と交差しない場合はスキップする
-					if (!view.frustum.IsIntersectAABBWorld(chunkAABB.min, chunkAABB.max))
+					// ローカルAABBにスケールを適用してワールド座標に変換してから視錐台判定する
+					const Vector3 chunkWorldMin(chunkAABB.min.x * sx, chunkAABB.min.y, chunkAABB.min.z * sz);
+					const Vector3 chunkWorldMax(chunkAABB.max.x * sx, chunkAABB.max.y, chunkAABB.max.z * sz);
+					if (!view.frustum.IsIntersectAABBWorld(chunkWorldMin, chunkWorldMax))
 					{
 						continue;
 					}
 
 					// 交差チャンクはセル単位でAABB判定し、可視セルのインデックスのみ追加する
-					// セルのY範囲は親チャンクのY範囲をそのまま流用する
 					const int cellXStart = chunkX * cellsPerChunk;
 					const int cellZStart = chunkZ * cellsPerChunk;
 
@@ -209,15 +214,15 @@ namespace app
 					{
 						for (int cx = cellXStart; cx < cellXStart + cellsPerChunk; cx++)
 						{
-							// セルのXZ範囲をワールド空間で算出する
-							const float cellMinX = -gridHalfSize + cellSize * static_cast<float>(cx);
-							const float cellMinZ = -gridHalfSize + cellSize * static_cast<float>(cz);
-							const float cellMaxX = cellMinX + cellSize;
-							const float cellMaxZ = cellMinZ + cellSize;
+							// セルのXZ範囲をワールド座標で算出する（スケール適用済み）
+							const float cellMinX = (-gridHalfSize + cellSize * static_cast<float>(cx))      * sx;
+							const float cellMinZ = (-gridHalfSize + cellSize * static_cast<float>(cz))      * sz;
+							const float cellMaxX = (-gridHalfSize + cellSize * static_cast<float>(cx + 1)) * sx;
+							const float cellMaxZ = (-gridHalfSize + cellSize * static_cast<float>(cz + 1)) * sz;
 
 							// セルAABBのY範囲は親チャンクのY範囲を流用する
-							const Vector3 cellMin(cellMinX, chunkAABB.min.y, cellMinZ);
-							const Vector3 cellMax(cellMaxX, chunkAABB.max.y, cellMaxZ);
+							const Vector3 cellMin(cellMinX, chunkWorldMin.y, cellMinZ);
+							const Vector3 cellMax(cellMaxX, chunkWorldMax.y, cellMaxZ);
 
 							// セルAABBが視錐台と交差しない場合はスキップする
 							if (!view.frustum.IsIntersectAABBWorld(cellMin, cellMax))
@@ -783,28 +788,56 @@ namespace app
 		}
 
 
-		void Ocean::Start(const char* parameterPath)
+		void Ocean::Start(const char* binaryPath, const char* jsonPath)
 		{
 			const std::array<DXGI_FORMAT, MAX_RENDERING_TARGET> colorBufferFormat = {
 				DXGI_FORMAT_R32G32B32A32_FLOAT,
 				DXGI_FORMAT_UNKNOWN
 			};
 
-			core::ParameterManager::Get()->LoadParameterBinary<MasterOceanParameter>(parameterPath);
+			core::ParameterManager::Get()->LoadParameterBinary<MasterOceanParameter>(binaryPath);
 
-			// 読み込んだパラメーターを定数バッファに反映する
-			const auto* param = core::ParameterManager::Get()->GetParameter<MasterOceanParameter>();
-			if (param != nullptr)
+			// 起動時にJSONを適用してバイナリに未収録フィールドを補完する（Release/Debug共通）
 			{
-				m_constantBuffer.baseReflectance = param->baseReflectance;
-				m_constantBuffer.wave1Amplitude = param->wave1Amplitude;
-				m_constantBuffer.wave1Frequency = param->wave1Frequency;
-				m_constantBuffer.wave2Amplitude = param->wave2Amplitude;
-				m_constantBuffer.wave2Frequency = param->wave2Frequency;
-				m_constantBuffer.specularPower = param->specularPower;
-				m_constantBuffer.specularScale = param->specularScale;
-				m_constantBuffer.ambientScale = param->ambientScale;
+				auto applyJson = [](const nlohmann::json& j, MasterOceanParameter& p)
+				{
+					p.baseReflectance = j.at("baseReflectance").get<float>();
+					p.wave1Amplitude  = j.at("wave1Amplitude").get<float>();
+					p.wave1Frequency  = j.at("wave1Frequency").get<float>();
+					p.wave2Amplitude  = j.at("wave2Amplitude").get<float>();
+					p.wave2Frequency  = j.at("wave2Frequency").get<float>();
+					p.specularPower   = j.at("specularPower").get<float>();
+					p.specularScale   = j.at("specularScale").get<float>();
+					p.ambientScale    = j.at("ambientScale").get<float>();
+					p.sizeX           = j.value("sizeX", 12500.0f);
+					p.sizeZ           = j.value("sizeZ", 12500.0f);
+				};
+
+				nlohmann::json jsonRoot;
+				if (util::JsonConverter::IsLoadJsonFile(jsonRoot, std::string(jsonPath)) && jsonRoot.is_array())
+				{
+					auto params = core::ParameterManager::Get()->GetParameters<MasterOceanParameter>();
+					const size_t readCount = (std::min)(params.size(), jsonRoot.size());
+					for (size_t i = 0; i < readCount; ++i)
+					{
+						applyJson(jsonRoot[i], *params[i]);
+					}
+				}
+
+#ifdef APP_PARAM_HOT_RELOAD
+				// ホットリロード用の設定（デバッグのみ）
+				MasterOceanParameter::load = applyJson;
+				const time_t jsonTime = util::JsonConverter::GetFileLastWriteTime(jsonPath);
+				for (auto* p : core::ParameterManager::Get()->GetParameters<MasterOceanParameter>())
+				{
+					p->m_path          = std::string(jsonPath);
+					p->m_lastWriteTime = jsonTime;
+				}
+#endif
 			}
+
+			// 読み込んだパラメーターを定数バッファに反映する（JSON 補完後に呼ぶ）
+			ApplyParameter();
 
 			m_oceanMesh.Init(
 				"Assets/shader/Ocean.fx",
@@ -822,8 +855,30 @@ namespace app
 		}
 
 
+		void Ocean::ApplyParameter()
+		{
+			const auto* param = core::ParameterManager::Get()->GetParameter<MasterOceanParameter>();
+			if (param == nullptr) return;
+
+			m_constantBuffer.baseReflectance = param->baseReflectance;
+			m_constantBuffer.wave1Amplitude  = param->wave1Amplitude;
+			m_constantBuffer.wave1Frequency  = param->wave1Frequency;
+			m_constantBuffer.wave2Amplitude  = param->wave2Amplitude;
+			m_constantBuffer.wave2Frequency  = param->wave2Frequency;
+			m_constantBuffer.specularPower   = param->specularPower;
+			m_constantBuffer.specularScale   = param->specularScale;
+			m_constantBuffer.ambientScale    = param->ambientScale;
+			m_scale = {
+				param->sizeX / OceanMesh::GRID_SIZE,
+				1.0f,
+				param->sizeZ / OceanMesh::GRID_SIZE
+			};
+		}
+
+
 		void Ocean::Update()
 		{
+			ApplyParameter();
 			m_constantBuffer.light = *g_sceneLight->GetLight();
 			UpdateWaveOffset();
 
@@ -853,8 +908,8 @@ namespace app
 			constexpr float cellSize = OceanMesh::GRID_SIZE / static_cast<float>(OceanMesh::GRID_DIVISION);
 			constexpr int   numVertsPerRow = OceanMesh::GRID_DIVISION + 1;
 
-			const float localX = (worldX + gridHalfSize) / cellSize;
-			const float localZ = (worldZ + gridHalfSize) / cellSize;
+			const float localX = (worldX / m_scale.x + gridHalfSize) / cellSize;
+			const float localZ = (worldZ / m_scale.z + gridHalfSize) / cellSize;
 
 			const float clampedX = max(0.0f, min(localX,
 				static_cast<float>(OceanMesh::GRID_DIVISION - 1)));

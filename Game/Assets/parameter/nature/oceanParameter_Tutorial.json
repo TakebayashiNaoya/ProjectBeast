@@ -7,6 +7,8 @@
     "wave2Frequency":  0.05,
     "specularPower":   50.0,
     "specularScale":   0.5,
-    "ambientScale":    2.0
+    "ambientScale":    2.0,
+    "sizeX":           12500.0,
+    "sizeZ":           12500.0
   }
 ]

@@ -1,9 +1,14 @@
 ﻿#include "stdafx.h"
-#include "system.h"
 #include "graphics/GraphicsEngine.h"
 #include "sound/SoundEngine.h"
+#include "system.h"
 
 HWND			g_hWnd = NULL;				//ウィンドウハンドル。
+
+/** @brief ImGui Win32バックエンドのウィンドウメッセージハンドラ（前方宣言） */
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
+	HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
+);
 
 ///////////////////////////////////////////////////////////////////
 //メッセージプロシージャ。
@@ -13,6 +18,9 @@ HWND			g_hWnd = NULL;				//ウィンドウハンドル。
 ///////////////////////////////////////////////////////////////////
 LRESULT CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		return 1;
+
 	//送られてきたメッセージで処理を分岐させる。
 	switch (msg)
 	{

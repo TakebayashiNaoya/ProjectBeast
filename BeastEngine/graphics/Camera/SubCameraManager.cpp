@@ -22,7 +22,7 @@ namespace nsBeastEngine
 		/** サブカメラのNearクリップ */
 		constexpr float SUB_CAMERA_NEAR = 1.0f;
 		/** サブカメラのFarクリップ */
-		constexpr float SUB_CAMERA_FAR = 13000.0f;
+		constexpr float SUB_CAMERA_FAR = 20000.0f;
 
 		/** 小窓の表示位置X（画面左下、スクリーン座標中心=(0,0)系） */
 		constexpr float SPRITE_POS_X = -500.0f;

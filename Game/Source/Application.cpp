@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
+
 #include "Application.h"
 #include "Source/Camera/CameraManager.h"
+#include "Source/Core/DebugWindow.h"
 #include "Source/Core/Fade.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Effect/EffectManager.h"
@@ -55,6 +57,10 @@ namespace app
 
 	void Application::Render(RenderContext& rc)
 	{
+		DebugWindow::Get().Render();
+		// ↑ 各自が Register() で追加したセクションが
+		//   CollapsingHeader としてここにまとめて表示される
+
 		SceneManager::GetInstance()->Render(rc);
 		core::Fade::Get().Render(rc);
 	}

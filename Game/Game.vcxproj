@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -146,7 +146,7 @@
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -165,7 +165,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -184,7 +184,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -207,7 +207,7 @@
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -230,7 +230,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -450,6 +450,7 @@
     <ClInclude Include="Source\Camera\CameraManager.h" />
     <ClInclude Include="Source\Camera\CameraSteering.h" />
     <ClInclude Include="Source\Core\AppParameterMacro.h" />
+    <ClInclude Include="Source\Core\DebugWindow.h" />
     <ClInclude Include="Source\Core\Fade.h" />
     <ClInclude Include="Source\Core\HierarchicalTransform.h" />
     <ClInclude Include="Source\Core\IMasterParameter.h" />
@@ -477,6 +478,7 @@
     <ClInclude Include="Source\Scene\DebugScene.h" />
     <ClInclude Include="Source\Scene\EasyInGameScene.h" />
     <ClInclude Include="Source\Scene\NormalInGameScene.h" />
+    <ClInclude Include="Source\Scene\HardInGameScene.h" />
     <ClInclude Include="Source\Scene\InGameSceneBase.h" />
     <ClInclude Include="Source\Scene\IScene.h" />
     <ClInclude Include="Source\Scene\ResultScene.h" />
@@ -556,6 +558,14 @@
     <ClInclude Include="Source\Vfx\ParticleValueProvider.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Test.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BeastEngine\BeastEngine.vcxproj">
+      <Project>{a4456994-fd16-4604-a832-20628ce9d50a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Third Party\imgui\ImGui\ImGui.vcxproj">
+      <Project>{c9924eaf-1bed-4a36-b31c-70567de0e178}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
