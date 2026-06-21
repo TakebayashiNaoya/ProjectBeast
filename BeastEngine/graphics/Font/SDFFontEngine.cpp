@@ -297,57 +297,113 @@ namespace nsBeastEngine
 	{
 		if (!text || m_glyphs.empty()) return;
 
-		float fontSizeX = m_emSize * scale.x;
-		float fontSizeY = m_emSize * scale.y;
+		const float fontSizeX = m_emSize * scale.x;
+		const float fontSizeY = m_emSize * scale.y;
 
-		float totalWidth = 0.0f;
-		for (const wchar_t* ch = text; *ch != L'\0'; ++ch) {
-			auto it = m_glyphs.find((uint32_t)*ch);
-			if (it != m_glyphs.end())
-				totalWidth += it->second.advance * fontSizeX;
+		// ---- 行分割と各行の幅を計算 ----------------------------------------
+		struct LineInfo { const wchar_t* start; int length; float width; };
+		static const int MAX_LINES = 32;
+		LineInfo lines[MAX_LINES];
+		int lineCount = 0;
+
+		const wchar_t* lineStart = text;
+		for (const wchar_t* ch = text; ; ++ch)
+		{
+			if (*ch != L'\n' && *ch != L'\0') continue;
+
+			float lineWidth = 0.0f;
+			for (const wchar_t* c = lineStart; c < ch; ++c)
+			{
+				auto it = m_glyphs.find((uint32_t)*c);
+				lineWidth += (it != m_glyphs.end())
+					? it->second.advance * fontSizeX
+					: fontSizeX * 0.5f;
+			}
+
+			if (lineCount < MAX_LINES)
+			{
+				lines[lineCount++] = { lineStart, (int)(ch - lineStart), lineWidth };
+			}
+
+			if (*ch == L'\0') break;
+			lineStart = ch + 1;
 		}
 
-		float totalHeight = m_lineHeight * fontSizeY;
-		float cursorX = screenPos.x - totalWidth * pivot.x;
-		float baselineY = screenPos.y
-			+ m_ascender * fontSizeY
-			- totalHeight * pivot.y;
+		if (lineCount == 0) return;
+
+		// ---- ブロック全体のサイズ -------------------------------------------
+		float maxLineWidth = 0.0f;
+		for (int i = 0; i < lineCount; ++i)
+			if (lines[i].width > maxLineWidth) maxLineWidth = lines[i].width;
+
+		// totalHeight = 1行目の高さ + (N-1)行分の行間
+		const float totalHeight = m_lineHeight * fontSizeY
+			* (1.0f + (lineCount - 1) * m_lineSpacing);
+
+		// ブロック左端と最初の行のベースライン
+		const float blockLeft     = screenPos.x - maxLineWidth * pivot.x;
+		const float firstBaseline = screenPos.y + m_ascender * fontSizeY - totalHeight * pivot.y;
 
 		XMUINT2 texSize = { m_atlasWidth, m_atlasHeight };
 
-		for (const wchar_t* ch = text; *ch != L'\0'; ++ch)
+		// ---- 行ごとに描画 --------------------------------------------------
+		for (int lineIdx = 0; lineIdx < lineCount; ++lineIdx)
 		{
-			auto it = m_glyphs.find((uint32_t)*ch);
-			if (it == m_glyphs.end()) {
-				cursorX += fontSizeX * 0.5f;
-				continue;
-			}
-			const SDFGlyph& g = it->second;
+			const float lineWidth = lines[lineIdx].width;
 
-			if (g.atlasRight > g.atlasLeft && g.atlasTop > g.atlasBottom)
+			float lineStartX;
+			switch (m_textAlign)
 			{
-				RECT srcRect;
-				srcRect.left = (LONG)std::round(g.atlasLeft);
-				srcRect.right = (LONG)std::round(g.atlasRight);
-				srcRect.top = (LONG)std::round(m_atlasHeight - g.atlasTop);
-				srcRect.bottom = (LONG)std::round(m_atlasHeight - g.atlasBottom);
-
-				RECT dstRect;
-				dstRect.left = (LONG)std::round(cursorX + g.planeLeft * fontSizeX);
-				dstRect.right = (LONG)std::round(cursorX + g.planeRight * fontSizeX);
-				dstRect.top = (LONG)std::round(baselineY - g.planeTop * fontSizeY);
-				dstRect.bottom = (LONG)std::round(baselineY - g.planeBottom * fontSizeY);
-
-				m_spriteBatch->Draw(
-					m_gpuHandle,
-					texSize,
-					dstRect,
-					&srcRect,
-					XMLoadFloat4(reinterpret_cast<const XMFLOAT4*>(&color))
-				);
+			case TextAlign::Center:
+				lineStartX = blockLeft + (maxLineWidth - lineWidth) * 0.5f;
+				break;
+			case TextAlign::Right:
+				lineStartX = blockLeft + (maxLineWidth - lineWidth);
+				break;
+			case TextAlign::Left:
+			default:
+				lineStartX = blockLeft;
+				break;
 			}
 
-			cursorX += g.advance * fontSizeX;
+			float cursorX   = lineStartX;
+			float baselineY = firstBaseline + lineIdx * m_lineHeight * m_lineSpacing * fontSizeY;
+
+			const wchar_t* lineEnd = lines[lineIdx].start + lines[lineIdx].length;
+			for (const wchar_t* c = lines[lineIdx].start; c < lineEnd; ++c)
+			{
+				auto it = m_glyphs.find((uint32_t)*c);
+				if (it == m_glyphs.end()) {
+					cursorX += fontSizeX * 0.5f;
+					continue;
+				}
+				const SDFGlyph& g = it->second;
+
+				if (g.atlasRight > g.atlasLeft && g.atlasTop > g.atlasBottom)
+				{
+					RECT srcRect;
+					srcRect.left   = (LONG)std::round(g.atlasLeft);
+					srcRect.right  = (LONG)std::round(g.atlasRight);
+					srcRect.top    = (LONG)std::round(m_atlasHeight - g.atlasTop);
+					srcRect.bottom = (LONG)std::round(m_atlasHeight - g.atlasBottom);
+
+					RECT dstRect;
+					dstRect.left   = (LONG)std::round(cursorX + g.planeLeft   * fontSizeX);
+					dstRect.right  = (LONG)std::round(cursorX + g.planeRight  * fontSizeX);
+					dstRect.top    = (LONG)std::round(baselineY - g.planeTop    * fontSizeY);
+					dstRect.bottom = (LONG)std::round(baselineY - g.planeBottom * fontSizeY);
+
+					m_spriteBatch->Draw(
+						m_gpuHandle,
+						texSize,
+						dstRect,
+						&srcRect,
+						XMLoadFloat4(reinterpret_cast<const XMFLOAT4*>(&color))
+					);
+				}
+
+				cursorX += g.advance * fontSizeX;
+			}
 		}
 	}
 

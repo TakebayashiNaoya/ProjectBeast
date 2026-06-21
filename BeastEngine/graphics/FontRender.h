@@ -105,6 +105,18 @@ namespace nsBeastEngine
 			m_shadowColor = color;
 		}
 
+		/**
+		 * @brief 水平アライメントを設定
+		 * @param align Left / Center / Right
+		 */
+		void SetTextAlign(TextAlign align) { m_textAlign = align; }
+
+		/**
+		 * @brief 行間倍率を設定
+		 * @param lineSpacing 1.0 = 隙間なし、1.2 = 1.2倍 (デフォルト)
+		 */
+		void SetLineSpacing(float lineSpacing) { m_lineSpacing = lineSpacing; }
+
 
 	public:
 		static const int MAX_TEXT_SIZE = 256;
@@ -119,6 +131,8 @@ namespace nsBeastEngine
 			, m_isDrawShadow(false)
 			, m_shadowOffset(0.0f)
 			, m_shadowColor({ 0.0f,0.0f,0.0f,0.0f })
+			, m_textAlign(TextAlign::Left)
+			, m_lineSpacing(1.2f)
 		{}
 		~FontRender() = default;
 
@@ -138,6 +152,8 @@ namespace nsBeastEngine
 		{
 			auto& sdfFont = GetSDFFontEngine();
 			sdfFont.SetShadowParam(m_isDrawShadow, m_shadowOffset, m_shadowColor);
+			sdfFont.SetTextAlign(m_textAlign);
+			sdfFont.SetLineSpacing(m_lineSpacing);
 			sdfFont.BeginDraw(rc, m_rotation, Vector2(m_position.x, m_position.y));
 			sdfFont.Draw(m_text, Vector2(m_position.x, m_position.y), m_color, m_rotation, m_scale, m_pivot);
 			sdfFont.EndDraw(rc);
@@ -151,8 +167,10 @@ namespace nsBeastEngine
 		Vector2	m_pivot;				/** 基点 */
 		wchar_t	m_text[MAX_TEXT_SIZE];	/** 描画する文字列 */
 		Vector4	m_color;				/** 色 */
-		bool    m_isDrawShadow;			/** 影を描画するか */
-		float   m_shadowOffset;			/** 影のオフセット */
-		Vector4 m_shadowColor;			/** 影の色 */
+		bool      m_isDrawShadow;			/** 影を描画するか */
+		float     m_shadowOffset;			/** 影のオフセット */
+		Vector4   m_shadowColor;			/** 影の色 */
+		TextAlign m_textAlign;				/** 水平アライメント */
+		float     m_lineSpacing;			/** 行間倍率 */
 	};
 }

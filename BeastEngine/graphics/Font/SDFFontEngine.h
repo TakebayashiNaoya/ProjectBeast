@@ -9,6 +9,16 @@
 namespace nsBeastEngine
 {
 	/**
+	 * @brief テキストの水平アライメント
+	 */
+	enum class TextAlign
+	{
+		Left,
+		Center,
+		Right,
+	};
+
+	/**
 	 * @brief msdf-atlas-gen が出力する1グリフ分のレイアウト情報
 	 */
 	struct SDFGlyph
@@ -85,6 +95,16 @@ namespace nsBeastEngine
 			m_shadowColor = color;
 		}
 
+		/**
+		 * @brief 水平アライメントを設定 (Draw の直前に呼ぶ)
+		 */
+		void SetTextAlign(TextAlign align) { m_textAlign = align; }
+
+		/**
+		 * @brief 行間倍率を設定 (1.0 = 行の高さぴったり、1.2 = 1.2倍)
+		 */
+		void SetLineSpacing(float lineSpacing) { m_lineSpacing = lineSpacing; }
+
 
 	private:
 		/**
@@ -124,9 +144,11 @@ namespace nsBeastEngine
 
 		nsK2EngineLow::Shader                       m_psShader;				/** ピクセルシェーダー (SDFFont.fx) */
 
-		bool    m_isDrawShadow = false;						/** 影を描画するかどうか */
-		float   m_shadowOffset = 0.0f;						/** 影のオフセット (em スケール) */
-		Vector4 m_shadowColor = { 0.0f, 0.0f, 0.0f, 0.0f };	/** 影のカラー */
+		bool      m_isDrawShadow = false;						/** 影を描画するかどうか */
+		float     m_shadowOffset = 0.0f;						/** 影のオフセット (em スケール) */
+		Vector4   m_shadowColor = { 0.0f, 0.0f, 0.0f, 0.0f };	/** 影のカラー */
+		TextAlign m_textAlign   = TextAlign::Left;				/** 水平アライメント */
+		float     m_lineSpacing = 1.2f;						/** 行間倍率 */
 	};
 
 	/**

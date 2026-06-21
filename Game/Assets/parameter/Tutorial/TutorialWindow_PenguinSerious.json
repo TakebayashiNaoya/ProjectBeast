@@ -13,12 +13,24 @@
                 "color":    [0, 0, 0, 220]
             },
             {
+                "type":       "UIText",
+                "name":       "TutorialWindowTitle",
+                "text":       "ブルーペンギン",
+                "fontSize":   1.0,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "position":   [0, 258, 0],
+                "rotation":   0,
+                "color":      [255, 255, 255, 255],
+                "pivot":      [0.5, 0.5]
+            },
+            {
                 "type":     "UIVideo",
                 "name":     "TutorialWindowVideo",
-                "clipPath": "Assets/Video/Tutorial_PenguinSerious.mp4",
-                "width":    750,
-                "height":   420,
-                "position": [0, 78, 0],
+                "clipPath": "Assets/Video/SeriousPenguin.mp4",
+                "width":    640,
+                "height":   360,
+                "position": [0, 40, 0],
                 "scale":    [1, 1, 1],
                 "rotation": 0,
                 "color":    [255, 255, 255, 255],
@@ -27,15 +39,16 @@
                 "autoPlay": false
             },
             {
-                "type":     "UIIcon",
-                "name":     "TutorialWindowDesc",
-                "asset":    "Assets/spriteData/UI/Tutorial/Tutorial_PenguinSerious.DDS",
-                "width":    820,
-                "height":   70,
-                "position": [0, -178, 0],
-                "scale":    [1, 1, 1],
-                "rotation": 0,
-                "color":    [255, 255, 255, 255]
+                "type":       "UIText",
+                "name":       "TutorialWindowDesc",
+                "text":       "とってもまじめで指示通り動いてくれる子ペンギン。",
+                "fontSize":   0.6,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "position":   [0, -185, 0],
+                "rotation":   0,
+                "color":      [255, 255, 255, 255],
+                "pivot":      [0.5, 0.5]
             },
             {
                 "type":     "UIIcon",
@@ -43,10 +56,22 @@
                 "asset":    "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_b.dds",
                 "width":    55,
                 "height":   55,
-                "position": [0, -265, 0],
+                "position": [-45, -260, 0],
                 "scale":    [1, 1, 1],
                 "rotation": 0,
                 "color":    [255, 255, 255, 255]
+            },
+            {
+                "type":      "UIText",
+                "name":      "TutorialWindowCloseText",
+                "text":      "閉じる",
+                "fontSize":  0.6,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "position":  [30, -260, 0],
+                "rotation":  0,
+                "color":     [255, 255, 255, 255],
+                "pivot":     [0.5, 0.5]
             }
         ]
     }
