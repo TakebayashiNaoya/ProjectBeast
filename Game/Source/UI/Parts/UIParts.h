@@ -609,6 +609,11 @@ namespace app
 			 */
 			void Stop() { m_videoRender.Stop(); }
 			/**
+			 * @brief 再生クリップを差し替えて先頭から再生する
+			 * @param clipPath 新しいクリップのパス
+			 */
+			void ChangeClip(const char* clipPath) { m_videoRender.ChangeClip(clipPath); }
+			/**
 			 * @brief ループ再生の設定
 			 * @param loop ループ再生する場合は true
 			 */

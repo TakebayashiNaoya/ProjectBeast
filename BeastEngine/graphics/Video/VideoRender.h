@@ -72,6 +72,13 @@ namespace nsBeastEngine
 		 * @return 初期化完了している場合は true
 		 */
 		bool IsInitialized() const { return m_isInitialized; }
+		/**
+		 * @brief 再生クリップを差し替えて先頭から再生する
+		 * @param clipPath 新しいクリップのパス（Init と同じ書式）
+		 * @param fps      コマ撮り FPS（MP4 では自動取得）
+		 * @note  新旧クリップの解像度が同じ前提。異なる場合は映像が乱れる。
+		 */
+		void ChangeClip(const char* clipPath, float fps = 24.0f);
 
 		/**
 		 * @brief 座標の設定

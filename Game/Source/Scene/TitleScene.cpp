@@ -86,7 +86,13 @@ namespace app
 	}
 
 	void TitleScene::PauseUpdate()
-	{}
+	{
+		// フェードアウト中も背景映像の更新を継続する
+		if (m_state == TitleState::StageSelect && m_stageSelectPacket)
+		{
+			m_stageSelectPacket->Update();
+		}
+	}
 
 
 	void TitleScene::Render(RenderContext& rc)

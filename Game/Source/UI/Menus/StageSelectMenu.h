@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
+#include "Source/UI/Parts/UIParts.h"
 
 
 namespace app
@@ -122,6 +123,8 @@ namespace app
 				float   cursorBlinkDuration  = 0.5f;
 				Vector4 cursorBlinkStartColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 				Vector4 cursorBlinkEndColor   = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+				/** ステージごとの背景映像パス（Easy/Normal/Hard/Tutorial 順）*/
+				std::array<std::string, static_cast<uint8_t>(EnStageChoices::Max)> stageVideoPaths = {};
 			};
 
 
@@ -185,6 +188,10 @@ namespace app
 			/** 選択カーソルのフレームの背景 */
 			UIIcon* m_cursorFrameBG;
 
+			/** ステージ背景映像 */
+			UIVideo* m_stagePreviewVideo;
+			/** 直前のステージ選択（映像切り替え検出用）*/
+			EnStageChoices m_prevSelectingStage;
 
 			/** 選択入力のインターバル */
 			float m_selectInputInterval;

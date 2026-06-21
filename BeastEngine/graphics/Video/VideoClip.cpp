@@ -65,6 +65,21 @@ namespace nsBeastEngine
 	}
 
 
+	void VideoClip::Unload()
+	{
+		CleanupMP4();
+		m_frames.clear();
+		m_mp4FrameBuffer.clear();
+		m_width          = 0;
+		m_height         = 0;
+		m_frameCount     = 0;
+		m_fps            = 24.0f;
+		m_clipType       = ClipType::None;
+		m_mp4CurrentFrame = -1;
+		m_mp4Eos         = false;
+	}
+
+
 	bool VideoClip::Load(const char* path)
 	{
 		if (!path || path[0] == '\0') return false;

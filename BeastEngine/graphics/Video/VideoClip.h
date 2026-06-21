@@ -52,6 +52,10 @@ namespace nsBeastEngine
 		 */
 		void SetFPS(float fps) { m_fps = fps; }
 		/**
+		 * @brief ロード済みリソースを解放して未初期化状態に戻す
+		 */
+		void Unload();
+		/**
 		 * @brief 指定したフレームのピクセルデータを取得
 		 * @param frameIndex フレームインデックス（0からframeCount-1の範囲）
 		 * @return RGBA32形式のピクセルデータへのポインタ。インデックスが範囲外の場合はnullptr。

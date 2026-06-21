@@ -46,6 +46,25 @@ namespace nsBeastEngine
 	}
 
 
+	void VideoRender::ChangeClip(const char* clipPath, float fps)
+	{
+		if (!m_isInitialized) return;
+
+		m_player.Stop();
+		m_lastFrameIdx = -1;
+
+		m_clip.Unload();
+		if (!m_clip.Load(clipPath))
+		{
+			K2_LOG("VideoRender::ChangeClip: クリップの読み込みに失敗しました: %s\n", clipPath);
+			return;
+		}
+		m_clip.SetFPS(fps);
+		m_player.SetClip(&m_clip);
+		m_player.Play();
+	}
+
+
 	void VideoRender::Update()
 	{
 		if (!m_isInitialized) return;
