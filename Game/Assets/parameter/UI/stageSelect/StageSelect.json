@@ -2,6 +2,20 @@
     "canvas":{
         "elements":[
             {
+                "type": "UIVideo",
+                "name": "StagePreviewVideo",
+                "clipPath": "Assets/Video/EasyStage.mp4",
+                "width": 1920,
+                "height": 1080,
+                "position": [0, 0, 0],
+                "scale": [1, 1, 1],
+                "rotation": 0,
+                "color": [255, 255, 255, 255],
+                "loop": true,
+                "autoPlay": true
+            },
+
+            {
                 "type":"UIIcon",
                 "name":"BG",
                 "asset":"Assets/spriteData/UI/StageSelect/BG.dds",
@@ -10,7 +24,7 @@
                 "position":[0,0,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "color":[255,255,255,0]
             },
 
             {
@@ -246,6 +260,12 @@
         "tutorialCursorScaleX": 1.4286,
         "cursorBlinkDuration": 0.5,
         "cursorBlinkStartColor": [255, 255, 255, 255],
-        "cursorBlinkEndColor": [255, 255, 255, 0]
+        "cursorBlinkEndColor": [255, 255, 255, 0],
+        "stageVideoPaths": [
+            "Assets/Video/EasyStage.mp4",
+            "Assets/Video/NormalStage.mp4",
+            "Assets/Video/HardStage.mp4",
+            "Assets/Video/TutorialStage.mp4"
+        ]
     }
 }

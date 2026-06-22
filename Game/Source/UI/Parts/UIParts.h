@@ -609,6 +609,27 @@ namespace app
 			 */
 			void Stop() { m_videoRender.Stop(); }
 			/**
+			 * @brief 再生クリップを差し替えて先頭から再生する（ファイル I/O あり）
+			 * @param clipPath 新しいクリップのパス
+			 */
+			void ChangeClip(const char* clipPath) { m_videoRender.ChangeClip(clipPath); }
+			/**
+			 * @brief クリップを事前にメモリへロードしてスロットに登録する
+			 * @param path ファイルパス
+			 * @param fps  コマ撮り FPS（MP4 では自動取得）
+			 * @return ロード成功なら true
+			 */
+			bool PreloadClip(const char* path, float fps = 24.0f);
+			/**
+			 * @brief 事前ロード済みのスロットに即座に切り替える（ファイル I/O なし）
+			 * @param slotIndex PreloadClip の呼び出し順（0 始まり）
+			 */
+			void SwitchToPreloadedClip(int slotIndex);
+			/**
+			 * @brief 全プリロードスロットを破棄する
+			 */
+			void ClearPreloadedClips() { m_preloadedClips.clear(); }
+			/**
 			 * @brief ループ再生の設定
 			 * @param loop ループ再生する場合は true
 			 */
@@ -637,6 +658,8 @@ namespace app
 
 		private:
 			nsBeastEngine::VideoRender m_videoRender;
+			/** PreloadClip で登録したクリップのプール */
+			std::vector<std::unique_ptr<nsBeastEngine::VideoClip>> m_preloadedClips;
 		};
 
 

@@ -74,6 +74,8 @@ namespace app
 			, m_buttonBGIcon(nullptr)
 			, m_cursorFrame(nullptr)
 			, m_cursorFrameBG(nullptr)
+			, m_stagePreviewVideo(nullptr)
+			, m_prevSelectingStage(EnStageChoices::Max)
 			, m_selectInputInterval(0.0f)
 			, m_isSelected(false)
 		{}
@@ -92,6 +94,8 @@ namespace app
 			m_buttonBGIcon = nullptr;
 			m_cursorFrame = nullptr;
 			m_cursorFrameBG = nullptr;
+			m_stagePreviewVideo = nullptr;
+			m_prevSelectingStage = EnStageChoices::Max;
 			for (auto& choice : m_choices)
 			{
 				choice.m_text = nullptr;
@@ -108,6 +112,16 @@ namespace app
 
 			// パーツを取得
 			GetUIParts();
+
+			// 全ステージのクリップをここで先読みしておく（カーソル移動時の I/O を排除）
+			if (m_stagePreviewVideo)
+			{
+				m_stagePreviewVideo->ClearPreloadedClips();
+				for (const auto& path : m_param.stageVideoPaths)
+				{
+					if (!path.empty()) m_stagePreviewVideo->PreloadClip(path.c_str());
+				}
+			}
 
 			std::vector<UIBase*> icons = {
 				m_bgIcon,
@@ -171,6 +185,7 @@ namespace app
 		{
 			m_state = EnStageSelectState::Selecting;
 			m_selectingStage = EnStageChoices::Easy;
+			m_prevSelectingStage = EnStageChoices::Max;
 
 			m_cursorFrameBG->StopAnimation();
 
@@ -259,6 +274,16 @@ namespace app
 					m_selectingStage = EnStageChoices::Tutorial;
 				}
 			}
+
+			// ステージが変わったら事前ロード済みクリップにポインタを切り替える（I/O なし）
+			if (m_selectingStage != m_prevSelectingStage)
+			{
+				m_prevSelectingStage = m_selectingStage;
+				if (m_stagePreviewVideo)
+				{
+					m_stagePreviewVideo->SwitchToPreloadedClip(static_cast<int>(m_selectingStage));
+				}
+			}
 		}
 
 
@@ -344,6 +369,8 @@ namespace app
 
 			if (!m_cursorFrame) m_cursorFrame = GetUI<UIIcon>(Hash32("Frame"));
 			if (!m_cursorFrameBG) m_cursorFrameBG = GetUI<UIIcon>(Hash32("FrameBG"));
+
+			if (!m_stagePreviewVideo) m_stagePreviewVideo = GetUI<UIVideo>(Hash32("StagePreviewVideo"));
 		}
 
 
@@ -378,6 +405,15 @@ namespace app
 			m_param.cursorBlinkDuration  = JC::ToFloat(p, "cursorBlinkDuration",  m_param.cursorBlinkDuration);
 			m_param.cursorBlinkStartColor = JC::ToVector4(p, "cursorBlinkStartColor", true, m_param.cursorBlinkStartColor);
 			m_param.cursorBlinkEndColor   = JC::ToVector4(p, "cursorBlinkEndColor",   true, m_param.cursorBlinkEndColor);
+
+			if (p.contains("stageVideoPaths") && p["stageVideoPaths"].is_array())
+			{
+				const auto& paths = p["stageVideoPaths"];
+				for (uint8_t i = 0; i < static_cast<uint8_t>(EnStageChoices::Max) && i < paths.size(); ++i)
+				{
+					m_param.stageVideoPaths[i] = paths[i].get<std::string>();
+				}
+			}
 		}
 
 	}

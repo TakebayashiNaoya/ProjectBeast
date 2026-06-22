@@ -11,17 +11,18 @@ namespace nsBeastEngine
 {
 	void VideoRender::Init(const char* clipPath, float dispWidth, float dispHeight, float fps)
 	{
-		if (!m_clip.Load(clipPath))
+		if (!m_ownedClip.Load(clipPath))
 		{
 			K2_LOG("VideoRender::Init: クリップの読み込みに失敗しました: %s\n", clipPath);
 			return;
 		}
-		m_clip.SetFPS(fps);
+		m_ownedClip.SetFPS(fps);
 
-		m_player.SetClip(&m_clip);
+		m_activeClip = &m_ownedClip;
+		m_player.SetClip(m_activeClip);
 
 		// 動的 GPU テクスチャを確保（内部で同期的な初回アップロードを実行）
-		m_frameTex.Init(m_clip.GetWidth(), m_clip.GetHeight());
+		m_frameTex.Init(m_ownedClip.GetWidth(), m_ownedClip.GetHeight());
 		if (!m_frameTex.IsInitialized())
 		{
 			K2_LOG("VideoRender::Init: VideoFrameTexture の初期化に失敗しました\n");
@@ -43,6 +44,38 @@ namespace nsBeastEngine
 		m_sprite.Init(initData);
 
 		m_isInitialized = true;
+	}
+
+
+	void VideoRender::ChangeClip(const char* clipPath, float fps)
+	{
+		if (!m_isInitialized) return;
+
+		m_player.Stop();
+		m_lastFrameIdx = -1;
+
+		m_ownedClip.Unload();
+		if (!m_ownedClip.Load(clipPath))
+		{
+			K2_LOG("VideoRender::ChangeClip: クリップの読み込みに失敗しました: %s\n", clipPath);
+			return;
+		}
+		m_ownedClip.SetFPS(fps);
+		m_activeClip = &m_ownedClip;
+		m_player.SetClip(m_activeClip);
+		m_player.Play();
+	}
+
+
+	void VideoRender::SwapClip(VideoClip* externalClip)
+	{
+		if (!m_isInitialized || !externalClip) return;
+
+		m_player.Stop();
+		m_lastFrameIdx = -1;
+		m_activeClip = externalClip;
+		m_player.SetClip(m_activeClip);
+		m_player.Play();
 	}
 
 
@@ -68,13 +101,13 @@ namespace nsBeastEngine
 
 	void VideoRender::OnRender2D(RenderContext& rc)
 	{
-		if (!m_isInitialized) return;
+		if (!m_isInitialized || !m_activeClip) return;
 
 		// フレームが変化した時だけ GPU テクスチャを更新する
 		const int frameIdx = m_player.GetCurrentFrameIndex();
 		if (frameIdx != m_lastFrameIdx)
 		{
-			const uint8_t* pixels = m_clip.GetFramePixels(frameIdx);
+			const uint8_t* pixels = m_activeClip->GetFramePixels(frameIdx);
 			if (pixels) m_frameTex.UploadFrame(pixels);
 			m_lastFrameIdx = frameIdx;
 		}

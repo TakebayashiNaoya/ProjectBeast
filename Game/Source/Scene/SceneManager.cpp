@@ -73,6 +73,8 @@ namespace app
 			break;
 
 		case TransitionState::FadingOut:
+			// フェード中もシーン固有の更新（映像再生など）を継続する
+			if (m_currentScene) m_currentScene->PauseUpdate();
 			if (core::Fade::Get().IsFadeOutComplete()) {
 				delete m_currentScene;
 				m_currentScene = nullptr;

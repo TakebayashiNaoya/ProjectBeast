@@ -72,6 +72,19 @@ namespace nsBeastEngine
 		 * @return 初期化完了している場合は true
 		 */
 		bool IsInitialized() const { return m_isInitialized; }
+		/**
+		 * @brief 再生クリップを差し替えて先頭から再生する（ファイル I/O あり）
+		 * @param clipPath 新しいクリップのパス（Init と同じ書式）
+		 * @param fps      コマ撮り FPS（MP4 では自動取得）
+		 * @note  新旧クリップの解像度が同じ前提。異なる場合は映像が乱れる。
+		 */
+		void ChangeClip(const char* clipPath, float fps = 24.0f);
+		/**
+		 * @brief 事前ロード済みのクリップに即座に切り替える（ファイル I/O なし）
+		 * @param externalClip 呼び出し元が所有・管理する VideoClip へのポインタ
+		 * @note  クリップの寿命はVideoRenderより長くなければならない
+		 */
+		void SwapClip(VideoClip* externalClip);
 
 		/**
 		 * @brief 座標の設定
@@ -112,8 +125,9 @@ namespace nsBeastEngine
 	private:
 		void OnRender2D(RenderContext& rc) override;
 
-		VideoClip         m_clip;     /** 再生する映像クリップ */
-		VideoPlayer       m_player;   /** プレイヤー */
+		VideoClip         m_ownedClip;              /** Init() でロードした所有クリップ */
+		VideoClip*        m_activeClip = nullptr;  /** 現在描画中のクリップ（所有または外部） */
+		VideoPlayer       m_player;                /** プレイヤー */
 		VideoFrameTexture m_frameTex; /** GPU テクスチャ管理 */
 		Sprite            m_sprite;   /** 描画用スプライト */
 
