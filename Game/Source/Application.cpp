@@ -57,10 +57,9 @@ namespace app
 
 	void Application::Render(RenderContext& rc)
 	{
+#if defined(_DEBUG) || defined(K2_DEBUG)
 		DebugWindow::Get().Render();
-		// ↑ 各自が Register() で追加したセクションが
-		//   CollapsingHeader としてここにまとめて表示される
-
+#endif
 		SceneManager::GetInstance()->Render(rc);
 		core::Fade::Get().Render(rc);
 	}
