@@ -282,7 +282,6 @@ namespace app
 			}
 
 			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
-			m_owner->SetIsAttack(true);
 		}
 
 
