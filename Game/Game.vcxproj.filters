@@ -192,9 +192,6 @@
     <ClCompile Include="Source\Scene\TitleScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scene\EasyInGameScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Scene\ResultScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
