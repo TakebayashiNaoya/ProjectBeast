@@ -423,6 +423,7 @@ namespace app
 
 			m_attackTimer = 0.0f;
 			m_hasFiredEffect = false;
+			m_owner->SetIsAttack(true);
 		}
 
 
