@@ -2,13 +2,13 @@
   "AchievementList": {
     "Achievement": [
       {
-        "name": "RescuePenguins10",
-        "description": "集めた子ペンギン：10匹以上",
+        "name": "RescuePenguins30",
+        "description": "集めた子ペンギン：30匹以上",
         "type": "Condition",
         "condition": "CheckRescuedCount",
-        "targetValue": 10,
+        "targetValue": 30,
         "spriteIndex": 0,
-        "spriteName": "penguin_rescue10"
+        "spriteName": "penguin_rescue30"
       },
       {
         "name": "WhirlpoolGuardianEasy",
