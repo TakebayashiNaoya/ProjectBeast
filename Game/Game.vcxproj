@@ -318,8 +318,6 @@
     <ClCompile Include="Source\Nature\WhirlpoolPowerSystem.cpp" />
     <ClCompile Include="Source\Noise\NoiseManager.cpp" />
     <ClCompile Include="Source\Scene\DebugScene.cpp" />
-    <ClCompile Include="Source\Scene\EasyInGameScene.cpp" />
-    <ClCompile Include="Source\Scene\NormalInGameScene.cpp" />
     <ClCompile Include="Source\Scene\InGameSceneBase.cpp" />
     <ClCompile Include="Source\Scene\IScene.cpp" />
     <ClCompile Include="Source\Scene\ResultScene.cpp" />

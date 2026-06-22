@@ -121,20 +121,28 @@ namespace app
 			}
 		}
 
-		/** 攻撃中のシロクマを探す */
-		bool isAnyAttacking = false;
+		/** チェイス中またはアタック中のシロクマを探す */
+		bool isAnyActive = false;
 		const actor::Enemy* attackingEnemy = nullptr;
+		const actor::Enemy* chasingEnemy = nullptr;
 		for (auto* enemy : enemies)
 		{
 			if (enemy == nullptr) continue;
-			if (!enemy->GetEnemyStateMachine()->IsAttack()) continue;
-
-			isAnyAttacking = true;
-			if (attackingEnemy == nullptr) attackingEnemy = enemy;
+			const auto* sm = enemy->GetEnemyStateMachine();
+			if (sm->IsAttack())
+			{
+				isAnyActive = true;
+				if (attackingEnemy == nullptr) attackingEnemy = enemy;
+			}
+			else if (sm->IsChasing())
+			{
+				isAnyActive = true;
+				if (chasingEnemy == nullptr) chasingEnemy = enemy;
+			}
 		}
 
-		/** 攻撃中のシロクマがいなければサブカメラを停止する */
-		if (!isAnyAttacking)
+		/** チェイスもアタックもしていなければサブカメラを停止する */
+		if (!isAnyActive)
 		{
 			if (m_isSubCameraActive)
 			{
@@ -145,7 +153,7 @@ namespace app
 			return;
 		}
 
-		/** 攻撃中のシロクマがいればサブカメラを起動する */
+		/** チェイスまたはアタック中のシロクマがいればサブカメラを起動する */
 		if (!m_isSubCameraActive)
 		{
 			nsBeastEngine::SubCameraManager::Get().Begin();
@@ -172,10 +180,12 @@ namespace app
 		// カメラ方向: 子ペンギン→シロクマ方向にカメラを向ける。
 		// カメラはペンギンの「シロクマと反対側」に置き、ペンギン越しにシロクマが迫る画を映す。
 		// bearToPenguin = penguinPos - bearPos（シロクマ→ペンギン方向）
+		// 攻撃中シロクマを優先し、いなければチェイス中シロクマを使う。
+		const actor::Enemy* relevantEnemy = (attackingEnemy != nullptr) ? attackingEnemy : chasingEnemy;
 		Vector3 bearToPenguin;
-		if (attackingEnemy != nullptr)
+		if (relevantEnemy != nullptr)
 		{
-			bearToPenguin = basePos - attackingEnemy->GetTransform().m_position;
+			bearToPenguin = basePos - relevantEnemy->GetTransform().m_position;
 		}
 		else
 		{

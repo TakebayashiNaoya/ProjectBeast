@@ -282,7 +282,6 @@ namespace app
 			}
 
 			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
-			m_owner->SetIsAttack(true);
 		}
 
 
@@ -424,6 +423,7 @@ namespace app
 
 			m_attackTimer = 0.0f;
 			m_hasFiredEffect = false;
+			m_owner->SetIsAttack(true);
 		}
 
 
