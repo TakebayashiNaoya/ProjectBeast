@@ -34,11 +34,7 @@
     { "index": 31, "position": [ 2519, 0,  -134] },
     { "index": 32, "position": [ 2557, 0,  3138] },
     { "index": 33, "position": [ 3048, 0,  -605] },
-    { "index": 34, "position": [ 3598, 0, -4133] },
-    { "index": 35, "position": [ 3618, 0,  -949] },
-    { "index": 36, "position": [ 4220, 0, -4342] },
-    { "index": 37, "position": [ 4270, 0,  -946] },
-    { "index": 38, "position": [ 5216, 0, -5105] },
-    { "index": 39, "position": [ 5710, 0, -4410] }
+    { "index": 34, "position": [ 3618, 0,  -949] },
+    { "index": 35, "position": [ 4270, 0,  -946] }
   ]
 }
