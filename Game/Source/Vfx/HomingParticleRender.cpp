@@ -23,7 +23,7 @@ namespace app
 		/** 持続時間 */
 		constexpr float DURATION = 1.0f;
 		/** 同時に飛ばすパーティクルの最大数 */
-		constexpr int MAX_PARTICLE_COUNT = 10;
+		constexpr int MAX_PARTICLE_COUNT = 5;
 	}
 
 
@@ -33,8 +33,8 @@ namespace app
 		, targetActor(nullptr)
 		, effectRender(nullptr)
 	{}
-	
-	
+
+
 	HomingParticleRender::HomingParticleRender()
 		: m_goalPosition(Vector3::Zero)
 		, m_particleCount(0)

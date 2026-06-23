@@ -24,6 +24,7 @@
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
 #include "Source/UI/Menus/CountDownMenu.h"
+#include "Source/UI/Menus/DebufMenu.h"
 #include "Source/UI/Menus/EnemySleepingMenu.h"
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
@@ -37,7 +38,6 @@
 #include "Source/UI/MiniMap/MiniMapMenu.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
-#include "Source/UI/Menus/DebufMenu.h"
 
 
 namespace app
@@ -88,7 +88,7 @@ namespace app
 		// デバフメニューを生成
 		ui::InitUIPacket(m_debufPacket, "Assets/parameter/debuf/Debuf.json");
 
-		if(auto* menu = m_debufPacket->GetMenu()) menu->SetDraw(false);
+		if (auto* menu = m_debufPacket->GetMenu()) menu->SetDraw(false);
 
 		if (auto* menu = m_enemySleepingPacket->GetMenu())
 		{
@@ -135,6 +135,7 @@ namespace app
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
 		m_cpReactionSystem->Initialize();
+		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
 
 		// WpWarningSystemを生成
 		m_wpWarningSystem = std::make_unique<ui::WpWarningSystem>();

@@ -14,6 +14,7 @@ namespace app
 	namespace actor
 	{
 		class ChildPenguin;
+		class DaddyPenguin;
 	}
 
 
@@ -37,6 +38,15 @@ namespace app
 
 
 		public:
+			/**
+			 * @brief リアクションの対象となる親ペンギンを設定
+			 * @param daddyPenguin 対象の親ペンギン
+			 */
+			void SetDaddyPenguin(actor::DaddyPenguin* daddyPenguin)
+			{
+				for (auto& packet : m_reactionPackets)
+					packet.GetMenu()->SetDaddyPenguin(daddyPenguin);
+			}
 			/**
 			 * @brief リアクションの対象となる子ペンギンを設定
 			 * @param childPenguin 対象の子ペンギン
