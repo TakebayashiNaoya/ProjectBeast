@@ -4,9 +4,9 @@
  * @author 忽那
  */
 #include "stdafx.h"
+#include "graphics/Camera/CameraSystem.h"
 #include "RemainingChildMenu.h"
 #include "Source/Sound/SoundManager.h"
-#include "graphics/Camera/CameraSystem.h"
 #include "Source/Vfx/HomingParticleRender.h"
 
 
@@ -34,7 +34,7 @@ namespace app
 				m_startingAnimLogic.Initialize(
 					this,
 					{ "ChildPenguinIcon", "SlashIcon", "BgIcon" },
-					{ "RemainingNum", "TotalNum"},
+					{ "RemainingNum", "TotalNum" },
 					Vector3(-400.0f, 0.0f, 0.0f)
 				);
 			}
@@ -55,7 +55,7 @@ namespace app
 
 			auto* bgIcon = GetUI<UIIcon>(Hash32("BgIcon"));
 			if (bgIcon) bgIcon->m_isDraw = isVisible;
-			
+
 			// 残り子ペンギンの数更新
 			auto* text = GetUI<UIText>(Hash32("RemainingNum"));
 			if (text) {
@@ -95,7 +95,7 @@ namespace app
 		{
 			// メニューの描画。
 			MenuBase::Render(rc);
-			
+
 			// パーティクルエフェクトの描画。
 			if (m_homingRender)
 			{
@@ -108,7 +108,7 @@ namespace app
 		{
 			// UITextを取得。
 			auto* remainText = GetUI<UIText>(Hash32("RemainingNum"));
-			
+
 
 			if (!remainText) return;
 
@@ -129,7 +129,7 @@ namespace app
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_TLANSLATE_UP_ANIM_KEY);
 					// 座標アニメーションを登録。(バウンドあり)
 					UIAnimationFactory::Attach<UITranslateAnimation>(remainText, animKey::RESCUE_REMAIN_BOUNCE_DOWN_ANIM_KEY);
-					
+
 					// シーケンスをクリア。
 					seq.Clear();
 
