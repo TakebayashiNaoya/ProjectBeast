@@ -4,9 +4,9 @@
  * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
-#include "SubCameraManager.h"
 #include "CameraSystem.h"
 #include "Graphics/RenderingEngine.h"
+#include "SubCameraManager.h"
 
 
 namespace nsBeastEngine
@@ -65,6 +65,7 @@ namespace nsBeastEngine
 		m_slideProgress = 0.0f;
 		m_pendingEnd = false;
 		m_pendingEndCallback = nullptr;
+		m_renderingBlocked = false;
 
 		if (onBegin) onBegin();
 	}
@@ -207,7 +208,7 @@ namespace nsBeastEngine
 		{
 			SpriteInitData bgInitData;
 			bgInitData.m_ddsFilePath[0] = "Assets/spriteData/UI/Icon/warning.DDS";
-			bgInitData.m_width  = SUB_CAMERA_RT_WIDTH  + SPRITE_BORDER_SIZE * 2;
+			bgInitData.m_width = SUB_CAMERA_RT_WIDTH + SPRITE_BORDER_SIZE * 2;
 			bgInitData.m_height = SUB_CAMERA_RT_HEIGHT + SPRITE_BORDER_SIZE * 2;
 			bgInitData.m_fxFilePath = "Assets/shader/sprite.fx";
 			bgInitData.m_alphaBlendMode = AlphaBlendMode_Trans;
