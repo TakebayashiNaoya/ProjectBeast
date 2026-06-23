@@ -250,6 +250,16 @@ namespace app
 		}// namespace
 
 
+		TerrainObject::~TerrainObject()
+		{
+			for (auto& render : m_chunkRenders)
+			{
+				if (render)
+					nsBeastEngine::OcclusionDitherManager::Get().Unregister(render.get());
+			}
+		}
+
+
 		void TerrainObject::Init(const TerrainConfig& config)
 		{
 			if (m_isInited) return;
@@ -526,6 +536,7 @@ namespace app
 				m_chunkRenders[i]->SetPBRParam(m_config.pbrParam);
 				m_chunkRenders[i]->SetTRS(Vector3::Zero, Quaternion::Identity, Vector3::One);
 				m_chunkRenders[i]->Update();
+				nsBeastEngine::OcclusionDitherManager::Get().Register(m_chunkRenders[i].get());
 			}
 		}
 	}
