@@ -54,7 +54,7 @@ namespace app
 
 		public:
 			TerrainObject()  = default;
-			~TerrainObject() = default;
+			~TerrainObject();
 
 			/**
 			 * @brief 地形を初期化する

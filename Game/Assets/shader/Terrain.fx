@@ -222,13 +222,48 @@ SPSIn VSMainSkin(SVSIn vsIn)
 // -----------------------------------------------------------------------
 SPSOut PSMain(SPSIn psIn)
 {
-    // ------ ディザリング ------
-    int2  pixelPos  = (int2)psIn.pos.xy;
-    int   bayerIdx  = g_bayerPattern[pixelPos.y % 4][pixelPos.x % 4];
-    float threshold = (bayerIdx + 0.5f) / 64.0f;
+    // ------ オクルージョンディザリング (DitherCb b3) ------
+    if (ditherStrength > 0.0f)
+    {
+        float3 camToTarget    = targetWorldPos - cameraWorldPos;
+        float  camToTargetLen = length(camToTarget);
 
-    if (modelDitherAlpha > threshold)
-        discard;
+        if (camToTargetLen > 0.001f)
+        {
+            float3 camToTargetDir = camToTarget / camToTargetLen;
+            float3 camToFrag      = psIn.worldPos - cameraWorldPos;
+            float  projLen        = dot(camToFrag, camToTargetDir);
+            bool   isBetween      = (projLen >= depthBias) && (projLen < camToTargetLen);
+
+            if (isBetween)
+            {
+                float3 crossVec  = cross(camToFrag, camToTargetDir);
+                float  distToRay = length(crossVec);
+                float  t         = projLen / camToTargetLen;
+                float  outerCone = cylinderRadius * t;
+                float  innerCone = outerCone * 0.7f;
+
+                if (distToRay < outerCone)
+                {
+                    float alpha      = smoothstep(innerCone, outerCone, distToRay);
+                    int   bx         = (int)fmod(psIn.pos.x, 4.0f);
+                    int   by         = (int)fmod(psIn.pos.y, 4.0f);
+                    float bayerValue = (float)g_bayerPattern[by][bx] / 64.0f;
+                    float threshold  = ditherStrength * (1.0f - alpha);
+                    clip(bayerValue - threshold);
+                }
+            }
+        }
+    }
+
+    // ------ モデル単位ディザリング (ModelDitherCb b4) ------
+    if (modelDitherAlpha > 0.0f)
+    {
+        int   bx         = (int)fmod(psIn.pos.x, 4.0f);
+        int   by         = (int)fmod(psIn.pos.y, 4.0f);
+        float bayerValue = (float)g_bayerPattern[by][bx] / 64.0f;
+        clip(bayerValue - modelDitherAlpha);
+    }
 
     // ------ スプラットマップ UV ------
     // 頂点は 3ds Max Z-up で生成し、エンジンが MakeRotationX(-PI/2) で Y-up に変換する。
