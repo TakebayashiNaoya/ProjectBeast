@@ -92,14 +92,18 @@ namespace app
 		{
 			m_owner->Move();
 
-			/** 足音を出す */
-			app::NoiseManager::GetInstance().AddNoise(
-				m_owner->GetTransform().m_position,
-				app::EnNoiseType::Sneak
-			);
-
 			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+
+			/** 子ペンギンのみ足音をエネミーに検知させる（親ペンギンは検知対象外） */
+			if (child != nullptr)
+			{
+				app::NoiseManager::GetInstance().AddNoise(
+					m_owner->GetTransform().m_position,
+					app::EnNoiseType::Sneak
+				);
+			}
+
 			if (child == nullptr) return;
 
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
@@ -160,14 +164,18 @@ namespace app
 		{
 			m_owner->Move();
 
-			/** 足音を出す */
-			app::NoiseManager::GetInstance().AddNoise(
-				m_owner->GetTransform().m_position,
-				app::EnNoiseType::Dash
-			);
-
 			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+
+			/** 子ペンギンのみ足音をエネミーに検知させる（親ペンギンは検知対象外） */
+			if (child != nullptr)
+			{
+				app::NoiseManager::GetInstance().AddNoise(
+					m_owner->GetTransform().m_position,
+					app::EnNoiseType::Dash
+				);
+			}
+
 			if (child == nullptr) return;
 
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
@@ -236,11 +244,15 @@ namespace app
 
 		void PenguinJumpState::Exit()
 		{
-			/** 足音を出す */
-			app::NoiseManager::GetInstance().AddNoise(
-				m_owner->GetTransform().m_position,
-				app::EnNoiseType::Fall
-			);
+			/** 子ペンギンのみ着地音をエネミーに検知させる（親ペンギンは検知対象外） */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child != nullptr)
+			{
+				app::NoiseManager::GetInstance().AddNoise(
+					m_owner->GetTransform().m_position,
+					app::EnNoiseType::Fall
+				);
+			}
 
 
 			auto* effectStatus = m_owner->GetEffectStatus();
@@ -319,11 +331,15 @@ namespace app
 		{
 			m_owner->Move();
 
-			/** 足音を出す */
-			app::NoiseManager::GetInstance().AddNoise(
-				m_owner->GetTransform().m_position,
-				app::EnNoiseType::Slide
-			);
+			/** 子ペンギンのみスライド音をエネミーに検知させる（親ペンギンは検知対象外） */
+			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
+			if (child != nullptr)
+			{
+				app::NoiseManager::GetInstance().AddNoise(
+					m_owner->GetTransform().m_position,
+					app::EnNoiseType::Slide
+				);
+			}
 
 			auto* effectStatus = m_owner->GetEffectStatus();
 			if (effectStatus == nullptr) return;
@@ -405,7 +421,6 @@ namespace app
 			}
 
 			/** 子ペンギンの場合、可聴状態の変化に応じてSEを開始・停止する */
-			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
 			if (child == nullptr) return;
 
 			const bool isAudible = ChildPenguinManager::GetInstance()->IsAudible(child);
