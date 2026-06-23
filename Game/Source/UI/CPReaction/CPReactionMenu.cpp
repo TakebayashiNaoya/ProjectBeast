@@ -14,6 +14,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 
 #include "Source/Sound/SoundManager.h"
 
@@ -135,6 +136,19 @@ namespace app
 		{
 			if (!m_target) return;
 			const Vector3 targetPosition = m_target->GetTransform().m_position;
+			const Vector3 daddyPosition = m_daddyPenguin->GetTransform().m_position;
+			const Quaternion daddyRotation = m_daddyPenguin->GetTransform().m_rotation;
+
+			// y座標を0とする
+			const Vector3 target = Vector3(targetPosition.x, 0.0f, targetPosition.z);
+			const Vector3 daddy = Vector3(daddyPosition.x, 0.0f, daddyPosition.z);
+
+			// ベクトルを取得
+			const Vector3 toTarget = target - daddy;
+			const float distance = toTarget.Length();
+
+			//const Vector3 daddyFront = daddyPosition * Vector3::Front;
+
 
 			Vector2 screenPos = Vector2::Zero;
 			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, targetPosition);

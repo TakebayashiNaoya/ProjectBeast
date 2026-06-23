@@ -13,6 +13,7 @@ namespace app
 	{
 		/** 前方宣言 */
 		class ChildPenguin;
+		class DaddyPenguin;
 	}
 
 
@@ -54,6 +55,14 @@ namespace app
 
 
 		public:
+			/**
+			 * @brief 親ペンギンを設定
+			 * @param daddyPenguin 親ペンギン
+			 */
+			inline void SetDaddyPenguin(actor::DaddyPenguin* daddyPenguin)
+			{
+				m_daddyPenguin = daddyPenguin;
+			}
 			/**
 			 * @brief ステータスを設定
 			 * @param status ステータス
@@ -135,6 +144,8 @@ namespace app
 
 			/** ターゲット*/
 			actor::ChildPenguin* m_target;
+			/** 親ペンギン */
+			actor::DaddyPenguin* m_daddyPenguin;
 
 			/** 吹き出し */
 			UIIcon* m_speechBubble;
