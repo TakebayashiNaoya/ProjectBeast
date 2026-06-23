@@ -99,6 +99,7 @@ namespace app
 			, m_isPlayAnimation(false)
 			, m_status(nullptr)
 			, m_animStatus(nullptr)
+			, m_isInFrontOfDaddy(false)
 		{}
 
 
@@ -137,18 +138,31 @@ namespace app
 			if (!m_target) return;
 			const Vector3 targetPosition = m_target->GetTransform().m_position;
 			const Vector3 daddyPosition = m_daddyPenguin->GetTransform().m_position;
-			const Quaternion daddyRotation = m_daddyPenguin->GetTransform().m_rotation;
+			Quaternion daddyRotation = m_daddyPenguin->GetTransform().m_rotation;
 
 			// y座標を0とする
 			const Vector3 target = Vector3(targetPosition.x, 0.0f, targetPosition.z);
 			const Vector3 daddy = Vector3(daddyPosition.x, 0.0f, daddyPosition.z);
 
 			// ベクトルを取得
-			const Vector3 toTarget = target - daddy;
-			const float distance = toTarget.Length();
+			Vector3 toTargetNorm = target - daddy;
+			toTargetNorm.Normalize();
 
-			//const Vector3 daddyFront = daddyPosition * Vector3::Front;
+			Vector3 front = Vector3::Front;
+			daddyRotation.Apply(front);
 
+			// 内積が正なら親ペンギンの前方にいる
+			const float dot = front.Dot(toTargetNorm);
+			m_isInFrontOfDaddy = (dot >= 0.0f);
+
+			// 前方でなければ描画しない
+			if (!m_isInFrontOfDaddy)
+			{
+				m_speechBubble->m_isDraw = false;
+				m_troubleReaction->m_isDraw = false;
+				m_happyReaction->m_isDraw = false;
+				return;
+			}
 
 			Vector2 screenPos = Vector2::Zero;
 			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, targetPosition);
@@ -167,6 +181,7 @@ namespace app
 
 		void CPReactionMenu::DrawFlagUpdate()
 		{
+			m_isInFrontOfDaddy = false;
 
 			if (!m_target)
 			{

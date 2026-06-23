@@ -161,6 +161,8 @@ namespace app
 			float m_timer;
 			/** アニメーション再生中フラグ */
 			bool m_isPlayAnimation;
+			/** 親ペンギンの前方にいるかフラグ */
+			bool m_isInFrontOfDaddy;
 		};
 	}
 }
