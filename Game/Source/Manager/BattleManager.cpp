@@ -163,11 +163,20 @@ namespace app
 		/** チェイス中にキャッシュしたターゲットを使用してカメラを追従する */
 		const actor::ChildPenguin* targetChild = m_lastTargetChild;
 
-		/** ターゲットが死亡していたらキャッシュをクリアしてサブビューを非表示にする */
-		if (targetChild != nullptr && targetChild->GetStatus<actor::ChildPenguinStatus>()->IsDead())
+		/** ダングリングポインタのガード：遅延deleteにより解放済みの場合はリストに存在しない */
+		if (targetChild != nullptr)
 		{
-			m_lastTargetChild = nullptr;
-			targetChild = nullptr;
+			const auto& list = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
+			bool stillExists = false;
+			for (const auto* p : list)
+			{
+				if (p == targetChild) { stillExists = true; break; }
+			}
+			if (!stillExists || targetChild->GetStatus<actor::ChildPenguinStatus>()->IsDead())
+			{
+				m_lastTargetChild = nullptr;
+				targetChild = nullptr;
+			}
 		}
 
 		/** 攻撃対象の子ペンギンが特定できなければ終了 */
