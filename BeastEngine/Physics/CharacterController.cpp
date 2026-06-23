@@ -422,6 +422,12 @@ namespace nsBeastEngine
 								m_position.x += normalXZ.x * slideAmount * slopeFactor;
 								m_position.z += normalXZ.z * slideAmount * slopeFactor;
 							}
+
+							// 急斜面に当たっていても、海面より下に潜らないようにする
+							if (m_position.y < m_seaLevel) {
+								m_position.y = m_seaLevel;
+								m_verticalVelocity = 0.0f;
+							}
 						}
 					}
 					else {
