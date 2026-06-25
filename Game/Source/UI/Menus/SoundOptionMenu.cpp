@@ -5,8 +5,8 @@
  */
 #include "stdafx.h"
 #include "SoundOptionMenu.h"
-#include "UIMenuConstants.h"
 #include "Source/Sound/SoundManager.h"
+#include "UIMenuConstants.h"
 
 
 namespace app
@@ -67,7 +67,7 @@ namespace app
 			/** 内部的には100 */
 			constexpr float MAX_VALUE = 100.0f;
 			/** 全体の音量のリセット値 */
-			constexpr float RESET_VOLUME_VALUE = 0.1f;
+			constexpr float RESET_VOLUME_VALUE = 0.5f;
 			/** 音量の最小値 */
 			constexpr float MIN_VOLUME_VALUE = 0.0f;
 			/** 音量の最大値 */
@@ -272,7 +272,7 @@ namespace app
 			// ノブのX座標とフレームのX座標への参照。
 			float& knobPosX = knobIcon->m_transform.m_localTransform.m_position.x;
 			float& framePosX = frameIcon->m_transform.m_localTransform.m_position.x;
-			
+
 			if (isChange)
 			{
 				volumeInt = util::clamp<int>(volumeInt, MIN_VALUE, MAX_VALUE);

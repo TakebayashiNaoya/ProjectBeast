@@ -18,7 +18,7 @@ namespace
 
 	constexpr uint8_t CLUMSY_CP_CRY_NUM = 5;
 
-	constexpr float DEFAULT_VOLUME = 0.1f;
+	constexpr float DEFAULT_VOLUME = 0.5f;
 
 	constexpr const char* SOUND_GO_NAME = "se";
 }
