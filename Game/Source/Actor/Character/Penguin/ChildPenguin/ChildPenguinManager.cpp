@@ -135,30 +135,66 @@ namespace app
 			float spawnRadius
 		)
 		{
-			/** タイプと生成数のペアをまとめて処理する */
-			const std::pair<EnChildPenguinType, int> spawnList[] =
-			{
-				{ EnChildPenguinType::Serious, seriousNum },
-				{ EnChildPenguinType::Clingy,  clingyNum  },
-				{ EnChildPenguinType::Naughty, naughtyNum },
-				{ EnChildPenguinType::Clumsy,  clumsyNum  },
-				{ EnChildPenguinType::Caring,  caringNum  },
-			};
+			// ==========================================
+			// 生成するすべてのペンギンの「タイプ」を1つのリスト（プール）にまとめる
+			// ==========================================
+			std::vector<EnChildPenguinType> spawnPool;
+			// メモリ確保の最適化（全匹分のサイズをあらかじめ確保）
+			spawnPool.reserve(seriousNum + clingyNum + naughtyNum + clumsyNum + caringNum);
 
-			for (const auto& [type, num] : spawnList)
+			// リストに指定された数だけタイプを追加していく
+			for (int i = 0; i < seriousNum; i++) spawnPool.push_back(EnChildPenguinType::Serious);
+			for (int i = 0; i < clingyNum; i++)  spawnPool.push_back(EnChildPenguinType::Clingy);
+			for (int i = 0; i < naughtyNum; i++) spawnPool.push_back(EnChildPenguinType::Naughty);
+			for (int i = 0; i < clumsyNum; i++)  spawnPool.push_back(EnChildPenguinType::Clumsy);
+			for (int i = 0; i < caringNum; i++)  spawnPool.push_back(EnChildPenguinType::Caring);
+
+			// ==========================================
+			// リストの中身をランダムにシャッフルする
+			// ==========================================
+			static std::mt19937 engine(std::random_device{}());
+			std::shuffle(spawnPool.begin(), spawnPool.end(), engine);
+
+			// ==========================================
+			// クラスター（群れ）として配置していく
+			// ==========================================
+			const int maxClusterSize = 5;       // 1つの群れに最大何匹入れるか
+			const float clusterRadius = 150.0f; // 群れの広さ（半径）
+
+			Vector3 currentClusterCenter = Vector3::Zero;
+			int currentClusterCount = 0;
+
+			// シャッフルされたリストから1匹ずつ順番に取り出して配置する
+			for (EnChildPenguinType type : spawnPool)
 			{
-				for (int i = 0; i < num; i++)
+				// 群れの人数が0、または最大数に達したら、新しい群れの中心（リーダー位置）を決める
+				if (currentClusterCount == 0 || currentClusterCount >= maxClusterSize)
 				{
-					SpawnOne(type, spawnRadius);
+					currentClusterCenter = GenerateRandomSpawnPosition(spawnRadius);
+					currentClusterCount = 0;
 				}
+
+				// 決まった群れの中心を渡して1匹生成
+				SpawnOne(type, spawnRadius, currentClusterCenter, clusterRadius);
+
+				currentClusterCount++;
 			}
 		}
 
 
-		void ChildPenguinManager::SpawnOne(EnChildPenguinType type, float spawnRadius)
+		void ChildPenguinManager::SpawnOne(EnChildPenguinType type, float spawnRadius, const Vector3& clusterCenter, float clusterRadius)
 		{
 			/** 円内のランダムな座標を生成 */
-			const Vector3 xzPos = GenerateRandomSpawnPosition(spawnRadius);
+			Vector3 xzPos;
+
+			if (clusterCenter.x == 0.0f && clusterCenter.y == 0.0f && clusterCenter.z == 0.0f)
+			{
+				xzPos = GenerateRandomSpawnPosition(spawnRadius);
+			}
+			else
+			{
+				xzPos = GenerateClusterMemberPosition(clusterCenter, clusterRadius);
+			}
 
 			/** レイキャストで地面のyを取得 */
 			const float groundY = GetGroundY(xzPos.x, xzPos.z);
@@ -173,7 +209,7 @@ namespace app
 			child->GetStateMachine()->SetPosition(spawnPos);
 			child->StartWrapper();
 			if (auto* lm = GameLogManager::GetInstance())
-				lm->RecordSpawn("penguin", child->GetLogId(), {{"type", child->GetChildPenguinTypeStr()}});
+				lm->RecordSpawn("penguin", child->GetLogId(), { {"type", child->GetChildPenguinTypeStr()} });
 		}
 
 
@@ -196,6 +232,29 @@ namespace app
 
 			/** 最大試行回数を超えた場合は原点付近に置く */
 			return Vector3::Zero;
+		}
+
+
+		Vector3 ChildPenguinManager::GenerateClusterMemberPosition(const Vector3& center, float clusterRadius)
+		{
+			static std::mt19937 engine(std::random_device{}());
+			std::uniform_real_distribution<float> dist(-clusterRadius, clusterRadius);
+
+			for (int i = 0; i < SPAWN_MAX_RETRY; i++)
+			{
+				const float x = dist(engine);
+				const float z = dist(engine);
+
+				// 群れの半径の円内に収まっているかチェック
+				if ((x * x + z * z) <= (clusterRadius * clusterRadius))
+				{
+					// 群れの中心座標にオフセットを足して返す
+					return Vector3(center.x + x, 0.0f, center.z + z);
+				}
+			}
+
+			// 試行回数を超えた場合は安全のため中心位置をそのまま返す
+			return center;
 		}
 
 
@@ -226,7 +285,7 @@ namespace app
 		{
 			if (auto* lm = GameLogManager::GetInstance())
 			{
-				lm->QueueEvent({{"ev", "penguin_die"}, {"penguin_id", penguin->GetLogId()}});
+				lm->QueueEvent({ {"ev", "penguin_die"}, {"penguin_id", penguin->GetLogId()} });
 				lm->RecordDespawn("penguin", penguin->GetLogId(), "dead");
 			}
 
@@ -263,14 +322,14 @@ namespace app
 				m_followers.push_back(penguin);
 				ScoreManager::GetInstance().AddCollectedCount();
 				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Happy);
-				
+
 				if (auto* menu = InGameUIManager::GetInstance()->GetRemainingChildMenu())
 				{
 					menu->SetTarget(penguin);
 				}
 
 				if (auto* lm = GameLogManager::GetInstance())
-					lm->QueueEvent({{"ev", "penguin_join"}, {"penguin_id", penguin->GetLogId()}});
+					lm->QueueEvent({ {"ev", "penguin_join"}, {"penguin_id", penguin->GetLogId()} });
 			}
 			/** メンバーが増えたので次フレームで再ソート・再割り当てが走る */
 		}
@@ -285,7 +344,7 @@ namespace app
 				ScoreManager::GetInstance().SubCollectedCount();
 				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Trouble);
 				if (auto* lm = GameLogManager::GetInstance())
-					lm->QueueEvent({{"ev", "penguin_leave"}, {"penguin_id", penguin->GetLogId()}});
+					lm->QueueEvent({ {"ev", "penguin_leave"}, {"penguin_id", penguin->GetLogId()} });
 			}
 			/** メンバーが減ったので外側の子が内側に詰める処理が次フレームで自然に行われる */
 		}
@@ -706,7 +765,7 @@ namespace app
 
 			auto info = std::make_unique<GhostPenguinInfo>();
 			info->modelRender.Init(GHOST_MODEL_PATH);
-			
+
 			info->floatCurve.Initialize(0.0f, POSITION_OFFSET_Y, ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
 			info->floatCurve.Play();
 			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
