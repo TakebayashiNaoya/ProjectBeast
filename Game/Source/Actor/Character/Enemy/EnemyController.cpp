@@ -832,16 +832,23 @@ namespace app
 				{
 					const int bearId = enemy->m_target->GetLogId();
 					const int penguinId = enemy->m_foundPenguin->GetLogId();
-					enemy->m_foundPenguin->GetStateMachine()->Damage();
-					if (auto* lm = GameLogManager::GetInstance())
+					auto* status = enemy->m_foundPenguin->GetStateMachine()->GetChildPenguinStatus();
+					if (status != nullptr && !status->IsDead())
 					{
-						lm->QueueEvent({ {"ev", "bear_attack"}, {"bear_id", bearId}, {"penguin_id", penguinId} });
-						auto* status = enemy->m_foundPenguin->GetStateMachine()->GetChildPenguinStatus();
-						if (status && status->IsDead())
+						// 生きている場合のみダメージ処理を実行
+						enemy->m_foundPenguin->GetStateMachine()->Damage();
+
+						if (auto* lm = GameLogManager::GetInstance())
 						{
-							lm->QueueEvent({ {"ev", "bear_kill"}, {"bear_id", bearId}, {"penguin_id", penguinId} });
-							if (auto* am = app::achievement::AchievementManager::GetInstance())
-								am->AddBearKill();
+							lm->QueueEvent({ {"ev", "bear_attack"}, {"bear_id", bearId}, {"penguin_id", penguinId} });
+
+							// 今の攻撃でトドメを刺したか判定
+							if (status->IsDead())
+							{
+								lm->QueueEvent({ {"ev", "bear_kill"}, {"bear_id", bearId}, {"penguin_id", penguinId} });
+								if (auto* am = app::achievement::AchievementManager::GetInstance())
+									am->AddBearKill();
+							}
 						}
 					}
 				}
