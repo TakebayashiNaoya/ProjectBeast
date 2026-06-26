@@ -763,17 +763,21 @@ namespace app
 		{
 			constexpr const char* GHOST_MODEL_PATH = "Assets/modelData/penguin/childPenguin/GhostChildPenguin.tkm";
 			constexpr float POSITION_OFFSET_Y = 0.2f;
-			constexpr float ANIM_DURATION = 3.0f;
-			constexpr float SCALE_UP = 2.0f;
+			// 浮上アニメーション持続時間。
+			constexpr float SURFACING_ANIM_DURATION = 3.0f;
+
+			const Vector3 scaleUp = Vector3(0.8f, 1.0f, 1.0f);
+			const Vector4 mulColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 			const Vector3 dethPos = penguin->GetTransform().m_position;
 			const Quaternion dethRot = penguin->GetTransform().m_rotation;
-			const Vector3 dethScale = penguin->GetTransform().m_scale * SCALE_UP;
+			const Vector3 dethScale = penguin->GetTransform().m_scale + scaleUp;
 
 			auto info = std::make_unique<GhostPenguinInfo>();
 			info->modelRender.Init(GHOST_MODEL_PATH);
 
-			info->floatCurve.Initialize(0.0f, POSITION_OFFSET_Y, ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
+			// 浮上アニメーションの初期化と再生。
+			info->floatCurve.Initialize(0.0f, POSITION_OFFSET_Y, SURFACING_ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
 			info->floatCurve.Play();
 			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
 			info->modelRender.Update();
@@ -787,6 +791,7 @@ namespace app
 		{
 			for (auto& info : m_ghostPenguins)
 			{
+				// 浮上アニメショーンの更新。
 				if (!info->floatCurve.IsPlaying()) continue;
 
 				info->floatCurve.Update(g_gameTime->GetFrameDeltaTime());
