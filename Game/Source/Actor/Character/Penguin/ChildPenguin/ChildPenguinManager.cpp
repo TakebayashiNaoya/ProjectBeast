@@ -344,46 +344,40 @@ namespace app
 
 		void ChildPenguinManager::CalculateFormationPositions()
 		{
-			m_formationPositions.clear();
+			const Vector3 centerPos = m_daddyPenguin->GetTransform().m_position;
+			const int followerCount = static_cast<int>(m_followers.size());
 
-			/** 親の現在座標を取得 */
-			Vector3 centerPos = m_daddyPenguin->GetTransform().m_position;
-
-			int currentCount = 0; /** 今何匹目を配置しているかのカウント */
-			int layer = 1;        /** 階層カウント（1が一番内側の円） */
-
-			/** 最大数に達するまで円を広げながら計算 */
-			while (currentCount < MAX_FORMATION_COUNT)
+			/** フォロワー数が変わったときだけオフセットを再計算する（sin/cosの節約） */
+			if (followerCount != m_cachedFollowerCount)
 			{
-				/** 現在の階層の半径 */
-				float r = FORMATION_BASE_RADIUS + (layer - 1) * FORMATION_RADIUS_STEP;
+				m_cachedFollowerCount = followerCount;
+				m_formationOffsets.clear();
 
-				/** 円周の長さ */
-				float circumference = 2.0f * Math::PI * r;
+				int currentCount = 0;
+				int layer = 1;
 
-				/** この階層に配置できる最大数(最低1匹は置く) */
-				int maxInThisLayer = max(1, static_cast<int>(circumference / FORMATION_MIN_DISTANCE));
-
-				/** 何°毎に配置するかの角度算出 */
-				float angleStep = 360.0f / maxInThisLayer;
-
-				/** この階層に配置する数だけループ */
-				for (int i = 0; i < maxInThisLayer && currentCount < MAX_FORMATION_COUNT; ++i)
+				while (currentCount < MAX_FORMATION_COUNT)
 				{
-					/** 角度を計算して、円周上の座標を求める */
-					float angleDeg = i * angleStep;
-					float angleRad = angleDeg * (Math::PI / 180.0f); /** ラジアン変換 */
+					float r = FORMATION_BASE_RADIUS + (layer - 1) * FORMATION_RADIUS_STEP;
+					float circumference = 2.0f * Math::PI * r;
+					int maxInThisLayer = max(1, static_cast<int>(circumference / FORMATION_MIN_DISTANCE));
+					float angleStep = 360.0f / maxInThisLayer;
 
-					Vector3 targetPos = centerPos;
-					/** Z軸とX軸で円を描く（ワールド座標系固定） */
-					targetPos.x += r * cosf(angleRad);
-					targetPos.z += r * sinf(angleRad);
-					/** ※Y軸（高さ）は地形に沿わせる処理が別途必要になる場合があります */
-
-					m_formationPositions.push_back(targetPos);
-					currentCount++;
+					for (int i = 0; i < maxInThisLayer && currentCount < MAX_FORMATION_COUNT; ++i)
+					{
+						float angleRad = i * angleStep * (Math::PI / 180.0f);
+						m_formationOffsets.push_back({ r * cosf(angleRad), 0.0f, r * sinf(angleRad) });
+						currentCount++;
+					}
+					layer++;
 				}
-				layer++;
+			}
+
+			/** 毎フレームは中心座標にオフセットを加算するだけ */
+			m_formationPositions.resize(m_formationOffsets.size());
+			for (size_t i = 0; i < m_formationOffsets.size(); ++i)
+			{
+				m_formationPositions[i] = centerPos + m_formationOffsets[i];
 			}
 		}
 
@@ -516,9 +510,8 @@ namespace app
 
 			const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
 
-			/** 有効な子ペンギンを距離付きで収集する */
-			std::vector<std::pair<float, ChildPenguin*>> distList;
-			distList.reserve(m_childPenguinList.size());
+			/** キャッシュを再利用してヒープ確保を避ける */
+			m_audibleDistCache.clear();
 
 			for (auto* cp : m_childPenguinList)
 			{
@@ -526,21 +519,23 @@ namespace app
 
 				Vector3 diff = cp->GetTransform().m_position - daddyPos;
 				diff.y = 0.0f;
-				const float distSq = diff.LengthSq();
-				distList.emplace_back(distSq, cp);
+				m_audibleDistCache.emplace_back(diff.LengthSq(), cp);
 			}
 
-			/** 距離の昇順でソートし、上位 AUDIBLE_PENGUIN_NUM 匹を可聴対象に登録する */
-			std::sort(distList.begin(), distList.end(),
+			/** nth_element で上位 AUDIBLE_PENGUIN_NUM 匹だけ O(n) で抽出する */
+			const int audibleCount = min(static_cast<int>(m_audibleDistCache.size()), AUDIBLE_PENGUIN_NUM);
+			std::nth_element(
+				m_audibleDistCache.begin(),
+				m_audibleDistCache.begin() + audibleCount,
+				m_audibleDistCache.end(),
 				[](const std::pair<float, ChildPenguin*>& a, const std::pair<float, ChildPenguin*>& b)
 				{
 					return a.first < b.first;
 				});
 
-			const int audibleCount = min(static_cast<int>(distList.size()), AUDIBLE_PENGUIN_NUM);
 			for (int i = 0; i < audibleCount; ++i)
 			{
-				m_audiblePenguins.insert(distList[i].second);
+				m_audiblePenguins.insert(m_audibleDistCache[i].second);
 			}
 		}
 

@@ -210,6 +210,10 @@ namespace app
 			const float FORMATION_BASE_RADIUS = 0.0f;  /** 一番内側の円の半径 */
 			const float FORMATION_RADIUS_STEP = 20.0f;
 			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
+
+			/** フォロワー数が変化したときのみ陣形オフセットを再計算するためのキャッシュ */
+			int m_cachedFollowerCount = -1;
+			std::vector<Vector3> m_formationOffsets;
 			
 
 
@@ -296,6 +300,9 @@ namespace app
 
 			/** 可聴対象とする子ペンギンの最大数 */
 			static constexpr int AUDIBLE_PENGUIN_NUM = 5;
+
+			/** UpdateAudiblePenguins 用の距離キャッシュ（毎フレームのヒープ確保を避けるため） */
+			std::vector<std::pair<float, ChildPenguin*>> m_audibleDistCache;
 
 
 
