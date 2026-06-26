@@ -158,8 +158,11 @@ namespace app
 			// ==========================================
 			// クラスター（群れ）として配置していく
 			// ==========================================
-			const int maxClusterSize = 5;       // 1つの群れに最大何匹入れるか
 			const float clusterRadius = 150.0f; // 群れの広さ（半径）
+
+			// 3〜5匹の間でランダムにサイズを決めるための設定
+			std::uniform_int_distribution<int> clusterSizeDist(1, 5);
+			int currentMaxClusterSize = 0; // 現在作ろうとしている群れの目標サイズ
 
 			Vector3 currentClusterCenter = Vector3::Zero;
 			int currentClusterCount = 0;
@@ -167,11 +170,15 @@ namespace app
 			// シャッフルされたリストから1匹ずつ順番に取り出して配置する
 			for (EnChildPenguinType type : spawnPool)
 			{
-				// 群れの人数が0、または最大数に達したら、新しい群れの中心（リーダー位置）を決める
-				if (currentClusterCount == 0 || currentClusterCount >= maxClusterSize)
+				// 群れの人数が0、または目標のサイズに達したら、新しい群れ（リーダー位置とサイズ）を決める
+				if (currentClusterCount == 0 || currentClusterCount >= currentMaxClusterSize)
 				{
+					// 新しい中心位置を決める
 					currentClusterCenter = GenerateRandomSpawnPosition(spawnRadius);
 					currentClusterCount = 0;
+
+					// ★ 次に作る群れのサイズを 3〜5 匹の間でランダムに決定する
+					currentMaxClusterSize = clusterSizeDist(engine);
 				}
 
 				// 決まった群れの中心を渡して1匹生成
