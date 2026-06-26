@@ -1,0 +1,8 @@
+[
+  {
+    "comment": "クマのリアクションに使用するアイコンのパラメーター",
+    "offsetX": -100,
+    "offsetY": 150,
+    "activeDistance": 3000
+  }
+]
