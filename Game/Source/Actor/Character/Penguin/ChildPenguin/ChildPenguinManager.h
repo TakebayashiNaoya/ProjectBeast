@@ -4,9 +4,9 @@
  * @author 立山、竹林
  */
 #pragma once
-#include <unordered_set>
 #include "ChildPenguinTypes.h"
 #include "Source/Util/Curve.h"
+#include <unordered_set>
 
 
 namespace app
@@ -92,8 +92,17 @@ namespace app
 			 * @brief 1体生成してタイプと座標をセットする
 			 * @param type        生成するタイプ
 			 * @param spawnRadius スポーン範囲の半径
+			 * @param clusterCenter 群れのセンターのポジション
+			 * @param clusterRadius 群れの半径
 			 */
-			void SpawnOne(EnChildPenguinType type, float spawnRadius);
+			void SpawnOne(EnChildPenguinType type, float spawnRadius, const Vector3& clusterCenter = Vector3::Zero, float clusterRadius = CLUSTER_RADIUS);
+
+			/**
+			 * @brief 群れのメンバー用の座標を計算する関数
+			 * @param center センターのポジション
+			 * @param clusterRadius 群れの半径
+			 */
+			Vector3 GenerateClusterMemberPosition(const Vector3& center, float clusterRadius);
 
 			/**
 			 * @brief 円内のランダムなXZ座標を生成する（拒絶サンプリング）
@@ -122,14 +131,14 @@ namespace app
 			std::vector<actor::ChildPenguin*> m_childPenguinList;
 			/** 削除待ちのペンギンを入れるリスト */
 			std::vector<ChildPenguin*> m_destroyList;
-			
+
 
 
 
 			//============================================//
 			// 陣形・追従管理
 			//============================================//
-			
+
 		public:
 			/**
 			 * @brief 親ペンギンの現在座標を取得する
@@ -210,7 +219,7 @@ namespace app
 			const float FORMATION_BASE_RADIUS = 0.0f;  /** 一番内側の円の半径 */
 			const float FORMATION_RADIUS_STEP = 20.0f;
 			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
-			
+
 
 
 
@@ -408,23 +417,23 @@ namespace app
 			std::unordered_set<ChildPenguin*> m_roamingPenguins;
 			/** いずれかの世話焼きが担当しているペンギンの集合 */
 			std::unordered_set<ChildPenguin*> m_assignedTargets;
-			
+
 
 			//============================================//
 			// ゴーストペンギン関連
 			//============================================//
 
-			private:
+		private:
 			/**
 			 * @brief ゴーストペンギンの情報構造体
 			 */
-				struct GhostPenguinInfo
-				{
-					ModelRender modelRender;
-					util::FloatCurve floatCurve;
-				};
+			struct GhostPenguinInfo
+			{
+				ModelRender modelRender;
+				util::FloatCurve floatCurve;
+			};
 
-						
+
 		public:
 			using GhostPenguins = std::vector<std::unique_ptr<GhostPenguinInfo>>;
 
@@ -463,7 +472,7 @@ namespace app
 			/** ゴーストペンギンのリスト */
 			GhostPenguins m_ghostPenguins;
 
-			
+
 
 			//============================================//
 			// シングルトン関連
@@ -530,6 +539,9 @@ namespace app
 			int m_iglooEnteringCount = 0;
 			/** ログ用IDの連番カウンタ */
 			int m_nextLogId = 0;
+
+			/** 群れの半径 */
+			static constexpr float CLUSTER_RADIUS = 150.0f;
 		};
 	}
 }
