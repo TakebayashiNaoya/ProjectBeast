@@ -30,6 +30,13 @@ namespace app
 			constexpr float SPAWN_RAY_START_Y = 1000.0f;
 			/** 拒絶サンプリングの最大試行回数（無限ループ防止） */
 			constexpr int SPAWN_MAX_RETRY = 100;
+			/** 群れの広さ（半径） */
+			constexpr float CLUSTER_RADIUS = 150.0f;
+			/** 群れサイズの最小値 */
+			constexpr int CLUSTER_SIZE_MIN = 1;
+			/** 群れサイズの最大値 */
+			constexpr int CLUSTER_SIZE_MAX = 5;
+
 		}
 
 
@@ -158,10 +165,9 @@ namespace app
 			// ==========================================
 			// クラスター（群れ）として配置していく
 			// ==========================================
-			const float clusterRadius = 150.0f; // 群れの広さ（半径）
 
 			// 3〜5匹の間でランダムにサイズを決めるための設定
-			std::uniform_int_distribution<int> clusterSizeDist(1, 5);
+			std::uniform_int_distribution<int> clusterSizeDist(CLUSTER_SIZE_MIN, CLUSTER_SIZE_MAX);
 			int currentMaxClusterSize = 0; // 現在作ろうとしている群れの目標サイズ
 
 			Vector3 currentClusterCenter = Vector3::Zero;
@@ -177,12 +183,12 @@ namespace app
 					currentClusterCenter = GenerateRandomSpawnPosition(spawnRadius);
 					currentClusterCount = 0;
 
-					// ★ 次に作る群れのサイズを 3〜5 匹の間でランダムに決定する
+					// ★ 次に作る群れのサイズを 1〜5 匹の間でランダムに決定する
 					currentMaxClusterSize = clusterSizeDist(engine);
 				}
 
 				// 決まった群れの中心を渡して1匹生成
-				SpawnOne(type, spawnRadius, currentClusterCenter, clusterRadius);
+				SpawnOne(type, spawnRadius, currentClusterCenter, CLUSTER_RADIUS);
 
 				currentClusterCount++;
 			}

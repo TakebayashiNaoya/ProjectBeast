@@ -95,7 +95,7 @@ namespace app
 			 * @param clusterCenter 群れのセンターのポジション
 			 * @param clusterRadius 群れの半径
 			 */
-			void SpawnOne(EnChildPenguinType type, float spawnRadius, const Vector3& clusterCenter = Vector3::Zero, float clusterRadius = 150.0f);
+			void SpawnOne(EnChildPenguinType type, float spawnRadius, const Vector3& clusterCenter = Vector3::Zero, float clusterRadius = CLUSTER_RADIUS);
 
 			/**
 			 * @brief 群れのメンバー用の座標を計算する関数
@@ -539,6 +539,9 @@ namespace app
 			int m_iglooEnteringCount = 0;
 			/** ログ用IDの連番カウンタ */
 			int m_nextLogId = 0;
+
+			/** 群れの半径 */
+			static constexpr float CLUSTER_RADIUS = 150.0f;
 		};
 	}
 }
