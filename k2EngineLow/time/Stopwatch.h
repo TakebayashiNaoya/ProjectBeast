@@ -27,7 +27,7 @@ namespace nsK2EngineLow {
 		/// </summary>
 		Stopwatch()
 		{
-			freq = 0;
+			::QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
 			end = 0;
 			begin = 0;
 			elapsed = 0.0;
@@ -56,7 +56,6 @@ namespace nsK2EngineLow {
 		/// </summary>
 		void Stop()
 		{
-			::QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
 			::QueryPerformanceCounter((LARGE_INTEGER*)&end);
 			elapsed = double(end - begin) / freq;
 			elapsedMill = elapsed * 1000.0;

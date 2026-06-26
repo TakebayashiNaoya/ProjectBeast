@@ -275,6 +275,7 @@ namespace app
 			menu->Open();
 			m_isWindowOpen = true;
 			SceneManager::GetInstance()->SetPause(true);
+			TimeManager::GetInstance().Pause();
 		}
 		else
 		{
