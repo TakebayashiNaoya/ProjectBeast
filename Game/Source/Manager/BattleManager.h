@@ -140,6 +140,12 @@ namespace app
 			m_onSleepingEnemyChanged = std::move(func);
 		}
 
+
+		inline void SetOnBearReactionChanged(std::function<void()> func)
+		{
+			m_onBearReactionChanged = std::move(func);
+		}
+
 		/**
 		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
 		 */
@@ -158,6 +164,9 @@ namespace app
 		 * 探索・UIセットはlambda内で完結する
 		 */
 		std::function<void()> m_onSleepingEnemyChanged;
+
+		/** クマのリアクションUI更新通知 */
+		std::function<void()> m_onBearReactionChanged;
 
 
 
