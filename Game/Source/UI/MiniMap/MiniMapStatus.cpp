@@ -16,7 +16,7 @@ namespace app
 		namespace
 		{
 			// ミニマップ専用JSONのパス。
-			const char* JSON_PATH = "Assets/parameter/miniMap/MiniMapParameter.json";
+			const char* JSON_PATH = "Assets/parameter/UI/miniMap/MiniMapParameter.json";
 		}
 
 

@@ -102,7 +102,7 @@ namespace app
 		if (auto* menu = m_pbWakingUpTimerPacket->GetMenu()) menu->SetDraw(false);
 
 		// ミニマップを生成
-		ui::InitUIPacket(m_miniMapPacket, "Assets/parameter/miniMap/MiniMap.json");
+		ui::InitUIPacket(m_miniMapPacket, "Assets/parameter/UI/miniMap/MiniMap.json");
 
 		if (auto* menu = m_miniMapPacket->GetMenu())
 		{
