@@ -34,27 +34,6 @@ namespace
 	constexpr uint32_t MAX_OBJECT_NUM = 0x200;
 
 
-	/**
-	 * @brief jsonファイルからQuaternionを変換する
-	 * @param arr jsonファイル
-	 * @param key キー
-	 */
-	Quaternion ToRotation(const nlohmann::json& arr, const char* key)
-	{
-		// 回転を度数法で取得
-		Vector3 rotDeg = app::util::JsonConverter::ToVector3(arr, key);
-		// クォータニオンに変換
-		Quaternion rotX, rotY, rotZ;
-		rotX.SetRotationDegX(rotDeg.x);
-		rotY.SetRotationDegY(rotDeg.y);
-		rotZ.SetRotationDegZ(rotDeg.z);
-		// 乗算して合成
-		Quaternion result = rotY;
-		result *= rotX;
-		result *= rotZ;
-
-		return result;
-	}
 
 
 	/**
@@ -64,10 +43,12 @@ namespace
 	 */
 	void LoadTransform(app::actor::IStageObject* object, const nlohmann::json& json)
 	{
-		const bool isNeedCollision = app::util::JsonConverter::ToBool(json, "isNeedCollision");
-		const Vector3 position = app::util::JsonConverter::ToVector3(json, "position");
-		const Quaternion rotation = ToRotation(json, "rotationDeg");
-		const Vector3 scale = app::util::JsonConverter::ToVector3(json, "scale");
+		using JC = app::util::JsonConverter;
+
+		const bool isNeedCollision = JC::ToBool(json, "isNeedCollision");
+		const Vector3 position = JC::ToVector3(json, "position");
+		const Quaternion rotation = JC::ToRotation(json, "rotationDeg");
+		const Vector3 scale = JC::ToVector3(json, "scale");
 
 		object->SetIsNeedCollision(isNeedCollision);
 		object->SetPosition(position);
@@ -108,14 +89,14 @@ namespace
 		app::actor::TerrainObject::TerrainConfig cfg;
 		if (!j.contains(TERRAIN_CONFIG_KEY)) return cfg;
 		const auto& t = j[TERRAIN_CONFIG_KEY];
-		cfg.totalWidth  = t.value("totalWidth",  cfg.totalWidth);
-		cfg.totalDepth  = t.value("totalDepth",  cfg.totalDepth);
+		cfg.totalWidth = t.value("totalWidth", cfg.totalWidth);
+		cfg.totalDepth = t.value("totalDepth", cfg.totalDepth);
 		cfg.heightScale = t.value("heightScale", cfg.heightScale);
-		cfg.subsample   = t.value("subsample",   cfg.subsample);
-		cfg.uvTile      = t.value("uvTile",      cfg.uvTile);
+		cfg.subsample = t.value("subsample", cfg.subsample);
+		cfg.uvTile = t.value("uvTile", cfg.uvTile);
 		cfg.albedoScale = t.value("albedoScale", cfg.albedoScale);
-		cfg.yOffset     = t.value("yOffset",     cfg.yOffset);
-		cfg.minHeight   = t.value("minHeight",   cfg.minHeight);
+		cfg.yOffset = t.value("yOffset", cfg.yOffset);
+		cfg.minHeight = t.value("minHeight", cfg.minHeight);
 		cfg.chunkDivision = t.value("chunkDivision", cfg.chunkDivision);
 		if (t.contains("heightmapPath"))
 		{
@@ -129,11 +110,11 @@ namespace
 		}
 		if (t.contains("pbrParam"))
 		{
-			const auto& p             = t["pbrParam"];
-			cfg.pbrParam.m_dirLightScale  = p.value("dirLightScale",  cfg.pbrParam.m_dirLightScale);
-			cfg.pbrParam.m_ambientScale   = p.value("ambientScale",   cfg.pbrParam.m_ambientScale);
+			const auto& p = t["pbrParam"];
+			cfg.pbrParam.m_dirLightScale = p.value("dirLightScale", cfg.pbrParam.m_dirLightScale);
+			cfg.pbrParam.m_ambientScale = p.value("ambientScale", cfg.pbrParam.m_ambientScale);
 			cfg.pbrParam.m_metallicOffset = p.value("metallicOffset", cfg.pbrParam.m_metallicOffset);
-			cfg.pbrParam.m_smoothOffset   = p.value("smoothOffset",   cfg.pbrParam.m_smoothOffset);
+			cfg.pbrParam.m_smoothOffset = p.value("smoothOffset", cfg.pbrParam.m_smoothOffset);
 		}
 		return cfg;
 	}
@@ -423,7 +404,7 @@ namespace app
 				if (distSq < minDistSq)
 				{
 					minDistSq = distSq;
-					nearest   = it;
+					nearest = it;
 				}
 			}
 

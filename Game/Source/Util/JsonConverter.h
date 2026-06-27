@@ -40,6 +40,8 @@ namespace app
 			static const Vector2 InvalidVector2;
 			/** 無効なVector3値 */
 			static const Vector3 InvalidVector3;
+			/** 無効なQuaternion値 */
+			static const Quaternion InvalidQuaternion;
 			/** 無効な拡大値Vector3値 */
 			static const Vector3 InvalidScaleVector3;
 			/** 無効なVector4値 */
@@ -88,7 +90,11 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidBool)
 			 * @return 読み込んだbool
 			 */
-			static bool ToBool(const nlohmann::json& json, const char* key, bool invalid = InvalidBool);
+			static bool ToBool(
+				const nlohmann::json& json,
+				const char* key,
+				bool invalid = InvalidBool
+			);
 
 			/**
 			 * @brief jsonからintを読み込む
@@ -97,15 +103,24 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidInt)
 			 * @return 読み込んだint
 			 */
-			static int ToInt(const nlohmann::json& json, const char* key, int invalid = InvalidInt);
+			static int ToInt(
+				const nlohmann::json& json,
+				const char* key,
+				int invalid = InvalidInt
+			);
 
 			/**
 			 * @brief jsonからuint32_tを読み込む
 			 * @param json 読み込むjsonファイル
 			 * @param key 読み込むキー
+			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidUInt32)
 			 * @return 読み込んだuint32_t
 			 */
-			static uint32_t ToUInt32(const nlohmann::json& json, const char* key, uint32_t invalid = InvalidUInt32);
+			static uint32_t ToUInt32(
+				const nlohmann::json& json,
+				const char* key,
+				uint32_t invalid = InvalidUInt32
+			);
 
 			/**
 			 * @brief jsonからfloatを読み込む
@@ -114,7 +129,11 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidFloat)
 			 * @return 読み込んだfloat
 			 */
-			static float ToFloat(const nlohmann::json& json, const char* key, float invalid = InvalidFloat);
+			static float ToFloat(
+				const nlohmann::json& json,
+				const char* key,
+				float invalid = InvalidFloat
+			);
 
 			/**
 			 * @brief jsonからstringを読み込む
@@ -123,7 +142,11 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidString)
 			 * @return 読み込んだstring
 			 */
-			static std::string ToString(const nlohmann::json& json, const char* key, std::string invalid = InvalidString);
+			static std::string ToString(
+				const nlohmann::json& json,
+				const char* key,
+				std::string invalid = InvalidString
+			);
 
 			/**
 			 * @brief jsonからVector2を読み込む
@@ -132,7 +155,11 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidVector2)
 			 * @return 読み込んだVector2
 			 */
-			static Vector2 ToVector2(const nlohmann::json& json, const char* key, Vector2 invalid = InvalidVector2);
+			static Vector2 ToVector2(
+				const nlohmann::json& json,
+				const char* key,
+				Vector2 invalid = InvalidVector2
+			);
 
 			/**
 			 * @brief jsonからVector3を読み込む
@@ -142,7 +169,12 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidVector3)
 			 * @return 読み込んだVector3
 			 */
-			static Vector3 ToVector3(const nlohmann::json& json, const char* key, bool isScale = false, Vector3 invalid = InvalidVector3);
+			static Vector3 ToVector3(
+				const nlohmann::json& json,
+				const char* key,
+				bool isScale = false,
+				Vector3 invalid = InvalidVector3
+			);
 
 			/**
 			 * @brief jsonからVector3を読み込む
@@ -151,7 +183,26 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidVector3)
 			 * @return 読み込んだVector3
 			 */
-			static Vector3 ToVector3(const nlohmann::json& json, bool isScale = false, Vector3 invalid = InvalidVector3);
+			static Vector3 ToVector3(
+				const nlohmann::json& json,
+				bool isScale = false,
+				Vector3 invalid = InvalidVector3
+			);
+
+			/*
+			 * @brief jsonからQuaternionを読み込む
+			 * @param json        読み込むjsonファイル
+			 * @param key         読み込むキー
+			 * @param isDegree    trueなら [rotX, rotY, rotZ]（度数法）から変換、
+			 *                    falseなら [x, y, z, w] をそのまま読む
+			 * @param invalid     無効な値を返す場合の値（デフォルトはInvalidQuaternion）
+			 * @return 読み込んだQuaternion
+			 */
+			static Quaternion ToRotation(
+				const nlohmann::json& json,
+				const char* key,
+				bool isDegree = true,
+				Quaternion invalid = InvalidQuaternion);
 
 			/**
 			 * @brief jsonからVector4を読み込む
@@ -161,7 +212,12 @@ namespace app
 			 * @param invalid 無効な値を返す場合の値(デフォルトはInvalidVector4)
 			 * @return 読み込んだVector4
 			 */
-			static Vector4 ToVector4(const nlohmann::json& json, const char* key, bool isConvert = true, Vector4 invalid = InvalidVector4);
+			static Vector4 ToVector4(
+				const nlohmann::json& json,
+				const char* key,
+				bool isConvert = true,
+				Vector4 invalid = InvalidVector4
+			);
 
 			/**
 			 * @brief jsonからFloatRange(Min, Max)を読み込む
@@ -169,7 +225,10 @@ namespace app
 			 * @param key 読み込むキー
 			 * @return 読み込んだFloatRange
 			 */
-			static FloatRange ToFloatRange(const nlohmann::json& json, const char* key);
+			static FloatRange ToFloatRange(
+				const nlohmann::json& json,
+				const char* key
+			);
 
 
 		private:
