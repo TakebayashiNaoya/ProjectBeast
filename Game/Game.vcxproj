@@ -525,6 +525,7 @@
     <ClInclude Include="Source\UI\MiniMap\MiniMapMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h" />
+    <ClInclude Include="Source\UI\MiniMap\MiniMapTypes.h" />
     <ClInclude Include="Source\UI\Model\AchievementAnimStatus.h" />
     <ClInclude Include="Source\UI\Model\MasterPBWakingUpTimerParameter.h" />
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerAnimStatus.h" />
