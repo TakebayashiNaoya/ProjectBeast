@@ -141,6 +141,15 @@ namespace app
 		}
 
 		/**
+		 * @brief ミニマップUI通知functionを設定
+		 * @param func 引数なし。lambda内でUIへのセットを行う
+		 */
+		inline void SetOnMiniMapChanged(std::function<void()> func)
+		{
+			m_onMiniMapChanged = std::move(func);
+		}
+
+		/**
 		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
 		 */
 		void ResetObservers();
@@ -158,6 +167,10 @@ namespace app
 		 * 探索・UIセットはlambda内で完結する
 		 */
 		std::function<void()> m_onSleepingEnemyChanged;
+
+
+		/** ミニマップUI更新通知 */
+		std::function<void()> m_onMiniMapChanged;
 
 
 

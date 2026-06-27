@@ -6,14 +6,14 @@
 #include "stdafx.h"
 #include "BattleManager.h"
 
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
+#include "Graphics/Camera/SubCameraManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
-#include "Graphics/Camera/SubCameraManager.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
 
 
 namespace app
@@ -79,6 +79,14 @@ namespace app
 			m_onSleepingEnemyChanged();
 		}
 
+
+		//--------------------------------------------//
+		// ミニマップの更新
+		//--------------------------------------------//
+		if (m_onMiniMapChanged)
+		{
+			m_onMiniMapChanged();
+		}
 
 		//--------------------------------------------//
 		// サブカメラの更新
@@ -183,7 +191,7 @@ namespace app
 		if (targetChild == nullptr) return;
 
 		/** ターゲット座標・カメラ座標をセットする */
-		const Vector3 basePos   = targetChild->GetTransform().m_position;
+		const Vector3 basePos = targetChild->GetTransform().m_position;
 		const Vector3 targetPos = basePos + Vector3(0.0f, SUB_CAMERA_TARGET_HEIGHT, 0.0f);
 
 		// カメラ方向: 子ペンギン→シロクマ方向にカメラを向ける。
@@ -233,6 +241,7 @@ namespace app
 		m_onTimeChanged = nullptr;
 		m_onRescuedNumChanged = nullptr;
 		m_onSleepingEnemyChanged = nullptr;
+		m_onMiniMapChanged = nullptr;
 	}
 
 
