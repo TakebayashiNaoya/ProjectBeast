@@ -380,6 +380,7 @@ namespace app
 			if (g_pad[0]->IsTrigger(enButtonStart))
 			{
 				SceneManager::GetInstance()->SetPause(true);
+				TimeManager::GetInstance().Pause();
 			}
 
 			/** プレイヤー・子ペンギン・シロクマ の更新 */
@@ -398,9 +399,9 @@ namespace app
 
 			/** ログ毎秒ティック */
 			m_logTickTimer += g_gameTime->GetFrameDeltaTime();
-			if (m_logTickTimer >= 0.1f)
+			if (m_logTickTimer >= 1.0f)
 			{
-				m_logTickTimer -= 0.1f;
+				m_logTickTimer -= 1.0f;
 				if (auto* lm = GameLogManager::GetInstance())
 					lm->RecordTick(m_daddyPenguin);
 			}
