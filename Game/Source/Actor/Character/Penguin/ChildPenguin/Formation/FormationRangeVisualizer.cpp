@@ -58,23 +58,23 @@ namespace app
 				{ "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc      = { 0 };
-			psoDesc.InputLayout                             = { inputElementDescs, _countof(inputElementDescs) };
-			psoDesc.pRootSignature                          = m_rootSignature.Get();
-			psoDesc.VS                                      = CD3DX12_SHADER_BYTECODE(m_vs.GetCompiledBlob());
-			psoDesc.PS                                      = CD3DX12_SHADER_BYTECODE(m_ps.GetCompiledBlob());
-			psoDesc.RasterizerState                         = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			psoDesc.BlendState                              = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			psoDesc.DepthStencilState.DepthEnable           = TRUE;
-			psoDesc.DepthStencilState.DepthWriteMask        = D3D12_DEPTH_WRITE_MASK_ALL;
-			psoDesc.DepthStencilState.DepthFunc             = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-			psoDesc.DepthStencilState.StencilEnable         = FALSE;
-			psoDesc.SampleMask                              = UINT_MAX;
-			psoDesc.PrimitiveTopologyType                   = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-			psoDesc.NumRenderTargets                        = 3;
-			psoDesc.RTVFormats[0]                           = DXGI_FORMAT_R8G8B8A8_UNORM;
-			psoDesc.DSVFormat                               = DXGI_FORMAT_D32_FLOAT;
-			psoDesc.SampleDesc.Count                        = 1;
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
+			psoDesc.pRootSignature                     = m_rootSignature.Get();
+			psoDesc.VS                                 = CD3DX12_SHADER_BYTECODE(m_vs.GetCompiledBlob());
+			psoDesc.PS                                 = CD3DX12_SHADER_BYTECODE(m_ps.GetCompiledBlob());
+			psoDesc.BlendState						   = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			psoDesc.SampleMask						   = UINT_MAX;
+			psoDesc.RasterizerState					   = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			psoDesc.DepthStencilState.DepthEnable	   = TRUE;
+			psoDesc.DepthStencilState.DepthWriteMask   = D3D12_DEPTH_WRITE_MASK_ALL;
+			psoDesc.DepthStencilState.DepthFunc		   = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			psoDesc.DepthStencilState.StencilEnable	   = FALSE;
+			psoDesc.InputLayout						   = { inputElementDescs, _countof(inputElementDescs) };
+			psoDesc.PrimitiveTopologyType              = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+			psoDesc.NumRenderTargets                   = 3;
+			psoDesc.RTVFormats[0]                      = DXGI_FORMAT_R8G8B8A8_UNORM;
+			psoDesc.DSVFormat                          = DXGI_FORMAT_D32_FLOAT;
+			psoDesc.SampleDesc.Count                   = 1;
 			m_pipelineState.Init(psoDesc);
 		}
 
@@ -134,8 +134,7 @@ namespace app
 		}
 
 
-		void FormationRangeVisualizer::BuildRingVertices(
-			const Vector3& center, float radius, const Vector3& color)
+		void FormationRangeVisualizer::BuildRingVertices(const Vector3& center, float radius, const Vector3& color)
 		{
 			// 円周上の頂点を計算
 			std::array<Vector3, N_SEGMENTS> points;
@@ -161,8 +160,7 @@ namespace app
 		}
 
 
-		void FormationRangeVisualizer::Update(
-			const Vector3& center, float joinRadius, float leaveRadius)
+		void FormationRangeVisualizer::Update(const Vector3& center, float joinRadius, float leaveRadius)
 		{
 			if (!m_isInitialized || !m_isVisible) return;
 
