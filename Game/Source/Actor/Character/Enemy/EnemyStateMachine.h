@@ -23,9 +23,6 @@ namespace app
 			EnemyStateMachine(Enemy* enemy);
 			~EnemyStateMachine() = default;
 
-			void Update();
-			void ChangeState();
-
 			core::IState* GetChangeState();
 
 			/** 初期設定用の関数 */
@@ -245,10 +242,6 @@ namespace app
 			Enemy* m_owner;
 			/** エネミーのステータス */
 			EnemyStatus* m_ownerStatus;
-
-			/** 今のステータス */
-			core::IState* m_currentState;
-			core::IState* m_nextState;
 
 			/** 移動ベクトル */
 			Vector3 m_moveVector;

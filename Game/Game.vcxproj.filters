@@ -109,6 +109,9 @@
     <Filter Include="Source\Vfx">
       <UniqueIdentifier>{283f31a8-a0a6-437e-b46e-10de1f9b5c85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\BearReaction">
+      <UniqueIdentifier>{65fa1729-2cfa-455d-96f1-6b17d7826e6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -534,6 +537,12 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Menus\DebufMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\BearReaction\BearReactionSystem.cpp">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\BearReaction\BearReactionMenu.cpp">
+      <Filter>Source\UI\BearReaction</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1001,6 +1010,18 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\DebufMenu.h">
       <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\BearReaction\BearReactionSystem.h">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\BearReaction\MasterBearReactionParameter.h">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\BearReaction\BearReactionTypes.h">
+      <Filter>Source\UI\BearReaction</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -328,6 +328,8 @@
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\Animation\UIAnimation.cpp" />
+    <ClCompile Include="Source\UI\BearReaction\BearReactionMenu.cpp" />
+    <ClCompile Include="Source\UI\BearReaction\BearReactionSystem.cpp" />
     <ClCompile Include="Source\UI\CPReaction\CPReactionAnimStatus.cpp" />
     <ClCompile Include="Source\UI\CPReaction\CPReactionMenu.cpp" />
     <ClCompile Include="Source\UI\CPReaction\CPReactionStatus.cpp" />
@@ -491,6 +493,10 @@
     <ClInclude Include="Source\UI\Animation\UIAnimation.h" />
     <ClInclude Include="Source\UI\Animation\UIAnimationFactory.h" />
     <ClInclude Include="Source\UI\Animation\UIAnimationParameter.h" />
+    <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h" />
+    <ClInclude Include="Source\UI\BearReaction\BearReactionSystem.h" />
+    <ClInclude Include="Source\UI\BearReaction\BearReactionTypes.h" />
+    <ClInclude Include="Source\UI\BearReaction\MasterBearReactionParameter.h" />
     <ClInclude Include="Source\UI\CPReaction\CPReactionAnimStatus.h" />
     <ClInclude Include="Source\UI\CPReaction\CPReactionMenu.h" />
     <ClInclude Include="Source\UI\CPReaction\CPReactionStatus.h" />
