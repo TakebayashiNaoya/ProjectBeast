@@ -47,6 +47,8 @@ namespace app
 
 		void ChildPenguinManager::Start()
 		{
+			m_rangeVisualizer.Init();
+
 			/** 各子ペンギンのStartを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
@@ -73,6 +75,18 @@ namespace app
 
 				/** 隊列メンバーに割り当て */
 				SortAndAssignFollowers();
+			}
+
+			/** 陣形範囲ビジュアライザーの更新（フォロワーがいるときだけ表示） */
+			m_rangeVisualizer.SetVisible(!m_followers.empty());
+			if (m_daddyPenguin != nullptr)
+			{
+				const Vector3 center = m_daddyPenguin->GetTransform().m_position;
+				m_rangeVisualizer.Update(
+					center,
+					m_formationController.GetJoinRadius(),
+					m_formationController.GetLeaveRadius()
+				);
 			}
 
 			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */
@@ -104,6 +118,7 @@ namespace app
 			}
 
 			RenderGhostPenguins(rc);
+			m_rangeVisualizer.Render(rc);
 		}
 
 
@@ -346,45 +361,19 @@ namespace app
 		{
 			m_formationPositions.clear();
 
-			/** 親の現在座標を取得 */
-			Vector3 centerPos = m_daddyPenguin->GetTransform().m_position;
+			const Vector3 center  = m_daddyPenguin->GetTransform().m_position;
 
-			int currentCount = 0; /** 今何匹目を配置しているかのカウント */
-			int layer = 1;        /** 階層カウント（1が一番内側の円） */
+			/** 親の向きから前方ベクトルを取得 */
+			Vector3 forward = Vector3::Front;
+			m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
 
-			/** 最大数に達するまで円を広げながら計算 */
-			while (currentCount < MAX_FORMATION_COUNT)
-			{
-				/** 現在の階層の半径 */
-				float r = FORMATION_BASE_RADIUS + (layer - 1) * FORMATION_RADIUS_STEP;
-
-				/** 円周の長さ */
-				float circumference = 2.0f * Math::PI * r;
-
-				/** この階層に配置できる最大数(最低1匹は置く) */
-				int maxInThisLayer = max(1, static_cast<int>(circumference / FORMATION_MIN_DISTANCE));
-
-				/** 何°毎に配置するかの角度算出 */
-				float angleStep = 360.0f / maxInThisLayer;
-
-				/** この階層に配置する数だけループ */
-				for (int i = 0; i < maxInThisLayer && currentCount < MAX_FORMATION_COUNT; ++i)
-				{
-					/** 角度を計算して、円周上の座標を求める */
-					float angleDeg = i * angleStep;
-					float angleRad = angleDeg * (Math::PI / 180.0f); /** ラジアン変換 */
-
-					Vector3 targetPos = centerPos;
-					/** Z軸とX軸で円を描く（ワールド座標系固定） */
-					targetPos.x += r * cosf(angleRad);
-					targetPos.z += r * sinf(angleRad);
-					/** ※Y軸（高さ）は地形に沿わせる処理が別途必要になる場合があります */
-
-					m_formationPositions.push_back(targetPos);
-					currentCount++;
-				}
-				layer++;
-			}
+			/** 現在のフォロワー数分だけ座標を生成する */
+			m_formationController.CalculatePositions(
+				center,
+				forward,
+				m_formationPositions,
+				static_cast<int>(m_followers.size())
+			);
 		}
 
 

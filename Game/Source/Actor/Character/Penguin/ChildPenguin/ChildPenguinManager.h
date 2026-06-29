@@ -7,6 +7,8 @@
 #include <unordered_set>
 #include "ChildPenguinTypes.h"
 #include "Source/Util/Curve.h"
+#include "Formation/FormationController.h"
+#include "Formation/FormationRangeVisualizer.h"
 
 
 namespace app
@@ -185,7 +187,7 @@ namespace app
 
 		private:
 			/**
-			 * @brief 陣形の座標を計算する
+			 * @brief 陣形の座標を計算する（FormationController に委譲）
 			 */
 			void CalculateFormationPositions();
 
@@ -195,6 +197,34 @@ namespace app
 			void SortAndAssignFollowers();
 
 
+		public:
+			/**
+			 * @brief 陣形を切り替える
+			 * @param type 切り替え先の陣形
+			 */
+			void SwitchFormation(EnFormationType type) { m_formationController.SwitchFormation(type); }
+
+			/**
+			 * @brief 現在の陣形種別を取得する
+			 */
+			EnFormationType GetCurrentFormationType() const { return m_formationController.GetCurrentType(); }
+
+			/**
+			 * @brief 陣形の移動速度倍率を取得する
+			 */
+			float GetFormationSpeedMultiplier() const { return m_formationController.GetSpeedMultiplier(); }
+
+			/**
+			 * @brief 入隊判定半径を取得する（現在のフォロワー数に比例）
+			 */
+			float GetJoinRadius()  const { return m_formationController.GetJoinRadius(); }
+
+			/**
+			 * @brief 脱隊判定半径を取得する（現在のフォロワー数に比例）
+			 */
+			float GetLeaveRadius() const { return m_formationController.GetLeaveRadius(); }
+
+
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
 			DaddyPenguin* m_daddyPenguin = nullptr;
@@ -202,14 +232,14 @@ namespace app
 			/** 現在、親に追従している子ペンギンのリスト（隊列） */
 			std::vector<ChildPenguin*> m_followers;
 
-			/** 計算された陣形の目標座標（最大100個） */
+			/** 計算された陣形の目標座標 */
 			std::vector<Vector3> m_formationPositions;
 
-			/** 陣形調整用のパラメータ */
-			const int   MAX_FORMATION_COUNT = 100;   /** 隊列の最大数 */
-			const float FORMATION_BASE_RADIUS = 0.0f;  /** 一番内側の円の半径 */
-			const float FORMATION_RADIUS_STEP = 20.0f;
-			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
+			/** 陣形コントローラー */
+			FormationController m_formationController;
+
+			/** 陣形範囲ビジュアライザー */
+			FormationRangeVisualizer m_rangeVisualizer;
 			
 
 
