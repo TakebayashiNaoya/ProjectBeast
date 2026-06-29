@@ -39,6 +39,21 @@ namespace app
 			/** 群れサイズの最大値 */
 			constexpr int CLUSTER_SIZE_MAX = 5;
 
+			//-----------ゴーストペンギン関連---------------//
+			/** 非表示待機時間 */
+			constexpr float GHOST_HIDDEN_WAIT_TIME = 2.0f;
+			/** かかった時間 */
+			constexpr float GHOST_TOTAL_TIME = 7.0f;
+			/** ゴーストペンギンのモデルパス */
+			constexpr const char* GHOST_MODEL_PATH = "Assets/modelData/penguin/childPenguin/GhostChildPenguin.tkm";
+			/** 一オフセットY */
+			constexpr float GHOST_POSITION_OFFSET_Y = 0.2f;
+			// 浮上アニメーション持続時間。
+			constexpr float GHOST_SURFACING_ANIM_DURATION = 3.0f;
+			/** スケールアップ */
+			const Vector3 GHOST_SCALE_UP = Vector3(0.8f, 1.0f, 1.0f);
+			/** 方向正規化の平方 */
+			constexpr float GHOST_DIR_NORMALIZE_SQ = 0.0001f;
 		}
 
 
@@ -778,23 +793,15 @@ namespace app
 
 		void ChildPenguinManager::RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target)
 		{
-			constexpr const char* GHOST_MODEL_PATH = "Assets/modelData/penguin/childPenguin/GhostChildPenguin.tkm";
-			constexpr float POSITION_OFFSET_Y = 0.2f;
-			// 浮上アニメーション持続時間。
-			constexpr float SURFACING_ANIM_DURATION = 3.0f;
-
-			const Vector3 scaleUp = Vector3(0.8f, 1.0f, 1.0f);
-			const Vector4 mulColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
 			const Vector3 dethPos = penguin->GetTransform().m_position;
 			const Quaternion dethRot = penguin->GetTransform().m_rotation;
-			const Vector3 dethScale = penguin->GetTransform().m_scale + scaleUp;
+			const Vector3 dethScale = penguin->GetTransform().m_scale + GHOST_SCALE_UP;
 
 			auto info = std::make_unique<GhostPenguinInfo>();
 			info->modelRender.Init(GHOST_MODEL_PATH);
 
 			// 浮上アニメーションの初期化と再生。
-			info->floatCurve.Initialize(0.0f, POSITION_OFFSET_Y, SURFACING_ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
+			info->floatCurve.Initialize(0.0f, GHOST_POSITION_OFFSET_Y, GHOST_SURFACING_ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
 			info->floatCurve.Play();
 			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
 			info->modelRender.Update();
@@ -811,15 +818,7 @@ namespace app
 
 		void ChildPenguinManager::UpdateGhostPenguins()
 		{
-			/** 非表示待機時間 */
-			constexpr float HIDDEN_WAIT_TIME = 2.0f;
-			/** かかった時間 */
-			constexpr float TOTAL_TIME = 7.0f;
-
-			// アニメーション用の経過時間。
 			float deltaTime = g_gameTime->GetFrameDeltaTime();
-			// デバフ用の経過時間。
-			float timer = g_gameTime->GetFrameDeltaTime();
 
 			for (auto& info : m_ghostPenguins)
 			{
@@ -837,10 +836,10 @@ namespace app
 				}
 				
 				// これ以降はアニメーション終了時の処理。
-				info->timer += timer;
+				info->timer += deltaTime;
 
 				// 2秒待機後に非表示にする。
-				if (info->timer >= HIDDEN_WAIT_TIME && !info->isHidden)
+				if (info->timer >= GHOST_HIDDEN_WAIT_TIME && !info->isHidden)
 				{
 					info->isHidden = true;
 					// nullチェック。
@@ -858,7 +857,6 @@ namespace app
 							info->isDebuffActive = true;
 							// タイマーをリセット。
 							info->timer = 0.0f;
-							timer = 0.0f;
 						}
 					}
 				}
@@ -866,23 +864,25 @@ namespace app
 				// デバフが有効でなければ、次の幽霊ペンギンへ。
 				if (!info->isDebuffActive) continue;
 
-				if (info->timer < TOTAL_TIME)
+				if (info->timer < GHOST_TOTAL_TIME)
 				{
 					if (!info->target) continue;
 
 					// 幽霊ペンギンが消えた位置から、シロクマへのベクトルを計算する。
 					Vector3 bearPos = info->target->GetEnemyStateMachine()->GetPosition();
 					info->position = bearPos - info->modelRender.GetPosition();
-					info->position.Normalize();
 
-					if (info->position.LengthSq() > 0.0001f)
+					// ベクトルの長さが0に限りなく近い場合は正規化しない。
+					if (info->position.LengthSq() > GHOST_DIR_NORMALIZE_SQ)
 					{
 						info->position.Normalize();
 					}
 				}
-
 				// 時間経過でデバフ終了。
-				else info->isDebuffActive = false;
+				else 
+				{
+					info->isDebuffActive = false;
+				}
 			}
 		}
 
