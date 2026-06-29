@@ -544,6 +544,12 @@
     <ClCompile Include="Source\UI\BearReaction\BearReactionMenu.cpp">
       <Filter>Source\UI\BearReaction</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Menus\ScorePopupAnimatorMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\ScorePopupAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -1010,18 +1016,6 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\DebufMenu.h">
       <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\BearReaction\BearReactionSystem.h">
-      <Filter>Source\UI\BearReaction</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h">
-      <Filter>Source\UI\BearReaction</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\BearReaction\MasterBearReactionParameter.h">
-      <Filter>Source\UI\BearReaction</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\BearReaction\BearReactionTypes.h">
-      <Filter>Source\UI\BearReaction</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

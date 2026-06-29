@@ -45,6 +45,11 @@ namespace app
 
 			/** WpWarning用のUIAnimationKey */
 			constexpr uint32_t WP_GROW_AND_SHRINK_ANIM_KEY = Hash32("growAndShrinkAnimation");
+
+
+			/** リザルト画面用のUIAnimationKey */
+			constexpr uint32_t SCORE_POPUP_FADE_IN_ANIM_KEY = Hash32("scorePopupFadeIn");
+			constexpr uint32_t SCORE_POPUP_FADE_OUT_ANIM_KEY = Hash32("scorePopupFadeOut");
 		}
 	}
 }

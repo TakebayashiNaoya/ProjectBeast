@@ -1,0 +1,24 @@
+{
+  "animations": [
+    {
+      "comment": "スコアポップアップをフェードインさせる",
+      "key": "scorePopupFadeIn",
+      "valueType": "Vector4",
+      "startValue": { "x": 0.0, "y": 255.0, "z": 0.0, "w": 0.0 },
+      "endValue":   { "x": 0.0, "y": 255.0, "z": 0.0, "w": 255.0 },
+      "duration": 0.15,
+      "easing": "EaseOut",
+      "loop": "Once"
+    },
+    {
+      "comment": "スコアポップアップをフェードアウトさせる",
+      "key": "scorePopupFadeOut",
+      "valueType": "Vector4",
+      "startValue": { "x": 0.0, "y": 255.0, "z": 0.0, "w": 255.0 },
+      "endValue":   { "x": 0.0, "y": 255.0, "z": 0.0, "w": 0.0 },
+      "duration": 0.6,
+      "easing": "EaseIn",
+      "loop": "Once"
+    }
+  ]
+}

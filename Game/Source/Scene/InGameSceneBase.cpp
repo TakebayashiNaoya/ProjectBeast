@@ -454,7 +454,7 @@ namespace app
 
 				const float clearTime = TimeManager::GetInstance().GetCurTime();
 				const int   rescued = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
-				ResultScene::SetResult(clearTime, rescued);
+				ResultScene::SetResult(rescued);
 
 				/** アチーブメント最終判定（FinalCondition 型を評価） */
 				float logScore = 0.0f;
