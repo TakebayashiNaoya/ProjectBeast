@@ -112,6 +112,9 @@
     <Filter Include="Source\Actor\Character\penguin\ChildPenguin\Formation">
       <UniqueIdentifier>{30c2f0f7-74f5-45cf-9168-6930daae46eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\BearReaction">
+      <UniqueIdentifier>{65fa1729-2cfa-455d-96f1-6b17d7826e6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -549,6 +552,18 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\BearReaction\BearReactionSystem.cpp">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\BearReaction\BearReactionMenu.cpp">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Menus\ScorePopupAnimatorMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\ScorePopupAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

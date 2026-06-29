@@ -18,6 +18,7 @@ namespace app
 		/** 前方宣言 */
 		class ChildPenguin;
 		class DaddyPenguin;
+		class Enemy;
 
 
 		/**
@@ -473,17 +474,33 @@ namespace app
 			{
 				ModelRender modelRender;
 				util::FloatCurve floatCurve;
+
+				Enemy* target;
+				float timer;
+				bool isHidden;
+				bool isDebuffActive;
+				Vector3 position;
+
+				GhostPenguinInfo();
 			};
 
 
 		public:
 			using GhostPenguins = std::vector<std::unique_ptr<GhostPenguinInfo>>;
 
+		public:
+			/**
+			 * @brief 幽霊ペンギンが非表示状態かどうかを取得
+			 * @return 非表示ならtrue
+			 */
+			bool IsGhostHidden() const { return m_isGhostHidden; }
+
 			/**
 			 * @brief ゴーストペンギンを登録する
 			 * @param penguin 登録するペンギンのポインタ
+			 * @param target ゴーストペンギンのデバフ対象となるシロクマ
 			 */
-			void RegisterGhostPenguin(ChildPenguin* penguin);
+			void RegisterGhostPenguin(ChildPenguin* penguin,Enemy* target);
 
 			/**
 			 * @brief ゴーストペンギンを更新する
@@ -513,7 +530,12 @@ namespace app
 			uint8_t m_ghostPenguinNum;
 			/** ゴーストペンギンのリスト */
 			GhostPenguins m_ghostPenguins;
-
+			/** ゴーストペンギンが非表示かどうか */
+			bool m_isGhostHidden;
+			/** ゴーストペンギンのタイマー */
+			float m_ghostTimer;
+			/** シロクマ */
+			Enemy* m_target;
 
 
 			//============================================//

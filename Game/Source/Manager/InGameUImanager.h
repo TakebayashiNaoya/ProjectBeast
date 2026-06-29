@@ -39,6 +39,7 @@ namespace app
 		class CPReactionSystem;
 		class WpWarningSystem;
 		class DangerArrowSystem;
+		class BearReactionSystem;
 	}
 
 
@@ -162,6 +163,13 @@ namespace app
 		 */
 		void AddSearchLayout(actor::Enemy* enemy);
 
+		/**
+		 * @brief エネミーの数に応じてクマのリアクションシステムを初期化する
+		 * @param enemyNum エネミーの数
+		 * @detail LoadPhase::Enemy でエネミー生成後に呼ぶ
+		 */
+		void InitializeReactionSystem(const uint8_t enemyNum);
+
 
 	private:
 		/**
@@ -196,6 +204,7 @@ namespace app
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;
 		std::unique_ptr<ui::WpWarningSystem> m_wpWarningSystem;
 		std::unique_ptr<ui::DangerArrowSystem> m_dangerArrowSystem;
+		std::unique_ptr<ui::BearReactionSystem> m_bearReactionSystem;
 
 
 		//============================================//

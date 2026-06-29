@@ -4,7 +4,7 @@
             {
                 "type" : "UIIcon",
                 "name" : "speechBubble",
-                "asset" : "Assets/spriteData/UI/Icon/CPReaction/SpeechBubble.dds",
+                "asset" : "Assets/spriteData/UI/Icon/Reaction/SpeechBubble.dds",
                 "width" : 130,
                 "height" : 130,
                 "position" : [0, 0, 0],
@@ -15,7 +15,7 @@
             {
                 "type" : "UIIcon",
                 "name" : "troubleReaction",
-                "asset" : "Assets/spriteData/UI/Icon/CPReaction/TroubleReaction.dds",
+                "asset" : "Assets/spriteData/UI/Icon/Reaction/CPReaction/TroubleReaction.dds",
                 "width" : 70,
                 "height" : 70,
                 "position" : [0, 0, 0],
@@ -26,7 +26,7 @@
             {
                 "type" : "UIIcon",
                 "name" : "happyReaction",
-                "asset" : "Assets/spriteData/UI/Icon/CPReaction/HappyReaction.dds",
+                "asset" : "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
                 "width" : 70,
                 "height" : 70,
                 "position" : [0, 0, 0],
