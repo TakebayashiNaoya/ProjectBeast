@@ -62,8 +62,10 @@ namespace app
 			/** 円周上 1 点の地表 Y をレイキャスト → 海面の順にサンプリングして返す */
 			float SampleSurfaceY(float x, float z) const;
 
-			/** 指定半径・色でリング頂点を m_vertices に追記する */
-			void BuildRingVertices(const Vector3& center, float radius, const Vector3& color);
+			/** 指定半径・色でリング縁取り頂点を m_vertices に追記する */
+			void BuildRingVertices(const Vector3& center, float radius, const Vector4& color);
+			/** 指定半径・色でリング塗りつぶし頂点を m_fillVertices に追記する */
+			void BuildRingFillVertices(const Vector3& center, float radius, const Vector4& color);
 
 			/** ルートシグネチャの初期化 */
 			void InitRootSignature();
@@ -75,6 +77,12 @@ namespace app
 			void InitVertexBuffer();
 			/** インデックスバッファの初期化 */
 			void InitIndexBuffer();
+			/** 塗りつぶし頂点バッファの初期化 */
+			void InitFillVertexBuffer();
+			/** 塗りつぶしインデックスバッファの初期化 */
+			void InitFillIndexBuffer();
+			/** 塗りつぶし用パイプラインステートの初期化 */
+			void InitFillPipelineState();
 			/** 定数バッファの初期化 */
 			void InitConstantBuffer();
 			/** ディスクリプタヒープの初期化 */
@@ -85,35 +93,46 @@ namespace app
 			/** 頂点構造体 */
 			struct Vertex
 			{
-				Vertex() : pos(0.0f, 0.0f, 0.0f), color(0.0f, 0.0f, 0.0f) {}
-				Vertex(const Vector3& p, const Vector3& c) : pos(p), color(c) {}
+				Vertex() : pos(0.0f, 0.0f, 0.0f), color(0.0f, 0.0f, 0.0f, 1.0f) {}
+				Vertex(const Vector3& p, const Vector4& c) : pos(p), color(c) {}
 				Vector3 pos;
-				Vector3 color;
+				Vector4 color;
 			};
 
 			/** 1 リングあたりの分割数。増やすほど滑らかになるが Raycast 呼び出し数も増える */
-			static constexpr int   N_SEGMENTS     = 32;
+			static constexpr int   N_SEGMENTS          = 32;
 			/** LINE_LIST: 1 セグメント = 始点 + 終点 = 2 頂点 */
-			static constexpr int   VERTS_PER_RING = N_SEGMENTS * 2;
+			static constexpr int   VERTS_PER_RING      = N_SEGMENTS * 2;
 			/** 入隊リング + 脱隊リング */
-			static constexpr int   TOTAL_VERTS    = VERTS_PER_RING * 2;
+			static constexpr int   TOTAL_VERTS         = VERTS_PER_RING * 2;
+			/** TRIANGLE_LIST: 1 セグメント = 中心 + 始点 + 終点 = 3 頂点 */
+			static constexpr int   FILL_VERTS_PER_RING = N_SEGMENTS * 3;
+			/** 入隊リング + 脱隊リング（塗りつぶし） */
+			static constexpr int   TOTAL_FILL_VERTS    = FILL_VERTS_PER_RING * 2;
 			/** Z-fighting 回避のため地表から少し浮かせる量（cm 単位想定） */
 			static constexpr float HEIGHT_OFFSET  = 3.0f;
 			static constexpr float RAYCAST_TOP    = 1000.0f;
 			static constexpr float RAYCAST_BOTTOM = -10.0f;
 
-			static const Vector3 JOIN_COLOR;   /** 緑（入隊半径） */
-			static const Vector3 LEAVE_COLOR;  /** 赤（脱隊半径） */
+			static const Vector4 JOIN_COLOR;        /** 緑（入隊半径・縁） */
+			static const Vector4 LEAVE_COLOR;       /** 赤（脱隊半径・縁） */
+			static const Vector4 JOIN_FILL_COLOR;   /** 緑（入隊半径・塗りつぶし） */
+			static const Vector4 LEAVE_FILL_COLOR;  /** 赤（脱隊半径・塗りつぶし） */
 
-			std::array<Vertex, TOTAL_VERTS> m_vertices = {};	/** 頂点バッファ用の頂点配列 */
-			int                             m_vertexCount = 0;	/** 現在の頂点数 */
+			std::array<Vertex, TOTAL_VERTS>      m_vertices     = {};	/** 縁取り用頂点配列 */
+			int                                  m_vertexCount  = 0;	/** 現在の縁取り頂点数 */
+			std::array<Vertex, TOTAL_FILL_VERTS> m_fillVertices    = {};	/** 塗りつぶし用頂点配列 */
+			int                                  m_fillVertexCount = 0;	/** 現在の塗りつぶし頂点数 */
 
-			VertexBuffer   m_vertexBuffer;		/** 頂点バッファ */
-			IndexBuffer    m_indexBuffer;		/** インデックスバッファ */
+			VertexBuffer   m_vertexBuffer;		/** 縁取り頂点バッファ */
+			IndexBuffer    m_indexBuffer;		/** 縁取りインデックスバッファ */
+			VertexBuffer   m_fillVertexBuffer;	/** 塗りつぶし頂点バッファ */
+			IndexBuffer    m_fillIndexBuffer;	/** 塗りつぶしインデックスバッファ */
 			RootSignature  m_rootSignature;		/** ルートシグネチャ */
 			Shader         m_vs;				/** 頂点シェーダ */
 			Shader         m_ps;				/** ピクセルシェーダ */
-			PipelineState  m_pipelineState;		/** パイプラインステート */
+			PipelineState  m_pipelineState;		/** 縁取り用パイプラインステート（LINE_LIST） */
+			PipelineState  m_fillPipelineState;	/** 塗りつぶし用パイプラインステート（TRIANGLE_LIST + αブレンド） */
 			ConstantBuffer m_constantBuffer;	/** 定数バッファ */
 			DescriptorHeap m_descriptorHeap;	/** ディスクリプタヒープ */
 

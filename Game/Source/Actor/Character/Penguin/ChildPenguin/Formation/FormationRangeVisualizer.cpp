@@ -12,8 +12,10 @@ namespace app
 {
 	namespace actor
 	{
-		const Vector3 FormationRangeVisualizer::JOIN_COLOR  = { 0.2f, 1.0f, 0.2f };
-		const Vector3 FormationRangeVisualizer::LEAVE_COLOR = { 1.0f, 0.2f, 0.2f };
+		const Vector4 FormationRangeVisualizer::JOIN_COLOR        = { 0.2f, 1.0f, 0.2f, 1.0f  };
+		const Vector4 FormationRangeVisualizer::LEAVE_COLOR       = { 1.0f, 0.2f, 0.2f, 1.0f  };
+		const Vector4 FormationRangeVisualizer::JOIN_FILL_COLOR   = { 0.2f, 1.0f, 0.2f, 0.25f };
+		const Vector4 FormationRangeVisualizer::LEAVE_FILL_COLOR  = { 1.0f, 0.2f, 0.2f, 0.25f };
 
 
 		void FormationRangeVisualizer::Init()
@@ -23,8 +25,11 @@ namespace app
 			InitRootSignature();
 			InitShader();
 			InitPipelineState();
+			InitFillPipelineState();
 			InitVertexBuffer();
 			InitIndexBuffer();
+			InitFillVertexBuffer();
+			InitFillIndexBuffer();
 			InitConstantBuffer();
 			InitDescriptorHeap();
 
@@ -54,8 +59,8 @@ namespace app
 		{
 			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
 			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-				{ "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
 			};
 
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = { 0 };
@@ -104,6 +109,69 @@ namespace app
 		}
 
 
+		void FormationRangeVisualizer::InitFillVertexBuffer()
+		{
+			m_fillVertexBuffer.Init(sizeof(Vertex) * TOTAL_FILL_VERTS, sizeof(Vertex));
+		}
+
+
+		void FormationRangeVisualizer::InitFillIndexBuffer()
+		{
+			m_fillIndexBuffer.Init(sizeof(uint16_t) * TOTAL_FILL_VERTS, sizeof(uint16_t));
+
+			std::array<uint16_t, TOTAL_FILL_VERTS> indices;
+			for (int i = 0; i < TOTAL_FILL_VERTS; ++i)
+			{
+				indices[i] = static_cast<uint16_t>(i);
+			}
+			m_fillIndexBuffer.Copy(indices.data());
+		}
+
+
+		void FormationRangeVisualizer::InitFillPipelineState()
+		{
+			D3D12_INPUT_ELEMENT_DESC inputElementDescs[] =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+				{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+			};
+
+			D3D12_RENDER_TARGET_BLEND_DESC rtBlend       = {};
+			rtBlend.BlendEnable                          = TRUE;
+			rtBlend.SrcBlend                             = D3D12_BLEND_SRC_ALPHA;
+			rtBlend.DestBlend                            = D3D12_BLEND_INV_SRC_ALPHA;
+			rtBlend.BlendOp                              = D3D12_BLEND_OP_ADD;
+			rtBlend.SrcBlendAlpha                        = D3D12_BLEND_ONE;
+			rtBlend.DestBlendAlpha                       = D3D12_BLEND_ZERO;
+			rtBlend.BlendOpAlpha                         = D3D12_BLEND_OP_ADD;
+			rtBlend.RenderTargetWriteMask                = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+			CD3DX12_BLEND_DESC blendDesc(D3D12_DEFAULT);
+			blendDesc.RenderTarget[0]                    = rtBlend;
+
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc    = { 0 };
+			psoDesc.pRootSignature                        = m_rootSignature.Get();
+			psoDesc.VS                                    = CD3DX12_SHADER_BYTECODE(m_vs.GetCompiledBlob());
+			psoDesc.PS                                    = CD3DX12_SHADER_BYTECODE(m_ps.GetCompiledBlob());
+			psoDesc.BlendState                            = blendDesc;
+			psoDesc.SampleMask                            = UINT_MAX;
+			CD3DX12_RASTERIZER_DESC rastDesc(D3D12_DEFAULT);
+			rastDesc.CullMode                             = D3D12_CULL_MODE_NONE;
+			psoDesc.RasterizerState                       = rastDesc;
+			psoDesc.DepthStencilState.DepthEnable         = TRUE;
+			psoDesc.DepthStencilState.DepthWriteMask      = D3D12_DEPTH_WRITE_MASK_ZERO;
+			psoDesc.DepthStencilState.DepthFunc           = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+			psoDesc.DepthStencilState.StencilEnable       = FALSE;
+			psoDesc.InputLayout                           = { inputElementDescs, _countof(inputElementDescs) };
+			psoDesc.PrimitiveTopologyType                 = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			psoDesc.NumRenderTargets                      = 1;
+			psoDesc.RTVFormats[0]                         = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			psoDesc.DSVFormat                             = DXGI_FORMAT_D32_FLOAT;
+			psoDesc.SampleDesc.Count                      = 1;
+			m_fillPipelineState.Init(psoDesc);
+		}
+
+
 		void FormationRangeVisualizer::InitDescriptorHeap()
 		{
 			m_descriptorHeap.RegistConstantBuffer(0, m_constantBuffer);
@@ -134,7 +202,7 @@ namespace app
 		}
 
 
-		void FormationRangeVisualizer::BuildRingVertices(const Vector3& center, float radius, const Vector3& color)
+		void FormationRangeVisualizer::BuildRingVertices(const Vector3& center, float radius, const Vector4& color)
 		{
 			// 円周上の頂点を計算
 			std::array<Vector3, N_SEGMENTS> points;
@@ -160,15 +228,49 @@ namespace app
 		}
 
 
+		void FormationRangeVisualizer::BuildRingFillVertices(const Vector3& center, float radius, const Vector4& color)
+		{
+			// 円周上の頂点を計算
+			std::array<Vector3, N_SEGMENTS> points;
+			const float angleStep = 2.0f * Math::PI / N_SEGMENTS;
+
+			for (int i = 0; i < N_SEGMENTS; ++i)
+			{
+				const float angle = i * angleStep;
+				const float x     = center.x + radius * cosf(angle);
+				const float z     = center.z + radius * sinf(angle);
+				const float y     = SampleSurfaceY(x, z) + HEIGHT_OFFSET;
+				points[i]         = Vector3(x, y, z);
+			}
+
+			// 中心点（地表の高さでサンプリング）
+			const Vector3 centerPt(center.x, SampleSurfaceY(center.x, center.z) + HEIGHT_OFFSET, center.z);
+
+			// TRIANGLE_LIST: セグメント i は 中心 → points[i] → points[i+1]
+			for (int i = 0; i < N_SEGMENTS; ++i)
+			{
+				const int next                    = (i + 1) % N_SEGMENTS;
+				m_fillVertices[m_fillVertexCount++] = { centerPt,     color };
+				m_fillVertices[m_fillVertexCount++] = { points[i],    color };
+				m_fillVertices[m_fillVertexCount++] = { points[next], color };
+			}
+		}
+
+
 		void FormationRangeVisualizer::Update(const Vector3& center, float joinRadius, float leaveRadius)
 		{
 			if (!m_isInitialized || !m_isVisible) return;
 
-			m_vertexCount = 0;
+			m_vertexCount     = 0;
+			m_fillVertexCount = 0;
 
 			// 入隊半径と脱隊半径のリングを構築
 			if (joinRadius  > 0.0f) BuildRingVertices(center, joinRadius,  JOIN_COLOR);
 			if (leaveRadius > 0.0f) BuildRingVertices(center, leaveRadius, LEAVE_COLOR);
+
+			// 半透明の塗りつぶしリングを構築
+			if (joinRadius  > 0.0f) BuildRingFillVertices(center, joinRadius,  JOIN_FILL_COLOR);
+			if (leaveRadius > 0.0f) BuildRingFillVertices(center, leaveRadius, LEAVE_FILL_COLOR);
 		}
 
 
@@ -176,20 +278,31 @@ namespace app
 		{
 			if (!m_isInitialized || !m_isVisible || m_vertexCount == 0) return;
 
-			m_vertexBuffer.Copy(m_vertices.data());
-
 			// 定数バッファに VP 行列をコピー
 			Matrix VP;
 			VP.Multiply(view.camera->GetViewMatrix(), view.camera->GetProjectionMatrix());
 			m_constantBuffer.CopyToVRAM(&VP);
 
-			// 描画
 			rc.SetRootSignature(m_rootSignature);
+			rc.SetDescriptorHeap(m_descriptorHeap);
+
+			// 半透明の塗りつぶしを先に描画（縁取りが上に重なるよう順序を守る）
+			if (m_fillVertexCount > 0)
+			{
+				m_fillVertexBuffer.Copy(m_fillVertices.data());
+				rc.SetPipelineState(m_fillPipelineState);
+				rc.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				rc.SetVertexBuffer(m_fillVertexBuffer);
+				rc.SetIndexBuffer(m_fillIndexBuffer);
+				rc.DrawIndexed(static_cast<UINT>(m_fillVertexCount));
+			}
+
+			// 縁取りを描画
+			m_vertexBuffer.Copy(m_vertices.data());
 			rc.SetPipelineState(m_pipelineState);
 			rc.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			rc.SetVertexBuffer(m_vertexBuffer);
 			rc.SetIndexBuffer(m_indexBuffer);
-			rc.SetDescriptorHeap(m_descriptorHeap);
 			rc.DrawIndexed(static_cast<UINT>(m_vertexCount));
 		}
 	}

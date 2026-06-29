@@ -12,13 +12,13 @@ cbuffer VSCb : register(b0)
 struct VSInput
 {
     float3 position : POSITION;
-    float3 color    : COLOR;
+    float4 color    : COLOR;
 };
 
 struct PSInput
 {
     float4 position : SV_POSITION;
-    float3 color    : COLOR;
+    float4 color    : COLOR;
 };
 
 PSInput VSMain(VSInput input)
@@ -31,5 +31,5 @@ PSInput VSMain(VSInput input)
 
 float4 PSMain(PSInput input) : SV_TARGET
 {
-    return float4(input.color, 1.0f);
+    return input.color;
 }
