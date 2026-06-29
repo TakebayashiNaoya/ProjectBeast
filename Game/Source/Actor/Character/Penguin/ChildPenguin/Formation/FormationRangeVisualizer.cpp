@@ -71,8 +71,8 @@ namespace app
 			psoDesc.DepthStencilState.StencilEnable	   = FALSE;
 			psoDesc.InputLayout						   = { inputElementDescs, _countof(inputElementDescs) };
 			psoDesc.PrimitiveTopologyType              = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-			psoDesc.NumRenderTargets                   = 3;
-			psoDesc.RTVFormats[0]                      = DXGI_FORMAT_R8G8B8A8_UNORM;
+			psoDesc.NumRenderTargets                   = 1;
+			psoDesc.RTVFormats[0]                      = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			psoDesc.DSVFormat                          = DXGI_FORMAT_D32_FLOAT;
 			psoDesc.SampleDesc.Count                   = 1;
 			m_pipelineState.Init(psoDesc);
