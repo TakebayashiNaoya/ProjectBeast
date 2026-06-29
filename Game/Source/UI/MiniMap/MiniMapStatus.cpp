@@ -32,15 +32,15 @@ namespace app
 				const char* heightKey;
 			};
 			static constexpr std::array<IconKeys, static_cast<uint8_t>(EnMiniMapIconType::Num)> ICON_KEYS = { {
-				{ "seriousName",  "childPenguinImageWidth", "childPenguinImageHeight" },
-				{ "clingyName",   "childPenguinImageWidth", "childPenguinImageHeight" },
-				{ "naughtyName",  "childPenguinImageWidth", "childPenguinImageHeight" },
-				{ "clumsyName",   "childPenguinImageWidth", "childPenguinImageHeight" },
-				{ "caringName",   "childPenguinImageWidth", "childPenguinImageHeight" },
-				{ "bearNestName", "bearNestImageWidth",      "bearNestImageHeight"     },
-				{ "bearName",     "bearImageWidth",          "bearImageHeight"         },
-				{ "currentName",  "currentImageWidth",       "currentImageHeight"      },
-				{ "iglooName",    "iglooImageWidth",         "iglooImageHeight"        },
+				{ "seriousName",  "childPenWidth",   "childPenHeight"   },
+				{ "clingyName",   "childPenWidth",   "childPenHeight"   },
+				{ "naughtyName",  "childPenWidth",   "childPenHeight"   },
+				{ "clumsyName",   "childPenWidth",   "childPenHeight"   },
+				{ "caringName",   "childPenWidth",   "childPenHeight"   },
+				{ "bearNestName", "bearNestwidth",   "bearNestHeight"   },
+				{ "bearName",     "bearWidth",       "bearHeight"       },
+				{ "whirlpoolName","whirlpoolWidth",  "whirlpoolHeight"  },
+				{ "iglooName",    "iglooWidth",      "iglooHeight"      },
 			} };
 
 

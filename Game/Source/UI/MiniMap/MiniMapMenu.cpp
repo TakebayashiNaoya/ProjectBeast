@@ -229,7 +229,17 @@ namespace app
 			{
 				auto& iconVector = m_iconVectors.at(i);
 
-				for (uint8_t j = 0; j < actorPositions.at(i).size(); ++j)
+				// 前フレームの表示をリセット
+				for (auto* icon : iconVector.icons)
+				{
+					icon->m_isDraw = false;
+				}
+
+				const uint8_t count = static_cast<uint8_t>(
+					min(actorPositions.at(i).size(), iconVector.icons.size())
+				);
+
+				for (uint8_t j = 0; j < count; ++j)
 				{
 					auto& icon = iconVector.icons.at(j);
 
@@ -240,8 +250,8 @@ namespace app
 						icon->m_transform.m_localTransform.m_position
 					);
 
-					// マップ座標に変換できたら表示する。
-					icon->m_isDraw = true;
+					// マップ範囲内のみ表示する。
+					icon->m_isDraw = canConvert;
 				}
 			}
 		}
