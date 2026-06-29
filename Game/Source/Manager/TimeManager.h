@@ -49,6 +49,9 @@ namespace app
 		/** タイムのリセット */
 		void ResetTime();
 
+		/** ポーズ時に呼ぶ（再開後の最初フレームで経過時間を計算しないようにする） */
+		inline void Pause() { m_lastUpdateTime = 0; }
+
 
 	private:
 		TimeManager()
@@ -56,7 +59,11 @@ namespace app
 			, m_currentTime(MAX_TIME)
 			, m_isTimeStop(false)
 			, m_isTimeUp(false)
-		{};
+			, m_lastUpdateTime(0)
+			, m_freq(0)
+		{
+			::QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&m_freq));
+		};
 
 		~TimeManager() = default;
 
@@ -70,6 +77,10 @@ namespace app
 		bool m_isTimeStop;
 		/** タイムアップしているか */
 		bool m_isTimeUp;
+		/** 前回 Update() を呼んだ時の QPC カウント（0 = 未初期化） */
+		LONGLONG m_lastUpdateTime;
+		/** QPC 周波数（コンストラクタで1回取得） */
+		LONGLONG m_freq;
 
 
 

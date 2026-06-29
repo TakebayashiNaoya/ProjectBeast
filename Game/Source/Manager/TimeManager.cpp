@@ -16,7 +16,17 @@ namespace app
 	{
 		if (m_isTimeStop) return;
 
-		m_currentTime -= g_gameTime->GetFrameDeltaTime();
+		LONGLONG now;
+		::QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&now));
+
+		if (m_lastUpdateTime != 0)
+		{
+			const float delta = static_cast<float>(
+				static_cast<double>(now - m_lastUpdateTime) / static_cast<double>(m_freq)
+			);
+			m_currentTime -= delta;
+		}
+		m_lastUpdateTime = now;
 
 		if (m_currentTime <= 0.0f)
 		{
@@ -36,5 +46,6 @@ namespace app
 		m_currentTime = m_maxTime;
 		m_isTimeStop = false;
 		m_isTimeUp = false;
+		m_lastUpdateTime = 0;
 	}
 }
