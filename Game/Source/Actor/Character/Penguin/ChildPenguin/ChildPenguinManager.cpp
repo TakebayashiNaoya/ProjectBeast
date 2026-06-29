@@ -97,6 +97,18 @@ namespace app
 
 			UpdateGhostPenguins();
 
+			/** L1/R1 で陣形を循環切り替え */
+			if (g_pad[0]->IsTrigger(enButtonRB1))
+			{
+				const int next = (static_cast<int>(m_formationController.GetCurrentType()) + 1) % static_cast<int>(EnFormationType::Num);
+				m_formationController.SwitchFormation(static_cast<EnFormationType>(next));
+			}
+			else if (g_pad[0]->IsTrigger(enButtonLB1))
+			{
+				const int prev = (static_cast<int>(m_formationController.GetCurrentType()) + static_cast<int>(EnFormationType::Num) - 1) % static_cast<int>(EnFormationType::Num);
+				m_formationController.SwitchFormation(static_cast<EnFormationType>(prev));
+			}
+
 			/** 陣形の更新処理 */
 			if (m_daddyPenguin != nullptr && !m_followers.empty())
 			{
