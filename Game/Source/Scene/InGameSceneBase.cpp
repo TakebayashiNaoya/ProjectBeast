@@ -222,6 +222,10 @@ namespace app
 				InGameUIManager::GetInstance()->AddSearchLayout(enemy);
 			}
 
+			InGameUIManager::GetInstance()->InitializeReactionSystem(
+				actor::EnemyManager::GetInstance()->GetEnemies().size()
+			);
+
 			m_loadPhase = LoadPhase::Camera;
 			break;
 		}

@@ -18,8 +18,6 @@ namespace app
 			: CharacterStateMachine(enemy)
 			, m_owner(enemy)
 			, m_ownerStatus(nullptr)
-			, m_currentState(nullptr)
-			, m_nextState(nullptr)
 			, m_moveVector(Vector3::Zero)
 			, m_playerPosition(Vector3::Zero)
 			, m_targetPlayer(nullptr)
@@ -60,33 +58,6 @@ namespace app
 
 			// TODO: 初期座標のハードコーディング。必要に応じてパラメータ化を検討
 			m_transform.m_position = Vector3(0.0f, 10.0f, 100.0f);
-		}
-
-
-		void EnemyStateMachine::Update()
-		{
-			//ステートの切り替え
-			ChangeState();
-			//ステートの更新処理
-			m_currentState->Update();
-		}
-
-
-		void EnemyStateMachine::ChangeState()
-		{
-			// ステートの切り替え
-			m_nextState = GetChangeState();
-			//ステートが切り替わった時・今のステートがnextStateと同じ数字ではないとき
-			if (m_nextState != nullptr && m_currentState != m_nextState) {
-				//今のステートを終了
-				m_currentState->Exit();
-				//次のステートに切り替える
-				m_currentState = m_nextState;
-				//次のステートに入る
-				m_currentState->Enter();
-				//次のステートを初期化
-				m_nextState = nullptr;
-			}
 		}
 
 
