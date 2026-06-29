@@ -502,6 +502,12 @@ namespace app
 			{
 				return enEnemyState_Roar;
 			}
+
+			if (enemy->m_target->GetEnemyStateMachine()->IsReturnHome())
+			{
+				return enEnemyState_ReturnHome;
+			}
+
 			if (enemy->IsFarFromHome())
 			{
 				return enEnemyState_ReturnHome;
@@ -613,6 +619,12 @@ namespace app
 		{
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
 			auto* status = sm->GetOwnerStatus();
+
+			if (sm->IsReturnHome())
+			{
+				enemy->m_foundPenguin = nullptr;
+				return enEnemyState_ReturnHome;
+			}
 
 			// スタミナが尽きたらターゲットを諦め、巣へ帰る
 			if (status->IsStaminaEmpty())
@@ -835,6 +847,12 @@ namespace app
 					auto* status = enemy->m_foundPenguin->GetStateMachine()->GetChildPenguinStatus();
 					if (status != nullptr && !status->IsDead())
 					{
+						auto* childSm= dynamic_cast<actor::ChildPenguinStateMachine*>(enemy->m_foundPenguin->GetStateMachine());
+						if (childSm != nullptr)
+						{
+							childSm->SetAttackerEnemy(enemy->m_target);
+						}
+
 						// 生きている場合のみダメージ処理を実行
 						enemy->m_foundPenguin->GetStateMachine()->Damage();
 
