@@ -25,11 +25,47 @@ namespace app
 			, m_limitDistance(0.0f)
 			, m_mapCenterPos(Vector3::Zero)
 		{
+			// アイコン種別に対応するJSONキー (EnMiniMapIconType の順番と一致させる)
+			struct IconKeys {
+				const char* nameKey;
+				const char* widthKey;
+				const char* heightKey;
+			};
+			static constexpr std::array<IconKeys, static_cast<uint8_t>(EnMiniMapIconType::Num)> ICON_KEYS = { {
+				{ "seriousName",  "childPenguinImageWidth", "childPenguinImageHeight" },
+				{ "clingyName",   "childPenguinImageWidth", "childPenguinImageHeight" },
+				{ "naughtyName",  "childPenguinImageWidth", "childPenguinImageHeight" },
+				{ "clumsyName",   "childPenguinImageWidth", "childPenguinImageHeight" },
+				{ "caringName",   "childPenguinImageWidth", "childPenguinImageHeight" },
+				{ "bearNestName", "bearNestImageWidth",      "bearNestImageHeight"     },
+				{ "bearName",     "bearImageWidth",          "bearImageHeight"         },
+				{ "currentName",  "currentImageWidth",       "currentImageHeight"      },
+				{ "iglooName",    "iglooImageWidth",         "iglooImageHeight"        },
+			} };
+
+
+
 			core::ParameterManager::Get()->LoadParameter<MiniMapParameter>(JSON_PATH, [](const nlohmann::json& j, MiniMapParameter& param)
 				{
-					param.mapRadius = j["radius"].get<float>();
-					param.mapLimitDistance = j["limitDis"].get<float>();
-					param.mapCenterPos = util::JsonConverter::ToVector3(j["centerPos"]);
+					using JC = util::JsonConverter;
+
+					param.mapRadius = JC::ToFloat(j, "radius");
+					param.mapLimitDistance = JC::ToFloat(j, "limitDis");
+					param.mapCenterPos = JC::ToVector3(j, "centerPos");
+					param.initPosition = JC::ToVector3(j, "initPosition");
+					param.initScale = JC::ToVector3(j, "initScale");
+					param.initRotation = JC::ToRotation(j, "initRotationDeg");
+					param.initColor = JC::ToVector4(j, "initColor");
+
+
+					for (uint8_t i = 0; i < static_cast<uint8_t>(EnMiniMapIconType::Num); i++)
+					{
+						const auto& keys = ICON_KEYS[i];
+						auto& info = param.iconInitializeInfos.at(i);
+						info.path = JC::ToString(j, keys.nameKey);
+						info.width = JC::ToFloat(j, keys.widthKey);
+						info.height = JC::ToFloat(j, keys.heightKey);
+					}
 				});
 		}
 
@@ -46,6 +82,13 @@ namespace app
 			m_radius = param->mapRadius;
 			m_limitDistance = param->mapLimitDistance;
 			m_mapCenterPos = param->mapCenterPos;
+
+			m_iconInitializeInfos = param->iconInitializeInfos;
+
+			m_initPosition = param->initPosition;
+			m_initScale = param->initScale;
+			m_initRotation = param->initRotation;
+			m_initColor = param->initColor;
 		}
 
 

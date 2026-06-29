@@ -14,6 +14,9 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
+#include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Nature/Whirlpool.h"
+#include "Source/Nature/WhirlpoolManager.h"
 
 
 namespace app
@@ -85,7 +88,85 @@ namespace app
 		//--------------------------------------------//
 		if (m_onMiniMapChanged)
 		{
-			m_onMiniMapChanged();
+			ui::ActorPositions positions;
+
+
+			// 子ペンギンの座標取得
+			const auto& childs = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
+
+			for (const auto* child : childs)
+			{
+				switch (child->GetChildPenguinType())
+				{
+				case actor::EnChildPenguinType::Serious:
+					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Serious)).push_back(child->GetTransform().m_position);
+					break;
+				case actor::EnChildPenguinType::Clingy:
+					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Clingy)).push_back(child->GetTransform().m_position);
+					break;
+				case actor::EnChildPenguinType::Naughty:
+					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Naughty)).push_back(child->GetTransform().m_position);
+					break;
+				case actor::EnChildPenguinType::Clumsy:
+					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Clumsy)).push_back(child->GetTransform().m_position);
+					break;
+				case actor::EnChildPenguinType::Caring:
+					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Caring)).push_back(child->GetTransform().m_position);
+					break;
+				default:
+					break;
+				}
+			}
+
+			// ステージオブジェクトの座標を取得する
+			auto GetObjectPosition = [&](const std::string& name, ui::EnMiniMapIconType type)
+				{
+					auto* system = actor::StageSystem::GetInstance();
+
+					// 座標を取得する
+					Vector3 objectPosition = Vector3::One;
+
+					// 座標の取得に失敗するとVector3::Zeroが返ってくる
+					// Vector3::Zeroが帰ってきたら終了する
+					int index = 1;
+					while (true)
+					{
+						const std::string keyName = name + std::to_string(index);
+
+						objectPosition = system->GetObjectPosition(keyName);
+
+						if (objectPosition.IsEqual(Vector3::Zero)) break;
+
+						positions.at(static_cast<uint8_t>(type)).push_back(objectPosition);
+						index++;
+					}
+				};
+
+
+			GetObjectPosition("BearNest", ui::EnMiniMapIconType::BearNest);
+			GetObjectPosition("Igloo", ui::EnMiniMapIconType::Igloo);
+
+
+			// シロクマの座標を取得する
+			const auto& enemies = actor::EnemyManager::GetInstance()->GetEnemies();
+
+			for (const auto* enemy : enemies)
+			{
+				K2_ASSERT(enemy, "エネミーがnullptr");
+				positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Bear)).push_back(enemy->GetTransform().m_position);
+			}
+
+
+			// 渦潮の座標を取得する
+			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* whirlpool)
+				{
+					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool)).push_back(whirlpool->GetTransform().m_position);
+				});
+
+
+
+
+			m_onMiniMapChanged(positions);
 		}
 
 		//--------------------------------------------//

@@ -19,6 +19,7 @@
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguinController.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraController.h"
 #include "Source/Camera/CameraManager.h"
@@ -161,15 +162,25 @@ namespace app
 		case LoadPhase::StageWait:
 		{
 			/** ステージの非同期モデルロードと物理コリジョン登録が完了するまで待つ */
-			actor::StageSystem::GetInstance()->Update();
-			if (actor::StageSystem::GetInstance()->IsAllLoaded())
+			auto* system = actor::StageSystem::GetInstance();
+
+			system->Update();
+			if (system->IsAllLoaded())
 			{
+				// イグルーとクマの巣の数をミニマップへ登録
+				const uint8_t iglooCount = system->GetNumbaringObjectCount("igloo_");
+				const uint8_t bearHomeCount = system->GetNumbaringObjectCount("bearHome_");
+
+				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Igloo, iglooCount);
+				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::BearNest, bearHomeCount);
+
 				m_loadPhase = LoadPhase::Daddy;
 			}
 			break;
 		}
 
 		case LoadPhase::Daddy:
+		{
 			m_daddyPenguin = new actor::DaddyPenguin();
 			m_daddyPenguin->SetPosition(GetDaddySpawnPos());
 			m_daddyPenguin->StartWrapper();
@@ -180,12 +191,15 @@ namespace app
 				&m_daddyPenguin->GetModelRender()
 			);
 
-			// DaddyPenguin生成後にUIManagerを初期化（睡眠クマ探索のキャプチャに使用）
-			InGameUIManager::GetInstance()->Initialize(m_daddyPenguin);
+
+			InGameUIManager::GetInstance()->RegisterObservers(m_daddyPenguin);
+			m_daddyPenguin->GetController()->SetIglooPromptMenu(
+				InGameUIManager::GetInstance()->GetIglooPromptMenu()
+			);
 
 			m_loadPhase = LoadPhase::Children;
 			break;
-
+		}
 		case LoadPhase::Children:
 		{
 			/** ステージ固有の生成設定を取得して一括生成 */
@@ -198,6 +212,13 @@ namespace app
 				cfg.caring,
 				cfg.spawnRadius
 			);
+
+			auto* ui = InGameUIManager::GetInstance();
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Serious, cfg.serious);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clingy, cfg.clingy);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Naughty, cfg.naughty);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clumsy, cfg.clumsy);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Caring, cfg.caring);
 
 			auto* manager = actor::ChildPenguinManager::GetInstance();
 			manager->SetDaddyPenguin(m_daddyPenguin);
@@ -216,11 +237,15 @@ namespace app
 			util::JsonConverter::IsLoadJsonFile(json, GetEnemyJsonPath());
 			actor::EnemyManager::GetInstance()->LoadEnemies(json);
 
+			const auto& enemies = actor::EnemyManager::GetInstance()->GetEnemies();
+
 			/** エネミー1体につき探索UIを1つ生成 */
-			for (auto* enemy : actor::EnemyManager::GetInstance()->GetEnemies())
+			for (auto* enemy : enemies)
 			{
 				InGameUIManager::GetInstance()->AddSearchLayout(enemy);
 			}
+
+			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Bear, enemies.size());
 
 			m_loadPhase = LoadPhase::Camera;
 			break;
@@ -241,6 +266,7 @@ namespace app
 		}
 
 		case LoadPhase::Ocean:
+		{
 			/**
 			 * NOTE:SkyCubeは後で生み出す場所を変えるかもしれない。
 			 */
@@ -258,6 +284,9 @@ namespace app
 				GetWhirlpoolParameterBinaryPath()
 			);
 
+			const uint8_t whirlpoolCount = nature::WhirlpoolManager::GetInstance()->GetWhirlpoolCountMax();
+			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Whirlpool, whirlpoolCount);
+
 			m_loadPhase = LoadPhase::Done;
 
 			/** ロード完了 → カウントダウン開始 */
@@ -269,8 +298,9 @@ namespace app
 
 			OnLoadComplete();
 			break;
-
+		}
 		case LoadPhase::Done:
+		{
 			/** ポーズ終了後の初回フレームでポーズ入場フラグとサブビューをリセットする
 			 *  通常ポーズ解除（IsRetry）と異なりチュートリアルポーズはここでリセットされる */
 			if (m_isPauseEntered)
@@ -281,7 +311,7 @@ namespace app
 			/** ゲームフェーズへ移譲 */
 			UpdateGamePhase();
 			break;
-
+		}
 		default:
 			break;
 		}
@@ -367,6 +397,7 @@ namespace app
 				BattleManager::GetInstance().SetIsActive(true);
 
 				// カウントダウン終了 → プレイ中のUIに切り替える。
+				InGameUIManager::GetInstance()->PlayingSetting();
 				InGameUIManager::GetInstance()->UpdatePlaying();
 			}
 			break;

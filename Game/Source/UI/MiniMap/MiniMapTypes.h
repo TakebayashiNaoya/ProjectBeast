@@ -36,5 +36,25 @@ namespace app
 			Igloo,
 			Num
 		};
+
+
+		/**
+		 * @brief ミニマップアイコンの初期化情報
+		 */
+		struct MiniMapIconInitializeInfo
+		{
+			/** アセットパス */
+			std::string path;
+			/** 幅 */
+			float width;
+			/** 高さ */
+			float height;
+		};
+
+
+		using MiniMapInitializeInfo = std::array<MiniMapIconInitializeInfo, static_cast<uint8_t>(EnMiniMapIconType::Num)>;
+
+
+		using ActorPositions = std::array<std::vector<Vector3>, static_cast<uint8_t>(ui::EnMiniMapIconType::Num)>;
 	}
 }

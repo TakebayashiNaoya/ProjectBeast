@@ -4,12 +4,15 @@
  * @author 竹林
  */
 #pragma once
-#include <functional>
+#include "Source/UI/MiniMap/MiniMapTypes.h"
 
-namespace app { namespace actor { class ChildPenguin; } }
 
 namespace app
 {
+	/** 前方宣言 */
+	namespace actor { class ChildPenguin; }
+
+
 	/**
 	 * @brief バトルの情報受け渡しクラス
 	 * @detail ゲームのフェーズ管理は行わない。
@@ -140,11 +143,13 @@ namespace app
 			m_onSleepingEnemyChanged = std::move(func);
 		}
 
+
+	public:
 		/**
 		 * @brief ミニマップUI通知functionを設定
 		 * @param func 引数なし。lambda内でUIへのセットを行う
 		 */
-		inline void SetOnMiniMapChanged(std::function<void()> func)
+		inline void SetOnMiniMapChanged(std::function<void(const ui::ActorPositions&)> func)
 		{
 			m_onMiniMapChanged = std::move(func);
 		}
@@ -170,7 +175,7 @@ namespace app
 
 
 		/** ミニマップUI更新通知 */
-		std::function<void()> m_onMiniMapChanged;
+		std::function<void(const ui::ActorPositions&)> m_onMiniMapChanged;
 
 
 

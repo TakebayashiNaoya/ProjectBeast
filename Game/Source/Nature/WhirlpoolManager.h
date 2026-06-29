@@ -50,6 +50,26 @@ namespace app
 			void ForEach(std::function<void(Whirlpool* info)> cb);
 
 
+			/**
+			 * @brief 現在の渦潮の数を取得する
+			 * @return 渦潮の数
+			 */
+			uint8_t GetWhirlpoolCount() const
+			{
+				return static_cast<uint8_t>(m_whirlpoolMap.size());
+			}
+
+
+			/**
+			 * @brief 渦潮の最大数を取得する
+			 * @return 渦潮の最大数
+			 */
+			uint8_t GetWhirlpoolCountMax() const
+			{
+				return static_cast<uint8_t>(m_positionMap.size());
+			}
+
+
 		private:
 			/**
 			 * @brief 渦潮の座標JSONを読み込んでm_positionMapを更新する

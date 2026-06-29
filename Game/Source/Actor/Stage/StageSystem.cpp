@@ -255,6 +255,21 @@ namespace app
 		}
 
 
+		uint8_t StageSystem::GetNumbaringObjectCount(const std::string& objectKey) const
+		{
+			uint8_t index = 1;
+			uint8_t count = 0;
+			for (const auto& obj : m_objectMap)
+			{
+				if (obj.first == objectKey + std::to_string(index))
+				{
+					count++;
+				}
+				index++;
+			}
+			return count;
+		}
+
 		StageSystem::StageSystem()
 		{
 			/** マップのメモリを確保 */

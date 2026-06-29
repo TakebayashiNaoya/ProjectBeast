@@ -115,11 +115,6 @@ namespace app
 		// イグループプロンプトを生成
 		ui::InitUIPacket(m_iglooPromptPacket, "Assets/parameter/UI/iglooPrompt/IglooPrompt.json");
 
-		if (auto* menu = m_iglooPromptPacket->GetMenu())
-		{
-			menu->SetDraw(false);
-			daddyPenguin->GetController()->SetIglooPromptMenu(menu);
-		}
 
 		// チュートリアルを生成
 		ui::InitUIPacket(m_tutorialPacket, "Assets/parameter/tutorial/Tutorial.json");
@@ -140,9 +135,18 @@ namespace app
 		// 危険矢印システムを生成
 		m_dangerArrowSystem = std::make_unique<ui::DangerArrowSystem>();
 		m_dangerArrowSystem->Initialize();
+	}
 
-		/** BattleManagerへのUI通知functionを登録 */
-		RegisterObservers(daddyPenguin);
+
+	void InGameUIManager::SetMiniMapIconNum(ui::EnMiniMapIconType type, uint8_t num)
+	{
+		m_miniMapPacket->GetMenu()->SetIconNum(type, num);
+	}
+
+
+	void InGameUIManager::InitializeMapIcon()
+	{
+		m_miniMapPacket->GetMenu()->InitializeMapIcon();
 	}
 
 
@@ -247,10 +251,15 @@ namespace app
 		// ミニマップUI通知
 		//--------------------------------------------//
 		bm.SetOnMiniMapChanged(
-			[this, daddyPenguin, CheckMenu]()
+			[this, daddyPenguin, CheckMenu](const ui::ActorPositions& actorPositions)
 			{
 				auto* menu = m_miniMapPacket->GetMenu();
 				CheckMenu(menu);
+
+				menu->SetActorPositions(
+					daddyPenguin->GetTransform().m_position,
+					actorPositions
+				);
 			}
 		);
 	}
@@ -263,6 +272,11 @@ namespace app
 	void InGameUIManager::UpdateCountDown()
 	{
 		if (m_countDownPacket) m_countDownPacket->Update();
+	}
+
+	void InGameUIManager::PlayingSetting()
+	{
+		m_miniMapPacket->GetMenu()->DrawMapIcons(true);
 	}
 
 
