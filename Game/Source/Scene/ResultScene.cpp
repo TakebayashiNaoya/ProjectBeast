@@ -1,5 +1,5 @@
 ﻿/**
- * @file ResultScene.h
+ * @file ResultScene.cpp
  * @brief リザルトシーン
  * @author 立山
  */
@@ -16,30 +16,20 @@
 
 namespace
 {
-	//constexpr float SCORE_TIME_DIVISOR = 100.0f; // タイムボーナス計算用の除数
 	constexpr float SCORE_BASE_MULTIPLIER = 100.0f; // 救出数の基本スコア倍率
 	constexpr float SCENE_WAIT_TIME = 3.0f;   // 次シーンへの遷移待機秒数
 	constexpr float SCORE_PER_ACHIEVEMENT = 2000.0f; // アチーブメント達成1件ごとの加算スコア
-
-	//constexpr int   MIN_ACHIEVE_MULTIPLIER = 1;    // アチーブメント未達成時の最低倍率
-	//constexpr float BASE_TIME_MULTIPLIER = 1.0f; // タイム倍率の基礎値（1.0倍）
 }
-
-
 
 namespace app
 {
-	float ResultScene::s_clearTime = 0.0f;
-	int   ResultScene::s_collectedPenguin = 0;
-
+	int ResultScene::s_collectedPenguin = 0;
 
 	ResultScene::ResultScene()
-		: m_clearTime(0.0f)
-		, m_collectedPenguin(0)
+		: m_collectedPenguin(0)
 		, m_totalScore(0.0f)
 		, m_resultMenu(nullptr)
 	{}
-
 
 	ResultScene::~ResultScene()
 	{
@@ -49,10 +39,8 @@ namespace app
 		}
 	}
 
-
 	bool ResultScene::Start()
 	{
-		m_clearTime = s_clearTime;
 		m_collectedPenguin = s_collectedPenguin;
 
 		if (auto* am = app::achievement::AchievementManager::GetInstance())
@@ -69,14 +57,13 @@ namespace app
 		if (m_resultMenu)
 		{
 			// Menuにスコアなどのデータを渡し、動的なUI（アチーブメント等）を生成させる
-			m_resultMenu->SetResultData(m_clearTime, m_collectedPenguin, m_totalScore, m_allAchievementList);
+			m_resultMenu->SetResultData(m_collectedPenguin, m_totalScore, m_allAchievementList, SCORE_PER_ACHIEVEMENT);
 		}
 
 		SoundManager::Get().PlayBGM(enSoundKind_Result);
 
 		return true;
 	}
-
 
 	void ResultScene::Update()
 	{
@@ -92,16 +79,13 @@ namespace app
 		}
 	}
 
-
 	void ResultScene::PauseUpdate()
 	{}
-
 
 	void ResultScene::Render(RenderContext& rc)
 	{
 		m_layout.Render(rc);
 	}
-
 
 	bool ResultScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
@@ -114,7 +98,6 @@ namespace app
 		}
 		return false;
 	}
-
 
 	void ResultScene::CalcTotalScore()
 	{

@@ -12,25 +12,13 @@
                 "rotation": 0,
                 "color": [255, 255, 255, 255]
             },
-
-            {
-                "type": "UIIcon",
-                "name": "ClearTimeFrame",
-                "asset": "Assets/spriteData/UI/Frame/ResultFrame2.DDS",
-                "width": 450,
-                "height": 220,
-                "position": [-310, 305, 0],
-                "scale": [1, 1, 1],
-                "rotation": 0,
-                "color": [255, 255, 255, 255]
-            },
             {
                 "type": "UIIcon",
                 "name": "RescueFrame",
                 "asset": "Assets/spriteData/UI/Frame/ResultFrame2.DDS",
                 "width": 450,
                 "height": 220,
-                "position": [335, 305, 0],
+                "position": [0, 305, 0],
                 "scale": [1, 1, 1],
                 "rotation": 0,
                 "color": [255, 255, 255, 255]
@@ -68,19 +56,6 @@
                 "rotation": 0,
                 "color": [255, 255, 255, 255]
             },
-
-            {
-                "type": "UIText",
-                "name": "ClearTimeText",
-                "text": "クリアタイム",
-                "fontSize": 1.0,
-                "fontScaleX": 1.0,
-                "fontScaleY": 1.0,
-                "position": [-310, 365, 0],
-                "rotation": 0,
-                "color": [20, 20, 80, 255],
-                "pivot": [0.5, 0.5]
-            },
             {
                 "type": "UIText",
                 "name": "RescueText",
@@ -88,7 +63,7 @@
                 "fontSize": 1.0,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
-                "position": [335, 365, 0],
+                "position": [0, 365, 0],
                 "rotation": 0,
                 "color": [20, 20, 80, 255],
                 "pivot": [0.5, 0.5]
@@ -117,19 +92,6 @@
                 "color": [20, 20, 80, 255],
                 "pivot": [0.0, 0.5]
             },
-
-            {
-                "type": "UIText",
-                "name": "ClearTimeValue",
-                "text": "0:00",
-                "fontSize": 2.0,
-                "fontScaleX": 1.0,
-                "fontScaleY": 1.0,
-                "position": [-310, 265, 0],
-                "rotation": 0,
-                "color": [0, 76, 255, 255],
-                "pivot": [0.5, 0.5]
-            },
             {
                 "type": "UIText",
                 "name": "RescueValue",
@@ -137,7 +99,7 @@
                 "fontSize": 2.0,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
-                "position": [335, 265, 0],
+                "position": [0, 265, 0],
                 "rotation": 0,
                 "color": [0, 76, 255, 255],
                 "pivot": [0.5, 0.5]

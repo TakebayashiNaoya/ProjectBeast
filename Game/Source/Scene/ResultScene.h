@@ -38,7 +38,6 @@ namespace app
 		// インゲームシーンから遷移前に呼ぶ
 		static void SetResult(float clearTime, int collectedPenguin)
 		{
-			s_clearTime = clearTime;
 			s_collectedPenguin = collectedPenguin;
 		}
 
@@ -55,8 +54,6 @@ namespace app
 		float m_totalScore;
 
 		std::vector<app::achievement::AchievementBase*> m_allAchievementList;
-
-		static float s_clearTime;
 		static int   s_collectedPenguin;
 
 		app::ui::Layout m_layout;

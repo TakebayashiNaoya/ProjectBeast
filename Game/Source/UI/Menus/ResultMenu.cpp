@@ -17,38 +17,32 @@ namespace
 	constexpr float CHECK_REVEAL_DELAY = 1.0f;
 	constexpr float CHECK_REVEAL_INTERVAL = 1.0f;
 	constexpr float TOTAL_REVEAL_DELAY = 1.0f;
+	constexpr float COUNT_UP_DURATION = 4.5f;  // トータルスコアのカウントアップにかける時間
 	constexpr float TITLE_BUTTON_DELAY = 1.5f;
 
 	constexpr const char* RESULT_JSON_PATH = "Assets/parameter/result/result.json";
 	constexpr const char* DYNAMIC_LAYOUT_KEY = "dynamic_layout";
-
-	constexpr int SECONDS_PER_MINUTE = 60;
-	constexpr int DECIMAL_BASE = 10;
 }
-
-
 
 namespace app
 {
 	namespace ui
 	{
 		ResultMenu::ResultMenu()
-			: m_clearTime(0.0f)
-			, m_collectedPenguin(0)
+			: m_collectedPenguin(0)
 			, m_totalScore(0.0f)
 			, m_checkRevealTimer(0.0f)
 			, m_checkRevealIndex(0)
 			, m_allChecksRevealed(false)
 			, m_postCheckTimer(0.0f)
+			, m_countUpTimer(0.0f)
 			, m_totalScoreShown(false)
 			, m_titleButtonShown(false)
 			, m_drumRollHandle(app::INVALID_SE_HANDLE)
 		{}
 
-
 		ResultMenu::~ResultMenu()
 		{}
-
 
 		void ResultMenu::InitializeLogic()
 		{
@@ -59,6 +53,7 @@ namespace app
 			m_checkRevealIndex = 0;
 			m_allChecksRevealed = false;
 			m_postCheckTimer = 0.0f;
+			m_countUpTimer = 0.0f;
 			m_totalScoreShown = false;
 			m_titleButtonShown = false;
 			m_checkIconList.clear();
@@ -67,24 +62,22 @@ namespace app
 			BuildDynamicUI();
 		}
 
-
-		void ResultMenu::SetResultData(float clearTime, int collectedPenguin, float totalScore, const std::vector<app::achievement::AchievementBase*>& achievements)
+		void ResultMenu::SetResultData(int collectedPenguin, float totalScore, const std::vector<app::achievement::AchievementBase*>& achievements, float scorePerAchieve)
 		{
-			m_clearTime = clearTime;
 			m_collectedPenguin = collectedPenguin;
 			m_totalScore = totalScore;
 			m_allAchievementList = achievements;
+			m_scorePerAchieve = scorePerAchieve;
 			m_dataSet = true;
 
 			ClearDynamicElements();
 			BuildDynamicUI();
-
-			m_drumRollHandle = SoundManager::Get().PlaySE(enSoundKind_DrumRoll, false);
 		}
-
 
 		void ResultMenu::ClearDynamicElements()
 		{
+			m_scorePopups.clear();
+
 			auto* canvas = GetCanvas();
 			if (!canvas) return;
 
@@ -96,7 +89,6 @@ namespace app
 				canvas->RemoveUI(Hash32(("AchieveCheck_" + std::to_string(i)).c_str()));
 			}
 		}
-
 
 		void ResultMenu::LoadDynamicLayout()
 		{
@@ -123,7 +115,6 @@ namespace app
 
 		}
 
-
 		void ResultMenu::BuildDynamicUI()
 		{
 			auto* canvas = GetCanvas();
@@ -146,19 +137,6 @@ namespace app
 			if (totalValue) totalValue->m_isDraw = false;
 
 			// ---------------------------------------------------------
-			// クリアタイムの初期テキスト設定（M:SS形式）
-			// ---------------------------------------------------------
-			int totalSec = static_cast<int>(m_clearTime);
-			int minutes = totalSec / SECONDS_PER_MINUTE;
-			int seconds = totalSec % SECONDS_PER_MINUTE;
-			int tensPlace = seconds / DECIMAL_BASE;
-			int onesPlace = seconds % DECIMAL_BASE;
-			std::string timeStr = std::to_string(minutes) + ":" + std::to_string(tensPlace) + std::to_string(onesPlace);
-
-			auto* clearTimeValue = GetUI<UIText>(Hash32("ClearTimeValue"));
-			if (clearTimeValue) clearTimeValue->SetText(timeStr);
-
-			// ---------------------------------------------------------
 			// 助けた数の初期テキスト設定
 			// ---------------------------------------------------------
 			auto* rescueValue = GetUI<UIText>(Hash32("RescueValue"));
@@ -167,14 +145,17 @@ namespace app
 			SetupAchievementUI();
 		}
 
-
 		void ResultMenu::Update()
 		{
+			for (auto& popup : m_scorePopups)
+			{
+				popup->Update();
+			}
+
 			UpdateRevealSequence();
 
 			MenuBase::Update();
 		}
-
 
 		void ResultMenu::UpdateRevealSequence()
 		{
@@ -192,30 +173,56 @@ namespace app
 					{
 						m_checkIconList[m_checkRevealIndex]->SetIsDraw(true);
 						SoundManager::Get().PlaySE(enSoundKind_Stamp);
+
+						// アチーブの横に「+2000」をポップアップさせる
+						if (m_checkRevealIndex < static_cast<int>(m_scorePopups.size()))
+						{
+							m_scorePopups[m_checkRevealIndex]->Play(static_cast<int>(m_scorePerAchieve));
+						}
+
 						m_checkRevealIndex++;
 					}
 				}
 				else
 				{
-					m_allChecksRevealed = true;
-					m_postCheckTimer = 0.0f;
+					m_postCheckTimer += dt;
+					if (m_postCheckTimer >= TOTAL_REVEAL_DELAY)
+					{
+						m_allChecksRevealed = true;
+						m_postCheckTimer = 0.0f;
+
+						// ここからトータルスコアのカウントアップ開始のためドラムロールを鳴らす
+						m_drumRollHandle = SoundManager::Get().PlaySE(enSoundKind_DrumRoll, false);
+
+						auto* totalValue = GetUI<UIText>(Hash32("TotalValue"));
+						if (totalValue)
+						{
+							totalValue->m_isDraw = true;
+							totalValue->SetText("0");
+						}
+					}
 				}
 				return;
 			}
 
-			// フェーズ2：トータルスコアを表示
+			// フェーズ2：トータルスコアをカウントアップ
 			if (!m_totalScoreShown)
 			{
-				m_postCheckTimer += dt;
-				if (m_postCheckTimer >= TOTAL_REVEAL_DELAY)
-				{
-					auto* totalValue = GetUI<UIText>(Hash32("TotalValue"));
-					if (totalValue)
-					{
-						totalValue->SetText(std::to_string(static_cast<int>(m_totalScore)));
-						totalValue->m_isDraw = true;
-					}
+				m_countUpTimer += dt;
+				float progress = m_countUpTimer / COUNT_UP_DURATION;
+				if (progress > 1.0f) progress = 1.0f;
 
+				// 0から目標の合計スコアまで徐々に増やす
+				float currentScore = m_totalScore * progress;
+
+				auto* totalValue = GetUI<UIText>(Hash32("TotalValue"));
+				if (totalValue)
+				{
+					totalValue->SetText(std::to_string(static_cast<int>(currentScore)));
+				}
+
+				if (progress >= 1.0f)
+				{
 					if (m_drumRollHandle != app::INVALID_SE_HANDLE)
 					{
 						SoundManager::Get().StopSE(m_drumRollHandle);
@@ -248,7 +255,6 @@ namespace app
 				}
 			}
 		}
-
 
 		void ResultMenu::SetupAchievementUI()
 		{
@@ -325,8 +331,26 @@ namespace app
 						checkIcon->m_isDraw = false;
 						m_checkIconList.push_back(checkIcon);
 					}
+
+					Vector3 popupPos = currentBackPos;
+					popupPos.x += L.achieveBackW * 0.5f - 100.0f;  // 枠右端付近（調整可）
+
+					auto popup = std::make_unique<ScorePopupAnimator>();
+					popup->Initialize(popupPos);
+					m_scorePopups.push_back(std::move(popup));
 				}
 				rowIndex++;
+			}
+		}
+
+		void ResultMenu::Render(RenderContext& rc)
+		{
+			MenuBase::Render(rc);   // 通常のUIを先に描画
+
+			// ポップアップをUIの上に重ねて描画
+			for (auto& popup : m_scorePopups)
+			{
+				popup->Render(rc);
 			}
 		}
 	}

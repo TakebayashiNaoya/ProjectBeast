@@ -4,6 +4,7 @@
  * @author 立山
  */
 #pragma once
+#include "ScorePopupAnimatorMenu.h"
 #include "Source/Achivement/AchievementManager.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Menu.h"
@@ -17,19 +18,19 @@ namespace app
 		/** @brief result.json の dynamic_layout セクションに対応する構造体 */
 		struct ResultDynamicLayout
 		{
-			Vector3 achieveStartPos     = { -200.0f, 150.0f, 0.0f };
-			float   achieveOffsetY      = -80.0f;
+			Vector3 achieveStartPos = { -200.0f, 150.0f, 0.0f };
+			float   achieveOffsetY = -80.0f;
 			float   achieveOffsetXCheck = -400.0f;
-			float   achieveOffsetXName  =   60.0f;
-			float   achieveOffsetXBack  =   60.0f;
-			float   achieveNameFontSize =    0.5f;
-			float   achieveNamePivotX   =    0.0f;
-			float   achieveBackW        = 780.0f;
-			float   achieveBackH        = 120.0f;
-			float   achieveBoxW         =  60.0f;
-			float   achieveBoxH         =  60.0f;
-			float   achieveCheckW       =  60.0f;
-			float   achieveCheckH       =  60.0f;
+			float   achieveOffsetXName = 60.0f;
+			float   achieveOffsetXBack = 60.0f;
+			float   achieveNameFontSize = 0.5f;
+			float   achieveNamePivotX = 0.0f;
+			float   achieveBackW = 780.0f;
+			float   achieveBackH = 120.0f;
+			float   achieveBoxW = 60.0f;
+			float   achieveBoxH = 60.0f;
+			float   achieveCheckW = 60.0f;
+			float   achieveCheckH = 60.0f;
 
 		};
 
@@ -44,12 +45,14 @@ namespace app
 			~ResultMenu();
 
 			void Update() override;
+			void Render(RenderContext& rc);
 			void InitializeLogic() override;
 
 
-			// シーンからスコアやクリア時間などのデータを受け取り、初期化する
-			void SetResultData(float clearTime, int collectedPenguin, float totalScore,
-				const std::vector<app::achievement::AchievementBase*>& achievements);
+			// シーンからスコアなどのデータを受け取り、初期化する
+			void SetResultData(int collectedPenguin, float totalScore,
+				const std::vector<app::achievement::AchievementBase*>& achievements,
+				float scorePerAchieve);
 
 
 			// Aボタンでの次シーン遷移が可能な状態か判定する
@@ -65,7 +68,6 @@ namespace app
 
 
 		private:
-			float m_clearTime;
 			int m_collectedPenguin;
 			float m_totalScore;
 			std::vector<app::achievement::AchievementBase*> m_allAchievementList;
@@ -82,8 +84,12 @@ namespace app
 			bool  m_allChecksRevealed;
 
 			float m_postCheckTimer;
+			float m_countUpTimer;                 // カウントアップ用タイマー
 			bool  m_totalScoreShown;
 			bool  m_titleButtonShown;
+
+			float m_scorePerAchieve = 0.0f;
+			std::vector<std::unique_ptr<ScorePopupAnimator>> m_scorePopups;
 		};
 	}
 }

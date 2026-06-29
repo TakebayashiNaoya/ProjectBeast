@@ -535,6 +535,12 @@
     <ClCompile Include="Source\UI\Menus\DebufMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Menus\ScorePopupAnimatorMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\ScorePopupAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -1001,6 +1007,12 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\DebufMenu.h">
       <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\ScorePopupAnimatorMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\ScorePopupAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
