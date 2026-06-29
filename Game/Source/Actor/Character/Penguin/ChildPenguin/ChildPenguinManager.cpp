@@ -17,6 +17,8 @@
 #include "Source/UI/CPReaction/CPReactionMenu.h"
 #include "Source/UI/CPReaction/CPReactionSystem.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include <random>
 
 
@@ -45,6 +47,9 @@ namespace app
 
 		ChildPenguinManager::ChildPenguinManager()
 			: m_ghostPenguinNum(0)
+			, m_isGhostHidden(false)
+			, m_ghostTimer(0.0f)
+			, m_target(nullptr)
 		{}
 
 
@@ -760,7 +765,18 @@ namespace app
 		}
 
 
-		void ChildPenguinManager::RegisterGhostPenguin(ChildPenguin* penguin)
+		ChildPenguinManager::GhostPenguinInfo::GhostPenguinInfo()
+			: modelRender()
+			, floatCurve()
+			, target(nullptr)
+			, timer(0.0f)
+			, isHidden(false)
+			, isDebuffActive(false)
+			, position(Vector3::Zero)
+		{}
+
+
+		void ChildPenguinManager::RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target)
 		{
 			constexpr const char* GHOST_MODEL_PATH = "Assets/modelData/penguin/childPenguin/GhostChildPenguin.tkm";
 			constexpr float POSITION_OFFSET_Y = 0.2f;
@@ -783,24 +799,90 @@ namespace app
 			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
 			info->modelRender.Update();
 
+			// 構造体のメンバにターゲットを設定。
+			info->target = target;
+
+			// ゴーストペンギンをリストに追加。
 			m_ghostPenguins.push_back(std::move(info));
+			// リストをキャッシュして同じ型に変換。
 			m_ghostPenguinNum = static_cast<uint8_t>(m_ghostPenguins.size());
 		}
 
 
 		void ChildPenguinManager::UpdateGhostPenguins()
 		{
+			/** 非表示待機時間 */
+			constexpr float HIDDEN_WAIT_TIME = 2.0f;
+			/** かかった時間 */
+			constexpr float TOTAL_TIME = 7.0f;
+
+			// アニメーション用の経過時間。
+			float deltaTime = g_gameTime->GetFrameDeltaTime();
+			// デバフ用の経過時間。
+			float timer = g_gameTime->GetFrameDeltaTime();
+
 			for (auto& info : m_ghostPenguins)
 			{
 				// 浮上アニメショーンの更新。
-				if (!info->floatCurve.IsPlaying()) continue;
+				if (info->floatCurve.IsPlaying())
+				{
+					info->floatCurve.Update(deltaTime);
+					const Vector3 currentPosition = info->modelRender.GetPosition();
+					const Vector3 translate = Vector3::Up * info->floatCurve.GetCurrentValue();
+					const Vector3 nextPosition = currentPosition + translate;
+					info->modelRender.SetPosition(nextPosition);
+					info->modelRender.Update();
 
-				info->floatCurve.Update(g_gameTime->GetFrameDeltaTime());
-				const Vector3 currentPosition = info->modelRender.GetPosition();
-				const Vector3 translate = Vector3::Up * info->floatCurve.GetCurrentValue();
-				const Vector3 nextPosition = currentPosition + translate;
-				info->modelRender.SetPosition(nextPosition);
-				info->modelRender.Update();
+					continue;
+				}
+				
+				// これ以降はアニメーション終了時の処理。
+				info->timer += timer;
+
+				// 2秒待機後に非表示にする。
+				if (info->timer >= HIDDEN_WAIT_TIME && !info->isHidden)
+				{
+					info->isHidden = true;
+					// nullチェック。
+					if (info->target != nullptr)
+					{
+						// シロクマのステートマシーンを取得。
+						EnemyStateMachine* sm = info->target->GetEnemyStateMachine();
+						
+						// 寝ている状態かつすでに帰巣中でなければデバフを発動!
+						if (!sm->IsCoolDown() && !sm->IsReturnHome())
+						{
+							// シロクマを家に帰す。
+							sm->SetReturnHome(true);
+							// デバフを有効化。
+							info->isDebuffActive = true;
+							// タイマーをリセット。
+							info->timer = 0.0f;
+							timer = 0.0f;
+						}
+					}
+				}
+
+				// デバフが有効でなければ、次の幽霊ペンギンへ。
+				if (!info->isDebuffActive) continue;
+
+				if (info->timer < TOTAL_TIME)
+				{
+					if (!info->target) continue;
+
+					// 幽霊ペンギンが消えた位置から、シロクマへのベクトルを計算する。
+					Vector3 bearPos = info->target->GetEnemyStateMachine()->GetPosition();
+					info->position = bearPos - info->modelRender.GetPosition();
+					info->position.Normalize();
+
+					if (info->position.LengthSq() > 0.0001f)
+					{
+						info->position.Normalize();
+					}
+				}
+
+				// 時間経過でデバフ終了。
+				else info->isDebuffActive = false;
 			}
 		}
 
@@ -809,7 +891,10 @@ namespace app
 		{
 			for (auto& it : m_ghostPenguins)
 			{
-				it->modelRender.Draw(rc);
+				if (!it->isHidden)
+				{
+					it->modelRender.Draw(rc);
+				}
 			}
 		}
 	}
