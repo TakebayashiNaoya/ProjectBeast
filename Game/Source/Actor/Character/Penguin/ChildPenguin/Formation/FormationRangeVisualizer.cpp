@@ -172,7 +172,7 @@ namespace app
 		}
 
 
-		void FormationRangeVisualizer::Render(RenderContext& rc)
+		void FormationRangeVisualizer::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			if (!m_isInitialized || !m_isVisible || m_vertexCount == 0) return;
 
@@ -180,9 +180,7 @@ namespace app
 
 			// 定数バッファに VP 行列をコピー
 			Matrix VP;
-			Matrix v = CameraSystem::Get().GetMainCamera().GetViewMatrix();
-			Matrix p = CameraSystem::Get().GetMainCamera().GetProjectionMatrix();
-			VP.Multiply(v, p);
+			VP.Multiply(view.camera->GetViewMatrix(), view.camera->GetProjectionMatrix());
 			m_constantBuffer.CopyToVRAM(&VP);
 
 			// 描画

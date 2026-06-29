@@ -345,6 +345,11 @@ namespace nsBeastEngine
 			renderObj->OnDraw(rc);
 		}
 
+		for (auto* renderer : m_customRenderers)
+		{
+			renderer->Render(rc, view);
+		}
+
 		rc.WaitUntilFinishDrawingToRenderTarget(view.renderTarget);
 
 		EndGPUEvent();

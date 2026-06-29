@@ -55,6 +55,7 @@ namespace app
 		void ChildPenguinManager::Start()
 		{
 			m_rangeVisualizer.Init();
+			g_renderingEngine->RegisterCustomRenderer(&m_rangeVisualizer);
 
 			/** 各子ペンギンのStartを呼び出す */
 			for (auto& cp : m_childPenguinList) {
@@ -125,7 +126,6 @@ namespace app
 			}
 
 			RenderGhostPenguins(rc);
-			m_rangeVisualizer.Render(rc);
 		}
 
 

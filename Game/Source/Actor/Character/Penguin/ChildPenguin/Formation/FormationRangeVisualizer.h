@@ -6,6 +6,7 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include "Graphics/ICustomRenderer.h"
 
 
 namespace app
@@ -20,7 +21,7 @@ namespace app
 		 *   地形がなければ Ocean::SampleWaveHeight() で波面をサンプリングする。
 		 *   Update() で毎フレーム動的頂点バッファを更新するため、海面の波打ちにも追従する。
 		 */
-		class FormationRangeVisualizer
+		class FormationRangeVisualizer : public nsBeastEngine::ICustomRenderer
 		{
 		public:
 			/**
@@ -51,9 +52,10 @@ namespace app
 
 			/**
 			 * @brief 描画
-			 * @param rc レンダリングコンテキスト
+			 * @param rc   レンダリングコンテキスト
+			 * @param view 描画対象ビュー（カメラ行列の取得に使用）
 			 */
-			void Render(RenderContext& rc);
+			void Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view) override;
 
 
 		private:
