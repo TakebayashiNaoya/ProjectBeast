@@ -247,6 +247,10 @@ namespace app
 				InGameUIManager::GetInstance()->AddSearchLayout(enemy);
 			}
 
+			InGameUIManager::GetInstance()->InitializeReactionSystem(
+				actor::EnemyManager::GetInstance()->GetEnemies().size()
+			);
+
 			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Bear, enemies.size());
 
 			m_loadPhase = LoadPhase::Camera;
@@ -484,7 +488,7 @@ namespace app
 
 				const float clearTime = TimeManager::GetInstance().GetCurTime();
 				const int   rescued = actor::ChildPenguinManager::GetInstance()->GetRescuedNum();
-				ResultScene::SetResult(clearTime, rescued);
+				ResultScene::SetResult(rescued);
 
 				/** アチーブメント最終判定（FinalCondition 型を評価） */
 				float logScore = 0.0f;

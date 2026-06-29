@@ -12,10 +12,10 @@ namespace app
 {
 	namespace actor
 	{
-
 		/** 前方宣言 */
 		class ChildPenguin;
 		class ChildPenguinStatus;
+		class Enemy;
 
 
 		/**
@@ -69,6 +69,19 @@ namespace app
 			 */
 			bool IsFinishAfterDeath() const { return m_isFinishAfterDeath; }
 
+			/**
+			 * @brief 攻撃したものを設定
+			 * @param enemy 攻撃者のポインタ
+			 */
+			void SetAttackerEnemy(Enemy* enemy) { m_attackerEnemy = enemy; }
+
+			/**
+			 * @brief 攻撃者を取得
+			 * @return 攻撃者
+			 */
+			Enemy* GetAttackerEnemy() const { return m_attackerEnemy; }
+
+
 		protected:
 			/**
 			 * @brief タイプ固有のステート遷移
@@ -85,6 +98,8 @@ namespace app
 			EnChildPenguinType m_type;
 			/** 死亡終了時 */
 			bool m_isFinishAfterDeath;
+			/** 攻撃者 */
+			Enemy* m_attackerEnemy;
 		};
 	}
 }

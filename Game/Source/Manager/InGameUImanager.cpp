@@ -18,6 +18,8 @@
 
 #include "Source/UI/Layout.h"
 
+#include "Source/UI/BearReaction/BearReactionSystem.h"
+#include "Source/UI/BearReaction/BearReactionTypes.h"
 #include "Source/UI/CPReaction/CPReactionSystem.h"
 #include "Source/UI/DangerArrow/DangerArrowSystem.h"
 #include "Source/UI/InGameButton/InGameButtonMenu.h"
@@ -165,6 +167,15 @@ namespace app
 	}
 
 
+	void InGameUIManager::InitializeReactionSystem(const uint8_t enemyNum)
+	{
+		// クマのリアクションシステムを生成
+		m_bearReactionSystem = std::make_unique<ui::BearReactionSystem>();
+		m_bearReactionSystem->SetReactionNum(enemyNum);
+		m_bearReactionSystem->Initialize();
+	}
+
+
 	void InGameUIManager::RegisterObservers()
 	{
 		auto& bm = BattleManager::GetInstance();
@@ -202,6 +213,42 @@ namespace app
 				CheckMenu(menu);
 				menu->SetChildNum(rescued);
 				menu->SetTotalNum(total);
+			}
+		);
+
+		//--------------------------------------------//
+		// クマのリアクションUI通知
+		//--------------------------------------------//
+		bm.SetOnBearReactionChanged(
+			[this, daddyPenguin]()
+			{
+				const auto& enemies = actor::EnemyManager::GetInstance()->GetEnemies();
+
+				for (uint8_t i = 0; i < enemies.size(); ++i)
+				{
+					auto* it = enemies.at(i);
+					bool isReturning = it->GetEnemyStateMachine()->IsReturnHome();
+					bool isChasing = it->GetEnemyStateMachine()->IsChasing();
+
+					auto type = ui::EnBearReactionType::None;
+
+					if (isReturning)
+					{
+						type = ui::EnBearReactionType::Bed;
+					}
+					else if (isChasing)
+					{
+						type = ui::EnBearReactionType::Tongue;
+					}
+
+					// クマのリアクションUIに位置を通知
+					m_bearReactionSystem->SetReaction(
+						i,
+						it->GetTransform().m_position,
+						daddyPenguin->GetTransform(),
+						type
+					);
+				}
 			}
 		);
 
@@ -287,6 +334,7 @@ namespace app
 			if (packet) packet->Update();
 		}
 		if (m_cpReactionSystem) m_cpReactionSystem->Update();
+		if (m_bearReactionSystem) m_bearReactionSystem->Update();
 		if (m_wpWarningSystem) m_wpWarningSystem->Update();
 		if (m_dangerArrowSystem) m_dangerArrowSystem->Update();
 		if (m_enemySleepingPacket) m_enemySleepingPacket->Update();
@@ -335,6 +383,7 @@ namespace app
 			if (packet) packet->Render(rc);
 		}
 		if (m_enemySleepingPacket) m_enemySleepingPacket->Render(rc);
+		if (m_bearReactionSystem) m_bearReactionSystem->Render(rc);
 		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
 		if (m_wpWarningSystem) m_wpWarningSystem->Render(rc);
 		if (m_dangerArrowSystem) m_dangerArrowSystem->Render(rc);

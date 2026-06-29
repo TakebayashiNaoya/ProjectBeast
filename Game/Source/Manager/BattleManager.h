@@ -148,6 +148,12 @@ namespace app
 		}
 
 
+		inline void SetOnBearReactionChanged(std::function<void()> func)
+		{
+			m_onBearReactionChanged = std::move(func);
+		}
+
+
 	public:
 		/**
 		 * @brief ミニマップUI通知functionを設定
@@ -176,6 +182,9 @@ namespace app
 		 * 探索・UIセットはlambda内で完結する
 		 */
 		std::function<void()> m_onSleepingEnemyChanged;
+
+		/** クマのリアクションUI更新通知 */
+		std::function<void()> m_onBearReactionChanged;
 
 
 		/** ミニマップUI更新通知 */

@@ -9,6 +9,7 @@
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
 
 
 namespace app
@@ -19,6 +20,7 @@ namespace app
 			: PenguinStateMachine(ownerChildPenguin)
 			, m_ownerChildPenguin(ownerChildPenguin)
 			, m_type(type)
+			, m_attackerEnemy(nullptr)
 		{
 			/** 共通ステートの追加 */
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
@@ -77,7 +79,7 @@ namespace app
 			auto* cpMng = ChildPenguinManager::GetInstance();
 
 			// ゴーストペンギンを登録して表示する。
-			cpMng->RegisterGhostPenguin(m_ownerChildPenguin);
+			cpMng->RegisterGhostPenguin(m_ownerChildPenguin, m_attackerEnemy);
 
 			// ChildPenguinManagerからの削除とdeleteを行う。
 			cpMng->RemoveAndDestroy(m_ownerChildPenguin);

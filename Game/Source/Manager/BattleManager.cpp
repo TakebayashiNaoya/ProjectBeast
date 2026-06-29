@@ -73,6 +73,13 @@ namespace app
 		}
 
 
+
+		//--------------------------------------------//
+		// クマのリアクション通知
+		//--------------------------------------------//
+		if (m_onBearReactionChanged) m_onBearReactionChanged();
+
+
 		//--------------------------------------------//
 		// 睡眠中クマの通知
 		// 探索・UIセットはlambda内で完結する
@@ -322,6 +329,7 @@ namespace app
 		m_onTimeChanged = nullptr;
 		m_onRescuedNumChanged = nullptr;
 		m_onSleepingEnemyChanged = nullptr;
+		m_onBearReactionChanged = nullptr;
 		m_onMiniMapChanged = nullptr;
 	}
 
