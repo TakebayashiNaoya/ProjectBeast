@@ -32,11 +32,11 @@ namespace app
 			m_joinCircle.Init(RANGE_SEGS,  JOIN_EDGE_COLOR,  JOIN_FILL_COLOR,  true);
 			m_leaveCircle.Init(RANGE_SEGS, LEAVE_EDGE_COLOR, LEAVE_FILL_COLOR, true);
 
-			// スロットマーカーを全て事前確保（Update()内でのGPUバッファ作成を避ける）
-			for (int i = 0; i < MAX_SLOT_COUNT; ++i)
-			{
-				m_slotCircles[i].Init(SLOT_SEGS, SLOT_COLOR, SLOT_COLOR, false);
-			}
+			//// スロットマーカーを全て事前確保（Update()内でのGPUバッファ作成を避ける）
+			//for (int i = 0; i < MAX_SLOT_COUNT; ++i)
+			//{
+			//	m_slotCircles[i].Init(SLOT_SEGS, SLOT_COLOR, SLOT_COLOR, false);
+			//}
 
 			m_isInitialized = true;
 		}
@@ -158,12 +158,12 @@ namespace app
 				if (leaveRadius > 0.0f) m_leaveCircle.Update(center, leaveRadius);
 			}
 
-			// スロットマーカーの更新（フォロワーの有無に関係なく常に表示）
-			m_activeSlotCount = static_cast<int>(std::min<size_t>(slotPositions.size(), MAX_SLOT_COUNT));
-			for (int i = 0; i < m_activeSlotCount; ++i)
-			{
-				m_slotCircles[i].Update(slotPositions[i], SLOT_RADIUS);
-			}
+			//// スロットマーカーの更新（フォロワーの有無に関係なく常に表示）
+			//m_activeSlotCount = static_cast<int>(std::min<size_t>(slotPositions.size(), MAX_SLOT_COUNT));
+			//for (int i = 0; i < m_activeSlotCount; ++i)
+			//{
+			//	m_slotCircles[i].Update(slotPositions[i], SLOT_RADIUS);
+			//}
 		}
 
 
@@ -195,10 +195,10 @@ namespace app
 				m_joinCircle.RenderEdge(rc);
 				m_leaveCircle.RenderEdge(rc);
 			}
-			for (int i = 0; i < m_activeSlotCount; ++i)
-			{
-				m_slotCircles[i].RenderEdge(rc);
-			}
+			//for (int i = 0; i < m_activeSlotCount; ++i)
+			//{
+			//	m_slotCircles[i].RenderEdge(rc);
+			//}
 		}
 	}
 }

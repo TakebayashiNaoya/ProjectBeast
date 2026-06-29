@@ -83,7 +83,7 @@ namespace app
 						
 			static constexpr int   RANGE_SEGS	   = 32;	/** 入隊・脱隊半径リングの分割数 */
 			static constexpr int   SLOT_SEGS       = 12;	/** スロットマーカーの分割数 */
-			static constexpr float SLOT_RADIUS     = 15.0f; /** スロットマーカーの半径 */
+			static constexpr float SLOT_RADIUS     = 5.0f;  /** スロットマーカーの半径 */
 			static constexpr int   MAX_SLOT_COUNT  = 100;	/** スロットマーカーの事前確保数（一周分 = リング k のスロット数 k*9、リング11まで対応） */
 
 			TerrainCircle m_joinCircle;					  /** 入隊半径円（緑・塗りつぶしあり） */
