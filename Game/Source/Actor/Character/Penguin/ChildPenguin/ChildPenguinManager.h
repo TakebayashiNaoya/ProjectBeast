@@ -205,6 +205,12 @@ namespace app
 			 */
 			void SortAndAssignFollowers();
 
+			/**
+			 * @brief 次レベルの空きスロット座標を計算して m_nextLevelSlots に格納する
+			 * @param center 親ペンギンの座標
+			 */
+			void CalculateNextLevelSlots(const Vector3& center);
+
 
 		public:
 			/**
@@ -243,6 +249,9 @@ namespace app
 
 			/** 計算された陣形の目標座標 */
 			std::vector<Vector3> m_formationPositions;
+
+			/** 次レベルの空きスロット座標（ビジュアライザー向け） */
+			std::vector<Vector3> m_nextLevelSlots;
 
 			/** 陣形コントローラー */
 			FormationController m_formationController;

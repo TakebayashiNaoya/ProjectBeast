@@ -33,6 +33,8 @@ namespace app
 
 			/** @brief 最外半径（CalculatePositions後に有効） */
 			inline float GetOuterRadius()  const { return m_outerRadius; }
+			/** @brief 最外半径を直接セットする（save/restore用） */
+			inline void  SetOuterRadius(float r) { m_outerRadius = r; }
 
 			/** @brief 入隊判定半径（最外半径 + 入隊マージン） */
 			inline float GetJoinRadius()   const { return m_outerRadius + m_joinMargin; }

@@ -62,6 +62,36 @@ namespace app
 		}
 
 
+		void FormationController::CalculateNextLevelPositions(
+			const Vector3& center,
+			const Vector3& forward,
+			std::vector<Vector3>& out,
+			int occupied
+		)
+		{
+			if (!m_currentFormation) return;
+
+			// 現在の m_outerRadius を保存（呼び出し後に復元する）
+			const float savedRadius = m_currentFormation->GetOuterRadius();
+
+			// 現在充填中のリング k の末尾インデックスを求める
+			// リング k のスロット数 = k * FOLLOWERS_PER_LEVEL
+			// リング 1〜k-1 の累計 = 1+2+...+(k-1) のスロット数 = ringStart
+			int ringStart = 0;
+			int k = 1;
+			while (ringStart + k * FOLLOWERS_PER_LEVEL <= occupied)
+			{
+				ringStart += k * FOLLOWERS_PER_LEVEL;
+				k++;
+			}
+			const int nextCount = ringStart + k * FOLLOWERS_PER_LEVEL;
+
+			out.clear();
+			m_currentFormation->CalculatePositions(center, forward, out, nextCount);
+			m_currentFormation->SetOuterRadius(savedRadius);
+		}
+
+
 		float FormationController::GetOuterRadius() const
 		{
 			return m_currentFormation 

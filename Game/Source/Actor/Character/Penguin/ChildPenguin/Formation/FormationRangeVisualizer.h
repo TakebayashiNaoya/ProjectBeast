@@ -4,9 +4,9 @@
  * @author 竹林
  */
 #pragma once
-#include <array>
-#include <cstdint>
+#include <vector>
 #include "Graphics/ICustomRenderer.h"
+#include "TerrainCircle.h"
 
 
 namespace app
@@ -16,10 +16,10 @@ namespace app
 		/**
 		 * @brief 陣形範囲ビジュアライザー（地形追従ライン）
 		 * @details
-		 *   入隊半径（緑）と脱隊半径（赤）を円周上の N_SEGMENTS 点を結ぶラインリングとして描画する。
-		 *   各頂点の Y 座標は PhysicsWorld::Raycast() で地形をサンプリングし、
-		 *   地形がなければ Ocean::SampleWaveHeight() で波面をサンプリングする。
-		 *   Update() で毎フレーム動的頂点バッファを更新するため、海面の波打ちにも追従する。
+		 *   入隊半径（緑）と脱隊半径（赤）を TerrainCircle で描画し、
+		 *   フォーメーションの各スロット位置を白い小円で可視化する。
+		 *   地形追従・半透明塗りつぶしは TerrainCircle が担当し、
+		 *   本クラスは PSO・ルートシグネチャ・定数バッファ等の共有 GPU リソースを保持する。
 		 */
 		class FormationRangeVisualizer : public nsBeastEngine::ICustomRenderer
 		{
@@ -37,18 +37,19 @@ namespace app
 
 
 		public:
-			/** 
+			/**
 			 * @brief 初期化
 			 */
 			void Init();
 
 			/**
 			 * @brief 更新
-			 * @param center      中心座標（親ペンギンの座標）
-			 * @param joinRadius  入隊半径
-			 * @param leaveRadius 脱隊半径
+			 * @param center         中心座標（親ペンギンの座標）
+			 * @param joinRadius     入隊半径
+			 * @param leaveRadius    脱隊半径
+			 * @param slotPositions  スロット座標リスト（次レベル分の全座標）
 			 */
-			void Update(const Vector3& center, float joinRadius, float leaveRadius);
+			void Update(const Vector3& center, float joinRadius, float leaveRadius, const std::vector<Vector3>& slotPositions);
 
 			/**
 			 * @brief 描画
@@ -59,29 +60,13 @@ namespace app
 
 
 		private:
-			/** 円周上 1 点の地表 Y をレイキャスト → 海面の順にサンプリングして返す */
-			float SampleSurfaceY(float x, float z) const;
-
-			/** 指定半径・色でリング縁取り頂点を m_vertices に追記する */
-			void BuildRingVertices(const Vector3& center, float radius, const Vector4& color);
-			/** 指定半径・色でリング塗りつぶし頂点を m_fillVertices に追記する */
-			void BuildRingFillVertices(const Vector3& center, float radius, const Vector4& color);
-
 			/** ルートシグネチャの初期化 */
 			void InitRootSignature();
 			/** シェーダーの初期化 */
 			void InitShader();
-			/** パイプラインステートの初期化 */
-			void InitPipelineState();
-			/** 頂点バッファの初期化 */
-			void InitVertexBuffer();
-			/** インデックスバッファの初期化 */
-			void InitIndexBuffer();
-			/** 塗りつぶし頂点バッファの初期化 */
-			void InitFillVertexBuffer();
-			/** 塗りつぶしインデックスバッファの初期化 */
-			void InitFillIndexBuffer();
-			/** 塗りつぶし用パイプラインステートの初期化 */
+			/** 縁取り用パイプラインステートの初期化（LINE_LIST） */
+			void InitLinePipelineState();
+			/** 塗りつぶし用パイプラインステートの初期化（TRIANGLE_LIST + αブレンド） */
 			void InitFillPipelineState();
 			/** 定数バッファの初期化 */
 			void InitConstantBuffer();
@@ -90,54 +75,32 @@ namespace app
 
 
 		private:
-			/** 頂点構造体 */
-			struct Vertex
-			{
-				Vertex() : pos(0.0f, 0.0f, 0.0f), color(0.0f, 0.0f, 0.0f, 1.0f) {}
-				Vertex(const Vector3& p, const Vector4& c) : pos(p), color(c) {}
-				Vector3 pos;
-				Vector4 color;
-			};
-
-			/** 1 リングあたりの分割数。増やすほど滑らかになるが Raycast 呼び出し数も増える */
-			static constexpr int   N_SEGMENTS          = 32;
-			/** LINE_LIST: 1 セグメント = 始点 + 終点 = 2 頂点 */
-			static constexpr int   VERTS_PER_RING      = N_SEGMENTS * 2;
-			/** 入隊リング + 脱隊リング */
-			static constexpr int   TOTAL_VERTS         = VERTS_PER_RING * 2;
-			/** TRIANGLE_LIST: 1 セグメント = 中心 + 始点 + 終点 = 3 頂点 */
-			static constexpr int   FILL_VERTS_PER_RING = N_SEGMENTS * 3;
-			/** 入隊リング + 脱隊リング（塗りつぶし） */
-			static constexpr int   TOTAL_FILL_VERTS    = FILL_VERTS_PER_RING * 2;
-			/** Z-fighting 回避のため地表から少し浮かせる量（cm 単位想定） */
-			static constexpr float HEIGHT_OFFSET  = 3.0f;
-			static constexpr float RAYCAST_TOP    = 1000.0f;
-			static constexpr float RAYCAST_BOTTOM = -10.0f;
-
-			static const Vector4 JOIN_COLOR;        /** 緑（入隊半径・縁） */
-			static const Vector4 LEAVE_COLOR;       /** 赤（脱隊半径・縁） */
+			static const Vector4 JOIN_EDGE_COLOR;   /** 緑（入隊半径・縁） */
 			static const Vector4 JOIN_FILL_COLOR;   /** 緑（入隊半径・塗りつぶし） */
+			static const Vector4 LEAVE_EDGE_COLOR;  /** 赤（脱隊半径・縁） */
 			static const Vector4 LEAVE_FILL_COLOR;  /** 赤（脱隊半径・塗りつぶし） */
+			static const Vector4 SLOT_COLOR;        /** 白（スロットマーカー） */
+						
+			static constexpr int   RANGE_SEGS	   = 32;	/** 入隊・脱隊半径リングの分割数 */
+			static constexpr int   SLOT_SEGS       = 12;	/** スロットマーカーの分割数 */
+			static constexpr float SLOT_RADIUS     = 15.0f; /** スロットマーカーの半径 */
+			static constexpr int   MAX_SLOT_COUNT  = 100;	/** スロットマーカーの事前確保数（一周分 = リング k のスロット数 k*9、リング11まで対応） */
 
-			std::array<Vertex, TOTAL_VERTS>      m_vertices     = {};	/** 縁取り用頂点配列 */
-			int                                  m_vertexCount  = 0;	/** 現在の縁取り頂点数 */
-			std::array<Vertex, TOTAL_FILL_VERTS> m_fillVertices    = {};	/** 塗りつぶし用頂点配列 */
-			int                                  m_fillVertexCount = 0;	/** 現在の塗りつぶし頂点数 */
+			TerrainCircle m_joinCircle;					  /** 入隊半径円（緑・塗りつぶしあり） */
+			TerrainCircle m_leaveCircle;				  /** 脱隊半径円（赤・塗りつぶしあり） */
+			TerrainCircle m_slotCircles[MAX_SLOT_COUNT];  /** スロットマーカー円（Init()で全て事前確保） */
+			int m_activeSlotCount = 0;					  /** 現フレームで描画するスロットマーカーの個数 */
 
-			VertexBuffer   m_vertexBuffer;		/** 縁取り頂点バッファ */
-			IndexBuffer    m_indexBuffer;		/** 縁取りインデックスバッファ */
-			VertexBuffer   m_fillVertexBuffer;	/** 塗りつぶし頂点バッファ */
-			IndexBuffer    m_fillIndexBuffer;	/** 塗りつぶしインデックスバッファ */
-			RootSignature  m_rootSignature;		/** ルートシグネチャ */
-			Shader         m_vs;				/** 頂点シェーダ */
-			Shader         m_ps;				/** ピクセルシェーダ */
-			PipelineState  m_pipelineState;		/** 縁取り用パイプラインステート（LINE_LIST） */
-			PipelineState  m_fillPipelineState;	/** 塗りつぶし用パイプラインステート（TRIANGLE_LIST + αブレンド） */
-			ConstantBuffer m_constantBuffer;	/** 定数バッファ */
-			DescriptorHeap m_descriptorHeap;	/** ディスクリプタヒープ */
+			RootSignature  m_rootSignature;      /** ルートシグネチャ */
+			Shader         m_vs;                 /** 頂点シェーダ */
+			Shader         m_ps;                 /** ピクセルシェーダ */
+			PipelineState  m_linePipelineState;  /** 縁取り用パイプラインステート */
+			PipelineState  m_fillPipelineState;  /** 塗りつぶし用パイプラインステート */
+			ConstantBuffer m_constantBuffer;     /** 定数バッファ（VP 行列） */
+			DescriptorHeap m_descriptorHeap;     /** ディスクリプタヒープ */
 
-			bool m_isInitialized = false;		/** 初期化済みかどうか */
-			bool m_isVisible	 = true;		/** 可視化有効かどうか */
+			bool m_isInitialized = false;        /** 初期化済みかどうか */
+			bool m_isVisible     = true;         /** 可視化有効かどうか */
 		};
 	}
 }

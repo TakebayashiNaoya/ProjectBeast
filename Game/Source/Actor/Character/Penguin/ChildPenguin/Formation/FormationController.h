@@ -47,6 +47,21 @@ namespace app
 			);
 
 			/**
+			 * @brief 現在充填中のリングの全スロット座標を計算する（表示専用・状態を変化させない）
+			 * @details m_outerRadius を元の値に復元するため、レベルアップ判定もしない。
+			 * @param center   親ペンギンの座標
+			 * @param forward  親ペンギンの前方向（正規化済み）
+			 * @param out      計算結果を書き込むベクター（事前にclearしておくこと）
+			 * @param occupied 現在のフォロワー数（空きスロットのフィルタリングに使用）
+			 */
+			void CalculateNextLevelPositions(
+				const Vector3& center,
+				const Vector3& forward,
+				std::vector<Vector3>& out,
+				int occupied
+			);
+
+			/**
 			 * @brief 陣形を切り替える
 			 * @param type 切り替え先の陣形
 			 */

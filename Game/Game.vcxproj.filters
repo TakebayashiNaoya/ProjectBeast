@@ -544,6 +544,9 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationRangeVisualizer.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\TerrainCircle.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
     </ClCompile>
@@ -1018,6 +1021,9 @@
       <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationRangeVisualizer.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\TerrainCircle.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.h">

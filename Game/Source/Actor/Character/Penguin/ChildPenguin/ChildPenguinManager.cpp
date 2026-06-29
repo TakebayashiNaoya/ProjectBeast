@@ -49,7 +49,9 @@ namespace app
 
 
 		ChildPenguinManager::~ChildPenguinManager()
-		{}
+		{
+			g_renderingEngine->UnregisterCustomRenderer(&m_rangeVisualizer);
+		}
 
 
 		void ChildPenguinManager::Start()
@@ -89,12 +91,12 @@ namespace app
 			m_rangeVisualizer.SetVisible(!m_followers.empty());
 			if (m_daddyPenguin != nullptr)
 			{
-				const Vector3 center = m_daddyPenguin->GetTransform().m_position;
-				m_rangeVisualizer.Update(
-					center,
-					m_formationController.GetJoinRadius(),
-					m_formationController.GetLeaveRadius()
-				);
+				const Vector3 center    = m_daddyPenguin->GetTransform().m_position;
+				const float joinRadius  = m_formationController.GetJoinRadius();
+				const float leaveRadius = m_formationController.GetLeaveRadius();
+				/** 次レベルの空きスロットを計算（CalculateNextLevelPositions内でm_outerRadiusが一時変化するため先に読んでおく） */
+				CalculateNextLevelSlots(center);
+				m_rangeVisualizer.Update(center, joinRadius, leaveRadius, m_nextLevelSlots);
 			}
 
 			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */
@@ -445,6 +447,26 @@ namespace app
 				m_formationPositions,
 				static_cast<int>(m_followers.size())
 			);
+		}
+
+
+		void ChildPenguinManager::CalculateNextLevelSlots(const Vector3& center)
+		{
+			/** 親の向きから前方ベクトルを取得 */
+			Vector3 forward = Vector3::Front;
+			m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
+
+			/** 次レベル分の全座標を計算（m_outerRadiusは内部で復元される） */
+			std::vector<Vector3> allNextLevelPositions;
+			m_formationController.CalculateNextLevelPositions(center, forward, allNextLevelPositions, static_cast<int>(m_followers.size()));
+
+			/** 現在フォロワーが占めているスロットを除き、空きスロットだけを格納する */
+			m_nextLevelSlots.clear();
+			const size_t occupied = m_followers.size();
+			for (size_t i = occupied; i < allNextLevelPositions.size(); ++i)
+			{
+				m_nextLevelSlots.push_back(allNextLevelPositions[i]);
+			}
 		}
 
 
