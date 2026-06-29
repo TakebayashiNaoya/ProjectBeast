@@ -143,8 +143,8 @@ namespace app
 				};
 
 
-			GetObjectPosition("BearNest", ui::EnMiniMapIconType::BearNest);
-			GetObjectPosition("Igloo", ui::EnMiniMapIconType::Igloo);
+			GetObjectPosition("bearHome_", ui::EnMiniMapIconType::BearNest);
+			GetObjectPosition("igloo_", ui::EnMiniMapIconType::Igloo);
 
 
 			// シロクマの座標を取得する

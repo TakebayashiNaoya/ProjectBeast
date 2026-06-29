@@ -6,16 +6,17 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
-#include "MiniMapStatus.h"
 #include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
-
-#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 
 
 namespace app
 {
 	namespace ui
 	{
+		/** 前方宣言 */
+		class MiniMapStatus;
+
+
 		class MiniMapMenu : public MenuBase
 		{
 		public:
@@ -47,23 +48,11 @@ namespace app
 				const ActorPositions& actorPositions
 			);
 
-			/**
-			 * @brief マップのアイコンを描画する
-			 * @param isDraw 描画するかどうかのフラグ
-			 * @detail 親ペンギン、マップ、フレームのみ操作する
-			 */
-			void DrawMapIcons(const bool isDraw);
-
 
 			//======================================//
 			// カプセル化関数
 			//======================================//
 		private:
-			/**
-			 * @brief UIを表示するかのフラグを更新する
-			 */
-			void UpdateDrawFlag();
-
 			/**
 			 * @brief UIIconの描画フラグを設定する
 			 * @param icon UIIconのポインタ。
@@ -98,6 +87,16 @@ namespace app
 			 * @brief マップのフレームアイコンをカメラの向きに合わせて回転させる。
 			 */
 			void MapFrameRotation();
+
+			void UpdateDrawFlag();
+
+
+			/**
+			 * @brief マップのアイコンを描画する
+			 * @param isDraw 描画するかどうかのフラグ
+			 * @detail 親ペンギン、マップ、フレームのみ操作する
+			 */
+			void DrawMapIcons(const bool isDraw);
 
 
 		private:

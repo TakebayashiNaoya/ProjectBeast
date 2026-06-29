@@ -61,15 +61,12 @@ namespace app
 		 * @detail Layoutの生成とBattleManagerへの配線を行う
 		 * @param daddyPenguin プレイヤーポインタ（睡眠クマ探索の基準座標に使用）
 		 */
-		void Initialize(actor::DaddyPenguin* daddyPenguin);
+		void Initialize();
 
 		/**
 		 * @brief カウントダウンフェーズの更新
 		 */
 		void UpdateCountDown();
-
-
-		void PlayingSetting();
 
 		/**
 		 * @brief プレイ中フェーズの更新
@@ -176,7 +173,7 @@ namespace app
 		 * @brief BattleManagerへUI通知functionを登録する
 		 * @param daddyPenguin 親ペンギンのポインタ
 		 */
-		void RegisterObservers(actor::DaddyPenguin* daddyPenguin);
+		void RegisterObservers();
 
 
 	private:

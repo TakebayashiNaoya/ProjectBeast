@@ -28,7 +28,7 @@ namespace
 	/** オブジェクトネームのキー */
 	const char* OBJECT_NAME = "objectName";
 	/** イグルーのキープレフィックス */
-	const char* IGLOO_KEY_PREFIX = "igloo";
+	const char* IGLOO_KEY_PREFIX = "igloo_";
 
 	/** ステージ上に配置できる最大の数 : 512 */
 	constexpr uint32_t MAX_OBJECT_NUM = 0x200;
@@ -257,15 +257,15 @@ namespace app
 
 		uint8_t StageSystem::GetNumbaringObjectCount(const std::string& objectKey) const
 		{
-			uint8_t index = 1;
 			uint8_t count = 0;
+			const std::string prefix = objectKey + "_";
+
 			for (const auto& obj : m_objectMap)
 			{
-				if (obj.first == objectKey + std::to_string(index))
+				if (obj.first.find(prefix) == 0)
 				{
 					count++;
 				}
-				index++;
 			}
 			return count;
 		}
@@ -490,7 +490,7 @@ namespace app
 
 		Vector3 StageSystem::GetNearestBearNestPosition(const Vector3& from) const
 		{
-			auto it = FindNearestByPrefix("bearHome", from);
+			auto it = FindNearestByPrefix("bearHome_", from);
 			return (it != m_objectMap.end())
 				? it->second->GetTransform().m_position
 				: Vector3::Zero;

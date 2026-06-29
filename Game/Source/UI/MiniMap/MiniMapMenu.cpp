@@ -5,8 +5,10 @@
  */
 #include "stdafx.h"
 #include "MiniMapMenu.h"
+#include "MiniMapStatus.h"
 
 #define CHECK_ICON(icon) K2_ASSERT(icon, "UIがnullptr")
+
 
 namespace app
 {
@@ -38,18 +40,21 @@ namespace app
 					{},
 					Vector3(-400.0f, 0.0f, 0.0f)
 				);
+
+				DrawMapIcons(true);
 			}
 			// アニメーション中の更新。
 			if (!m_startingAnimLogic.IsAnimationFinished())
 			{
 				m_startingAnimLogic.Update();
-				DrawMapIcons(true);
 			}
 			else
 			{
-				m_isDraw = true;
-				UpdateDrawFlag();
+				//m_isDraw = true;
+				//UpdateDrawFlag();
 			}
+
+
 
 
 
@@ -87,12 +92,10 @@ namespace app
 			rot.SetRotationY(atan2(-forward.x, forward.z));
 			rot.Apply(diff);
 
-			diff.Normalize();
-
 			// マップの大きさ / 距離の限界値 の倍率でマップ座標に変換する。
 			const float mapRadius = m_miniMapStatus->GetRadius();
 			const float mapLimitDis = m_miniMapStatus->GetLimitDistance();
-			diff *= length * mapRadius / mapLimitDis;
+			diff *= mapRadius / mapLimitDis;
 
 			// マップ中心座標 + 回転させた差分でマップ座標を算出する。
 			Vector3 mapCenterPos = m_miniMapStatus->GetMapCenterPos();
@@ -152,6 +155,12 @@ namespace app
 			m_map = GetAndInitIcon(Hash32("MiniMapIcon"));
 			m_frame = GetAndInitIcon(Hash32("MiniMapFrameIcon"));
 			m_daddy = GetAndInitIcon(Hash32("DaddyIcon"));
+
+			const Vector3 position = m_miniMapStatus->GetMapCenterPos();
+
+			m_map->m_transform.m_localTransform.m_position = position;
+			m_frame->m_transform.m_localTransform.m_position = position;
+			m_daddy->m_transform.m_localTransform.m_position = position;
 		}
 
 
@@ -177,14 +186,16 @@ namespace app
 					// ステータスから初期値を取得
 					auto& info = m_miniMapStatus->GetIconInitializeInfos().at(i);
 
-					const std::string path = "Assets/spriteData/UI/Icon/MiniMap/" + info.path + ".dds";
+					const std::string path = "Assets/spriteData/UI/Icon/MiniMap/" + info.path + ".DDS";
 					const uint32_t key = Hash32((info.path + std::to_string(j)).c_str());
 
 
 					// UIIconを生成、初期化
 					canvas->CreateUI<UIIcon>(key);
 
-					auto* icon = GetAndInitIcon(key);
+					auto* icon = canvas->FindUI<UIIcon>(key);
+					K2_ASSERT(icon, "登録失敗");
+					icon->m_isDraw = false;
 
 					icon->Initialize(path.c_str(), info.width, info.height, position, scale, rotation, color);
 
@@ -194,7 +205,6 @@ namespace app
 
 				K2_ASSERT(it.icons.size() == it.num, "サイズ不一致");
 			}
-
 		}
 
 
@@ -206,6 +216,7 @@ namespace app
 
 			it.num = num;
 			it.icons.reserve(num);
+			it.isFirstCall = false;
 		}
 
 
@@ -216,21 +227,21 @@ namespace app
 		{
 			for (uint8_t i = 0; i < static_cast<uint8_t>(EnMiniMapIconType::Num); ++i)
 			{
-				auto& it = m_iconVectors.at(i);
+				auto& iconVector = m_iconVectors.at(i);
 
-				for (uint8_t j = 0; j < it.num; ++j)
+				for (uint8_t j = 0; j < actorPositions.at(i).size(); ++j)
 				{
-					auto& iconPosition = it.icons.at(j)->m_transform.m_localTransform.m_position;
+					auto& icon = iconVector.icons.at(j);
 
 					// マップ座標に変換する。
 					bool canConvert = WorldPosConverterToMapPos(
 						centerActorPosition,
 						actorPositions.at(i).at(j),
-						iconPosition
+						icon->m_transform.m_localTransform.m_position
 					);
 
 					// マップ座標に変換できたら表示する。
-					it.icons.at(j)->m_isDraw = canConvert;
+					icon->m_isDraw = true;
 				}
 			}
 		}

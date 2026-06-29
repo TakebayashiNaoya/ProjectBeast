@@ -66,7 +66,7 @@ namespace app
 	}
 
 
-	void InGameUIManager::Initialize(actor::DaddyPenguin* daddyPenguin)
+	void InGameUIManager::Initialize()
 	{
 		//------------------------------------------------------------
 		// Layout・Menuの生成
@@ -125,12 +125,10 @@ namespace app
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
 		m_cpReactionSystem->Initialize();
-		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
 
 		// WpWarningSystemを生成
 		m_wpWarningSystem = std::make_unique<ui::WpWarningSystem>();
 		m_wpWarningSystem->Initialize();
-		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
 
 		// 危険矢印システムを生成
 		m_dangerArrowSystem = std::make_unique<ui::DangerArrowSystem>();
@@ -167,15 +165,20 @@ namespace app
 	}
 
 
-	void InGameUIManager::RegisterObservers(actor::DaddyPenguin* daddyPenguin)
+	void InGameUIManager::RegisterObservers()
 	{
 		auto& bm = BattleManager::GetInstance();
+
+		auto* daddyPenguin = bm.GetDaddyPenguin();
 
 		// UIがnullptrでないかをチェックするラムダ
 		auto CheckMenu = [](ui::MenuBase* menu)
 			{
 				K2_ASSERT(menu, "メニューがnullptr");
 			};
+
+		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
+		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
 
 		//--------------------------------------------//
 		// タイマーUI通知
@@ -272,11 +275,6 @@ namespace app
 	void InGameUIManager::UpdateCountDown()
 	{
 		if (m_countDownPacket) m_countDownPacket->Update();
-	}
-
-	void InGameUIManager::PlayingSetting()
-	{
-		m_miniMapPacket->GetMenu()->DrawMapIcons(true);
 	}
 
 

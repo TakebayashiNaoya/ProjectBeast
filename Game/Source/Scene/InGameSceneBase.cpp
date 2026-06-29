@@ -132,6 +132,7 @@ namespace app
 
 		/** UIManager生成（Layoutの生成はDaddyPenguin生成後のInitializeで行う） */
 		InGameUIManager::CreateInstance();
+		InGameUIManager::GetInstance()->Initialize();
 
 		/** ロードフェーズ開始 */
 		m_loadPhase = LoadPhase::Stage;
@@ -168,8 +169,8 @@ namespace app
 			if (system->IsAllLoaded())
 			{
 				// イグルーとクマの巣の数をミニマップへ登録
-				const uint8_t iglooCount = system->GetNumbaringObjectCount("igloo_");
-				const uint8_t bearHomeCount = system->GetNumbaringObjectCount("bearHome_");
+				const uint8_t iglooCount = system->GetNumbaringObjectCount("igloo");
+				const uint8_t bearHomeCount = system->GetNumbaringObjectCount("bearHome");
 
 				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Igloo, iglooCount);
 				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::BearNest, bearHomeCount);
@@ -192,7 +193,8 @@ namespace app
 			);
 
 
-			InGameUIManager::GetInstance()->RegisterObservers(m_daddyPenguin);
+			BattleManager::GetInstance().SetDaddyPenguin(m_daddyPenguin);
+			InGameUIManager::GetInstance()->RegisterObservers();
 			m_daddyPenguin->GetController()->SetIglooPromptMenu(
 				InGameUIManager::GetInstance()->GetIglooPromptMenu()
 			);
@@ -296,6 +298,8 @@ namespace app
 				SoundManager::Get().PlayBGM(enSoundKind_InGame);
 			}
 
+			InGameUIManager::GetInstance()->InitializeMapIcon();
+
 			OnLoadComplete();
 			break;
 		}
@@ -397,7 +401,6 @@ namespace app
 				BattleManager::GetInstance().SetIsActive(true);
 
 				// カウントダウン終了 → プレイ中のUIに切り替える。
-				InGameUIManager::GetInstance()->PlayingSetting();
 				InGameUIManager::GetInstance()->UpdatePlaying();
 			}
 			break;
