@@ -38,7 +38,7 @@ namespace app
 		/**
 		 * @brief リザルト画面の動的処理クラス
 		 */
-		class ResultMenu :public MenuBase
+		class ResultMenu : public MenuBase
 		{
 		public:
 			ResultMenu();
@@ -49,7 +49,13 @@ namespace app
 			void InitializeLogic() override;
 
 
-			// シーンからスコアなどのデータを受け取り、初期化する
+			/**
+			 * @brief シーンからスコアなどのデータを受け取り、初期化する
+			 * @param collectedPenguin 収集したペンギンの数
+			 * @param totalScore 合計スコア
+			 * @param achievements アチーブメントリスト
+			 * @param scorePerAchieve アチーブメント1件あたりのスコア
+			 */
 			void SetResultData(int collectedPenguin, float totalScore,
 				const std::vector<app::achievement::AchievementBase*>& achievements,
 				float scorePerAchieve);
@@ -60,10 +66,15 @@ namespace app
 
 
 		private:
+			/** @brief アチーブメントUIの構築処理 */
 			void SetupAchievementUI();
+			/** @brief 演出シーケンスの更新処理 */
 			void UpdateRevealSequence();
+			/** @brief 動的UIの構築処理 */
 			void BuildDynamicUI();
+			/** @brief 動的要素のクリア処理 */
 			void ClearDynamicElements();
+			/** @brief 動的レイアウトの読み込み処理 */
 			void LoadDynamicLayout();
 
 

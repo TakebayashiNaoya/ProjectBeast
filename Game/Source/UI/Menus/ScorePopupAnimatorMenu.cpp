@@ -1,6 +1,7 @@
 ﻿/**
  * @file ScorePopupAnimator.cpp
  * @brief スコア加算ポップアップ（"+2000"等）のアニメーションを担当するクラス
+ * @author 立山
  */
 #include "stdafx.h"
 #include "ScorePopupAnimatorMenu.h"

@@ -21,6 +21,7 @@ namespace
 	constexpr float SCORE_PER_ACHIEVEMENT = 2000.0f; // アチーブメント達成1件ごとの加算スコア
 }
 
+
 namespace app
 {
 	int ResultScene::s_collectedPenguin = 0;
@@ -31,6 +32,7 @@ namespace app
 		, m_resultMenu(nullptr)
 	{}
 
+
 	ResultScene::~ResultScene()
 	{
 		if (app::achievement::AchievementManager::GetInstance())
@@ -38,6 +40,7 @@ namespace app
 			app::achievement::AchievementManager::DestroyInstance();
 		}
 	}
+
 
 	bool ResultScene::Start()
 	{
@@ -65,6 +68,7 @@ namespace app
 		return true;
 	}
 
+
 	void ResultScene::Update()
 	{
 		m_layout.Update();
@@ -79,13 +83,16 @@ namespace app
 		}
 	}
 
+
 	void ResultScene::PauseUpdate()
 	{}
+
 
 	void ResultScene::Render(RenderContext& rc)
 	{
 		m_layout.Render(rc);
 	}
+
 
 	bool ResultScene::RequesutScene(uint32_t& id, float& waitTime)
 	{
@@ -98,6 +105,7 @@ namespace app
 		}
 		return false;
 	}
+
 
 	void ResultScene::CalcTotalScore()
 	{

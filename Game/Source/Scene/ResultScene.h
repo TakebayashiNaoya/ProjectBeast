@@ -36,20 +36,17 @@ namespace app
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
 		// インゲームシーンから遷移前に呼ぶ
-		static void SetResult(float clearTime, int collectedPenguin)
+		static void SetResult(int collectedPenguin)
 		{
 			s_collectedPenguin = collectedPenguin;
 		}
 
 
 	private:
-		// スコア計算とアチーブメントUI構築
+		/** @brief スコア計算とアチーブメントUI構築 */
 		void CalcTotalScore();
 
-
-	private:
 		bool m_nextScene = false;
-		float m_clearTime;
 		int m_collectedPenguin;
 		float m_totalScore;
 

@@ -20,6 +20,8 @@ namespace
 	constexpr float COUNT_UP_DURATION = 4.5f;  // トータルスコアのカウントアップにかける時間
 	constexpr float TITLE_BUTTON_DELAY = 1.5f;
 
+	constexpr float ACHIEVE_X_POS = 100.0f;
+
 	constexpr const char* RESULT_JSON_PATH = "Assets/parameter/result/result.json";
 	constexpr const char* DYNAMIC_LAYOUT_KEY = "dynamic_layout";
 }
@@ -41,8 +43,10 @@ namespace app
 			, m_drumRollHandle(app::INVALID_SE_HANDLE)
 		{}
 
+
 		ResultMenu::~ResultMenu()
 		{}
+
 
 		void ResultMenu::InitializeLogic()
 		{
@@ -62,6 +66,7 @@ namespace app
 			BuildDynamicUI();
 		}
 
+
 		void ResultMenu::SetResultData(int collectedPenguin, float totalScore, const std::vector<app::achievement::AchievementBase*>& achievements, float scorePerAchieve)
 		{
 			m_collectedPenguin = collectedPenguin;
@@ -73,6 +78,7 @@ namespace app
 			ClearDynamicElements();
 			BuildDynamicUI();
 		}
+
 
 		void ResultMenu::ClearDynamicElements()
 		{
@@ -89,6 +95,7 @@ namespace app
 				canvas->RemoveUI(Hash32(("AchieveCheck_" + std::to_string(i)).c_str()));
 			}
 		}
+
 
 		void ResultMenu::LoadDynamicLayout()
 		{
@@ -114,6 +121,7 @@ namespace app
 			m_dynLayout.achieveCheckH = JC::ToFloat(dl, "achieve_check_h", m_dynLayout.achieveCheckH);
 
 		}
+
 
 		void ResultMenu::BuildDynamicUI()
 		{
@@ -145,6 +153,7 @@ namespace app
 			SetupAchievementUI();
 		}
 
+
 		void ResultMenu::Update()
 		{
 			for (auto& popup : m_scorePopups)
@@ -156,6 +165,7 @@ namespace app
 
 			MenuBase::Update();
 		}
+
 
 		void ResultMenu::UpdateRevealSequence()
 		{
@@ -256,6 +266,7 @@ namespace app
 			}
 		}
 
+
 		void ResultMenu::SetupAchievementUI()
 		{
 			auto* canvas = GetCanvas();
@@ -333,7 +344,7 @@ namespace app
 					}
 
 					Vector3 popupPos = currentBackPos;
-					popupPos.x += L.achieveBackW * 0.5f - 100.0f;  // 枠右端付近（調整可）
+					popupPos.x += L.achieveBackW * 0.5f - ACHIEVE_X_POS;  // 枠右端付近（調整可）
 
 					auto popup = std::make_unique<ScorePopupAnimator>();
 					popup->Initialize(popupPos);
@@ -342,6 +353,7 @@ namespace app
 				rowIndex++;
 			}
 		}
+
 
 		void ResultMenu::Render(RenderContext& rc)
 		{
