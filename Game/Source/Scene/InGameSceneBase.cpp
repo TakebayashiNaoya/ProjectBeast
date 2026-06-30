@@ -224,6 +224,7 @@ namespace app
 
 			auto* manager = actor::ChildPenguinManager::GetInstance();
 			manager->SetDaddyPenguin(m_daddyPenguin);
+			manager->Start();
 
 			/** ステージ上の総ペンギン数をセット */
 			const int totalNum = cfg.serious + cfg.clingy + cfg.naughty + cfg.clumsy + cfg.caring;

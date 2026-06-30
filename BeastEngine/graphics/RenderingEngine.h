@@ -8,6 +8,7 @@
 #include "Graphics/Light/SceneLight.h"
 #include "Graphics/RenderViewContext.h"
 #include "Nature/INatureObject.h"
+#include "Graphics/ICustomRenderer.h"
 #include "Geometry/Frustum.h"
 #include "Graphics/PostEffect/PostEffectManager.h"
 #include "Graphics/PostEffect/PostEffectTypes.h"
@@ -143,6 +144,28 @@ namespace nsBeastEngine
 			}
 		}
 
+		/**
+		 * @brief カスタムメッシュ描画オブジェクトを登録する
+		 * @param renderer 登録する描画オブジェクト
+		 */
+		void RegisterCustomRenderer(ICustomRenderer* renderer)
+		{
+			m_customRenderers.push_back(renderer);
+		}
+
+		/**
+		 * @brief カスタムメッシュ描画オブジェクトの登録を解除する
+		 * @param renderer 登録解除する描画オブジェクト
+		 */
+		void UnregisterCustomRenderer(ICustomRenderer* renderer)
+		{
+			auto it = std::find(m_customRenderers.begin(), m_customRenderers.end(), renderer);
+			if (it != m_customRenderers.end())
+			{
+				m_customRenderers.erase(it);
+			}
+		}
+
 
 		//============================================//
 		// Init内で呼ばれる初期化処理
@@ -266,6 +289,8 @@ namespace nsBeastEngine
 		std::vector<IRenderer*> m_renderObjects;
 		/** 自然オブジェクトのリスト（Ocean・WhirlpoolManagerなど） */
 		std::vector<INatureObject*> m_natureObjects;
+		/** カスタムメッシュ描画オブジェクトのリスト */
+		std::vector<ICustomRenderer*> m_customRenderers;
 
 		/** フラスタムカリングの有効/無効 */
 		bool m_frustumCullingEnabled = true;
