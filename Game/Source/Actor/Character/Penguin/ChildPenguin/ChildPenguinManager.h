@@ -235,6 +235,11 @@ namespace app
 			 */
 			float GetJoinRadius()  const { return m_formationController.GetJoinRadius(); }
 
+			/**
+			 * @brief 現在の陣形が渦潮耐性パッシブを持つか
+			 */
+			bool HasWhirlpoolResistance() const { return m_formationController.HasWhirlpoolResistance(); }
+
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
 			DaddyPenguin* m_daddyPenguin = nullptr;

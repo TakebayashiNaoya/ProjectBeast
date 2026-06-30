@@ -150,6 +150,13 @@ namespace app
 				// 渦潮の範囲内に入ったら影響フラグを立てる
 				if (!it->isAffected && distXZ <= effectiveRadius)
 				{
+					// ディフェンス陣形のフォロワーは渦潮に飲まれない
+					if (m_cpManager->HasWhirlpoolResistance() && m_cpManager->IsFollower(it->target))
+					{
+						++it;
+						continue;
+					}
+
 					const MasterWhirlpoolParameter* param = GetParam();
 					const float orbitOffsetVariation = (param != nullptr) ? param->orbitOffsetVariation : 30.0f;
 					const float rotateScaleVariation = (param != nullptr) ? param->rotateScaleVariation : 0.3f;
@@ -168,6 +175,25 @@ namespace app
 				// 影響を受けているペンギンのフェーズ処理
 				if (it->isAffected)
 				{
+					// ディフェンス陣形で入隊圏内まで近づいたら渦潮から救出する
+					if (m_cpManager->HasWhirlpoolResistance())
+					{
+						const Vector3 daddyPos = m_cpManager->GetDaddyPosition();
+						const float dx = it->target->GetTransform().m_position.x - daddyPos.x;
+						const float dz = it->target->GetTransform().m_position.z - daddyPos.z;
+						const float distToDaddy = sqrtf(dx * dx + dz * dz);
+
+						if (distToDaddy <= m_cpManager->GetJoinRadius())
+						{
+							it->isAffected = false;
+							it->target->GetStateMachine()->SetIsInWhirlpool(false);
+							m_cpManager->UnregisterDowning(it->target);
+							m_cpManager->AddFollower(it->target);
+							++it;
+							continue;
+						}
+					}
+
 					it->target->GetStateMachine()->SetIsInWhirlpool(true);
 					UpdateAttract(*it, deltaTime);
 				}

@@ -80,6 +80,11 @@ namespace app
 			float GetSpeedMultiplier() const;
 
 			/**
+			 * @brief 現在の陣形が渦潮耐性パッシブを持つか
+			 */
+			bool HasWhirlpoolResistance() const;
+
+			/**
 			 * @brief 最外半径を取得する（CalculatePositions後に有効）
 			 */
 			float GetOuterRadius()  const;

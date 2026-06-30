@@ -39,6 +39,9 @@ namespace app
 			/** @brief 入隊判定半径（最外半径 + 入隊マージン） */
 			inline float GetJoinRadius()   const { return m_outerRadius + m_joinMargin; }
 
+			/** @brief 渦潮耐性パッシブを持つか（ディフェンス陣形のみtrue） */
+			virtual bool HasWhirlpoolResistance() const { return false; }
+
 			/**
 			 * @brief 陣形座標を計算する
 			 * @param center  親ペンギンの座標
@@ -130,6 +133,7 @@ namespace app
 			}
 
 			float GetSpeedMultiplier(int /*level*/) const override { return 0.8f; }
+			bool  HasWhirlpoolResistance()          const override { return true; }
 		};
 
 

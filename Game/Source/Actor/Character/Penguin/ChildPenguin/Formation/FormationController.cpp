@@ -64,6 +64,12 @@ namespace app
 		}
 
 
+		bool FormationController::HasWhirlpoolResistance() const
+		{
+			return m_currentFormation && m_currentFormation->HasWhirlpoolResistance();
+		}
+
+
 		void FormationController::CalculateNextLevelPositions(
 			const Vector3& center,
 			const Vector3& forward,
