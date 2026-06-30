@@ -75,8 +75,6 @@ namespace app
 			Range stopDistance;
 			Range walkDistance;
 			Range runDistance;
-			Range joinDistance;
-			Range giveUpDistance;
 			/**
 			 * @brief やんちゃペンギン固有：徘徊を開始する親との距離
 			 * @details 待機命令中に親がこの距離以上離れたら徘徊を開始する

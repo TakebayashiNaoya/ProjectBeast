@@ -191,14 +191,10 @@ namespace app
 			m_stopDistance = RollRange(td.stopDistance);
 			m_walkDistance = RollRange(td.walkDistance);
 			m_runDistance = RollRange(td.runDistance);
-			m_joinDistance = RollRange(td.joinDistance);
-			m_giveUpDistance = RollRange(td.giveUpDistance);
 
-			/** 制約補正：stopDistance < walkDistance < runDistance < joinDistance < giveUpDistance */
+			/** 制約補正：stopDistance < walkDistance < runDistance */
 			m_walkDistance = max(m_walkDistance, m_stopDistance + 1.0f);
 			m_runDistance = max(m_runDistance, m_walkDistance + 1.0f);
-			m_joinDistance = max(m_joinDistance, m_runDistance + 1.0f);
-			m_giveUpDistance = max(m_giveUpDistance, m_joinDistance + 1.0f);
 		}
 
 
@@ -505,7 +501,7 @@ namespace app
 
 			// 親が隊列参加距離以内にいる場合は逃走より隊列を優先する
 			// → false を返すことで呼び出し元の通常AI（隊列追従）処理へ制御を渡す
-			if (GetDistanceToDaddy() <= m_joinDistance)
+			if (GetDistanceToDaddy() <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 			{
 				m_fleeDirChangeTimer = 0.0f;
 				m_fleeAngleOffset = 0.0f;
@@ -634,13 +630,13 @@ namespace app
 			}
 
 			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= m_joinDistance) {
+			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius()) {
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
 			}
 
 			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > m_giveUpDistance) {
+			else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius()) {
 				manager->RemoveFollower(m_owner);
 				m_isFollowing = false;
 			}
@@ -751,7 +747,7 @@ namespace app
 
 				const float distDaddy = GetDistanceToDaddy();
 
-				if (!m_isFollowing && distDaddy <= m_joinDistance)
+				if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 				{
 					manager->AddFollower(m_owner);
 					m_isFollowing = true;
@@ -759,7 +755,7 @@ namespace app
 
 				if (m_isFollowing)
 				{
-					if (distDaddy > m_giveUpDistance)
+					if (distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
 					{
 						manager->RemoveFollower(m_owner);
 						m_isFollowing = false;
@@ -804,14 +800,14 @@ namespace app
 			const float distDaddy = GetDistanceToDaddy();
 
 			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= m_joinDistance)
+			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 			{
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
 			}
 
 			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > m_giveUpDistance)
+			else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
 			{
 				manager->RemoveFollower(m_owner);
 				m_isFollowing = false;
@@ -1113,7 +1109,7 @@ namespace app
 			if (isFollowCmd)
 			{
 				/** joinDistance以内に入ったら徘徊を終了して隊列に参加する */
-				if (distDaddy <= m_joinDistance)
+				if (distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 				{
 					/** 徘徊登録を解除する */
 					manager->UnregisterRoaming(m_owner);
@@ -1128,7 +1124,7 @@ namespace app
 				}
 
 				/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-				else if (m_isFollowing && distDaddy > m_giveUpDistance)
+				else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
@@ -1324,12 +1320,12 @@ namespace app
 
 			const float distDaddy = GetDistanceToDaddy();
 
-			if (!m_isFollowing && distDaddy <= m_joinDistance)
+			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 			{
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
 			}
-			else if (m_isFollowing && distDaddy > m_giveUpDistance)
+			else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
 			{
 				manager->RemoveFollower(m_owner);
 				m_isFollowing = false;
@@ -1563,12 +1559,12 @@ namespace app
 				/** 介入対象がいなければ通常の追従行動 */
 				const float distDaddy = GetDistanceToDaddy();
 
-				if (!m_isFollowing && distDaddy <= m_joinDistance)
+				if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 				{
 					manager->AddFollower(m_owner);
 					m_isFollowing = true;
 				}
-				else if (m_isFollowing && distDaddy > m_giveUpDistance)
+				else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;

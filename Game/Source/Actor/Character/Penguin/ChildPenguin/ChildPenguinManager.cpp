@@ -453,8 +453,8 @@ namespace app
 				diff.y = 0.0f;
 				const float dist = diff.Length();
 
-				/** 各子ペンギンの joinDistance 以内なら救出済みとみなす */
-				if (dist <= cp->GetJoinDistance())
+				/** 入隊半径（陣形設定）以内なら救出済みとみなす */
+				if (dist <= GetJoinRadius())
 				{
 					count++;
 				}
@@ -564,8 +564,8 @@ namespace app
 					diff.y = 0.0f;
 					float distToDaddy = diff.Length();
 
-					// 隊列に加わる距離(JoinDistance)の範囲にいる子ペンギンを呼ぶ
-					if (distToDaddy <= child->GetJoinDistance())
+					// 入隊半径（陣形設定）の範囲にいる子ペンギンを呼ぶ
+					if (distToDaddy <= GetJoinRadius())
 					{
 						targetPenguins.push_back(child);
 					}

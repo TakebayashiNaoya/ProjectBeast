@@ -39,13 +39,6 @@ namespace app
 
 		public:
 			/**
-			 * @brief 隊列に加わる距離を取得
-			 * @return 隊列に加わる距離
-			 */
-			float GetJoinDistance() const { return m_joinDistance; }
-
-
-			/**
 			 * @brief かまくらに入るイベントを開始する
 			 * @param targetPos 向かうべき入り口の座標（青い円）
 			 */
@@ -158,15 +151,6 @@ namespace app
 			float m_walkDistance;
 			/** 走りの上限距離（これを超えると滑りで追う） */
 			float m_runDistance;
-			/** 隊列に加わる距離（未参加→参加） */
-			float m_joinDistance;
-			/**
-			 * @brief 追跡をあきらめてその場で待機する距離（参加中→離脱）
-			 * @details m_joinDistance より大きい値にすること。
-			 */
-			float m_giveUpDistance;
-
-
 			/** かまくらイベント中かどうか */
 			bool m_isEnterIglooMode = false;
 			/** すでにかまくらの中に入ったか */
