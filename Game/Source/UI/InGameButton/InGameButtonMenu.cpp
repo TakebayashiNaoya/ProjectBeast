@@ -15,6 +15,7 @@ namespace app
 		InGameButtonMenu::InGameButtonMenu()
 		{}
 
+
 		void InGameButtonMenu::Update()
 		{
 			// ゲーム開始時のアニメーション
@@ -42,9 +43,6 @@ namespace app
 		}
 
 
-
-
-
 		void InGameButtonMenu::ButtonIconUpdate()
 		{
 			// UI表示を切り替えるラムダ式（ローカル関数）
@@ -60,13 +58,14 @@ namespace app
 
 			// 各ボタンに対して一括処理
 			updateUI(IsInputAButton(), "NotInputJumpIcon", "InputJumpIcon", "NotInputAbuttonIcon", "InputAbuttonIcon");
-			// ── 変更箇所：isSneakAvailable が false なら、Bボタンを押していても isInput は常に false ──
+			// isSneakAvailable が false なら、Bボタンを押していても isInput は常に false 
 			updateUI(IsInputBButton() && isSneakAvailable, "NotInputSneakIcon", "InputSneakIcon", "NotInputBbuttonIcon", "InputBbuttonIcon");
 			updateUI(IsInputXButton(), "NotInputSlideIcon", "InputSlideIcon", "NotInputXbuttonIcon", "InputXbuttonIcon");
 			updateUI(IsInputYButton(), "NotInputOrderIcon", "InputOrderIcon", "NotInputYbuttonIcon", "InputYbuttonIcon");
 
 			UpdateSneakIconColor();
 		}
+
 
 		void InGameButtonMenu::InitializeLogic()
 		{
@@ -88,6 +87,7 @@ namespace app
 			}
 		}
 
+
 		void InGameButtonMenu::UpdateSneakIconColor()
 		{
 			const Vector4 normalColor(1.0f, 1.0f, 1.0f, 1.0f);   // 通常（白）
@@ -107,20 +107,24 @@ namespace app
 			}
 		}
 
+
 		bool InGameButtonMenu::IsInputAButton() const
 		{
 			return g_pad[0]->IsPress(enButtonA);
 		}
+
 
 		bool InGameButtonMenu::IsInputBButton() const
 		{
 			return g_pad[0]->IsPress(enButtonB);
 		}
 
+
 		bool InGameButtonMenu::IsInputXButton() const
 		{
 			return g_pad[0]->IsPress(enButtonX);
 		}
+
 
 		bool InGameButtonMenu::IsInputYButton() const
 		{

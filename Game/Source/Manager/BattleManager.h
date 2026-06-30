@@ -218,6 +218,7 @@ namespace app
 		const actor::ChildPenguin* m_lastTargetChild = nullptr;
 
 
+
 		//============================================//
 		// スニーク関連
 		//============================================//
