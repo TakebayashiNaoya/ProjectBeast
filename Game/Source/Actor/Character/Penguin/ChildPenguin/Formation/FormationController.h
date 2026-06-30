@@ -34,16 +34,18 @@ namespace app
 			/**
 			 * @brief 陣形座標を計算する（現在の陣形に委譲）
 			 * @details レベルが上昇した場合は m_onLevelUp を呼び出す。
-			 * @param center  親ペンギンの座標
-			 * @param forward 親ペンギンの前方向（正規化済み）
-			 * @param out     計算結果を書き込むベクター（事前にclearしておくこと）
-			 * @param count   配置するペンギン数（= 現在のフォロワー数）
+			 * @param center         親ペンギンの座標
+			 * @param forward        親ペンギンの前方向（正規化済み）
+			 * @param out            計算結果を書き込むベクター（事前にclearしておくこと）
+			 * @param count          位置を生成するスロット数（m_outerRadius の算出に使用）
+			 * @param countForLevel  レベル判定に使うフォロワー数。-1 の場合は count を使う
 			 */
 			void CalculatePositions(
 				const Vector3& center,
 				const Vector3& forward,
 				std::vector<Vector3>& out,
-				int count
+				int count,
+				int countForLevel = -1
 			);
 
 			/**

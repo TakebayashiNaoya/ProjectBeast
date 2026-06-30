@@ -30,16 +30,18 @@ namespace app
 			const Vector3& center,
 			const Vector3& forward,
 			std::vector<Vector3>& out,
-			int count
+			int count,
+			int countForLevel
 		)
 		{
 			if (m_currentFormation == nullptr) return;
 
-			// 現在の陣形に座標計算を委譲
+			// 現在の陣形に座標計算を委譲（count は m_outerRadius の算出に使われる）
 			m_currentFormation->CalculatePositions(center, forward, out, count);
 
-			// フォロワー数に応じて陣形レベルを更新
-			const int newLevel = count / FOLLOWERS_PER_LEVEL;
+			// レベル判定は countForLevel で行う（-1 の場合は count を使う）
+			const int effective = (countForLevel < 0) ? count : countForLevel;
+			const int newLevel = effective / FOLLOWERS_PER_LEVEL;
 			if (newLevel > m_formationLevel && m_onLevelUp){
 				m_onLevelUp(newLevel);
 			}

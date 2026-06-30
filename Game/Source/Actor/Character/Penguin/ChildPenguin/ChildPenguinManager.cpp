@@ -127,7 +127,7 @@ namespace app
 					m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
 					m_formationPositions.clear();
 					m_formationController.CalculatePositions(
-						m_daddyPenguin->GetTransform().m_position, forward, m_formationPositions, 1);
+						m_daddyPenguin->GetTransform().m_position, forward, m_formationPositions, 1, 0);
 				}
 			}
 
@@ -462,14 +462,15 @@ namespace app
 			Vector3 forward = Vector3::Front;
 			m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
 
-			/** 現在のフォロワー数分だけ座標を生成する */
+			const int actual = static_cast<int>(m_followers.size());
+
+			/** count を actual+1 にすることで、現在のリングが満員になった瞬間に
+			 *  m_outerRadius が次のリング半径へ切り替わり、入隊範囲円が先取り拡大する。
+			 *  余分な1スロットは SortAndAssignFollowers では使われない。
+			 *  レベル判定は actual で行い、速度ボーナス等への影響を正確に保つ。 */
 			m_formationPositions.clear();
 			m_formationController.CalculatePositions(
-				center,
-				forward,
-				m_formationPositions,
-				static_cast<int>(m_followers.size())
-			);
+				center, forward, m_formationPositions, actual + 1, actual);
 		}
 
 
