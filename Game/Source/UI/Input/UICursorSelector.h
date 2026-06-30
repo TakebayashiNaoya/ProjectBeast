@@ -11,6 +11,12 @@ namespace app
 {
 	namespace ui
 	{
+		/**
+		 * @brief カーソルのインデックスを選択するクラス
+		 * @details
+		 * - 入力方向に応じてインデックスを動かすことができる
+		 * - インデックスが動いた場合はSEを鳴らす
+		 */
 		class CursorIndexSelector
 		{
 		public:

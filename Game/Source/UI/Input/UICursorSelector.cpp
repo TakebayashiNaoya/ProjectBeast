@@ -1,6 +1,6 @@
 ﻿/**
- * @file UIInputController.cpp
- * @brief UI入力制御を行うクラス
+ * @file UICursorSelector.cpp
+ * @brief UIカーソル選択を行うクラス
  * @author 藤谷
  */
 #include "stdafx.h"

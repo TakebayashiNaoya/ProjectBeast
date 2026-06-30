@@ -11,6 +11,13 @@ namespace app
 {
 	namespace ui
 	{
+		/**
+		 * @brief スティック/十字キーの方向入力を判定するクラス
+		 * @details
+		 * - スティックの倒しっぱなし状態に応じて、方向入力を判定する
+		 * - トリガー入力は倒しっぱなし状態に関係なく毎回一発判定する
+		 * - 倒しっぱなし状態でrepeatIntervalが指定されていればオートリピートする
+		 */
 		class AxisInputDetector
 		{
 		public:
