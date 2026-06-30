@@ -55,9 +55,13 @@ namespace app
 				if (auto* ui = GetUI<UIIcon>(Hash32(inputBtn)))    ui->m_isDraw = isInput;
 				};
 
+			// スニークが使用可能かどうか（シロクマとの距離）
+			const bool isSneakAvailable = BattleManager::GetInstance().IsSneakAvailable();
+
 			// 各ボタンに対して一括処理
 			updateUI(IsInputAButton(), "NotInputJumpIcon", "InputJumpIcon", "NotInputAbuttonIcon", "InputAbuttonIcon");
-			updateUI(IsInputBButton(), "NotInputSneakIcon", "InputSneakIcon", "NotInputBbuttonIcon", "InputBbuttonIcon");
+			// ── 変更箇所：isSneakAvailable が false なら、Bボタンを押していても isInput は常に false ──
+			updateUI(IsInputBButton() && isSneakAvailable, "NotInputSneakIcon", "InputSneakIcon", "NotInputBbuttonIcon", "InputBbuttonIcon");
 			updateUI(IsInputXButton(), "NotInputSlideIcon", "InputSlideIcon", "NotInputXbuttonIcon", "InputXbuttonIcon");
 			updateUI(IsInputYButton(), "NotInputOrderIcon", "InputOrderIcon", "NotInputYbuttonIcon", "InputYbuttonIcon");
 
