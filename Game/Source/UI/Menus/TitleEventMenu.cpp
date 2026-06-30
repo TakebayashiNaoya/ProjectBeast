@@ -7,6 +7,8 @@
 #include "TitleEventMenu.h"
 #include "UIMenuConstants.h"
 
+#include "Source/Sound/SoundManager.h"
+
 
 namespace app
 {
@@ -34,6 +36,8 @@ namespace app
 			, m_frameIcon(nullptr)
 			, m_frameBackIcon(nullptr)
 			, m_eventIcon{ nullptr }
+			, m_axisInputDetector()
+			, m_cursorSelector(static_cast<int>(EnEventType::Num))
 		{}
 
 
@@ -44,33 +48,14 @@ namespace app
 		void TitleEventMenu::Update()
 		{
 			const float stickX = m_gamePad->GetLStickXF();
-			if (fabsf(stickX) < STICK_THRESHOLD) m_isStickNeutral = true;
 
-			const int eventNum = static_cast<int>(EnEventType::Num);
+			// 右入力（十字キーまたはスティック右）でPositive、左入力でNegative。
+			const auto dir = m_axisInputDetector.Update(
+				stickX, m_gamePad->IsTrigger(enButtonLeft), m_gamePad->IsTrigger(enButtonRight), STICK_THRESHOLD);
 
-			// スティック入力（ニュートラル復帰後のみ）。
-			if (m_isStickNeutral && stickX > STICK_THRESHOLD)
+			if (m_cursorSelector.TryMove(dir))
 			{
-				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) + 1) % eventNum);
-				m_isStickNeutral = false;
-				SelectVisual();
-			}
-			if (m_isStickNeutral && stickX < -STICK_THRESHOLD)
-			{
-				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) - 1 + eventNum) % eventNum);
-				m_isStickNeutral = false;
-				SelectVisual();
-			}
-
-			// 十字キー入力（IsTriggerで独立して一発判定）。
-			if (m_gamePad->IsTrigger(enButtonRight))
-			{
-				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) + 1) % eventNum);
-				SelectVisual();
-			}
-			if (m_gamePad->IsTrigger(enButtonLeft))
-			{
-				m_selectIndex = static_cast<EnEventType>((static_cast<uint8_t>(m_selectIndex) - 1 + eventNum) % eventNum);
+				m_selectIndex = static_cast<EnEventType>(m_cursorSelector.Get());
 				SelectVisual();
 			}
 
@@ -104,6 +89,11 @@ namespace app
 			{
 				if (it) it->SetIsDraw(false);
 			}
+
+			// 入力検出・カーソル選択の状態をリセット。
+			m_axisInputDetector.Reset();
+			m_cursorSelector.Reset();
+			m_selectIndex = static_cast<EnEventType>(m_cursorSelector.Get());
 
 			// 最初の選択状態を設定。
 			SelectVisual();

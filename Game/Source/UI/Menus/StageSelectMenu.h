@@ -5,7 +5,9 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include "Source/UI/Parts/UIParts.h"
+
+#include "Source/UI/Input/UICursorSelector.h"
+#include "Source/UI/Input/UIInputController.h"
 
 
 namespace app
@@ -117,12 +119,12 @@ namespace app
 			/** JSONから読み込むメニューパラメーター */
 			struct StageSelectParam
 			{
-				float   inputInterval        = 0.2f;
-				float   inputThreshold       = 0.5f;
+				float   inputInterval = 0.2f;
+				float   inputThreshold = 0.5f;
 				float   tutorialCursorScaleX = 400.0f / 280.0f;
-				float   cursorBlinkDuration  = 0.5f;
+				float   cursorBlinkDuration = 0.5f;
 				Vector4 cursorBlinkStartColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-				Vector4 cursorBlinkEndColor   = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
+				Vector4 cursorBlinkEndColor = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
 				/** ステージごとの背景映像パス（Easy/Normal/Hard/Tutorial 順）*/
 				std::array<std::string, static_cast<uint8_t>(EnStageChoices::Max)> stageVideoPaths = {};
 			};
@@ -199,6 +201,11 @@ namespace app
 			bool m_isSelected;
 			/** JSONから読み込んだメニューパラメーター */
 			StageSelectParam m_param;
+
+
+			AxisInputDetector m_verticalInputDetector;
+			AxisInputDetector m_horizontalInputDetector;
+			CursorIndexSelector m_cursorSelector;
 		};
 	}
 }

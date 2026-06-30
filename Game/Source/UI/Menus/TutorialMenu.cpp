@@ -6,6 +6,8 @@
 #include "stdafx.h"
 #include "TutorialMenu.h"
 #include "UIMenuConstants.h"
+
+#include "Source/Sound/SoundManager.h"
 #include "Source/Util/CRC32.h"
 
 
@@ -44,6 +46,8 @@ namespace app
 			: m_currentPage(0)
 			, m_isClosed(false)
 			, m_isStickNeutralX(true)
+			, m_axisInputDetector()
+			, m_cursorSelector(TUTORIAL_PAGE_COUNT)
 		{}
 
 
@@ -73,6 +77,9 @@ namespace app
 
 			// ページ番号UIの初期化。
 			InitializePageNumber();
+
+			m_axisInputDetector.Reset();
+			m_cursorSelector.Reset();
 		}
 
 
@@ -94,7 +101,8 @@ namespace app
 			}
 
 			// ページインデックスをリセット。
-			m_currentPage = 0;
+			m_cursorSelector.Reset();
+			m_currentPage = m_cursorSelector.Get();
 		}
 
 
@@ -126,19 +134,15 @@ namespace app
 			}
 
 			const float stickX = g_pad[0]->GetLStickXF();
-			if (fabsf(stickX) < STICK_THRESHOLD) m_isStickNeutralX = true;
 
-			// 右入力（十字キーまたはスティック右）で次のページへ。
-			if (g_pad[0]->IsTrigger(enButtonRight) || (m_isStickNeutralX && stickX > STICK_THRESHOLD))
+			// 右入力（十字キーまたはスティック右）で次のページへ、左入力で前のページへ。
+			// Positive=右（+1）、Negative=左（-1）として、ページ切り替えとSE再生をまとめて行う。
+			const auto dir = m_axisInputDetector.Update(
+				stickX, g_pad[0]->IsTrigger(enButtonLeft), g_pad[0]->IsTrigger(enButtonRight), STICK_THRESHOLD);
+
+			if (m_cursorSelector.TryMove(dir))
 			{
-				m_currentPage = (m_currentPage + 1) % TUTORIAL_PAGE_COUNT;
-				m_isStickNeutralX = false;
-			}
-			// 左入力（十字キーまたはスティック左）で前のページへ。
-			else if (g_pad[0]->IsTrigger(enButtonLeft) || (m_isStickNeutralX && stickX < -STICK_THRESHOLD))
-			{
-				m_currentPage = (m_currentPage - 1 + TUTORIAL_PAGE_COUNT) % TUTORIAL_PAGE_COUNT;
-				m_isStickNeutralX = false;
+				m_currentPage = m_cursorSelector.Get();
 			}
 		}
 
