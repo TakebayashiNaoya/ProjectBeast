@@ -1,0 +1,31 @@
+[
+    {
+        "comment":"ミニマップのパラメーター",
+        "radius":114,
+        "limitDis":1000,
+        "centerPos":[ -600, 290, 0],
+        "seriousName": "BlueChilPen",
+        "clingyName": "PingChilPen",
+        "naughtyName": "YellowChilPen",
+        "clumsyName": "OrangeChilPen",
+        "caringName": "GreenChilPen",
+        "childPenWidth":10,
+        "childPenHeight":10,
+        "bearNestName": "BearNest",
+        "bearNestwidth": 10,
+        "bearNestHeight": 10,
+        "bearName": "Bear",
+        "bearWidth": 25,
+        "bearHeight": 25,
+        "whirlpoolName": "Whirlpool",
+        "whirlpoolWidth": 25,
+        "whirlpoolHeight": 25,
+        "iglooName": "Igloo",
+        "iglooWidth": 25,
+        "iglooHeight": 20,
+        "initPosition":[ 0, 0, 0],
+        "initScale":[ 1, 1, 1],
+        "initRotationDeg": [0, 0, 0],
+        "initColor":[ 255, 255, 255, 255]
+    }
+]

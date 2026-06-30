@@ -1017,6 +1017,9 @@
     <ClInclude Include="Source\UI\Menus\DebufMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\MiniMap\MiniMapTypes.h">
+      <Filter>Source\UI\MiniMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">

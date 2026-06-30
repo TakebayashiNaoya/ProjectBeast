@@ -62,7 +62,7 @@ namespace app
 		 * @detail Layoutの生成とBattleManagerへの配線を行う
 		 * @param daddyPenguin プレイヤーポインタ（睡眠クマ探索の基準座標に使用）
 		 */
-		void Initialize(actor::DaddyPenguin* daddyPenguin);
+		void Initialize();
 
 		/**
 		 * @brief カウントダウンフェーズの更新
@@ -155,6 +155,13 @@ namespace app
 		inline ui::RemainingChildMenu* GetRemainingChildMenu() const { return m_remainingChildPacket->GetMenu(); }
 		/** @brief デバフMenuを取得 */
 		inline ui::DebufMenu* GetDebufMenu() const { return m_debufPacket->GetMenu(); }
+		/** @brief イグループプロンプトMenuを取得 */
+		inline ui::IglooPromptMenu* GetIglooPromptMenu() const { return m_iglooPromptPacket->GetMenu(); }
+
+
+
+		void SetMiniMapIconNum(ui::EnMiniMapIconType type, uint8_t num);
+		void InitializeMapIcon();
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
@@ -170,13 +177,11 @@ namespace app
 		 */
 		void InitializeReactionSystem(const uint8_t enemyNum);
 
-
-	private:
 		/**
 		 * @brief BattleManagerへUI通知functionを登録する
-		 * @param daddyPenguin 睡眠クマ探索の基準座標に使用
+		 * @param daddyPenguin 親ペンギンのポインタ
 		 */
-		void RegisterObservers(actor::DaddyPenguin* daddyPenguin);
+		void RegisterObservers();
 
 
 	private:

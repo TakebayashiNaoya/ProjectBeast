@@ -6,17 +6,15 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
-#include "MiniMapStatus.h"
 #include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
-
-#include "Source/Actor/Character/penguin/daddyPenguin/DaddyPenguin.h"
 
 
 namespace app
 {
 	namespace ui
 	{
-		class DaddyPenguin;
+		/** 前方宣言 */
+		class MiniMapStatus;
 
 
 		class MiniMapMenu : public MenuBase
@@ -24,20 +22,59 @@ namespace app
 		public:
 			MiniMapMenu();
 			~MiniMapMenu();
-			void Update() override;
-			void InitializeLogic() override;
+			void Update() override final;
+			void InitializeLogic() override final;
 
+
+			//======================================//
+			// 外部からのアクセス関数
+			//======================================//
+		public:
 			/**
-			 * @brief 描画の設定。
-			 * @param isDraw 描画するかどうかのフラグ
+			 * @brief アイコンの数を設定する
 			 */
-			void SetDraw(const bool isDraw) { m_isDraw = isDraw; }
+			void InitializeMapIcon();
 
 			/**
-			 * @brief ワールド座標系をマップ座標系に変換する
+			 * @brief アイコンの数を設定する
+			 * @param type アイコンの種類
+			 * @param num アイコンの数
+			 */
+			void SetIconNum(const EnMiniMapIconType type, const uint8_t num);
+
+
+			void SetActorPositions(
+				const Vector3& centerActorPosition,
+				const ActorPositions& actorPositions
+			);
+
+
+			//======================================//
+			// カプセル化関数
+			//======================================//
+		private:
+			/**
+			 * @brief UIIconの描画フラグを設定する
+			 * @param icon UIIconのポインタ。
+			 * @param isDraw 描画するかどうかのフラグ。
+			 */
+			void SetDrawFlag(UIIcon* icon, const bool isDraw);
+
+
+			/**
+			 * @brief UIIconのポインタを取得、初期化する
+			 * @param icon UIIconのポインタ。
+			 * @param name UIIconの名前。
+			 */
+			UIIcon* GetAndInitIcon(const uint32_t key);
+
+
+			/**
+			 * @brief ワールド座標系をマップ座標系に変換する。
 			 * @param worldCenterPos マップの中心とするオブジェクトのワールド座標。
 			 * @param worldPos マップに表示したいオブジェクトのワールド座標。
 			 * @param mapPos 変換した後のマップ座標。
+			 * @return マップの範囲内なら true、範囲外なら false。
 			 */
 			bool WorldPosConverterToMapPos(
 				Vector3 worldCenterPos
@@ -45,59 +82,58 @@ namespace app
 				, Vector3& mapPos
 			);
 
+
 			/**
-			 * @brief マップのフレームアイコンをカメラの向きに併せて回転する用
+			 * @brief マップのフレームアイコンをカメラの向きに合わせて回転させる。
 			 */
 			void MapFrameRotation();
 
-			/**
-			 * @brief シロクマの巣のアイコンをマップに表示する用
-			 */
-			void MapPolarBearNest();
+			void UpdateDrawFlag();
+
 
 			/**
-			 * @brief 渦潮のアイコンをマップに表示する用
+			 * @brief マップのアイコンを描画する
+			 * @param isDraw 描画するかどうかのフラグ
+			 * @detail 親ペンギン、マップ、フレームのみ操作する
 			 */
-			void MapWhirlpool();
-
-			/**
-			 * @brief イグルーのアイコンをマップに表示する用
-			 */
-			void MapIgloo();
-
-			/**
-			 * @brief 子ペンギンのアイコンをマップに表示する用
-			 */
-			void MapChildPen();
-
-			/**
-			 * @brief 親ペンギンのアイコンをマップに表示する用
-			 */
-			void MapDaddyPen();
-
-			/**
-			 * @brief シロクマのアイコンをマップに表示する用
-			 */
-			void MapPolarBear();
-
-			/**
-			 * @brief 親ペンギンのポインタを設定。
-			 * @param daddy 親ペンギンのポインタ。
-			 */
-			inline void SetDaddyPenguin(actor::DaddyPenguin* daddy) { m_daddyPenguin = daddy; }
+			void DrawMapIcons(const bool isDraw);
 
 
 		private:
-			void SetDrawMovableIcon(bool isDraw);
-
-
-		private:
-			/** ミニマップのステータスをunique_ptrで所有 */
+			/** ミニマップのステータス */
 			std::unique_ptr<MiniMapStatus> m_miniMapStatus;
+
+			/** 親ペンギンのアイコン */
+			UIIcon* m_daddy;
+			/** マップのアイコン */
+			UIIcon* m_map;
+			/** マップのフレームアイコン */
+			UIIcon* m_frame;
+
+
+			struct MapIconInfo
+			{
+				/** アイコンの配列 */
+				std::vector<UIIcon*> icons;
+				/** アイコンの数 */
+				uint8_t num;
+				/** 呼ばれたのが一度目かどうか */
+				bool isFirstCall;
+
+
+				MapIconInfo();
+				~MapIconInfo() = default;
+			};
+
+
+
+			/** アイコンの種類ごとの情報を保持する配列 */
+			std::array<MapIconInfo, static_cast<uint8_t>(EnMiniMapIconType::Num)> m_iconVectors;
+
+
+
 			/** UIを表示するかのフラグ */
 			bool m_isDraw;
-			/** 親ペンギンのポインタ */
-			actor::DaddyPenguin* m_daddyPenguin;
 
 			/** ゲーム開始時のアニメーションロジック */
 			InGameStartingAnimLogic m_startingAnimLogic;

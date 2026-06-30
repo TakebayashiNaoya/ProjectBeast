@@ -4,12 +4,19 @@
  * @author 竹林
  */
 #pragma once
-#include <functional>
+#include "Source/UI/MiniMap/MiniMapTypes.h"
 
-namespace app { namespace actor { class ChildPenguin; } }
 
 namespace app
 {
+	/** 前方宣言 */
+	namespace actor
+	{
+		class ChildPenguin;
+		class DaddyPenguin;
+	}
+
+
 	/**
 	 * @brief バトルの情報受け渡しクラス
 	 * @detail ゲームのフェーズ管理は行わない。
@@ -146,6 +153,17 @@ namespace app
 			m_onBearReactionChanged = std::move(func);
 		}
 
+
+	public:
+		/**
+		 * @brief ミニマップUI通知functionを設定
+		 * @param func 引数なし。lambda内でUIへのセットを行う
+		 */
+		inline void SetOnMiniMapChanged(std::function<void(const ui::ActorPositions&)> func)
+		{
+			m_onMiniMapChanged = std::move(func);
+		}
+
 		/**
 		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
 		 */
@@ -167,6 +185,10 @@ namespace app
 
 		/** クマのリアクションUI更新通知 */
 		std::function<void()> m_onBearReactionChanged;
+
+
+		/** ミニマップUI更新通知 */
+		std::function<void(const ui::ActorPositions&)> m_onMiniMapChanged;
 
 
 
@@ -194,6 +216,30 @@ namespace app
 		 * サブビュー終了時にnullptrへリセットする。
 		 */
 		const actor::ChildPenguin* m_lastTargetChild = nullptr;
+
+
+
+		//============================================//
+		// 親ペンギン関連
+		//============================================//
+	public:
+		/**
+		 * @brief 親ペンギンを設定
+		 * @param dadyPenguin 親ペンギンのポインタ
+		 */
+		void SetDaddyPenguin(actor::DaddyPenguin* dadyPenguin) { m_daddyPenguin = dadyPenguin; }
+
+
+		/**
+		 * @brief 親ペンギンを取得
+		 * @return 親ペンギンのポインタ
+		 */
+		actor::DaddyPenguin* GetDaddyPenguin() const { return m_daddyPenguin; }
+
+
+	private:
+		/** 親ペンギンのポインタ */
+		actor::DaddyPenguin* m_daddyPenguin = nullptr;
 
 
 
