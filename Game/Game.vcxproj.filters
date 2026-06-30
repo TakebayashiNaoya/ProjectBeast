@@ -109,6 +109,9 @@
     <Filter Include="Source\Vfx">
       <UniqueIdentifier>{283f31a8-a0a6-437e-b46e-10de1f9b5c85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Actor\Character\penguin\ChildPenguin\Formation">
+      <UniqueIdentifier>{30c2f0f7-74f5-45cf-9168-6930daae46eb}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\UI\BearReaction">
       <UniqueIdentifier>{65fa1729-2cfa-455d-96f1-6b17d7826e6e}</UniqueIdentifier>
     </Filter>
@@ -537,6 +540,18 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Menus\DebufMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationController.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationRangeVisualizer.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\TerrainCircle.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.cpp">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\BearReaction\BearReactionSystem.cpp">
       <Filter>Source\UI\BearReaction</Filter>
@@ -1016,6 +1031,18 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\DebufMenu.h">
       <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationController.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationRangeVisualizer.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\TerrainCircle.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.h">
+      <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\MiniMap\MiniMapTypes.h">
       <Filter>Source\UI\MiniMap</Filter>
