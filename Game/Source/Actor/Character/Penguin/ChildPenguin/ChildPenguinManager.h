@@ -177,7 +177,7 @@ namespace app
 
 			/**
 			 * @brief 救出済み子ペンギンの数を取得
-			 * @details コマンドに関係なく、各子ペンギンの joinDistance 以内にいる数を返す
+			 * @details 現在隊列（m_followers）に参加している子ペンギンの数を返す
 			 * @return 救出済み子ペンギンの数
 			 */
 			int GetRescuedNum() const;
