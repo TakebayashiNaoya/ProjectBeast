@@ -110,7 +110,7 @@ namespace app
 			InitializeWhirlpoolInfo();
 
 			const MasterWhirlpoolParameter* param = GetParam();
-			const float                     wpRadius = (param != nullptr) ? param->whirlpoolRadius : 200.0f;
+			const float wpRadius = (param != nullptr) ? param->whirlpoolRadius : 200.0f;
 
 			// イテレータで走査し、targetがnullptrのエントリを安全に削除する
 			for (auto it = m_wpPowerInfos.begin(); it != m_wpPowerInfos.end(); )
@@ -134,9 +134,6 @@ namespace app
 				// 渦潮から子ペンギンへのベクトルを更新
 				it->toTargetVector = it->target->GetTransform().m_position - whirlpoolPos;
 
-				const Vector3 toTargetXZ = Vector3(it->toTargetVector.x, 0.0f, it->toTargetVector.z);
-				const float   distXZ = toTargetXZ.Length();
-
 				// Bigger状態ではスケール比率に応じて判定半径を動的に広げる
 				float effectiveRadius = wpRadius;
 				if (m_owner->GetState() == Whirlpool::EnWhirlpoolState::Bigger)
@@ -147,10 +144,9 @@ namespace app
 					effectiveRadius = wpRadius * ratio;
 				}
 
-				// 渦潮の範囲内に入ったら影響フラグを立てる
-				if (!it->isAffected && distXZ <= effectiveRadius)
+				// 捕獲判定
+				if (ShouldCapture(*it, effectiveRadius))
 				{
-					const MasterWhirlpoolParameter* param = GetParam();
 					const float orbitOffsetVariation = (param != nullptr) ? param->orbitOffsetVariation : 30.0f;
 					const float rotateScaleVariation = (param != nullptr) ? param->rotateScaleVariation : 0.3f;
 
@@ -168,12 +164,46 @@ namespace app
 				// 影響を受けているペンギンのフェーズ処理
 				if (it->isAffected)
 				{
+					// 救出判定
+					if (ShouldRescue(*it))
+					{
+						it->isAffected = false;
+						it->target->GetStateMachine()->SetIsInWhirlpool(false);
+						m_cpManager->UnregisterDowning(it->target);
+						m_cpManager->AddFollower(it->target);
+						++it;
+						continue;
+					}
+
 					it->target->GetStateMachine()->SetIsInWhirlpool(true);
 					UpdateAttract(*it, deltaTime);
 				}
 
 				++it;
 			}
+		}
+
+
+		bool WhirlpoolPowerSytem::ShouldCapture(const WhirlpoolPowerInfo& info, float effectiveRadius) const
+		{
+			if (info.isAffected) return false;
+
+			const Vector3 toTargetXZ(info.toTargetVector.x, 0.0f, info.toTargetVector.z);
+			if (toTargetXZ.Length() > effectiveRadius) return false;
+
+			return !m_cpManager->IsWhirlpoolImmune(info.target);
+		}
+
+
+		bool WhirlpoolPowerSytem::ShouldRescue(const WhirlpoolPowerInfo& info) const
+		{
+			if (!info.isAffected) return false;
+			if (!m_cpManager->HasWhirlpoolResistance()) return false;
+
+			const Vector3 daddyPos = m_cpManager->GetDaddyPosition();
+			const float dx = info.target->GetTransform().m_position.x - daddyPos.x;
+			const float dz = info.target->GetTransform().m_position.z - daddyPos.z;
+			return sqrtf(dx * dx + dz * dz) <= m_cpManager->GetJoinRadius(m_cpManager->GetFollowersNum());
 		}
 
 

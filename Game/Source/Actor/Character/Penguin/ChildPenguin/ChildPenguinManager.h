@@ -235,6 +235,27 @@ namespace app
 			 */
 			float GetJoinRadius()  const { return m_formationController.GetJoinRadius(); }
 
+			/**
+			 * @brief 現在の陣形が渦潮耐性パッシブを持つか
+			 */
+			bool HasWhirlpoolResistance() const { return m_formationController.HasWhirlpoolResistance(); }
+
+			/**
+			 * @brief 指定フォロワー数に対応する入隊判定半径を返す
+			 * @param count フォロワー数
+			 */
+			float GetJoinRadius(int count) const { return m_formationController.GetJoinRadius(count); }
+
+			/**
+			 * @brief 指定ペンギンが渦潮の捕獲を免れるか
+			 * @details ディフェンス陣形かつフォロワーである場合に true を返す
+			 * @param penguin 判定するペンギン
+			 */
+			bool IsWhirlpoolImmune(const ChildPenguin* penguin) const
+			{
+				return HasWhirlpoolResistance() && IsFollower(penguin);
+			}
+
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
 			DaddyPenguin* m_daddyPenguin = nullptr;
