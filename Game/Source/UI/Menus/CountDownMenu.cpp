@@ -35,7 +35,7 @@ namespace app
 			constexpr float COUNT_DOWN_DELTA_VALUE = 4.0f;
 
 			// カウントダウン前の遅延時間。
-			constexpr float COUNT_DOWN_DELAY_TIME = 4.5f;
+			constexpr float COUNT_DOWN_DELAY_TIME = 3.0f;
 
 			// 初期化時の値。
 			constexpr float TIME_VALUE_FOUR = 4.0f;
