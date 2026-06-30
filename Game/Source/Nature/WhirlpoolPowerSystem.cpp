@@ -203,7 +203,7 @@ namespace app
 			const Vector3 daddyPos = m_cpManager->GetDaddyPosition();
 			const float dx = info.target->GetTransform().m_position.x - daddyPos.x;
 			const float dz = info.target->GetTransform().m_position.z - daddyPos.z;
-			return sqrtf(dx * dx + dz * dz) <= m_cpManager->GetJoinRadius();
+			return sqrtf(dx * dx + dz * dz) <= m_cpManager->GetJoinRadius(m_cpManager->GetFollowersNum());
 		}
 
 

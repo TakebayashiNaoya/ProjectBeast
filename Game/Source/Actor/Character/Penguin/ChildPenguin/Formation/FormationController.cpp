@@ -70,6 +70,12 @@ namespace app
 		}
 
 
+		float FormationController::GetJoinRadius(int count) const
+		{
+			return m_currentFormation ? m_currentFormation->GetJoinRadius(count) : 0.0f;
+		}
+
+
 		void FormationController::CalculateNextLevelPositions(
 			const Vector3& center,
 			const Vector3& forward,
