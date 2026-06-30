@@ -77,7 +77,7 @@ namespace app
 		{
 			if (g_pad[0]->IsTrigger(enButtonA))
 			{
-				SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+				SoundManager::Get().PlaySE(enSoundKind_ButtonEnter);
 				m_nextScene = true;
 			}
 		}

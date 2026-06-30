@@ -6,6 +6,9 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
+#include "Source/UI/Input/UICursorSelector.h"
+#include "Source/UI/Input/UIInputController.h"
+
 
 namespace app
 {
@@ -74,6 +77,11 @@ namespace app
 			bool m_isClosed;
 			/** スティック左右ニュートラル判定 */
 			bool m_isStickNeutralX;
+
+			/** コントローラの入力制御 */
+			AxisInputDetector m_axisInputDetector;
+			/** カーソル移動時の制御 */
+			CursorIndexSelector m_cursorSelector;
 		};
 	}
 }

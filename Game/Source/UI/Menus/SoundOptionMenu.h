@@ -6,6 +6,9 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
+#include "Source/UI/Input/UICursorSelector.h"
+#include "Source/UI/Input/UIInputController.h"
+
 
 namespace app
 {
@@ -89,7 +92,7 @@ namespace app
 			 * @param isReturn 戻るフラグ
 			 */
 			void SetBack(bool isBack) { m_isBack = isBack; }
-			
+
 
 		private:
 			/** 現在値 */
@@ -101,6 +104,13 @@ namespace app
 			bool m_isStickNeutralY;
 			/** スティック左右ニュートラル判定 */
 			bool m_isStickNeutralX;
+
+			/** スティックのY入力検出器 */
+			AxisInputDetector m_stickYDetector;
+			/** スティックのX入力検出器 */
+			AxisInputDetector m_stickXDetector;
+			/** カーソルのインデックス選択器 */
+			CursorIndexSelector m_cursorSelector;
 		};
 	}
 }

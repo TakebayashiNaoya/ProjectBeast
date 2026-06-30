@@ -5,9 +5,10 @@
  */
 #include "stdafx.h"
 #include "PauseScreenMenu.h"
-#include "UIMenuConstants.h"
-#include "Source/Util/CRC32.h"
 #include "SoundOptionMenu.h"
+#include "Source/Sound/SoundManager.h"
+#include "Source/Util/CRC32.h"
+#include "UIMenuConstants.h"
 
 
 namespace app
@@ -150,6 +151,8 @@ namespace app
 			, m_isSound(false)
 			, m_isRule(false)
 			, m_isStickNeutralY(true)
+			, m_axisInputDetector()
+			, m_cursorSelector(PAUSE_SCREEN_BUTTON_SIZE)
 		{}
 
 
@@ -185,40 +188,42 @@ namespace app
 
 		void PauseScreenMenu::MoveCursor()
 		{
-			int currentType = static_cast<int>(m_currentType);
-			int typeMax = static_cast<int>(PauseScreenType::GoBackTitleType);
-			int typeMin = PAUSE_SCREEN_MIN_VALUE;
-
 			const float stickY = g_pad[0]->GetLStickYF();
-			if (fabsf(stickY) < STICK_THRESHOLD) m_isStickNeutralY = true;
 
-			if (g_pad[0]->IsTrigger(enButtonUp) || (m_isStickNeutralY && stickY > STICK_THRESHOLD)) {
-				currentType = (currentType - PAUSE_SCREEN_ONE_VALUE < typeMin) ? typeMax : currentType - PAUSE_SCREEN_ONE_VALUE;
-				m_isStickNeutralY = false;
+			// 上入力でNegative（-1）、下入力でPositive（+1）として、
+			// PAUSE_SCREEN_MIN_VALUEを基準にしたオフセット付きインデックスをループ移動する。
+			const auto dir = m_axisInputDetector.Update(
+				-stickY, g_pad[0]->IsTrigger(enButtonUp), g_pad[0]->IsTrigger(enButtonDown), STICK_THRESHOLD);
+
+			if (m_cursorSelector.TryMove(dir))
+			{
+				m_currentType = static_cast<PauseScreenType>(PAUSE_SCREEN_MIN_VALUE + m_cursorSelector.Get());
 			}
-			else if (g_pad[0]->IsTrigger(enButtonDown) || (m_isStickNeutralY && stickY < -STICK_THRESHOLD)) {
-				currentType = (currentType + PAUSE_SCREEN_ONE_VALUE > typeMax) ? typeMin : currentType + PAUSE_SCREEN_ONE_VALUE;
-				m_isStickNeutralY = false;
-			}
-			m_currentType = static_cast<PauseScreenType>(currentType);
 		}
 
 
 		void PauseScreenMenu::EnterType()
 		{
 			if (!g_pad[0]->IsTrigger(enButtonA))return;
+
+
+
 			switch (m_currentType)
 			{
 			case PauseScreenType::ReturnPlayType:
+				// ゲームに戻る場合は別でSEを再生
 				m_isRetry = true;
 				break;
 			case PauseScreenType::SoundOptionType:
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 				m_isSound = true;
 				break;
 			case PauseScreenType::RuleType:
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 				m_isRule = true;
 				break;
 			case PauseScreenType::GoBackTitleType:
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 				m_isGoTitle = true;
 				break;
 			default:
@@ -234,6 +239,11 @@ namespace app
 			InitializeIcon();
 			// ボタンの初期化。
 			InitializeButton();
+
+			// 入力検出・カーソル選択の状態をリセット。
+			m_axisInputDetector.Reset();
+			m_cursorSelector.Reset();
+			m_currentType = static_cast<PauseScreenType>(PAUSE_SCREEN_MIN_VALUE + m_cursorSelector.Get());
 		}
 
 
