@@ -612,6 +612,14 @@ namespace app
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 
+			/** 渦潮に飲まれている間は隊を抜けて入力をゼロにする */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
 			/** 親との距離を取得 */
 			const float distDaddy = GetDistanceToDaddy();
 
@@ -683,6 +691,14 @@ namespace app
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
+
+			/** 渦潮に飲まれている間は隊を抜けて入力をゼロにする */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
 
 			// エフェクトの再生と位置更新を行うラムダ。
 			auto updateClingyEffect = [&]()
@@ -861,6 +877,15 @@ namespace app
 			/** 親との距離を取得 */
 			const float distDaddy = GetDistanceToDaddy();
 
+			/** 意図せず渦潮に飲まれている間は隊を抜けて入力をゼロにする
+			 *  （意図的な場合は後続の GetIsGoingToWhirlpool() ブロックで処理） */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool() && !m_naughtyStateMachine->GetIsGoingToWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
 			/** 世話焼きペンギンに制止されているときはその場で待機する */
 			/** （命令に関わらず最優先で制止を適用する） */
 			if (m_isRestrained)
@@ -1000,6 +1025,7 @@ namespace app
 
 					// 巻き込まれたフラグを立てて、入力はゼロにしてシステムに身を任せる
 					m_wasSwallowedByWhirlpool = true;
+					if (m_isFollowing) { m_isFollowing = false; }
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 					PlayLivelyEffect();
 					return;
@@ -1274,6 +1300,15 @@ namespace app
 			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
 			if (CheckAndFlee()) return;
 
+			/** 渦潮に飲まれている間は隊を抜けて入力をゼロにする */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_wasSliding = false;
+				return;
+			}
+
 			/** 待機命令のとき */
 			if (!isFollowCmd)
 			{
@@ -1395,6 +1430,7 @@ namespace app
 					manager->UnregisterAssigned(m_interventionTarget);
 					m_interventionTarget = nullptr;
 				}
+				if (m_isFollowing) { m_isFollowing = false; }
 				// 自分の入力もゼロにしてシステムに身を任せる
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;

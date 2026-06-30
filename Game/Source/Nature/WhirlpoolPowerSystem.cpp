@@ -160,6 +160,9 @@ namespace app
 					it->radiusOffsetTarget = 0.0f;
 					it->individualOrbitOffset = GenerateRandomFloat(-orbitOffsetVariation, orbitOffsetVariation);
 					it->individualRotateScale = 1.0f + GenerateRandomFloat(-rotateScaleVariation, rotateScaleVariation);
+
+					// 渦潮に飲まれた瞬間に隊から抜ける
+					m_cpManager->RemoveFollower(it->target);
 				}
 
 				// 影響を受けているペンギンのフェーズ処理
