@@ -29,6 +29,10 @@ namespace app
 		constexpr float SUB_CAMERA_HEIGHT = 60.0f;
 		/** ペンギンのルート座標から注視点までのYオフセット */
 		constexpr float SUB_CAMERA_TARGET_HEIGHT = 0.0f;
+
+		/** スニークが有効になるシロクマへの最大距離 */
+		constexpr float SNEAK_AVAILABLE_DIST = 200.0f;
+		constexpr float SNEAK_AVAILABLE_DIST_SQ = SNEAK_AVAILABLE_DIST * SNEAK_AVAILABLE_DIST;
 	}
 
 
@@ -176,10 +180,35 @@ namespace app
 			m_onMiniMapChanged(positions);
 		}
 
+
+		//--------------------------------------------//
+		// スニーク可否の更新
+		//--------------------------------------------//
+		UpdateSneakAvailability();
+
 		//--------------------------------------------//
 		// サブカメラの更新
 		//--------------------------------------------//
 		UpdateSubCamera();
+	}
+
+
+	void BattleManager::UpdateSneakAvailability()
+	{
+		const auto enemies = actor::EnemyManager::GetInstance()->GetEnemies();
+		const Vector3 daddyPos = actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
+
+		float nearestDistSq = FLT_MAX;
+		for (const auto* enemy : enemies)
+		{
+			if (enemy == nullptr) continue;
+			Vector3 diff = enemy->GetTransform().m_position - daddyPos;
+			diff.y = 0.0f; // 高低差は無視
+			const float distSq = diff.LengthSq();
+			if (distSq < nearestDistSq) nearestDistSq = distSq;
+		}
+
+		m_isSneakAvailable = (nearestDistSq <= SNEAK_AVAILABLE_DIST_SQ);
 	}
 
 
