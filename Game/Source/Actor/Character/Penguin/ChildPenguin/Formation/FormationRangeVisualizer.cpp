@@ -13,7 +13,7 @@ namespace app
 	{
 		const Vector4 FormationRangeVisualizer::JOIN_EDGE_COLOR = { 0.2f, 1.0f, 0.2f, 1.0f  };  /** 入隊範囲（縁） */
 		const Vector4 FormationRangeVisualizer::JOIN_FILL_COLOR = { 0.2f, 1.0f, 0.2f, 0.25f };  /** 入隊範囲（塗りつぶし） */
-		const Vector4 FormationRangeVisualizer::SLOT_COLOR      = { 1.0f, 1.0f, 1.0f, 1.0f  };  /** スロット */
+		//const Vector4 FormationRangeVisualizer::SLOT_COLOR    = { 1.0f, 1.0f, 1.0f, 1.0f  };  /** スロット */
 
 
 		void FormationRangeVisualizer::Init()
@@ -29,7 +29,7 @@ namespace app
 
 			m_joinCircle.Init(RANGE_SEGS, JOIN_EDGE_COLOR, JOIN_FILL_COLOR, true);
 
-			//// スロットマーカーを全て事前確保（Update()内でのGPUバッファ作成を避ける）
+			// TODO: スロットマーカーの初期化。実装時は以下を有効化する。
 			//for (int i = 0; i < MAX_SLOT_COUNT; ++i)
 			//{
 			//	m_slotCircles[i].Init(SLOT_SEGS, SLOT_COLOR, SLOT_COLOR, false);
@@ -153,7 +153,7 @@ namespace app
 				if (joinRadius > 0.0f) m_joinCircle.Update(center, joinRadius);
 			}
 
-			//// スロットマーカーの更新（フォロワーの有無に関係なく常に表示）
+			// TODO: スロットマーカーの更新。実装時は以下を有効化する。
 			//m_activeSlotCount = static_cast<int>(std::min<size_t>(slotPositions.size(), MAX_SLOT_COUNT));
 			//for (int i = 0; i < m_activeSlotCount; ++i)
 			//{
@@ -165,7 +165,7 @@ namespace app
 		void FormationRangeVisualizer::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			if (!m_isInitialized) return;
-			if (!m_isVisible && m_activeSlotCount == 0) return;
+			if (!m_isVisible) return;
 
 			// 定数バッファに VP 行列をコピー
 			Matrix VP;
@@ -188,6 +188,7 @@ namespace app
 			{
 				m_joinCircle.RenderEdge(rc);
 			}
+			// TODO: スロットマーカーの描画。実装時は以下を有効化する。
 			//for (int i = 0; i < m_activeSlotCount; ++i)
 			//{
 			//	m_slotCircles[i].RenderEdge(rc);

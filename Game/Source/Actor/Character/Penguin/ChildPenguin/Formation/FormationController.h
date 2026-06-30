@@ -109,10 +109,10 @@ namespace app
 				static_cast<size_t>(EnFormationType::Num)> m_formations;	/** 陣形の種類ごとのインスタンスを保持する配列 */
 
 			IFormation*     m_currentFormation = nullptr;					/** 現在の陣形インスタンスへのポインタ */
-			EnFormationType m_currentType      = EnFormationType::Circle;	/**< 現在の陣形種別 */
+			EnFormationType m_currentType      = EnFormationType::Circle;	/** 現在の陣形種別 */
 			int             m_formationLevel   = 0;							/** 現在の陣形レベル */
 
-			std::function<void(int)> m_onLevelUp;  /**< レベルアップ時のコールバック */
+			std::function<void(int)> m_onLevelUp;  /** レベルアップ時のコールバック */
 		};
 	}
 }

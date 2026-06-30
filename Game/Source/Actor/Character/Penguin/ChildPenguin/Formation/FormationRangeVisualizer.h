@@ -76,16 +76,19 @@ namespace app
 		private:
 			static const Vector4 JOIN_EDGE_COLOR;   /** 緑（入隊半径・縁） */
 			static const Vector4 JOIN_FILL_COLOR;   /** 緑（入隊半径・塗りつぶし） */
-			static const Vector4 SLOT_COLOR;        /** 白（スロットマーカー） */
 
-			static constexpr int   RANGE_SEGS	   = 32;	/** 入隊半径リングの分割数 */
-			static constexpr int   SLOT_SEGS       = 12;	/** スロットマーカーの分割数 */
-			static constexpr float SLOT_RADIUS     = 5.0f;  /** スロットマーカーの半径 */
-			static constexpr int   MAX_SLOT_COUNT  = 100;	/** スロットマーカーの事前確保数（一周分 = リング k のスロット数 k*9、リング11まで対応） */
+			static constexpr int   RANGE_SEGS = 32;  /** 入隊半径リングの分割数 */
 
-			TerrainCircle m_joinCircle;					  /** 入隊半径円（緑・塗りつぶしあり） */
-			TerrainCircle m_slotCircles[MAX_SLOT_COUNT];  /** スロットマーカー円（Init()で全て事前確保） */
-			int m_activeSlotCount = 0;					  /** 現フレームで描画するスロットマーカーの個数 */
+			// TODO: スロットマーカー実装時に以下を有効化する。
+			//       合わせて Init() / Update() / Render() 内のコメントアウト部分も有効化すること。
+			//static const Vector4 SLOT_COLOR;                  /** 白（スロットマーカー） */
+			//static constexpr int   SLOT_SEGS      = 12;      /** スロットマーカーの分割数 */
+			//static constexpr float SLOT_RADIUS    = 5.0f;    /** スロットマーカーの半径 */
+			//static constexpr int   MAX_SLOT_COUNT = 100;     /** スロットマーカーの事前確保数（リング k のスロット数 k*9、リング11まで対応） */
+			//TerrainCircle m_slotCircles[MAX_SLOT_COUNT];      /** スロットマーカー円 */
+			//int           m_activeSlotCount = 0;              /** 現フレームで描画するスロットマーカーの個数 */
+
+			TerrainCircle m_joinCircle;  /** 入隊半径円（緑・塗りつぶしあり） */
 
 			RootSignature  m_rootSignature;      /** ルートシグネチャ */
 			Shader         m_vs;                 /** 頂点シェーダ */
