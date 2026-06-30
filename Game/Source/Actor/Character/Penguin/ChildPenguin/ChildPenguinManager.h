@@ -4,9 +4,11 @@
  * @author 立山、竹林
  */
 #pragma once
+#include <unordered_set>
 #include "ChildPenguinTypes.h"
 #include "Source/Util/Curve.h"
-#include <unordered_set>
+#include "Formation/FormationController.h"
+#include "Formation/FormationRangeVisualizer.h"
 
 
 namespace app
@@ -175,7 +177,7 @@ namespace app
 
 			/**
 			 * @brief 救出済み子ペンギンの数を取得
-			 * @details コマンドに関係なく、各子ペンギンの joinDistance 以内にいる数を返す
+			 * @details 現在隊列（m_followers）に参加している子ペンギンの数を返す
 			 * @return 救出済み子ペンギンの数
 			 */
 			int GetRescuedNum() const;
@@ -195,7 +197,7 @@ namespace app
 
 		private:
 			/**
-			 * @brief 陣形の座標を計算する
+			 * @brief 陣形の座標を計算する（FormationController に委譲）
 			 */
 			void CalculateFormationPositions();
 
@@ -204,6 +206,55 @@ namespace app
 			 */
 			void SortAndAssignFollowers();
 
+			/**
+			 * @brief 次レベルの空きスロット座標を計算して m_nextLevelSlots に格納する
+			 * @param center 親ペンギンの座標
+			 */
+			void CalculateNextLevelSlots(const Vector3& center);
+
+
+		public:
+			/**
+			 * @brief 陣形を切り替える
+			 * @param type 切り替え先の陣形
+			 */
+			void SwitchFormation(EnFormationType type) { m_formationController.SwitchFormation(type); }
+
+			/**
+			 * @brief 現在の陣形種別を取得する
+			 */
+			EnFormationType GetCurrentFormationType() const { return m_formationController.GetCurrentType(); }
+
+			/**
+			 * @brief 陣形の移動速度倍率を取得する
+			 */
+			float GetFormationSpeedMultiplier() const { return m_formationController.GetSpeedMultiplier(); }
+
+			/**
+			 * @brief 入隊判定半径を取得する（現在のフォロワー数に比例）
+			 */
+			float GetJoinRadius()  const { return m_formationController.GetJoinRadius(); }
+
+			/**
+			 * @brief 現在の陣形が渦潮耐性パッシブを持つか
+			 */
+			bool HasWhirlpoolResistance() const { return m_formationController.HasWhirlpoolResistance(); }
+
+			/**
+			 * @brief 指定フォロワー数に対応する入隊判定半径を返す
+			 * @param count フォロワー数
+			 */
+			float GetJoinRadius(int count) const { return m_formationController.GetJoinRadius(count); }
+
+			/**
+			 * @brief 指定ペンギンが渦潮の捕獲を免れるか
+			 * @details ディフェンス陣形かつフォロワーである場合に true を返す
+			 * @param penguin 判定するペンギン
+			 */
+			bool IsWhirlpoolImmune(const ChildPenguin* penguin) const
+			{
+				return HasWhirlpoolResistance() && IsFollower(penguin);
+			}
 
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
@@ -212,18 +263,17 @@ namespace app
 			/** 現在、親に追従している子ペンギンのリスト（隊列） */
 			std::vector<ChildPenguin*> m_followers;
 
-			/** 計算された陣形の目標座標（最大100個） */
+			/** 計算された陣形の目標座標 */
 			std::vector<Vector3> m_formationPositions;
 
-			/** 陣形調整用のパラメータ */
-			const int   MAX_FORMATION_COUNT = 100;   /** 隊列の最大数 */
-			const float FORMATION_BASE_RADIUS = 0.0f;  /** 一番内側の円の半径 */
-			const float FORMATION_RADIUS_STEP = 20.0f;
-			const float FORMATION_MIN_DISTANCE = 15.0f; /** ペンギン同士の最低間隔 */
+			/** 次レベルの空きスロット座標（ビジュアライザー向け） */
+			std::vector<Vector3> m_nextLevelSlots;
 
-			/** フォロワー数が変化したときのみ陣形オフセットを再計算するためのキャッシュ */
-			int m_cachedFollowerCount = -1;
-			std::vector<Vector3> m_formationOffsets;
+			/** 陣形コントローラー */
+			FormationController m_formationController;
+
+			/** 陣形範囲ビジュアライザー */
+			FormationRangeVisualizer m_rangeVisualizer;
 
 
 

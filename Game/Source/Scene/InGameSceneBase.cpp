@@ -224,6 +224,7 @@ namespace app
 
 			auto* manager = actor::ChildPenguinManager::GetInstance();
 			manager->SetDaddyPenguin(m_daddyPenguin);
+			manager->Start();
 
 			/** ステージ上の総ペンギン数をセット */
 			const int totalNum = cfg.serious + cfg.clingy + cfg.naughty + cfg.clumsy + cfg.caring;
@@ -534,6 +535,7 @@ namespace app
 		if (!m_isPauseEntered)
 		{
 			SoundManager::Get().StopAllSE();
+			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 			nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(true);
 			m_isPauseEntered = true;
 		}
@@ -570,6 +572,7 @@ namespace app
 				pauseMenu->IsRetry(false);
 				nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(false);
 				SceneManager::GetInstance()->SetPause(false);
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonBack);
 				/** ポーズ解除時にフラグをリセットする */
 				m_isPauseEntered = false;
 			}
@@ -577,6 +580,7 @@ namespace app
 			else if (pauseMenu->IsSound())
 			{
 				pauseMenu->IsSound(false);
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 				m_pauseState = PauseState::SoundOption;
 			}
 			/** ルール画面へ */
@@ -589,6 +593,7 @@ namespace app
 					tutorialMenu->SetClosed(false);
 					tutorialMenu->InitializeLogic();
 				}
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 				m_pauseState = PauseState::Tutorial;
 			}
 			/** タイトルへ戻る */
@@ -596,6 +601,7 @@ namespace app
 			{
 				pauseMenu->IsGoTitle(false);
 				SceneManager::GetInstance()->SetPause(false);
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonBack);
 				/** ポーズ解除時にフラグをリセットする */
 				m_isPauseEntered = false;
 				m_goTitle = true;
@@ -618,6 +624,7 @@ namespace app
 			/** Bボタンでポーズ画面に戻る */
 			if (g_pad[0]->IsTrigger(enButtonB))
 			{
+				SoundManager::Get().PlaySE(enSoundKind_ButtonBack);
 				m_pauseState = PauseState::Pause;
 			}
 			break;
@@ -638,6 +645,7 @@ namespace app
 				if (tutorialMenu->IsClosed())
 				{
 					tutorialMenu->SetClosed(false);
+					SoundManager::Get().PlaySE(enSoundKind_ButtonBack);
 					m_pauseState = PauseState::Pause;
 				}
 			}

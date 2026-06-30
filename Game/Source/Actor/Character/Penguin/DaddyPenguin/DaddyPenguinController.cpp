@@ -8,11 +8,12 @@
 #include "DaddyPenguinController.h"
 #include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
+#include "Source/Manager/BattleManager.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include <algorithm> // std::min用
 
 
@@ -70,6 +71,10 @@ namespace app
 			/** Bボタンが押されているか（スニークのトグル用） */
 			bool isPressB = g_pad[0]->IsPress(enButtonB);
 
+			// シロクマに近づいているときだけ、Bボタンによる強制忍び足を有効にする
+			// （遠いときにBを押しても、歩き自体は別途スティック量で判定されるので問題ない）
+			bool isForceSneakByButton = isPressB && BattleManager::GetInstance().IsSneakAvailable();
+
 			Vector3 moveDirection = Vector3::Zero;
 			bool isSneak = false;
 			bool isDash = false;
@@ -124,7 +129,7 @@ namespace app
 
 				/** Bボタンの状態でスニークかダッシュかを決める */
 				const float SNEAK_THRESHOLD = 0.9f;
-				if (stickLength <= SNEAK_THRESHOLD || isPressB) {
+				if (stickLength <= SNEAK_THRESHOLD || isForceSneakByButton) {
 					isSneak = true;
 					isDash = false;
 				}

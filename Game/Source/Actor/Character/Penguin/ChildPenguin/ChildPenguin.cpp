@@ -35,15 +35,6 @@ namespace app
 		}
 
 
-		float ChildPenguin::GetJoinDistance() const
-		{
-			if (m_aiController)
-			{
-				return m_aiController->GetJoinDistance();
-			}
-			return 0.0f;
-		}
-
 
 		void ChildPenguin::SetChildPenguinType(EnChildPenguinType type)
 		{
