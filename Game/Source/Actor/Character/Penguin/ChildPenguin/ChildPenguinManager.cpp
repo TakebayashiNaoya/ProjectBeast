@@ -110,17 +110,29 @@ namespace app
 			}
 
 			/** 陣形の更新処理 */
-			if (m_daddyPenguin != nullptr && !m_followers.empty())
+			if (m_daddyPenguin != nullptr)
 			{
-				/** 親の位置をベースに最大100個のポジションを計算 */
-				CalculateFormationPositions();
+				if (!m_followers.empty())
+				{
+					/** 親の位置をベースに最大100個のポジションを計算 */
+					CalculateFormationPositions();
 
-				/** 隊列メンバーに割り当て */
-				SortAndAssignFollowers();
+					/** 隊列メンバーに割り当て */
+					SortAndAssignFollowers();
+				}
+				else
+				{
+					/** フォロワーが0匹でもレベル0の最小半径を確定させるため1スロット分だけ計算する */
+					Vector3 forward = Vector3::Front;
+					m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
+					m_formationPositions.clear();
+					m_formationController.CalculatePositions(
+						m_daddyPenguin->GetTransform().m_position, forward, m_formationPositions, 1);
+				}
 			}
 
-			/** 陣形範囲ビジュアライザーの更新（フォロワーがいるときだけ表示） */
-			m_rangeVisualizer.SetVisible(!m_followers.empty());
+			/** 陣形範囲ビジュアライザーの更新 */
+			m_rangeVisualizer.SetVisible(true);
 			if (m_daddyPenguin != nullptr)
 			{
 				const Vector3 center   = m_daddyPenguin->GetTransform().m_position;
