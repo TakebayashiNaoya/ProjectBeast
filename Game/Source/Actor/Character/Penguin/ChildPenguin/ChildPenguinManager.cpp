@@ -69,11 +69,16 @@ namespace app
 
 
 		ChildPenguinManager::~ChildPenguinManager()
-		{}
+		{
+			g_renderingEngine->UnregisterCustomRenderer(&m_rangeVisualizer);
+		}
 
 
 		void ChildPenguinManager::Start()
 		{
+			m_rangeVisualizer.Init();
+			g_renderingEngine->RegisterCustomRenderer(&m_rangeVisualizer);
+
 			/** 各子ペンギンのStartを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
@@ -92,14 +97,49 @@ namespace app
 
 			UpdateGhostPenguins();
 
-			/** 陣形の更新処理 */
-			if (m_daddyPenguin != nullptr && !m_followers.empty())
+			/** L1/R1 で陣形を循環切り替え */
+			if (g_pad[0]->IsTrigger(enButtonRB1))
 			{
-				/** 親の位置をベースに最大100個のポジションを計算 */
-				CalculateFormationPositions();
+				const int next = (static_cast<int>(m_formationController.GetCurrentType()) + 1) % static_cast<int>(EnFormationType::Num);
+				m_formationController.SwitchFormation(static_cast<EnFormationType>(next));
+			}
+			else if (g_pad[0]->IsTrigger(enButtonLB1))
+			{
+				const int prev = (static_cast<int>(m_formationController.GetCurrentType()) + static_cast<int>(EnFormationType::Num) - 1) % static_cast<int>(EnFormationType::Num);
+				m_formationController.SwitchFormation(static_cast<EnFormationType>(prev));
+			}
 
-				/** 隊列メンバーに割り当て */
-				SortAndAssignFollowers();
+			/** 陣形の更新処理 */
+			if (m_daddyPenguin != nullptr)
+			{
+				if (!m_followers.empty())
+				{
+					/** 親の位置をベースに最大100個のポジションを計算 */
+					CalculateFormationPositions();
+
+					/** 隊列メンバーに割り当て */
+					SortAndAssignFollowers();
+				}
+				else
+				{
+					/** フォロワーが0匹でもレベル0の最小半径を確定させるため1スロット分だけ計算する */
+					Vector3 forward = Vector3::Front;
+					m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
+					m_formationPositions.clear();
+					m_formationController.CalculatePositions(
+						m_daddyPenguin->GetTransform().m_position, forward, m_formationPositions, 1, 0);
+				}
+			}
+
+			/** 陣形範囲ビジュアライザーの更新 */
+			m_rangeVisualizer.SetVisible(true);
+			if (m_daddyPenguin != nullptr)
+			{
+				const Vector3 center   = m_daddyPenguin->GetTransform().m_position;
+				const float joinRadius = m_formationController.GetJoinRadius();
+				/** 次レベルの空きスロットを計算（CalculateNextLevelPositions内でm_outerRadiusが一時変化するため先に読んでおく） */
+				CalculateNextLevelSlots(center);
+				m_rangeVisualizer.Update(center, joinRadius, m_nextLevelSlots);
 			}
 
 			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */
@@ -410,66 +450,46 @@ namespace app
 
 		int ChildPenguinManager::GetRescuedNum() const
 		{
-			if (m_daddyPenguin == nullptr) return 0;
-
-			int count = 0;
-			const Vector3& daddyPos = m_daddyPenguin->GetTransform().m_position;
-
-			for (const auto* cp : m_childPenguinList)
-			{
-				if (!cp) continue;
-
-				/** 親との水平距離を計算 */
-				Vector3 diff = daddyPos - cp->GetTransform().m_position;
-				diff.y = 0.0f;
-				const float dist = diff.Length();
-
-				/** 各子ペンギンの joinDistance 以内なら救出済みとみなす */
-				if (dist <= cp->GetJoinDistance())
-				{
-					count++;
-				}
-			}
-			return count;
+			return static_cast<int>(m_followers.size());
 		}
 
 
 		void ChildPenguinManager::CalculateFormationPositions()
 		{
-			const Vector3 centerPos = m_daddyPenguin->GetTransform().m_position;
-			const int followerCount = static_cast<int>(m_followers.size());
+			const Vector3 center  = m_daddyPenguin->GetTransform().m_position;
 
-			/** フォロワー数が変わったときだけオフセットを再計算する（sin/cosの節約） */
-			if (followerCount != m_cachedFollowerCount)
+			/** 親の向きから前方ベクトルを取得 */
+			Vector3 forward = Vector3::Front;
+			m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
+
+			const int actual = static_cast<int>(m_followers.size());
+
+			/** count を actual+1 にすることで、現在のリングが満員になった瞬間に
+			 *  m_outerRadius が次のリング半径へ切り替わり、入隊範囲円が先取り拡大する。
+			 *  余分な1スロットは SortAndAssignFollowers では使われない。
+			 *  レベル判定は actual で行い、速度ボーナス等への影響を正確に保つ。 */
+			m_formationPositions.clear();
+			m_formationController.CalculatePositions(
+				center, forward, m_formationPositions, actual + 1, actual);
+		}
+
+
+		void ChildPenguinManager::CalculateNextLevelSlots(const Vector3& center)
+		{
+			/** 親の向きから前方ベクトルを取得 */
+			Vector3 forward = Vector3::Front;
+			m_daddyPenguin->GetTransform().m_rotation.Apply(forward);
+
+			/** 次レベル分の全座標を計算（m_outerRadiusは内部で復元される） */
+			std::vector<Vector3> allNextLevelPositions;
+			m_formationController.CalculateNextLevelPositions(center, forward, allNextLevelPositions, static_cast<int>(m_followers.size()));
+
+			/** 現在フォロワーが占めているスロットを除き、空きスロットだけを格納する */
+			m_nextLevelSlots.clear();
+			const size_t occupied = m_followers.size();
+			for (size_t i = occupied; i < allNextLevelPositions.size(); ++i)
 			{
-				m_cachedFollowerCount = followerCount;
-				m_formationOffsets.clear();
-
-				int currentCount = 0;
-				int layer = 1;
-
-				while (currentCount < MAX_FORMATION_COUNT)
-				{
-					float r = FORMATION_BASE_RADIUS + (layer - 1) * FORMATION_RADIUS_STEP;
-					float circumference = 2.0f * Math::PI * r;
-					int maxInThisLayer = max(1, static_cast<int>(circumference / FORMATION_MIN_DISTANCE));
-					float angleStep = 360.0f / maxInThisLayer;
-
-					for (int i = 0; i < maxInThisLayer && currentCount < MAX_FORMATION_COUNT; ++i)
-					{
-						float angleRad = i * angleStep * (Math::PI / 180.0f);
-						m_formationOffsets.push_back({ r * cosf(angleRad), 0.0f, r * sinf(angleRad) });
-						currentCount++;
-					}
-					layer++;
-				}
-			}
-
-			/** 毎フレームは中心座標にオフセットを加算するだけ */
-			m_formationPositions.resize(m_formationOffsets.size());
-			for (size_t i = 0; i < m_formationOffsets.size(); ++i)
-			{
-				m_formationPositions[i] = centerPos + m_formationOffsets[i];
+				m_nextLevelSlots.push_back(allNextLevelPositions[i]);
 			}
 		}
 
@@ -536,8 +556,8 @@ namespace app
 					diff.y = 0.0f;
 					float distToDaddy = diff.Length();
 
-					// 隊列に加わる距離(JoinDistance)の範囲にいる子ペンギンを呼ぶ
-					if (distToDaddy <= child->GetJoinDistance())
+					// 入隊半径（陣形設定）の範囲にいる子ペンギンを呼ぶ
+					if (distToDaddy <= GetJoinRadius())
 					{
 						targetPenguins.push_back(child);
 					}

@@ -191,14 +191,10 @@ namespace app
 			m_stopDistance = RollRange(td.stopDistance);
 			m_walkDistance = RollRange(td.walkDistance);
 			m_runDistance = RollRange(td.runDistance);
-			m_joinDistance = RollRange(td.joinDistance);
-			m_giveUpDistance = RollRange(td.giveUpDistance);
 
-			/** 制約補正：stopDistance < walkDistance < runDistance < joinDistance < giveUpDistance */
+			/** 制約補正：stopDistance < walkDistance < runDistance */
 			m_walkDistance = max(m_walkDistance, m_stopDistance + 1.0f);
 			m_runDistance = max(m_runDistance, m_walkDistance + 1.0f);
-			m_joinDistance = max(m_joinDistance, m_runDistance + 1.0f);
-			m_giveUpDistance = max(m_giveUpDistance, m_joinDistance + 1.0f);
 		}
 
 
@@ -505,7 +501,7 @@ namespace app
 
 			// 親が隊列参加距離以内にいる場合は逃走より隊列を優先する
 			// → false を返すことで呼び出し元の通常AI（隊列追従）処理へ制御を渡す
-			if (GetDistanceToDaddy() <= m_joinDistance)
+			if (GetDistanceToDaddy() <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 			{
 				m_fleeDirChangeTimer = 0.0f;
 				m_fleeAngleOffset = 0.0f;
@@ -616,6 +612,14 @@ namespace app
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 
+			/** 渦潮に飲まれている間は隊を抜けて入力をゼロにする */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
+
 			/** 親との距離を取得 */
 			const float distDaddy = GetDistanceToDaddy();
 
@@ -634,15 +638,9 @@ namespace app
 			}
 
 			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= m_joinDistance) {
+			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius()) {
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
-			}
-
-			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > m_giveUpDistance) {
-				manager->RemoveFollower(m_owner);
-				m_isFollowing = false;
 			}
 
 			/** 隊列に参加していない状態ならその場で待機する */
@@ -693,6 +691,14 @@ namespace app
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
+
+			/** 渦潮に飲まれている間は隊を抜けて入力をゼロにする */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
 
 			// エフェクトの再生と位置更新を行うラムダ。
 			auto updateClingyEffect = [&]()
@@ -751,7 +757,7 @@ namespace app
 
 				const float distDaddy = GetDistanceToDaddy();
 
-				if (!m_isFollowing && distDaddy <= m_joinDistance)
+				if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 				{
 					manager->AddFollower(m_owner);
 					m_isFollowing = true;
@@ -759,16 +765,7 @@ namespace app
 
 				if (m_isFollowing)
 				{
-					if (distDaddy > m_giveUpDistance)
-					{
-						manager->RemoveFollower(m_owner);
-						m_isFollowing = false;
-						stopEffect();
-					}
-					else
-					{
-						updateClingyEffect();
-					}
+					updateClingyEffect();
 				}
 
 				if (!m_isFollowing)
@@ -804,17 +801,10 @@ namespace app
 			const float distDaddy = GetDistanceToDaddy();
 
 			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= m_joinDistance)
+			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 			{
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
-			}
-
-			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > m_giveUpDistance)
-			{
-				manager->RemoveFollower(m_owner);
-				m_isFollowing = false;
 			}
 
 			/** 隊列に参加していない状態ならその場で待機する */
@@ -886,6 +876,15 @@ namespace app
 
 			/** 親との距離を取得 */
 			const float distDaddy = GetDistanceToDaddy();
+
+			/** 意図せず渦潮に飲まれている間は隊を抜けて入力をゼロにする
+			 *  （意図的な場合は後続の GetIsGoingToWhirlpool() ブロックで処理） */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool() && !m_naughtyStateMachine->GetIsGoingToWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				return;
+			}
 
 			/** 世話焼きペンギンに制止されているときはその場で待機する */
 			/** （命令に関わらず最優先で制止を適用する） */
@@ -1026,6 +1025,7 @@ namespace app
 
 					// 巻き込まれたフラグを立てて、入力はゼロにしてシステムに身を任せる
 					m_wasSwallowedByWhirlpool = true;
+					if (m_isFollowing) { m_isFollowing = false; }
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 					PlayLivelyEffect();
 					return;
@@ -1113,7 +1113,7 @@ namespace app
 			if (isFollowCmd)
 			{
 				/** joinDistance以内に入ったら徘徊を終了して隊列に参加する */
-				if (distDaddy <= m_joinDistance)
+				if (distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 				{
 					/** 徘徊登録を解除する */
 					manager->UnregisterRoaming(m_owner);
@@ -1125,15 +1125,6 @@ namespace app
 						manager->AddFollower(m_owner);
 						m_isFollowing = true;
 					}
-				}
-
-				/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-				else if (m_isFollowing && distDaddy > m_giveUpDistance)
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
-
-					PlayLivelyEffect();
 				}
 
 				/** 隊列に参加していない状態（＝まだ遠くにいる）なら徘徊を継続する */
@@ -1309,6 +1300,15 @@ namespace app
 			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
 			if (CheckAndFlee()) return;
 
+			/** 渦潮に飲まれている間は隊を抜けて入力をゼロにする */
+			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
+			{
+				if (m_isFollowing) { m_isFollowing = false; }
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_wasSliding = false;
+				return;
+			}
+
 			/** 待機命令のとき */
 			if (!isFollowCmd)
 			{
@@ -1324,15 +1324,10 @@ namespace app
 
 			const float distDaddy = GetDistanceToDaddy();
 
-			if (!m_isFollowing && distDaddy <= m_joinDistance)
+			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 			{
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
-			}
-			else if (m_isFollowing && distDaddy > m_giveUpDistance)
-			{
-				manager->RemoveFollower(m_owner);
-				m_isFollowing = false;
 			}
 
 			if (!m_isFollowing)
@@ -1435,6 +1430,7 @@ namespace app
 					manager->UnregisterAssigned(m_interventionTarget);
 					m_interventionTarget = nullptr;
 				}
+				if (m_isFollowing) { m_isFollowing = false; }
 				// 自分の入力もゼロにしてシステムに身を任せる
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				return;
@@ -1563,15 +1559,10 @@ namespace app
 				/** 介入対象がいなければ通常の追従行動 */
 				const float distDaddy = GetDistanceToDaddy();
 
-				if (!m_isFollowing && distDaddy <= m_joinDistance)
+				if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
 				{
 					manager->AddFollower(m_owner);
 					m_isFollowing = true;
-				}
-				else if (m_isFollowing && distDaddy > m_giveUpDistance)
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
 				}
 
 				if (!m_isFollowing)

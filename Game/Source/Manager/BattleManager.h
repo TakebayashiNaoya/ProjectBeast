@@ -220,6 +220,31 @@ namespace app
 
 
 		//============================================//
+		// スニーク関連
+		//============================================//
+
+	public:
+		/**
+		 * @brief スニークが使用可能かどうかを取得
+		 * @return シロクマに十分近ければ true
+		 */
+		inline bool IsSneakAvailable() const { return m_isSneakAvailable; }
+
+
+	private:
+		/**
+		 * @brief シロクマとの距離を確認し、スニーク可否フラグを更新する
+		 */
+		void UpdateSneakAvailability();
+
+
+	private:
+		/** スニークが使用可能かどうか */
+		bool m_isSneakAvailable = false;
+
+
+
+		//============================================//
 		// 親ペンギン関連
 		//============================================//
 	public:

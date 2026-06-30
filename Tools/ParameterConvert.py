@@ -129,7 +129,7 @@ def pack_child_penguin_type_parameter(data):
         return float(val[1]) if isinstance(val, list) and len(val) > 1 else float(val)
 
     return struct.pack(
-        "<32f",
+        "<28f",
         float(color[0]), float(color[1]), float(color[2]), float(color[3]),  # colorR/G/B/A
         rmin("runSpeed"),       rmax("runSpeed"),
         rmin("swimSpeed"),      rmax("swimSpeed"),
@@ -139,8 +139,6 @@ def pack_child_penguin_type_parameter(data):
         rmin("stopDistance"),   rmax("stopDistance"),
         rmin("walkDistance"),   rmax("walkDistance"),
         rmin("runDistance"),    rmax("runDistance"),
-        rmin("joinDistance"),   rmax("joinDistance"),
-        rmin("giveUpDistance"), rmax("giveUpDistance"),
         rmin("roamTriggerDistance"), rmax("roamTriggerDistance"),  # やんちゃのみ（他は0.0）
         rmin("roamRadius"),     rmax("roamRadius"),                # やんちゃのみ（他は0.0）
         float(data.get("tripChancePerSec",  0.0)),  # おっちょこちょいのみ
