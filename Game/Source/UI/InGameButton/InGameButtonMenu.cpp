@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "InGameButtonMenu.h"
+#include "Source/Manager/BattleManager.h"
 #include "Source/Util/CRC32.h"
 
 namespace app
@@ -59,6 +60,8 @@ namespace app
 			updateUI(IsInputBButton(), "NotInputSneakIcon", "InputSneakIcon", "NotInputBbuttonIcon", "InputBbuttonIcon");
 			updateUI(IsInputXButton(), "NotInputSlideIcon", "InputSlideIcon", "NotInputXbuttonIcon", "InputXbuttonIcon");
 			updateUI(IsInputYButton(), "NotInputOrderIcon", "InputOrderIcon", "NotInputYbuttonIcon", "InputYbuttonIcon");
+
+			UpdateSneakIconColor();
 		}
 
 		void InGameButtonMenu::InitializeLogic()
@@ -77,6 +80,25 @@ namespace app
 				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
 				{
 					ui->m_isDraw = false;
+				}
+			}
+		}
+
+		void InGameButtonMenu::UpdateSneakIconColor()
+		{
+			const Vector4 normalColor(1.0f, 1.0f, 1.0f, 1.0f);   // 通常（白）
+			const Vector4 grayColor(0.4f, 0.4f, 0.4f, 1.0f);     // グレーアウト
+			const Vector4& color = BattleManager::GetInstance().IsSneakAvailable() ? normalColor : grayColor;
+
+			const char* sneakIconNames[] = {
+				"NotInputSneakIcon",   "InputSneakIcon",
+				"NotInputBbuttonIcon", "InputBbuttonIcon"
+			};
+			for (const char* name : sneakIconNames)
+			{
+				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
+				{
+					ui->m_color = color;
 				}
 			}
 		}

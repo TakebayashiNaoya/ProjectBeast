@@ -30,6 +30,9 @@ namespace app
 			/** ボタンのアイコンの更新処理 */
 			void ButtonIconUpdate();
 
+			/** スニーク関連アイコンのカラーをグレー / 通常に切り替える */
+			void UpdateSneakIconColor();
+
 			bool IsInputAButton() const;
 			bool IsInputBButton() const;
 			bool IsInputXButton() const;
@@ -38,6 +41,7 @@ namespace app
 
 		private:
 			InGameStartingAnimLogic m_startingAnimLogic;
+
 		};
 	}
 }
