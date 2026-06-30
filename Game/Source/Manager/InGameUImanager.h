@@ -104,6 +104,14 @@ namespace app
 		void RenderPlaying(RenderContext& rc);
 
 		/**
+		 * @brief プレイ中にアチーブメント一覧を描画する
+		 * @detail ポーズを開かずに確認させたいステージ（チュートリアル等）専用。
+		 *         通常の RenderPlaying() には含めない。
+		 * @param rc レンダーコンテキスト
+		 */
+		void RenderAchievementInPlaying(RenderContext& rc);
+
+		/**
 		 * @brief フィニッシュフェーズの描画
 		 * @param rc レンダーコンテキスト
 		 */

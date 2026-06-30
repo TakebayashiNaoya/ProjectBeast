@@ -4,8 +4,9 @@
  * @author 竹林
  */
 #include "stdafx.h"
-#include "TutorialInGameScene.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Manager/InGameUIManager.h"
+#include "TutorialInGameScene.h"
 
 
 namespace app
@@ -25,6 +26,9 @@ namespace app
 	void TutorialInGameScene::OnRenderPlaying(RenderContext& rc)
 	{
 		m_tutorialController.Render(rc);
+
+		/** チュートリアルはポーズを開かずにアチーブメント一覧を確認できるようにする */
+		InGameUIManager::GetInstance()->RenderAchievementInPlaying(rc);
 	}
 
 

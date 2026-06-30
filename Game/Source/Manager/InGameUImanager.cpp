@@ -398,6 +398,12 @@ namespace app
 	}
 
 
+	void InGameUIManager::RenderAchievementInPlaying(RenderContext& rc)
+	{
+		if (m_achievementPacket) m_achievementPacket->Render(rc);
+	}
+
+
 	void InGameUIManager::RenderFinishing(RenderContext& rc)
 	{
 		if (m_timerPacket) m_timerPacket->Render(rc);
