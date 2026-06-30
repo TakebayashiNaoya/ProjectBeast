@@ -8,14 +8,14 @@
 
 #include "DebugScene.h"
 #include "EasyInGameScene.h"
-#include "NormalInGameScene.h"
 #include "HardInGameScene.h"
-#include "TutorialInGameScene.h"
+#include "NormalInGameScene.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
+#include "Source/UI/Menus/StageSelectMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
-#include "Source/UI/Menus/StageSelectMenu.h"
+#include "TutorialInGameScene.h"
 
 
 namespace app
@@ -135,7 +135,7 @@ namespace app
 	{
 		if (g_pad[0]->IsTrigger(enButtonA))
 		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			SoundManager::Get().PlaySE(enSoundKind_ButtonEnter);
 
 			const uint32_t selectKey = m_titleEventPacket->GetMenu()->GetSelectKey();
 			if (selectKey == Hash32("StartIcon"))
@@ -190,7 +190,7 @@ namespace app
 		// Aボタンが押されていなければ抜ける
 		if (g_pad[0]->IsTrigger(enButtonA))
 		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			SoundManager::Get().PlaySE(enSoundKind_ButtonEnter);
 
 			// ステートを選択済みにする
 			menu->SetIsSelected(true);
@@ -216,7 +216,7 @@ namespace app
 		}
 		else if (g_pad[0]->IsTrigger(enButtonB))
 		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			SoundManager::Get().PlaySE(enSoundKind_ButtonBack);
 			// ステートを選択済みにする
 			menu->Reset();
 			m_state = TitleState::Title;
@@ -233,7 +233,7 @@ namespace app
 
 		if (g_pad[0]->IsTrigger(enButtonB))
 		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			SoundManager::Get().PlaySE(enSoundKind_ButtonBack);
 			m_state = TitleState::Title;
 		}
 	}
@@ -249,7 +249,7 @@ namespace app
 		// TutorialMenu 内で Bボタンが押されたら閉じる。
 		if (m_tutorialPacket->GetMenu() && m_tutorialPacket->GetMenu()->IsClosed())
 		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonPush);
+			SoundManager::Get().PlaySE(enSoundKind_ButtonBack);
 			m_tutorialPacket->GetMenu()->SetClosed(false);
 			m_state = TitleState::Title;
 		}

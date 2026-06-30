@@ -7,12 +7,13 @@
 
 #include "DebugScene.h"
 #include "EasyInGameScene.h"
-#include "NormalInGameScene.h"
 #include "HardInGameScene.h"
-#include "TutorialInGameScene.h"
+#include "NormalInGameScene.h"
 #include "ResultScene.h"
 #include "SceneManager.h"
+#include "Source/Sound/SoundManager.h"
 #include "TitleScene.h"
+#include "TutorialInGameScene.h"
 
 #include "Resource/ResourceManager.h"
 #include "Source/Core/Fade.h"
@@ -51,6 +52,11 @@ namespace app
 		// ポーズ切り替え
 		if (g_pad[0]->IsTrigger(enButtonSelect))
 		{
+			if (m_isPause)
+			{
+				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonBack);
+			}
+
 			m_isPause = !m_isPause;
 		}
 
