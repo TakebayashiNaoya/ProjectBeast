@@ -240,6 +240,16 @@ namespace app
 			 */
 			bool HasWhirlpoolResistance() const { return m_formationController.HasWhirlpoolResistance(); }
 
+			/**
+			 * @brief 指定ペンギンが渦潮の捕獲を免れるか
+			 * @details ディフェンス陣形かつフォロワーである場合に true を返す
+			 * @param penguin 判定するペンギン
+			 */
+			bool IsWhirlpoolImmune(const ChildPenguin* penguin) const
+			{
+				return HasWhirlpoolResistance() && IsFollower(penguin);
+			}
+
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
 			DaddyPenguin* m_daddyPenguin = nullptr;
