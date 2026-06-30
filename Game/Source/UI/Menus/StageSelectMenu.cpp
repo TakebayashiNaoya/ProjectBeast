@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "StageSelectMenu.h"
 
+#include "Source/Sound/SoundManager.h"
 #include "Source/UI/Animation/UIAnimation.h"
 #include "Source/Util/JsonConverter.h"
 
@@ -35,7 +36,7 @@ namespace app
 			constexpr uint32_t SELECTING_CURSOR_ANIMATION_KEY = Hash32("SelectingBlinking");
 
 			constexpr const char* STAGE_SELECT_JSON_PATH = "Assets/parameter/UI/stageSelect/StageSelect.json";
-			constexpr const char* MENU_PARAM_KEY         = "menuParam";
+			constexpr const char* MENU_PARAM_KEY = "menuParam";
 		}
 
 
@@ -78,6 +79,9 @@ namespace app
 			, m_prevSelectingStage(EnStageChoices::Max)
 			, m_selectInputInterval(0.0f)
 			, m_isSelected(false)
+			, m_verticalInputDetector()
+			, m_horizontalInputDetector()
+			, m_cursorSelector(static_cast<int>(EnStageChoices::Max))
 		{}
 
 
@@ -96,6 +100,18 @@ namespace app
 			m_cursorFrameBG = nullptr;
 			m_stagePreviewVideo = nullptr;
 			m_prevSelectingStage = EnStageChoices::Max;
+
+			// Reload後に古い状態が残らないようリセットする。
+			m_verticalInputDetector.Reset();
+			m_horizontalInputDetector.Reset();
+			m_cursorSelector.Reset();
+
+			// このメニューは「倒しっぱなし連続移動」の仕様のため入力判定自体には使わないが、
+			// Reload後に古い状態が残らないようリセットだけしておく。
+			m_verticalInputDetector.Reset();
+			m_horizontalInputDetector.Reset();
+			m_cursorSelector.Reset();
+
 			for (auto& choice : m_choices)
 			{
 				choice.m_text = nullptr;
@@ -215,42 +231,46 @@ namespace app
 			CheckAnimation(m_cursorFrameBG);
 
 
-
-			if (m_selectInputInterval > 0.0f)
-			{
-				m_selectInputInterval -= g_gameTime->GetFrameDeltaTime();
-
-				// タイマーがまだ残っていたら、これ以上の入力処理はせずに抜ける
-				if (m_selectInputInterval > 0.0f)
-				{
-					return;
-				}
-			}
-
 			const float stickLXF = g_pad[0]->GetLStickXF();
 			const float stickLYF = g_pad[0]->GetLStickYF();
-			const bool leftInput  = stickLXF < -m_param.inputThreshold || g_pad[0]->IsTrigger(enButtonLeft);
-			const bool rightInput = stickLXF > m_param.inputThreshold  || g_pad[0]->IsTrigger(enButtonRight);
-			const bool upInput    = stickLYF > m_param.inputThreshold  || g_pad[0]->IsTrigger(enButtonUp);
-			const bool downInput  = stickLYF < -m_param.inputThreshold || g_pad[0]->IsTrigger(enButtonDown);
+
+			// 横方向：Negative=左、Positive=右。倒しっぱなし中はinputIntervalごとにリピートする。
+			const auto hDir = m_horizontalInputDetector.Update(
+				stickLXF, g_pad[0]->IsTrigger(enButtonLeft), g_pad[0]->IsTrigger(enButtonRight),
+				m_param.inputThreshold, m_param.inputInterval);
+			const bool leftInput = hDir == Direction::Negative;
+			const bool rightInput = hDir == Direction::Positive;
+
+			// 縦方向：Negative=下、Positive=上。倒しっぱなし中はinputIntervalごとにリピートする。
+			const auto vDir = m_verticalInputDetector.Update(
+				stickLYF, g_pad[0]->IsTrigger(enButtonDown), g_pad[0]->IsTrigger(enButtonUp),
+				m_param.inputThreshold, m_param.inputInterval);
+			const bool upInput = vDir == Direction::Positive;
+			const bool downInput = vDir == Direction::Negative;
+
+
+			auto PlayCursorSE = [&]()
+				{
+					SoundManager::Get().PlaySE(static_cast<int>(enSoundKind::enSoundKind_CursorMove));
+				};
 
 			if (m_selectingStage == EnStageChoices::Tutorial)
 			{
 				// チュートリアルから上段への移動：左→イージー、上→ノーマル、右→ハード
 				if (leftInput)
 				{
-					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Easy;
+					PlayCursorSE();
 				}
 				else if (upInput)
 				{
-					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Normal;
+					PlayCursorSE();
 				}
 				else if (rightInput)
 				{
-					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Hard;
+					PlayCursorSE();
 				}
 			}
 			else
@@ -260,18 +280,18 @@ namespace app
 				constexpr uint8_t HARD_INDEX = static_cast<uint8_t>(EnStageChoices::Hard);
 				if (leftInput && current > 0)
 				{
-					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = static_cast<EnStageChoices>(current - 1);
+					PlayCursorSE();
 				}
 				else if (rightInput && current < HARD_INDEX)
 				{
-					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = static_cast<EnStageChoices>(current + 1);
+					PlayCursorSE();
 				}
 				else if (downInput)
 				{
-					m_selectInputInterval = m_param.inputInterval;
 					m_selectingStage = EnStageChoices::Tutorial;
+					PlayCursorSE();
 				}
 			}
 
@@ -399,12 +419,12 @@ namespace app
 			const auto& p = json[MENU_PARAM_KEY];
 			using JC = app::util::JsonConverter;
 
-			m_param.inputInterval        = JC::ToFloat(p, "inputInterval",        m_param.inputInterval);
-			m_param.inputThreshold       = JC::ToFloat(p, "inputThreshold",       m_param.inputThreshold);
+			m_param.inputInterval = JC::ToFloat(p, "inputInterval", m_param.inputInterval);
+			m_param.inputThreshold = JC::ToFloat(p, "inputThreshold", m_param.inputThreshold);
 			m_param.tutorialCursorScaleX = JC::ToFloat(p, "tutorialCursorScaleX", m_param.tutorialCursorScaleX);
-			m_param.cursorBlinkDuration  = JC::ToFloat(p, "cursorBlinkDuration",  m_param.cursorBlinkDuration);
+			m_param.cursorBlinkDuration = JC::ToFloat(p, "cursorBlinkDuration", m_param.cursorBlinkDuration);
 			m_param.cursorBlinkStartColor = JC::ToVector4(p, "cursorBlinkStartColor", true, m_param.cursorBlinkStartColor);
-			m_param.cursorBlinkEndColor   = JC::ToVector4(p, "cursorBlinkEndColor",   true, m_param.cursorBlinkEndColor);
+			m_param.cursorBlinkEndColor = JC::ToVector4(p, "cursorBlinkEndColor", true, m_param.cursorBlinkEndColor);
 
 			if (p.contains("stageVideoPaths") && p["stageVideoPaths"].is_array())
 			{
