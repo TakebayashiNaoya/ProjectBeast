@@ -635,12 +635,6 @@ namespace app
 				m_isFollowing = true;
 			}
 
-			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius()) {
-				manager->RemoveFollower(m_owner);
-				m_isFollowing = false;
-			}
-
 			/** 隊列に参加していない状態ならその場で待機する */
 			if (!m_isFollowing) {
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
@@ -755,16 +749,7 @@ namespace app
 
 				if (m_isFollowing)
 				{
-					if (distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
-					{
-						manager->RemoveFollower(m_owner);
-						m_isFollowing = false;
-						stopEffect();
-					}
-					else
-					{
-						updateClingyEffect();
-					}
+					updateClingyEffect();
 				}
 
 				if (!m_isFollowing)
@@ -804,13 +789,6 @@ namespace app
 			{
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
-			}
-
-			/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-			else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
-			{
-				manager->RemoveFollower(m_owner);
-				m_isFollowing = false;
 			}
 
 			/** 隊列に参加していない状態ならその場で待機する */
@@ -1123,15 +1101,6 @@ namespace app
 					}
 				}
 
-				/** すでに隊列に参加している状態で、親との距離が一定を超えたら離脱する */
-				else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
-
-					PlayLivelyEffect();
-				}
-
 				/** 隊列に参加していない状態（＝まだ遠くにいる）なら徘徊を継続する */
 				if (!m_isFollowing)
 				{
@@ -1324,11 +1293,6 @@ namespace app
 			{
 				manager->AddFollower(m_owner);
 				m_isFollowing = true;
-			}
-			else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
-			{
-				manager->RemoveFollower(m_owner);
-				m_isFollowing = false;
 			}
 
 			if (!m_isFollowing)
@@ -1563,11 +1527,6 @@ namespace app
 				{
 					manager->AddFollower(m_owner);
 					m_isFollowing = true;
-				}
-				else if (m_isFollowing && distDaddy > ChildPenguinManager::GetInstance()->GetLeaveRadius())
-				{
-					manager->RemoveFollower(m_owner);
-					m_isFollowing = false;
 				}
 
 				if (!m_isFollowing)

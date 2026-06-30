@@ -235,12 +235,6 @@ namespace app
 			 */
 			float GetJoinRadius()  const { return m_formationController.GetJoinRadius(); }
 
-			/**
-			 * @brief 脱隊判定半径を取得する（現在のフォロワー数に比例）
-			 */
-			float GetLeaveRadius() const { return m_formationController.GetLeaveRadius(); }
-
-
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
 			DaddyPenguin* m_daddyPenguin = nullptr;

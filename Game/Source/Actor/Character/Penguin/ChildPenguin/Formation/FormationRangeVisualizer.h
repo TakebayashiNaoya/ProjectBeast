@@ -16,7 +16,7 @@ namespace app
 		/**
 		 * @brief 陣形範囲ビジュアライザー（地形追従ライン）
 		 * @details
-		 *   入隊半径（緑）と脱隊半径（赤）を TerrainCircle で描画し、
+		 *   入隊半径（緑）を TerrainCircle で描画し、
 		 *   フォーメーションの各スロット位置を白い小円で可視化する。
 		 *   地形追従・半透明塗りつぶしは TerrainCircle が担当し、
 		 *   本クラスは PSO・ルートシグネチャ・定数バッファ等の共有 GPU リソースを保持する。
@@ -46,10 +46,9 @@ namespace app
 			 * @brief 更新
 			 * @param center         中心座標（親ペンギンの座標）
 			 * @param joinRadius     入隊半径
-			 * @param leaveRadius    脱隊半径
 			 * @param slotPositions  スロット座標リスト（次レベル分の全座標）
 			 */
-			void Update(const Vector3& center, float joinRadius, float leaveRadius, const std::vector<Vector3>& slotPositions);
+			void Update(const Vector3& center, float joinRadius, const std::vector<Vector3>& slotPositions);
 
 			/**
 			 * @brief 描画
@@ -77,17 +76,14 @@ namespace app
 		private:
 			static const Vector4 JOIN_EDGE_COLOR;   /** 緑（入隊半径・縁） */
 			static const Vector4 JOIN_FILL_COLOR;   /** 緑（入隊半径・塗りつぶし） */
-			static const Vector4 LEAVE_EDGE_COLOR;  /** 赤（脱隊半径・縁） */
-			static const Vector4 LEAVE_FILL_COLOR;  /** 赤（脱隊半径・塗りつぶし） */
 			static const Vector4 SLOT_COLOR;        /** 白（スロットマーカー） */
-						
-			static constexpr int   RANGE_SEGS	   = 32;	/** 入隊・脱隊半径リングの分割数 */
+
+			static constexpr int   RANGE_SEGS	   = 32;	/** 入隊半径リングの分割数 */
 			static constexpr int   SLOT_SEGS       = 12;	/** スロットマーカーの分割数 */
 			static constexpr float SLOT_RADIUS     = 5.0f;  /** スロットマーカーの半径 */
 			static constexpr int   MAX_SLOT_COUNT  = 100;	/** スロットマーカーの事前確保数（一周分 = リング k のスロット数 k*9、リング11まで対応） */
 
 			TerrainCircle m_joinCircle;					  /** 入隊半径円（緑・塗りつぶしあり） */
-			TerrainCircle m_leaveCircle;				  /** 脱隊半径円（赤・塗りつぶしあり） */
 			TerrainCircle m_slotCircles[MAX_SLOT_COUNT];  /** スロットマーカー円（Init()で全て事前確保） */
 			int m_activeSlotCount = 0;					  /** 現フレームで描画するスロットマーカーの個数 */
 

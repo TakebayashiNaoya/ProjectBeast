@@ -88,11 +88,6 @@ namespace app
 			float GetJoinRadius()   const;
 
 			/**
-			 * @brief 脱隊判定半径を取得する（最外半径 + 脱隊マージン）
-			 */
-			float GetLeaveRadius()  const;
-
-			/**
 			 * @brief 陣形レベルを取得する（フォロワー数 / FOLLOWERS_PER_LEVEL）
 			 */
 			int GetFormationLevel() const { return m_formationLevel; }

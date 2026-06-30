@@ -11,11 +11,9 @@ namespace app
 {
 	namespace actor
 	{
-		const Vector4 FormationRangeVisualizer::JOIN_EDGE_COLOR  = { 0.2f, 1.0f, 0.2f, 1.0f  };  /** 入隊範囲（縁） */
-		const Vector4 FormationRangeVisualizer::JOIN_FILL_COLOR  = { 0.2f, 1.0f, 0.2f, 0.25f };  /** 入隊範囲（塗りつぶし） */
-		const Vector4 FormationRangeVisualizer::LEAVE_EDGE_COLOR = { 1.0f, 0.2f, 0.2f, 1.0f  };  /** 脱隊範囲（縁） */
-		const Vector4 FormationRangeVisualizer::LEAVE_FILL_COLOR = { 1.0f, 0.2f, 0.2f, 0.25f };  /** 脱隊範囲（塗りつぶし） */
-		const Vector4 FormationRangeVisualizer::SLOT_COLOR       = { 1.0f, 1.0f, 1.0f, 1.0f  };  /** スロット */
+		const Vector4 FormationRangeVisualizer::JOIN_EDGE_COLOR = { 0.2f, 1.0f, 0.2f, 1.0f  };  /** 入隊範囲（縁） */
+		const Vector4 FormationRangeVisualizer::JOIN_FILL_COLOR = { 0.2f, 1.0f, 0.2f, 0.25f };  /** 入隊範囲（塗りつぶし） */
+		const Vector4 FormationRangeVisualizer::SLOT_COLOR      = { 1.0f, 1.0f, 1.0f, 1.0f  };  /** スロット */
 
 
 		void FormationRangeVisualizer::Init()
@@ -29,8 +27,7 @@ namespace app
 			InitConstantBuffer();
 			InitDescriptorHeap();
 
-			m_joinCircle.Init(RANGE_SEGS,  JOIN_EDGE_COLOR,  JOIN_FILL_COLOR,  true);
-			m_leaveCircle.Init(RANGE_SEGS, LEAVE_EDGE_COLOR, LEAVE_FILL_COLOR, true);
+			m_joinCircle.Init(RANGE_SEGS, JOIN_EDGE_COLOR, JOIN_FILL_COLOR, true);
 
 			//// スロットマーカーを全て事前確保（Update()内でのGPUバッファ作成を避ける）
 			//for (int i = 0; i < MAX_SLOT_COUNT; ++i)
@@ -147,15 +144,13 @@ namespace app
 		}
 
 
-		void FormationRangeVisualizer::Update(const Vector3& center, float joinRadius, float leaveRadius, const std::vector<Vector3>& slotPositions)
+		void FormationRangeVisualizer::Update(const Vector3& center, float joinRadius, const std::vector<Vector3>& slotPositions)
 		{
 			if (!m_isInitialized) return;
 
 			if (m_isVisible)
 			{
-				// 入隊・脱隊半径リングを更新（各頂点で地表 Y をサンプリング）
-				if (joinRadius  > 0.0f) m_joinCircle.Update(center, joinRadius);
-				if (leaveRadius > 0.0f) m_leaveCircle.Update(center, leaveRadius);
+				if (joinRadius > 0.0f) m_joinCircle.Update(center, joinRadius);
 			}
 
 			//// スロットマーカーの更新（フォロワーの有無に関係なく常に表示）
@@ -185,7 +180,6 @@ namespace app
 			{
 				rc.SetPipelineState(m_fillPipelineState);
 				m_joinCircle.RenderFill(rc);
-				m_leaveCircle.RenderFill(rc);
 			}
 
 			// 縁取りと白いスロットマーカーを描画
@@ -193,7 +187,6 @@ namespace app
 			if (m_isVisible)
 			{
 				m_joinCircle.RenderEdge(rc);
-				m_leaveCircle.RenderEdge(rc);
 			}
 			//for (int i = 0; i < m_activeSlotCount; ++i)
 			//{

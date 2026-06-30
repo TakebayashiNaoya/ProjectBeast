@@ -108,11 +108,5 @@ namespace app
 		}
 
 
-		float FormationController::GetLeaveRadius() const
-		{
-			return m_currentFormation 
-				? m_currentFormation->GetLeaveRadius()
-				: 0.0f;
-		}
 	}
 }

@@ -123,12 +123,11 @@ namespace app
 			m_rangeVisualizer.SetVisible(!m_followers.empty());
 			if (m_daddyPenguin != nullptr)
 			{
-				const Vector3 center    = m_daddyPenguin->GetTransform().m_position;
-				const float joinRadius  = m_formationController.GetJoinRadius();
-				const float leaveRadius = m_formationController.GetLeaveRadius();
+				const Vector3 center   = m_daddyPenguin->GetTransform().m_position;
+				const float joinRadius = m_formationController.GetJoinRadius();
 				/** 次レベルの空きスロットを計算（CalculateNextLevelPositions内でm_outerRadiusが一時変化するため先に読んでおく） */
 				CalculateNextLevelSlots(center);
-				m_rangeVisualizer.Update(center, joinRadius, leaveRadius, m_nextLevelSlots);
+				m_rangeVisualizer.Update(center, joinRadius, m_nextLevelSlots);
 			}
 
 			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */

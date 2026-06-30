@@ -15,8 +15,8 @@ namespace app
 		 * @brief 陣形インターフェース
 		 * @details
 		 *   CalculatePositions() でフォロワー数分の座標を計算すると
-		 *   m_outerRadius が更新され、GetJoinRadius() / GetLeaveRadius() が
-		 *   現在の人数に応じた判定半径を返す。
+		 *   m_outerRadius が更新され、GetJoinRadius() が
+		 *   現在の人数に応じた入隊判定半径を返す。
 		 *   レベル管理は FormationController が担う。
 		 */
 		class IFormation
@@ -39,9 +39,6 @@ namespace app
 			/** @brief 入隊判定半径（最外半径 + 入隊マージン） */
 			inline float GetJoinRadius()   const { return m_outerRadius + m_joinMargin; }
 
-			/** @brief 脱隊判定半径（最外半径 + 脱隊マージン） */
-			inline float GetLeaveRadius()  const { return m_outerRadius + m_leaveMargin; }
-
 			/**
 			 * @brief 陣形座標を計算する
 			 * @param center  親ペンギンの座標
@@ -60,7 +57,6 @@ namespace app
 		protected:
 			float m_outerRadius = 0.0f;   /** 最外半径 */
 			float m_joinMargin  = 20.0f;  /** 入隊判定マージン */
-			float m_leaveMargin = 35.0f;  /** 脱隊判定マージン */
 		};
 
 
@@ -130,8 +126,7 @@ namespace app
 		public:
 			ClusterFormation() : RingFormation(9, 8.0f)
 			{
-				m_joinMargin  = 10.0f;
-				m_leaveMargin = 20.0f;
+				m_joinMargin = 10.0f;
 			}
 
 			float GetSpeedMultiplier(int /*level*/) const override { return 0.8f; }
@@ -152,8 +147,7 @@ namespace app
 		public:
 			ScatterFormation() : RingFormation(9, 40.0f)
 			{
-				m_joinMargin  = 50.0f;
-				m_leaveMargin = 70.0f;
+				m_joinMargin = 50.0f;
 			}
 
 			float GetSpeedMultiplier(int /*level*/) const override { return 1.0f; }
@@ -184,8 +178,7 @@ namespace app
 		public:
 			TriangleFormation()
 			{
-				m_joinMargin  = 15.0f;
-				m_leaveMargin = 30.0f;
+				m_joinMargin = 15.0f;
 			}
 
 			/**
