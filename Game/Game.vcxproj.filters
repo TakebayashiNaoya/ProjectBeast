@@ -1044,6 +1044,9 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin\Formation</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\MiniMap\MiniMapTypes.h">
+      <Filter>Source\UI\MiniMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">

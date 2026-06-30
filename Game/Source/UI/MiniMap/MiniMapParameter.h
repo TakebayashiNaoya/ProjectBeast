@@ -6,6 +6,8 @@
 #pragma once
 #include "Source/Core/IMasterParameter.h"
 
+#include "MiniMapTypes.h"
+
 
 namespace app
 {
@@ -24,9 +26,22 @@ namespace app
 			}
 #endif
 			/** JSONから受け取る変数群 */
+			/** マップの半径 */
 			float mapRadius;
+			/** マップの距離制限 */
 			float mapLimitDistance;
+			/** マップの中心座標 */
 			Vector3 mapCenterPos;
+			/** アイコンの初期化情報 */
+			MiniMapInitializeInfo iconInitializeInfos;
+			/** 画像の初期座標 */
+			Vector3 initPosition;
+			/** 画像の初期拡大率 */
+			Vector3 initScale;
+			/** 画像の初期回転 */
+			Quaternion initRotation;
+			/** 画像の初期カラー */
+			Vector4 initColor;
 		};
 	}
 }

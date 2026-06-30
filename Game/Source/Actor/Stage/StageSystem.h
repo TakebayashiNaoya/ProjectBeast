@@ -5,8 +5,8 @@
  */
 #pragma once
 #include "IStage.h"
-#include "TerrainObject.h"
 #include "json/json.hpp"
+#include "TerrainObject.h"
 
 
 #ifdef K2_DEBUG
@@ -71,6 +71,14 @@ namespace app
 			void InitTerrainFromJson(const std::string& jsonPath);
 
 
+			/**
+			 * @brief 指定したオブジェクトキーの個数を返す
+			 * @param objectKey オブジェクトキー（"igloo" や "bearHome" など）
+			 * @return 個数
+			 */
+			uint8_t GetNumbaringObjectCount(const std::string& objectKey) const;
+
+
 		public:
 			StageSystem();
 			~StageSystem() = default;
@@ -84,7 +92,7 @@ namespace app
 
 		private:
 #ifdef ENABLE_OBJECT_LAYOUT_HOTRELOAD
-			time_t      m_lastUpdateTime        = 0;
+			time_t      m_lastUpdateTime = 0;
 			time_t      m_lastTerrainUpdateTime = 0;
 			std::string m_terrainJsonPath;
 			std::string m_stageObjectJsonPath;

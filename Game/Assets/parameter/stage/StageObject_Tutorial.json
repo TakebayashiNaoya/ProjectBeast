@@ -19,7 +19,7 @@
         "scale" : [1, 1, 1]
       },
       {
-        "objectName" : "igloo01",
+        "objectName" : "igloo_1",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
         "position" : [-1400, 45, 50],

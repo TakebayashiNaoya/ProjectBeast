@@ -68,7 +68,7 @@ namespace app
 	}
 
 
-	void InGameUIManager::Initialize(actor::DaddyPenguin* daddyPenguin)
+	void InGameUIManager::Initialize()
 	{
 		//------------------------------------------------------------
 		// Layout・Menuの生成
@@ -104,13 +104,8 @@ namespace app
 		if (auto* menu = m_pbWakingUpTimerPacket->GetMenu()) menu->SetDraw(false);
 
 		// ミニマップを生成
-		ui::InitUIPacket(m_miniMapPacket, "Assets/parameter/miniMap/MiniMap.json");
+		ui::InitUIPacket(m_miniMapPacket, "Assets/parameter/UI/miniMap/MiniMap.json");
 
-		if (auto* menu = m_miniMapPacket->GetMenu())
-		{
-			menu->SetDraw(true);
-			menu->SetDaddyPenguin(daddyPenguin);
-		}
 
 		// タイトルイベントを生成
 		ui::InitUIPacket(m_titleEventPacket, "Assets/parameter/event/TitleEvent.json");
@@ -122,11 +117,6 @@ namespace app
 		// イグループプロンプトを生成
 		ui::InitUIPacket(m_iglooPromptPacket, "Assets/parameter/UI/iglooPrompt/IglooPrompt.json");
 
-		if (auto* menu = m_iglooPromptPacket->GetMenu())
-		{
-			menu->SetDraw(false);
-			daddyPenguin->GetController()->SetIglooPromptMenu(menu);
-		}
 
 		// チュートリアルを生成
 		ui::InitUIPacket(m_tutorialPacket, "Assets/parameter/tutorial/Tutorial.json");
@@ -137,19 +127,26 @@ namespace app
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
 		m_cpReactionSystem->Initialize();
-		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
 
 		// WpWarningSystemを生成
 		m_wpWarningSystem = std::make_unique<ui::WpWarningSystem>();
 		m_wpWarningSystem->Initialize();
-		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
 
 		// 危険矢印システムを生成
 		m_dangerArrowSystem = std::make_unique<ui::DangerArrowSystem>();
 		m_dangerArrowSystem->Initialize();
+	}
 
-		/** BattleManagerへのUI通知functionを登録 */
-		RegisterObservers(daddyPenguin);
+
+	void InGameUIManager::SetMiniMapIconNum(ui::EnMiniMapIconType type, uint8_t num)
+	{
+		m_miniMapPacket->GetMenu()->SetIconNum(type, num);
+	}
+
+
+	void InGameUIManager::InitializeMapIcon()
+	{
+		m_miniMapPacket->GetMenu()->InitializeMapIcon();
 	}
 
 
@@ -179,17 +176,30 @@ namespace app
 	}
 
 
-	void InGameUIManager::RegisterObservers(actor::DaddyPenguin* daddyPenguin)
+	void InGameUIManager::RegisterObservers()
 	{
 		auto& bm = BattleManager::GetInstance();
+
+		auto* daddyPenguin = bm.GetDaddyPenguin();
+
+		// UIがnullptrでないかをチェックするラムダ
+		auto CheckMenu = [](ui::MenuBase* menu)
+			{
+				K2_ASSERT(menu, "メニューがnullptr");
+			};
+
+		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
+		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
 
 		//--------------------------------------------//
 		// タイマーUI通知
 		//--------------------------------------------//
 		bm.SetOnTimeChanged(
-			[this](float time)
+			[this, CheckMenu](float time)
 			{
-				if (auto* menu = m_timerPacket->GetMenu()) menu->SetTime(time);
+				auto* menu = m_timerPacket->GetMenu();
+				CheckMenu(menu);
+				menu->SetTime(time);
 			}
 		);
 
@@ -197,13 +207,12 @@ namespace app
 		// 残り子ペンギン数UI通知
 		//--------------------------------------------//
 		bm.SetOnRescuedNumChanged(
-			[this](int rescued, int total)
+			[this, CheckMenu](int rescued, int total)
 			{
-				if (auto* menu = m_remainingChildPacket->GetMenu())
-				{
-					menu->SetChildNum(rescued);
-					menu->SetTotalNum(total);
-				}
+				auto* menu = m_remainingChildPacket->GetMenu();
+				CheckMenu(menu);
+				menu->SetChildNum(rescued);
+				menu->SetTotalNum(total);
 			}
 		);
 
@@ -248,7 +257,7 @@ namespace app
 		// daddyPenguinをキャプチャしてlambda内で探索する
 		//--------------------------------------------//
 		bm.SetOnSleepingEnemyChanged(
-			[this, daddyPenguin]()
+			[this, daddyPenguin, CheckMenu]()
 			{
 				/** プレイヤー座標を基準に最近傍の睡眠中クマを探す */
 				const Vector3 playerPos = daddyPenguin->GetTransform().m_position;
@@ -260,31 +269,47 @@ namespace app
 				const bool isFound = (enemy != nullptr);
 
 				/** 起床ゲージUIへ通知 */
-				if (auto* menu = m_enemySleepingPacket->GetMenu())
+				auto* sleepingMenu = m_enemySleepingPacket->GetMenu();
+				CheckMenu(sleepingMenu);
+				if (isFound)
 				{
-					if (isFound)
-					{
-						auto* sm = enemy->GetEnemyStateMachine();
-						/** 起床ゲージ（満タン=100）を0〜1に正規化して渡す */
-						menu->SetSleepingRate(sm->GetWakeUpGauge() / 100.0f);
-						menu->SetTargetPosition(enemy->GetTransform().m_position);
-					}
-
-					menu->SetDraw(isFound);
+					auto* sm = enemy->GetEnemyStateMachine();
+					/** 起床ゲージ（満タン=100）を0〜1に正規化して渡す */
+					sleepingMenu->SetSleepingRate(sm->GetWakeUpGauge() / 100.0f);
+					sleepingMenu->SetTargetPosition(enemy->GetTransform().m_position);
 				}
+
+				sleepingMenu->SetDraw(isFound);
+
 
 
 				/** 睡眠タイマーUIへ通知 */
-				if (auto* menu = m_pbWakingUpTimerPacket->GetMenu())
+				auto* walkingMenu = m_pbWakingUpTimerPacket->GetMenu();
+				CheckMenu(walkingMenu);
+				if (isFound)
 				{
-					if (isFound)
-					{
-						auto* sm = enemy->GetEnemyStateMachine();
-						menu->SetCurrentPBTime(sm->GetSleepTimer());
-						menu->SetTargetPosition(enemy->GetTransform().m_position);
-					}
-					menu->SetDraw(isFound);
+					auto* sm = enemy->GetEnemyStateMachine();
+					walkingMenu->SetCurrentPBTime(sm->GetSleepTimer());
+					walkingMenu->SetTargetPosition(enemy->GetTransform().m_position);
 				}
+				walkingMenu->SetDraw(isFound);
+			}
+		);
+
+
+		//--------------------------------------------//
+		// ミニマップUI通知
+		//--------------------------------------------//
+		bm.SetOnMiniMapChanged(
+			[this, daddyPenguin, CheckMenu](const ui::ActorPositions& actorPositions)
+			{
+				auto* menu = m_miniMapPacket->GetMenu();
+				CheckMenu(menu);
+
+				menu->SetActorPositions(
+					daddyPenguin->GetTransform().m_position,
+					actorPositions
+				);
 			}
 		);
 	}

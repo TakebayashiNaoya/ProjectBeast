@@ -83,7 +83,7 @@
         "scale" : [1, 1, 1]
       },
       {
-        "objectName" : "igloo01",
+        "objectName" : "igloo_1",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
         "position" : [-2320, 78, 1418],
@@ -92,7 +92,7 @@
         "pbrName" : "igloo"
       },
       {
-        "objectName" : "igloo02",
+        "objectName" : "igloo_2",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
         "position" : [-1174, 90, 2478],
@@ -101,7 +101,7 @@
         "pbrName" : "igloo"
       },
       {
-        "objectName" : "igloo03",
+        "objectName" : "igloo_3",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
         "position" : [-874, 90, 3706],
@@ -110,7 +110,7 @@
         "pbrName" : "igloo"
       },
       {
-        "objectName" : "igloo04",
+        "objectName" : "igloo_4",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
         "position" : [-250, 212, 80],
