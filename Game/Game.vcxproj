@@ -340,6 +340,8 @@
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp" />
     <ClCompile Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp" />
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp" />
+    <ClCompile Include="Source\UI\Input\UICursorSelector.cpp" />
+    <ClCompile Include="Source\UI\Input\UIInputController.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
     <ClCompile Include="Source\UI\Menus\AchievementNotificationMenu.cpp" />
@@ -510,6 +512,9 @@
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />
     <ClInclude Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.h" />
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h" />
+    <ClInclude Include="Source\UI\Input\Types.h" />
+    <ClInclude Include="Source\UI\Input\UICursorSelector.h" />
+    <ClInclude Include="Source\UI\Input\UIInputController.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
     <ClInclude Include="Source\UI\Menus\AchievementNotificationMenu.h" />

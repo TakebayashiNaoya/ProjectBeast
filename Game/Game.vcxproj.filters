@@ -112,6 +112,9 @@
     <Filter Include="Source\UI\BearReaction">
       <UniqueIdentifier>{65fa1729-2cfa-455d-96f1-6b17d7826e6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\Input">
+      <UniqueIdentifier>{20a7d61a-4eea-4a5b-976b-e562f84acf2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -549,6 +552,12 @@
     </ClCompile>
     <ClCompile Include="Source\UI\Model\ScorePopupAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Input\UIInputController.cpp">
+      <Filter>Source\UI\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Input\UICursorSelector.cpp">
+      <Filter>Source\UI\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1019,6 +1028,21 @@
     </ClInclude>
     <ClInclude Include="Source\UI\MiniMap\MiniMapTypes.h">
       <Filter>Source\UI\MiniMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h" />
+    <ClInclude Include="Source\UI\BearReaction\BearReactionSystem.h" />
+    <ClInclude Include="Source\UI\BearReaction\BearReactionTypes.h" />
+    <ClInclude Include="Source\UI\BearReaction\MasterBearReactionParameter.h" />
+    <ClInclude Include="Source\UI\Menus\ScorePopupAnimatorMenu.h" />
+    <ClInclude Include="Source\UI\Model\ScorePopupAnimStatus.h" />
+    <ClInclude Include="Source\UI\Input\UIInputController.h">
+      <Filter>Source\UI\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Input\UICursorSelector.h">
+      <Filter>Source\UI\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Input\Types.h">
+      <Filter>Source\UI\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
