@@ -19,7 +19,7 @@ namespace app
 		{
 			m_formations[static_cast<size_t>(EnFormationType::Circle)]   = std::make_unique<CircleFormation>();
 			m_formations[static_cast<size_t>(EnFormationType::Triangle)] = std::make_unique<TriangleFormation>();
-			m_formations[static_cast<size_t>(EnFormationType::Cluster)]  = std::make_unique<ClusterFormation>();
+			m_formations[static_cast<size_t>(EnFormationType::Defense)]  = std::make_unique<DefenseFormation>();
 			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>();
 
 			m_currentFormation = m_formations[static_cast<size_t>(EnFormationType::Circle)].get();

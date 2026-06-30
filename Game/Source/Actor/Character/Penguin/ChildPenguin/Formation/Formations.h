@@ -70,7 +70,7 @@ namespace app
 		 * @details
 		 *   リング k（1始まり）に baseFollowers*k 体を等間隔配置する。
 		 *   各リングの半径は radiusPerRing*k。全リングで隣接間隔が均一になる。
-		 *   Circle・Cluster・Scatter はこのクラスを継承し定数だけ変える。
+		 *   Circle・Defense・Scatter はこのクラスを継承し定数だけ変える。
 		 */
 		class RingFormation : public IFormation
 		{
@@ -121,10 +121,10 @@ namespace app
 		 * @brief 密集陣（狭間隔）
 		 * @details リング間隔: ~5単位。速度が下がる代わりに防御効果を得られる。
 		 */
-		class ClusterFormation : public RingFormation
+		class DefenseFormation : public RingFormation
 		{
 		public:
-			ClusterFormation() : RingFormation(9, 8.0f)
+			DefenseFormation() : RingFormation(9, 8.0f)
 			{
 				m_joinMargin = 10.0f;
 			}
