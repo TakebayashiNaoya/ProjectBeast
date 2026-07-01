@@ -33,6 +33,18 @@
                 "scale" : [1.0, 1.0, 1.0],
                 "rotation" : 0,
                 "color" : [255, 255, 255, 255]
+            },
+            {
+                "comment":"シロクマに頭上に付けるデバフアイコン",
+                "type":"UIIcon",
+                "name":"feelingDownReaction",
+                "asset":"Assets/spriteData/UI/Icon/Debuf/FeelingDown.dds",
+                "width":50,
+                "height":50,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
             }
         ]
     }

@@ -228,11 +228,16 @@ namespace app
 				{
 					auto* it = enemies.at(i);
 					bool isReturning = it->GetEnemyStateMachine()->IsReturnHome();
+					bool isDebuff = it->GetEnemyStateMachine()->IsDebuffReturnHome();
 					bool isChasing = it->GetEnemyStateMachine()->IsChasing();
 
 					auto type = ui::EnBearReactionType::None;
 
-					if (isReturning)
+					if (isDebuff)
+					{
+						type = ui::EnBearReactionType::Debuff;
+					}
+					else if (isReturning)
 					{
 						type = ui::EnBearReactionType::Bed;
 					}

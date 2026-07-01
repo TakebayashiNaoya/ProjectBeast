@@ -136,6 +136,17 @@ namespace app
 			bool IsReturnHome() const { return m_isReturnHome; }
 
 			/**
+			 * @brief デバフで帰巣するかの設定
+			 * @param debuffReturnHome デバフでの帰巣フラグ
+			 */
+			void SetDebuffReturnHome(const bool debuffReturnHome) { m_isDebuffReturnHome = debuffReturnHome; }
+			/**
+			 * @brief デバフで帰巣するかの取得
+			 * @return デバフで帰巣するかのフラグ
+			 */
+			bool IsDebuffReturnHome() const { return m_isDebuffReturnHome; }
+
+			/**
 			 * @brief クールダウンするかの設定
 			 */
 			void SetCoolDown(const bool coolDown) { m_isCoolDown = coolDown; }
@@ -274,6 +285,8 @@ namespace app
 			bool m_isStun;
 			/** 帰巣する状態か */
 			bool m_isReturnHome;
+			/** デバフによる帰巣状態か */
+			bool m_isDebuffReturnHome;
 			/** クールダウン状態か */
 			bool m_isCoolDown;
 			/** 攻撃中かどうか */
