@@ -82,7 +82,7 @@ namespace app
 
 			m_speechBubble->m_color = speechBubbleColor;
 
-			soundMng.PlaySE(kind);
+			soundMng.PlaySE(kind, 0.8f);
 
 			SetAnimation();
 			m_timer = 0.0f;

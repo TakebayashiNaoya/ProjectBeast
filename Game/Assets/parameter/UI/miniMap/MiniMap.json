@@ -23,17 +23,6 @@
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[ 255, 255, 255, 255]
-            },
-            {
-                "type":"UIIcon",
-                "name":"DaddyIcon",
-                "asset":"Assets/spriteData/UI/Icon/MiniMap/DaddyPen.dds",
-                "width":20,
-                "height":20,
-                "position":[ 0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 255]
             }
         ]
     }

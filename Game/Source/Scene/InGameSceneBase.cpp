@@ -300,7 +300,7 @@ namespace app
 			if (InGameUIManager::GetInstance()->GetCountDownMenu())
 			{
 				InGameUIManager::GetInstance()->GetCountDownMenu()->SetIsDelay(true);
-				SoundManager::Get().PlayBGM(enSoundKind_InGame);
+				SoundManager::Get().PlayBGM(enSoundKind_InGame, 0.5f);
 			}
 
 			InGameUIManager::GetInstance()->InitializeMapIcon();

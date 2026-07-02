@@ -18,7 +18,6 @@ namespace app
 			: m_daddy(nullptr)
 			, m_map(nullptr)
 			, m_frame(nullptr)
-			, m_isDraw(false)
 		{
 			// ミニマップ専用ステータスを生成する。
 			m_miniMapStatus = std::make_unique<MiniMapStatus>();
@@ -41,7 +40,8 @@ namespace app
 					Vector3(-400.0f, 0.0f, 0.0f)
 				);
 
-				DrawMapIcons(true);
+				m_map->m_isDraw = true;
+				m_frame->m_isDraw = true;
 			}
 			// アニメーション中の更新。
 			if (!m_startingAnimLogic.IsAnimationFinished())
@@ -50,14 +50,8 @@ namespace app
 			}
 			else
 			{
-				//m_isDraw = true;
-				//UpdateDrawFlag();
+				m_daddy->m_isDraw = true;
 			}
-
-
-
-
-
 
 			// マップのフレームアイコンをカメラの向きに合わせて回転させる。
 			MapFrameRotation();
@@ -119,27 +113,6 @@ namespace app
 		}
 
 
-		void MiniMapMenu::UpdateDrawFlag()
-		{
-			DrawMapIcons(m_isDraw);
-
-			for (auto& it : m_iconVectors)
-			{
-				for (auto* icon : it.icons)
-				{
-					SetDrawFlag(icon, m_isDraw);
-				}
-			}
-		}
-
-
-		void MiniMapMenu::SetDrawFlag(UIIcon* icon, const bool isDraw)
-		{
-			CHECK_ICON(icon);
-			icon->m_isDraw = isDraw;
-		}
-
-
 		UIIcon* MiniMapMenu::GetAndInitIcon(const uint32_t key)
 		{
 			auto* icon = GetUI<UIIcon>(key);
@@ -154,13 +127,11 @@ namespace app
 			// アイコンを取得、初期化
 			m_map = GetAndInitIcon(Hash32("MiniMapIcon"));
 			m_frame = GetAndInitIcon(Hash32("MiniMapFrameIcon"));
-			m_daddy = GetAndInitIcon(Hash32("DaddyIcon"));
 
 			const Vector3 position = m_miniMapStatus->GetMapCenterPos();
 
 			m_map->m_transform.m_localTransform.m_position = position;
 			m_frame->m_transform.m_localTransform.m_position = position;
-			m_daddy->m_transform.m_localTransform.m_position = position;
 		}
 
 
@@ -175,6 +146,8 @@ namespace app
 			auto* canvas = GetCanvas();
 			K2_ASSERT(canvas, "取得失敗");
 
+			const std::string path = "Assets/spriteData/UI/Icon/MiniMap/";
+			const std::string ext = ".DDS";
 
 			for (uint8_t i = 0; i < static_cast<uint8_t>(EnMiniMapIconType::Num); ++i)
 			{
@@ -186,7 +159,7 @@ namespace app
 					// ステータスから初期値を取得
 					auto& info = m_miniMapStatus->GetIconInitializeInfos().at(i);
 
-					const std::string path = "Assets/spriteData/UI/Icon/MiniMap/" + info.path + ".DDS";
+					const std::string fullPath = path + info.path + ext;
 					const uint32_t key = Hash32((info.path + std::to_string(j)).c_str());
 
 
@@ -197,7 +170,7 @@ namespace app
 					K2_ASSERT(icon, "登録失敗");
 					icon->m_isDraw = false;
 
-					icon->Initialize(path.c_str(), info.width, info.height, position, scale, rotation, color);
+					icon->Initialize(fullPath.c_str(), info.width, info.height, position, scale, rotation, color);
 
 					// アイコンを配列に追加
 					it.icons.push_back(icon);
@@ -205,6 +178,26 @@ namespace app
 
 				K2_ASSERT(it.icons.size() == it.num, "サイズ不一致");
 			}
+
+			// マップ上のアイコンをすべて生成し終わってから親ペンギンのアイコンを生成する
+
+			const auto& daddyInfo = m_miniMapStatus->GetDaddyInfo();
+			const std::string name = daddyInfo.path;
+			canvas->CreateUI<UIIcon>(Hash32(name.c_str()));
+			m_daddy = canvas->FindUI<UIIcon>(Hash32(name.c_str()));
+
+			K2_ASSERT(m_daddy, "登録失敗");
+
+			m_daddy->Initialize(
+				(path + name + ext).c_str(),
+				daddyInfo.width,
+				daddyInfo.height,
+				position, scale, rotation, color
+			);
+
+
+			m_daddy->m_transform.m_localTransform.m_position = m_miniMapStatus->GetMapCenterPos();
+			m_daddy->m_isDraw = false;
 		}
 
 
@@ -237,7 +230,7 @@ namespace app
 
 				const uint8_t count = static_cast<uint8_t>(
 					min(actorPositions.at(i).size(), iconVector.icons.size())
-				);
+					);
 
 				for (uint8_t j = 0; j < count; ++j)
 				{
@@ -250,17 +243,13 @@ namespace app
 						icon->m_transform.m_localTransform.m_position
 					);
 
+					// アニメーションが終了していない場合は描画しない。
+					const bool isDraw = canConvert && m_startingAnimLogic.IsAnimationFinished();
+
 					// マップ範囲内のみ表示する。
-					icon->m_isDraw = canConvert;
+					icon->m_isDraw = isDraw;
 				}
 			}
-		}
-
-		void MiniMapMenu::DrawMapIcons(const bool isDraw)
-		{
-			SetDrawFlag(m_daddy, isDraw);
-			SetDrawFlag(m_map, isDraw);
-			SetDrawFlag(m_frame, isDraw);
 		}
 
 
