@@ -17,7 +17,7 @@ namespace app
 		 * チュートリアルは実績一覧を常時表示するため、
 		 * 画面下部のインゲームボタン等と重ならないよう少し上にずらす。
 		 */
-		constexpr float TUTORIAL_ACHIEVEMENT_OFFSET_Y = 40.0f;
+		constexpr float TUTORIAL_ACHIEVEMENT_OFFSET_Y = 60.0f;
 	}
 
 	void TutorialInGameScene::OnLoadComplete()
