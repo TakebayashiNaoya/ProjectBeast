@@ -5,8 +5,9 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include <unordered_map>
-#include <memory>
+
+#include "Source/UI/Input/UICursorSelector.h"
+#include "Source/UI/Input/UIInputController.h"
 
 
 namespace app
@@ -161,6 +162,10 @@ namespace app
 			bool m_isGoTitle;
 			/** スティック上下ニュートラル判定 */
 			bool m_isStickNeutralY;
+
+
+			AxisInputDetector m_axisInputDetector;
+			CursorIndexSelector m_cursorSelector;
 
 
 			using Icon = std::unique_ptr<PauseScreenIcon>;

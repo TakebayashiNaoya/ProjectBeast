@@ -87,6 +87,21 @@ namespace app
 			void UpdateWhirlpoolInfo(const float deltaTime);
 
 			/**
+			 * @brief 子ペンギンをこの渦潮が捕獲すべきか判定する
+			 * @param info            対象の渦潮情報
+			 * @param effectiveRadius 現フレームの有効捕獲半径
+			 * @return 捕獲すべきなら true
+			 */
+			bool ShouldCapture(const WhirlpoolPowerInfo& info, float effectiveRadius) const;
+
+			/**
+			 * @brief ディフェンス陣形による救出条件を満たしているか判定する
+			 * @param info 対象の渦潮情報
+			 * @return 救出すべきなら true
+			 */
+			bool ShouldRescue(const WhirlpoolPowerInfo& info) const;
+
+			/**
 			 * @brief 引き寄せ処理：軌道半径まで近づき、そこで回転しながらランダムにふらつく
 			 * @param info      対象の渦潮情報
 			 * @param deltaTime フレーム間の経過時間

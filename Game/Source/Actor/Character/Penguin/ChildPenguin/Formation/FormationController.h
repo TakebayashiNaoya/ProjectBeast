@@ -80,6 +80,17 @@ namespace app
 			float GetSpeedMultiplier() const;
 
 			/**
+			 * @brief 現在の陣形が渦潮耐性パッシブを持つか
+			 */
+			bool HasWhirlpoolResistance() const;
+
+			/**
+			 * @brief 指定フォロワー数に対応する入隊判定半径を返す
+			 * @param count フォロワー数
+			 */
+			float GetJoinRadius(int count) const;
+
+			/**
 			 * @brief 最外半径を取得する（CalculatePositions後に有効）
 			 */
 			float GetOuterRadius()  const;

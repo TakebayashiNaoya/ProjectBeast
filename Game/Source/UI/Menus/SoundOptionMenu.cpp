@@ -15,6 +15,12 @@ namespace app
 	{
 		namespace
 		{
+			void PlayCursorSE()
+			{
+				SoundManager::Get().PlaySE(static_cast<int>(enSoundKind::enSoundKind_CursorMove));
+			}
+
+
 			// keyとenum classの構造体
 			struct SoundInfo
 			{
@@ -145,6 +151,9 @@ namespace app
 			, m_currentValue(0.0f)
 			, m_isStickNeutralY(true)
 			, m_isStickNeutralX(true)
+			, m_stickYDetector()
+			, m_stickXDetector()
+			, m_cursorSelector(SOUND_SIZE)
 		{
 			// シーン遷移後も現在の音量設定が維持されるよう、SoundManagerの現在値で初期化する。
 			m_currentValue = GetCurrentVolumeFromManager(m_currentSoundType);
@@ -153,11 +162,6 @@ namespace app
 
 		void SoundOptionMenu::Update()
 		{
-			// 現在のタイプを保存。
-			const uint8_t currentType = static_cast<uint8_t>(m_currentSoundType);
-
-			uint8_t add = 0;
-
 			// Xボタンに入力があったら、リセットする。
 			if (g_pad[0]->IsTrigger(enButtonX))
 			{
@@ -165,27 +169,16 @@ namespace app
 			}
 
 			const float stickY = g_pad[0]->GetLStickYF();
-			if (fabsf(stickY) < STICK_THRESHOLD) m_isStickNeutralY = true;
 
-			// 上方向に入力があったら
-			if (g_pad[0]->IsTrigger(enButtonUp) || (m_isStickNeutralY && stickY > STICK_THRESHOLD))
-			{
-				add = 3;
-				m_isStickNeutralY = false;
-			}
-			// 下方向に入力があったら
-			else if (g_pad[0]->IsTrigger(enButtonDown) || (m_isStickNeutralY && stickY < -STICK_THRESHOLD))
-			{
-				add = 1;
-				m_isStickNeutralY = false;
-			}
+			// 上入力でNegative（タイプを-1）、下入力でPositive（タイプを+1）として判定する。
+			const auto typeDir = m_stickYDetector.Update(
+				-stickY, g_pad[0]->IsTrigger(enButtonUp), g_pad[0]->IsTrigger(enButtonDown), STICK_THRESHOLD);
 
-			// addが0でなければ
-			if (add != 0)
+			const bool isTypeChanged = m_cursorSelector.TryMove(typeDir);
+			if (isTypeChanged)
 			{
 				// タイプを変更する。
-				m_currentSoundType = static_cast<SoundType>((currentType + add) % SOUND_SIZE);
-
+				m_currentSoundType = static_cast<SoundType>(m_cursorSelector.Get());
 				// 変更したタイプに対応するフレームのカラーアニメーションを更新する。
 				UpdateColorAnim();
 			}
@@ -204,7 +197,7 @@ namespace app
 					knobIcon->StopAnimation();
 					knobIcon->m_color = Vector4::White;
 				}
-				else if (add == 0)
+				else if (!isTypeChanged)
 				{
 					// 上下入力も左右入力もないときはカラーアニメーションを再開する。
 					UpdateColorAnim();
@@ -228,6 +221,12 @@ namespace app
 			InitializeFrame();
 			InitializeDigit();
 			InitializeIconAnim();
+
+			m_stickYDetector.Reset();
+			m_stickXDetector.Reset();
+			m_cursorSelector.Reset();
+			m_currentSoundType = static_cast<SoundType>(m_cursorSelector.Get());
+
 			UpdateColorAnim();
 		}
 
@@ -252,21 +251,20 @@ namespace app
 			bool isChange = false;
 
 			const float stickX = g_pad[0]->GetLStickXF();
-			if (fabsf(stickX) < STICK_THRESHOLD) m_isStickNeutralX = true;
 
-			// 右入力（十字キーまたはスティック右）
-			if (g_pad[0]->IsTrigger(enButtonRight) || (m_isStickNeutralX && stickX > STICK_THRESHOLD))
+			// 右入力（十字キーまたはスティック右）でPositive、左入力でNegative。
+			const auto dir = m_stickXDetector.Update(
+				stickX, g_pad[0]->IsTrigger(enButtonLeft), g_pad[0]->IsTrigger(enButtonRight), STICK_THRESHOLD);
+
+			if (dir == Direction::Positive)
 			{
 				volumeInt += VOLUME_STEP;
 				isChange = true;
-				m_isStickNeutralX = false;
 			}
-			// 左入力（十字キーまたはスティック左）
-			else if (g_pad[0]->IsTrigger(enButtonLeft) || (m_isStickNeutralX && stickX < -STICK_THRESHOLD))
+			else if (dir == Direction::Negative)
 			{
 				volumeInt -= VOLUME_STEP;
 				isChange = true;
-				m_isStickNeutralX = false;
 			}
 
 			// ノブのX座標とフレームのX座標への参照。
@@ -285,6 +283,9 @@ namespace app
 
 				// SoundManagerに音量を反映する。
 				SetVolumeToManager(type, currentVolume);
+
+				// カーソルSEを再生する。
+				PlayCursorSE();
 			}
 		}
 

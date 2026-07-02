@@ -16,6 +16,7 @@ namespace app
 			m_speechBubble->m_transform.m_localTransform.m_position = position;
 			m_tongue->m_transform.m_localTransform.m_position = position;
 			m_bed->m_transform.m_localTransform.m_position = position;
+			m_feelingDown->m_transform.m_localTransform.m_position = position;
 		}
 
 
@@ -28,6 +29,16 @@ namespace app
 				m_speechBubble->m_isDraw = true;
 				m_tongue->m_isDraw = true;
 				m_bed->m_isDraw = false;
+				m_feelingDown->m_isDraw = false;
+
+				break;
+			}
+			case EnBearReactionType::Debuff:
+			{
+				m_speechBubble->m_isDraw = true;
+				m_tongue->m_isDraw = false;
+				m_bed->m_isDraw = false;
+				m_feelingDown->m_isDraw = true;
 
 				break;
 			}
@@ -36,6 +47,7 @@ namespace app
 				m_speechBubble->m_isDraw = true;
 				m_tongue->m_isDraw = false;
 				m_bed->m_isDraw = true;
+				m_feelingDown->m_isDraw = false;
 
 				break;
 			}
@@ -44,6 +56,7 @@ namespace app
 				m_speechBubble->m_isDraw = false;
 				m_tongue->m_isDraw = false;
 				m_bed->m_isDraw = false;
+				m_feelingDown->m_isDraw = false;
 
 				break;
 			}
@@ -59,6 +72,7 @@ namespace app
 			m_speechBubble = GetUI<UIIcon>(Hash32("speechBubble"));
 			m_tongue = GetUI<UIIcon>(Hash32("tongueReaction"));
 			m_bed = GetUI<UIIcon>(Hash32("bedReaction"));
+			m_feelingDown = GetUI<UIIcon>(Hash32("feelingDownReaction"));
 
 			auto initializeUI = [](UIIcon* ui)
 				{
@@ -69,6 +83,7 @@ namespace app
 			initializeUI(m_speechBubble);
 			initializeUI(m_tongue);
 			initializeUI(m_bed);
+			initializeUI(m_feelingDown);
 		}
 
 
@@ -82,6 +97,7 @@ namespace app
 			: m_speechBubble(nullptr)
 			, m_tongue(nullptr)
 			, m_bed(nullptr)
+			, m_feelingDown(nullptr)
 		{}
 
 

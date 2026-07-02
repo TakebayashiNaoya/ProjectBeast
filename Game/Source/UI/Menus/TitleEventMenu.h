@@ -6,6 +6,9 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
+#include "Source/UI/Input/UICursorSelector.h"
+#include "Source/UI/Input/UIInputController.h"
+
 
 namespace app
 {
@@ -80,6 +83,11 @@ namespace app
 			UIIcon* m_frameBackIcon;
 			/** イベントテキスト */
 			std::array<UIText*, static_cast<uint8_t>(EnEventType::Num)> m_eventIcon;
+
+			/** コントローラの入力制御 */
+			AxisInputDetector m_axisInputDetector;
+			/** カーソル移動時の制御 */
+			CursorIndexSelector m_cursorSelector;
 		};
 	}
 }

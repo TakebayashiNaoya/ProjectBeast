@@ -39,6 +39,15 @@ namespace app
 			/** @brief 入隊判定半径（最外半径 + 入隊マージン） */
 			inline float GetJoinRadius()   const { return m_outerRadius + m_joinMargin; }
 
+			/** @brief 渦潮耐性パッシブを持つか（ディフェンス陣形のみtrue） */
+			virtual bool HasWhirlpoolResistance() const { return false; }
+
+			/**
+			 * @brief 指定フォロワー数に対応する入隊判定半径を返す
+			 * @param count フォロワー数
+			 */
+			virtual float GetJoinRadius(int count) const { return GetJoinRadius(); }
+
 			/**
 			 * @brief 陣形座標を計算する
 			 * @param center  親ペンギンの座標
@@ -70,7 +79,7 @@ namespace app
 		 * @details
 		 *   リング k（1始まり）に baseFollowers*k 体を等間隔配置する。
 		 *   各リングの半径は radiusPerRing*k。全リングで隣接間隔が均一になる。
-		 *   Circle・Cluster・Scatter はこのクラスを継承し定数だけ変える。
+		 *   Circle・Defense・Scatter はこのクラスを継承し定数だけ変える。
 		 */
 		class RingFormation : public IFormation
 		{
@@ -86,6 +95,21 @@ namespace app
 				std::vector<Vector3>& out,
 				int count
 			) override;
+
+			/** @brief count 人のときの次入隊リングから入隊半径を計算する */
+			float GetJoinRadius(int count) const override
+			{
+				// リング k の収容数は baseFollowers*k（k=1:9, k=2:18, ...）
+				// count 人が埋まったとき、次の入隊先リングを求める
+				int ring       = 1;
+				int cumulative = 0;
+				while (cumulative + m_baseFollowers * ring <= count)
+				{
+					cumulative += m_baseFollowers * ring;
+					++ring;
+				}
+				return m_radiusPerRing * ring + m_joinMargin;
+			}
 
 
 		private:
@@ -121,15 +145,16 @@ namespace app
 		 * @brief 密集陣（狭間隔）
 		 * @details リング間隔: ~5単位。速度が下がる代わりに防御効果を得られる。
 		 */
-		class ClusterFormation : public RingFormation
+		class DefenseFormation : public RingFormation
 		{
 		public:
-			ClusterFormation() : RingFormation(9, 8.0f)
+			DefenseFormation() : RingFormation(9, 8.0f)
 			{
 				m_joinMargin = 10.0f;
 			}
 
 			float GetSpeedMultiplier(int /*level*/) const override { return 0.8f; }
+			bool  HasWhirlpoolResistance()          const override { return true; }
 		};
 
 
