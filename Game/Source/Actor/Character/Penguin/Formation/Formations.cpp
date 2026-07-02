@@ -5,6 +5,8 @@
  */
 #include "stdafx.h"
 #include "Formations.h"
+#include "Passive/PassiveFactory.h"
+#include "Ult/UltFactory.h"
 
 
 namespace app
@@ -57,9 +59,55 @@ namespace app
 		}
 
 
-
+		
 
 		/****************************************/
+
+
+		CircleFormation::CircleFormation() : RingFormation(9, 22.0f)
+		{
+			m_passive = PassiveFactory::CreateCirclePassive();
+			m_ult     = UltFactory::CreateCircleUlt();
+		}
+
+
+		
+
+		/****************************************/
+
+
+		DefenseFormation::DefenseFormation() : RingFormation(9, 8.0f)
+		{
+			m_joinMargin = 10.0f;
+			m_passive    = PassiveFactory::CreateDefensePassive();
+			m_ult        = UltFactory::CreateDefenseUlt();
+		}
+
+
+		
+
+		/****************************************/
+
+
+		ScatterFormation::ScatterFormation() : RingFormation(9, 40.0f)
+		{
+			m_joinMargin = 50.0f;
+			m_passive    = PassiveFactory::CreateScatterPassive();
+			m_ult        = UltFactory::CreateScatterUlt();
+		}
+
+
+		
+
+		/****************************************/
+
+
+		TriangleFormation::TriangleFormation()
+		{
+			m_joinMargin = 15.0f;
+			m_passive    = PassiveFactory::CreateTrianglePassive();
+			m_ult        = UltFactory::CreateTriangleUlt();
+		}
 
 
 		void TriangleFormation::CalculatePositions(

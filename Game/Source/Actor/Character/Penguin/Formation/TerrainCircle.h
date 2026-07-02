@@ -63,16 +63,18 @@ namespace app
 
 			/**
 			 * @brief 塗りつぶしを持つかどうか
+			 * @return true のとき内側を TRIANGLE_LIST で塗りつぶす
 			 */
 			bool HasFill()     const { return m_hasFill; }
 
 			/**
 			 * @brief Update 済みで描画可能かどうか
+			 * @return true のとき描画可能
 			 */
 			bool HasVertices() const { return m_edgeVertexCount > 0; }
 
 
-		public:
+		private:
 			/**
 			 * @brief 指定 XZ 座標の地表 Y をサンプリングする
 			 * @details PhysicsWorld::Raycast → Ocean::SampleWaveHeight の順に試みる

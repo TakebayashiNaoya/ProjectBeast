@@ -7,8 +7,8 @@
 #include <unordered_set>
 #include "ChildPenguinTypes.h"
 #include "Source/Util/Curve.h"
-#include "Formation/FormationController.h"
-#include "Formation/FormationRangeVisualizer.h"
+#include "../Formation/FormationController.h"
+#include "../Formation/FormationRangeVisualizer.h"
 
 
 namespace app
@@ -227,6 +227,7 @@ namespace app
 
 			/**
 			 * @brief 陣形の移動速度倍率を取得する
+			 * @details パッシブ倍率 × ウルト倍率の積を返す。
 			 */
 			float GetFormationSpeedMultiplier() const { return m_formationController.GetSpeedMultiplier(); }
 
@@ -236,9 +237,34 @@ namespace app
 			float GetJoinRadius()  const { return m_formationController.GetJoinRadius(); }
 
 			/**
-			 * @brief 現在の陣形が渦潮耐性パッシブを持つか
+			 * @brief 現在の陣形が渦潮耐性を持つか（パッシブ OR ウルト免疫）
 			 */
 			bool HasWhirlpoolResistance() const { return m_formationController.HasWhirlpoolResistance(); }
+
+
+			//============================================//
+			// ウルト操作
+			//============================================//
+
+			/**
+			 * @brief ウルトを発動する（入力ハンドラから呼ぶ）
+			 */
+			void ActivateUlt();
+
+			/**
+			 * @brief ウルト発動中か
+			 */
+			bool IsUltActive() const { return m_formationController.IsUltActive(); }
+
+			/**
+			 * @brief ウルトが発動可能か
+			 */
+			bool CanActivateUlt() const { return m_formationController.CanActivateUlt(); }
+
+			/**
+			 * @brief ウルトのクールダウン残量を 0.0〜1.0 で返す（UI表示用）
+			 */
+			float GetUltCooldownRate() const { return m_formationController.GetUltCooldownRate(); }
 
 			/**
 			 * @brief 指定フォロワー数に対応する入隊判定半径を返す

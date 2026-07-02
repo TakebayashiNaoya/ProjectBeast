@@ -9,6 +9,7 @@
 #include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
+#include "../Formation/Ult/UltContext.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -96,6 +97,13 @@ namespace app
 			}
 
 			UpdateGhostPenguins();
+
+			/** ウルト更新 */
+			if (m_daddyPenguin != nullptr)
+			{
+				UltContext ctx{ this, m_daddyPenguin };
+				m_formationController.UpdateUlt(g_gameTime->GetFrameDeltaTime(), ctx);
+			}
 
 			/** L1/R1 で陣形を循環切り替え */
 			if (g_pad[0]->IsTrigger(enButtonRB1))
@@ -451,6 +459,14 @@ namespace app
 		int ChildPenguinManager::GetRescuedNum() const
 		{
 			return static_cast<int>(m_followers.size());
+		}
+
+
+		void ChildPenguinManager::ActivateUlt()
+		{
+			if (!m_daddyPenguin) return;
+			UltContext ctx{ this, m_daddyPenguin };
+			m_formationController.ActivateUlt(ctx);
 		}
 
 
