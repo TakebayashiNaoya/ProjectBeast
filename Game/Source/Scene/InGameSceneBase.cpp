@@ -419,7 +419,6 @@ namespace app
 			if (g_pad[0]->IsTrigger(enButtonStart))
 			{
 				SceneManager::GetInstance()->SetPause(true);
-				TimeManager::GetInstance().Pause();
 			}
 
 			/** プレイヤー・子ペンギン・シロクマ の更新 */
@@ -531,12 +530,16 @@ namespace app
 	{
 		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする
 		 *  チュートリアルポーズを含むすべてのポーズ種別に適用するため
-		 *  OnPauseUpdate() の前に実行する */
+		 *  OnPauseUpdate() の前に実行する
+		 *  TimeManagerの停止もここで行うことで、SceneManager側のポーズ切り替え
+		 *  （Selectボタン等、個別にTimeManager::Pause()を呼んでいない経路）でも
+		 *  再開時に経過時間がまとめて減算されないようにする */
 		if (!m_isPauseEntered)
 		{
 			SoundManager::Get().StopAllSE();
 			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 			nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(true);
+			TimeManager::GetInstance().Pause();
 			m_isPauseEntered = true;
 		}
 
