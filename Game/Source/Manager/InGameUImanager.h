@@ -104,6 +104,14 @@ namespace app
 		void RenderPlaying(RenderContext& rc);
 
 		/**
+		 * @brief プレイ中にアチーブメント一覧を描画する
+		 * @detail ポーズを開かずに確認させたいステージ（チュートリアル等）専用。
+		 *         通常の RenderPlaying() には含めない。
+		 * @param rc レンダーコンテキスト
+		 */
+		void RenderAchievementInPlaying(RenderContext& rc);
+
+		/**
 		 * @brief フィニッシュフェーズの描画
 		 * @param rc レンダーコンテキスト
 		 */
@@ -162,6 +170,13 @@ namespace app
 
 		void SetMiniMapIconNum(ui::EnMiniMapIconType type, uint8_t num);
 		void InitializeMapIcon();
+
+		/**
+		 * @brief 実績一覧UIの表示位置にYオフセットを設定する（チュートリアル等、特定ステージのみ使用）
+		 * @detail JSON上の初期座標を基準にオフセットを加算するため、何度呼んでも位置が多重にずれることはない。
+		 * @param offsetY 加算するYオフセット（未設定時は0＝JSON通りの位置）
+		 */
+		void SetAchievementPositionOffsetY(float offsetY);
 
 		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する

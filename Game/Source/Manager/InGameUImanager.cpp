@@ -150,6 +150,17 @@ namespace app
 	}
 
 
+	void InGameUIManager::SetAchievementPositionOffsetY(float offsetY)
+	{
+		if (!m_achievementPacket) return;
+
+		if (auto* menu = m_achievementPacket->GetMenu())
+		{
+			menu->SetPositionOffsetY(offsetY);
+		}
+	}
+
+
 	void InGameUIManager::AddSearchLayout(actor::Enemy* enemy)
 	{
 		ui::UIPacket<ui::SearchMenu> searchPacket;
@@ -348,6 +359,24 @@ namespace app
 		if (m_miniMapPacket) m_miniMapPacket->Update();
 		if (m_achievementPacket) m_achievementPacket->Update();
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Update();
+
+		if (m_achievementPacket)
+		{
+			bool isShowing = false;
+			if (m_achievementNotificationPacket)
+			{
+				if (auto* notifyMenu = m_achievementNotificationPacket->GetMenu())
+				{
+					isShowing = notifyMenu->IsShowing();
+				}
+			}
+
+			if (auto* listMenu = m_achievementPacket->GetMenu())
+			{
+				listMenu->SetDraw(!isShowing);
+			}
+		}
+
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Update();
 		if (m_debufPacket) m_debufPacket->Update();
 	}
@@ -368,6 +397,14 @@ namespace app
 	void InGameUIManager::UpdatePause()
 	{
 		if (m_pausePacket) m_pausePacket->Update();
+
+		if (m_achievementPacket)
+		{
+			if (auto* listMenu = m_achievementPacket->GetMenu())
+			{
+				listMenu->SetDraw(true);
+			}
+		}
 	}
 
 
@@ -400,6 +437,12 @@ namespace app
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Render(rc);
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Render(rc);
 		if (m_debufPacket) m_debufPacket->Render(rc);
+	}
+
+
+	void InGameUIManager::RenderAchievementInPlaying(RenderContext& rc)
+	{
+		if (m_achievementPacket) m_achievementPacket->Render(rc);
 	}
 
 
