@@ -77,10 +77,10 @@ namespace app
 				}
 			}
 
-			auto* bgIcon    = GetUI<UIIcon>(Hash32("AchieveBackGroundIcon"));
-			auto* checkBox  = GetUI<UIIcon>(Hash32("CheckBoxIcon"));
+			auto* bgIcon = GetUI<UIIcon>(Hash32("AchieveBackGroundIcon"));
+			auto* checkBox = GetUI<UIIcon>(Hash32("CheckBoxIcon"));
 			auto* stampIcon = GetUI<UIIcon>(Hash32("Stamp"));
-			auto* nameText  = GetUI<UIText>(Hash32("AchieveNameText"));
+			auto* nameText = GetUI<UIText>(Hash32("AchieveNameText"));
 
 			// 3. アニメーション開始
 			if (!m_isPlaying && !m_notificationQueue.empty())
@@ -96,13 +96,13 @@ namespace app
 				}
 
 				// 各UIを初期座標にリセット
-				if (bgIcon)   bgIcon->m_transform.m_localTransform.m_position   = m_defaultBgPos;
+				if (bgIcon)   bgIcon->m_transform.m_localTransform.m_position = m_defaultBgPos;
 				if (checkBox) checkBox->m_transform.m_localTransform.m_position = m_defaultCheckPos;
 				if (stampIcon) stampIcon->m_transform.m_localTransform.m_position = m_defaultStampPos;
 
-				if (bgIcon)   bgIcon->m_isDraw   = true;
-				if (checkBox) checkBox->m_isDraw  = true;
-				if (nameText) nameText->m_isDraw  = true;
+				if (bgIcon)   bgIcon->m_isDraw = true;
+				if (checkBox) checkBox->m_isDraw = true;
+				if (nameText) nameText->m_isDraw = true;
 
 				auto attachAndPlayFadeIn = [this](UIBase* ui, const Vector3& defaultPos) {
 					if (!ui) return;
@@ -113,7 +113,7 @@ namespace app
 					if (auto* anim = ui->FindAnimation(animKey::ACHIEVE_FADE_IN_ANIM_KEY))
 					{
 						auto* translateAnim = static_cast<UITranslateAnimation*>(anim);
-						Vector3 endPos   = defaultPos;
+						Vector3 endPos = defaultPos;
 						Vector3 startPos = endPos;
 						startPos.x += FADE_IN_OFFSET_X;
 						translateAnim->SetParameter(
@@ -124,15 +124,15 @@ namespace app
 						);
 						anim->PlayAnimation();
 					}
-				};
+					};
 
-				attachAndPlayFadeIn(bgIcon,    m_defaultBgPos);
-				attachAndPlayFadeIn(checkBox,  m_defaultCheckPos);
-				attachAndPlayFadeIn(nameText,  m_defaultNameTextPos);
+				attachAndPlayFadeIn(bgIcon, m_defaultBgPos);
+				attachAndPlayFadeIn(checkBox, m_defaultCheckPos);
+				attachAndPlayFadeIn(nameText, m_defaultNameTextPos);
 
-				m_isPlaying  = true;
-				m_animState  = AnimState::FadeIn;
-				m_animTimer  = 0.0f;
+				m_isPlaying = true;
+				m_animState = AnimState::FadeIn;
+				m_animTimer = 0.0f;
 
 				app::SoundManager::Get().PlaySE(app::enSoundKind_NoticeAchievement);
 			}
@@ -201,7 +201,7 @@ namespace app
 							{
 								auto* translateAnim = static_cast<UITranslateAnimation*>(anim);
 								Vector3 startPos = defaultPos;
-								Vector3 endPos   = startPos;
+								Vector3 endPos = startPos;
 								endPos.x += FADE_OUT_OFFSET_X;
 								translateAnim->SetParameter(
 									startPos, endPos,
@@ -211,11 +211,11 @@ namespace app
 								);
 								anim->PlayAnimation();
 							}
-						};
+							};
 
-						attachAndPlayFadeOut(bgIcon,    m_defaultBgPos);
-						attachAndPlayFadeOut(checkBox,  m_defaultCheckPos);
-						attachAndPlayFadeOut(nameText,  m_defaultNameTextPos);
+						attachAndPlayFadeOut(bgIcon, m_defaultBgPos);
+						attachAndPlayFadeOut(checkBox, m_defaultCheckPos);
+						attachAndPlayFadeOut(nameText, m_defaultNameTextPos);
 						attachAndPlayFadeOut(stampIcon, m_defaultStampPos);
 					}
 					break;
@@ -233,7 +233,7 @@ namespace app
 							ui->RemoveAnimation(animKey::ACHIEVE_FADE_IN_ANIM_KEY);
 							ui->RemoveAnimation(animKey::ACHIEVE_FADE_OUT_ANIM_KEY);
 							ui->RemoveAnimation(animKey::ACHIEVE_STAMP_ANIM_KEY);
-						};
+							};
 
 						clearAnims(bgIcon);
 						clearAnims(checkBox);
@@ -241,9 +241,9 @@ namespace app
 						clearAnims(nameText);
 
 						if (stampIcon) stampIcon->m_isDraw = false;
-						if (bgIcon)    bgIcon->m_isDraw    = false;
-						if (checkBox)  checkBox->m_isDraw  = false;
-						if (nameText)  nameText->m_isDraw  = false;
+						if (bgIcon)    bgIcon->m_isDraw = false;
+						if (checkBox)  checkBox->m_isDraw = false;
+						if (nameText)  nameText->m_isDraw = false;
 					}
 				}
 				break;
@@ -255,6 +255,14 @@ namespace app
 			}
 
 			MenuBase::Update();
+		}
+
+
+		bool AchievementNotificationMenu::IsShowing() const
+		{
+			// m_isPlayingは FadeIn開始〜FadeOut完了まで true のまま。
+			// つまりバナーが画面外に消えきるまでずっとtrueを返す。
+			return m_isPlaying;
 		}
 
 
@@ -272,20 +280,20 @@ namespace app
 			m_animTimer = 0.0f;
 			m_animState = AnimState::Idle;
 
-			auto* bgIcon    = GetUI<UIIcon>(Hash32("AchieveBackGroundIcon"));
-			auto* checkBox  = GetUI<UIIcon>(Hash32("CheckBoxIcon"));
+			auto* bgIcon = GetUI<UIIcon>(Hash32("AchieveBackGroundIcon"));
+			auto* checkBox = GetUI<UIIcon>(Hash32("CheckBoxIcon"));
 			auto* stampIcon = GetUI<UIIcon>(Hash32("Stamp"));
-			auto* nameText  = GetUI<UIText>(Hash32("AchieveNameText"));
+			auto* nameText = GetUI<UIText>(Hash32("AchieveNameText"));
 
-			if (bgIcon)    m_defaultBgPos        = bgIcon->m_transform.m_localTransform.m_position;
-			if (checkBox)  m_defaultCheckPos      = checkBox->m_transform.m_localTransform.m_position;
-			if (stampIcon) m_defaultStampPos      = stampIcon->m_transform.m_localTransform.m_position;
-			if (nameText)  m_defaultNameTextPos   = nameText->m_transform.m_localTransform.m_position;
+			if (bgIcon)    m_defaultBgPos = bgIcon->m_transform.m_localTransform.m_position;
+			if (checkBox)  m_defaultCheckPos = checkBox->m_transform.m_localTransform.m_position;
+			if (stampIcon) m_defaultStampPos = stampIcon->m_transform.m_localTransform.m_position;
+			if (nameText)  m_defaultNameTextPos = nameText->m_transform.m_localTransform.m_position;
 
-			if (bgIcon)    bgIcon->m_isDraw    = false;
-			if (checkBox)  checkBox->m_isDraw  = false;
+			if (bgIcon)    bgIcon->m_isDraw = false;
+			if (checkBox)  checkBox->m_isDraw = false;
 			if (stampIcon) stampIcon->m_isDraw = false;
-			if (nameText)  nameText->m_isDraw  = false;
+			if (nameText)  nameText->m_isDraw = false;
 		}
 	}
 }
