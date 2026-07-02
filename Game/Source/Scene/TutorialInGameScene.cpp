@@ -11,9 +11,20 @@
 
 namespace app
 {
+	namespace
+	{
+		/**
+		 * チュートリアルは実績一覧を常時表示するため、
+		 * 画面下部のインゲームボタン等と重ならないよう少し上にずらす。
+		 */
+		constexpr float TUTORIAL_ACHIEVEMENT_OFFSET_Y = 40.0f;
+	}
+
 	void TutorialInGameScene::OnLoadComplete()
 	{
 		m_tutorialController.Initialize(m_daddyPenguin);
+
+		InGameUIManager::GetInstance()->SetAchievementPositionOffsetY(TUTORIAL_ACHIEVEMENT_OFFSET_Y);
 	}
 
 

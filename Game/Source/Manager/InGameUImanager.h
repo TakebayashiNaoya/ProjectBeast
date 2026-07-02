@@ -172,6 +172,13 @@ namespace app
 		void InitializeMapIcon();
 
 		/**
+		 * @brief 実績一覧UIの表示位置にYオフセットを設定する（チュートリアル等、特定ステージのみ使用）
+		 * @detail JSON上の初期座標を基準にオフセットを加算するため、何度呼んでも位置が多重にずれることはない。
+		 * @param offsetY 加算するYオフセット（未設定時は0＝JSON通りの位置）
+		 */
+		void SetAchievementPositionOffsetY(float offsetY);
+
+		/**
 		 * @brief エネミー1体分の探索Layoutを生成して登録する
 		 * @detail LoadPhase::Enemy でエネミー生成後に呼ぶ
 		 * @param enemy 対象エネミーのポインタ
