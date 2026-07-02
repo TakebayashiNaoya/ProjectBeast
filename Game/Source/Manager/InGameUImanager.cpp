@@ -397,6 +397,14 @@ namespace app
 	void InGameUIManager::UpdatePause()
 	{
 		if (m_pausePacket) m_pausePacket->Update();
+
+		if (m_achievementPacket)
+		{
+			if (auto* listMenu = m_achievementPacket->GetMenu())
+			{
+				listMenu->SetDraw(true);
+			}
+		}
 	}
 
 

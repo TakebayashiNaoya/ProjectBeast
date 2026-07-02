@@ -37,7 +37,6 @@ namespace app
 			 */
 			void InitializeLogic() override;
 
-
 			/**
 			 * @brief 表示位置のYオフセットを設定する（チュートリアル等、特定ステージのみ使用）
 			 * @details JSON上の初期座標を基準にオフセットを加算するため、
@@ -45,7 +44,6 @@ namespace app
 			 * @param offsetY 加算するYオフセット（未設定時は0＝JSON通りの位置）
 			 */
 			void SetPositionOffsetY(float offsetY);
-
 
 			/**
 			 * @brief このメニュー全体の表示/非表示を切り替える

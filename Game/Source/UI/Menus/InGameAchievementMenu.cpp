@@ -130,6 +130,7 @@ namespace app
 			MenuBase::Update();
 		}
 
+
 		void InGameAchievementMenu::SetPositionOffsetY(float offsetY)
 		{
 			if (m_positionOffsetY == offsetY) return;
@@ -142,6 +143,7 @@ namespace app
 				InitializeLogic();
 			}
 		}
+
 
 		void InGameAchievementMenu::SetDraw(bool isDraw)
 		{

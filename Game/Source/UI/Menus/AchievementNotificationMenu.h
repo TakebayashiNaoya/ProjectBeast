@@ -35,7 +35,6 @@ namespace app
 			/** 描画処理 */
 			void Render(RenderContext& rc) override;
 
-
 			/** UIのロジック初期化処理 */
 			void InitializeLogic() override;
 
