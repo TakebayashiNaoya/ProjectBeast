@@ -64,7 +64,7 @@ namespace app
 
 		// --- UI: ゲージ・数値変動（救助数など） ---
 		enSoundKind_RemainPlus,
-		enSoundKind_RemainORTotalMinus,
+		enSoundKind_Minus,
 
 		// --- UI: 実績通知 ---
 		enSoundKind_NoticeAchievement,

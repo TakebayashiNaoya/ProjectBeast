@@ -12,11 +12,12 @@ namespace app
 	{
 		/**
 		 * @brief リアクションタイプ
-		 * @details Tongue:舌、Bed:ベッド、None:なし
+		 * @details Tongue:舌、Debuff:デバフ、Bed:ベッド、None:なし
 		 */
 		enum class EnBearReactionType : uint8_t
 		{
 			Tongue,
+			Debuff,
 			Bed,
 			None,
 			Max

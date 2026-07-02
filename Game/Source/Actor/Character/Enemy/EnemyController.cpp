@@ -958,6 +958,7 @@ namespace app
 		void EnemyController::ExitReturnHome(EnemyController* enemy)
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetReturnHome(false);
+			enemy->m_target->GetEnemyStateMachine()->SetDebuffReturnHome(false);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 		}
 

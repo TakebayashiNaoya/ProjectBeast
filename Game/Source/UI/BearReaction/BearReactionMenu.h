@@ -47,6 +47,8 @@ namespace app
 			UIIcon* m_tongue;
 			/** ベッド */
 			UIIcon* m_bed;
+			/** 落ち込み */
+			UIIcon* m_feelingDown;
 		};
 	}
 }

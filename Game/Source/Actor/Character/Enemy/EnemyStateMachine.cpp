@@ -31,6 +31,7 @@ namespace app
 			, m_canAttack(false)
 			, m_isStun(false)
 			, m_isReturnHome(false)
+			, m_isDebuffReturnHome(false)
 			, m_isCoolDown(false)
 			, m_isAttackPlaying(false)
 			, m_isRoar(false)

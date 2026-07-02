@@ -88,16 +88,6 @@ namespace app
 			 */
 			void MapFrameRotation();
 
-			void UpdateDrawFlag();
-
-
-			/**
-			 * @brief マップのアイコンを描画する
-			 * @param isDraw 描画するかどうかのフラグ
-			 * @detail 親ペンギン、マップ、フレームのみ操作する
-			 */
-			void DrawMapIcons(const bool isDraw);
-
 
 		private:
 			/** ミニマップのステータス */
@@ -129,11 +119,6 @@ namespace app
 
 			/** アイコンの種類ごとの情報を保持する配列 */
 			std::array<MapIconInfo, static_cast<uint8_t>(EnMiniMapIconType::Num)> m_iconVectors;
-
-
-
-			/** UIを表示するかのフラグ */
-			bool m_isDraw;
 
 			/** ゲーム開始時のアニメーションロジック */
 			InGameStartingAnimLogic m_startingAnimLogic;
