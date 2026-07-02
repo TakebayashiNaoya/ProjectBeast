@@ -553,6 +553,9 @@
     <ClCompile Include="Source\Actor\Character\penguin\Formation\FormationController.cpp">
       <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\penguin\Formation\FormationDebugMonitor.cpp">
+      <Filter>Source\Actor\Character\penguin\Formation</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\penguin\Formation\FormationRangeVisualizer.cpp">
       <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClCompile>
@@ -1060,6 +1063,9 @@
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationController.h">
+      <Filter>Source\Actor\Character\penguin\Formation</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationDebugMonitor.h">
       <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationRangeVisualizer.h">

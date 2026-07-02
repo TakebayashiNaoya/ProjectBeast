@@ -273,6 +273,7 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\FormationController.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\FormationDebugMonitor.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\FormationRangeVisualizer.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\TerrainCircle.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\Formations.cpp" />
@@ -437,6 +438,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationController.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationDebugMonitor.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationRangeVisualizer.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\TerrainCircle.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Formations.h" />

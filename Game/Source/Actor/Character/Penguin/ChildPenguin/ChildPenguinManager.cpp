@@ -10,6 +10,9 @@
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
 #include "../Formation/Ult/UltContext.h"
+#if defined(_DEBUG) || defined(K2_DEBUG)
+#include "../Formation/FormationDebugMonitor.h"
+#endif
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -66,7 +69,11 @@ namespace app
 			, m_isGhostHidden(false)
 			, m_ghostTimer(0.0f)
 			, m_target(nullptr)
-		{}
+		{
+#if defined(_DEBUG) || defined(K2_DEBUG)
+			m_formationDebugMonitor = std::make_unique<FormationDebugMonitor>(this);
+#endif
+		}
 
 
 		ChildPenguinManager::~ChildPenguinManager()

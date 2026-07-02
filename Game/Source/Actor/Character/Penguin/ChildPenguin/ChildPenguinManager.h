@@ -19,6 +19,7 @@ namespace app
 		class ChildPenguin;
 		class DaddyPenguin;
 		class Enemy;
+			class FormationDebugMonitor;
 
 
 		/**
@@ -282,6 +283,18 @@ namespace app
 				return HasWhirlpoolResistance() && IsFollower(penguin);
 			}
 
+			/**
+			 * @brief 陣形レベルを取得する
+			 * @return 陣形レベル
+			 */
+			int GetFormationLevel() const { return m_formationController.GetFormationLevel(); }
+
+			/**
+			 * @brief 陣形の最外半径を取得する（CalculatePositions後に有効）
+			 * @return 最外半径
+			 */
+			float GetOuterRadius() const { return m_formationController.GetOuterRadius(); }
+
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
 			DaddyPenguin* m_daddyPenguin = nullptr;
@@ -300,6 +313,11 @@ namespace app
 
 			/** 陣形範囲ビジュアライザー */
 			FormationRangeVisualizer m_rangeVisualizer;
+
+#if defined(_DEBUG) || defined(K2_DEBUG)
+			/** 陣形の状態をImGuiで監視するデバッグ用クラス */
+			std::unique_ptr<FormationDebugMonitor> m_formationDebugMonitor;
+#endif
 
 
 
