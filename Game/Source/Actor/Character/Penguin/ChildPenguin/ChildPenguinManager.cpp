@@ -871,6 +871,8 @@ namespace app
 						// 寝ている状態かつすでに帰巣中でなければデバフを発動!
 						if (!sm->IsCoolDown() && !sm->IsReturnHome())
 						{
+							// デバフが発動したことをシロクマに通知。
+							sm->SetDebuffReturnHome(true);
 							// シロクマを家に帰す。
 							sm->SetReturnHome(true);
 							// デバフを有効化。
