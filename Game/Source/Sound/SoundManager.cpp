@@ -101,7 +101,7 @@ namespace app
 			for (const auto& info : infoList) {
 				auto* se = NewGO<SoundSource>(0, SOUND_GO_NAME);
 				se->Init(info.m_kind, info.m_is3D);
-				se->SetVolume(m_masterVolume * m_seVolume);
+				se->SetVolume(m_masterVolume * m_seVolume * info.m_volumeMagnification);
 				se->Play(info.m_isLoop);
 				m_seList.emplace(info.m_handle, se);
 				m_seHandleKindMap.emplace(info.m_handle, info.m_kind);
@@ -113,8 +113,14 @@ namespace app
 	}
 
 
-	void SoundManager::PlayBGM(const int kind)
+	void SoundManager::PlayBGM(const int kind, const float volumeMagnification)
 	{
+		const float bgmVolumeMagn = (volumeMagnification == INVALID_VOLUME) ? DEFAULT_VOLUME_MAGNIFICATION : volumeMagnification;
+
+		// BGMはゲーム上に1つしか存在しないため、常に情報を上書きする
+		// （BGMInformationのコンストラクタでisLoopは強制的にtrueになる）
+		m_bgmInformation.emplace(kind, bgmVolumeMagn);
+
 		if (m_bgm == nullptr) {
 			m_bgm = NewGO<SoundSource>(0, SOUND_GO_NAME);
 		}
@@ -123,7 +129,7 @@ namespace app
 		}
 		/** 初期化 */
 		m_bgm->Init(kind);
-		m_bgm->Play(true);
+		m_bgm->Play(m_bgmInformation->m_isLoop); // 必ずtrue（ループ再生）
 
 		ApplyBGMVolume();
 	}
@@ -138,7 +144,7 @@ namespace app
 	}
 
 
-	SEHandle SoundManager::PlaySE(const int kind, const bool isLoop, const bool is3D, const EnSoundPriority priority)
+	SEHandle SoundManager::PlaySE(const int kind, const float volumeMagnification, const bool isLoop, const bool is3D, const EnSoundPriority priority)
 	{
 		if (m_soundHandleCount == INVALID_SE_HANDLE) {
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
@@ -174,7 +180,9 @@ namespace app
 		// ================================
 
 		SEHandle handle = m_soundHandleCount++;
-		m_seInfomationList[priority].push_back(SEInformation(kind, isLoop, is3D, handle));
+
+		const float seVolume = (volumeMagnification == INVALID_VOLUME) ? DEFAULT_VOLUME_MAGNIFICATION : volumeMagnification;
+		m_seInfomationList[priority].push_back(SEInformation(kind, isLoop, is3D, handle, seVolume));
 		return handle;
 	}
 
@@ -263,7 +271,8 @@ namespace app
 	{
 		if (m_bgm)
 		{
-			m_bgm->SetVolume(m_masterVolume * m_bgmVolume);
+			const float volumeMagn = m_bgmInformation ? m_bgmInformation->m_volumeMagnification : DEFAULT_VOLUME_MAGNIFICATION;
+			m_bgm->SetVolume(m_masterVolume * m_bgmVolume * volumeMagn);
 		}
 	}
 

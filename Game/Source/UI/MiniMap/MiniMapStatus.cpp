@@ -37,7 +37,7 @@ namespace app
 				{ "naughtyName",  "childPenWidth",   "childPenHeight"   },
 				{ "clumsyName",   "childPenWidth",   "childPenHeight"   },
 				{ "caringName",   "childPenWidth",   "childPenHeight"   },
-				{ "bearNestName", "bearNestwidth",   "bearNestHeight"   },
+				{ "bearNestName", "bearNestWidth",   "bearNestHeight"   },
 				{ "bearName",     "bearWidth",       "bearHeight"       },
 				{ "whirlpoolName","whirlpoolWidth",  "whirlpoolHeight"  },
 				{ "iglooName",    "iglooWidth",      "iglooHeight"      },
@@ -56,7 +56,9 @@ namespace app
 					param.initScale = JC::ToVector3(j, "initScale");
 					param.initRotation = JC::ToRotation(j, "initRotationDeg");
 					param.initColor = JC::ToVector4(j, "initColor");
-
+					param.daddyInfo.path = JC::ToString(j, "daddyName");
+					param.daddyInfo.width = JC::ToFloat(j, "daddyWidth");
+					param.daddyInfo.height = JC::ToFloat(j, "daddyHeight");
 
 					for (uint8_t i = 0; i < static_cast<uint8_t>(EnMiniMapIconType::Num); i++)
 					{
@@ -83,6 +85,7 @@ namespace app
 			m_limitDistance = param->mapLimitDistance;
 			m_mapCenterPos = param->mapCenterPos;
 
+			m_daddyInfo = param->daddyInfo;
 			m_iconInitializeInfos = param->iconInitializeInfos;
 
 			m_initPosition = param->initPosition;

@@ -30,6 +30,7 @@ namespace app
 			float GetRadius() const { return m_radius; }
 			float GetLimitDistance() const { return m_limitDistance; }
 			const Vector3& GetMapCenterPos() const { return m_mapCenterPos; }
+			const MiniMapIconInitializeInfo& GetDaddyInfo() const { return m_daddyInfo; }
 			const MiniMapInitializeInfo& GetIconInitializeInfos() const { return m_iconInitializeInfos; }
 			const Vector3& GetInitPosition() const { return m_initPosition; }
 			const Vector3& GetInitScale() const { return m_initScale; }
@@ -41,6 +42,7 @@ namespace app
 			float m_radius;
 			float m_limitDistance;
 			Vector3 m_mapCenterPos;
+			MiniMapIconInitializeInfo m_daddyInfo;
 			MiniMapInitializeInfo m_iconInitializeInfos;
 			Vector3 m_initPosition;
 			Vector3 m_initScale;

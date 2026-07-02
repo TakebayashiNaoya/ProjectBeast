@@ -32,6 +32,8 @@ namespace app
 			float mapLimitDistance;
 			/** マップの中心座標 */
 			Vector3 mapCenterPos;
+			/** 親ペンギンの初期化情報 */
+			MiniMapIconInitializeInfo daddyInfo;
 			/** アイコンの初期化情報 */
 			MiniMapInitializeInfo iconInitializeInfos;
 			/** 画像の初期座標 */

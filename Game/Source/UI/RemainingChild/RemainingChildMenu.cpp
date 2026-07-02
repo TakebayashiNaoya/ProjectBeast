@@ -140,7 +140,8 @@ namespace app
 							, [remainText, this]()
 							{
 								// SEを再生。
-								SoundManager::Get().PlaySE(enSoundKind_RemainPlus);
+								SoundManager::Get().PlaySE(enSoundKind_RemainPlus, 2.0f);
+
 							}
 							, []() {})
 						// アニメーション完了後にSEを停止する。
@@ -179,7 +180,7 @@ namespace app
 							, [remainText]()
 							{
 								// SEを再生。
-								SoundManager::Get().PlaySE(enSoundKind_RemainORTotalMinus);
+								SoundManager::Get().PlaySE(enSoundKind_Minus, 1.5f);
 							},
 							[]() {})
 						// アニメーション完了後にSEを停止する。
@@ -231,7 +232,7 @@ namespace app
 							, [totalText]()
 							{
 								// SEを再生。
-								SoundManager::Get().PlaySE(enSoundKind_RemainORTotalMinus);
+								SoundManager::Get().PlaySE(enSoundKind_Minus, 1.5f);
 							}
 							, []() {})
 						// アニメーション完了後にSEを停止する。

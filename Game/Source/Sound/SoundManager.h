@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Sound/Types.h"
+#include <optional>
 
 
 namespace app
@@ -18,6 +19,10 @@ namespace app
 	using VoiceHandle = uint32_t;
 	/** ハンドル無効値 */
 	static constexpr VoiceHandle INVALID_VOICE_HANDLE = 0xffffffff;
+
+	/** 無効な音量値 */
+	static constexpr float INVALID_VOLUME = -1.0f;
+	static constexpr float DEFAULT_VOLUME_MAGNIFICATION = 1.0f;
 
 
 	/** サウンド再生の優先度 */
@@ -38,22 +43,58 @@ namespace app
 	{
 	private:
 		/**
-		 * SE再生用の情報
-		 * NOTE: リクエスト方式にするため一時的に情報を確保
+		 * @brief サウンドの情報の構造体
 		 */
-		struct SEInformation
+		struct SoundInformation
 		{
-			int m_kind = 0;
-			bool m_isLoop = false;
-			bool m_is3D = false;
-			VoiceHandle m_handle = INVALID_VOICE_HANDLE;
-			//
-			SEInformation(const int kind, const bool isLoop, const bool is3D, const VoiceHandle handle)
+			/** サウンドの種類 */
+			int m_kind;
+			/** ループ再生するか */
+			bool m_isLoop;
+			/** 3Dサウンドか */
+			bool m_is3D;
+			/** 音量 */
+			float m_volumeMagnification;
+
+
+			SoundInformation(const int kind, const bool isLoop, const bool is3D, const float volumeMagn)
 				: m_kind(kind)
 				, m_isLoop(isLoop)
 				, m_is3D(is3D)
+				, m_volumeMagnification(volumeMagn)
+			{}
+			~SoundInformation() = default;
+		};
+
+
+		/**
+		 * SE再生用の情報
+		 */
+		struct SEInformation : public SoundInformation
+		{
+			/** 再生中のSEのハンドル */
+			SEHandle m_handle;
+
+
+			SEInformation(const int kind, const bool isLoop, const bool is3D, const SEHandle handle, const float volumeMagn)
+				: SoundInformation(kind, isLoop, is3D, volumeMagn)
 				, m_handle(handle)
 			{}
+			~SEInformation() = default;
+		};
+
+
+		/**
+		 * @brief BGM再生用の情報
+		 * @detail BGMはゲーム上に1つしか存在せず、必ずループ再生される
+		 *		   （isLoopは常にtrue固定、SoundManager側で1インスタンスのみ保持することで単一性を保証する）
+		 */
+		struct BGMInformation : public SoundInformation
+		{
+			BGMInformation(const int kind, const float volumeMagn)
+				: SoundInformation(kind, /*isLoop=*/true, /*is3D=*/false, volumeMagn)
+			{}
+			~BGMInformation() = default;
 		};
 
 
@@ -67,8 +108,8 @@ namespace app
 
 
 	public:
-		/** BGMの再生 */
-		void PlayBGM(const int kind);
+		/** BGMの再生（BGMは常に1つ・必ずループ） */
+		void PlayBGM(const int kind, const float volumeMagnification = INVALID_VOLUME);
 		/** BGMの停止 */
 		void StopBGM();
 
@@ -78,7 +119,7 @@ namespace app
 		 * NOTE: フレームの最後でまとめて再生される
 		 *		 再生されない可能性があるのでHandleから取得する際はnullptrチェックをすること
 		 */
-		SEHandle PlaySE(const int kind, const bool isLoop = false, const bool is3D = false, const EnSoundPriority priority = enSoundPriority_Normal);
+		SEHandle PlaySE(const int kind, const float volumeMagnification = INVALID_VOLUME, const bool isLoop = false, const bool is3D = false, const EnSoundPriority priority = enSoundPriority_Normal);
 		/** SEの停止 */
 		void StopSE(const SEHandle handle);
 		/** 全てのSEを停止 */
@@ -99,6 +140,59 @@ namespace app
 			}
 			//K2_ASSERT(false, "削除済みか追加されていないSEにアクセスしようとしています。\n");
 			return nullptr;
+		}
+
+
+	public:
+		/**
+		 * @brief BGMが再生中かどうかを確認する
+		 * @return 再生中ならtrue
+		 */
+		bool IsPlayingBGM() const
+		{
+			return (m_bgm != nullptr) && m_bgm->IsPlaying();
+		}
+
+		/**
+		 * @brief 指定したハンドルのSEが再生中かどうかを確認する
+		 * @param handle 確認するSEのハンドル
+		 * @return 再生中ならtrue（見つからない・再生していない場合はfalse）
+		 */
+		bool IsPlayingSE(const SEHandle handle) const
+		{
+			auto it = m_seList.find(handle);
+			if (it != m_seList.end() && it->second != nullptr) {
+				return it->second->IsPlaying();
+			}
+			return false;
+		}
+
+		/**
+		 * @brief 何かしらのSEが再生中かどうかを確認する
+		 * @return 1つでも再生中のSEがあればtrue
+		 */
+		bool IsPlayingAnySE() const
+		{
+			for (const auto& it : m_seList) {
+				if (it.second != nullptr && it.second->IsPlaying()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * @brief 指定したハンドルのVoiceが再生中かどうかを確認する
+		 * @param handle 確認するVoiceのハンドル
+		 * @return 再生中ならtrue（見つからない・再生していない場合はfalse）
+		 */
+		bool IsPlayingVoice(const VoiceHandle handle) const
+		{
+			auto it = m_voiceList.find(handle);
+			if (it != m_voiceList.end() && it->second != nullptr) {
+				return it->second->IsPlaying();
+			}
+			return false;
 		}
 
 
@@ -185,6 +279,11 @@ namespace app
 	private:
 		/** BGM用のサウンドソースインスタンスを保持する */
 		SoundSource* m_bgm = nullptr;
+		/**
+		 * 現在再生中のBGMの情報
+		 * @detail BGMはゲーム上に1つしか存在しないため、リストではなく単一のoptionalで保持する
+		 */
+		std::optional<BGMInformation> m_bgmInformation;
 		/** SE用のサウンドソースインスタンスを保持する */
 		std::map<SEHandle, SoundSource*> m_seList;
 		/** Voice用のサウンドソースインスタンスを保持する */
