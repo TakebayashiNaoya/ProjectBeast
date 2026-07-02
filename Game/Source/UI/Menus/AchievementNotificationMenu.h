@@ -38,7 +38,6 @@ namespace app
 			/** UIのロジック初期化処理 */
 			void InitializeLogic() override;
 
-
 			/**
 			 * @brief 通知バナーが表示中(スライドイン〜スタンプ演出〜フェードアウトで画面外に消えきるまで)かどうか
 			 * @details InGameAchievementMenu（常時表示リスト）側で、
