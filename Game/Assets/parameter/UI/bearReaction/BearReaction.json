@@ -35,7 +35,7 @@
                 "color" : [255, 255, 255, 255]
             },
             {
-                "comment":"シロクマに頭上に付けるデバフアイコン",
+                "comment":"シロクマの頭上に付けるデバフアイコン",
                 "type":"UIIcon",
                 "name":"feelingDownReaction",
                 "asset":"Assets/spriteData/UI/Icon/Debuf/FeelingDown.DDS",
