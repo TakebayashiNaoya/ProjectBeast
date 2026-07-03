@@ -19,7 +19,7 @@ namespace app
 		{
 			m_formations[static_cast<size_t>(EnFormationType::Circle)]   = std::make_unique<CircleFormation>();
 			m_formations[static_cast<size_t>(EnFormationType::Triangle)] = std::make_unique<TriangleFormation>();
-			m_formations[static_cast<size_t>(EnFormationType::Defense)]  = std::make_unique<DefenseFormation>();
+			m_formations[static_cast<size_t>(EnFormationType::Cluster)]  = std::make_unique<ClusterFormation>();
 			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>();
 
 			SwitchFormation(EnFormationType::Circle);
@@ -54,7 +54,7 @@ namespace app
 			m_currentType      = type;
 			m_currentFormation = m_formations[static_cast<size_t>(type)].get();
 
-			// 陣形切り替えと同時にウルトも差し替える
+			// 陣形切り替えと同時にウルトチェーンも差し替える
 			m_ultController.SetUlt(m_currentFormation->GetUlt(), ULT_DURATION, ULT_COOLDOWN);
 		}
 
@@ -63,10 +63,13 @@ namespace app
 		{
 			if (!m_currentFormation) return 1.0f;
 
-			// パッシブ倍率 × ウルト倍率
-			const float passive = m_currentFormation->GetPassive()->GetSpeedMultiplier(m_formationLevel);
-			const float ult     = m_ultController.GetSpeedMultiplierBonus();
-			return passive * ult;
+			// パッシブ倍率 × (ウルト中ならウルト倍率)
+			float speed = m_currentFormation->GetPassive().GetSpeedMultiplier(m_formationLevel);
+			if (m_ultController.IsActive())
+			{
+				speed *= m_currentFormation->GetUlt()->GetSpeedMultiplier(m_formationLevel);
+			}
+			return speed;
 		}
 
 
@@ -74,10 +77,10 @@ namespace app
 		{
 			if (!m_currentFormation) return false;
 
-			// パッシブ耐性 OR ウルト免疫
-			const bool passiveResistance = m_currentFormation->GetPassive()->HasWhirlpoolResistance();
-			const bool ultImmunity       = m_ultController.IsWhirlpoolImmune();
-			return passiveResistance || ultImmunity;
+			// パッシブ耐性 OR (ウルト中かつウルト耐性)
+			if (m_currentFormation->GetPassive().HasWhirlpoolResistance()) return true;
+			return m_ultController.IsActive()
+				&& m_currentFormation->GetUlt()->HasWhirlpoolResistance();
 		}
 
 

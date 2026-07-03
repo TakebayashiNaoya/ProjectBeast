@@ -5,14 +5,14 @@
  */
 #include "stdafx.h"
 #include "UltController.h"
-#include "IUltEffect.h"
+#include "../Effect/FormationEffectChain.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-		void UltController::SetUlt(IUltEffect* ult, float duration, float cooldown)
+		void UltController::SetUlt(FormationEffectChain* ult, float duration, float cooldown)
 		{
 			m_ult      = ult;
 			m_duration = duration;
@@ -32,7 +32,7 @@ namespace app
 
 			m_isActive = true;
 			m_timer    = m_duration;
-			m_ult->Activate(ctx);
+			m_ult->Enter(ctx);
 		}
 
 
@@ -52,7 +52,7 @@ namespace app
 			{
 				m_isActive      = false;
 				m_cooldownTimer = m_cooldown;
-				m_ult->Deactivate(ctx);
+				m_ult->Exit(ctx);
 			}
 		}
 
@@ -61,18 +61,6 @@ namespace app
 		{
 			if (m_cooldown <= 0.0f) return 0.0f;
 			return max(m_cooldownTimer / m_cooldown, 0.0f);
-		}
-
-
-		float UltController::GetSpeedMultiplierBonus() const
-		{
-			return (m_isActive && m_ult) ? m_ult->GetSpeedMultiplierBonus() : 1.0f;
-		}
-
-
-		bool UltController::IsWhirlpoolImmune() const
-		{
-			return m_isActive && m_ult && m_ult->IsWhirlpoolImmune();
 		}
 	}
 }

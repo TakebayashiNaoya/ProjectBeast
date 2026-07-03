@@ -26,8 +26,8 @@ namespace app
 		 *   座標計算の委譲を担う。レベル管理もここで行う。
 		 *   ChildPenguinManager のメンバーとして所有される。
 		 *
-		 *   速度倍率 = パッシブ倍率（IFormationPassive）× ウルト倍率（UltController）
-		 *   渦潮耐性 = パッシブ耐性 OR ウルト免疫
+		 *   速度倍率 = passive->GetSpeedMultiplier(level) × (ウルト中なら ult->GetSpeedMultiplier(level))
+		 *   渦潮耐性 = passive->HasWhirlpoolResistance() || (ウルト中 && ult->HasWhirlpoolResistance())
 		 */
 		class FormationController
 		{
@@ -82,12 +82,12 @@ namespace app
 
 			/**
 			 * @brief 移動速度倍率を取得する
-			 * @details パッシブ倍率 × ウルト倍率の積を返す。
+			 * @details 陣形効果チェーンから直接取得する（パッシブ + ウルトを統合済み）。
 			 */
 			float GetSpeedMultiplier() const;
 
-			/** 
-			 * @brief 現在の陣形が渦潮耐性を持つか（パッシブ OR ウルト免疫）
+			/**
+			 * @brief 現在の陣形が渦潮耐性を持つか（パッシブ + ウルト効果を統合済み）
 			 * @return true で持つ、false で持たない
 			 */
 			bool HasWhirlpoolResistance() const;

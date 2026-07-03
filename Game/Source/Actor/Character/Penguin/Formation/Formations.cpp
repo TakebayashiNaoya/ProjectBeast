@@ -5,8 +5,7 @@
  */
 #include "stdafx.h"
 #include "Formations.h"
-#include "Passive/PassiveFactory.h"
-#include "Ult/UltFactory.h"
+#include "Effect/FormationEffects.h"
 
 
 namespace app
@@ -66,8 +65,11 @@ namespace app
 
 		CircleFormation::CircleFormation() : RingFormation(9, 22.0f)
 		{
-			m_passive = PassiveFactory::CreateCirclePassive();
-			m_ult     = UltFactory::CreateCircleUlt();
+			// パッシブ: なし
+			// ウルト: 速度1.3x + 渦潮免疫 + ペンギン呼び出し（距離250）
+			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(1.3f));
+			m_ult.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
+			m_ult.AddEffect(std::make_unique<PenguinCallEffect>(250.0f));
 		}
 
 
@@ -76,11 +78,14 @@ namespace app
 		/****************************************/
 
 
-		DefenseFormation::DefenseFormation() : RingFormation(9, 8.0f)
+		ClusterFormation::ClusterFormation() : RingFormation(9, 8.0f)
 		{
-			m_joinMargin = 10.0f;
-			m_passive    = PassiveFactory::CreateDefensePassive();
-			m_ult        = UltFactory::CreateDefenseUlt();
+			// パッシブ: 渦潮耐性
+			m_passive.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
+
+			// ウルト: 渦潮近傍で速度1.5x + シロクマ攻撃無効化
+			m_ult.AddEffect(std::make_unique<WhirlpoolSpeedBoostEffect>(1.5f));
+			m_ult.AddEffect(std::make_unique<BearAttackNullifyEffect>());
 		}
 
 
@@ -92,8 +97,9 @@ namespace app
 		ScatterFormation::ScatterFormation() : RingFormation(9, 40.0f)
 		{
 			m_joinMargin = 50.0f;
-			m_passive    = PassiveFactory::CreateScatterPassive();
-			m_ult        = UltFactory::CreateScatterUlt();
+			// パッシブ: なし
+			// ウルト: ペンギン呼び出し（距離600）
+			m_ult.AddEffect(std::make_unique<PenguinCallEffect>(600.0f));
 		}
 
 
@@ -105,8 +111,11 @@ namespace app
 		TriangleFormation::TriangleFormation()
 		{
 			m_joinMargin = 15.0f;
-			m_passive    = PassiveFactory::CreateTrianglePassive();
-			m_ult        = UltFactory::CreateTriangleUlt();
+			// パッシブ: 速度 (1.0 + level×0.1)x
+			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(1.0f, 0.1f));
+
+			// ウルト: 速度1.8x（純粋なスピード特化）
+			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(1.8f));
 		}
 
 
