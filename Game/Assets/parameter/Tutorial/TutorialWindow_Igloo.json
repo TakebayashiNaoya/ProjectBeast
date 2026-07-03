@@ -5,11 +5,11 @@
                 "type": "UIIcon",
                 "name": "TutorialWindowBg",
                 "asset": "Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseBackGroundIcon.dds",
-                "width": 528,
-                "height": 330,
+                "width": 430,
+                "height": 310,
                 "position": [
-                    -500,
-                    -140,
+                    -540,
+                    -130,
                     0
                 ],
                 "scale": [
@@ -33,7 +33,7 @@
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    -500,
+                    -540,
                     2,
                     0
                 ],
@@ -56,7 +56,7 @@
                 "width": 352,
                 "height": 198,
                 "position": [
-                    -500,
+                    -540,
                     -118,
                     0
                 ],
@@ -79,15 +79,15 @@
             {
                 "type": "UIText",
                 "name": "TutorialWindowDesc",
-                "text": "氷でできた家。シロクマの視界を遮ることができるよ！\nでもシロクマに見つかっているときに入ると壊されてしまうから注意！",
+                "text": "氷でできた家。シロクマの視界を遮ることができるよ！\nでもシロクマに見つかっているときに入ると\n壊されてしまうから注意！",
                 "align": "center",
                 "lineSpacing": 1.0,
                 "fontSize": 0.33,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    -500,
-                    -242,
+                    -540,
+                    -250,
                     0
                 ],
                 "rotation": 0,
