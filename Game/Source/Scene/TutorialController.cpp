@@ -149,10 +149,12 @@ namespace app
 
 			auto* menu = m_windowLayouts[m_currentTargetIdx].GetMenu<ui::TutorialWindowMenu>();
 
-			// TODO: GetDeltaTime() はプロジェクトの実際のデルタタイム取得処理に置き換えてください
-			m_windowDisplayTimer += g_gameTime->GetFrameDeltaTime();
-			if (m_windowDisplayTimer >= TUTORIAL_WINDOW_DISPLAY_TIME && menu)
-				menu->RequestClose();
+			if (m_windowDisplayTimer < TUTORIAL_WINDOW_DISPLAY_TIME)
+			{
+				m_windowDisplayTimer += g_gameTime->GetFrameDeltaTime();
+				if (m_windowDisplayTimer >= TUTORIAL_WINDOW_DISPLAY_TIME && menu)
+					menu->RequestClose();
+			}
 
 			if (menu && menu->IsClosed())
 				FinishCurrentWindow();
