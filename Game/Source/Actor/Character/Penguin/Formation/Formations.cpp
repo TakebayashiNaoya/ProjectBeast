@@ -63,7 +63,7 @@ namespace app
 		/****************************************/
 
 
-		CircleFormation::CircleFormation() : RingFormation(9, 22.0f)
+		CircleFormation::CircleFormation() : RingFormation(9, 35.0f)
 		{
 			// パッシブ: なし
 			// ウルト: 速度1.3x + 渦潮免疫 + ペンギン呼び出し（距離250）
