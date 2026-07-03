@@ -124,6 +124,12 @@ namespace app
 				m_formationController.SwitchFormation(static_cast<EnFormationType>(prev));
 			}
 
+			/** LB2/RB2 でウルト発動 */
+			if (g_pad[0]->IsTrigger(enButtonLB2) || g_pad[0]->IsTrigger(enButtonRB2))
+			{
+				ActivateUlt();
+			}
+
 			/** 陣形の更新処理 */
 			if (m_daddyPenguin != nullptr)
 			{
