@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file FormationEffectChain.h
  * @brief 複数の陣形効果をまとめて管理するチェーン
  * @author 竹林
@@ -64,19 +64,29 @@ namespace app
 				return false;
 			}
 
-			/** @brief 全エフェクトの Enter を呼ぶ（ウルト発動時） */
+			/**
+			 * @brief 全エフェクトの Enter を呼ぶ（ウルト発動時）
+			 * @param ctx ウルトコンテキスト
+			 */
 			void Enter(const UltContext& ctx)
 			{
 				for (auto& e : m_effects) e->Enter(ctx);
 			}
 
-			/** @brief 全エフェクトの Update を呼ぶ（ウルト中・毎フレーム） */
+			/**
+			 * @brief 全エフェクトの Update を呼ぶ（ウルト中・毎フレーム）
+			 * @param dt  デルタタイム（秒）
+			 * @param ctx ウルトコンテキスト
+			 */
 			void Update(float dt, const UltContext& ctx)
 			{
 				for (auto& e : m_effects) e->Update(dt, ctx);
 			}
 
-			/** @brief 全エフェクトの Exit を呼ぶ（ウルト終了時） */
+			/**
+			 * @brief 全エフェクトの Exit を呼ぶ（ウルト終了時）
+			 * @param ctx ウルトコンテキスト
+			 */
 			void Exit(const UltContext& ctx)
 			{
 				for (auto& e : m_effects) e->Exit(ctx);
@@ -84,6 +94,9 @@ namespace app
 
 
 		private:
+			/**
+			 * @brief 登録された陣形効果のリスト（所有権を保持）
+			 */
 			std::vector<std::unique_ptr<IFormationEffect>> m_effects;
 		};
 	}

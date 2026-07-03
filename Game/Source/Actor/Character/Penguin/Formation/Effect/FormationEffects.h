@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file FormationEffects.h
  * @brief 陣形効果の具体クラス群
  * @author 竹林
@@ -11,10 +11,6 @@ namespace app
 {
 	namespace actor
 	{
-		//─────────────────────────────────────────────────
-		// 速度系
-		//─────────────────────────────────────────────────
-
 		/**
 		 * @brief 固定速度倍率エフェクト
 		 * @details GetSpeedMultiplier() に固定の倍率を返す。
@@ -81,11 +77,6 @@ namespace app
 			float GetSpeedMultiplier(int level) const override;
 		};
 
-
-		//─────────────────────────────────────────────────
-		// 渦潮耐性系
-		//─────────────────────────────────────────────────
-
 		/**
 		 * @brief 渦潮耐性エフェクト
 		 * @details HasWhirlpoolResistance() を常に true にする。
@@ -96,11 +87,6 @@ namespace app
 		public:
 			bool HasWhirlpoolResistance() const override { return true; }
 		};
-
-
-		//─────────────────────────────────────────────────
-		// ウルト発動系（Enter で効果を起動する）
-		//─────────────────────────────────────────────────
 
 		/**
 		 * @brief ペンギン呼び出しエフェクト

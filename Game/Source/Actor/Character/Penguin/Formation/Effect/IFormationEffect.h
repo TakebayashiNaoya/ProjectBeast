@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file IFormationEffect.h
  * @brief 陣形効果のインターフェース
  * @author 竹林
@@ -23,19 +23,35 @@ namespace app
 		public:
 			virtual ~IFormationEffect() = default;
 
-			/** @brief 移動速度倍率を返す（デフォルト: 1.0x＝効果なし） */
+			/** 
+			 * @brief 移動速度倍率を返す
+			 * @param level レベルに応じたスピード倍率
+			 */
 			virtual float GetSpeedMultiplier(int level) const { return 1.0f; }
 
-			/** @brief 渦潮耐性を持つか（デフォルト: false） */
+			/** 
+			 * @brief 渦潮耐性を持つか
+			 * @return true で耐性あり、false で耐性なし
+			 */
 			virtual bool  HasWhirlpoolResistance() const { return false; }
 
-			/** @brief ウルト発動時 */
+			/** 
+			 * @brief ウルト発動時
+			 * @param ctx ウルトコンテキスト
+			 */
 			virtual void  Enter (const UltContext& ctx) {}
 
-			/** @brief ウルト中の毎フレーム更新 */
+			/** 
+			 * @brief ウルト中の毎フレーム更新
+			 * @param dt  デルタタイム（秒）
+			 * @param ctx ウルトコンテキスト
+			 */
 			virtual void  Update(float dt, const UltContext& ctx) {}
 
-			/** @brief ウルト終了時 */
+			/** 
+			 * @brief ウルト終了時
+			 * @param ctx ウルトコンテキスト
+			 */
 			virtual void  Exit  (const UltContext& ctx) {}
 		};
 	}

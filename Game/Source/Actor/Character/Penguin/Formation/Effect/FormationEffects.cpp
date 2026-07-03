@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file FormationEffects.cpp
  * @brief 陣形効果の具体クラス群の実装
  * @author 竹林
@@ -14,10 +14,6 @@ namespace app
 {
 	namespace actor
 	{
-		//─────────────────────────────────────────────────
-		// WhirlpoolSpeedBoostEffect
-		//─────────────────────────────────────────────────
-
 		void WhirlpoolSpeedBoostEffect::Update(float dt, const UltContext& ctx)
 		{
 			// TODO: 渦潮との近接判定を実装する
@@ -36,9 +32,10 @@ namespace app
 		}
 
 
-		//─────────────────────────────────────────────────
-		// PenguinCallEffect
-		//─────────────────────────────────────────────────
+
+
+		/****************************************/
+
 
 		void PenguinCallEffect::Enter(const UltContext& ctx)
 		{
@@ -61,9 +58,9 @@ namespace app
 		}
 
 
-		//─────────────────────────────────────────────────
-		// BearAttackNullifyEffect
-		//─────────────────────────────────────────────────
+
+		/****************************************/
+
 
 		void BearAttackNullifyEffect::Enter(const UltContext& ctx)
 		{
