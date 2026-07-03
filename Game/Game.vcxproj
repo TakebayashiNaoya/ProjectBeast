@@ -375,6 +375,7 @@
     <ClCompile Include="Source\UI\Model\SearchStatus.cpp" />
     <ClCompile Include="Source\UI\Model\UIAnimationStatus.cpp" />
     <ClCompile Include="Source\UI\Model\UIStatus.cpp" />
+    <ClCompile Include="Source\UI\Modules\FrontChecker\FrontChecker.cpp" />
     <ClCompile Include="Source\UI\Modules\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp" />
     <ClCompile Include="Source\UI\Modules\Input\UICursorSelector.cpp" />
     <ClCompile Include="Source\UI\Modules\Input\UIInputController.cpp" />
@@ -553,6 +554,7 @@
     <ClInclude Include="Source\UI\Model\SearchStatus.h" />
     <ClInclude Include="Source\UI\Model\UIAnimationStatus.h" />
     <ClInclude Include="Source\UI\Model\UIStatus.h" />
+    <ClInclude Include="Source\UI\Modules\FrontChecker\FrontChecker.h" />
     <ClInclude Include="Source\UI\Modules\InGameStartingAnimLogic\InGameStartingAnimLogic.h" />
     <ClInclude Include="Source\UI\Modules\Input\Types.h" />
     <ClInclude Include="Source\UI\Modules\Input\UICursorSelector.h" />

@@ -118,6 +118,9 @@
     <Filter Include="Source\UI\Modules\SystemPacket">
       <UniqueIdentifier>{5baf1a1c-6f2f-454d-820e-fe2856b8490a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\Modules\FrontChecker">
+      <UniqueIdentifier>{79145728-3639-4801-90bd-867ec9ce8236}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -574,6 +577,8 @@
     <ClCompile Include="Source\UI\Modules\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp">
       <Filter>Source\UI\Modules\InGameStartingAnimLogic</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Modules\FrontChecker\FrontChecker.cpp">
+      <Filter>Source\UI\Modules\FrontChecker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1084,6 +1089,8 @@
     <ClInclude Include="Source\UI\Modules\InGameStartingAnimLogic\InGameStartingAnimLogic.h">
       <Filter>Source\UI\Modules\InGameStartingAnimLogic</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\Modules\FrontChecker\FrontChecker.h">
+      <Filter>Source\UI\Modules\FrontChecker</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
