@@ -91,8 +91,8 @@ namespace app
 		/** キューの先頭ウィンドウを開いてポーズをかける */
 		void TryOpenNextWindow();
 
-		/** 表示中ウィンドウを閉じて次のウィンドウを開く準備をする */
-		void CloseCurrentWindow();
+		/** クローズアニメーション完了を検知したときの完了処理（達成/ログ/次のウィンドウ準備） */
+		void FinishCurrentWindow();
 
 
 	private:

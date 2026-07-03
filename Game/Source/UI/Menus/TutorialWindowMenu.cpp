@@ -4,8 +4,8 @@
  * @author 竹林
  */
 #include "stdafx.h"
-#include "TutorialWindowMenu.h"
 #include "Source/Util/CRC32.h"
+#include "TutorialWindowMenu.h"
 
 
 namespace app
@@ -104,11 +104,6 @@ namespace app
 		{
 			m_closedByUser = false;
 
-			if (m_state == State::Opened)
-			{
-				UpdateInput();
-			}
-
 			// UIScaleAnimation を含む UI 全体を更新
 			Base::Update();
 
@@ -145,10 +140,16 @@ namespace app
 		}
 
 
-		void TutorialWindowMenu::UpdateInput()
+		void TutorialWindowMenu::RequestClose()
 		{
-			if (!g_pad[0]->IsTrigger(enButtonB)) return;
+			// Opened のときだけ受け付ける（Opening/Closing 中の二重実行・多重呼び出しを防止）
+			if (m_state != State::Opened) return;
+			StartClosing();
+		}
 
+
+		void TutorialWindowMenu::StartClosing()
+		{
 			// コンテンツを即非表示にして閉じるアニメーション開始
 			SetContentVisible(false);
 

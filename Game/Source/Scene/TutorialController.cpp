@@ -147,9 +147,15 @@ namespace app
 		{
 			m_windowLayouts[m_currentTargetIdx].Update();
 
+			auto* menu = m_windowLayouts[m_currentTargetIdx].GetMenu<ui::TutorialWindowMenu>();
+
+			// TODO: GetDeltaTime() はプロジェクトの実際のデルタタイム取得処理に置き換えてください
 			m_windowDisplayTimer += g_gameTime->GetFrameDeltaTime();
-			if (m_windowDisplayTimer >= TUTORIAL_WINDOW_DISPLAY_TIME)
-				CloseCurrentWindow();
+			if (m_windowDisplayTimer >= TUTORIAL_WINDOW_DISPLAY_TIME && menu)
+				menu->RequestClose();
+
+			if (menu && menu->IsClosed())
+				FinishCurrentWindow();
 		}
 
 		if (!m_isWindowOpen && !m_queue.empty())
@@ -278,7 +284,7 @@ namespace app
 	}
 
 
-	void TutorialController::CloseCurrentWindow()
+	void TutorialController::FinishCurrentWindow()
 	{
 		m_completed[m_currentTargetIdx] = true;
 		m_isWindowOpen = false;
@@ -291,9 +297,5 @@ namespace app
 			if (auto* ev = dynamic_cast<app::achievement::EventAchievement*>(base))
 				ev->Unlock();
 		}
-
-		auto* menu = m_windowLayouts[m_currentTargetIdx].GetMenu<ui::TutorialWindowMenu>();
-		if (menu)
-			menu->Close();
 	}
 }
