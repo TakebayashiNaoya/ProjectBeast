@@ -7,7 +7,7 @@
 #include "InGameStartingAnimLogic.h"
 
 #include "Source/UI/Menu.h"
-#include "Source/UI/Parts/UIParts.h"
+#include "Source/UI/UIParts.h"
 
 
 namespace app

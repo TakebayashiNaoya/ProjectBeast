@@ -5,7 +5,8 @@
  */
 #pragma once
 #include "BearReactionTypes.h"
-#include "Source/UI/System/SystemPacket.h"
+#include "Source/UI/Modules/FrontChecker/FrontChecker.h"
+#include "Source/UI/Modules/System/SystemPacket.h"
 
 
 namespace app
@@ -81,6 +82,9 @@ namespace app
 			std::vector<std::unique_ptr<ReactionInfo>> m_reactions;
 			/** リアクションの数 */
 			uint8_t m_reactionNum;
+
+			/** 前方チェッククラス */
+			FrontChecker m_frontChecker;
 		};
 	}
 }

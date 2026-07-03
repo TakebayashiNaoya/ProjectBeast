@@ -4,8 +4,8 @@
  * @author 忽那
  */
 #include "stdafx.h"
+#include "Source/UI/UIParts.h"
 #include "UIAnimation.h"
-#include "Source/UI/Parts/UIParts.h"
 
 
 namespace app
@@ -117,10 +117,10 @@ namespace app
 		void UIAnimationSequence::StartCurrentStep()
 		{
 			if (m_currentIndex < 0 || m_currentIndex >= static_cast<int>(m_steps.size())) return;
-			
+
 			const auto& step = m_steps[m_currentIndex];
 			UIAnimationBase* anim = m_target->FindAnimation(step.animationKey);
-			if (anim){
+			if (anim) {
 				if (step.onStart)step.onStart();
 				anim->PlayAnimation();
 			}
@@ -128,7 +128,7 @@ namespace app
 				// アニメーションが見つからない場合はスキップ。
 				AdvanceToNext();
 			}
-			
+
 		}
 	}
 }
