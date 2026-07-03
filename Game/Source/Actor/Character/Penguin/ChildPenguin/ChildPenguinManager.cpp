@@ -9,9 +9,9 @@
 #include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
-#include "../Formation/Ult/UltContext.h"
+#include "Source/Actor/Character/Penguin/Formation/Ult/UltContext.h"
 #if defined(_DEBUG) || defined(K2_DEBUG)
-#include "../Formation/FormationDebugMonitor.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationDebugMonitor.h"
 #endif
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"

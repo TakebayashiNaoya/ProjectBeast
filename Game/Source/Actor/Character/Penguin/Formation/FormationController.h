@@ -8,7 +8,7 @@
 #include <functional>
 #include <memory>
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
-#include "Ult/UltController.h"
+#include "Source/Actor/Character/Penguin/Formation/Ult/UltController.h"
 
 
 namespace app
@@ -160,9 +160,7 @@ namespace app
 
 
 		private:
-			static constexpr int   FOLLOWERS_PER_LEVEL = 9;    /** レベルアップに必要なフォロワー数 */
-			static constexpr float ULT_DURATION        = 8.0f; /** ウルト持続時間（秒） */
-			static constexpr float ULT_COOLDOWN        = 30.0f;/** ウルトクールダウン（秒） */
+			static constexpr int FOLLOWERS_PER_LEVEL = 9;  /** レベルアップに必要なフォロワー数 */
 
 			std::array<
 				std::unique_ptr<IFormation>,

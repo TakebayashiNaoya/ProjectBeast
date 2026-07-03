@@ -13,45 +13,47 @@ namespace app
 	{
 		/**
 		 * @brief 固定速度倍率エフェクト
-		 * @details GetSpeedMultiplier() に固定の倍率を返す。
+		 * @details GetSpeedMultiplier() に MasterFormationParameter 上の倍率をそのまま返す。
+		 *          パラメーターへの生ポインタを保持するため、ホットリロードで即座に反映される。
 		 *          パッシブ（0.8xなど）でもウルト（1.3xなど）でも同じクラスを使う。
 		 */
 		class SpeedModifierEffect : public IFormationEffect
 		{
-			float m_multiplier;
+			const float* m_multiplier;
 
 		public:
-			/** @param multiplier 速度倍率（例: 0.8f, 1.3f） */
-			explicit SpeedModifierEffect(float multiplier)
+			/** @param multiplier MasterFormationParameter が保持する速度倍率フィールドへのポインタ（非所有） */
+			explicit SpeedModifierEffect(const float* multiplier)
 				: m_multiplier(multiplier)
 			{}
 
-			float GetSpeedMultiplier(int level) const override { return m_multiplier; }
+			float GetSpeedMultiplier(int level) const override { return *m_multiplier; }
 		};
 
 
 		/**
 		 * @brief レベル連動速度倍率エフェクト（パッシブ）
-		 * @details GetSpeedMultiplier() = baseRate + coefficient * level
+		 * @details GetSpeedMultiplier() = *baseRate + *coefficient * level
+		 *          パラメーターへの生ポインタを保持するため、ホットリロードで即座に反映される。
 		 */
 		class LevelSpeedEffect : public IFormationEffect
 		{
-			float m_baseRate;
-			float m_coefficient;
+			const float* m_baseRate;
+			const float* m_coefficient;
 
 		public:
 			/**
-			 * @param baseRate    レベル0の倍率
-			 * @param coefficient レベルごとの増分
+			 * @param baseRate    レベル0の倍率フィールドへのポインタ（非所有）
+			 * @param coefficient レベルごとの増分フィールドへのポインタ（非所有）
 			 */
-			LevelSpeedEffect(float baseRate, float coefficient)
+			LevelSpeedEffect(const float* baseRate, const float* coefficient)
 				: m_baseRate(baseRate)
 				, m_coefficient(coefficient)
 			{}
 
 			float GetSpeedMultiplier(int level) const override
 			{
-				return m_baseRate + m_coefficient * level;
+				return *m_baseRate + *m_coefficient * level;
 			}
 		};
 
@@ -60,15 +62,16 @@ namespace app
 		 * @brief 渦潮近傍限定速度上昇エフェクト（防御陣形ウルト）
 		 * @details Update() で渦潮との近接を判定し、近傍時のみ速度ボーナスを付与する。
 		 *          ウルトチェーンに登録するため、Update/Exit はウルト中にのみ呼ばれる。
+		 *          パラメーターへの生ポインタを保持するため、ホットリロードで即座に反映される。
 		 */
 		class WhirlpoolSpeedBoostEffect : public IFormationEffect
 		{
-			float m_multiplier;
-			bool  m_isNearWhirlpool = false;
+			const float* m_multiplier;
+			bool         m_isNearWhirlpool = false;
 
 		public:
-			/** @param multiplier 渦潮近傍時の速度倍率（例: 1.5f） */
-			explicit WhirlpoolSpeedBoostEffect(float multiplier)
+			/** @param multiplier 渦潮近傍時の速度倍率フィールドへのポインタ（非所有、例: 1.5f） */
+			explicit WhirlpoolSpeedBoostEffect(const float* multiplier)
 				: m_multiplier(multiplier)
 			{}
 
@@ -91,14 +94,15 @@ namespace app
 		/**
 		 * @brief ペンギン呼び出しエフェクト
 		 * @details ウルト発動時（Enter）に指定距離内の非フォロワーペンギンを陣形に呼び戻す。
+		 *          パラメーターへの生ポインタを保持するため、ホットリロードで即座に反映される。
 		 */
 		class PenguinCallEffect : public IFormationEffect
 		{
-			float m_callDistance;
+			const float* m_callDistance;
 
 		public:
-			/** @param callDistance この距離以内の非フォロワーを呼び戻す */
-			explicit PenguinCallEffect(float callDistance)
+			/** @param callDistance この距離以内の非フォロワーを呼び戻す距離フィールドへのポインタ（非所有） */
+			explicit PenguinCallEffect(const float* callDistance)
 				: m_callDistance(callDistance)
 			{}
 

@@ -5,13 +5,15 @@
  */
 #pragma once
 #include <vector>
-#include "Effect/FormationEffectChain.h"
+#include "Source/Actor/Character/Penguin/Formation/Effect/FormationEffectChain.h"
 
 
 namespace app
 {
 	namespace actor
 	{
+		struct MasterFormationParameter;
+
 		/**
 		 * @brief 陣形インターフェース
 		 * @details
@@ -26,13 +28,34 @@ namespace app
 		class IFormation
 		{
 		public:
+			/**
+			 * @brief コンストラクタ
+			 * @param param JSONから読み込んだこの陣形のパラメーター
+			 * @details 定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
+			 */
+			explicit IFormation(const MasterFormationParameter& param);
+
 			virtual ~IFormation() = default;
 
 			/** @brief パッシブエフェクトチェーンを返す */
 			const FormationEffectChain& GetPassive() const { return m_passive; }
 
 			/** @brief ウルトエフェクトチェーンを返す（UltController が Enter/Update/Exit を呼ぶ） */
-			FormationEffectChain* GetUlt() { return &m_ult; }
+			FormationEffectChain& GetUlt() { return m_ult; }
+
+			/**
+			 * @brief ウルト持続時間を返す（秒）
+			 * @details パラメーターを直接参照するのでホットリロードが即座に反映される。
+			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
+			 */
+			float GetUltDuration() const;
+
+			/**
+			 * @brief ウルトクールダウンを返す（秒）
+			 * @details パラメーターを直接参照するのでホットリロードが即座に反映される。
+			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
+			 */
+			float GetUltCooldown() const;
 
 			/** @brief 最外半径（CalculatePositions後に有効） */
 			float GetOuterRadius() const { return m_outerRadius; }
@@ -40,8 +63,12 @@ namespace app
 			/** @brief 最外半径を直接セットする（save/restore用） */
 			void  SetOuterRadius(float r) { m_outerRadius = r; }
 
-			/** @brief 入隊判定半径（最外半径 + 入隊マージン） */
-			float GetJoinRadius() const { return m_outerRadius + m_joinMargin; }
+			/**
+			 * @brief 入隊判定半径（最外半径 + 入隊マージン）を返す
+			 * @details パラメーターを直接参照するのでホットリロードが即座に反映される。
+			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
+			 */
+			float GetJoinRadius() const;
 
 			/**
 			 * @brief 指定フォロワー数に対応する入隊判定半径を返す
@@ -65,11 +92,12 @@ namespace app
 
 
 		protected:
-			float m_outerRadius = 0.0f;   /** 最外半径 */
-			float m_joinMargin  = 20.0f;  /** 入隊判定マージン */
+			float m_outerRadius = 0.0f;  /** 最外半径 */
 
 			FormationEffectChain m_passive;  /** 常時有効なエフェクトチェーン */
 			FormationEffectChain m_ult;      /** ウルト発動中のみ有効なエフェクトチェーン */
+
+			const MasterFormationParameter* m_param;  /** 陣形パラメーターへの非所有ポインタ（ホットリロード対応） */
 		};
 
 
@@ -83,15 +111,20 @@ namespace app
 		 * @details
 		 *   リング k（1始まり）に baseFollowers*k 体を等間隔配置する。
 		 *   各リングの半径は radiusPerRing*k。全リングで隣接間隔が均一になる。
-		 *   Circle・Cluster・Scatter はこのクラスを継承し定数だけ変える。
+		 *   Circle・Cluster・Scatter はこのクラスを継承し、パラメーターだけ変える。
 		 */
 		class RingFormation : public IFormation
 		{
 		public:
-			RingFormation(int baseFollowers, float radiusPerRing)
-				: m_baseFollowers(baseFollowers)
-				, m_radiusPerRing(radiusPerRing)
-			{}
+			/**
+			 * @brief コンストラクタ
+			 * @param param JSONから読み込んだこの陣形のパラメーター（baseFollowers/radiusPerRing を使用）
+			 * @details 定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
+			 */
+			explicit RingFormation(const MasterFormationParameter& param);
+
+			/** @brief IFormation::GetJoinRadius() （引数なし）が隠蔽されないようにする */
+			using IFormation::GetJoinRadius;
 
 			void CalculatePositions(
 				const Vector3& center,
@@ -100,23 +133,12 @@ namespace app
 				int count
 			) override;
 
-			/** @brief count 人のときの次入隊リングから入隊半径を計算する */
-			float GetJoinRadius(int count) const override
-			{
-				int ring       = 1;
-				int cumulative = 0;
-				while (cumulative + m_baseFollowers * ring <= count)
-				{
-					cumulative += m_baseFollowers * ring;
-					++ring;
-				}
-				return m_radiusPerRing * ring + m_joinMargin;
-			}
-
-
-		private:
-			int   m_baseFollowers;
-			float m_radiusPerRing;
+			/**
+			 * @brief count 人のときの次入隊リングから入隊半径を計算する
+			 * @details パラメーターを直接参照するのでホットリロードが即座に反映される。
+			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
+			 */
+			float GetJoinRadius(int count) const override;
 		};
 
 
@@ -129,12 +151,13 @@ namespace app
 		 * @brief 円陣（標準間隔）
 		 * @details
 		 *   パッシブ: なし。
-		 *   ウルト: 速度1.3x ＋ 渦潮免疫 ＋ ペンギン呼び出し（距離250）。
+		 *   ウルト: 速度up ＋ 渦潮免疫 ＋ ペンギン呼び出し（MasterFormationParameter で調整）。
 		 */
 		class CircleFormation : public RingFormation
 		{
 		public:
-			CircleFormation();
+			/** @param param JSONから読み込んだ円陣のパラメーター */
+			explicit CircleFormation(const MasterFormationParameter& param);
 		};
 
 
@@ -146,13 +169,14 @@ namespace app
 		/**
 		 * @brief 密集陣（狭間隔）
 		 * @details
-		 *   パッシブ: 速度0.8x ＋ 渦潮耐性。
-		 *   ウルト: 渦潮近傍で速度1.5x ＋ シロクマ攻撃無効化。
+		 *   パッシブ: 速度down ＋ 渦潮耐性。
+		 *   ウルト: 渦潮近傍で速度up ＋ シロクマ攻撃無効化（MasterFormationParameter で調整）。
 		 */
 		class ClusterFormation : public RingFormation
 		{
 		public:
-			ClusterFormation();
+			/** @param param JSONから読み込んだ密集陣のパラメーター */
+			explicit ClusterFormation(const MasterFormationParameter& param);
 		};
 
 
@@ -165,12 +189,13 @@ namespace app
 		 * @brief 散開陣（広間隔）
 		 * @details
 		 *   パッシブ: なし。
-		 *   ウルト: ペンギン呼び出し（距離600）。
+		 *   ウルト: ペンギン呼び出し（MasterFormationParameter で調整）。
 		 */
 		class ScatterFormation : public RingFormation
 		{
 		public:
-			ScatterFormation();
+			/** @param param JSONから読み込んだ散開陣のパラメーター */
+			explicit ScatterFormation(const MasterFormationParameter& param);
 		};
 
 
@@ -182,13 +207,14 @@ namespace app
 		/**
 		 * @brief 三角陣
 		 * @details
-		 *   パッシブ: 速度 (1.0 + level × 0.1)x。
-		 *   ウルト: 速度1.8x（純粋なスピード特化）。
+		 *   パッシブ: レベル連動速度（MasterFormationParameter で調整）。
+		 *   ウルト: 純粋なスピード特化（MasterFormationParameter で調整）。
 		 */
 		class TriangleFormation : public IFormation
 		{
 		public:
-			TriangleFormation();
+			/** @param param JSONから読み込んだ三角陣のパラメーター */
+			explicit TriangleFormation(const MasterFormationParameter& param);
 
 			void CalculatePositions(
 				const Vector3& center,
@@ -196,11 +222,6 @@ namespace app
 				std::vector<Vector3>& out,
 				int count
 			) override;
-
-
-		private:
-			static constexpr float ROW_SPACING = 15.0f;
-			static constexpr float COL_SPACING = 15.0f;
 		};
 	}
 }

@@ -7,8 +7,8 @@
 #include <unordered_set>
 #include "ChildPenguinTypes.h"
 #include "Source/Util/Curve.h"
-#include "../Formation/FormationController.h"
-#include "../Formation/FormationRangeVisualizer.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationController.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationRangeVisualizer.h"
 
 
 namespace app
@@ -19,7 +19,7 @@ namespace app
 		class ChildPenguin;
 		class DaddyPenguin;
 		class Enemy;
-			class FormationDebugMonitor;
+		class FormationDebugMonitor;
 
 
 		/**
@@ -275,7 +275,7 @@ namespace app
 
 			/**
 			 * @brief 指定ペンギンが渦潮の捕獲を免れるか
-			 * @details ディフェンス陣形かつフォロワーである場合に true を返す
+			 * @details 密集陣かつフォロワーである場合に true を返す
 			 * @param penguin 判定するペンギン
 			 */
 			bool IsWhirlpoolImmune(const ChildPenguin* penguin) const

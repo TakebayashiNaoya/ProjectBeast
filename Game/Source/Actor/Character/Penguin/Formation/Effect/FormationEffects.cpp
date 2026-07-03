@@ -28,7 +28,7 @@ namespace app
 
 		float WhirlpoolSpeedBoostEffect::GetSpeedMultiplier(int level) const
 		{
-			return m_isNearWhirlpool ? m_multiplier : 1.0f;
+			return m_isNearWhirlpool ? *m_multiplier : 1.0f;
 		}
 
 
@@ -42,7 +42,7 @@ namespace app
 			if (!ctx.penguinManager || !ctx.daddyPenguin) return;
 
 			const Vector3 daddyPos = ctx.penguinManager->GetDaddyPosition();
-			const float   distSq   = m_callDistance * m_callDistance;
+			const float   distSq   = (*m_callDistance) * (*m_callDistance);
 
 			for (ChildPenguin* penguin : ctx.penguinManager->GetChildPenguin())
 			{

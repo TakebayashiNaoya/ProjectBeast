@@ -6,21 +6,72 @@
 #include "stdafx.h"
 #include "FormationController.h"
 #include "Formations.h"
+#include "MasterFormationParameter.h"
+#include "Source/Core/ParameterManager.h"
+#include "Source/Util/JsonConverter.h"
 
 
 namespace app
 {
 	namespace actor
 	{
-		FormationController::~FormationController() = default;
+		namespace
+		{
+			/** 陣形パラメーターのファイルパス（ホットリロード時: JSONを直接読み込む） */
+			constexpr const char* PARAMETER_JSON_FILE_PATH = "Assets/parameter/character/penguin/formation/FormationParameter.json";
+			/** 陣形パラメーターのファイルパス（リリース時: 変換済みバイナリを読み込む） */
+			constexpr const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/formation/FormationParameter.bin";
+		}
+
+
+		FormationController::~FormationController()
+		{
+			core::ParameterManager::Get()->UnloadParameter<MasterFormationParameter>();
+		}
 
 
 		FormationController::FormationController()
 		{
-			m_formations[static_cast<size_t>(EnFormationType::Circle)]   = std::make_unique<CircleFormation>();
-			m_formations[static_cast<size_t>(EnFormationType::Triangle)] = std::make_unique<TriangleFormation>();
-			m_formations[static_cast<size_t>(EnFormationType::Cluster)]  = std::make_unique<ClusterFormation>();
-			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>();
+			// 外部ファイルを読み込み（インデックスは EnFormationType の値と対応する）
+#if defined(APP_PARAM_HOT_RELOAD)
+			// ホットリロード有効時はJSONを直接読み込む。保存するだけで即座に反映される（変換不要）
+			core::ParameterManager::Get()->LoadParameter<MasterFormationParameter>(
+				PARAMETER_JSON_FILE_PATH,
+				[](const nlohmann::json& j, MasterFormationParameter& p)
+				{
+					p.ultDuration                 = util::JsonConverter::ToFloat(j, "ultDuration");
+					p.ultCooldown                 = util::JsonConverter::ToFloat(j, "ultCooldown");
+					p.passiveSpeedMultiplier      = util::JsonConverter::ToFloat(j, "passiveSpeedMultiplier");
+					p.passiveSpeedBase            = util::JsonConverter::ToFloat(j, "passiveSpeedBase");
+					p.passiveSpeedPerLevel        = util::JsonConverter::ToFloat(j, "passiveSpeedPerLevel");
+					p.passiveWhirlpoolResistance  = util::JsonConverter::ToBool(j, "passiveWhirlpoolResistance");
+					p.ultSpeedMultiplier          = util::JsonConverter::ToFloat(j, "ultSpeedMultiplier");
+					p.ultWhirlpoolResistance      = util::JsonConverter::ToBool(j, "ultWhirlpoolResistance");
+					p.ultWhirlpoolBoostMultiplier = util::JsonConverter::ToFloat(j, "ultWhirlpoolBoostMultiplier");
+					p.ultBearAttackNullify        = util::JsonConverter::ToBool(j, "ultBearAttackNullify");
+					p.ultCallDistance             = util::JsonConverter::ToFloat(j, "ultCallDistance");
+					p.radiusPerRing               = util::JsonConverter::ToFloat(j, "radiusPerRing");
+					p.joinMargin                  = util::JsonConverter::ToFloat(j, "joinMargin");
+					p.rowSpacing                  = util::JsonConverter::ToFloat(j, "rowSpacing");
+					p.colSpacing                  = util::JsonConverter::ToFloat(j, "colSpacing");
+					p.baseFollowers               = util::JsonConverter::ToInt(j, "baseFollowers");
+				}
+			);
+#else
+			// リリースビルドは変換済みバイナリを読み込む（軽量・高速。ホットリロードは非対応）
+			core::ParameterManager::Get()->LoadParameterBinary<MasterFormationParameter>(PARAMETER_BINARY_FILE_PATH);
+#endif
+
+			auto* parameterManager = core::ParameterManager::Get();
+			const auto* circleParam   = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Circle));
+			const auto* triangleParam = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Triangle));
+			const auto* clusterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Cluster));
+			const auto* scatterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Scatter));
+
+			m_formations[static_cast<size_t>(EnFormationType::Circle)]   = std::make_unique<CircleFormation>(*circleParam);
+			m_formations[static_cast<size_t>(EnFormationType::Triangle)] = std::make_unique<TriangleFormation>(*triangleParam);
+			m_formations[static_cast<size_t>(EnFormationType::Cluster)]  = std::make_unique<ClusterFormation>(*clusterParam);
+			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>(*scatterParam);
 
 			SwitchFormation(EnFormationType::Circle);
 		}
@@ -55,7 +106,11 @@ namespace app
 			m_currentFormation = m_formations[static_cast<size_t>(type)].get();
 
 			// 陣形切り替えと同時にウルトチェーンも差し替える
-			m_ultController.SetUlt(m_currentFormation->GetUlt(), ULT_DURATION, ULT_COOLDOWN);
+			m_ultController.SetUlt(
+				&m_currentFormation->GetUlt(),
+				m_currentFormation->GetUltDuration(),
+				m_currentFormation->GetUltCooldown()
+			);
 		}
 
 
@@ -67,7 +122,7 @@ namespace app
 			float speed = m_currentFormation->GetPassive().GetSpeedMultiplier(m_formationLevel);
 			if (m_ultController.IsActive())
 			{
-				speed *= m_currentFormation->GetUlt()->GetSpeedMultiplier(m_formationLevel);
+				speed *= m_currentFormation->GetUlt().GetSpeedMultiplier(m_formationLevel);
 			}
 			return speed;
 		}
@@ -80,7 +135,7 @@ namespace app
 			// パッシブ耐性 OR (ウルト中かつウルト耐性)
 			if (m_currentFormation->GetPassive().HasWhirlpoolResistance()) return true;
 			return m_ultController.IsActive()
-				&& m_currentFormation->GetUlt()->HasWhirlpoolResistance();
+				&& m_currentFormation->GetUlt().HasWhirlpoolResistance();
 		}
 
 

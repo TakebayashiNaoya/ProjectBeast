@@ -192,6 +192,32 @@ def pack_pbr_parameter(data):
         float(data.get("smoothOffset",   0.0)),         # f   : smoothOffset（スムーズオフセット）
     )
 
+def pack_formation_parameter(data):
+    # MasterFormationParameter（float×12 → int×4 の順でメモリレイアウトに合わせる）
+    # 実機で sizeof / オフセットを計測して確認済み。今回はこの並びだと
+    # 末尾パディングは発生しない（基底クラスのアライメント要件をちょうど満たすため）。
+    # "<12f4i" = f(4)×12 + i(4)×4 = 64 bytes
+    return struct.pack(
+        "<12f4i",
+        float(data.get("ultDuration",                 0.0)),  # f : ウルト持続時間（秒）
+        float(data.get("ultCooldown",                  0.0)),  # f : ウルトクールダウン（秒）
+        float(data.get("passiveSpeedMultiplier",       0.0)),  # f : パッシブ固定速度倍率
+        float(data.get("passiveSpeedBase",             0.0)),  # f : パッシブ レベル0の速度倍率
+        float(data.get("passiveSpeedPerLevel",         0.0)),  # f : パッシブ レベルごとの速度増分
+        float(data.get("ultSpeedMultiplier",           0.0)),  # f : ウルト固定速度倍率
+        float(data.get("ultWhirlpoolBoostMultiplier",  0.0)),  # f : ウルト 渦潮近傍時の速度倍率
+        float(data.get("ultCallDistance",              0.0)),  # f : ウルト ペンギン呼び戻し距離
+        float(data.get("radiusPerRing",                0.0)),  # f : 形状 リングの半径増分
+        float(data.get("joinMargin",                   0.0)),  # f : 形状 入隊判定マージン
+        float(data.get("rowSpacing",                   0.0)),  # f : 形状 三角陣の行間隔
+        float(data.get("colSpacing",                   0.0)),  # f : 形状 三角陣の列間隔
+        int(bool(data.get("passiveWhirlpoolResistance", False))),  # i : パッシブ 渦潮耐性 (0/1)
+        int(bool(data.get("ultWhirlpoolResistance",     False))),  # i : ウルト 渦潮免疫 (0/1)
+        int(bool(data.get("ultBearAttackNullify",       False))),  # i : ウルト シロクマ攻撃無効化 (0/1)
+        int(data.get("baseFollowers",                  0)),        # i : 形状 リング1の配置数
+    )
+
+
 def pack_whirlpool_parameter(data):
     # 全フィールドが float のみ
     # "<11f" = float(4) × 11 = 44 bytes
@@ -226,6 +252,7 @@ RULE_BOOK = {
     "oceanParameter":           pack_ocean_parameter,
     "PBRParameter":             pack_pbr_parameter,
     "whirlpoolParameter":       pack_whirlpool_parameter,
+    "FormationParameter":       pack_formation_parameter,
 }
 
 # ファイル全体を処理する特殊な変換テーブル（可変長データを持つ構造向け）

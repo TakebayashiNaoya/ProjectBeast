@@ -5,13 +5,55 @@
  */
 #include "stdafx.h"
 #include "Formations.h"
-#include "Effect/FormationEffects.h"
+#include "Source/Actor/Character/Penguin/Formation/Effect/FormationEffects.h"
+#include "Source/Actor/Character/Penguin/Formation/MasterFormationParameter.h"
 
 
 namespace app
 {
 	namespace actor
 	{
+		IFormation::IFormation(const MasterFormationParameter& param)
+			: m_param(&param)
+		{}
+
+
+		float IFormation::GetUltDuration() const
+		{
+			return m_param->ultDuration;
+		}
+
+
+		float IFormation::GetUltCooldown() const
+		{
+			return m_param->ultCooldown;
+		}
+
+
+		float IFormation::GetJoinRadius() const
+		{
+			return m_outerRadius + m_param->joinMargin;
+		}
+
+
+		RingFormation::RingFormation(const MasterFormationParameter& param)
+			: IFormation(param)
+		{}
+
+
+		float RingFormation::GetJoinRadius(int count) const
+		{
+			int ring       = 1;
+			int cumulative = 0;
+			while (cumulative + m_param->baseFollowers * ring <= count)
+			{
+				cumulative += m_param->baseFollowers * ring;
+				++ring;
+			}
+			return m_param->radiusPerRing * ring + m_param->joinMargin;
+		}
+
+
 		void RingFormation::CalculatePositions(
 			const Vector3& center,
 			const Vector3& forward,
@@ -36,13 +78,13 @@ namespace app
 			// 配置した数
 			int placed = 0;
 
-			// リング ring (1始まり): m_baseFollowers*ring 体を半径 m_radiusPerRing*ring に等間隔配置
+			// リング ring (1始まり): param.baseFollowers*ring 体を半径 param.radiusPerRing*ring に等間隔配置
 			for (int ring = 1; placed < count; ++ring)
 			{
 				// リングの配置数と半径
-				const int   ringCount = m_baseFollowers * ring;
+				const int   ringCount = m_param->baseFollowers * ring;
 				// リングの半径
-				const float radius    = m_radiusPerRing * ring;
+				const float radius    = m_param->radiusPerRing * ring;
 				// 配置を決定
 				for (int i = 0; i < ringCount && placed < count; ++i)
 				{
@@ -63,13 +105,19 @@ namespace app
 		/****************************************/
 
 
-		CircleFormation::CircleFormation() : RingFormation(9, 35.0f)
+		CircleFormation::CircleFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
 			// パッシブ: なし
-			// ウルト: 速度1.3x + 渦潮免疫 + ペンギン呼び出し（距離250）
-			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(1.3f));
-			m_ult.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
-			m_ult.AddEffect(std::make_unique<PenguinCallEffect>(250.0f));
+			// ウルト: 速度up + 渦潮免疫 + ペンギン呼び出し
+			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));
+			if (param.ultWhirlpoolResistance)
+			{
+				m_ult.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
+			}
+			if (param.ultCallDistance > 0.0f)
+			{
+				m_ult.AddEffect(std::make_unique<PenguinCallEffect>(&param.ultCallDistance));
+			}
 		}
 
 
@@ -78,14 +126,21 @@ namespace app
 		/****************************************/
 
 
-		ClusterFormation::ClusterFormation() : RingFormation(9, 8.0f)
+		ClusterFormation::ClusterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: 渦潮耐性
-			m_passive.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
+			// パッシブ: 速度down + 渦潮耐性
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
+			if (param.passiveWhirlpoolResistance)
+			{
+				m_passive.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
+			}
 
-			// ウルト: 渦潮近傍で速度1.5x + シロクマ攻撃無効化
-			m_ult.AddEffect(std::make_unique<WhirlpoolSpeedBoostEffect>(1.5f));
-			m_ult.AddEffect(std::make_unique<BearAttackNullifyEffect>());
+			// ウルト: 渦潮近傍で速度up + シロクマ攻撃無効化
+			m_ult.AddEffect(std::make_unique<WhirlpoolSpeedBoostEffect>(&param.ultWhirlpoolBoostMultiplier));
+			if (param.ultBearAttackNullify)
+			{
+				m_ult.AddEffect(std::make_unique<BearAttackNullifyEffect>());
+			}
 		}
 
 
@@ -94,12 +149,14 @@ namespace app
 		/****************************************/
 
 
-		ScatterFormation::ScatterFormation() : RingFormation(9, 40.0f)
+		ScatterFormation::ScatterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			m_joinMargin = 50.0f;
 			// パッシブ: なし
-			// ウルト: ペンギン呼び出し（距離600）
-			m_ult.AddEffect(std::make_unique<PenguinCallEffect>(600.0f));
+			// ウルト: ペンギン呼び出し
+			if (param.ultCallDistance > 0.0f)
+			{
+				m_ult.AddEffect(std::make_unique<PenguinCallEffect>(&param.ultCallDistance));
+			}
 		}
 
 
@@ -108,14 +165,14 @@ namespace app
 		/****************************************/
 
 
-		TriangleFormation::TriangleFormation()
+		TriangleFormation::TriangleFormation(const MasterFormationParameter& param)
+			: IFormation(param)
 		{
-			m_joinMargin = 15.0f;
-			// パッシブ: 速度 (1.0 + level×0.1)x
-			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(1.0f, 0.1f));
+			// パッシブ: レベル連動速度
+			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
 
-			// ウルト: 速度1.8x（純粋なスピード特化）
-			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(1.8f));
+			// ウルト: 純粋なスピード特化
+			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));
 		}
 
 
@@ -143,8 +200,8 @@ namespace app
 				right = Vector3(fwd.z, 0.0f, -fwd.x);
 			}
 
-			const float ROW = ROW_SPACING;
-			const float COL = COL_SPACING;
+			const float ROW = m_param->rowSpacing;
+			const float COL = m_param->colSpacing;
 			int placed = 0;
 
 			// 座標追加ヘルパー: count 体に達したら false を返す
