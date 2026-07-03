@@ -181,6 +181,21 @@ namespace app
 		}
 
 
+
+		//--------------------------------------------//
+		// 渦潮の警告座標の通知
+		//--------------------------------------------//
+		if (m_wpWarningChanged)
+		{
+			std::vector<Vector3> warningPositions;
+			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* whirlpool)
+				{
+					warningPositions.push_back(whirlpool->GetTransform().m_position);
+				});
+			m_wpWarningChanged(warningPositions);
+		}
+
+
 		//--------------------------------------------//
 		// スニーク可否の更新
 		//--------------------------------------------//

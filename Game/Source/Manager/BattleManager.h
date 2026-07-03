@@ -154,7 +154,6 @@ namespace app
 		}
 
 
-	public:
 		/**
 		 * @brief ミニマップUI通知functionを設定
 		 * @param func 引数なし。lambda内でUIへのセットを行う
@@ -163,6 +162,14 @@ namespace app
 		{
 			m_onMiniMapChanged = std::move(func);
 		}
+
+
+
+		void SetOnWpWarningChanged(std::function<void(std::vector<Vector3>)> func)
+		{
+			m_wpWarningChanged = std::move(func);
+		}
+
 
 		/**
 		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
@@ -189,6 +196,10 @@ namespace app
 
 		/** ミニマップUI更新通知 */
 		std::function<void(const ui::ActorPositions&)> m_onMiniMapChanged;
+
+
+		/** 渦潮UI更新通知 */
+		std::function<void(std::vector<Vector3>)> m_wpWarningChanged;
 
 
 

@@ -189,7 +189,6 @@ namespace app
 			};
 
 		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
-		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
 
 		//--------------------------------------------//
 		// タイマーUI通知
@@ -315,6 +314,19 @@ namespace app
 					daddyPenguin->GetTransform().m_position,
 					actorPositions
 				);
+			}
+		);
+
+
+		//--------------------------------------------//
+		// 渦潮UI通知
+		//--------------------------------------------//
+		bm.SetOnWpWarningChanged(
+			[this, daddyPenguin, CheckMenu](std::vector<Vector3> whirlpoolPositions)
+			{
+				m_wpWarningSystem->SetDaddyTRS(daddyPenguin->GetTransform());
+				m_wpWarningSystem->SetWhirlpoolPositions(whirlpoolPositions);
+				m_wpWarningSystem->UpdateDrawFlags();
 			}
 		);
 	}
