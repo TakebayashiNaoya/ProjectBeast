@@ -35,9 +35,16 @@ namespace app
 			/** 描画処理 */
 			void Render(RenderContext& rc) override;
 
-
 			/** UIのロジック初期化処理 */
 			void InitializeLogic() override;
+
+			/**
+			 * @brief 通知バナーが表示中(スライドイン〜スタンプ演出〜フェードアウトで画面外に消えきるまで)かどうか
+			 * @details InGameAchievementMenu（常時表示リスト）側で、
+			 *          この間だけリスト表示を隠すために使用する。
+			 *          Idle（何も表示していない）の時だけfalseを返す。
+			 */
+			bool IsShowing() const;
 
 
 		private:

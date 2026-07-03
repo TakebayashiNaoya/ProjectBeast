@@ -4,8 +4,8 @@
  * @author 竹林
  */
 #pragma once
-#include "Source/UI/Menu.h"
 #include "Source/UI/Animation/UIAnimation.h"
+#include "Source/UI/Menu.h"
 
 
 namespace app
@@ -45,12 +45,16 @@ namespace app
 			void Update() override;
 			void InitializeLogic() override;
 
+
 		public:
 			/** ウィンドウを開く（Opening アニメーション開始） */
 			void Open();
 
 			/** プログラムからウィンドウを即座に閉じる（アニメーションなし） */
 			void Close();
+
+			/** Closing アニメーションを再生してウィンドウを閉じる（Opened 状態でのみ有効） */
+			void RequestClose();
 
 			/** ウィンドウが完全に閉じているか */
 			bool IsClosed() const { return m_state == State::Closed; }
@@ -61,13 +65,16 @@ namespace app
 			/** 今フレームに閉じアニメーションが完了したか（1フレームのみ true） */
 			bool IsClosedByUser() const { return m_closedByUser; }
 
+
 		private:
 			enum class State { Closed, Opening, Opened, Closing };
 
-			void UpdateInput();
+			//void UpdateInput();
 			void CheckAnimationComplete();
 			void SetContentVisible(bool visible);
 			void SetAllVisible(bool visible);
+			void StartClosing();
+
 
 		private:
 			State m_state = State::Closed;

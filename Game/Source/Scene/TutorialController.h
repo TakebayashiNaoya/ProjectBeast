@@ -43,7 +43,8 @@ namespace app
 	 *   1. 近接トリガー検知：プレイヤーが各ターゲット種別に一定距離まで近づいたら
 	 *      未表示チュートリアルをキューに積む（複数同時→順番に表示）
 	 *   2. ウィンドウ管理：キューから順に TutorialWindowMenu を開閉し、
-	 *      窓が開いている間はゲームをポーズする
+	 *      一定時間（TUTORIAL_WINDOW_DISPLAY_TIME）表示した後、自動的に閉じる。
+	 *      ゲームはポーズせず、通常の Update() 内で進行する。
 	 *   3. 矢印管理：未完了ターゲット（Ocean以外）を指す edge/overhead 矢印を表示し、
 	 *      チュートリアル完了後に消す
 	 *
@@ -89,6 +90,9 @@ namespace app
 		/** キューの先頭ウィンドウを開いてポーズをかける */
 		void TryOpenNextWindow();
 
+		/** クローズアニメーション完了を検知したときの完了処理（達成/ログ/次のウィンドウ準備） */
+		void FinishCurrentWindow();
+
 
 	private:
 		static constexpr int TARGET_COUNT = static_cast<int>(EnTutorialTarget::Max);
@@ -119,6 +123,9 @@ namespace app
 		/** プレイヤーとの距離がこれ以下でトリガー（ワールド単位） */
 		static constexpr float TRIGGER_RADIUS = 200.0f;
 
+		/** ウィンドウを表示し続ける時間（秒）。経過したら自動で閉じる */
+		static constexpr float TUTORIAL_WINDOW_DISPLAY_TIME = 4.0f;
+
 
 	private:
 		actor::DaddyPenguin* m_daddy = nullptr;
@@ -134,6 +141,9 @@ namespace app
 		/** 現在表示中のウィンドウインデックス（-1 = 無し） */
 		int  m_currentTargetIdx = -1;
 		bool m_isWindowOpen = false;
+
+		/** 現在表示中ウィンドウの経過時間 */
+		float m_windowDisplayTimer = 0.0f;
 
 		/** ターゲットごとのウィンドウ Layout */
 		ui::Layout m_windowLayouts[TARGET_COUNT];
