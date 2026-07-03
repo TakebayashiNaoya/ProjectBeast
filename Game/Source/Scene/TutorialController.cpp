@@ -4,17 +4,17 @@
  * @author 竹林
  */
 #include "stdafx.h"
-#include "TutorialController.h"
 #include "SceneManager.h"
+#include "TutorialController.h"
 
-#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
-#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Actor/Character/Enemy/EnemyManager.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
-#include "Source/Nature/WhirlpoolManager.h"
 #include "Source/Nature/Whirlpool.h"
+#include "Source/Nature/WhirlpoolManager.h"
 
 #include "Graphics/Camera/CameraSystem.h"
 #include "Source/Achivement/AchievementManager.h"
@@ -142,6 +142,16 @@ namespace app
 			m_arrowPackets[i].Update();
 		}
 
+		// 表示中ウィンドウの更新（ポーズさせず毎フレーム動かす）
+		if (m_isWindowOpen)
+		{
+			m_windowLayouts[m_currentTargetIdx].Update();
+
+			m_windowDisplayTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_windowDisplayTimer >= TUTORIAL_WINDOW_DISPLAY_TIME)
+				CloseCurrentWindow();
+		}
+
 		if (!m_isWindowOpen && !m_queue.empty())
 			TryOpenNextWindow();
 	}
@@ -151,45 +161,21 @@ namespace app
 	{
 		for (auto& packet : m_arrowPackets)
 			packet.Render(rc);
+
+		if (m_isWindowOpen)
+			m_windowLayouts[m_currentTargetIdx].Render(rc);
 	}
 
 
 	bool TutorialController::PauseUpdate()
 	{
-		if (!m_isWindowOpen) return false;
-
-		m_windowLayouts[m_currentTargetIdx].Update();
-
-		auto* menu = m_windowLayouts[m_currentTargetIdx].GetMenu<ui::TutorialWindowMenu>();
-		if (menu && menu->IsClosedByUser())
-		{
-			m_completed[m_currentTargetIdx] = true;
-			m_isWindowOpen = false;
-			if (auto* lm = GameLogManager::GetInstance())
-				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
-			if (auto* am = app::achievement::AchievementManager::GetInstance())
-			{
-				auto* base = am->GetAchievement(Hash32(TUTORIAL_STEP_NAMES[m_currentTargetIdx]));
-				if (auto* ev = dynamic_cast<app::achievement::EventAchievement*>(base))
-					ev->Unlock();
-			}
-
-			if (!m_queue.empty())
-				TryOpenNextWindow();
-			else
-				SceneManager::GetInstance()->SetPause(false);
-		}
-
-		return true;
+		return false;
 	}
 
 
 	bool TutorialController::PauseRender(RenderContext& rc)
 	{
-		if (!m_isWindowOpen) return false;
-
-		m_windowLayouts[m_currentTargetIdx].Render(rc);
-		return true;
+		return false;
 	}
 
 
@@ -274,14 +260,14 @@ namespace app
 		{
 			menu->Open();
 			m_isWindowOpen = true;
-			SceneManager::GetInstance()->SetPause(true);
+			m_windowDisplayTimer = 0.0f;
 		}
 		else
 		{
 			// Layout 初期化失敗（JSON 欠損など） — エントリをスキップして完了済みにする
 			m_completed[m_currentTargetIdx] = true;
 			if (auto* lm = GameLogManager::GetInstance())
-				lm->QueueEvent({{"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]}});
+				lm->QueueEvent({ {"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]} });
 			if (auto* am = app::achievement::AchievementManager::GetInstance())
 			{
 				auto* base = am->GetAchievement(Hash32(TUTORIAL_STEP_NAMES[m_currentTargetIdx]));
@@ -289,5 +275,25 @@ namespace app
 					ev->Unlock();
 			}
 		}
+	}
+
+
+	void TutorialController::CloseCurrentWindow()
+	{
+		m_completed[m_currentTargetIdx] = true;
+		m_isWindowOpen = false;
+
+		if (auto* lm = GameLogManager::GetInstance())
+			lm->QueueEvent({ {"ev", "tutorial_complete"}, {"step", TUTORIAL_STEP_NAMES[m_currentTargetIdx]} });
+		if (auto* am = app::achievement::AchievementManager::GetInstance())
+		{
+			auto* base = am->GetAchievement(Hash32(TUTORIAL_STEP_NAMES[m_currentTargetIdx]));
+			if (auto* ev = dynamic_cast<app::achievement::EventAchievement*>(base))
+				ev->Unlock();
+		}
+
+		auto* menu = m_windowLayouts[m_currentTargetIdx].GetMenu<ui::TutorialWindowMenu>();
+		if (menu)
+			menu->Close();
 	}
 }

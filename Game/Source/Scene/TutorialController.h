@@ -4,13 +4,13 @@
  * @author 竹林
  */
 #pragma once
-#include <queue>
-#include <array>
+#include "Source/UI/DangerArrow/DangerArrowCalc.h"
+#include "Source/UI/DangerArrow/DangerArrowMenu.h"
 #include "Source/UI/Layout.h"
 #include "Source/UI/Menus/TutorialWindowMenu.h"
-#include "Source/UI/DangerArrow/DangerArrowMenu.h"
-#include "Source/UI/DangerArrow/DangerArrowCalc.h"
 #include "Source/UI/System/SystemPacket.h"
+#include <array>
+#include <queue>
 
 
 namespace app
@@ -91,6 +91,9 @@ namespace app
 		/** キューの先頭ウィンドウを開いてポーズをかける */
 		void TryOpenNextWindow();
 
+		/** 表示中ウィンドウを閉じて次のウィンドウを開く準備をする */
+		void CloseCurrentWindow();
+
 
 	private:
 		static constexpr int TARGET_COUNT = static_cast<int>(EnTutorialTarget::Max);
@@ -121,6 +124,9 @@ namespace app
 		/** プレイヤーとの距離がこれ以下でトリガー（ワールド単位） */
 		static constexpr float TRIGGER_RADIUS = 200.0f;
 
+		/** ウィンドウを表示し続ける時間（秒）。経過したら自動で閉じる */
+		static constexpr float TUTORIAL_WINDOW_DISPLAY_TIME = 4.0f;
+
 
 	private:
 		actor::DaddyPenguin* m_daddy = nullptr;
@@ -136,6 +142,9 @@ namespace app
 		/** 現在表示中のウィンドウインデックス（-1 = 無し） */
 		int  m_currentTargetIdx = -1;
 		bool m_isWindowOpen = false;
+
+		/** 現在表示中ウィンドウの経過時間 */
+		float m_windowDisplayTimer = 0.0f;
 
 		/** ターゲットごとのウィンドウ Layout */
 		ui::Layout m_windowLayouts[TARGET_COUNT];

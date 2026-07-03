@@ -2,78 +2,105 @@
     "canvas": {
         "elements": [
             {
-                "type":     "UIIcon",
-                "name":     "TutorialWindowBg",
-                "asset":    "Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseBackGroundIcon.dds",
-                "width":    960,
-                "height":   600,
-                "position": [0, 0, 0],
-                "scale":    [0, 0, 1],
+                "type": "UIIcon",
+                "name": "TutorialWindowBg",
+                "asset": "Assets/spriteData/UI/PauseScreen/PauseScreenSprite/PauseBackGroundIcon.dds",
+                "width": 528,
+                "height": 330,
+                "position": [
+                    -500,
+                    -140,
+                    0
+                ],
+                "scale": [
+                    0,
+                    0,
+                    1
+                ],
                 "rotation": 0,
-                "color":    [0, 0, 0, 220]
+                "color": [
+                    0,
+                    0,
+                    0,
+                    220
+                ]
             },
             {
-                "type":      "UIText",
-                "name":      "TutorialWindowTitle",
-                "text":      "ピンクペンギン",
-                "fontSize":  1.0,
+                "type": "UIText",
+                "name": "TutorialWindowTitle",
+                "text": "ピンクペンギン",
+                "fontSize": 0.55,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
-                "position":  [0, 258, 0],
-                "rotation":  0,
-                "color":     [255, 255, 255, 255],
-                "pivot":     [0.5, 0.5]
+                "position": [
+                    -500,
+                    2,
+                    0
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ]
             },
             {
-                "type":     "UIVideo",
-                "name":     "TutorialWindowVideo",
+                "type": "UIVideo",
+                "name": "TutorialWindowVideo",
                 "clipPath": "Assets/Video/ClingyPenguin.mp4",
-                "width":    640,
-                "height":   360,
-                "position": [0, 40, 0],
-                "scale":    [1, 1, 1],
+                "width": 352,
+                "height": 198,
+                "position": [
+                    -500,
+                    -118,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
                 "rotation": 0,
-                "color":    [255, 255, 255, 255],
-                "fps":      24.0,
-                "loop":     false,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "fps": 24.0,
+                "loop": false,
                 "autoPlay": false
             },
             {
-                "type":        "UIText",
-                "name":        "TutorialWindowDesc",
-                "text":        "甘えん坊でくっついて離れない子ペンギン。\nたくさん集まると重くて動きにくい！",
-                "align":       "center",
+                "type": "UIText",
+                "name": "TutorialWindowDesc",
+                "text": "甘えん坊でくっついて離れない子ペンギン。\nたくさん集まると重くて動きにくい！",
+                "align": "center",
                 "lineSpacing": 1.0,
-                "fontSize":    0.6,
-                "fontScaleX":  1.0,
-                "fontScaleY":  1.0,
-                "position":    [0, -185, 0],
-                "rotation":    0,
-                "color":       [255, 255, 255, 255],
-                "pivot":       [0.5, 0.5]
-            },
-            {
-                "type":     "UIIcon",
-                "name":     "TutorialWindowClosePrompt",
-                "asset":    "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_b.dds",
-                "width":    55,
-                "height":   55,
-                "position": [-45, -260, 0],
-                "scale":    [1, 1, 1],
-                "rotation": 0,
-                "color":    [255, 255, 255, 255]
-            },
-            {
-                "type":      "UIText",
-                "name":      "TutorialWindowCloseText",
-                "text":      "閉じる",
-                "fontSize":  0.6,
+                "fontSize": 0.33,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
-                "position":  [30, -260, 0],
-                "rotation":  0,
-                "color":     [255, 255, 255, 255],
-                "pivot":     [0.5, 0.5]
+                "position": [
+                    -500,
+                    -242,
+                    0
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ]
             }
         ]
     }
