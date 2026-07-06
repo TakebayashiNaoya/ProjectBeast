@@ -984,12 +984,12 @@ namespace app
 						if (wp->GetState() == nature::Whirlpool::EnWhirlpoolState::None) return;
 
 						const float wpRadius = wp->GetMaxRadius();
-						const float trigerDistSq = (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius) * (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius);
+						const float triggerDistSq = (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius) * (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius);
 
 						const Vector3& pos = wp->GetTransform().m_position;
 						float distSq = (pos - myPos).LengthSq();
 
-						if (distSq <= minDistSq && distSq <= trigerDistSq)
+						if (distSq <= minDistSq && distSq <= triggerDistSq)
 						{
 							minDistSq = distSq;
 							whirlpoolPos = pos;

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file BattleManager.cpp
  * @brief バトルの管理をするクラス
  * @author 竹林
@@ -169,12 +169,13 @@ namespace app
 
 
 			// 渦潮の座標を取得する
-			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* whirlpool)
-				{
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool)).push_back(whirlpool->GetTransform().m_position);
-				});
-
-
+			if (auto* wm = nature::WhirlpoolManager::GetInstance())
+			{
+				wm->ForEach([&](nature::Whirlpool* whirlpool)
+					{
+						positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool)).push_back(whirlpool->GetTransform().m_position);
+					});
+			}
 
 
 			m_onMiniMapChanged(positions);

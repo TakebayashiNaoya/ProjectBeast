@@ -7,6 +7,7 @@
 #include "Source/UI/Layout.h"
 #include "Source/UI/Menus/TutorialWindowMenu.h"
 #include "Source/UI/Modules/System/SystemPacket.h"
+#include <queue>
 
 
 namespace app

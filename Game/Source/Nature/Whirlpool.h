@@ -87,7 +87,7 @@ namespace app
 			 * @brief 最大半径を取得
 			 * @return 最大半径
 			 */
-			float GetMaxRadius()
+			float GetMaxRadius() const
 			{
 				return m_maxRadius;
 			}

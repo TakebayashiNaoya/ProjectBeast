@@ -93,15 +93,24 @@ namespace app
 				posses.end()
 			);
 			// 上位3つ手前にソート
-			const uint8_t size = std::min<uint8_t>(PACKET_NUM, posses.size());
-			std::nth_element(posses.begin(), posses.begin() + size, posses.end(),
-				[dpPosition](const Vector3& a, const Vector3& b)
+			const size_t size = std::min<size_t>(PACKET_NUM, posses.size());
+
+			auto distanceLess = [dpPosition](const Vector3& a, const Vector3& b)
 				{
 					const float diffSqA = (dpPosition - a).LengthSq();
 					const float diffSqB = (dpPosition - b).LengthSq();
 					return diffSqA < diffSqB;
-				}
-			);
+				};
+
+			// 渦潮数がPACKET_NUMより多い場合のみ、上位size個を前方に集める
+			// (size == posses.size() の場合、nth が end() になり並び替えが不要なため)
+			if (posses.size() > size)
+			{
+				std::nth_element(posses.begin(), posses.begin() + size, posses.end(), distanceLess);
+			}
+
+			// UIスロットの割当がフレーム間で入れ替わらないよう、先頭size個を距離順に確定させる
+			std::sort(posses.begin(), posses.begin() + size, distanceLess);
 
 			for (uint8_t i = 0; i < PACKET_NUM; ++i)
 			{

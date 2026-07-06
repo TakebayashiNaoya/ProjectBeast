@@ -35,7 +35,7 @@ namespace app
 		public:
 			/**
 			 * @brief 親ペンギンの位置を設定
-			 * @param position 親ペンギンの位置
+			 * @param trs 親ペンギンのトランスフォーム
 			 */
 			void SetDaddyTRS(const core::Transform& trs)
 			{
