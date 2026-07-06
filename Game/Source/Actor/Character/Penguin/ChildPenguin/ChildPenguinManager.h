@@ -90,6 +90,19 @@ namespace app
 			 */
 			void RemoveAndDestroy(ChildPenguin* penguin);
 
+			/**
+			 * @brief フィーバータイム用：上空から1匹だけ子ペンギンを降らせる
+			 * @param dropHeight 地面からの投下高度オフセット
+			 * @detail タイプはステージ設定（CreateChildPenguinsで渡された比率）に従って重み付き抽選する
+			 */
+			void SpawnFromSky(float dropHeight);
+
+			/**
+			 * @brief ステージの初期スポーン総数を取得
+			 * @return CreateChildPenguins呼び出し時に指定された総数（フィーバータイムの上限などに使用）
+			 */
+			int GetInitialTotalCount() const { return m_initialTotalCount; }
+
 
 		private:
 			/**
@@ -135,6 +148,13 @@ namespace app
 			std::vector<actor::ChildPenguin*> m_childPenguinList;
 			/** 削除待ちのペンギンを入れるリスト */
 			std::vector<ChildPenguin*> m_destroyList;
+
+			/** ステージの初期スポーン総数（CreateChildPenguinsでキャッシュ、フィーバータイムの上限に使用） */
+			int m_initialTotalCount = 0;
+			/** ステージの生成半径（CreateChildPenguinsでキャッシュ、フィーバー時のランダム配置に再利用） */
+			float m_spawnRadius = 3000.0f;
+			/** タイプ別の初期スポーン数（CreateChildPenguinsでキャッシュ、フィーバー時の比率抽選に再利用） */
+			int m_seriousNum = 0, m_clingyNum = 0, m_naughtyNum = 0, m_clumsyNum = 0, m_caringNum = 0;
 
 
 

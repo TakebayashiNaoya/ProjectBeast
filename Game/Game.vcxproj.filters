@@ -337,6 +337,9 @@
     <ClCompile Include="Source\Manager\IglooManager.cpp">
       <Filter>Source\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Manager\FeverTimeManager.cpp">
+      <Filter>Source\Manager</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
     </ClCompile>
@@ -805,6 +808,9 @@
       <Filter>Source\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\Manager\IglooManager.h">
+      <Filter>Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Manager\FeverTimeManager.h">
       <Filter>Source\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h">

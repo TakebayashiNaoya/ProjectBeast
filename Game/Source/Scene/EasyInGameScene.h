@@ -59,6 +59,11 @@ namespace app
 			return "Assets/parameter/nature/whirlpoolParameter_Easy.bin";
 		}
 
+		const char* GetFeverParameterJsonPath() const override
+		{
+			return "Assets/parameter/fever/feverParameter_Easy.json";
+		}
+
 		const char* GetOceanParameterJsonPath() const override
 		{
 			return "Assets/parameter/nature/oceanParameter_Easy.json";

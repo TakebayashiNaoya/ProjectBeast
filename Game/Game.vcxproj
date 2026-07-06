@@ -315,6 +315,7 @@
     <ClCompile Include="Source\GameLog\GameLogManager.cpp" />
     <ClCompile Include="Source\Graphics\PBRStatus.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
+    <ClCompile Include="Source\Manager\FeverTimeManager.cpp" />
     <ClCompile Include="Source\Manager\IglooManager.cpp" />
     <ClCompile Include="Source\Manager\InGameUImanager.cpp" />
     <ClCompile Include="Source\Manager\ScoreManager.cpp" />
@@ -484,6 +485,7 @@
     <ClInclude Include="Source\Graphics\PBRParameter.h" />
     <ClInclude Include="Source\Graphics\PBRStatus.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
+    <ClInclude Include="Source\Manager\FeverTimeManager.h" />
     <ClInclude Include="Source\Manager\IglooManager.h" />
     <ClInclude Include="Source\Manager\InGameUImanager.h" />
     <ClInclude Include="Source\Manager\ScoreManager.h" />

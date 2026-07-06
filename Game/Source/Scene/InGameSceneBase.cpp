@@ -27,6 +27,7 @@
 #include "Source/Util/JsonConverter.h"
 
 #include "Source/Manager/BattleManager.h"
+#include "Source/Manager/FeverTimeManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
 #include "Source/Manager/ScoreManager.h"
@@ -86,6 +87,7 @@ namespace app
 		BattleManager::DestroyInstance();
 		ScoreManager::DestroyInstance();
 		TimeManager::DestroyInstance();
+		FeverTimeManager::DestroyInstance();
 
 		/** シーン破棄時にサブカメラを強制停止する（タイトル遷移後に残らないよう） */
 		nsBeastEngine::SubCameraManager::Get().ForceEnd();
@@ -111,10 +113,14 @@ namespace app
 		BattleManager::CreateInstance();
 		ScoreManager::CreateInstance();
 		TimeManager::CreateInstance();
+		FeverTimeManager::CreateInstance();
 
 		/** ステージ固有の制限時間を設定する */
 		TimeManager::GetInstance().SetMaxTime(GetTimeLimit());
 		TimeManager::GetInstance().ResetTime();
+
+		/** フィーバータイムの設定を読み込む */
+		FeverTimeManager::GetInstance()->Start(GetFeverParameterJsonPath());
 
 		app::achievement::AchievementManager::CreateInstance();
 		app::achievement::AchievementManager::GetInstance()->Start(GetAchievementJsonPath());
@@ -432,6 +438,7 @@ namespace app
 
 			BattleManager::GetInstance().Update();
 			TimeManager::GetInstance().Update();
+			FeverTimeManager::GetInstance()->Update();
 
 			app::achievement::AchievementManager::GetInstance()->Update();
 

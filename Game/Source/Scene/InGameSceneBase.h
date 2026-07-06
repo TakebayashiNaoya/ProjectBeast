@@ -82,6 +82,8 @@ namespace app
 		virtual const char* GetWhirlpoolParameterJsonPath() const = 0;
 		/** 渦潮のパラメーターバイナリパス */
 		virtual const char* GetWhirlpoolParameterBinaryPath() const = 0;
+		/** フィーバータイムのパラメーターJSONパス */
+		virtual const char* GetFeverParameterJsonPath() const = 0;
 		/** 海のパラメーターJSONパス */
 		virtual const char* GetOceanParameterJsonPath() const = 0;
 		/** 海のパラメーターバイナリパス */
