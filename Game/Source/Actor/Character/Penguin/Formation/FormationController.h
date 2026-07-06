@@ -159,8 +159,57 @@ namespace app
 			float GetUltCooldownRate() const { return m_ultController.GetCooldownRate(); }
 
 
+			//============================================//
+			// 陣形切り替え演出（スライドUI用の入力ロック）
+			//============================================//
+
+			/**
+			 * @brief 陣形切り替え演出（スライド）を開始する
+			 * @details 演出中は IsSwitchingFormation() が true を返し、ChildPenguinManager 側で
+			 *          連続切り替え入力を無視するために使う。
+			 */
+			void StartSwitchTransition() { m_switchLockTimer = m_switchLockDuration; }
+
+			/**
+			 * @brief 陣形切り替え演出中か
+			 * @return true の間は再度の切り替え入力を無視すべき
+			 */
+			bool IsSwitchingFormation() const { return m_switchLockTimer > 0.0f; }
+
+			/**
+			 * @brief 切り替え演出の進行度を 0.0(開始)〜1.0(完了) で返す（UI表示用）
+			 */
+			float GetSwitchProgress() const { return 1.0f - (m_switchLockTimer / m_switchLockDuration); }
+
+			/**
+			 * @brief 切り替えロックのタイマーを更新する（切り替え時間のホットリロード監視も行う）
+			 * @param dt 前フレームとの時間差（秒）
+			 */
+			void UpdateSwitchLock(float dt)
+			{
+#if defined(APP_DEBUG)
+				m_tuningReloadTimer += dt;
+				if (m_tuningReloadTimer >= kTuningReloadInterval)
+				{
+					m_tuningReloadTimer = 0.0f;
+					ReloadSwitchTuningIfChanged();
+				}
+#endif
+				m_switchLockTimer -= dt;
+				if (m_switchLockTimer < 0.0f) m_switchLockTimer = 0.0f;
+			}
+
+
+		private:
+			/** 陣形切り替え演出（スライド）時間のホットリロード対象JSONを再読み込みする（変更があれば） */
+			void ReloadSwitchTuningIfChanged();
+
+
 		private:
 			static constexpr int FOLLOWERS_PER_LEVEL = 9;  /** レベルアップに必要なフォロワー数 */
+#if defined(APP_DEBUG)
+			static constexpr float kTuningReloadInterval = 1.0f;  /** チューニングJSONの変更チェック間隔（秒） */
+#endif
 
 			std::array<
 				std::unique_ptr<IFormation>,
@@ -173,6 +222,13 @@ namespace app
 			std::function<void(int)> m_onLevelUp;  /** レベルアップ時のコールバック */
 
 			UltController m_ultController;  /** ウルト発動・タイマー管理 */
+
+			float m_switchLockTimer    = 0.0f;  /** 陣形切り替え演出の残り時間（秒）。0より大きい間は演出中 */
+			float m_switchLockDuration = 0.2f;  /** 陣形切り替え演出（スライド）の時間（秒）。FormationSwitchTuning.jsonからホットリロード可能 */
+#if defined(APP_DEBUG)
+			time_t m_tuningLastWriteTime = 0;   /** チューニングJSONの最終更新日時（ホットリロード監視用） */
+			float  m_tuningReloadTimer   = 0.0f;/** チューニングJSONの変更チェック用タイマー */
+#endif
 		};
 	}
 }

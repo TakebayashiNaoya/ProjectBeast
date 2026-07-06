@@ -227,6 +227,17 @@ namespace app
 			EnFormationType GetCurrentFormationType() const { return m_formationController.GetCurrentType(); }
 
 			/**
+			 * @brief 陣形切り替え演出（スライドUI）の最中か
+			 * @details true の間はLB/RBによる再切り替え入力を無視する
+			 */
+			bool IsSwitchingFormation() const { return m_formationController.IsSwitchingFormation(); }
+
+			/**
+			 * @brief 陣形切り替え演出の進行度を 0.0(開始)〜1.0(完了) で返す（UI表示用）
+			 */
+			float GetFormationSwitchProgress() const { return m_formationController.GetSwitchProgress(); }
+
+			/**
 			 * @brief 陣形の移動速度倍率を取得する
 			 * @details パッシブ倍率 × ウルト倍率の積を返す。
 			 */

@@ -21,6 +21,8 @@ namespace app
 			constexpr const char* PARAMETER_JSON_FILE_PATH = "Assets/parameter/character/penguin/formation/FormationParameter.json";
 			/** 陣形パラメーターのファイルパス（リリース時: 変換済みバイナリを読み込む） */
 			constexpr const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/formation/FormationParameter.bin";
+			/** 陣形切り替え演出（スライド）時間のチューニングファイルパス（ホットリロード対応） */
+			constexpr const char* SWITCH_TUNING_JSON_PATH = "Assets/parameter/character/penguin/formation/FormationSwitchTuning.json";
 		}
 
 
@@ -74,6 +76,32 @@ namespace app
 			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>(*scatterParam);
 
 			SwitchFormation(EnFormationType::Circle);
+
+			// 陣形切り替え演出時間の初期読み込み
+			{
+				nlohmann::json tuningJson;
+				if (util::JsonConverter::IsLoadJsonFile(tuningJson, SWITCH_TUNING_JSON_PATH))
+				{
+					m_switchLockDuration = util::JsonConverter::ToFloat(tuningJson, "switchDuration", m_switchLockDuration);
+				}
+#if defined(APP_DEBUG)
+				m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(SWITCH_TUNING_JSON_PATH);
+#endif
+			}
+		}
+
+
+		void FormationController::ReloadSwitchTuningIfChanged()
+		{
+#if defined(APP_DEBUG)
+			if (!util::JsonConverter::CheckFileModified(SWITCH_TUNING_JSON_PATH, m_tuningLastWriteTime)) return;
+
+			nlohmann::json tuningJson;
+			if (!util::JsonConverter::IsLoadJsonFile(tuningJson, SWITCH_TUNING_JSON_PATH)) return;
+
+			m_switchLockDuration  = util::JsonConverter::ToFloat(tuningJson, "switchDuration", m_switchLockDuration);
+			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(SWITCH_TUNING_JSON_PATH);
+#endif
 		}
 
 

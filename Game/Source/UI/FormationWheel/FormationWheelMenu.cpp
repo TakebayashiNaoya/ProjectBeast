@@ -7,6 +7,8 @@
 #include "FormationWheelMenu.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Util/CRC32.h"
+#include "Source/Util/JsonConverter.h"
+#include <cmath>
 
 namespace app
 {
@@ -14,18 +16,32 @@ namespace app
 	{
 		namespace
 		{
-			/** 陣形種別ごとのアイコン名の接尾辞（JSON側の要素名と対応） */
-			constexpr const char* kFormationSuffixes[] = { "Circle", "Triangle", "Cluster", "Scatter" };
+			/** 陣形種別(EnFormationTypeの値)ごとのJSON要素名 */
+			constexpr const char* kFormationIconNames[] = { "CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon" };
 			constexpr int kFormationNum = static_cast<int>(actor::EnFormationType::Num);
+
+			/** 見た目チューニングのホットリロード対象JSON */
+			constexpr const char* kTuningJsonPath = "Assets/parameter/UI/formationWheel/FormationWheelTuning.json";
+			/** チューニングJSONの変更チェック間隔（秒） */
+			constexpr float kTuningReloadInterval = 1.0f;
+
+
+			float Lerp(float a, float b, float t) { return a + (b - a) * t; }
+			float Clamp01(float v) { return v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v); }
 		}
 
 
 		FormationWheelMenu::FormationWheelMenu()
-		{}
+		{
+			LoadTuning();
+		}
 
 
 		void FormationWheelMenu::Update()
 		{
+#if defined(APP_DEBUG)
+			ReloadTuningIfChanged(g_gameTime->GetFrameDeltaTime());
+#endif
 			UpdateFormationIcons();
 			UpdateUltIconColor();
 			MenuBase::Update();
@@ -34,19 +50,53 @@ namespace app
 
 		void FormationWheelMenu::InitializeLogic()
 		{
-			// 陣形アイコンは毎フレームUpdateFormationIconsで表示状態が確定するため、
-			// 初期化時点ではひとまず全て非表示にしておく
-			const char* slotPrefixes[] = { "Current", "Prev", "Next" };
-			for (const char* prefix : slotPrefixes)
+			for (const char* name : kFormationIconNames)
 			{
-				for (const char* suffix : kFormationSuffixes)
+				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
 				{
-					std::string name = std::string(prefix) + suffix + "Icon";
-					if (auto* ui = GetUI<UIIcon>(Hash32(name.c_str())))
-					{
-						ui->m_isDraw = false;
-					}
+					ui->m_isDraw = true;
 				}
+			}
+		}
+
+
+		float FormationWheelMenu::SlotToX(float slot) const
+		{
+			return m_centerX + slot * m_slotSpacing;
+		}
+
+
+		float FormationWheelMenu::SlotToSize(float slot) const
+		{
+			const float t = Clamp01(std::fabs(slot));
+			return Lerp(m_currentSize, m_sideSize, t);
+		}
+
+
+		float FormationWheelMenu::SlotToAlpha(float slot) const
+		{
+			const float absSlot = std::fabs(slot);
+			if (absSlot <= 1.0f) return Lerp(1.0f, m_sideAlpha, absSlot);
+			return Lerp(m_sideAlpha, 0.0f, Clamp01(absSlot - 1.0f));
+		}
+
+
+		void FormationWheelMenu::BeginTransition(actor::EnFormationType oldType, actor::EnFormationType newType)
+		{
+			// 切り替え方向を計算する
+			const int oldIndex = static_cast<int>(oldType);
+			const int newIndex = static_cast<int>(newType);
+			const int diff = (newIndex - oldIndex + kFormationNum) % kFormationNum;
+			// 1: 次へ(RB) / -1: 前へ(LB)
+			m_direction = (diff == 1) ? 1 : -1;
+			// 各陣形種別の遷移前スロット位置を確定する
+			for (int i = 0; i < kFormationNum; i++)
+			{
+				const int diffFromOld = (i - oldIndex + kFormationNum) % kFormationNum;
+				if (diffFromOld == 0)                        m_fromSlot[i] = 0;
+				else if (diffFromOld == 1)                   m_fromSlot[i] = 1;
+				else if (diffFromOld == kFormationNum - 1)   m_fromSlot[i] = -1;
+				else                                         m_fromSlot[i] = (m_direction > 0) ? 2 : -2;
 			}
 		}
 
@@ -56,25 +106,45 @@ namespace app
 			auto* cpm = actor::ChildPenguinManager::GetInstance();
 			if (cpm == nullptr) return;
 
-			const int current = static_cast<int>(cpm->GetCurrentFormationType());
-			const int prev = (current + kFormationNum - 1) % kFormationNum;
-			const int next = (current + 1) % kFormationNum;
+			const actor::EnFormationType currentType = cpm->GetCurrentFormationType();
+			const bool isSwitching = cpm->IsSwitchingFormation();
 
-			auto updateSlot = [&](const char* prefix, int activeType)
+			// 切り替え開始エッジを検知し、遷移前のスロット配置を確定する
+			if (isSwitching && !m_wasSwitching)
+			{
+				BeginTransition(m_lastFrameType, currentType);
+			}
+
+			for (int i = 0; i < kFormationNum; i++)
+			{
+				float slot;
+				if (isSwitching)
 				{
-					for (int i = 0; i < kFormationNum; i++)
-					{
-						std::string name = std::string(prefix) + kFormationSuffixes[i] + "Icon";
-						if (auto* ui = GetUI<UIIcon>(Hash32(name.c_str())))
-						{
-							ui->m_isDraw = (i == activeType);
-						}
-					}
-				};
+					const float progress = cpm->GetFormationSwitchProgress();
+					slot = static_cast<float>(m_fromSlot[i]) - static_cast<float>(m_direction) * progress;
+				}
+				else
+				{
+					const int currentIndex = static_cast<int>(currentType);
+					const int diffFromCurrent = (i - currentIndex + kFormationNum) % kFormationNum;
+					if (diffFromCurrent == 0)                      slot = 0.0f;
+					else if (diffFromCurrent == 1)                 slot = 1.0f;
+					else if (diffFromCurrent == kFormationNum - 1) slot = -1.0f;
+					else                                           slot = 2.0f; // 非表示側（見えないので向きは任意）
+				}
 
-			updateSlot("Current", current);
-			updateSlot("Prev", prev);
-			updateSlot("Next", next);
+				if (auto* ui = GetUI<UIIcon>(Hash32(kFormationIconNames[i])))
+				{
+					const float size = SlotToSize(slot);
+					const float scaleFactor = size / m_currentSize;
+					ui->m_transform.m_localTransform.m_position = Vector3(SlotToX(slot), m_rowY, 0.0f);
+					ui->m_transform.m_localTransform.m_scale = Vector3(scaleFactor, scaleFactor, scaleFactor);
+					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, SlotToAlpha(slot));
+				}
+			}
+
+			m_wasSwitching = isSwitching;
+			m_lastFrameType = currentType;
 		}
 
 
@@ -95,6 +165,38 @@ namespace app
 					ui->m_color = color;
 				}
 			}
+		}
+
+
+		void FormationWheelMenu::LoadTuning()
+		{
+			nlohmann::json j;
+			if (util::JsonConverter::IsLoadJsonFile(j, kTuningJsonPath))
+			{
+				m_centerX     = util::JsonConverter::ToFloat(j, "centerX", m_centerX);
+				m_rowY        = util::JsonConverter::ToFloat(j, "rowY", m_rowY);
+				m_slotSpacing = util::JsonConverter::ToFloat(j, "slotSpacing", m_slotSpacing);
+				m_currentSize = util::JsonConverter::ToFloat(j, "currentSize", m_currentSize);
+				m_sideSize    = util::JsonConverter::ToFloat(j, "sideSize", m_sideSize);
+				m_sideAlpha   = util::JsonConverter::ToFloat(j, "sideAlpha", m_sideAlpha);
+				m_iconColor   = util::JsonConverter::ToVector3(j, "iconColor", false, m_iconColor);
+			}
+#if defined(APP_DEBUG)
+			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(kTuningJsonPath);
+#endif
+		}
+
+
+		void FormationWheelMenu::ReloadTuningIfChanged(float dt)
+		{
+#if defined(APP_DEBUG)
+			m_tuningReloadTimer += dt;
+			if (m_tuningReloadTimer < kTuningReloadInterval) return;
+			m_tuningReloadTimer = 0.0f;
+
+			if (!util::JsonConverter::CheckFileModified(kTuningJsonPath, m_tuningLastWriteTime)) return;
+			LoadTuning();
+#endif
 		}
 	}
 }
