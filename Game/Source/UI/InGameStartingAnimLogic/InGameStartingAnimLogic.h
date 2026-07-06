@@ -26,7 +26,7 @@ namespace app
 			/**
 			 * @brief 初期化
 			 * @param menu メニュークラスのポインタ
-			 * @param iconNames アイコンUIの名前
+			 * @param iconNames アイコンUIの名前（UIIconに限らず任意のUIパーツ名を指定可能）
 			 * @param digitNames 数字UIの名前
 			 * @param startOffset 開始位置のオフセット
 			 * @param duration アニメーションの持続時間

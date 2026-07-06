@@ -63,6 +63,18 @@ namespace app
 			 */
 			float GetCooldownRate() const;
 
+			/**
+			 * @brief 発動中の残り時間割合を 0.0〜1.0 で返す（UI表示用）
+			 * @return 発動直後は1.0、終了間際は0.0。発動中でなければ0.0
+			 */
+			float GetActiveRemainingRate() const;
+
+			/**
+			 * @brief クールダウンを最大値にリセットする
+			 * @details ゲーム開始直後など、ウルトを「何も貯まっていない状態」から開始させたい場合に呼ぶ
+			 */
+			void ResetCooldown() { m_cooldownTimer = m_cooldown; }
+
 
 		private:
 			FormationEffectChain* m_ult          = nullptr;  /** 非所有ポインタ。IFormation が所有する */

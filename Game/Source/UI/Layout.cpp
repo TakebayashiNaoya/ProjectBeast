@@ -123,6 +123,30 @@ void InitializeUIParts(app::ui::UIGauge* gauge, const nlohmann::json& item)
 }
 
 
+void InitializeUIParts(app::ui::UILinearFillGauge* gauge, const nlohmann::json& item)
+{
+	const std::string asset = app::util::JsonConverter::ToString(item, "asset");
+	const std::string fx = app::util::JsonConverter::ToString(item, "fx");
+	const float w = app::util::JsonConverter::ToFloat(item, "width");
+	const float h = app::util::JsonConverter::ToFloat(item, "height");
+	const Vector3 position = app::util::JsonConverter::ToVector3(item, "position");
+	const Vector3 scale = app::util::JsonConverter::ToVector3(item, "scale");
+	const Quaternion rotation = ParseRotation(app::util::JsonConverter::ToFloat(item, "rotation"));
+	const Vector2 pivot = app::util::JsonConverter::ToVector2(item, "pivot");
+	const Vector4 color = app::util::JsonConverter::ToVector4(item, "color", true, Vector4::White);
+	const Vector4 baseColor = app::util::JsonConverter::ToVector4(item, "baseColor");
+	const Vector4 fillColor = app::util::JsonConverter::ToVector4(item, "fillColor");
+
+
+	gauge->Initialize(asset.c_str(), fx.c_str(), w, h, position, scale, rotation, pivot, baseColor, fillColor);
+	gauge->m_transform.m_localTransform.m_position = position;
+	gauge->m_transform.m_localTransform.m_scale = scale;
+	gauge->m_transform.m_localTransform.m_rotation = rotation;
+	gauge->m_color = color;
+	gauge->m_pivot = pivot;
+}
+
+
 void InitializeUIParts(app::ui::UIButton* button, const nlohmann::json& item)
 {
 	const std::string asset = app::util::JsonConverter::ToString(item, "asset");
@@ -343,6 +367,13 @@ namespace app
 				auto* cirGauge = canvas->FindUI<UICircleGauge>(key);
 				InitializeUIParts(cirGauge, item);
 				return cirGauge;
+			}
+			if (type == "UILinearFillGauge")
+			{
+				canvas->CreateUI<UILinearFillGauge>(key);
+				auto* fillGauge = canvas->FindUI<UILinearFillGauge>(key);
+				InitializeUIParts(fillGauge, item);
+				return fillGauge;
 			}
 			if (type == "UIVideo")
 			{
