@@ -199,8 +199,6 @@ namespace app
 				K2_ASSERT(menu, "メニューがnullptr");
 			};
 
-		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
-
 		//--------------------------------------------//
 		// タイマーUI通知
 		//--------------------------------------------//

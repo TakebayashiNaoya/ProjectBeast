@@ -948,16 +948,19 @@ namespace app
 
 				Vector3 whirlpoolPos = Vector3::Zero;
 				bool foundWhirlpool = false;
-				float minDistSq = WHIRLPOOL_TRIGGER_DISTANCE * WHIRLPOOL_TRIGGER_DISTANCE;
+				float minDistSq = FLT_MAX;
 
 				nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* wp)
 					{
 						if (wp->GetState() == nature::Whirlpool::EnWhirlpoolState::None) return;
 
+						const float wpRadius = wp->GetMaxRadius();
+						const float trigerDistSq = (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius) * (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius);
+
 						const Vector3& pos = wp->GetTransform().m_position;
 						float distSq = (pos - myPos).LengthSq();
 
-						if (distSq <= minDistSq)
+						if (distSq <= minDistSq && distSq <= trigerDistSq)
 						{
 							minDistSq = distSq;
 							whirlpoolPos = pos;

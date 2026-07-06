@@ -38,7 +38,7 @@ namespace app
 			// リアクションタイプが有効かどうか
 			const bool isReaction = (type != EnBearReactionType::None);
 
-			const bool isFront = m_frontChecker.IsInFront(daddyTRS.m_position, daddyTRS.m_rotation, position);
+			const bool isFront = FrontChecker::IsInFront(daddyTRS.m_position, daddyTRS.m_rotation, position);
 
 			it->isActive = enableLength && isReaction && isFront;
 

@@ -9,23 +9,21 @@
 #include "CPReactionStatus.h"
 
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ClumsyChildPenguinIState.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ClumsyChildPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/NaughtyChildPenguinIState.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/NaughtyChildPenguinStateMachine.h"
+
 
 
 namespace app
 {
 	namespace ui
 	{
-		void CPReactionSystem::SetTarget(actor::ChildPenguin* childPenguin, const EnReactionType type)
-		{
-			auto* menu = SearchTargettableMenu();
-			menu->SetTarget(childPenguin);
-			menu->PlayUIAnimation(type);
-		}
-
-
 		CPReactionSystem::CPReactionSystem()
 			: m_reactionPackets{}
+			, m_targets{}
 			, m_reactionStatusParent(nullptr)
 		{}
 
@@ -45,6 +43,8 @@ namespace app
 				it.Initialize("Assets/parameter/UI/cpReaction/CPReaction.json");
 
 				it.GetMenu()->SetStatus(m_reactionStatusParent.get());
+
+				m_targets.at(i) = nullptr;
 			}
 		}
 
@@ -55,6 +55,8 @@ namespace app
 			{
 				packet.Update();
 			}
+
+			UpdateReactionPositions();
 		}
 
 
@@ -67,17 +69,79 @@ namespace app
 		}
 
 
-		CPReactionMenu* CPReactionSystem::SearchTargettableMenu()
+		void CPReactionSystem::SetTarget(actor::ChildPenguin* childPenguin, const EnReactionType type)
 		{
-			// リアクションしていないメニューを探す
-			for (auto& packet : m_reactionPackets)
+			if (!childPenguin) return;
+
+			const uint8_t index = SearchTargettableIndex();
+
+			m_targets.at(index) = childPenguin;
+
+			EnReactionType currentType = type;
+
+			auto penguinType = childPenguin->GetChildPenguinType();
+
+
+			// ステートマシンを取得する
+			switch (penguinType)
 			{
-				auto* menu = packet.GetMenu();
-				if (menu && menu->GetReactionType() == EnReactionType::None) return menu;
+			case actor::EnChildPenguinType::Naughty:
+				auto naughty = dynamic_cast<actor::NaughtyChildPenguinStateMachine*>(childPenguin->GetStateMachine());
+
+				const bool isWhirlpool = naughty->GetIsGoingToWakeBear();
+				const bool isWakeBear = naughty->GetIsGoingToWhirlpool();
+
+				currentType = (isWhirlpool || isWakeBear) ? EnReactionType::Happy : type;
+				break;
 			}
 
-			// 見つからなければ、先頭のメニューを上書きする
-			return m_reactionPackets.at(0).GetMenu();
+
+
+
+			auto* menu = m_reactionPackets.at(index).GetMenu();
+			menu->PlayUIAnimation(currentType, childPenguin->GetChildPenguinType());
+		}
+
+
+		uint8_t CPReactionSystem::SearchTargettableIndex() const
+		{
+			// リアクションしていないスロットを探す
+			for (uint8_t i = 0; i < REACTION_PACKET_NUM; ++i)
+			{
+				if (m_reactionPackets.at(i).GetMenu()->GetReactionType() == EnReactionType::None) return i;
+			}
+
+			// 見つからなければ、先頭のスロットを上書きする
+			return 0;
+		}
+
+
+		void CPReactionSystem::UpdateReactionPositions()
+		{
+			for (uint8_t i = 0; i < REACTION_PACKET_NUM; ++i)
+			{
+				auto* menu = m_reactionPackets.at(i).GetMenu();
+				auto*& target = m_targets.at(i);
+
+				// タイマー終了などでリアクションが終わっていたらターゲットを解放する
+				if (menu->GetReactionType() == EnReactionType::None)
+				{
+					target = nullptr;
+					continue;
+				}
+
+				if (!target) continue;
+
+				// 前方判定は行わず、ターゲットが存在する限り常に描画する
+				menu->SetIsDraw(true);
+
+				const Vector3 targetPosition = target->GetTransform().m_position;
+
+				Vector2 screenPosition = Vector2::Zero;
+				CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPosition, targetPosition);
+
+				menu->SetTargetPosition(Vector3(screenPosition.x, screenPosition.y, 0.0f));
+			}
 		}
 	}
 }

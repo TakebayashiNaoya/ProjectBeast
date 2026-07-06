@@ -26,9 +26,10 @@ namespace app
 		class CPReactionStatus;
 
 
-
 		/**
 		 * @brief 子ペンギンのリアクションシステムクラス
+		 * @detail ターゲットの管理・前方判定・座標変換をここで行い、
+		 *         Menuには最終的な座標・描画フラグのみを渡す。
 		 */
 		class CPReactionSystem : Noncopyable
 		{
@@ -39,25 +40,11 @@ namespace app
 
 		public:
 			/**
-			 * @brief リアクションの対象となる親ペンギンを設定
-			 * @param daddyPenguin 対象の親ペンギン
-			 */
-			void SetDaddyPenguin(actor::DaddyPenguin* daddyPenguin)
-			{
-				for (auto& packet : m_reactionPackets)
-					packet.GetMenu()->SetDaddyPenguin(daddyPenguin);
-			}
-			/**
 			 * @brief リアクションの対象となる子ペンギンを設定
 			 * @param childPenguin 対象の子ペンギン
 			 * @param type リアクションのタイプ
 			 */
 			void SetTarget(actor::ChildPenguin* childPenguin, const EnReactionType type);
-
-
-		public:
-			/** @brief リアクションメニューの配列を取得 */
-			const std::array<SystemPacket<CPReactionMenu>, REACTION_PACKET_NUM>& GetReactionMenus() const { return m_reactionPackets; }
 
 
 		public:
@@ -76,15 +63,22 @@ namespace app
 
 		private:
 			/**
-			 * @brief ターゲットの子ペンギンに対応するリアクションMenuを探索して返す
-			 * @return 対象の子ペンギンに対応するリアクションMenuのポインタ。
+			 * @brief 空いているリアクションスロットのインデックスを探索する
+			 * @detail 見つからなければ先頭(0)を返す(上書き)
 			 */
-			CPReactionMenu* SearchTargettableMenu();
+			uint8_t SearchTargettableIndex() const;
+
+			/**
+			 * @brief 各リアクションスロットの前方判定・座標変換を行い、Menuへ反映する
+			 */
+			void UpdateReactionPositions();
 
 
 		private:
 			/** リアクションのSystemPacketの配列 */
 			std::array<SystemPacket<CPReactionMenu>, REACTION_PACKET_NUM> m_reactionPackets;
+			/** 各スロットに対応するターゲットの子ペンギン */
+			std::array<actor::ChildPenguin*, REACTION_PACKET_NUM> m_targets;
 			/** リアクションの親パラメータ */
 			std::unique_ptr<CPReactionStatus> m_reactionStatusParent;
 		};

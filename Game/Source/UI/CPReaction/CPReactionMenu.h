@@ -1,22 +1,15 @@
-﻿/**
+/**
  * @file CPReactionMenu.h
  * @brief 子ペンギンのリアクションUIクラス
  * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Menu.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
 
 
 namespace app
 {
-	namespace actor
-	{
-		/** 前方宣言 */
-		class ChildPenguin;
-		class DaddyPenguin;
-	}
-
-
 	namespace ui
 	{
 		/** 前方宣言 */
@@ -36,18 +29,9 @@ namespace app
 
 
 		/**
-		 * @brief リアクションの描画フェーズ
-		 */
-		enum class EnDrawPhase : uint8_t
-		{
-			Drawing,
-			ToClear,
-			None
-		};
-
-
-		/**
 		 * @brief 子ペンギンのリアクションUIクラス
+		 * @detail ターゲットの管理・前方判定・座標変換はCPReactionSystemが行う。
+		 *         Menuは渡された座標・フラグを自身のアイコンへ反映するのみ。
 		 */
 		class CPReactionMenu : public MenuBase
 		{
@@ -56,14 +40,6 @@ namespace app
 
 		public:
 			/**
-			 * @brief 親ペンギンを設定
-			 * @param daddyPenguin 親ペンギン
-			 */
-			inline void SetDaddyPenguin(actor::DaddyPenguin* daddyPenguin)
-			{
-				m_daddyPenguin = daddyPenguin;
-			}
-			/**
 			 * @brief ステータスを設定
 			 * @param status ステータス
 			 */
@@ -71,31 +47,32 @@ namespace app
 			{
 				m_status = status;
 			}
+
 			/**
-			 * @brief ターゲットの子ペンギンを設定
-			 * @param target ターゲットの子ペンギン
+			 * @brief アイコンのスクリーン座標を設定する
+			 * @param screenPosition スクリーン座標(x, y)。zは未使用。
 			 */
-			inline void SetTarget(actor::ChildPenguin* target)
-			{
-				m_target = target;
-			}
+			void SetTargetPosition(const Vector3& screenPosition);
+
 			/**
-			 * @brief UIAnimationを再生する
+			 * @brief 描画するかどうかを設定する
+			 * @detail m_typeがNoneの場合は常に非表示になる
+			 * @param isDraw 描画するかどうか(前方判定などの結果をSystemから渡す)
 			 */
-			void PlayUIAnimation(const EnReactionType type);
+			void SetIsDraw(const bool isDraw);
+
+			/**
+			 * @brief リアクションを開始し、UIAnimationを再生する
+			 * @param type リアクションのタイプ
+			 * @param cpType 対象の子ペンギンのタイプ(吹き出し色の決定に使用)
+			 */
+			void PlayUIAnimation(const EnReactionType type, const actor::EnChildPenguinType cpType);
 
 
 		public:
 			/**
-			 * @brief ターゲットの子ペンギンを取得
-			 * @return ターゲットの子ペンギン
-			 */
-			inline actor::ChildPenguin* GetTarget() const
-			{
-				return m_target;
-			}
-			/**
 			 * @brief リアクションのタイプを取得
+			 * @detail Noneであれば、このMenuは空き状態(ターゲット未設定)であることを示す
 			 * @return リアクションのタイプ
 			 */
 			inline EnReactionType GetReactionType() const
@@ -114,11 +91,7 @@ namespace app
 
 		private:
 			/**
-			 * @brief ターゲットの子ペンギンの位置にUIを移動させる
-			 */
-			void PositionUpdate();
-			/**
-			 * @brief リアクションの描画フラグを更新する
+			 * @brief タイマーの更新とアニメーションの再生・自動終了処理
 			 */
 			void DrawFlagUpdate();
 			/**
@@ -142,11 +115,6 @@ namespace app
 			/** アニメーションステータス */
 			std::unique_ptr<CPReactionAnimStatus> m_animStatus;
 
-			/** ターゲット*/
-			actor::ChildPenguin* m_target;
-			/** 親ペンギン */
-			actor::DaddyPenguin* m_daddyPenguin;
-
 			/** 吹き出し */
 			UIIcon* m_speechBubble;
 			/** 困り */
@@ -161,8 +129,8 @@ namespace app
 			float m_timer;
 			/** アニメーション再生中フラグ */
 			bool m_isPlayAnimation;
-			/** 親ペンギンの前方にいるかフラグ */
-			bool m_isInFrontOfDaddy;
+			/** 描画するかどうか(Systemから渡される前方判定の結果) */
+			bool m_isDraw;
 		};
 	}
 }

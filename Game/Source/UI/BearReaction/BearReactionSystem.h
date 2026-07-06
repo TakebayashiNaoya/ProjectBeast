@@ -82,9 +82,6 @@ namespace app
 			std::vector<std::unique_ptr<ReactionInfo>> m_reactions;
 			/** リアクションの数 */
 			uint8_t m_reactionNum;
-
-			/** 前方チェッククラス */
-			FrontChecker m_frontChecker;
 		};
 	}
 }

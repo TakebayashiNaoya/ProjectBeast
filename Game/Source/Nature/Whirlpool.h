@@ -6,10 +6,10 @@
 #pragma once
 #include "IObject.h"
 #include "Source/Core/Transform.h"
-#include "Source/Util/Curve.h"
-#include "WhirlpoolPowerSystem.h"
-#include "WhirlpoolParameter.h"
 #include "Source/Effect/EffectManager.h"
+#include "Source/Util/Curve.h"
+#include "WhirlpoolParameter.h"
+#include "WhirlpoolPowerSystem.h"
 
 
 namespace nsBeastEngine
@@ -83,6 +83,14 @@ namespace app
 
 
 		public:
+			/**
+			 * @brief 最大半径を取得
+			 * @return 最大半径
+			 */
+			float GetMaxRadius()
+			{
+				return m_maxRadius;
+			}
 			/**
 			 * @brief 渦潮の状態を取得
 			 * @return 渦潮の状態
@@ -218,7 +226,7 @@ namespace app
 
 			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
 			IndexBuffer    m_indexBuffer;					/** 元インデックスバッファ（カリングなし描画用） */
-			IndexBuffer*   m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
+			IndexBuffer* m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
 			int            m_indexCount = 0;			/** インデックス数 */
 
 			/** 元インデックス配列（CPUキャッシュ・カリング判定用） */
@@ -253,6 +261,8 @@ namespace app
 			float m_uvRotation;
 			/** Bigger完了時の最大スケールXZ */
 			float m_maxScaleXZ;
+			/** Bigger完了時の最大半径 */
+			float m_maxRadius;
 			/** 渦潮エフェクトのハンドル */
 			EffectHandle m_effectHandle;
 			/** 渦潮の引き寄せ、押し出しを管理するクラス */
