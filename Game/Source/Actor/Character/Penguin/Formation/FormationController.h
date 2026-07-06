@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
+#include "Source/Actor/Character/Penguin/Formation/Ult/UltController.h"
 
 
 namespace app
@@ -15,6 +16,7 @@ namespace app
 	namespace actor
 	{
 		class IFormation;
+		struct UltContext;
 
 
 		/**
@@ -23,6 +25,9 @@ namespace app
 		 *   IFormation の各実装を保持し、現在の陣形への切り替えと
 		 *   座標計算の委譲を担う。レベル管理もここで行う。
 		 *   ChildPenguinManager のメンバーとして所有される。
+		 *
+		 *   速度倍率 = passive->GetSpeedMultiplier(level) × (ウルト中なら ult->GetSpeedMultiplier(level))
+		 *   渦潮耐性 = passive->HasWhirlpoolResistance() || (ウルト中 && ult->HasWhirlpoolResistance())
 		 */
 		class FormationController
 		{
@@ -69,18 +74,21 @@ namespace app
 			 */
 			void SwitchFormation(EnFormationType type);
 
-			/**
+			/** 
 			 * @brief 現在の陣形種別を取得する
+			 * @return 現在の陣形種別
 			 */
 			EnFormationType GetCurrentType() const { return m_currentType; }
 
 			/**
 			 * @brief 移動速度倍率を取得する
+			 * @details 陣形効果チェーンから直接取得する（パッシブ + ウルトを統合済み）。
 			 */
 			float GetSpeedMultiplier() const;
 
 			/**
-			 * @brief 現在の陣形が渦潮耐性パッシブを持つか
+			 * @brief 現在の陣形が渦潮耐性を持つか（パッシブ + ウルト効果を統合済み）
+			 * @return true で持つ、false で持たない
 			 */
 			bool HasWhirlpoolResistance() const;
 
@@ -90,18 +98,21 @@ namespace app
 			 */
 			float GetJoinRadius(int count) const;
 
-			/**
+			/** 
 			 * @brief 最外半径を取得する（CalculatePositions後に有効）
+			 * @return 最外半径
 			 */
-			float GetOuterRadius()  const;
+			float GetOuterRadius() const;
 
-			/**
+			/** 
 			 * @brief 入隊判定半径を取得する（最外半径 + 入隊マージン）
+			 * @return 入隊判定半径
 			 */
-			float GetJoinRadius()   const;
+			float GetJoinRadius() const;
 
-			/**
+			/** 
 			 * @brief 陣形レベルを取得する（フォロワー数 / FOLLOWERS_PER_LEVEL）
+			 * @return 陣形レベル
 			 */
 			int GetFormationLevel() const { return m_formationLevel; }
 
@@ -110,6 +121,42 @@ namespace app
 			 * @param callback 引数: 新しいレベル
 			 */
 			void SetOnLevelUp(std::function<void(int)> callback) { m_onLevelUp = std::move(callback); }
+
+
+			//============================================//
+			// ウルト操作
+			//============================================//
+
+			/** 
+			 * @brief ウルトを発動する
+			 * @param ctx ウルト発動時のコンテキスト情報
+			 */
+			void ActivateUlt(const UltContext& ctx) { m_ultController.Activate(ctx); }
+
+			/** 
+			 * @brief ウルトを毎フレーム更新する（ChildPenguinManager::Update から呼ぶ）
+			 * @param dt 前フレームとの時間差（秒）
+			 * @param ctx ウルト更新時のコンテキスト情報
+			 */
+			void UpdateUlt(float dt, const UltContext& ctx) { m_ultController.Update(dt, ctx); }
+
+			/** 
+			 * @brief ウルト発動中か
+			 * @return true で発動中、false で非発動
+			 */
+			bool IsUltActive() const { return m_ultController.IsActive(); }
+
+			/** 
+			 * @brief ウルトが発動可能か
+			 * @return true で発動可能、false で非発動
+			 */
+			bool CanActivateUlt() const { return m_ultController.CanActivate(); }
+
+			/** 
+			 * @brief クールダウン残量を 0.0〜1.0 で返す（UI表示用）
+			 * @return クールダウン率（0.0 〜 1.0）
+			 */
+			float GetUltCooldownRate() const { return m_ultController.GetCooldownRate(); }
 
 
 		private:
@@ -124,6 +171,8 @@ namespace app
 			int             m_formationLevel   = 0;							/** 現在の陣形レベル */
 
 			std::function<void(int)> m_onLevelUp;  /** レベルアップ時のコールバック */
+
+			UltController m_ultController;  /** ウルト発動・タイマー管理 */
 		};
 	}
 }
