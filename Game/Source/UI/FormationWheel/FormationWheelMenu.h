@@ -50,26 +50,26 @@ namespace app
 			 * @param slot スロット位置
 			 * @return X座標
 			 */
-			float SlotToX(float slot) const;
+			float CalculateSlotX(float slot) const;
 			/**
 			 * @brief スロット位置(連続値)からアイコンサイズを算出する（中央=大、隣接=小）
 			 * @param slot スロット位置
 			 * @return アイコンサイズ
 			 */
-			float SlotToSize(float slot) const;
+			float CalculateSlotSize(float slot) const;
 			/**
 			 * @brief スロット位置(連続値)からアルファ値を算出する（中央=不透明、離れるほど透明）
 			 * @param slot スロット位置
 			 * @return アルファ値
 			 */
-			float SlotToAlpha(float slot) const;
+			float CalculateSlotAlpha(float slot) const;
 
 			/**
 			 * @brief ドクンドクンと拡縮するパルス演出の倍率を計算する
 			 * @param isPulsing 演出中かどうか(falseなら等倍を返す)
 			 * @return 拡縮倍率(等倍=1.0を中心に振動する)
 			 */
-			float ComputePulseScale(bool isPulsing) const;
+			float CalculatePulseScale(bool isPulsing) const;
 
 			/**
 			 * @brief チューニングJSONを読み込む（初回読み込み）

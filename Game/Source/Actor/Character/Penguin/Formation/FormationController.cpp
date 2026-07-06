@@ -77,6 +77,9 @@ namespace app
 
 			SwitchFormation(EnFormationType::Circle);
 
+			// ゲーム開始直後はウルトが貯まっていない状態から始める
+			m_ultController.ResetCooldown();
+
 			// 陣形切り替え演出時間の初期読み込み
 			{
 				nlohmann::json tuningJson;

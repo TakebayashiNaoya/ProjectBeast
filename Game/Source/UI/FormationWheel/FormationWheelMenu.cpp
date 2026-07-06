@@ -17,13 +17,13 @@ namespace app
 		namespace
 		{
 			/** 陣形種別(EnFormationTypeの値)ごとのJSON要素名 */
-			constexpr const char* kFormationIconNames[] = { "CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon" };
-			constexpr int kFormationNum = static_cast<int>(actor::EnFormationType::Num);
+			constexpr const char* FORMATION_ICON_NAMES[] = { "CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon" };
+			constexpr int FORMATION_NUM = static_cast<int>(actor::EnFormationType::Num);
 
 			/** 見た目チューニングのホットリロード対象JSON */
-			constexpr const char* kTuningJsonPath = "Assets/parameter/UI/formationWheel/FormationWheelTuning.json";
+			constexpr const char* TUNING_JSON_PATH = "Assets/parameter/UI/formationWheel/FormationWheelTuning.json";
 			/** チューニングJSONの変更チェック間隔（秒） */
-			constexpr float kTuningReloadInterval = 1.0f;
+			constexpr float TUNING_RELOAD_INTERVAL = 1.0f;
 
 
 			float Lerp(float a, float b, float t) { return a + (b - a) * t; }
@@ -52,7 +52,7 @@ namespace app
 
 		void FormationWheelMenu::InitializeLogic()
 		{
-			for (const char* name : kFormationIconNames)
+			for (const char* name : FORMATION_ICON_NAMES)
 			{
 				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(name)))
 				{
@@ -62,20 +62,20 @@ namespace app
 		}
 
 
-		float FormationWheelMenu::SlotToX(float slot) const
+		float FormationWheelMenu::CalculateSlotX(float slot) const
 		{
 			return m_centerX + slot * m_slotSpacing;
 		}
 
 
-		float FormationWheelMenu::SlotToSize(float slot) const
+		float FormationWheelMenu::CalculateSlotSize(float slot) const
 		{
 			const float t = Clamp01(std::fabs(slot));
 			return Lerp(m_currentSize, m_sideSize, t);
 		}
 
 
-		float FormationWheelMenu::SlotToAlpha(float slot) const
+		float FormationWheelMenu::CalculateSlotAlpha(float slot) const
 		{
 			const float absSlot = std::fabs(slot);
 			if (absSlot <= 1.0f) return Lerp(1.0f, m_sideAlpha, absSlot);
@@ -83,7 +83,7 @@ namespace app
 		}
 
 
-		float FormationWheelMenu::ComputePulseScale(bool isPulsing) const
+		float FormationWheelMenu::CalculatePulseScale(bool isPulsing) const
 		{
 			if (!isPulsing) return 1.0f;
 			return 1.0f + m_pulseAmplitude * sinf(m_pulseTimer * m_pulseSpeed);
@@ -92,20 +92,19 @@ namespace app
 
 		void FormationWheelMenu::BeginTransition(actor::EnFormationType oldType, actor::EnFormationType newType)
 		{
-			// 切り替え方向を計算する
 			const int oldIndex = static_cast<int>(oldType);
 			const int newIndex = static_cast<int>(newType);
-			const int diff = (newIndex - oldIndex + kFormationNum) % kFormationNum;
+			const int diff = (newIndex - oldIndex + FORMATION_NUM) % FORMATION_NUM;
 			// 1: 次へ(RB) / -1: 前へ(LB)
 			m_direction = (diff == 1) ? 1 : -1;
-			// 各陣形種別の遷移前スロット位置を確定する
-			for (int i = 0; i < kFormationNum; i++)
+
+			for (int i = 0; i < FORMATION_NUM; i++)
 			{
-				const int diffFromOld = (i - oldIndex + kFormationNum) % kFormationNum;
-				if (diffFromOld == 0)                        m_fromSlot[i] = 0;
-				else if (diffFromOld == 1)                   m_fromSlot[i] = 1;
-				else if (diffFromOld == kFormationNum - 1)   m_fromSlot[i] = -1;
-				else                                         m_fromSlot[i] = (m_direction > 0) ? 2 : -2;
+				const int diffFromOld = (i - oldIndex + FORMATION_NUM) % FORMATION_NUM;
+				if (diffFromOld == 0)                      m_fromSlot[i] = 0;
+				else if (diffFromOld == 1)                 m_fromSlot[i] = 1;
+				else if (diffFromOld == FORMATION_NUM - 1) m_fromSlot[i] = -1;
+				else                                       m_fromSlot[i] = (m_direction > 0) ? 2 : -2;
 			}
 		}
 
@@ -130,13 +129,13 @@ namespace app
 				? cpm->GetUltActiveRemainingRate()
 				: (1.0f - cpm->GetUltCooldownRate());
 
-			// 発動可能 or 発動中 の間、現在の陣形アイコンをドクンドクンと拡縮させる
+			// パルス演出・ウルト充填演出は「現在選択中の陣形」のアイコンにのみ反映する
 			const bool pulseFormation = cpm->CanActivateUlt() || isUltActive;
-			const float pulseScale = ComputePulseScale(pulseFormation);
+			const float pulseScale = CalculatePulseScale(pulseFormation);
 
 			const int currentIndex = static_cast<int>(currentType);
 
-			for (int i = 0; i < kFormationNum; i++)
+			for (int i = 0; i < FORMATION_NUM; i++)
 			{
 				float slot;
 				if (isSwitching)
@@ -146,24 +145,21 @@ namespace app
 				}
 				else
 				{
-					const int diffFromCurrent = (i - currentIndex + kFormationNum) % kFormationNum;
+					const int diffFromCurrent = (i - currentIndex + FORMATION_NUM) % FORMATION_NUM;
 					if (diffFromCurrent == 0)                      slot = 0.0f;
 					else if (diffFromCurrent == 1)                 slot = 1.0f;
-					else if (diffFromCurrent == kFormationNum - 1) slot = -1.0f;
+					else if (diffFromCurrent == FORMATION_NUM - 1) slot = -1.0f;
 					else                                           slot = 2.0f; // 非表示側（見えないので向きは任意）
 				}
 
-				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(kFormationIconNames[i])))
+				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(FORMATION_ICON_NAMES[i])))
 				{
 					const bool isCurrent = (i == currentIndex);
-					const float size = SlotToSize(slot);
-					// パルス演出は「現在選択中の陣形」のアイコンにのみ反映する
+					const float size = CalculateSlotSize(slot);
 					const float scaleFactor = (size / m_currentSize) * (isCurrent ? pulseScale : 1.0f);
-					ui->m_transform.m_localTransform.m_position = Vector3(SlotToX(slot), m_rowY, 0.0f);
+					ui->m_transform.m_localTransform.m_position = Vector3(CalculateSlotX(slot), m_rowY, 0.0f);
 					ui->m_transform.m_localTransform.m_scale = Vector3(scaleFactor, scaleFactor, scaleFactor);
-					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, SlotToAlpha(slot));
-
-					// ウルトの充填演出は「現在選択中の陣形」のアイコンにのみ反映する
+					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, CalculateSlotAlpha(slot));
 					ui->SetFillAmount(isCurrent ? ultFillAmount : 0.0f);
 				}
 			}
@@ -183,7 +179,7 @@ namespace app
 			const Vector4& color = canActivate ? readyColor : grayColor;
 
 			// 発動可能な間だけボタンをドクンドクン拡縮させる（発動中は等倍に戻す）
-			const float pulseScale = ComputePulseScale(canActivate);
+			const float pulseScale = CalculatePulseScale(canActivate);
 
 			const char* ultIconNames[] = { "LTButtonIcon", "RTButtonIcon" };
 			for (const char* name : ultIconNames)
@@ -200,7 +196,7 @@ namespace app
 		void FormationWheelMenu::LoadTuning()
 		{
 			nlohmann::json j;
-			if (util::JsonConverter::IsLoadJsonFile(j, kTuningJsonPath))
+			if (util::JsonConverter::IsLoadJsonFile(j, TUNING_JSON_PATH))
 			{
 				m_centerX     = util::JsonConverter::ToFloat(j, "centerX", m_centerX);
 				m_rowY        = util::JsonConverter::ToFloat(j, "rowY", m_rowY);
@@ -213,7 +209,7 @@ namespace app
 				m_pulseSpeed     = util::JsonConverter::ToFloat(j, "pulseSpeed", m_pulseSpeed);
 			}
 #if defined(APP_DEBUG)
-			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(kTuningJsonPath);
+			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(TUNING_JSON_PATH);
 #endif
 		}
 
@@ -222,10 +218,10 @@ namespace app
 		{
 #if defined(APP_DEBUG)
 			m_tuningReloadTimer += dt;
-			if (m_tuningReloadTimer < kTuningReloadInterval) return;
+			if (m_tuningReloadTimer < TUNING_RELOAD_INTERVAL) return;
 			m_tuningReloadTimer = 0.0f;
 
-			if (!util::JsonConverter::CheckFileModified(kTuningJsonPath, m_tuningLastWriteTime)) return;
+			if (!util::JsonConverter::CheckFileModified(TUNING_JSON_PATH, m_tuningLastWriteTime)) return;
 			LoadTuning();
 #endif
 		}

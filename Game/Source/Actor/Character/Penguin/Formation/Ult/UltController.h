@@ -69,6 +69,12 @@ namespace app
 			 */
 			float GetActiveRemainingRate() const;
 
+			/**
+			 * @brief クールダウンを最大値にリセットする
+			 * @details ゲーム開始直後など、ウルトを「何も貯まっていない状態」から開始させたい場合に呼ぶ
+			 */
+			void ResetCooldown() { m_cooldownTimer = m_cooldown; }
+
 
 		private:
 			FormationEffectChain* m_ult          = nullptr;  /** 非所有ポインタ。IFormation が所有する */

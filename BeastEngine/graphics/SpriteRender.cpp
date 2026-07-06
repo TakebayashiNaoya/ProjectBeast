@@ -105,6 +105,9 @@ namespace nsBeastEngine
 
 	void LinearFillGaugeRender::UpdateConstantBuffer(LinearFillConstantBuffer* fillCb, size_t size, int slot)
 	{
+		// GaugeRender::UpdateConstantBufferと同じダミー実装。
+		// 実データはInit()で登録したm_fillCbへのポインタ(m_expandConstantBuffer)経由で
+		// 描画時にアップロードされるため、引数は未使用のままでよい。
 		m_sprite.GetExpandConstantBufferGPU();
 	}
 

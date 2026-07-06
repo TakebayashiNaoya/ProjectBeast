@@ -195,7 +195,7 @@ namespace app
 			{
 #if defined(APP_DEBUG)
 				m_tuningReloadTimer += dt;
-				if (m_tuningReloadTimer >= kTuningReloadInterval)
+				if (m_tuningReloadTimer >= TUNING_RELOAD_INTERVAL)
 				{
 					m_tuningReloadTimer = 0.0f;
 					ReloadSwitchTuningIfChanged();
@@ -214,7 +214,7 @@ namespace app
 		private:
 			static constexpr int FOLLOWERS_PER_LEVEL = 9;  /** レベルアップに必要なフォロワー数 */
 #if defined(APP_DEBUG)
-			static constexpr float kTuningReloadInterval = 1.0f;  /** チューニングJSONの変更チェック間隔（秒） */
+			static constexpr float TUNING_RELOAD_INTERVAL = 1.0f;  /** チューニングJSONの変更チェック間隔（秒） */
 #endif
 
 			std::array<
