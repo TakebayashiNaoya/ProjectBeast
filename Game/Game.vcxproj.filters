@@ -574,6 +574,9 @@
     <ClCompile Include="Source\UI\Input\UICursorSelector.cpp">
       <Filter>Source\UI\Input</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.cpp">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -1070,6 +1073,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Input\Types.h">
       <Filter>Source\UI\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

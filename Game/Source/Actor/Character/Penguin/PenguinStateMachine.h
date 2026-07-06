@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "PenguinEffectStatus.h"
+#include "PenguinStaminaGauge.h"
 #include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Source/Actor/Character/penguin/PenguinStatus.h"
 
@@ -109,6 +110,39 @@ namespace app
 			 */
 			PenguinEffectStatus* GetEffectStatus() const;
 
+			/**
+			 * @brief ジャンプが使用可能かどうかを取得
+			 * @return スタミナが枯渇しクールダウン中でなければtrue
+			 */
+			bool CanUseJump() const
+			{
+				return m_jumpStaminaGauge.CanUse();
+			}
+			/**
+			 * @brief スライドが使用可能かどうかを取得
+			 * @return スタミナが枯渇しクールダウン中でなければtrue
+			 */
+			bool CanUseSlide() const
+			{
+				return m_slideStaminaGauge.CanUse();
+			}
+			/**
+			 * @brief ジャンプのスタミナゲージの割合を取得（UI表示用）
+			 * @return 0.0(空)〜1.0(満タン)の割合
+			 */
+			float GetJumpStaminaRatio() const
+			{
+				return m_jumpStaminaGauge.GetRatio();
+			}
+			/**
+			 * @brief スライドのスタミナゲージの割合を取得（UI表示用）
+			 * @return 0.0(空)〜1.0(満タン)の割合
+			 */
+			float GetSlideStaminaRatio() const
+			{
+				return m_slideStaminaGauge.GetRatio();
+			}
+
 
 			/** ステートの変更先を取得する */
 			virtual core::IState* GetChangeState() override;
@@ -119,6 +153,17 @@ namespace app
 			 * @brief ジャンプ処理
 			 */
 			void Jump();
+			/**
+			 * @brief ジャンプのスタミナを即座に全消費し、クールダウンに入れる
+			 */
+			void ConsumeJumpStamina()
+			{
+				m_jumpStaminaGauge.ConsumeAll();
+			}
+			/**
+			 * @brief ジャンプ・スライドのスタミナゲージを毎フレーム更新する
+			 */
+			void UpdateStaminaGauges();
 			/**
 			 * @brief ダメージ処理
 			 */
@@ -137,6 +182,9 @@ namespace app
 				m_isJump = isJump;
 				m_isSlide = isSlide;
 				m_isSwimming = IsInWater();
+
+				// 毎フレーム呼ばれるこの関数内で、ジャンプ・スライドのスタミナゲージを更新する。
+				UpdateStaminaGauges();
 			}
 			/** ログ用：現在の状態名を返す（PenguinStateMachine.cpp で定義） */
 			const char* GetStateNameForLog() const;
@@ -148,7 +196,7 @@ namespace app
 			 */
 			bool CanChangeJumpState() const
 			{
-				return m_isJump && IsOnGround();
+				return m_isJump && IsOnGround() && CanUseJump();
 			}
 			/**
 			 * @brief スライド開始ステートに切り替えられるかどうか
@@ -157,7 +205,7 @@ namespace app
 			bool CanChangeSlideStartState() const
 			{
 				const float height = m_transform.m_position.y;
-				return  m_isSlide && height >= 0.0f;
+				return  m_isSlide && height >= 0.0f && CanUseSlide();
 			}
 			/**
 			 * @brief スライドステートに切り替えられるかどうか
@@ -165,7 +213,7 @@ namespace app
 			 */
 			bool CanChangeSlidingState() const
 			{
-				return m_isSlide;
+				return m_isSlide && CanUseSlide();
 			}
 			/**
 			 * @brief スライドをキープできるかどうか
@@ -173,7 +221,7 @@ namespace app
 			 */
 			bool CanKeepSlidingState() const
 			{
-				return m_isSlide;
+				return m_isSlide && CanUseSlide();
 			}
 			/**
 			 * @brief スライド終了ステートが終わったかどうか
@@ -229,6 +277,10 @@ namespace app
 			bool m_isDamaged;
 			/** 渦潮の中にいるかどうか */
 			bool m_isInWhirlpool;
+			/** ジャンプのスタミナ(オーバーヒート式)ゲージ */
+			PenguinStaminaGauge m_jumpStaminaGauge;
+			/** スライドのスタミナ(オーバーヒート式)ゲージ */
+			PenguinStaminaGauge m_slideStaminaGauge;
 		};
 	}
 }

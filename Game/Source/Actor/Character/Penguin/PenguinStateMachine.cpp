@@ -5,14 +5,25 @@
  */
 #include "stdafx.h"
 #include "PenguinBase.h"
-#include "PenguinStateMachine.h"
 #include "PenguinIState.h"
+#include "PenguinStateMachine.h"
 
 
 namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			constexpr float JUMP_STAMINA_MAX = 100.0f;
+			constexpr float JUMP_STAMINA_DECREASE_SPEED = 0.0f;
+			constexpr float JUMP_STAMINA_RECOVER_SPEED = 50.0f;
+
+			constexpr float SLIDE_STAMINA_MAX = 100.0f;
+			constexpr float SLIDE_STAMINA_DECREASE_SPEED = 50.0f;
+			constexpr float SLIDE_STAMINA_RECOVER_SPEED = 25.0f;
+		}
+
 		void PenguinStateMachine::Jump()
 		{
 			m_ownerCharacter->GetCharacterController()->Jump(m_jumpPower);
@@ -35,7 +46,18 @@ namespace app
 			, m_isSlide(false)
 			, m_isDamaged(false)
 			, m_isInWhirlpool(false)
+			, m_jumpStaminaGauge(JUMP_STAMINA_MAX, JUMP_STAMINA_DECREASE_SPEED, JUMP_STAMINA_RECOVER_SPEED)
+			, m_slideStaminaGauge(SLIDE_STAMINA_MAX, SLIDE_STAMINA_DECREASE_SPEED, SLIDE_STAMINA_RECOVER_SPEED)
 		{}
+
+
+		void PenguinStateMachine::UpdateStaminaGauges()
+		{
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			m_slideStaminaGauge.Update(m_isSlide, deltaTime);
+			m_jumpStaminaGauge.Update(false, deltaTime); // ジャンプは回復のみ。減少はConsumeJumpStamina()で行う
+		}
 
 
 		PenguinEffectStatus* PenguinStateMachine::GetEffectStatus() const
