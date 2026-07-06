@@ -1,9 +1,8 @@
 ﻿/**
  * @file DangerArrowCalc.h
  * @brief edge/overhead 矢印共通の定数・計算関数
- * @details DangerArrowSystem と TutorialController の両方が使用する共通ヘッダ。
- *          定数や計算ロジックをここで一元管理することで、
- *          両システムの矢印表示が常に一致することを保証する。
+ * @details DangerArrowSystem が使用する共通ヘッダ。
+ *          定数や計算ロジックをここで一元管理する。
  */
 #pragma once
 
