@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file FeverIconMenu.cpp
  * @brief フィーバータイム開始時にアイコンを画面上から下へ落下させる演出
  * @author 竹林
@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "FeverIconMenu.h"
 #include "Source/Manager/FeverTimeManager.h"
+#include "Source/Sound/SoundManager.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
 #include "Source/UI/Animation/UIAnimationParameter.h"
 #include "Source/UIAnimationTypes.h"
@@ -26,6 +27,9 @@ namespace app
 
 			/** feverFallAnimの定義を含むアニメーションパラメーターJSON */
 			const char* FEVER_ANIM_PARAMETER_JSON_PATH = "Assets/parameter/UI/fever/FeverAnimParameter.json";
+
+			/** フィーバーボイスの音量倍率（通常SEの既定倍率1.0より大きくして目立たせる） */
+			constexpr float FEVER_VOICE_VOLUME = 10.0f;
 		}
 
 
@@ -65,6 +69,9 @@ namespace app
 					);
 					anim->PlayAnimation();
 				}
+
+				/** PlayVoiceは音量倍率を指定できないため、PlaySEで個別に音量を上げて再生する */
+				SoundManager::Get().PlaySE(enSoundKind_fever, FEVER_VOICE_VOLUME);
 
 				m_isFalling = true;
 			}

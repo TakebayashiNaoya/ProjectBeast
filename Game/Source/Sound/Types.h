@@ -90,6 +90,7 @@ namespace app
 		// =========================================================================
 		enSoundKind_Voice,
 		enSoundKind_bootA = enSoundKind_Voice,
+		enSoundKind_fever,
 
 		// =========================================================================
 		// 全体の最大数定義
@@ -185,6 +186,7 @@ namespace app
 		// -------------------------------------------------------------------------
 		// Voice (ボイス)
 		// -------------------------------------------------------------------------
-		SoundInformation("Assets/sound/Voice/bootA.wav")
+		SoundInformation("Assets/sound/Voice/bootA.wav"),
+		SoundInformation("Assets/sound/Voice/fever.wav")
 	};
 }
