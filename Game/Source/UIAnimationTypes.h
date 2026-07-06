@@ -50,6 +50,9 @@ namespace app
 			/** リザルト画面用のUIAnimationKey */
 			constexpr uint32_t SCORE_POPUP_FADE_IN_ANIM_KEY = Hash32("scorePopupFadeIn");
 			constexpr uint32_t SCORE_POPUP_FADE_OUT_ANIM_KEY = Hash32("scorePopupFadeOut");
+
+			/** フィーバータイム演出用のUIAnimationKey */
+			constexpr uint32_t FEVER_FALL_ANIM_KEY = Hash32("feverFallAnim");
 		}
 	}
 }

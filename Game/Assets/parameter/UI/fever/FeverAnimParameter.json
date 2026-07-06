@@ -1,0 +1,14 @@
+{
+  "animations": [
+    {
+      "comment": "フィーバーアイコンを画面上から下へ落下させる",
+      "key": "feverFallAnim",
+      "valueType": "Vector3",
+      "startValue": { "x": 0.0, "y": 575.0, "z": 0.0 },
+      "endValue": { "x": 0.0, "y": -575.0, "z": 0.0 },
+      "duration": 3.0,
+      "easing": "Linear",
+      "loop": "Once"
+    }
+  ]
+}

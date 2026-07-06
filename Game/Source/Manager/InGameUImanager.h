@@ -35,6 +35,7 @@ namespace app
 		class AchievementNotificationMenu;
 		class InGameButtonMenu;
 		class DebufMenu;
+		class FeverIconMenu;
 
 		class CPReactionSystem;
 		class WpWarningSystem;
@@ -219,6 +220,7 @@ namespace app
 		ui::UIPacket<ui::AchievementNotificationMenu> m_achievementNotificationPacket;
 		ui::UIPacket<ui::InGameButtonMenu> m_inGameButtonPacket;
 		ui::UIPacket<ui::DebufMenu> m_debufPacket;
+		ui::UIPacket<ui::FeverIconMenu> m_feverIconPacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;

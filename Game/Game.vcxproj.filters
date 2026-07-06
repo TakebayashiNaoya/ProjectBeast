@@ -103,6 +103,9 @@
     <Filter Include="Source\UI\DangerArrow">
       <UniqueIdentifier>{62914d05-498f-48ae-bbd7-1f6000ebc36a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\Fever">
+      <UniqueIdentifier>{bee24a0c-e665-49ce-b826-1f942d473f3b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\GameLog">
       <UniqueIdentifier>{9ed61377-067e-46fb-b431-ad3cf0abcdde}</UniqueIdentifier>
     </Filter>
@@ -504,6 +507,9 @@
     </ClCompile>
     <ClCompile Include="Source\UI\DangerArrow\DangerArrowSystem.cpp">
       <Filter>Source\UI\DangerArrow</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Fever\FeverIconMenu.cpp">
+      <Filter>Source\UI\Fever</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scene\InGameSceneBase.cpp">
       <Filter>Source\Scene</Filter>
@@ -1010,6 +1016,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h">
       <Filter>Source\UI\DangerArrow</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Fever\FeverIconMenu.h">
+      <Filter>Source\UI\Fever</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\InGameSceneBase.h">
       <Filter>Source\Scene</Filter>
