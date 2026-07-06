@@ -210,6 +210,12 @@ namespace app
 				ImGui::EndMainMenuBar();
 			}
 
+			// ── 初期位置・サイズ（左上）──────────────────────
+			// ImGuiCond_FirstUseEver : imgui.ini に保存記録が無い「本当に初回」のときだけ適用される。
+			// 一度でもユーザーが動かす／リサイズすると、以後は imgui.ini 側の値が優先される。
+			ImGui::SetNextWindowPos(ImVec2(20.0f, 20.0f), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(600.0f, 500.0f), ImGuiCond_FirstUseEver);
+
 			ImGui::Begin(u8"デバッグ");
 
 			// ── 共通情報（常に表示）──────────────────────

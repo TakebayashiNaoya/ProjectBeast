@@ -31,7 +31,7 @@ namespace app
 		{
 			Circle   = 0,	// 円陣（通常）
 			Triangle,		// 三角陣（スピード特化）
-			Defense,		// 密集陣（防御特化）
+			Cluster,		// 密集陣（防御特化）
 			Scatter,		// 散開陣（収集特化）
 			Num
 		};

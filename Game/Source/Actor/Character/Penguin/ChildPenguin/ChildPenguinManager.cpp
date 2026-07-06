@@ -9,6 +9,10 @@
 #include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
+#include "Source/Actor/Character/Penguin/Formation/Ult/UltContext.h"
+#if defined(_DEBUG) || defined(K2_DEBUG)
+#include "Source/Actor/Character/Penguin/Formation/FormationDebugMonitor.h"
+#endif
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -65,7 +69,11 @@ namespace app
 			, m_isGhostHidden(false)
 			, m_ghostTimer(0.0f)
 			, m_target(nullptr)
-		{}
+		{
+#if defined(_DEBUG) || defined(K2_DEBUG)
+			m_formationDebugMonitor = std::make_unique<FormationDebugMonitor>(this);
+#endif
+		}
 
 
 		ChildPenguinManager::~ChildPenguinManager()
@@ -97,6 +105,13 @@ namespace app
 
 			UpdateGhostPenguins();
 
+			/** ウルト更新 */
+			if (m_daddyPenguin != nullptr)
+			{
+				UltContext ctx{ this, m_daddyPenguin };
+				m_formationController.UpdateUlt(g_gameTime->GetFrameDeltaTime(), ctx);
+			}
+
 			/** L1/R1 で陣形を循環切り替え */
 			if (g_pad[0]->IsTrigger(enButtonRB1))
 			{
@@ -107,6 +122,12 @@ namespace app
 			{
 				const int prev = (static_cast<int>(m_formationController.GetCurrentType()) + static_cast<int>(EnFormationType::Num) - 1) % static_cast<int>(EnFormationType::Num);
 				m_formationController.SwitchFormation(static_cast<EnFormationType>(prev));
+			}
+
+			/** LB2/RB2 でウルト発動 */
+			if (g_pad[0]->IsTrigger(enButtonLB2) || g_pad[0]->IsTrigger(enButtonRB2))
+			{
+				ActivateUlt();
 			}
 
 			/** 陣形の更新処理 */
@@ -451,6 +472,14 @@ namespace app
 		int ChildPenguinManager::GetRescuedNum() const
 		{
 			return static_cast<int>(m_followers.size());
+		}
+
+
+		void ChildPenguinManager::ActivateUlt()
+		{
+			if (!m_daddyPenguin) return;
+			UltContext ctx{ this, m_daddyPenguin };
+			m_formationController.ActivateUlt(ctx);
 		}
 
 
