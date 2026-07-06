@@ -83,4 +83,57 @@ namespace nsBeastEngine
 			g_renderingEngine->AddRenderObject(this);
 		}
 	}
+
+
+
+
+	// --------------------------------------------------
+	// 直線ゲージレンダー
+	// --------------------------------------------------
+
+
+	void LinearFillGaugeRender::Update()
+	{
+		// 定数バッファをGPUに送る。
+		UpdateConstantBuffer(
+				&m_fillCb          // 送るデータ。
+			,	sizeof(m_fillCb)   // サイズ。
+			,	1                  // b1スロット。
+		);
+		m_sprite.Update(m_position, m_rotation, m_scale, m_pivot);
+	}
+
+	void LinearFillGaugeRender::UpdateConstantBuffer(LinearFillConstantBuffer* fillCb, size_t size, int slot)
+	{
+		m_sprite.GetExpandConstantBufferGPU();
+	}
+
+
+	void LinearFillGaugeRender::Init(const char* filePath, const char* fxName, float w, float h)
+	{
+		SpriteInitData initData;
+		/** DDSのファイルの指定 */
+		initData.m_ddsFilePath[0] = filePath;
+		/** シェーダーのファイルパスの指定 */
+		initData.m_fxFilePath = fxName;
+		/** スプライトのサイズの指定 */
+		initData.m_width = static_cast<UINT>(w);
+		initData.m_height = static_cast<UINT>(h);
+		/** アイコンの透明部分を正しく合成するため半透明ブレンドを使う */
+		initData.m_alphaBlendMode = AlphaBlendMode_Trans;
+
+		/** ユーザー定義の拡張定数バッファの指定 */
+		initData.m_expandConstantBuffer = &m_fillCb;
+		/** ユーザー定義の拡張定数バッファのサイズの指定 */
+		initData.m_expandConstantBufferSize = sizeof(LinearFillConstantBuffer);
+		m_sprite.Init(initData);
+	}
+
+
+	void LinearFillGaugeRender::Draw(RenderContext& rc)
+	{
+		if (g_renderingEngine) {
+			g_renderingEngine->AddRenderObject(this);
+		}
+	}
 }

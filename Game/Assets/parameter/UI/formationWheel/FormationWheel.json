@@ -13,48 +13,64 @@
                 "color":[0,0,0,150]
             },
             {
-                "type":"UIIcon",
+                "type":"UILinearFillGauge",
                 "name":"CircleIcon",
                 "asset":"Assets/spriteData/UI/Icon/Formation/Penguin.DDS",
+                "fx":"Assets/shader/LinearFillGauge.fx",
                 "width":80,
                 "height":80,
                 "position":[630,-80,0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,255]
+                "pivot":[0.5,0.5],
+                "color":[255,255,255,255],
+                "baseColor":[255,255,255,255],
+                "fillColor":[255,255,0,255]
             },
             {
-                "type":"UIIcon",
+                "type":"UILinearFillGauge",
                 "name":"TriangleIcon",
                 "asset":"Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
+                "fx":"Assets/shader/LinearFillGauge.fx",
                 "width":80,
                 "height":80,
                 "position":[710,-80,0],
                 "scale":[0.625,0.625,0.625],
                 "rotation":0,
-                "color":[255,255,255,199]
+                "pivot":[0.5,0.5],
+                "color":[255,255,255,199],
+                "baseColor":[255,255,255,255],
+                "fillColor":[255,255,0,255]
             },
             {
-                "type":"UIIcon",
+                "type":"UILinearFillGauge",
                 "name":"ClusterIcon",
                 "asset":"Assets/spriteData/UI/Icon/Formation/Shield.DDS",
+                "fx":"Assets/shader/LinearFillGauge.fx",
                 "width":80,
                 "height":80,
                 "position":[790,-80,0],
                 "scale":[0.625,0.625,0.625],
                 "rotation":0,
-                "color":[255,255,255,0]
+                "pivot":[0.5,0.5],
+                "color":[255,255,255,0],
+                "baseColor":[255,255,255,255],
+                "fillColor":[255,255,0,255]
             },
             {
-                "type":"UIIcon",
+                "type":"UILinearFillGauge",
                 "name":"ScatterIcon",
                 "asset":"Assets/spriteData/UI/Icon/Formation/Megaphone.DDS",
+                "fx":"Assets/shader/LinearFillGauge.fx",
                 "width":80,
                 "height":80,
                 "position":[550,-80,0],
                 "scale":[0.625,0.625,0.625],
                 "rotation":0,
-                "color":[255,255,255,199]
+                "pivot":[0.5,0.5],
+                "color":[255,255,255,199],
+                "baseColor":[255,255,255,255],
+                "fillColor":[255,255,0,255]
             },
 
 

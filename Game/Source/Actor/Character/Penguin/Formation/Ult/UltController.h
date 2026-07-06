@@ -63,6 +63,12 @@ namespace app
 			 */
 			float GetCooldownRate() const;
 
+			/**
+			 * @brief 発動中の残り時間割合を 0.0〜1.0 で返す（UI表示用）
+			 * @return 発動直後は1.0、終了間際は0.0。発動中でなければ0.0
+			 */
+			float GetActiveRemainingRate() const;
+
 
 		private:
 			FormationEffectChain* m_ult          = nullptr;  /** 非所有ポインタ。IFormation が所有する */

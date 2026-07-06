@@ -52,7 +52,7 @@ namespace app
 		{
 			for (const char* name : kFormationIconNames)
 			{
-				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
+				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(name)))
 				{
 					ui->m_isDraw = true;
 				}
@@ -115,6 +115,14 @@ namespace app
 				BeginTransition(m_lastFrameType, currentType);
 			}
 
+			// ウルトの充填率：発動中は残り時間割合(上から白くなっていく)、それ以外はチャージ進行度(下から黄色くなる)
+			const bool isUltActive = cpm->IsUltActive();
+			const float ultFillAmount = isUltActive
+				? cpm->GetUltActiveRemainingRate()
+				: (1.0f - cpm->GetUltCooldownRate());
+
+			const int currentIndex = static_cast<int>(currentType);
+
 			for (int i = 0; i < kFormationNum; i++)
 			{
 				float slot;
@@ -125,7 +133,6 @@ namespace app
 				}
 				else
 				{
-					const int currentIndex = static_cast<int>(currentType);
 					const int diffFromCurrent = (i - currentIndex + kFormationNum) % kFormationNum;
 					if (diffFromCurrent == 0)                      slot = 0.0f;
 					else if (diffFromCurrent == 1)                 slot = 1.0f;
@@ -133,13 +140,16 @@ namespace app
 					else                                           slot = 2.0f; // 非表示側（見えないので向きは任意）
 				}
 
-				if (auto* ui = GetUI<UIIcon>(Hash32(kFormationIconNames[i])))
+				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(kFormationIconNames[i])))
 				{
 					const float size = SlotToSize(slot);
 					const float scaleFactor = size / m_currentSize;
 					ui->m_transform.m_localTransform.m_position = Vector3(SlotToX(slot), m_rowY, 0.0f);
 					ui->m_transform.m_localTransform.m_scale = Vector3(scaleFactor, scaleFactor, scaleFactor);
 					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, SlotToAlpha(slot));
+
+					// ウルトの充填演出は「現在選択中の陣形」のアイコンにのみ反映する
+					ui->SetFillAmount(i == currentIndex ? ultFillAmount : 0.0f);
 				}
 			}
 
@@ -150,12 +160,12 @@ namespace app
 
 		void FormationWheelMenu::UpdateUltIconColor()
 		{
-			const Vector4 normalColor(1.0f, 1.0f, 1.0f, 1.0f);   // 通常（白）
-			const Vector4 grayColor(0.4f, 0.4f, 0.4f, 1.0f);     // グレーアウト
+			const Vector4 readyColor(1.0f, 1.0f, 0.0f, 1.0f);    // 黄色（発動可能）
+			const Vector4 grayColor(0.4f, 0.4f, 0.4f, 1.0f);     // グレーアウト（発動不可）
 
 			auto* cpm = actor::ChildPenguinManager::GetInstance();
 			const bool canActivate = (cpm != nullptr) && cpm->CanActivateUlt();
-			const Vector4& color = canActivate ? normalColor : grayColor;
+			const Vector4& color = canActivate ? readyColor : grayColor;
 
 			const char* ultIconNames[] = { "LTButtonIcon", "RTButtonIcon" };
 			for (const char* name : ultIconNames)
