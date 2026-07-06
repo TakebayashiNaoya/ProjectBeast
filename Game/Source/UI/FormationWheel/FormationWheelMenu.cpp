@@ -39,6 +39,25 @@ namespace app
 
 		void FormationWheelMenu::Update()
 		{
+			// ゲーム開始時のスライドイン演出（画面外右から所定の位置へ）
+			if (!m_startingAnimLogic.IsAnimationStarted())
+			{
+				m_startingAnimLogic.Initialize(
+					this,
+					{
+						"BackgroundIcon",
+						"CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon",
+						"LBButtonIcon", "RBButtonIcon", "LTButtonIcon", "RTButtonIcon"
+					},
+					{}, // 数字UIは使用しないため空のリストを渡す
+					Vector3(300.0f, 0.0f, 0.0f)
+				);
+			}
+			if (!m_startingAnimLogic.IsAnimationFinished())
+			{
+				m_startingAnimLogic.Update();
+			}
+
 			const float dt = g_gameTime->GetFrameDeltaTime();
 			m_pulseTimer += dt;
 #if defined(APP_DEBUG)

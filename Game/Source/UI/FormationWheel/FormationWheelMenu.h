@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
+#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
 
 
@@ -111,6 +112,9 @@ namespace app
 			time_t m_tuningLastWriteTime = 0;    /** チューニングJSONの最終更新日時 */
 			float  m_tuningReloadTimer   = 0.0f; /** チューニングJSONの変更チェック用タイマー */
 #endif
+
+			/** ゲーム開始時に画面外右からスライドインさせる演出 */
+			InGameStartingAnimLogic m_startingAnimLogic;
 		};
 	}
 }
