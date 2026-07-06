@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -272,10 +272,13 @@
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.cpp" />
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationController.cpp" />
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationRangeVisualizer.cpp" />
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\TerrainCircle.cpp" />
-    <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\FormationController.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\FormationDebugMonitor.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\FormationRangeVisualizer.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\TerrainCircle.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Formations.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffects.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\UltController.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.cpp" />
@@ -432,10 +435,16 @@
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinTypes.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinIstate.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ClumsyChildPenguinStateMachine.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationController.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\FormationRangeVisualizer.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\TerrainCircle.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\Formation\Formations.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationController.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationDebugMonitor.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationRangeVisualizer.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\TerrainCircle.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Formations.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\IFormationEffect.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffectChain.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffects.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\UltContext.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\UltController.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.h" />
@@ -591,3 +600,4 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
+
