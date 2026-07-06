@@ -43,9 +43,8 @@ namespace app
 				m_startingAnimLogic.Update();
 			}
 
-			// 開始アニメーション中は非表示のまま保つ。
-			// アニメーション完了前に救助が発生しても、UIが突然現れるバグを防ぐ。
-			const bool isVisible = m_startingAnimLogic.IsAnimationFinished();
+			// スライドイン演出が始まったら表示する（開始前の1フレームだけ非表示のまま保つ）。
+			const bool isVisible = m_startingAnimLogic.IsAnimationStarted();
 
 			auto* icon = GetUI<UIIcon>(Hash32("ChildPenguinIcon"));
 			if (icon) icon->m_isDraw = isVisible;

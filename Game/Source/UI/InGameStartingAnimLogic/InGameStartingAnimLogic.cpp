@@ -114,13 +114,13 @@ namespace app
 			m_uiParts.clear();
 			m_uiParts.reserve(m_totalSize);
 
-			// UIBaseで取得することで、UIIconに限らず任意のUIパーツ(UIGauge/UICircleGauge/UILinearFillGaugeなど)を対象にできる
+			// UIBaseで取得することで、実際の型(UIIcon/UIDigit/UIText/UIGauge/UICircleGauge/UILinearFillGaugeなど)を問わず対象にできる
 			for (const auto& name : m_iconNames)
 				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
 			for (const auto& name : m_digitNames)
-				m_uiParts.push_back(m_menu->GetUI<UIDigit>(Hash32(name.c_str())));
+				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
 			for (const auto& name : m_textNames)
-				m_uiParts.push_back(m_menu->GetUI<UIText>(Hash32(name.c_str())));
+				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
 		}
 	}
 }
