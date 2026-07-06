@@ -65,6 +65,13 @@ namespace app
 			float SlotToAlpha(float slot) const;
 
 			/**
+			 * @brief ドクンドクンと拡縮するパルス演出の倍率を計算する
+			 * @param isPulsing 演出中かどうか(falseなら等倍を返す)
+			 * @return 拡縮倍率(等倍=1.0を中心に振動する)
+			 */
+			float ComputePulseScale(bool isPulsing) const;
+
+			/**
 			 * @brief チューニングJSONを読み込む（初回読み込み）
 			 * @details FormationWheelTuning.jsonから見た目パラメーターを読み込む
 			 */
@@ -94,6 +101,11 @@ namespace app
 			float m_sideSize    = 50.0f;   /** 隣接アイコンのサイズ */
 			float m_sideAlpha   = 0.78f;   /** 隣接アイコンのアルファ値 */
 			Vector3 m_iconColor = Vector3(255.0f, 255.0f, 255.0f);   /** アイコンのRGB色 */
+			float m_pulseAmplitude = 0.15f;   /** パルス演出の振幅(等倍1.0に対する割合) */
+			float m_pulseSpeed     = 6.0f;    /** パルス演出の速さ(ラジアン/秒) */
+
+			/** パルス演出用の経過時間(常時加算し続ける) */
+			float m_pulseTimer = 0.0f;
 
 #if defined(APP_DEBUG)
 			time_t m_tuningLastWriteTime = 0;    /** チューニングJSONの最終更新日時 */

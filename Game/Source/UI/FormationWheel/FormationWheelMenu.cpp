@@ -39,8 +39,10 @@ namespace app
 
 		void FormationWheelMenu::Update()
 		{
+			const float dt = g_gameTime->GetFrameDeltaTime();
+			m_pulseTimer += dt;
 #if defined(APP_DEBUG)
-			ReloadTuningIfChanged(g_gameTime->GetFrameDeltaTime());
+			ReloadTuningIfChanged(dt);
 #endif
 			UpdateFormationIcons();
 			UpdateUltIconColor();
@@ -78,6 +80,13 @@ namespace app
 			const float absSlot = std::fabs(slot);
 			if (absSlot <= 1.0f) return Lerp(1.0f, m_sideAlpha, absSlot);
 			return Lerp(m_sideAlpha, 0.0f, Clamp01(absSlot - 1.0f));
+		}
+
+
+		float FormationWheelMenu::ComputePulseScale(bool isPulsing) const
+		{
+			if (!isPulsing) return 1.0f;
+			return 1.0f + m_pulseAmplitude * sinf(m_pulseTimer * m_pulseSpeed);
 		}
 
 
@@ -121,6 +130,10 @@ namespace app
 				? cpm->GetUltActiveRemainingRate()
 				: (1.0f - cpm->GetUltCooldownRate());
 
+			// 発動可能 or 発動中 の間、現在の陣形アイコンをドクンドクンと拡縮させる
+			const bool pulseFormation = cpm->CanActivateUlt() || isUltActive;
+			const float pulseScale = ComputePulseScale(pulseFormation);
+
 			const int currentIndex = static_cast<int>(currentType);
 
 			for (int i = 0; i < kFormationNum; i++)
@@ -142,14 +155,16 @@ namespace app
 
 				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(kFormationIconNames[i])))
 				{
+					const bool isCurrent = (i == currentIndex);
 					const float size = SlotToSize(slot);
-					const float scaleFactor = size / m_currentSize;
+					// パルス演出は「現在選択中の陣形」のアイコンにのみ反映する
+					const float scaleFactor = (size / m_currentSize) * (isCurrent ? pulseScale : 1.0f);
 					ui->m_transform.m_localTransform.m_position = Vector3(SlotToX(slot), m_rowY, 0.0f);
 					ui->m_transform.m_localTransform.m_scale = Vector3(scaleFactor, scaleFactor, scaleFactor);
 					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, SlotToAlpha(slot));
 
 					// ウルトの充填演出は「現在選択中の陣形」のアイコンにのみ反映する
-					ui->SetFillAmount(i == currentIndex ? ultFillAmount : 0.0f);
+					ui->SetFillAmount(isCurrent ? ultFillAmount : 0.0f);
 				}
 			}
 
@@ -167,12 +182,16 @@ namespace app
 			const bool canActivate = (cpm != nullptr) && cpm->CanActivateUlt();
 			const Vector4& color = canActivate ? readyColor : grayColor;
 
+			// 発動可能な間だけボタンをドクンドクン拡縮させる（発動中は等倍に戻す）
+			const float pulseScale = ComputePulseScale(canActivate);
+
 			const char* ultIconNames[] = { "LTButtonIcon", "RTButtonIcon" };
 			for (const char* name : ultIconNames)
 			{
 				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
 				{
 					ui->m_color = color;
+					ui->m_transform.m_localTransform.m_scale = Vector3(pulseScale, pulseScale, pulseScale);
 				}
 			}
 		}
@@ -190,6 +209,8 @@ namespace app
 				m_sideSize    = util::JsonConverter::ToFloat(j, "sideSize", m_sideSize);
 				m_sideAlpha   = util::JsonConverter::ToFloat(j, "sideAlpha", m_sideAlpha);
 				m_iconColor   = util::JsonConverter::ToVector3(j, "iconColor", false, m_iconColor);
+				m_pulseAmplitude = util::JsonConverter::ToFloat(j, "pulseAmplitude", m_pulseAmplitude);
+				m_pulseSpeed     = util::JsonConverter::ToFloat(j, "pulseSpeed", m_pulseSpeed);
 			}
 #if defined(APP_DEBUG)
 			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(kTuningJsonPath);

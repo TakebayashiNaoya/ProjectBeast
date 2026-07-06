@@ -5,5 +5,7 @@
     "currentSize": 80.0,
     "sideSize": 40.0,
     "sideAlpha": 0.78,
-    "iconColor": [255, 255, 255]
+    "iconColor": [255, 255, 255],
+    "pulseAmplitude": 0.15,
+    "pulseSpeed": 6.0
 }
