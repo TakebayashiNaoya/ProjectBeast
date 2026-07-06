@@ -34,34 +34,28 @@ namespace app
 			}
 			toTargetNorm.Normalize();
 
-			// 基準の前方向ベクトル（こちらもXZ平面に投影しておくと安全）
+			// カメラの前方向についてXZ平面上で判定する
+			Vector3 cameraFront2D = Vector3(cameraFront.x, 0.0f, cameraFront.z);
+
+			// カメラが真上・真下を向いている等でゼロベクトルにならない場合は
+			// カメラの前方向にあるかどうかで判定結果を決定する
+			// （自身の前方かどうかに関わらず、カメラ前方ならtrue、カメラ前方でなければfalse）
+			if (cameraFront2D.LengthSq() > FLT_EPSILON)
+			{
+				cameraFront2D.Normalize();
+
+				const float cameraDot = cameraFront2D.Dot(toTargetNorm);
+				return cameraDot >= dotThreshold;
+			}
+
+			// カメラの前方向が判定に使えない場合は、基準の前方向で判定する
 			Vector3 front = Vector3::Front;
 			baseRotation.Apply(front);
 			front.y = 0.0f;
 			front.Normalize();
 
 			const float dot = front.Dot(toTargetNorm);
-			if (dot < dotThreshold)
-			{
-				return false;
-			}
-
-			// カメラの前方向についてもXZ平面上で判定する
-			Vector3 cameraFront2D = Vector3(cameraFront.x, 0.0f, cameraFront.z);
-
-			// カメラが真上・真下を向いている等でゼロベクトルになる場合はカメラ判定をスキップする
-			if (cameraFront2D.LengthSq() > FLT_EPSILON)
-			{
-				cameraFront2D.Normalize();
-
-				const float cameraDot = cameraFront2D.Dot(toTargetNorm);
-				if (cameraDot < dotThreshold)
-				{
-					return false;
-				}
-			}
-
-			return true;
+			return dot >= dotThreshold;
 		}
 	}
 }
