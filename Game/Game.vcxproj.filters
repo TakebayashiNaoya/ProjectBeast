@@ -1092,6 +1092,9 @@
     <ClInclude Include="Source\UI\Modules\FrontChecker\FrontChecker.h">
       <Filter>Source\UI\Modules\FrontChecker</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\CPReaction\CPReactionTypes.h">
+      <Filter>Source\UI\CPReaction</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">

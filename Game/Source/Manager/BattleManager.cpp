@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file BattleManager.cpp
  * @brief バトルの管理をするクラス
  * @author 竹林
@@ -375,6 +375,8 @@ namespace app
 		m_onSleepingEnemyChanged = nullptr;
 		m_onBearReactionChanged = nullptr;
 		m_onMiniMapChanged = nullptr;
+		m_wpWarningChanged = nullptr;
+		m_onCPReactionChanged = nullptr;
 	}
 
 

@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
+#include "CPReactionTypes.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
 
 
@@ -18,20 +19,10 @@ namespace app
 
 
 		/**
-		 * @brief リアクションのタイプ
-		 */
-		enum class EnReactionType : uint8_t
-		{
-			Trouble,
-			Happy,
-			None
-		};
-
-
-		/**
 		 * @brief 子ペンギンのリアクションUIクラス
-		 * @detail ターゲットの管理・前方判定・座標変換はCPReactionSystemが行う。
-		 *         Menuは渡された座標・フラグを自身のアイコンへ反映するのみ。
+		 * @detail ターゲットの管理・座標変換はCPReactionSystemが行う。
+		 *         リアクションのタイプの判定は行わず、Systemから渡された
+		 *         座標・タイプ・フラグを自身のアイコンへ反映するのみ。
 		 */
 		class CPReactionMenu : public MenuBase
 		{
@@ -63,10 +54,10 @@ namespace app
 
 			/**
 			 * @brief リアクションを開始し、UIAnimationを再生する
-			 * @param type リアクションのタイプ
+			 * @param type リアクションのタイプ(呼び出し側で確定済みの値)
 			 * @param cpType 対象の子ペンギンのタイプ(吹き出し色の決定に使用)
 			 */
-			void PlayUIAnimation(const EnReactionType type, const actor::EnChildPenguinType cpType);
+			void PlayUIAnimation(const EnCPReactionType type, const actor::EnChildPenguinType cpType);
 
 
 		public:
@@ -75,7 +66,7 @@ namespace app
 			 * @detail Noneであれば、このMenuは空き状態(ターゲット未設定)であることを示す
 			 * @return リアクションのタイプ
 			 */
-			inline EnReactionType GetReactionType() const
+			inline EnCPReactionType GetReactionType() const
 			{
 				return m_type;
 			}
@@ -123,7 +114,7 @@ namespace app
 			UIIcon* m_happyReaction;
 
 			/** リアクションのタイプ */
-			EnReactionType m_type;
+			EnCPReactionType m_type;
 
 			/** タイマー */
 			float m_timer;

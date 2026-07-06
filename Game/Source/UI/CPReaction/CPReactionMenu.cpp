@@ -24,7 +24,7 @@ namespace app
 			, m_speechBubble(nullptr)
 			, m_troubleReaction(nullptr)
 			, m_happyReaction(nullptr)
-			, m_type(EnReactionType::None)
+			, m_type(EnCPReactionType::None)
 			, m_timer(0.0f)
 			, m_isPlayAnimation(false)
 			, m_isDraw(false)
@@ -79,7 +79,7 @@ namespace app
 			m_isDraw = isDraw;
 
 			// リアクション中でなければ常に非表示
-			if (m_type == EnReactionType::None)
+			if (m_type == EnCPReactionType::None)
 			{
 				m_speechBubble->m_isDraw = false;
 				m_troubleReaction->m_isDraw = false;
@@ -88,12 +88,12 @@ namespace app
 			}
 
 			m_speechBubble->m_isDraw = isDraw;
-			m_troubleReaction->m_isDraw = isDraw && (m_type == EnReactionType::Trouble);
-			m_happyReaction->m_isDraw = isDraw && (m_type == EnReactionType::Happy);
+			m_troubleReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Trouble);
+			m_happyReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Happy);
 		}
 
 
-		void CPReactionMenu::PlayUIAnimation(const EnReactionType type, const actor::EnChildPenguinType cpType)
+		void CPReactionMenu::PlayUIAnimation(const EnCPReactionType type, const actor::EnChildPenguinType cpType)
 		{
 			auto& soundMng = SoundManager::Get();
 
@@ -102,11 +102,11 @@ namespace app
 			Vector4 speechBubbleColor = Vector4::Black;
 			enSoundKind kind = enSoundKind::enSoundKind_None;
 
-			if (m_type == EnReactionType::Trouble)
+			if (m_type == EnCPReactionType::Trouble)
 			{
 				kind = enSoundKind::enSoundKind_CPReactionTrouble;
 			}
-			else if (m_type == EnReactionType::Happy)
+			else if (m_type == EnCPReactionType::Happy)
 			{
 				kind = enSoundKind::enSoundKind_CPReactionHappy;
 			}
@@ -143,7 +143,7 @@ namespace app
 
 		void CPReactionMenu::DrawFlagUpdate()
 		{
-			if (m_type == EnReactionType::None) return;
+			if (m_type == EnCPReactionType::None) return;
 
 			UpdateAnimation();
 
@@ -157,7 +157,7 @@ namespace app
 				{
 					m_timer = 0.0f;
 					ResetIcon();
-					m_type = EnReactionType::None;
+					m_type = EnCPReactionType::None;
 				}
 			}
 		}
@@ -203,11 +203,11 @@ namespace app
 
 		void CPReactionMenu::UpdateAnimation()
 		{
-			if (m_type == EnReactionType::Happy)
+			if (m_type == EnCPReactionType::Happy)
 			{
 				m_troubleReaction->StopAnimation();
 			}
-			else if (m_type == EnReactionType::Trouble)
+			else if (m_type == EnCPReactionType::Trouble)
 			{
 				m_happyReaction->StopAnimation();
 			}

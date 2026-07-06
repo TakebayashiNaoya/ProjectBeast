@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file CPReactionSystem.cpp
  * @brief 子ペンギンのリアクションシステムクラス
  * @author 藤谷
@@ -9,11 +9,6 @@
 #include "CPReactionStatus.h"
 
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ClumsyChildPenguinIState.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ClumsyChildPenguinStateMachine.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/NaughtyChildPenguinIState.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/NaughtyChildPenguinStateMachine.h"
 
 
 
@@ -24,6 +19,7 @@ namespace app
 		CPReactionSystem::CPReactionSystem()
 			: m_reactionPackets{}
 			, m_targets{}
+			, m_priorities{}
 			, m_reactionStatusParent(nullptr)
 		{}
 
@@ -45,6 +41,7 @@ namespace app
 				it.GetMenu()->SetStatus(m_reactionStatusParent.get());
 
 				m_targets.at(i) = nullptr;
+				m_priorities.at(i) = EnCPReactionPriority::Normal;
 			}
 		}
 
@@ -69,37 +66,41 @@ namespace app
 		}
 
 
-		void CPReactionSystem::SetTarget(actor::ChildPenguin* childPenguin, const EnReactionType type)
+		void CPReactionSystem::SetTarget(actor::ChildPenguin* childPenguin, const EnCPReactionType type, const EnCPReactionPriority priority)
 		{
 			if (!childPenguin) return;
 
-			const uint8_t index = SearchTargettableIndex();
+			// すでにこの子ペンギンがスロットを使用中であればそれを使い回す。
+			// （BattleManager経由の通知は毎フレーム呼ばれる可能性があるため、
+			//   呼ばれるたびに新規スロットを消費してしまうのを防ぐ）
+			uint8_t index = SearchExistingIndex(childPenguin);
 
-			m_targets.at(index) = childPenguin;
-
-			EnReactionType currentType = type;
-
-			auto penguinType = childPenguin->GetChildPenguinType();
-
-
-			// ステートマシンを取得する
-			switch (penguinType)
+			if (index == REACTION_PACKET_NUM)
 			{
-			case actor::EnChildPenguinType::Naughty:
-				auto naughty = dynamic_cast<actor::NaughtyChildPenguinStateMachine*>(childPenguin->GetStateMachine());
-
-				const bool isWhirlpool = naughty->GetIsGoingToWakeBear();
-				const bool isWakeBear = naughty->GetIsGoingToWhirlpool();
-
-				currentType = (isWhirlpool || isWakeBear) ? EnReactionType::Happy : type;
-				break;
+				index = SearchTargettableIndex();
+				m_targets.at(index) = childPenguin;
+			}
+			else
+			{
+				// 既に表示中のリアクションより優先度が低い通知は無視する。
+				// これにより、呼び出し順序に関わらず結果が一定になる
+				// （優先度が同じ場合は、単純に後から呼ばれた方が反映される）
+				if (static_cast<uint8_t>(priority) < static_cast<uint8_t>(m_priorities.at(index)))
+				{
+					return;
+				}
 			}
 
-
-
+			m_priorities.at(index) = priority;
 
 			auto* menu = m_reactionPackets.at(index).GetMenu();
-			menu->PlayUIAnimation(currentType, childPenguin->GetChildPenguinType());
+
+			// 同じタイプが継続している間はアニメーションを再スタートしない
+			if (menu->GetReactionType() == type) return;
+
+			// typeの確定（対象の内部状態による上書き等）は呼び出し側の責務。
+			// Systemはタイプ別の分岐を持たず、受け取った値をそのまま反映する。
+			menu->PlayUIAnimation(type, childPenguin->GetChildPenguinType());
 		}
 
 
@@ -108,11 +109,22 @@ namespace app
 			// リアクションしていないスロットを探す
 			for (uint8_t i = 0; i < REACTION_PACKET_NUM; ++i)
 			{
-				if (m_reactionPackets.at(i).GetMenu()->GetReactionType() == EnReactionType::None) return i;
+				if (m_reactionPackets.at(i).GetMenu()->GetReactionType() == EnCPReactionType::None) return i;
 			}
 
 			// 見つからなければ、先頭のスロットを上書きする
 			return 0;
+		}
+
+
+		uint8_t CPReactionSystem::SearchExistingIndex(const actor::ChildPenguin* childPenguin) const
+		{
+			for (uint8_t i = 0; i < REACTION_PACKET_NUM; ++i)
+			{
+				if (m_targets.at(i) == childPenguin) return i;
+			}
+
+			return REACTION_PACKET_NUM;
 		}
 
 
@@ -124,9 +136,10 @@ namespace app
 				auto*& target = m_targets.at(i);
 
 				// タイマー終了などでリアクションが終わっていたらターゲットを解放する
-				if (menu->GetReactionType() == EnReactionType::None)
+				if (menu->GetReactionType() == EnCPReactionType::None)
 				{
 					target = nullptr;
+					m_priorities.at(i) = EnCPReactionPriority::Normal;
 					continue;
 				}
 
