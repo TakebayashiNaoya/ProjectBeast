@@ -344,6 +344,7 @@
     <ClCompile Include="Source\UI\CPReaction\MasterCPReactionParameter.cpp" />
     <ClCompile Include="Source\UI\DangerArrow\DangerArrowMenu.cpp" />
     <ClCompile Include="Source\UI\DangerArrow\DangerArrowSystem.cpp" />
+    <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp" />
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
@@ -528,6 +529,7 @@
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowCalc.h" />
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowMenu.h" />
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h" />
+    <ClInclude Include="Source\UI\FormationWheel\FormationWheelMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />

@@ -244,6 +244,59 @@ namespace app
 
 
 
+		/********************************/
+
+
+
+		UILinearFillGauge::UILinearFillGauge()
+		{}
+
+
+		UILinearFillGauge::~UILinearFillGauge()
+		{}
+
+
+		void UILinearFillGauge::Update()
+		{
+			UpdateAnimation();
+			m_fillGaugeRender.SetMulColor(m_color);
+			m_transform.UpdateTransform();
+			m_fillGaugeRender.SetPosition(m_transform.m_localTransform.m_position);
+			m_fillGaugeRender.SetScale(m_transform.m_localTransform.m_scale);
+			m_fillGaugeRender.SetRotation(m_transform.m_localTransform.m_rotation);
+			m_fillGaugeRender.SetPivot(m_pivot);
+			m_fillGaugeRender.Update();
+		}
+
+
+		void UILinearFillGauge::Initialize(const char* assetName, const char* fxName, const float width, const float height, const Vector3& position, const Vector3& scale, const Quaternion& rotation, const Vector2& pivot, const Vector4& baseColor, const Vector4& fillColor)
+		{
+			m_transform.m_localTransform.m_position = position;
+			m_transform.m_localTransform.m_scale = scale;
+			m_transform.m_localTransform.m_rotation = rotation;
+			m_color = Vector4::White;
+			m_pivot = pivot;
+
+			m_fillGaugeRender.Init(assetName, fxName, width, height);
+			m_fillGaugeRender.SetPosition(position);
+			m_fillGaugeRender.SetScale(scale);
+			m_fillGaugeRender.SetRotation(rotation);
+			m_fillGaugeRender.SetPivot(pivot);
+			m_fillGaugeRender.SetBaseColor(baseColor);
+			m_fillGaugeRender.SetFillColor(fillColor);
+			m_fillGaugeRender.SetFillAmount(0.0f);
+			m_fillGaugeRender.Update();
+		}
+
+
+		void UILinearFillGauge::Render(RenderContext& rc)
+		{
+			if (m_isDraw) {
+				m_fillGaugeRender.Draw(rc);
+			}
+		}
+
+
 
 
 		/********************************/

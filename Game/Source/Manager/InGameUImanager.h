@@ -34,6 +34,7 @@ namespace app
 		class TitleEventMenu;
 		class AchievementNotificationMenu;
 		class InGameButtonMenu;
+		class FormationWheelMenu;
 		class DebufMenu;
 
 		class CPReactionSystem;
@@ -218,6 +219,7 @@ namespace app
 		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
 		ui::UIPacket<ui::AchievementNotificationMenu> m_achievementNotificationPacket;
 		ui::UIPacket<ui::InGameButtonMenu> m_inGameButtonPacket;
+		ui::UIPacket<ui::FormationWheelMenu> m_formationWheelPacket;
 		ui::UIPacket<ui::DebufMenu> m_debufPacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 

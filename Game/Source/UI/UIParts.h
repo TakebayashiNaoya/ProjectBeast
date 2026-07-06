@@ -325,6 +325,84 @@ namespace app
 
 
 		/**
+		 * @brief 縦方向の塗り分けゲージUI
+		 * @details
+		 *   テクスチャのアルファ形状(アイコンの見た目)を保ったまま、
+		 *   下から上へ baseColor → fillColor に塗り分ける。スケールで
+		 *   引き伸ばさないため、アイコン自体は歪まない(シェーダーで実現)。
+		 */
+		class UILinearFillGauge : public UIBase
+		{
+		public:
+			UILinearFillGauge();
+			~UILinearFillGauge();
+
+			virtual void Update()override;
+			virtual void Render(RenderContext& rc)override;
+
+
+			/**
+			 * @brief 初期化
+			 * @param assetName アセット名
+			 * @param fxName シェーダー名
+			 * @param width 横
+			 * @param height 縦
+			 * @param position 座標
+			 * @param scale 大きさ
+			 * @param rotation 回転
+			 * @param pivot 基底軸
+			 * @param baseColor 未充填部分の色
+			 * @param fillColor 充填部分の色
+			 */
+			void Initialize(
+				const char* assetName
+				, const char* fxName
+				, const float width
+				, const float height
+				, const Vector3& position
+				, const Vector3& scale
+				, const Quaternion& rotation
+				, const Vector2& pivot
+				, const Vector4& baseColor
+				, const Vector4& fillColor
+			);
+
+
+			// ------------------------------------------
+			// LinearFillGaugeRender固有のパラメーター
+			// -----------------------------------------
+
+
+			/**
+			 * @brief 塗りつぶし割合を設定する(0.0f ~ 1.0f)。下から上へ塗られる
+			 * @param fillAmount 割合
+			 */
+			void SetFillAmount(float fillAmount) { m_fillGaugeRender.SetFillAmount(fillAmount); }
+			/**
+			 * @brief 塗りつぶし割合を取得
+			 * @return 割合(0.0f ~ 1.0f)
+			 */
+			float GetFillAmount()const { return m_fillGaugeRender.GetFillAmount(); }
+			/**
+			 * @brief 未充填部分の色を設定
+			 * @param color 色
+			 */
+			void SetBaseColor(const Vector4& color) { m_fillGaugeRender.SetBaseColor(color); }
+			/**
+			 * @brief 充填部分の色を設定
+			 * @param color 色
+			 */
+			void SetFillColor(const Vector4& color) { m_fillGaugeRender.SetFillColor(color); }
+
+
+		private:
+			/** 直線ゲージ専用のスプライト */
+			nsBeastEngine::LinearFillGaugeRender m_fillGaugeRender;
+		};
+
+
+
+		/**
 		 * @brief UIアイコン
 		 */
 		class UIIcon : public UIImage
