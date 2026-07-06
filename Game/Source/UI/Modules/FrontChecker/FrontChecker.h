@@ -12,7 +12,7 @@ namespace app
 	{
 		/**
 		 * @brief 前方チェッククラス
-		 * @detail 前方にいるかどうかを判定する
+		 * @details 前方にいるかどうかを判定する
 		 */
 		class FrontChecker
 		{

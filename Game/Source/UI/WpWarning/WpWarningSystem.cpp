@@ -93,7 +93,7 @@ namespace app
 				posses.end()
 			);
 			// 上位3つ手前にソート
-			const uint8_t size = std::min<uint8_t>(PACKET_NUM, posses.size());
+			const size_t size = std::min<size_t>(PACKET_NUM, posses.size());
 			std::nth_element(posses.begin(), posses.begin() + size, posses.end(),
 				[dpPosition](const Vector3& a, const Vector3& b)
 				{

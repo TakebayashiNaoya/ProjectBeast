@@ -20,6 +20,7 @@ namespace app
 			, m_warning(nullptr)
 			, m_status(nullptr)
 			, m_animStatus(nullptr)
+			, m_isDraw(false)
 		{}
 
 
@@ -58,7 +59,7 @@ namespace app
 		{
 			auto UpdateAnimation = [this](UIIcon* ui)
 				{
-					if (ui->IsPlayAnimation())
+					if (!ui->IsPlayAnimation())
 					{
 						SetAnimation(ui);
 					}
