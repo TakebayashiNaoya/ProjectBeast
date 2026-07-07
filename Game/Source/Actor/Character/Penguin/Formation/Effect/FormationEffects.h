@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "IFormationEffect.h"
+#include "Source/Effect/Types.h"
 
 
 namespace app

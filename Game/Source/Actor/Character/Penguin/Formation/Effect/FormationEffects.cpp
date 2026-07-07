@@ -66,7 +66,8 @@ namespace app
 		namespace
 		{
 			/** エフェクトの拡大倍率 */
-			constexpr float EFFECT_SCALE = 200.0f;
+			const Vector3 EFFECT_SCALE = Vector3(15.0f, 5.0f, 15.0f);
+			constexpr float OFFSET_Y = 20.0f;
 		}
 
 
@@ -79,12 +80,13 @@ namespace app
 				EnEffectKind::BarrierBegin,
 				ctx.daddyPenguin->GetTransform().m_position,
 				ctx.daddyPenguin->GetTransform().m_rotation,
-				Vector3(EFFECT_SCALE, EFFECT_SCALE, EFFECT_SCALE)
+				EFFECT_SCALE
 			);
 
 			EffectManager::Get().AttachEffect(
 				m_ultHandle,
-				&ctx.daddyPenguin->GetTransform().m_position
+				&ctx.daddyPenguin->GetTransform().m_position,
+				Vector3(0.0f, OFFSET_Y, 0.0f)
 			);
 		}
 
@@ -102,12 +104,13 @@ namespace app
 					EnEffectKind::BarrierLoop,
 					ctx.daddyPenguin->GetTransform().m_position,
 					ctx.daddyPenguin->GetTransform().m_rotation,
-					Vector3(EFFECT_SCALE, EFFECT_SCALE, EFFECT_SCALE)
+					EFFECT_SCALE
 				);
 
 				em.AttachEffect(
 					m_ultHandle,
-					&ctx.daddyPenguin->GetTransform().m_position
+					&ctx.daddyPenguin->GetTransform().m_position,
+					Vector3(0.0f, OFFSET_Y, 0.0f)
 				);
 			}
 		}
@@ -124,12 +127,13 @@ namespace app
 				EnEffectKind::BarrierEnd,
 				ctx.daddyPenguin->GetTransform().m_position,
 				ctx.daddyPenguin->GetTransform().m_rotation,
-				Vector3(EFFECT_SCALE, EFFECT_SCALE, EFFECT_SCALE)
+				EFFECT_SCALE
 			);
 
 			em.AttachEffect(
 				m_ultHandle,
-				&ctx.daddyPenguin->GetTransform().m_position
+				&ctx.daddyPenguin->GetTransform().m_position,
+				Vector3(0.0f, OFFSET_Y, 0.0f)
 			);
 		}
 	}
