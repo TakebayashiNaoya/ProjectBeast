@@ -240,14 +240,13 @@ namespace app
 			float spawnRadius
 		)
 		{
-			// フィーバータイムの上限判定・比率抽選・ランダム配置に再利用するためキャッシュしておく
-			m_seriousNum		= seriousNum;
-			m_clingyNum			= clingyNum;
-			m_naughtyNum		= naughtyNum;
-			m_clumsyNum			= clumsyNum;
-			m_caringNum			= caringNum;
-			m_spawnRadius		= spawnRadius;
-			m_initialTotalCount	= seriousNum + clingyNum + naughtyNum + clumsyNum + caringNum;
+			// フィーバータイムの比率抽選・ランダム配置に再利用するためキャッシュしておく
+			m_seriousNum  = seriousNum;
+			m_clingyNum   = clingyNum;
+			m_naughtyNum  = naughtyNum;
+			m_clumsyNum   = clumsyNum;
+			m_caringNum   = caringNum;
+			m_spawnRadius = spawnRadius;
 
 			// ==========================================
 			// 生成するすべてのペンギンの「タイプ」を1つのリスト（プール）にまとめる

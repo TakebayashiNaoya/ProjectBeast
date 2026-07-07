@@ -24,6 +24,7 @@ namespace app
 		m_feverStartTime = util::JsonConverter::ToFloat(json, "feverStartTime", m_feverStartTime);
 		m_dropInterval   = util::JsonConverter::ToFloat(json, "dropInterval", m_dropInterval);
 		m_dropHeight     = util::JsonConverter::ToFloat(json, "dropHeight", m_dropHeight);
+		m_feverDropCount = util::JsonConverter::ToInt(json, "feverDropCount", m_feverDropCount);
 	}
 
 
@@ -57,11 +58,8 @@ namespace app
 		/** フィーバー中BGMに切り替える */
 		SoundManager::Get().PlayBGM(enSoundKind_FeverTime);
 
-		/** 現在の野良数（生存数−救出済み数）とステージ初期数の差分を投下キューの初期数にする */
-		auto* manager = actor::ChildPenguinManager::GetInstance();
-		const int cap = manager->GetInitialTotalCount();
-		const int strayNum = manager->GetChildPenguinNum() - manager->GetRescuedNum();
-		m_pendingDropCount = max(0, cap - strayNum);
+		/** それまでの捕獲数によらず、固定数を投下キューの初期数にする */
+		m_pendingDropCount = m_feverDropCount;
 	}
 
 

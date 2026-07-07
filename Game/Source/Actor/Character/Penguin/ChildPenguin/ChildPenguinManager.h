@@ -97,12 +97,6 @@ namespace app
 			 */
 			void SpawnFromSky(float dropHeight);
 
-			/**
-			 * @brief ステージの初期スポーン総数を取得
-			 * @return CreateChildPenguins呼び出し時に指定された総数（フィーバータイムの上限などに使用）
-			 */
-			int GetInitialTotalCount() const { return m_initialTotalCount; }
-
 
 		private:
 			/**
@@ -149,8 +143,6 @@ namespace app
 			/** 削除待ちのペンギンを入れるリスト */
 			std::vector<ChildPenguin*> m_destroyList;
 
-			/** ステージの初期スポーン総数（CreateChildPenguinsでキャッシュ、フィーバータイムの上限に使用） */
-			int m_initialTotalCount = 0;
 			/** ステージの生成半径（CreateChildPenguinsでキャッシュ、フィーバー時のランダム配置に再利用） */
 			float m_spawnRadius = 3000.0f;
 			/** タイプ別の初期スポーン数（CreateChildPenguinsでキャッシュ、フィーバー時の比率抽選に再利用） */
