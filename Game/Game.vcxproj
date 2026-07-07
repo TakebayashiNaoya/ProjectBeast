@@ -507,6 +507,7 @@
     <ClInclude Include="Source\Scene\TitleScene.h" />
     <ClInclude Include="Source\Scene\TutorialController.h" />
     <ClInclude Include="Source\Scene\TutorialInGameScene.h" />
+    <ClInclude Include="Source\Sound\SoundHandle.h" />
     <ClInclude Include="Source\Sound\SoundManager.h" />
     <ClInclude Include="Source\Sound\Types.h" />
     <ClInclude Include="Source\system\system.h" />

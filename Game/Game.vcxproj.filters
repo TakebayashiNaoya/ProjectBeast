@@ -665,6 +665,9 @@
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h">
       <Filter>Source\Actor\Character</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Sound\SoundHandle.h">
+      <Filter>Source\Sound</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Sound\SoundManager.h">
       <Filter>Source\Sound</Filter>
     </ClInclude>
