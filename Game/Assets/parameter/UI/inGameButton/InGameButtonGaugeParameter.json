@@ -1,0 +1,7 @@
+[
+    {
+        "comment":"インゲームボタンのスタミナゲージ専用のステータス（表示追従用イージング設定）",
+        "jumpFollowSpeed":2.0,
+        "slideFollowSpeed":2.0
+    }
+]

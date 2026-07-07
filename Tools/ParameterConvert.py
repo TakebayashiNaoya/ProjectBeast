@@ -46,23 +46,29 @@ import struct
 # ─────────────────────────────────────────────────────────────────
 
 def pack_daddy_penguin(data):
-    # 継承順（Character -> Penguin -> DaddyPenguin）のメモリレイアウトに合わせる
     # Character: runSpeed(f), swimSpeed(f), radius(f), height(f)
-    # Penguin  : maxHp(i), hp(i), sneakSpeed(f), slideSpeed(f), jumpPower(f)
+    # Penguin  : maxHp(i), hp(i), sneakSpeed(f), slideSpeed(f), jumpPower(f),
+    #            jumpStaminaMax(f), jumpStaminaRecoverSpeed(f),
+    #            slideStaminaMax(f), slideStaminaDecreaseSpeed(f), slideStaminaRecoverSpeed(f)
     # Daddy    : enableCommandRange(f)
-    # 計: float×4, int×2, float×4 = 40 bytes
+    # 計: float×4, int×2, float×9 = 60 bytes
     return struct.pack(
-        "<ffffiiffff",
-        float(data.get("runSpeed", 0.0)),         # CharacterParameter
-        float(data.get("swimSpeed", 0.0)),        # CharacterParameter
-        float(data.get("radius", 0.0)),           # CharacterParameter
-        float(data.get("height", 0.0)),           # CharacterParameter
-        int(data.get("maxHp", 0)),                # PenguinParameter
-        int(data.get("hp", 0)),                   # PenguinParameter
-        float(data.get("sneakSpeed", 0.0)),       # PenguinParameter
-        float(data.get("slideSpeed", 0.0)),       # PenguinParameter
-        float(data.get("jumpPower", 0.0)),        # PenguinParameter
-        float(data.get("enableCommandRange", 0))  # DaddyPenguinParameter
+        "<ffffiifffffffff",
+        float(data.get("runSpeed", 0.0)),
+        float(data.get("swimSpeed", 0.0)),
+        float(data.get("radius", 0.0)),
+        float(data.get("height", 0.0)),
+        int(data.get("maxHp", 0)),
+        int(data.get("hp", 0)),
+        float(data.get("sneakSpeed", 0.0)),
+        float(data.get("slideSpeed", 0.0)),
+        float(data.get("jumpPower", 0.0)),
+        float(data.get("jumpStaminaMax", 0.0)),
+        float(data.get("jumpStaminaRecoverSpeed", 0.0)),
+        float(data.get("slideStaminaMax", 0.0)),
+        float(data.get("slideStaminaDecreaseSpeed", 0.0)),
+        float(data.get("slideStaminaRecoverSpeed", 0.0)),
+        float(data.get("enableCommandRange", 0))
     )
 
 def pack_penguin_effect_parameter(data):
@@ -101,19 +107,23 @@ def pack_penguin_effect_parameter(data):
 
 
 def pack_child_penguin_parameter(data):
-     # MasterChildPenguinParameter（MasterPenguinParameter継承分のみ。配列は持たない）
-     # "<ffffiifff" = f×4 + i×2 + f×3 = 36 bytes
+     # "<ffffiiffffffff" = f×4 + i×2 + f×8 = 56 bytes
      return struct.pack(
-         "<ffffiifff",
-         float(data.get("runSpeed",   0.0)),  # Character
-         float(data.get("swimSpeed",  0.0)),  # Character
-         float(data.get("radius",     0.0)),  # Character
-         float(data.get("height",     0.0)),  # Character
-         int(data.get("maxHp",        0)),    # Penguin
-         int(data.get("hp",           0)),    # Penguin
-         float(data.get("sneakSpeed", 0.0)),  # Penguin
-         float(data.get("slideSpeed", 0.0)),  # Penguin
-         float(data.get("jumpPower",  0.0)),  # Penguin
+         "<ffffiiffffffff",
+         float(data.get("runSpeed",   0.0)),
+         float(data.get("swimSpeed",  0.0)),
+         float(data.get("radius",     0.0)),
+         float(data.get("height",     0.0)),
+         int(data.get("maxHp",        0)),
+         int(data.get("hp",           0)),
+         float(data.get("sneakSpeed", 0.0)),
+         float(data.get("slideSpeed", 0.0)),
+         float(data.get("jumpPower",  0.0)),
+         float(data.get("jumpStaminaMax", 0.0)),
+         float(data.get("jumpStaminaRecoverSpeed", 0.0)),
+         float(data.get("slideStaminaMax", 0.0)),
+         float(data.get("slideStaminaDecreaseSpeed", 0.0)),
+         float(data.get("slideStaminaRecoverSpeed", 0.0)),
      )
 
 

@@ -18,6 +18,7 @@ namespace app
 			: m_totalSize(0)
 			, m_iconNames{}
 			, m_digitNames{}
+			, m_gaugeNames{}
 			, m_uiParts{}
 			, m_menu(nullptr)
 			, m_startOffset(Vector3::Zero)
@@ -31,17 +32,19 @@ namespace app
 			const std::vector<std::string> digitNames,
 			const Vector3 startOffset,
 			float duration,
-			const std::vector<std::string> textNames
+			const std::vector<std::string> textNames,
+			const std::vector<std::string> gaugeNames
 		)
 		{
 			if (menu == nullptr) return;
 			m_menu = menu;
 			m_startOffset = startOffset;
 			m_duration = util::clamp(duration, 0.1f, 10.0f);
-			m_totalSize = iconNames.size() + digitNames.size() + textNames.size();
+			m_totalSize = iconNames.size() + digitNames.size() + textNames.size() + gaugeNames.size();
 			m_iconNames = iconNames;
 			m_digitNames = digitNames;
 			m_textNames = textNames;
+			m_gaugeNames = gaugeNames;
 
 			m_uiParts.reserve(m_totalSize);
 
@@ -120,6 +123,8 @@ namespace app
 			for (const auto& name : m_digitNames)
 				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
 			for (const auto& name : m_textNames)
+				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
+			for (const auto& name : m_gaugeNames)
 				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
 		}
 	}
