@@ -84,6 +84,7 @@ namespace app
 		enSoundKind_InGame = enSoundKind_BGM,
 		enSoundKind_Title,
 		enSoundKind_Result,
+		enSoundKind_FeverTime,
 
 		// =========================================================================
 		// Voice (ボイス)
@@ -182,6 +183,7 @@ namespace app
 		SoundInformation("Assets/sound/BGM/inGame.wav"),
 		SoundInformation("Assets/sound/BGM/title.wav"),
 		SoundInformation("Assets/sound/BGM/result.wav"),
+		SoundInformation("Assets/sound/BGM/FeverTime.wav"),
 
 		// -------------------------------------------------------------------------
 		// Voice (ボイス)

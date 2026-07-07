@@ -461,6 +461,9 @@ namespace app
 			{
 				SoundManager::Get().StopAllSE();
 
+				/** FINISH演出（3秒）に合わせてBGMを徐々にフェードアウトする */
+				SoundManager::Get().FadeOutBGM(3.0f);
+
 				/** FINISH 演出開始 */
 				auto* finishMenu = uiMngr->GetFinishMenu();
 				if (finishMenu) finishMenu->StartFinish();

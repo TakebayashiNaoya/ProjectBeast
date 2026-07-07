@@ -7,6 +7,7 @@
 #include "FeverTimeManager.h"
 #include "TimeManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Sound/SoundManager.h"
 #include "Source/Util/JsonConverter.h"
 
 
@@ -52,6 +53,9 @@ namespace app
 	{
 		m_isActive = true;
 		m_dropTimer = 0.0f;
+
+		/** フィーバー中BGMに切り替える */
+		SoundManager::Get().PlayBGM(enSoundKind_FeverTime);
 
 		/** 現在の野良数（生存数−救出済み数）とステージ初期数の差分を投下キューの初期数にする */
 		auto* manager = actor::ChildPenguinManager::GetInstance();
