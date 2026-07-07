@@ -85,6 +85,9 @@
     <Filter Include="Source\UI\InGameButton">
       <UniqueIdentifier>{6cf23173-7acb-4026-9850-4f2cb0624d76}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\FormationWheel">
+      <UniqueIdentifier>{3f7b1a2c-9e4d-4b6a-8c1f-2d5e6a7b8c9d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\UI\InGameTimer">
       <UniqueIdentifier>{1a5286f1-26e8-433a-86b8-dd21bbc4ef60}</UniqueIdentifier>
     </Filter>
@@ -459,6 +462,9 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectStatus.cpp">
       <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp">
+      <Filter>Source\UI\FormationWheel</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp">
       <Filter>Source\UI\InGameButton</Filter>
@@ -962,6 +968,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
       <Filter>Source\UI\WpWarning</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\FormationWheel\FormationWheelMenu.h">
+      <Filter>Source\UI\FormationWheel</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h">
       <Filter>Source\UI\InGameButton</Filter>

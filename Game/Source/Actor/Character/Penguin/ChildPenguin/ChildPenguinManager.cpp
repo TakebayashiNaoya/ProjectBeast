@@ -113,16 +113,24 @@ namespace app
 				m_formationController.UpdateUlt(g_gameTime->GetFrameDeltaTime(), ctx);
 			}
 
-			/** L1/R1 で陣形を循環切り替え */
-			if (g_pad[0]->IsTrigger(enButtonRB1))
+			/** 陣形切り替え演出（スライドUI）のロックタイマー更新 */
+			m_formationController.UpdateSwitchLock(g_gameTime->GetFrameDeltaTime());
+
+			/** L1/R1 で陣形を循環切り替え（スライド演出中は入力を無視する） */
+			if (!m_formationController.IsSwitchingFormation())
 			{
-				const int next = (static_cast<int>(m_formationController.GetCurrentType()) + 1) % static_cast<int>(EnFormationType::Num);
-				m_formationController.SwitchFormation(static_cast<EnFormationType>(next));
-			}
-			else if (g_pad[0]->IsTrigger(enButtonLB1))
-			{
-				const int prev = (static_cast<int>(m_formationController.GetCurrentType()) + static_cast<int>(EnFormationType::Num) - 1) % static_cast<int>(EnFormationType::Num);
-				m_formationController.SwitchFormation(static_cast<EnFormationType>(prev));
+				if (g_pad[0]->IsTrigger(enButtonRB1))
+				{
+					const int next = (static_cast<int>(m_formationController.GetCurrentType()) + 1) % static_cast<int>(EnFormationType::Num);
+					m_formationController.SwitchFormation(static_cast<EnFormationType>(next));
+					m_formationController.StartSwitchTransition();
+				}
+				else if (g_pad[0]->IsTrigger(enButtonLB1))
+				{
+					const int prev = (static_cast<int>(m_formationController.GetCurrentType()) + static_cast<int>(EnFormationType::Num) - 1) % static_cast<int>(EnFormationType::Num);
+					m_formationController.SwitchFormation(static_cast<EnFormationType>(prev));
+					m_formationController.StartSwitchTransition();
+				}
 			}
 
 			/** LB2/RB2 でウルト発動 */

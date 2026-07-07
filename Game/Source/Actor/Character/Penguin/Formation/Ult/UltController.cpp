@@ -62,5 +62,12 @@ namespace app
 			if (m_cooldown <= 0.0f) return 0.0f;
 			return max(m_cooldownTimer / m_cooldown, 0.0f);
 		}
+
+
+		float UltController::GetActiveRemainingRate() const
+		{
+			if (!m_isActive || m_duration <= 0.0f) return 0.0f;
+			return max(m_timer / m_duration, 0.0f);
+		}
 	}
 }
