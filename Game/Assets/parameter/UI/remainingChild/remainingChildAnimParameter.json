@@ -47,6 +47,29 @@
 
 
         {
+            "comment":"総数が増加した時に跳ねさせるアニメーション",
+            "key":"tTlanslateUpAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-515, "y":95, "z":0 },
+            "endValue":{ "x":-515, "y":115, "z":0 },
+            "duration":0.18,
+            "easing":"EaseOut",
+            "loop":"Once"
+        },
+        {
+            "comment":"総数が増加した時に戻ってバウンドするアニメーション",
+            "key":"tBounceDownAnim",
+            "valueType":"Vector3",
+            "startValue":{ "x":-515, "y":115, "z":0 },
+            "endValue":{ "x":-515, "y":95, "z":0 },
+            "duration":0.32,
+            "easing":"BounceOut",
+            "loop":"Once"
+        },
+
+
+
+        {
             "comment":"総数が減少した時に沈むアニメーション",
             "key":"tSinkDownAnim",
             "valueType":"Vector3",

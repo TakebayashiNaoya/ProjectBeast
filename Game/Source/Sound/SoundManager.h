@@ -103,6 +103,8 @@ namespace app
 		void PlayBGM(const int kind, const float volumeMagnification = INVALID_VOLUME);
 		/** BGMの停止 */
 		void StopBGM();
+		/** BGMを指定時間かけて徐々にフェードアウトし、完了後に停止する */
+		void FadeOutBGM(const float duration);
 
 
 		/**
@@ -292,6 +294,13 @@ namespace app
 
 		/** SE種別ごとの同時再生数上限 */
 		std::unordered_map<int, uint8_t> m_seConcurrentLimitMap;
+
+		/** BGMフェードアウト中かどうか */
+		bool m_isBgmFading = false;
+		/** BGMフェードアウトの経過時間 */
+		float m_bgmFadeTimer = 0.0f;
+		/** BGMフェードアウトにかける時間（秒） */
+		float m_bgmFadeDuration = 0.0f;
 
 
 	private:

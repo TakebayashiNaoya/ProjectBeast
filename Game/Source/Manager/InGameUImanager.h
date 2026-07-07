@@ -36,6 +36,7 @@ namespace app
 		class InGameButtonMenu;
 		class FormationWheelMenu;
 		class DebufMenu;
+		class FeverIconMenu;
 
 		class CPReactionSystem;
 		class WpWarningSystem;
@@ -147,6 +148,8 @@ namespace app
 		/** @brief フィニッシュMenuを取得 */
 		//inline ui::FinishMenu* GetFinishMenu() const { return m_finishMenu; }
 		inline ui::FinishMenu* GetFinishMenu() const { return m_finishPacket->GetMenu(); }
+		/** @brief フィーバーアイコンMenuを取得 */
+		inline ui::FeverIconMenu* GetFeverIconMenu() const { return m_feverIconPacket->GetMenu(); }
 		/** @brief ポーズMenuを取得 */
 		//inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pauseMenu; }
 		inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pausePacket->GetMenu(); }
@@ -221,6 +224,7 @@ namespace app
 		ui::UIPacket<ui::InGameButtonMenu> m_inGameButtonPacket;
 		ui::UIPacket<ui::FormationWheelMenu> m_formationWheelPacket;
 		ui::UIPacket<ui::DebufMenu> m_debufPacket;
+		ui::UIPacket<ui::FeverIconMenu> m_feverIconPacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;

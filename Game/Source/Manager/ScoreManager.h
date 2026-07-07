@@ -23,6 +23,7 @@ namespace app
 		void SetTotalCount(int total) { m_totalCount = total; }
 		int GetTotalCount() { return m_totalCount; }
 
+		void AddTotalCount() { m_totalCount++; }
 		void SubTotalCount() { m_totalCount--; }
 
 

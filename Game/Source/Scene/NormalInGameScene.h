@@ -31,7 +31,7 @@ namespace app
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 0, 0, 35, 35, 30, 5000.0f };
+			return { 0, 0, 35, 35, 30, 5000.0f, 1500.0f };
 		}
 
 		const char* GetStageJsonPath() const override
@@ -57,6 +57,11 @@ namespace app
 		const char* GetWhirlpoolParameterBinaryPath() const override
 		{
 			return "Assets/parameter/nature/whirlpoolParameter_Normal.bin";
+		}
+
+		const char* GetFeverParameterJsonPath() const override
+		{
+			return "Assets/parameter/fever/feverParameter_Normal.json";
 		}
 
 		const char* GetOceanParameterJsonPath() const override
