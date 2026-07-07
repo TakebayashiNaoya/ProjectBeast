@@ -61,6 +61,9 @@ namespace app
 
 			/** 陣形選択（スワイプ）SEの音量倍率 */
 			constexpr float FORMATION_SWIPE_SE_VOLUME = 1.0f;
+
+			/** ゴーストペンギン出現音の音量倍率 */
+			constexpr float SPAWN_GHOST_PENGUIN_SE_VOLUME = 1.0f;
 		}
 
 
@@ -916,6 +919,9 @@ namespace app
 			info->floatCurve.Play();
 			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
 			info->modelRender.Update();
+
+			// ゴーストペンギンの出現音を再生。
+			SoundManager::Get().PlaySE(enSoundKind_GhostPenguinReaction, SPAWN_GHOST_PENGUIN_SE_VOLUME, enSoundPriority_Hight);
 
 			// 構造体のメンバにターゲットを設定。
 			info->target = target;
