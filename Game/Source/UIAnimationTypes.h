@@ -38,6 +38,9 @@ namespace app
 			constexpr uint32_t RESCUE_TOTAL_SINK_DOWN_ANIM_KEY = Hash32("tSinkDownAnim");
 			constexpr uint32_t RESCUE_TOTAL_BOUNCE_DOWN_UP_ANIM_KEY = Hash32("tBounceDownUpAnim");
 
+			constexpr uint32_t RESCUE_TOTAL_TLANSLATE_UP_ANIM_KEY = Hash32("tTlanslateUpAnim");
+			constexpr uint32_t RESCUE_TOTAL_BOUNCE_DOWN_ANIM_KEY = Hash32("tBounceDownAnim");
+
 
 
 			/** CPReaction用のUIAnimationKey */

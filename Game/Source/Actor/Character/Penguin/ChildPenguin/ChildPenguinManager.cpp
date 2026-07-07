@@ -17,6 +17,7 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Manager/BattleManager.h"
+#include "Source/Manager/FeverTimeManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
 #include "Source/UI/CPReaction/CPReactionTypes.h"
@@ -33,8 +34,6 @@ namespace app
 	{
 		namespace
 		{
-			/** スポーン座標を求めるレイの発射高度 */
-			constexpr float SPAWN_RAY_START_Y = 1000.0f;
 			/** 拒絶サンプリングの最大試行回数（無限ループ防止） */
 			constexpr int SPAWN_MAX_RETRY = 100;
 			/** 群れの広さ（半径） */
@@ -236,9 +235,28 @@ namespace app
 			int naughtyNum,
 			int clumsyNum,
 			int caringNum,
-			float spawnRadius
+			float spawnRadius,
+			float groundRayStartY
 		)
 		{
+			// フィーバータイムの比率抽選・ランダム配置に再利用するためキャッシュしておく
+			m_seriousNum      = seriousNum;
+			m_clingyNum       = clingyNum;
+			m_naughtyNum      = naughtyNum;
+			m_clumsyNum       = clumsyNum;
+			m_caringNum       = caringNum;
+			m_spawnRadius     = spawnRadius;
+			m_groundRayStartY = groundRayStartY;
+
+			// フィーバー時のタイプ抽選器を一度だけ構築しておく（毎回再構築しない）
+			m_typeDist = std::discrete_distribution<int>{
+				static_cast<double>(m_seriousNum),
+				static_cast<double>(m_clingyNum),
+				static_cast<double>(m_naughtyNum),
+				static_cast<double>(m_clumsyNum),
+				static_cast<double>(m_caringNum)
+			};
+
 			// ==========================================
 			// 生成するすべてのペンギンの「タイプ」を1つのリスト（プール）にまとめる
 			// ==========================================
@@ -248,10 +266,10 @@ namespace app
 
 			// リストに指定された数だけタイプを追加していく
 			for (int i = 0; i < seriousNum; i++) spawnPool.push_back(EnChildPenguinType::Serious);
-			for (int i = 0; i < clingyNum; i++)  spawnPool.push_back(EnChildPenguinType::Clingy);
+			for (int i = 0; i < clingyNum;  i++) spawnPool.push_back(EnChildPenguinType::Clingy);
 			for (int i = 0; i < naughtyNum; i++) spawnPool.push_back(EnChildPenguinType::Naughty);
-			for (int i = 0; i < clumsyNum; i++)  spawnPool.push_back(EnChildPenguinType::Clumsy);
-			for (int i = 0; i < caringNum; i++)  spawnPool.push_back(EnChildPenguinType::Caring);
+			for (int i = 0; i < clumsyNum;  i++) spawnPool.push_back(EnChildPenguinType::Clumsy);
+			for (int i = 0; i < caringNum;  i++) spawnPool.push_back(EnChildPenguinType::Caring);
 
 			// ==========================================
 			// リストの中身をランダムにシャッフルする
@@ -280,7 +298,7 @@ namespace app
 					currentClusterCenter = GenerateRandomSpawnPosition(spawnRadius);
 					currentClusterCount = 0;
 
-					// ★ 次に作る群れのサイズを 1〜5 匹の間でランダムに決定する
+					// 次に作る群れのサイズを 1〜5 匹の間でランダムに決定する
 					currentMaxClusterSize = clusterSizeDist(engine);
 				}
 
@@ -289,6 +307,21 @@ namespace app
 
 				currentClusterCount++;
 			}
+		}
+
+
+		ChildPenguin* ChildPenguinManager::PlaceChildPenguin(EnChildPenguinType type, const Vector3& spawnPos)
+		{
+			CreateChildPenguin();
+			auto* child = m_childPenguinList.back();
+			child->SetLogId(m_nextLogId++);
+			child->SetChildPenguinType(type);
+			child->SetPosition(spawnPos);
+			child->GetStateMachine()->SetPosition(spawnPos);
+			child->StartWrapper();
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->RecordSpawn("penguin", child->GetLogId(), { {"type", child->GetChildPenguinTypeStr()} });
+			return child;
 		}
 
 
@@ -310,16 +343,25 @@ namespace app
 			const float groundY = GetGroundY(xzPos.x, xzPos.z);
 			const Vector3 spawnPos = Vector3(xzPos.x, groundY, xzPos.z);
 
-			/** 子ペンギンを生成してタイプと座標をセット */
-			CreateChildPenguin();
-			auto* child = m_childPenguinList.back();
-			child->SetLogId(m_nextLogId++);
-			child->SetChildPenguinType(type);
-			child->SetPosition(spawnPos);
-			child->GetStateMachine()->SetPosition(spawnPos);
-			child->StartWrapper();
-			if (auto* lm = GameLogManager::GetInstance())
-				lm->RecordSpawn("penguin", child->GetLogId(), { {"type", child->GetChildPenguinTypeStr()} });
+			PlaceChildPenguin(type, spawnPos);
+		}
+
+
+		void ChildPenguinManager::SpawnFromSky(float dropHeight)
+		{
+			/** ステージ設定と同じ比率であらかじめ構築済みの抽選器からタイプを選ぶ */
+			static std::mt19937 engine(std::random_device{}());
+			const EnChildPenguinType type = static_cast<EnChildPenguinType>(m_typeDist(engine));
+
+			/** ステージ全体からランダムなXZ座標を選び、地面より上空の高さから配置する */
+			const Vector3 xzPos = GenerateRandomSpawnPosition(m_spawnRadius);
+			const float groundY = GetGroundY(xzPos.x, xzPos.z);
+			const Vector3 spawnPos = Vector3(xzPos.x, groundY + dropHeight, xzPos.z);
+
+			PlaceChildPenguin(type, spawnPos);
+
+			/** ステージ上のペンギン総数を1匹分増やす */
+			ScoreManager::GetInstance().AddTotalCount();
 		}
 
 
@@ -370,7 +412,7 @@ namespace app
 
 		float ChildPenguinManager::GetGroundY(float x, float z)
 		{
-			const Vector3 rayStart = Vector3(x, SPAWN_RAY_START_Y, z);
+			const Vector3 rayStart = Vector3(x, m_groundRayStartY, z);
 			const Vector3 rayEnd = Vector3(x, -10.0f, z);
 
 			nsBeastEngine::nsCollision::RaycastHit hit;
@@ -440,6 +482,10 @@ namespace app
 
 				if (auto* lm = GameLogManager::GetInstance())
 					lm->QueueEvent({ {"ev", "penguin_join"}, {"penguin_id", penguin->GetLogId()} });
+
+				/** フィーバータイム中は捕獲した分だけ投下キューに追加し、連続して降り続けるようにする */
+				if (auto* feverManager = FeverTimeManager::GetInstance())
+					feverManager->OnPenguinCaught();
 			}
 			/** メンバーが増えたので次フレームで再ソート・再割り当てが走る */
 		}
@@ -913,7 +959,7 @@ namespace app
 						// シロクマのステートマシーンを取得。
 						EnemyStateMachine* sm = info->target->GetEnemyStateMachine();
 						
-						// 寝ている状態かつすでに帰巣中でなければデバフを発動!
+						// デバフを発動!
 						if (!sm->IsCoolDown() && !sm->IsReturnHome())
 						{
 							// デバフが発動したことをシロクマに通知。
@@ -939,7 +985,6 @@ namespace app
 					Vector3 bearPos = info->target->GetEnemyStateMachine()->GetPosition();
 					info->position = bearPos - info->modelRender.GetPosition();
 
-					// ベクトルの長さが0に限りなく近い場合は正規化しない。
 					if (info->position.LengthSq() > GHOST_DIR_NORMALIZE_SQ)
 					{
 						info->position.Normalize();

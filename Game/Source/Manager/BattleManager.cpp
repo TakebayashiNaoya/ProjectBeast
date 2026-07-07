@@ -15,6 +15,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Manager/FeverTimeManager.h"
 #include "Source/Nature/Whirlpool.h"
 #include "Source/Nature/WhirlpoolManager.h"
 
@@ -393,12 +394,16 @@ namespace app
 		const int total = ScoreManager::GetInstance().GetTotalCount();
 		const bool isTimeUp = TimeManager::GetInstance().IsTimeUp();
 
+		/** フィーバー中、まだ投下待ちの子ペンギンがいる間は総数がこれから増える予定なので、
+		 *  瞬間的に collected == total になっても全員救助扱いにしない */
+		const bool feverPending = FeverTimeManager::GetInstance()->HasPendingDrops();
+
 		/**
 		 *	[終了条件]
-		 *	1. 全員救助（救助数 == ステージ上の総数）
+		 *	1. 全員救助（救助数 == ステージ上の総数、ただしフィーバーの投下待ちが無い場合のみ）
 		 *	2. タイムアップ
 		 */
-		if (collected == total || isTimeUp)
+		if ((collected == total && !feverPending) || isTimeUp)
 		{
 			return EnBattleState::Finished;
 		}
