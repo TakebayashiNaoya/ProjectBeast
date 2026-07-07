@@ -20,6 +20,27 @@ namespace app
 		{}
 
 
+		PenguinStaminaGauge::PenguinStaminaGauge()
+			: m_maxValue(0.0f)
+			, m_currentValue(0.0f)
+			, m_decreaseSpeed(0.0f)
+			, m_recoverSpeed(0.0f)
+			, m_isLocked(false)
+		{}
+
+
+		void PenguinStaminaGauge::Initialize(float maxValue, float decreaseSpeed, float recoverSpeed)
+		{
+			m_maxValue = maxValue;
+			m_decreaseSpeed = decreaseSpeed;
+			m_recoverSpeed = recoverSpeed;
+
+			// 満タン・ロック解除の状態にする。
+			m_currentValue = maxValue;
+			m_isLocked = false;
+		}
+
+
 		void PenguinStaminaGauge::Update(bool isUsing, float deltaTime)
 		{
 			// 使用中、かつロックされていない場合はゲージを減少させる。

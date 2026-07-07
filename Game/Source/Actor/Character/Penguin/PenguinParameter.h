@@ -37,6 +37,16 @@ namespace app
 			float slideSpeed;
 			/** ジャンプパワー */
 			float jumpPower;
+			/** ジャンプのスタミナ最大値 */
+			float jumpStaminaMax;
+			/** ジャンプのスタミナ回復速度(1秒あたり) */
+			float jumpStaminaRecoverSpeed;
+			/** スライドのスタミナ最大値 */
+			float slideStaminaMax;
+			/** スライドのスタミナ減少速度(1秒あたり) */
+			float slideStaminaDecreaseSpeed;
+			/** スライドのスタミナ回復速度(1秒あたり) */
+			float slideStaminaRecoverSpeed;
 		};
 	}
 }

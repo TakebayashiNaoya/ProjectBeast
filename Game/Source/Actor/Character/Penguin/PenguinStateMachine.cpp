@@ -53,10 +53,34 @@ namespace app
 
 		void PenguinStateMachine::UpdateStaminaGauges()
 		{
+			// まだ初期化できていなければここで試みる（Statusの値が揃うまで毎フレーム再試行される）
+			if (!m_isStaminaGaugeSetup)
+			{
+				SetupStaminaGauges();
+			}
+
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			m_slideStaminaGauge.Update(m_isSlide, deltaTime);
-			m_jumpStaminaGauge.Update(false, deltaTime); // ジャンプは回復のみ。減少はConsumeJumpStamina()で行う
+			m_jumpStaminaGauge.Update(false, deltaTime);
+		}
+
+
+		void PenguinStateMachine::SetupStaminaGauges()
+		{
+			// すでに初期化済みなら何もしない（Statusのホットリロードで何度呼ばれても安全にする）
+			if (m_isStaminaGaugeSetup) return;
+
+			const PenguinStatus* status = GetPenguinStatus();
+			if (!status) return;
+
+			// Statusのセットアップがまだ済んでいない場合、最大値が0のままなので次のフレームに再試行する。
+			if (status->GetJumpStaminaMax() <= 0.0f && status->GetSlideStaminaMax() <= 0.0f) return;
+
+			m_jumpStaminaGauge.Initialize(status->GetJumpStaminaMax(), 0.0f, status->GetJumpStaminaRecoverSpeed());
+			m_slideStaminaGauge.Initialize(status->GetSlideStaminaMax(), status->GetSlideStaminaDecreaseSpeed(), status->GetSlideStaminaRecoverSpeed());
+
+			m_isStaminaGaugeSetup = true;
 		}
 
 

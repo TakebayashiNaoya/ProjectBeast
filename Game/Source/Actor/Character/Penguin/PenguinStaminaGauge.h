@@ -12,13 +12,6 @@ namespace app
 	{
 		/**
 		 * @brief スタミナ(オーバーヒート式)ゲージクラス
-		 * @details
-		 *  ・使用中はゲージが減少し、未使用中は回復する。
-		 *  ・ゲージが0まで枯渇すると「ロック状態」になり、
-		 *    最大値まで回復しきるまで再使用不可になる。
-		 *  ・0になる前に使用をやめた場合はロックされず、
-		 *    その時点の値から通常通り回復・再使用が可能。
-		 *  （APEXのLスターのオーバーヒートと同様の挙動）
 		 */
 		class PenguinStaminaGauge
 		{
@@ -30,7 +23,19 @@ namespace app
 			 * @param recoverSpeed 未使用中の回復速度（1秒あたり）
 			 */
 			PenguinStaminaGauge(float maxValue, float decreaseSpeed, float recoverSpeed);
+			/**
+			 * @brief デフォルトコンストラクタ
+			 */
+			PenguinStaminaGauge();
 			~PenguinStaminaGauge() = default;
+
+			/**
+			 * @brief パラメータを設定し、満タン・ロック解除の状態にする
+			 * @param maxValue ゲージの最大値
+			 * @param decreaseSpeed 使用中の減少速度（1秒あたり）
+			 * @param recoverSpeed 未使用中の回復速度（1秒あたり）
+			 */
+			void Initialize(float maxValue, float decreaseSpeed, float recoverSpeed);
 
 			/**
 			 * @brief 毎フレーム呼び出す更新処理
@@ -41,7 +46,6 @@ namespace app
 
 			/**
 			 * @brief ゲージを即座に全消費する（ジャンプのような単発消費のアクション用）
-			 * @note すでにロック中の場合は何もしない
 			 */
 			void ConsumeAll();
 

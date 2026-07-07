@@ -165,6 +165,10 @@ namespace app
 			 */
 			void UpdateStaminaGauges();
 			/**
+			 * @brief ジャンプ・スライドのスタミナゲージをPenguinStatusの値で初期化する
+			 */
+			void SetupStaminaGauges();
+			/**
 			 * @brief ダメージ処理
 			 */
 			virtual void Damage();
@@ -281,6 +285,8 @@ namespace app
 			PenguinStaminaGauge m_jumpStaminaGauge;
 			/** スライドのスタミナ(オーバーヒート式)ゲージ */
 			PenguinStaminaGauge m_slideStaminaGauge;
+			/** スタミナゲージの初期化が完了したかどうか */
+			bool m_isStaminaGaugeSetup = false;
 		};
 	}
 }
