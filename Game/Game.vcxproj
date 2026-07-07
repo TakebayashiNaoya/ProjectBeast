@@ -293,6 +293,7 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinParameter.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\Stage\IStage.cpp" />
@@ -347,7 +348,10 @@
     <ClCompile Include="Source\UI\DangerArrow\DangerArrowSystem.cpp" />
     <ClCompile Include="Source\UI\Fever\FeverIconMenu.cpp" />
     <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp" />
+    <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.cpp" />
+    <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeStatus.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp" />
+    <ClCompile Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.cpp" />
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Layout.cpp" />
     <ClCompile Include="Source\UI\Menu.cpp" />
@@ -463,6 +467,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinEffectStatus.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinIState.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinParameter.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
@@ -534,8 +539,10 @@
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowMenu.h" />
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h" />
     <ClInclude Include="Source\UI\Fever\FeverIconMenu.h" />
-    <ClInclude Include="Source\UI\FormationWheel\FormationWheelMenu.h" />
+    <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.h" />
+    <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeStatus.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />
+    <ClInclude Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.h" />
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h" />
     <ClInclude Include="Source\UI\Layout.h" />
     <ClInclude Include="Source\UI\Menu.h" />
@@ -610,4 +617,3 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
-

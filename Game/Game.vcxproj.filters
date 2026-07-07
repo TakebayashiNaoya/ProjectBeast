@@ -610,6 +610,18 @@
     <ClCompile Include="Source\UI\Modules\FrontChecker\FrontChecker.cpp">
       <Filter>Source\UI\Modules\FrontChecker</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.cpp">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.cpp">
+      <Filter>Source\UI\InGameButton</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeStatus.cpp">
+      <Filter>Source\UI\InGameButton</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.cpp">
+      <Filter>Source\UI\InGameButton</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -972,9 +984,6 @@
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
       <Filter>Source\UI\WpWarning</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\FormationWheel\FormationWheelMenu.h">
-      <Filter>Source\UI\FormationWheel</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h">
       <Filter>Source\UI\InGameButton</Filter>
     </ClInclude>
@@ -1155,6 +1164,18 @@
     <ClInclude Include="Source\UI\CPReaction\CPReactionTypes.h">
       <Filter>Source\UI\CPReaction</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.h">
+      <Filter>Source\UI\InGameButton</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeStatus.h">
+      <Filter>Source\UI\InGameButton</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.h">
+      <Filter>Source\UI\InGameButton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguinController.h">
@@ -1177,5 +1198,3 @@
     </ClInclude>
   </ItemGroup>
 </Project>
-
-

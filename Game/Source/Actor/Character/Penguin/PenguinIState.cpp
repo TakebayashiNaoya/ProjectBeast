@@ -10,9 +10,9 @@
 #include "PenguinIState.h"
 #include "PenguinStateMachine.h"
 #include "PenguinStatus.h"
+#include "Source/Achivement/AchievementManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Achivement/AchievementManager.h"
 #include "Source/Effect/EffectManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Sound/SoundManager.h"
@@ -224,6 +224,8 @@ namespace app
 			{
 				m_owner->SetJumpPower(jumpPower);
 				m_owner->Jump();
+
+				m_owner->ConsumeJumpStamina();
 			}
 
 			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);

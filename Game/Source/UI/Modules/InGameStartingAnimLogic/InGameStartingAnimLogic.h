@@ -38,7 +38,8 @@ namespace app
 				const std::vector<std::string> digitNames,
 				const Vector3 startOffset,
 				float duration = 1.0f,
-				const std::vector<std::string> textNames = {}
+				const std::vector<std::string> textNames = {},
+				const std::vector<std::string> gaugeNames = {}
 			);
 
 			/**
@@ -65,6 +66,8 @@ namespace app
 			std::vector<std::string> m_digitNames;
 			/** テキストUIの名前 */
 			std::vector<std::string> m_textNames;
+			/** サークルゲージUIの名前 */
+			std::vector<std::string> m_gaugeNames;
 			/** UIパーツのリスト */
 			std::vector<UIBase*> m_uiParts;
 			/** メニュークラスのポインタ */
