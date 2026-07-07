@@ -60,6 +60,7 @@ namespace app
 
 		/** それまでの捕獲数によらず、固定数を投下キューの初期数にする */
 		m_pendingDropCount = m_feverDropCount;
+		m_totalQueuedCount = m_feverDropCount;
 	}
 
 
@@ -68,7 +69,11 @@ namespace app
 		/** フィーバー中でなければ何もしない（通常時の捕獲では補充しない） */
 		if (!m_isActive) return;
 
+		/** 今回のフィーバーで投下する総数がfeverDropCountを超える場合は補充しない */
+		if (m_totalQueuedCount >= m_feverDropCount) return;
+
 		/** 捕獲された分だけ投下キューに追加し、連続して降り続けるようにする */
 		m_pendingDropCount++;
+		m_totalQueuedCount++;
 	}
 }

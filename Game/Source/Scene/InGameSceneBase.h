@@ -37,6 +37,7 @@ namespace app
 		int clumsy = 0;   // おっちょこちょい
 		int caring = 0;   // 世話焼き
 		float spawnRadius = 3000.0f; // 生成半径
+		float groundRayStartY = 3000.0f; // 地面の高さを調べるレイの発射高度（このステージの地形最大高さを安全に超える値）
 	};
 
 

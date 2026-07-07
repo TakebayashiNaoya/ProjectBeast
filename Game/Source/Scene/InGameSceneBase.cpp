@@ -28,6 +28,7 @@
 
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/FeverTimeManager.h"
+#include "Source/UI/Fever/FeverIconMenu.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
 #include "Source/Manager/ScoreManager.h"
@@ -218,15 +219,19 @@ namespace app
 				cfg.naughty,
 				cfg.clumsy,
 				cfg.caring,
-				cfg.spawnRadius
+				cfg.spawnRadius,
+				cfg.groundRayStartY
 			);
 
+			/** フィーバーで降ってくる分のミニマップアイコン枠をあらかじめ確保する
+			 *  （SpawnFromSkyは初期数が0のタイプを選ばないため、0のタイプには足さない） */
+			const int feverExtra = FeverTimeManager::GetInstance()->GetFeverDropCount();
 			auto* ui = InGameUIManager::GetInstance();
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Serious, cfg.serious);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clingy, cfg.clingy);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Naughty, cfg.naughty);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clumsy, cfg.clumsy);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Caring, cfg.caring);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Serious, cfg.serious > 0 ? cfg.serious + feverExtra : 0);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clingy, cfg.clingy > 0 ? cfg.clingy + feverExtra : 0);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Naughty, cfg.naughty > 0 ? cfg.naughty + feverExtra : 0);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clumsy, cfg.clumsy > 0 ? cfg.clumsy + feverExtra : 0);
+			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Caring, cfg.caring > 0 ? cfg.caring + feverExtra : 0);
 
 			auto* manager = actor::ChildPenguinManager::GetInstance();
 			manager->SetDaddyPenguin(m_daddyPenguin);
@@ -463,6 +468,13 @@ namespace app
 
 				/** FINISH演出（3秒）に合わせてBGMを徐々にフェードアウトする */
 				SoundManager::Get().FadeOutBGM(3.0f);
+
+				/** フィーバー演出中にラウンドが終わった場合、途中の状態で固まらないよう強制的に消す
+				 *  （Finishingフェーズに入るとUpdatePlaying経由のUpdate()が呼ばれなくなるため） */
+				if (auto* feverIconMenu = uiMngr->GetFeverIconMenu())
+				{
+					feverIconMenu->ForceHide();
+				}
 
 				/** FINISH 演出開始 */
 				auto* finishMenu = uiMngr->GetFinishMenu();

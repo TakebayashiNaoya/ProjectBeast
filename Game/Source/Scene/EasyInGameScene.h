@@ -31,7 +31,7 @@ namespace app
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 50, 50, 0, 0, 0, 3500.0f };
+			return { 50, 50, 0, 0, 0, 3500.0f, 1000.0f };
 		}
 
 		const char* GetStageJsonPath() const override

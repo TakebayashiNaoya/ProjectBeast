@@ -4,6 +4,7 @@
  * @author 立山、竹林
  */
 #pragma once
+#include <random>
 #include <unordered_set>
 #include "ChildPenguinTypes.h"
 #include "Source/Util/Curve.h"
@@ -55,6 +56,7 @@ namespace app
 			 * @param clumsyNum   おっちょこちょいタイプの生成数
 			 * @param caringNum   世話焼きタイプの生成数
 			 * @param spawnRadius スポーン範囲の半径
+			 * @param groundRayStartY 地面の高さを調べるレイの発射高度（ステージの地形最大高さを安全に超える値）
 			 */
 			void CreateChildPenguins(
 				int seriousNum,
@@ -62,7 +64,8 @@ namespace app
 				int naughtyNum,
 				int clumsyNum,
 				int caringNum,
-				float spawnRadius
+				float spawnRadius,
+				float groundRayStartY
 			);
 
 			/**
@@ -136,6 +139,14 @@ namespace app
 			 */
 			void CreateChildPenguin();
 
+			/**
+			 * @brief 子ペンギンを1体生成し、タイプ・座標をセットして開始する（SpawnOne/SpawnFromSky共通処理）
+			 * @param type     生成するタイプ
+			 * @param spawnPos 配置する座標
+			 * @return 生成した子ペンギンのポインタ
+			 */
+			ChildPenguin* PlaceChildPenguin(EnChildPenguinType type, const Vector3& spawnPos);
+
 
 		private:
 			/** 子ペンギンのリスト */
@@ -145,8 +156,12 @@ namespace app
 
 			/** ステージの生成半径（CreateChildPenguinsでキャッシュ、フィーバー時のランダム配置に再利用） */
 			float m_spawnRadius = 3000.0f;
+			/** 地面の高さを調べるレイの発射高度（CreateChildPenguinsでキャッシュ、ステージごとの地形最大高さに合わせる） */
+			float m_groundRayStartY = 3000.0f;
 			/** タイプ別の初期スポーン数（CreateChildPenguinsでキャッシュ、フィーバー時の比率抽選に再利用） */
 			int m_seriousNum = 0, m_clingyNum = 0, m_naughtyNum = 0, m_clumsyNum = 0, m_caringNum = 0;
+			/** タイプ別の初期スポーン比率で重み付けした抽選器（CreateChildPenguinsで一度だけ構築し、フィーバー時のタイプ抽選に再利用） */
+			std::discrete_distribution<int> m_typeDist;
 
 
 
