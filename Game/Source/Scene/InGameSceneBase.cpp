@@ -28,11 +28,11 @@
 
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/FeverTimeManager.h"
-#include "Source/UI/Fever/FeverIconMenu.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
 #include "Source/Manager/ScoreManager.h"
 #include "Source/Manager/TimeManager.h"
+#include "Source/UI/Fever/FeverIconMenu.h"
 
 #include "Source/Achivement/AchievementManager.h"
 
@@ -497,7 +497,7 @@ namespace app
 			/** ホイッスルは演出開始時に1回だけ鳴らす */
 			if (!m_isWhistlePlayed)
 			{
-				SoundManager::Get().PlaySE(enSoundKind_Whistle, false);
+				SoundManager::Get().PlaySE(enSoundKind_Whistle, 1.0f, false);
 				m_isWhistlePlayed = true;
 			}
 

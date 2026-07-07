@@ -182,7 +182,7 @@ namespace app
 					if (m_checkRevealTimer >= threshold)
 					{
 						m_checkIconList[m_checkRevealIndex]->SetIsDraw(true);
-						SoundManager::Get().PlaySE(enSoundKind_Stamp);
+						SoundManager::Get().PlaySE(enSoundKind_Stamp, 1.0f);
 
 						// アチーブの横に「+2000」をポップアップさせる
 						if (m_checkRevealIndex < static_cast<int>(m_scorePopups.size()))
@@ -202,7 +202,7 @@ namespace app
 						m_postCheckTimer = 0.0f;
 
 						// ここからトータルスコアのカウントアップ開始のためドラムロールを鳴らす
-						m_drumRollHandle = SoundManager::Get().PlaySE(enSoundKind_DrumRoll, false);
+						m_drumRollHandle = SoundManager::Get().PlaySE(enSoundKind_DrumRoll, 1.0f, false);
 
 						auto* totalValue = GetUI<UIText>(Hash32("TotalValue"));
 						if (totalValue)
