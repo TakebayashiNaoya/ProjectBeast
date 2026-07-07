@@ -40,6 +40,9 @@ namespace app
 			/** ウルト発動可否に応じてLT/RTアイコンの色を切り替える */
 			void UpdateUltIconColor();
 
+			/** 陣形レベルと次のレベルアップまでの隊員数ゲージの表示を更新する */
+			void UpdateLevelDisplay();
+
 			/**
 			 * @brief 陣形切り替え開始時に、各陣形種別の遷移前スロット位置を確定する
 			 * @param oldType 切り替え前の陣形種別

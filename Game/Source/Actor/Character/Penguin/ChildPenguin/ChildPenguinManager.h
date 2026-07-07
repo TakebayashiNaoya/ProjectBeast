@@ -307,6 +307,19 @@ namespace app
 			int GetFormationLevel() const { return m_formationController.GetFormationLevel(); }
 
 			/**
+			 * @brief 次のレベルアップに必要なフォロワー数を取得する
+			 * @details レベルが上がるほど必要人数も増える（Lv1→2は9人、Lv2→3は18人...）
+			 * @return 次のレベルアップに必要なフォロワー数
+			 */
+			int GetFormationNextLevelRequirement() const { return m_formationController.GetCurrentRingRequirement(); }
+
+			/**
+			 * @brief 現在のレベル内で集めたフォロワー数を取得する
+			 * @return レベル内の進行フォロワー数（0 〜 GetFormationNextLevelRequirement()-1）
+			 */
+			int GetFormationLevelProgress() const { return m_formationController.GetCurrentRingProgress(); }
+
+			/**
 			 * @brief 陣形の最外半径を取得する（CalculatePositions後に有効）
 			 * @return 最外半径
 			 */

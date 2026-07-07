@@ -6,8 +6,8 @@
                 "name":"BackgroundIcon",
                 "asset":"Assets/spriteData/UI/Icon/Formation/back.DDS",
                 "width":350,
-                "height":140,
-                "position":[630,-60,0],
+                "height":200,
+                "position":[630,-30,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[0,0,0,150]
@@ -104,7 +104,7 @@
                 "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_lt.DDS",
                 "width":50,
                 "height":50,
-                "position":[590,-20,0],
+                "position":[560,-20,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[102,102,102,255]
@@ -115,10 +115,61 @@
                 "asset":"Assets/spriteData/UI/Icon/ButtonIcon/xbox_rt.DDS",
                 "width":50,
                 "height":50,
-                "position":[670,-20,0],
+                "position":[700,-20,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[102,102,102,255]
+            },
+
+
+            {
+                "type":"UIText",
+                "name":"LevelText",
+                "text":"Lv1",
+                "fontSize":0.8,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[630,-20,0],
+                "rotation":0,
+                "color":[255,255,255,255],
+                "pivot":[0.5,0.5]
+            },
+
+
+            {
+                "type":"UIIcon",
+                "name":"MemberGaugeBg",
+                "asset":"Assets/spriteData/UI/white.DDS",
+                "width":150,
+                "height":20,
+                "position":[630,40,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[0,0,0,180]
+            },
+            {
+                "type":"UIGauge",
+                "name":"MemberGaugeFill",
+                "asset":"Assets/spriteData/UI/white.DDS",
+                "width":140,
+                "height":14,
+                "position":[560,40,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,210,60,255],
+                "pivot":[0.0,0.5]
+            },
+            {
+                "type":"UIText",
+                "name":"MemberGaugeText",
+                "text":"0/9",
+                "fontSize":0.6,
+                "fontScaleX":1.0,
+                "fontScaleY":1.0,
+                "position":[630,15,0],
+                "rotation":0,
+                "color":[255,255,255,255],
+                "pivot":[0.5,0.5]
             }
         ]
     }

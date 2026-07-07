@@ -47,7 +47,8 @@ namespace app
 					{
 						"BackgroundIcon",
 						"CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon",
-						"LBButtonIcon", "RBButtonIcon", "LTButtonIcon", "RTButtonIcon"
+						"LBButtonIcon", "RBButtonIcon", "LTButtonIcon", "RTButtonIcon",
+						"LevelText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
 					Vector3(300.0f, 0.0f, 0.0f)
@@ -65,6 +66,7 @@ namespace app
 #endif
 			UpdateFormationIcons();
 			UpdateUltIconColor();
+			UpdateLevelDisplay();
 			MenuBase::Update();
 		}
 
@@ -208,6 +210,34 @@ namespace app
 					ui->m_color = color;
 					ui->m_transform.m_localTransform.m_scale = Vector3(pulseScale, pulseScale, pulseScale);
 				}
+			}
+		}
+
+
+		void FormationWheelMenu::UpdateLevelDisplay()
+		{
+			auto* cpm = actor::ChildPenguinManager::GetInstance();
+			if (cpm == nullptr) return;
+
+			// レベルは内部では0始まりだが、UIでは1始まりの表示にする
+			const int level = cpm->GetFormationLevel() + 1;
+			const int progress = cpm->GetFormationLevelProgress();
+			const int required = cpm->GetFormationNextLevelRequirement();
+
+			if (auto* levelText = GetUI<UIText>(Hash32("LevelText")))
+			{
+				levelText->SetText("Lv" + std::to_string(level));
+			}
+
+			if (auto* gauge = GetUI<UIGauge>(Hash32("MemberGaugeFill")))
+			{
+				const float fillRate = (required > 0) ? static_cast<float>(progress) / static_cast<float>(required) : 0.0f;
+				gauge->m_transform.m_localTransform.m_scale.x = fillRate;
+			}
+
+			if (auto* memberText = GetUI<UIText>(Hash32("MemberGaugeText")))
+			{
+				memberText->SetText(std::to_string(progress) + "/" + std::to_string(required));
 			}
 		}
 
