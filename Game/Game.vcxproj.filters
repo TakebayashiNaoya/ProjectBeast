@@ -622,6 +622,9 @@
     <ClCompile Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.cpp">
       <Filter>Source\UI\InGameButton</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Util\RandomDevice.cpp">
+      <Filter>Source\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -1175,6 +1178,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.h">
       <Filter>Source\UI\InGameButton</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Util\RandomDevice.h">
+      <Filter>Source\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

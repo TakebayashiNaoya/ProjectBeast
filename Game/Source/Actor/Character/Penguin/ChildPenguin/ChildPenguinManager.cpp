@@ -13,6 +13,8 @@
 #if defined(_DEBUG) || defined(K2_DEBUG)
 #include "Source/Actor/Character/Penguin/Formation/FormationDebugMonitor.h"
 #endif
+#include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -171,7 +173,7 @@ namespace app
 			m_rangeVisualizer.SetVisible(true);
 			if (m_daddyPenguin != nullptr)
 			{
-				const Vector3 center   = m_daddyPenguin->GetTransform().m_position;
+				const Vector3 center = m_daddyPenguin->GetTransform().m_position;
 				const float joinRadius = m_formationController.GetJoinRadius();
 				/** 次レベルの空きスロットを計算（CalculateNextLevelPositions内でm_outerRadiusが一時変化するため先に読んでおく） */
 				CalculateNextLevelSlots(center);
@@ -266,10 +268,10 @@ namespace app
 
 			// リストに指定された数だけタイプを追加していく
 			for (int i = 0; i < seriousNum; i++) spawnPool.push_back(EnChildPenguinType::Serious);
-			for (int i = 0; i < clingyNum;  i++) spawnPool.push_back(EnChildPenguinType::Clingy);
+			for (int i = 0; i < clingyNum; i++) spawnPool.push_back(EnChildPenguinType::Clingy);
 			for (int i = 0; i < naughtyNum; i++) spawnPool.push_back(EnChildPenguinType::Naughty);
-			for (int i = 0; i < clumsyNum;  i++) spawnPool.push_back(EnChildPenguinType::Clumsy);
-			for (int i = 0; i < caringNum;  i++) spawnPool.push_back(EnChildPenguinType::Caring);
+			for (int i = 0; i < clumsyNum; i++) spawnPool.push_back(EnChildPenguinType::Clumsy);
+			for (int i = 0; i < caringNum; i++) spawnPool.push_back(EnChildPenguinType::Caring);
 
 			// ==========================================
 			// リストの中身をランダムにシャッフルする
@@ -367,14 +369,11 @@ namespace app
 
 		Vector3 ChildPenguinManager::GenerateRandomSpawnPosition(float radius)
 		{
-			static std::mt19937 engine(std::random_device{}());
-			std::uniform_real_distribution<float> dist(-radius, radius);
-
 			/** 拒絶サンプリング：円の外側に落ちた点を棄却して再抽選する */
 			for (int i = 0; i < SPAWN_MAX_RETRY; i++)
 			{
-				const float x = dist(engine);
-				const float z = dist(engine);
+				const float x = util::RandomDevice::Random(-radius, radius);;
+				const float z = util::RandomDevice::Random(-radius, radius);
 
 				if ((x * x + z * z) <= (radius * radius))
 				{
@@ -389,13 +388,10 @@ namespace app
 
 		Vector3 ChildPenguinManager::GenerateClusterMemberPosition(const Vector3& center, float clusterRadius)
 		{
-			static std::mt19937 engine(std::random_device{}());
-			std::uniform_real_distribution<float> dist(-clusterRadius, clusterRadius);
-
 			for (int i = 0; i < SPAWN_MAX_RETRY; i++)
 			{
-				const float x = dist(engine);
-				const float z = dist(engine);
+				const float x = util::RandomDevice::Random(-clusterRadius, clusterRadius);
+				const float z = util::RandomDevice::Random(-clusterRadius, clusterRadius);
 
 				// 群れの半径の円内に収まっているかチェック
 				if ((x * x + z * z) <= (clusterRadius * clusterRadius))
@@ -547,7 +543,7 @@ namespace app
 
 		void ChildPenguinManager::CalculateFormationPositions()
 		{
-			const Vector3 center  = m_daddyPenguin->GetTransform().m_position;
+			const Vector3 center = m_daddyPenguin->GetTransform().m_position;
 
 			/** 親の向きから前方ベクトルを取得 */
 			Vector3 forward = Vector3::Front;
@@ -945,7 +941,7 @@ namespace app
 
 					continue;
 				}
-				
+
 				// これ以降はアニメーション終了時の処理。
 				info->timer += deltaTime;
 
@@ -991,7 +987,7 @@ namespace app
 					}
 				}
 				// 時間経過でデバフ終了。
-				else 
+				else
 				{
 					info->isDebuffActive = false;
 				}

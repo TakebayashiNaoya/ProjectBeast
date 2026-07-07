@@ -24,6 +24,9 @@ enum class EnEffectKind : uint8_t
 	CaringPenguinSweat,
 	NaughtyPenguinLively,
 	ToEnemyDebuff,
+	BarrierBegin,
+	BarrierEnd,
+	BarrierLoop,
 	Max,
 	None = Max,
 };
@@ -58,5 +61,8 @@ static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Ma
 	EffectInformation(u"Assets/effect/childPenguin/childPenguinClingyHart.efk", 200.0f),
 	EffectInformation(u"Assets/effect/childPenguin/childPenguinCaringSweat.efk", 100.0f),
 	EffectInformation(u"Assets/effect/childPenguin/childPenguinNaugtyLively.efk", 100.0f),
-	EffectInformation(u"Assets/effect/enemy/Gloomy.efk",100.0f)
+	EffectInformation(u"Assets/effect/enemy/Gloomy.efk",100.0f),
+	EffectInformation(u"Assets/effect/barrier/barrierBegin.efk", 100.0f),
+	EffectInformation(u"Assets/effect/barrier/barrierEnd.efk", 100.0f),
+	EffectInformation(u"Assets/effect/barrier/barrierLoop.efk", 100.0f)
 };

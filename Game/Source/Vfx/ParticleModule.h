@@ -6,9 +6,8 @@
 #pragma once
 #include "Particle.h"
 #include "ParticleValueProvider.h"
-#include <vector>
-#include <random>
 #include <string>
+#include <vector>
 
 
 namespace
@@ -87,7 +86,7 @@ namespace app
 		 * @param p 生成されたパーティクル
 		 * @param rng 乱数生成器(シード値)
 		 */
-		virtual void OnParticleSpawn(Particle& p, std::mt19937& rng) {}
+		virtual void OnParticleSpawn(Particle& p) {}
 
 		/**
 		 * @brief マイフレーム呼ばれる(パーティクルが生存している限り毎フレーム呼ばれる)
@@ -95,7 +94,7 @@ namespace app
 		 * @param deltaTime 前フレームからの経過時間(秒)
 		 * @param emitterPos エミッターの位置
 		 */
-		virtual void OnParticleUpdate(Particle& p, float deltaTime,const Vector3& emitterPos) {}
+		virtual void OnParticleUpdate(Particle& p, float deltaTime, const Vector3& emitterPos) {}
 	};
 
 
@@ -209,7 +208,7 @@ namespace app
 
 
 	/***********************************************/
-	
+
 
 	/**
 	 * @brief 寿命初期化
@@ -238,9 +237,9 @@ namespace app
 		 * @param p 生成されたパーティクル
 		 * @param rng 乱数生成器(シード値)
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			p.lifeTime = m_lifeTime.ResolveInitial(rng);
+			p.lifeTime = m_lifeTime.ResolveInitial();
 			p.age = 0.0f;
 		}
 	};
@@ -273,9 +272,9 @@ namespace app
 		 * @param p 生成されたパーティクル
 		 * @param rng 乱数生成器(シード値)
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			p.position = m_position.ResolveInitial(rng);
+			p.position = m_position.ResolveInitial();
 		}
 	};
 
@@ -310,9 +309,9 @@ namespace app
 		 * @param p 生成されたパーティクル
 		 * @param rng 乱数生成器(シード値)
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			p.velocity = m_velocity.ResolveInitial(rng);
+			p.velocity = m_velocity.ResolveInitial();
 		}
 	};
 
@@ -347,9 +346,9 @@ namespace app
 		 * @param p 生成されたパーティクル
 		 * @param rng 乱数生成器(シード値)
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			p.scaleValue = m_scale.ResolveInitial(rng);
+			p.scaleValue = m_scale.ResolveInitial();
 		}
 	};
 
@@ -393,10 +392,10 @@ namespace app
 		 * @param p 生成されたパーティクル
 		 * @param rng 乱数生成器(シード値)
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			p.rotationAngle = m_angle.ResolveInitial(rng);
-			p.angularVelocity = m_angularVelocity.ResolveInitial(rng);
+			p.rotationAngle = m_angle.ResolveInitial();
+			p.angularVelocity = m_angularVelocity.ResolveInitial();
 		}
 	};
 
@@ -442,12 +441,12 @@ namespace app
 		 * @param p 生成されたパーティクル
 		 * @param rng 乱数生成器(シード値)
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			p.color.x = m_r.ResolveInitial(rng);
-			p.color.y = m_g.ResolveInitial(rng);
-			p.color.z = m_b.ResolveInitial(rng);
-			p.color.w = m_a.ResolveInitial(rng);
+			p.color.x = m_r.ResolveInitial();
+			p.color.y = m_g.ResolveInitial();
+			p.color.z = m_b.ResolveInitial();
+			p.color.w = m_a.ResolveInitial();
 		}
 	};
 
@@ -527,23 +526,23 @@ namespace app
 		 * @param p 更新するパーティクル
 		 * @param rng 乱数生成器
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
 			float sx, ex, sy, ey;
 
 			if (m_uniform)
 			{
-				sx = m_startScaleX.ResolveInitial(rng);
-				ex = m_endScaleX.ResolveInitial(rng);
+				sx = m_startScaleX.ResolveInitial();
+				ex = m_endScaleX.ResolveInitial();
 				sy = sx;
 				ey = ex;
 			}
 			else
 			{
-				sx = m_startScaleX.ResolveInitial(rng);
-				ex = m_endScaleX.ResolveInitial(rng);;
-				sy = m_startScaleY.ResolveInitial(rng);
-				ey = m_endScaleY.ResolveInitial(rng);
+				sx = m_startScaleX.ResolveInitial();
+				ex = m_endScaleX.ResolveInitial();
+				sy = m_startScaleY.ResolveInitial();
+				ey = m_endScaleY.ResolveInitial();
 			}
 
 			/**
@@ -623,10 +622,10 @@ namespace app
 		 * @param p 更新するパーティクル
 		 * @param rng 乱数生成器
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			float s = m_startAngle.ResolveInitial(rng);
-			float e = m_endAngle.ResolveInitial(rng);
+			float s = m_startAngle.ResolveInitial();
+			float e = m_endAngle.ResolveInitial();
 			p.rotationCurve.Initialize(s, e, p.lifeTime, m_easingType, util::LoopMode::Once);
 			p.rotationCurve.Play();
 			p.hasRotationCurve = true;
@@ -691,10 +690,10 @@ namespace app
 		 * @param p 更新するパーティクル
 		 * @param rng 乱数生成器
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			float s = m_startAlpha.ResolveInitial(rng);
-			float e = m_endAlpha.ResolveInitial(rng);
+			float s = m_startAlpha.ResolveInitial();
+			float e = m_endAlpha.ResolveInitial();
 			p.alphaCurve.Initialize(s, e, p.lifeTime, m_easingType, util::LoopMode::Once);
 			p.alphaCurve.Play();
 			p.hasAlphaCurve = true;
@@ -760,10 +759,10 @@ namespace app
 		 * @param p 更新するパーティクル
 		 * @param rng 乱数生成器
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			float s = m_startMultiplier.ResolveInitial(rng);
-			float e = m_endMultiplier.ResolveInitial(rng);
+			float s = m_startMultiplier.ResolveInitial();
+			float e = m_endMultiplier.ResolveInitial();
 			p.speedCurveX.Initialize(s, e, p.lifeTime, m_easingType, util::LoopMode::Once);
 			p.speedCurveY.Initialize(s, e, p.lifeTime, m_easingType, util::LoopMode::Once);
 			p.speedCurveX.Play();
@@ -932,10 +931,10 @@ namespace app
 		 * @param p 更新するパーティクル
 		 * @param rng 乱数生成器
 		 */
-		void OnParticleSpawn(Particle& p, std::mt19937& rng) override
+		void OnParticleSpawn(Particle& p) override
 		{
-			float s = m_startRatio.ResolveInitial(rng);
-			float e = m_endRatio.ResolveInitial(rng);
+			float s = m_startRatio.ResolveInitial();
+			float e = m_endRatio.ResolveInitial();
 			// 初期化。
 			p.convergenceCurve.Initialize(s, e, p.lifeTime, m_easingType, util::LoopMode::Once);
 			p.convergenceCurve.Play();

@@ -26,9 +26,9 @@
 #include "Source/Manager/IglooManager.h"
 #include "Source/Nature/Whirlpool.h"
 #include "Source/Nature/WhirlpoolManager.h"
+#include "Source/Util/RandomDevice.h"
 #include "Source/UI/CPReaction/CPReactionTypes.h"
 #include <algorithm>
-#include <random>
 
 
 namespace app
@@ -118,23 +118,13 @@ namespace app
 
 
 			/**
-			 * @brief 乱数エンジン（起動時に一度だけシード初期化）
-			 */
-			std::mt19937& GetRandomEngine()
-			{
-				static std::mt19937 engine(std::random_device{}());
-				return engine;
-			}
-
-			/**
 			 * @brief 範囲 [r.min, r.max] から一様乱数を生成する
 			 * @param r 範囲
 			 * @return 生成された乱数値
 			 */
 			float RollRange(const MasterChildPenguinTypeParameter::Range& r)
 			{
-				std::uniform_real_distribution<float> dist(r.min, r.max);
-				return dist(GetRandomEngine());
+				return util::RandomDevice::Random(r.min, r.max);
 			}
 
 			/**
@@ -143,8 +133,7 @@ namespace app
 			 */
 			float RollUnit()
 			{
-				std::uniform_real_distribution<float> dist(0.0f, 1.0f);
-				return dist(GetRandomEngine());
+				return util::RandomDevice::Random(0.0f, 1.0f);
 			}
 
 			/**
@@ -408,15 +397,14 @@ namespace app
 				constexpr float IGLOO_INSIDE_CIRCLE = 360.0f;
 				constexpr float IGLOO_INSIDE_RADIUS = 60.0f; // かまくらの中に収まる半径
 
-				// 一列に並ぶのを防ぐため、浮動小数点で円形にばらけさせる
-				auto& engine = GetRandomEngine();
-				std::uniform_real_distribution<float> angleDist(0.0f, IGLOO_INSIDE_CIRCLE);
-				std::uniform_real_distribution<float> radiusDist(0.0f, IGLOO_INSIDE_RADIUS);
+
+				const float angle = util::RandomDevice::Random(0.0f, IGLOO_INSIDE_CIRCLE);
+				const float radius = util::RandomDevice::Random(0.0f, IGLOO_INSIDE_RADIUS);
 
 				constexpr float IGLOO_INSIDE_HALF_CIRCLE = 180.0f;
 
-				float angleRad = angleDist(engine) * (Math::PI / IGLOO_INSIDE_HALF_CIRCLE);
-				float r = radiusDist(engine);
+				float angleRad = angle * (Math::PI / IGLOO_INSIDE_HALF_CIRCLE);
+				float r = radius;
 
 				insidePos.x += r * cosf(angleRad);
 				insidePos.z += r * sinf(angleRad);
@@ -521,15 +509,15 @@ namespace app
 			if (m_fleeDirChangeTimer <= 0.0f)
 			{
 				// 次の方向変更まで 0.5～1.5 秒保持する
-				std::uniform_real_distribution<float> intervalDist(FLEE_DIR_HOLD_MIN, FLEE_DIR_HOLD_MAX);
-				m_fleeDirChangeTimer = intervalDist(GetRandomEngine());
+				const float newInterval = util::RandomDevice::Random(FLEE_DIR_HOLD_MIN, FLEE_DIR_HOLD_MAX);
+				m_fleeDirChangeTimer = newInterval;
 
 				if (RollUnit() >= FLEE_STRAIGHT_CHANCE)
 				{
 					// 30%の確率で横方向（45～90度）へ回避する
-					std::uniform_real_distribution<float> angleDist(FLEE_DODGE_ANGLE_MIN, FLEE_DODGE_ANGLE_MAX);
+					const float angle = util::RandomDevice::Random(FLEE_DODGE_ANGLE_MIN, FLEE_DODGE_ANGLE_MAX);
 					const float sign = (RollUnit() < FLEE_SIGN_FLIP_CHANCE) ? 1.0f : -1.0f;
-					m_fleeAngleOffset = angleDist(GetRandomEngine()) * sign;
+					m_fleeAngleOffset = angle * sign;
 				}
 				else
 				{
@@ -567,12 +555,11 @@ namespace app
 
 			// 2. 弾き出される座標をランダムに散らす
 			// かまくらの中心(iglooPos)を基準に、周囲にランダムに配置します
-			auto& engine = GetRandomEngine();
-			std::uniform_real_distribution<float> offsetDist(-EJECT_OFFSET_RANGE, EJECT_OFFSET_RANGE);
+			const float offset = util::RandomDevice::Random(-EJECT_OFFSET_RANGE, EJECT_OFFSET_RANGE);
 
 			Vector3 spawnPos = iglooPos;
-			spawnPos.x += offsetDist(engine);
-			spawnPos.z += offsetDist(engine);
+			spawnPos.x += offset;
+			spawnPos.z += offset;
 
 			// 少し上空から落とすことで、弾き飛ばされた感を演出します
 			//spawnPos.y +=EJECT_UP_OFFSET;
@@ -1234,15 +1221,12 @@ namespace app
 
 		void NaughtyChildPenguinAI::PickNewRoamTarget()
 		{
-			std::uniform_real_distribution<float> dist(-m_roamRadius, m_roamRadius);
-			auto& engine = GetRandomEngine();
-
 			/** 円内のランダムな座標を選ぶ（拒絶サンプリング） */
 			const Vector3& currentPos = m_owner->GetTransform().m_position;
 			for (int i = 0; i < 10; i++)
 			{
-				const float x = dist(engine);
-				const float z = dist(engine);
+				const float x = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
+				const float z = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
 				if ((x * x + z * z) <= (m_roamRadius * m_roamRadius))
 				{
 					m_roamTarget = Vector3(currentPos.x + x, currentPos.y, currentPos.z + z);
