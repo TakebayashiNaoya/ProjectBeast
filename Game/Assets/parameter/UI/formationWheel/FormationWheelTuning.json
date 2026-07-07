@@ -1,0 +1,11 @@
+{
+    "centerX": 630.0,
+    "rowY": -80.0,
+    "slotSpacing": 80.0,
+    "currentSize": 80.0,
+    "sideSize": 40.0,
+    "sideAlpha": 0.78,
+    "iconColor": [255, 255, 255],
+    "pulseAmplitude": 0.15,
+    "pulseSpeed": 6.0
+}

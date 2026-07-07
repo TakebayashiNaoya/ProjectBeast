@@ -6,7 +6,7 @@
 #pragma once
 #include "IScene.h"
 
-#include "Source/UI/System/SystemPacket.h"
+#include "Source/UI/Modules/System/SystemPacket.h"
 
 
 namespace app
@@ -59,7 +59,7 @@ namespace app
 		TitleState m_state;
 
 	private:
-		bool     m_nextScene   = false;
+		bool     m_nextScene = false;
 		uint32_t m_nextSceneId = 0;
 
 

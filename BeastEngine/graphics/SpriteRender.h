@@ -141,16 +141,11 @@ namespace nsBeastEngine
 
 
 	private:
-		/** スプライト */
-		Sprite		m_sprite;
-		/** 基点 */
-		Vector2		m_pivot;
-		/** 位置 */
-		Vector3		m_position;
-		/** 大きさ */
-		Vector3		m_scale;
-		/** 回転 */
-		Quaternion	m_rotation;
+		Sprite	   m_sprite;	/** スプライト */
+		Vector3	   m_position;	/** 位置 */
+		Vector3	   m_scale;		/** 大きさ */
+		Quaternion m_rotation;	/** 回転 */
+		Vector2	   m_pivot;		/** 基点 */
 	};
 
 
@@ -428,18 +423,194 @@ namespace nsBeastEngine
 
 
 	private:
-		/** スプライト本体 */
-		Sprite m_sprite;
-		/** ゲージ用定数バッファ */
-		GaugeConstantBuffer m_gaugeCb;
-		/** 位置 */
-		Vector3 m_position;
-		/** 大きさ */
-		Vector3 m_scale;
-		/** 回転 */
-		Quaternion m_rotation;
-		/** ピボット */
-		Vector2 m_pivot;
+		GaugeConstantBuffer m_gaugeCb;	 /** ゲージ用定数バッファ */
+		Sprite	   m_sprite;	/** スプライト本体 */
+		Vector3	   m_position;  /** 位置 */
+		Vector3	   m_scale;		/** 大きさ */
+		Quaternion m_rotation;	/** 回転 */
+		Vector2	   m_pivot;		/** ピボット */
+	};
+
+
+	/**
+	 * @brief 縦方向の塗り分けゲージレンダラー
+	 * @details
+	 * テクスチャのアルファ形状(アイコンの見た目)はそのまま活かし、
+	 * UV.yに応じて下から上へ baseColor → fillColor に塗り分ける。
+	 * スケールで引き伸ばさないため、アイコンが歪まない。
+	 */
+	class LinearFillGaugeRender : public IRenderer
+	{
+	public:
+		/**
+		 * @brief 直線ゲージ描画用の定数バッファ構造体
+		 * @param fillAmount 塗りつぶし割合(0.0f ~ 1.0f)。下から上へ塗られる
+		 * @param baseColor  未充填部分の色
+		 * @param fillColor  充填部分の色
+		 * @details
+		 * padding0~2がないと値がずれ、正しく動かない為
+		 * paddingで空きを埋めて、16バイトに境界をそろえる
+		 */
+		struct LinearFillConstantBuffer
+		{
+			float fillAmount;
+			float padding0;
+			float padding1;
+			float padding2;
+			Vector4 baseColor;
+			Vector4 fillColor;
+		};
+
+
+	public:
+		LinearFillGaugeRender()
+			: m_position(Vector3::Zero)
+			, m_scale(Vector3::One)
+			, m_rotation(Quaternion::Identity)
+			, m_pivot(Sprite::DEFAULT_PIVOT)
+		{}
+
+		~LinearFillGaugeRender() = default;
+
+		/**
+		 * @brief 初期化
+		 * @param filePath 画像ファイルのパス
+		 * @param fxName   シェーダーの名前
+		 * @param w        画像の横幅のサイズ
+		 * @param h        画像の縦幅のサイズ
+		 */
+		void Init(const char* filePath, const char* fxName, float w, float h);
+
+		/**
+		 * @brief 位置の設定
+		 * @param position 位置
+		 */
+		void SetPosition(const Vector3& position) { m_position = position; }
+		/**
+		 * @brief 位置の取得
+		 * @return 位置
+		 */
+		const Vector3& GetPosition()const { return m_position; }
+
+		/**
+		 * @brief 大きさの設定
+		 * @param scale 大きさ
+		 */
+		void SetScale(const Vector3& scale) { m_scale = scale; }
+		/**
+		 * @brief 大きさの取得
+		 * @return 大きさ
+		 */
+		const Vector3& GetScale()const { return m_scale; }
+
+		/**
+		 * @brief 回転の設定
+		 * @param rotation 回転
+		 */
+		void SetRotation(const Quaternion& rotation) { m_rotation = rotation; }
+		/**
+		 * @brief 回転の取得
+		 * @return 回転
+		 */
+		const Quaternion& GetRotation()const { return m_rotation; }
+
+		/**
+		 * @brief ピボットの設定
+		 * @param pivot ピボット
+		 */
+		void SetPivot(const Vector2& pivot) { m_pivot = pivot; }
+		/**
+		 * @brief ピボットの取得
+		 * @return ピボット
+		 */
+		const Vector2& GetPivot()const { return m_pivot; }
+
+		/**
+		 * @brief 乗算カラーの設定
+		 * @param mulColor 乗算カラー
+		 */
+		void SetMulColor(const Vector4& mulColor) { m_sprite.SetMulColor(mulColor); }
+		/**
+		 * @brief 乗算カラーの取得
+		 * @return 乗算カラー
+		 */
+		const Vector4& GetMulColor()const { return m_sprite.GetMulColor(); }
+
+		/**
+		 * @brief 塗りつぶし割合を設定する
+		 * @param fillAmount 割合(0.0f ~ 1.0f)。下から上へ塗られる
+		 */
+		void SetFillAmount(float fillAmount)
+		{
+			m_fillCb.fillAmount = max(0.0f, min(1.0f, fillAmount));
+		}
+		/**
+		 * @brief 塗りつぶし割合を取得
+		 * @return 割合(0.0f ~ 1.0f)
+		 */
+		float GetFillAmount()const { return m_fillCb.fillAmount; }
+
+		/**
+		 * @brief 未充填部分の色を設定
+		 * @param color 色
+		 */
+		void SetBaseColor(const Vector4& color) { m_fillCb.baseColor = color; }
+		/**
+		 * @brief 未充填部分の色を取得
+		 * @return 色
+		 */
+		const Vector4& GetBaseColor()const { return m_fillCb.baseColor; }
+
+		/**
+		 * @brief 充填部分の色を設定
+		 * @param color 色
+		 */
+		void SetFillColor(const Vector4& color) { m_fillCb.fillColor = color; }
+		/**
+		 * @brief 充填部分の色を取得
+		 * @return 色
+		 */
+		const Vector4& GetFillColor()const { return m_fillCb.fillColor; }
+
+
+		/**
+		 * @brief 更新処理
+		 */
+		void Update();
+
+		/**
+		 * @brief 定数バッファの更新
+		 * @param fillCb 直線ゲージ描画用の定数バッファ構造体
+		 * @param size 定数バッファのサイズ
+		 * @param slot 定数バッファのスロット番号(HLSL側で : register(b0)となっているところ)
+		 */
+		void UpdateConstantBuffer(LinearFillConstantBuffer* fillCb, size_t size, int slot);
+
+		/**
+		 * @brief 描画処理
+		 * @param rc レンダリングコンテキスト
+		 */
+		void Draw(RenderContext& rc);
+
+
+	private:
+		/**
+		 * @brief 2D描画パスから呼ばれる処理
+		 * @param rc レンダリングコンテキスト
+		 */
+		void OnRender2D(RenderContext& rc)override
+		{
+			m_sprite.Draw(rc);
+		}
+
+
+	private:
+		LinearFillConstantBuffer m_fillCb;	/** 直線ゲージ用定数バッファ */
+		Sprite	   m_sprite;	/** スプライト本体 */
+		Vector3	   m_position;	/** 位置 */
+		Vector3	   m_scale;		/** 大きさ */
+		Quaternion m_rotation;	/** 回転 */
+		Vector2	   m_pivot;		/** ピボット */
 	};
 }
 

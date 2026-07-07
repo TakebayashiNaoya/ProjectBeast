@@ -8,7 +8,7 @@
 
 #include "Source/UI/InGameButton/InGameButtonGaugeAnimStatus.h"
 #include "Source/UI/InGameButton/InGameButtonGaugeStatus.h"
-#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
+#include "Source/UI/Modules/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
 namespace app

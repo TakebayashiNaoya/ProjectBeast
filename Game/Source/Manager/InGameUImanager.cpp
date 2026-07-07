@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file InGameUIManager.cpp
  * @brief インゲームUIの生成・更新・描画・配線を管理するクラス
  * @author 竹林
@@ -23,6 +23,7 @@
 #include "Source/UI/BearReaction/BearReactionTypes.h"
 #include "Source/UI/CPReaction/CPReactionSystem.h"
 #include "Source/UI/DangerArrow/DangerArrowSystem.h"
+#include "Source/UI/FormationWheel/FormationWheelMenu.h"
 #include "Source/UI/InGameButton/InGameButtonMenu.h"
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
@@ -125,6 +126,8 @@ namespace app
 		ui::InitUIPacket(m_achievementPacket, "Assets/parameter/UI/inGameAchievement/InGameAchievement.json");
 		// インゲームボタンを生成
 		ui::InitUIPacket(m_inGameButtonPacket, "Assets/parameter/UI/inGameButton/InGameButton.json");
+		// 陣形/ウルトのボタン表示を生成
+		ui::InitUIPacket(m_formationWheelPacket, "Assets/parameter/UI/formationWheel/FormationWheel.json");
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
 		m_cpReactionSystem->Initialize();
@@ -203,9 +206,6 @@ namespace app
 				K2_ASSERT(menu, "メニューがnullptr");
 			};
 
-		m_cpReactionSystem->SetDaddyPenguin(daddyPenguin);
-		m_wpWarningSystem->SetDaddyPenguin(daddyPenguin);
-
 		//--------------------------------------------//
 		// タイマーUI通知
 		//--------------------------------------------//
@@ -273,6 +273,18 @@ namespace app
 		);
 
 		//--------------------------------------------//
+		// 子ペンギンリアクションUI通知
+		// タイプの確定は呼び出し側（ChildPenguinManagerや各AIController）の責務。
+		// ここではSystemへの反映のみを行う。
+		//--------------------------------------------//
+		bm.SetOnCPReactionChanged(
+			[this](actor::ChildPenguin* penguin, ui::EnCPReactionType type, ui::EnCPReactionPriority priority)
+			{
+				if (m_cpReactionSystem) m_cpReactionSystem->SetTarget(penguin, type, priority);
+			}
+		);
+
+		//--------------------------------------------//
 		// 睡眠中クマUI通知
 		// daddyPenguinをキャプチャしてlambda内で探索する
 		//--------------------------------------------//
@@ -330,6 +342,19 @@ namespace app
 					daddyPenguin->GetTransform().m_position,
 					actorPositions
 				);
+			}
+		);
+
+
+		//--------------------------------------------//
+		// 渦潮UI通知
+		//--------------------------------------------//
+		bm.SetOnWpWarningChanged(
+			[this, daddyPenguin, CheckMenu](std::vector<Vector3> whirlpoolPositions)
+			{
+				m_wpWarningSystem->SetDaddyTRS(daddyPenguin->GetTransform());
+				m_wpWarningSystem->SetWhirlpoolPositions(whirlpoolPositions);
+				m_wpWarningSystem->UpdateDrawFlags();
 			}
 		);
 	}
@@ -395,6 +420,7 @@ namespace app
 		}
 
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Update();
+		if (m_formationWheelPacket) m_formationWheelPacket->Update();
 		if (m_debufPacket) m_debufPacket->Update();
 	}
 
@@ -453,6 +479,7 @@ namespace app
 		if (m_remainingChildPacket) m_remainingChildPacket->Render(rc);
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Render(rc);
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Render(rc);
+		if (m_formationWheelPacket) m_formationWheelPacket->Render(rc);
 		if (m_debufPacket) m_debufPacket->Render(rc);
 	}
 

@@ -6,8 +6,9 @@
  */
 #pragma once
 #include "UIAnimation.h"
-#include "Source/UI/Parts/UIParts.h"
 #include "UIAnimationParameter.h"
+
+#include "Source/UI/UIParts.h"
 
 
 namespace app
@@ -68,7 +69,7 @@ namespace app
 				anim->SetParameter(def.startFloat, def.endFloat, def.duration, def.easingType, def.loopMode);
 			}
 
-			
+
 			/**
 			 * @brief Vector2アニメーションのパラメーターを適用
 			 * @param anim 適用先のアニメーション
