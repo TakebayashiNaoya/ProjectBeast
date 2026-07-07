@@ -80,8 +80,9 @@ namespace app
 		enSoundKind_UltCharge,      // チャージ中（ゲージ蓄積中のループ）
 		enSoundKind_UltActivate,    // 発動時
 		enSoundKind_UltDischarge,   // 発動中（効果持続中のループ）
-		enSoundKind_UltSwipeLeft,   // 選択（左スワイプ）
-		enSoundKind_UltSwipeRight,  // 選択（右スワイプ）
+		// スワイプは陣形切り替え（LB1/RB1）の選択音。アセット名に合わせて Ult 名を付けている
+		enSoundKind_UltSwipeLeft,   // 陣形切り替え（前へ・左スワイプ）
+		enSoundKind_UltSwipeRight,  // 陣形切り替え（次へ・右スワイプ）
 
 		enSoundKind_SE_Max,
 

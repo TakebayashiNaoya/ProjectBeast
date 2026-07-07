@@ -5,7 +5,7 @@
  */
 #pragma once
 #include "UltContext.h"
-#include "Source/Sound/SoundManager.h"
+#include "Source/Sound/SoundHandle.h"
 
 
 namespace app
@@ -28,6 +28,15 @@ namespace app
 		class UltController
 		{
 		public:
+			UltController() = default;
+			/**
+			 * @brief デストラクタ
+			 * @details 再生中のループSE（チャージ・ディスチャージ）を止めてから破棄する。
+			 *          通常はシーン破棄時の StopAllSE で止まるが、それを経由しない破棄経路でも
+			 *          鳴りっぱなしにならないよう保険として停止する。
+			 */
+			~UltController();
+
 			/**
 			 * @brief ウルトチェーンをセットする（陣形切り替え時に呼ぶ）
 			 * @param ult      陣形のウルトエフェクトチェーン（IFormation が所有する）

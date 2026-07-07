@@ -9,23 +9,31 @@
 #include "Source/Sound/SoundManager.h"
 
 
-namespace
-{
-	/** ウルト満タンSEの音量倍率 */
-	constexpr float ULT_FULL_SE_VOLUME     = 1.0f;
-	/** ウルトチャージ中SEの音量倍率 */
-	constexpr float ULT_CHARGE_SE_VOLUME    = 1.0f;
-	/** ウルト発動SEの音量倍率 */
-	constexpr float ULT_ACTIVATE_SE_VOLUME  = 1.0f;
-	/** ウルト発動中（ディスチャージ）SEの音量倍率 */
-	constexpr float ULT_DISCHARGE_SE_VOLUME = 1.0f;
-}
-
-
 namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** ウルト満タンSEの音量倍率 */
+			constexpr float ULT_FULL_SE_VOLUME      = 1.0f;
+			/** ウルトチャージ中SEの音量倍率 */
+			constexpr float ULT_CHARGE_SE_VOLUME    = 1.0f;
+			/** ウルト発動SEの音量倍率 */
+			constexpr float ULT_ACTIVATE_SE_VOLUME  = 1.0f;
+			/** ウルト発動中（ディスチャージ）SEの音量倍率 */
+			constexpr float ULT_DISCHARGE_SE_VOLUME = 1.0f;
+		}
+
+
+		UltController::~UltController()
+		{
+			// 再生中のループSEを止めてから破棄する
+			SoundManager::Get().StopSE(m_chargeSeHandle);
+			SoundManager::Get().StopSE(m_dischargeSeHandle);
+		}
+
+
 		void UltController::SetUlt(FormationEffectChain* ult, float duration, float cooldown)
 		{
 			m_ult      = ult;
