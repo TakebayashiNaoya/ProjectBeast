@@ -189,13 +189,16 @@ namespace app
 			float minDistSq = FLT_MAX;
 			bool  found = false;
 
-			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* w)
-				{
-					if (!w) return;
-					const float dSq = (from - w->GetTransform().m_position).LengthSq();
-					if (dSq < minDistSq) { minDistSq = dSq; outPos = w->GetTransform().m_position; found = true; }
-				});
-			return found;
+			if (auto* wm = nature::WhirlpoolManager::GetInstance())
+			{
+				wm->ForEach([&](nature::Whirlpool* w)
+					{
+						if (!w) return;
+						const float dSq = (from - w->GetTransform().m_position).LengthSq();
+						if (dSq < minDistSq) { minDistSq = dSq; outPos = w->GetTransform().m_position; found = true; }
+					});
+				return found;
+			}
 		}
 
 		default:

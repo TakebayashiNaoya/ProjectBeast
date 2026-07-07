@@ -4,6 +4,7 @@
  * @author 竹林
  */
 #pragma once
+#include "Source/UI/CPReaction/CPReactionTypes.h"
 #include "Source/UI/MiniMap/MiniMapTypes.h"
 
 
@@ -154,7 +155,6 @@ namespace app
 		}
 
 
-	public:
 		/**
 		 * @brief ミニマップUI通知functionを設定
 		 * @param func 引数なし。lambda内でUIへのセットを行う
@@ -163,6 +163,41 @@ namespace app
 		{
 			m_onMiniMapChanged = std::move(func);
 		}
+
+
+
+		void SetOnWpWarningChanged(std::function<void(std::vector<Vector3>)> func)
+		{
+			m_wpWarningChanged = std::move(func);
+		}
+
+
+		/**
+		 * @brief 子ペンギンリアクションUI通知functionを設定
+		 * @param func 引数：対象の子ペンギン、リアクションのタイプ、通知の優先度
+		 */
+		inline void SetOnCPReactionChanged(std::function<void(actor::ChildPenguin*, ui::EnCPReactionType, ui::EnCPReactionPriority)> func)
+		{
+			m_onCPReactionChanged = std::move(func);
+		}
+
+		/**
+		 * @brief 子ペンギンのリアクション再生を通知する
+		 * @detail 他のUI通知（タイム・ミニマップ等）と異なり、Update()内でのポーリングではなく、
+		 *         状態が変化した瞬間（AddFollower/RemoveFollowerや各AIControllerの状態遷移時など）に
+		 *         呼び出し側から明示的に呼ぶ。typeの確定は呼び出し側の責務。
+		 * @param penguin 対象の子ペンギン
+		 * @param type リアクションのタイプ（呼び出し側で確定済みの値）
+		 * @param priority 通知の優先度。同フレーム内で複数回通知された場合の調停に使う（省略時はNormal）
+		 */
+		inline void NotifyCPReactionChanged(
+			actor::ChildPenguin* penguin,
+			ui::EnCPReactionType type,
+			ui::EnCPReactionPriority priority = ui::EnCPReactionPriority::Normal)
+		{
+			if (m_onCPReactionChanged) m_onCPReactionChanged(penguin, type, priority);
+		}
+
 
 		/**
 		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
@@ -189,6 +224,13 @@ namespace app
 
 		/** ミニマップUI更新通知 */
 		std::function<void(const ui::ActorPositions&)> m_onMiniMapChanged;
+
+
+		/** 渦潮UI更新通知 */
+		std::function<void(std::vector<Vector3>)> m_wpWarningChanged;
+
+		/** 子ペンギンリアクションUI更新通知 */
+		std::function<void(actor::ChildPenguin*, ui::EnCPReactionType, ui::EnCPReactionPriority)> m_onCPReactionChanged;
 
 
 

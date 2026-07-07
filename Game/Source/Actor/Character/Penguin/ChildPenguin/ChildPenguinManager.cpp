@@ -16,10 +16,10 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Manager/BattleManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
-#include "Source/UI/CPReaction/CPReactionMenu.h"
-#include "Source/UI/CPReaction/CPReactionSystem.h"
+#include "Source/UI/CPReaction/CPReactionTypes.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
@@ -431,7 +431,7 @@ namespace app
 			if (it == m_followers.end()) {
 				m_followers.push_back(penguin);
 				ScoreManager::GetInstance().AddCollectedCount();
-				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Happy);
+				BattleManager::GetInstance().NotifyCPReactionChanged(penguin, ui::EnCPReactionType::Happy);
 
 				if (auto* menu = InGameUIManager::GetInstance()->GetRemainingChildMenu())
 				{
@@ -452,7 +452,7 @@ namespace app
 			if (it != m_followers.end()) {
 				m_followers.erase(it);
 				ScoreManager::GetInstance().SubCollectedCount();
-				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Trouble);
+				BattleManager::GetInstance().NotifyCPReactionChanged(penguin, ui::EnCPReactionType::Trouble);
 				if (auto* lm = GameLogManager::GetInstance())
 					lm->QueueEvent({ {"ev", "penguin_leave"}, {"penguin_id", penguin->GetLogId()} });
 			}

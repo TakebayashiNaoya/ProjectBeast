@@ -6,7 +6,7 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
-#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
+#include "Source/UI/Modules/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
 namespace app
