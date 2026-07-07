@@ -4,15 +4,15 @@
  * @author 藤谷、竹林
  */
 #include "stdafx.h"
-#include "Whirlpool.h"
+#include "Geometry/Frustum.h"
+#include "Geometry/TriangleCuller.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 #include "Ocean.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Effect/EffectManager.h"
-#include "graphics/effect/BeastEffectEmitter.h"
-#include "Geometry/Frustum.h"
-#include "Geometry/TriangleCuller.h"
+#include "Whirlpool.h"
 
 
 namespace app
@@ -74,6 +74,10 @@ namespace app
 			// パラメーターからスケールの最大値を計算する
 			// メッシュ半径にスケールを掛けたワールド半径が渦潮の影響範囲と一致するように設定する
 			const MasterWhirlpoolParameter* param = GetParam();
+			m_maxRadius = (param != nullptr)
+				? param->whirlpoolRadius
+				: 0.0f;
+
 			m_maxScaleXZ = (param != nullptr)
 				? param->whirlpoolRadius / MESH_RADIUS
 				: 2.0f;

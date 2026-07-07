@@ -26,9 +26,26 @@ namespace app
 		 */
 		class WpWarningMenu : public MenuBase
 		{
-			using WpWarning = MenuBase;
-
 		public:
+			/**
+			 * @brief ターゲットの座標を設定
+			 * @param position 座標
+			 */
+			void SetTargetPosition(const Vector3& position)
+			{
+				m_speechBubble->m_transform.m_localTransform.m_position = position;
+				m_warning->m_transform.m_localTransform.m_position = position;
+			}
+			/**
+			 * @brief 描画するかどうかの設定
+			 * @param isDraw 描画するかどうか
+			 */
+			void SetIsDraw(const bool isDraw)
+			{
+				m_speechBubble->m_isDraw = isDraw;
+				m_warning->m_isDraw = isDraw;
+				m_isDraw = isDraw;
+			}
 			/**
 			 * @brief ステータスを設定
 			 * @param status ステータス
@@ -36,22 +53,6 @@ namespace app
 			void SetStatus(WpWarningStatus* status)
 			{
 				m_status = status;
-			}
-			/**
-			 * @brief 描画フラグを設定
-			 * @param isDraw 描画フラグ
-			 */
-			void SetIsDraw(bool isDraw)
-			{
-				m_isDraw = isDraw;
-			}
-			/**
-			 * @brief 渦潮の位置を設定
-			 * @param position 渦潮の位置
-			 */
-			void SetWhirlpool(nature::Whirlpool* whirlpool)
-			{
-				m_whirlpool = whirlpool;
 			}
 
 
@@ -84,8 +85,6 @@ namespace app
 			WpWarningStatus* m_status;
 			/** アニメーションステータス */
 			std::unique_ptr<WpWarningAnimStatus> m_animStatus;
-			/** 渦潮 */
-			nature::Whirlpool* m_whirlpool;
 			/** 描画フラグ */
 			bool m_isDraw;
 		};

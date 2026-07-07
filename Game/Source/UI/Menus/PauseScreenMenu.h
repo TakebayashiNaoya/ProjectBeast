@@ -6,8 +6,8 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
-#include "Source/UI/Input/UICursorSelector.h"
-#include "Source/UI/Input/UIInputController.h"
+#include "Source/UI/Modules/Input/UICursorSelector.h"
+#include "Source/UI/Modules/Input/UIInputController.h"
 
 
 namespace app

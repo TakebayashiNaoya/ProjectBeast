@@ -232,12 +232,10 @@ namespace app
 
 			/**
 			 * @brief 世話焼きペンギンによる制止フラグを設定する
+			 * @detail 制止された瞬間(false→true)にリアクションUIへの通知を行う
 			 * @param isRestrained 制止フラグ
 			 */
-			inline void SetRestrained(const bool isRestrained)
-			{
-				m_isRestrained = isRestrained;
-			}
+			void SetRestrained(const bool isRestrained);
 
 			/**
 			 * @brief 制止中かどうかを取得する
@@ -278,12 +276,10 @@ namespace app
 
 			/**
 			 * @brief 世話焼きペンギンによる制止フラグを設定する
+			 * @detail 制止された瞬間(false→true)にリアクションUIへの通知を行う
 			 * @param isRestrained 制止フラグ
 			 */
-			inline void SetRestrained(const bool isRestrained)
-			{
-				m_isRestrained = isRestrained;
-			}
+			void SetRestrained(const bool isRestrained);
 
 			/**
 			 * @brief 制止中かどうかを取得する
@@ -369,6 +365,10 @@ namespace app
 			float m_slipChance = 0.0f;
 			/** 前フレームにスライド中だったかどうか（スライド解除の検出に使う） */
 			bool m_wasSliding = false;
+			/** 前フレームに転倒・スリップ中(Downing)だったかどうか（起き上がりの検出に使う） */
+			bool m_wasDowning = false;
+			/** 今回の転倒・スリップ中に世話焼きペンギンに助けてもらったかどうか */
+			bool m_wasHelpedThisDowning = false;
 		};
 
 

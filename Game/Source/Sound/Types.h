@@ -75,6 +75,15 @@ namespace app
 		enSoundKind_DrumRoll,
 		enSoundKind_Cymbals,
 
+		// --- UI: ウルト ---
+		enSoundKind_UltFull,        // 満タン時
+		enSoundKind_UltCharge,      // チャージ中（ゲージ蓄積中のループ）
+		enSoundKind_UltActivate,    // 発動時
+		enSoundKind_UltDischarge,   // 発動中（効果持続中のループ）
+		// スワイプは陣形切り替え（LB1/RB1）の選択音。アセット名に合わせて Ult 名を付けている
+		enSoundKind_UltSwipeLeft,   // 陣形切り替え（前へ・左スワイプ）
+		enSoundKind_UltSwipeRight,  // 陣形切り替え（次へ・右スワイプ）
+
 		enSoundKind_SE_Max,
 
 		// =========================================================================
@@ -176,6 +185,14 @@ namespace app
 		SoundInformation("Assets/sound/SE/result/stamp.wav"),
 		SoundInformation("Assets/sound/SE/result/drumRoll.wav"),
 		SoundInformation("Assets/sound/SE/result/cymbals.wav"),
+
+		// --- UI: ウルト ---
+		SoundInformation("Assets/sound/SE/UI/ult/ult_full.wav"),
+		SoundInformation("Assets/sound/SE/UI/ult/ult_charge.wav"),
+		SoundInformation("Assets/sound/SE/UI/ult/ult_active.wav"),
+		SoundInformation("Assets/sound/SE/UI/ult/ult_discharge.wav"),
+		SoundInformation("Assets/sound/SE/UI/ult/ult_swipe_left.wav"),
+		SoundInformation("Assets/sound/SE/UI/ult/ult_swipe_right.wav"),
 
 		// -------------------------------------------------------------------------
 		// BGM

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file CPReactionMenu.cpp
  * @brief 子ペンギンのリアクションUIクラス
  * @author 藤谷
@@ -11,11 +11,6 @@
 
 #include "Source/UI/Animation/UIAnimationFactory.h"
 
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
-#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
-#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
-
 #include "Source/Sound/SoundManager.h"
 
 
@@ -23,83 +18,16 @@ namespace app
 {
 	namespace ui
 	{
-		void CPReactionMenu::PlayUIAnimation(const EnReactionType type)
-		{
-			// サウンドマネージャーのインスタンスを取得
-			auto& soundMng = SoundManager::Get();
-
-			m_type = type;
-
-			bool isDrawSpeechBubble = false;
-			bool isDrawTroubleReaction = false;
-			bool isDrawHappyReaction = false;
-			Vector4 speechBubbleColor = Vector4::Black;
-
-			enSoundKind kind = enSoundKind::enSoundKind_None;
-
-			if (m_type == EnReactionType::Trouble)
-			{
-				isDrawSpeechBubble = true;
-				isDrawTroubleReaction = true;
-				isDrawHappyReaction = false;
-
-				kind = enSoundKind::enSoundKind_CPReactionTrouble;
-			}
-			else if (m_type == EnReactionType::Happy)
-			{
-				isDrawSpeechBubble = true;
-				isDrawTroubleReaction = false;
-				isDrawHappyReaction = true;
-
-				kind = enSoundKind::enSoundKind_CPReactionHappy;
-			}
-
-			auto cpType = m_target->GetChildPenguinType();
-			switch (cpType)
-			{
-			case actor::EnChildPenguinType::Serious:
-				speechBubbleColor = m_status->GetSeriousReactionColor();
-				break;
-			case actor::EnChildPenguinType::Clingy:
-				speechBubbleColor = m_status->GetClingyReactionColor();
-				break;
-			case actor::EnChildPenguinType::Naughty:
-				speechBubbleColor = m_status->GetNaughtyReactionColor();
-				break;
-			case actor::EnChildPenguinType::Clumsy:
-				speechBubbleColor = m_status->GetClumsyReactionColor();
-				break;
-			case actor::EnChildPenguinType::Caring:
-				speechBubbleColor = m_status->GetCaringReactionColor();
-				break;
-			default:
-				break;
-			}
-
-			m_speechBubble->m_isDraw = isDrawSpeechBubble;
-			m_troubleReaction->m_isDraw = isDrawTroubleReaction;
-			m_happyReaction->m_isDraw = isDrawHappyReaction;
-
-			m_speechBubble->m_color = speechBubbleColor;
-
-			soundMng.PlaySE(kind, 0.8f);
-
-			SetAnimation();
-			m_timer = 0.0f;
-		}
-
-
 		CPReactionMenu::CPReactionMenu()
-			: m_target(nullptr)
+			: m_status(nullptr)
+			, m_animStatus(nullptr)
 			, m_speechBubble(nullptr)
 			, m_troubleReaction(nullptr)
 			, m_happyReaction(nullptr)
-			, m_type(EnReactionType::None)
+			, m_type(EnCPReactionType::None)
 			, m_timer(0.0f)
 			, m_isPlayAnimation(false)
-			, m_status(nullptr)
-			, m_animStatus(nullptr)
-			, m_isInFrontOfDaddy(false)
+			, m_isDraw(false)
 		{}
 
 
@@ -109,7 +37,6 @@ namespace app
 
 		void CPReactionMenu::Update()
 		{
-
 			DrawFlagUpdate();
 
 			MenuBase::Update();
@@ -133,30 +60,26 @@ namespace app
 		}
 
 
-		void CPReactionMenu::PositionUpdate()
+		void CPReactionMenu::SetTargetPosition(const Vector3& screenPosition)
 		{
-			if (!m_target) return;
-			const Vector3 targetPosition = m_target->GetTransform().m_position;
-			const Vector3 daddyPosition = m_daddyPenguin->GetTransform().m_position;
-			Quaternion daddyRotation = m_daddyPenguin->GetTransform().m_rotation;
+			const Vector3 basePosition = Vector3(
+				screenPosition.x,
+				screenPosition.y + m_status->GetIconOffsetY(),
+				0.0f
+			);
 
-			// y座標を0とする
-			const Vector3 target = Vector3(targetPosition.x, 0.0f, targetPosition.z);
-			const Vector3 daddy = Vector3(daddyPosition.x, 0.0f, daddyPosition.z);
+			m_speechBubble->m_transform.m_localTransform.m_position = basePosition + m_status->GetSpeechBubbleOffset();
+			m_troubleReaction->m_transform.m_localTransform.m_position = basePosition + m_status->GetTroubleReactionOffset();
+			m_happyReaction->m_transform.m_localTransform.m_position = basePosition + m_status->GetHappyReactionOffset();
+		}
 
-			// ベクトルを取得
-			Vector3 toTargetNorm = target - daddy;
-			toTargetNorm.Normalize();
 
-			Vector3 front = Vector3::Front;
-			daddyRotation.Apply(front);
+		void CPReactionMenu::SetIsDraw(const bool isDraw)
+		{
+			m_isDraw = isDraw;
 
-			// 内積が正なら親ペンギンの前方にいる
-			const float dot = front.Dot(toTargetNorm);
-			m_isInFrontOfDaddy = (dot >= 0.0f);
-
-			// 前方でなければ描画しない
-			if (!m_isInFrontOfDaddy)
+			// リアクション中でなければ常に非表示
+			if (m_type == EnCPReactionType::None)
 			{
 				m_speechBubble->m_isDraw = false;
 				m_troubleReaction->m_isDraw = false;
@@ -164,61 +87,69 @@ namespace app
 				return;
 			}
 
-			Vector2 screenPos = Vector2::Zero;
-			CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPos, targetPosition);
+			m_speechBubble->m_isDraw = isDraw;
+			m_troubleReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Trouble);
+			m_happyReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Happy);
+		}
 
-			const Vector3 prevPosition = Vector3(
-				screenPos.x,
-				screenPos.y + m_status->GetIconOffsetY(),
-				0.0f
-			);
 
-			m_speechBubble->m_transform.m_localTransform.m_position = prevPosition + m_status->GetSpeechBubbleOffset();
-			m_troubleReaction->m_transform.m_localTransform.m_position = prevPosition + m_status->GetTroubleReactionOffset();
-			m_happyReaction->m_transform.m_localTransform.m_position = prevPosition + m_status->GetHappyReactionOffset();
+		void CPReactionMenu::PlayUIAnimation(const EnCPReactionType type, const actor::EnChildPenguinType cpType)
+		{
+			auto& soundMng = SoundManager::Get();
+
+			m_type = type;
+
+			Vector4 speechBubbleColor = Vector4::Black;
+			enSoundKind kind = enSoundKind::enSoundKind_None;
+
+			if (m_type == EnCPReactionType::Trouble)
+			{
+				kind = enSoundKind::enSoundKind_CPReactionTrouble;
+			}
+			else if (m_type == EnCPReactionType::Happy)
+			{
+				kind = enSoundKind::enSoundKind_CPReactionHappy;
+			}
+
+			switch (cpType)
+			{
+			case actor::EnChildPenguinType::Serious:
+				speechBubbleColor = m_status->GetSeriousReactionColor();
+				break;
+			case actor::EnChildPenguinType::Clingy:
+				speechBubbleColor = m_status->GetClingyReactionColor();
+				break;
+			case actor::EnChildPenguinType::Naughty:
+				speechBubbleColor = m_status->GetNaughtyReactionColor();
+				break;
+			case actor::EnChildPenguinType::Clumsy:
+				speechBubbleColor = m_status->GetClumsyReactionColor();
+				break;
+			case actor::EnChildPenguinType::Caring:
+				speechBubbleColor = m_status->GetCaringReactionColor();
+				break;
+			default:
+				break;
+			}
+
+			m_speechBubble->m_color = speechBubbleColor;
+
+			soundMng.PlaySE(kind, 0.8f);
+
+			SetAnimation();
+			m_timer = 0.0f;
 		}
 
 
 		void CPReactionMenu::DrawFlagUpdate()
 		{
-			m_isInFrontOfDaddy = false;
+			if (m_type == EnCPReactionType::None) return;
 
-			if (!m_target)
-			{
-				m_type = EnReactionType::None;
-			}
-
-
-			switch (m_type)
-			{
-			case EnReactionType::Trouble:
-			{
-				m_speechBubble->m_isDraw = true;
-				m_troubleReaction->m_isDraw = true;
-				m_happyReaction->m_isDraw = false;
-				UpdateAnimation();
-				PositionUpdate();
-				break;
-			}
-			case EnReactionType::Happy:
-			{
-				m_speechBubble->m_isDraw = true;
-				m_troubleReaction->m_isDraw = false;
-				m_happyReaction->m_isDraw = true;
-				UpdateAnimation();
-				PositionUpdate();
-				break;
-			}
-			case EnReactionType::None:
-			{
-				break;
-			}
-			}
-
+			UpdateAnimation();
 
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
-			if (m_type != EnReactionType::None && m_isPlayAnimation)
+			if (m_isPlayAnimation)
 			{
 				m_timer += deltaTime;
 
@@ -226,7 +157,7 @@ namespace app
 				{
 					m_timer = 0.0f;
 					ResetIcon();
-					m_type = EnReactionType::None;
+					m_type = EnCPReactionType::None;
 				}
 			}
 		}
@@ -246,7 +177,7 @@ namespace app
 			m_happyReaction->RemoveAnimation(key);
 			m_isPlayAnimation = false;
 			m_timer = 0.0f;
-			m_target = nullptr;
+			m_isDraw = false;
 		}
 
 
@@ -272,15 +203,14 @@ namespace app
 
 		void CPReactionMenu::UpdateAnimation()
 		{
-			if (m_type == EnReactionType::Happy)
+			if (m_type == EnCPReactionType::Happy)
 			{
 				m_troubleReaction->StopAnimation();
 			}
-			else if (m_type == EnReactionType::Trouble)
+			else if (m_type == EnCPReactionType::Trouble)
 			{
 				m_happyReaction->StopAnimation();
 			}
-
 
 			m_isPlayAnimation = m_troubleReaction->IsPlayAnimation() || m_happyReaction->IsPlayAnimation();
 		}

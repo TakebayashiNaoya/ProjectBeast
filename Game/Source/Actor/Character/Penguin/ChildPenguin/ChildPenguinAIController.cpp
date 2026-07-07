@@ -22,9 +22,11 @@
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Manager/BattleManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Nature/Whirlpool.h"
 #include "Source/Nature/WhirlpoolManager.h"
+#include "Source/UI/CPReaction/CPReactionTypes.h"
 #include <algorithm>
 #include <random>
 
@@ -678,6 +680,19 @@ namespace app
 		}
 
 
+		void ClingyChildPenguinAI::SetRestrained(const bool isRestrained)
+		{
+			// 制止された瞬間(false→true)だけリアクションを要求する
+			// （ApplyIntervention()は介入中毎フレーム呼ばれるため、ここでエッジ検出する）
+			if (isRestrained && !m_isRestrained)
+			{
+				BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Trouble, ui::EnCPReactionPriority::High);
+			}
+
+			m_isRestrained = isRestrained;
+		}
+
+
 		void ClingyChildPenguinAI::Update()
 		{
 			if (m_isEnterIglooMode) {
@@ -860,6 +875,19 @@ namespace app
 		}
 
 
+		void NaughtyChildPenguinAI::SetRestrained(const bool isRestrained)
+		{
+			// 制止された瞬間(false→true)だけリアクションを要求する
+			// （ApplyIntervention()は介入中毎フレーム呼ばれるため、ここでエッジ検出する）
+			if (isRestrained && !m_isRestrained)
+			{
+				BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Trouble, ui::EnCPReactionPriority::High);
+			}
+
+			m_isRestrained = isRestrained;
+		}
+
+
 		void NaughtyChildPenguinAI::Update()
 		{
 			if (m_isEnterIglooMode) {
@@ -928,6 +956,7 @@ namespace app
 				manager->UnregisterAttempting(m_owner); // 問題行動リストから外れる
 				m_scoldCooldown = SCOLD_COOLDOWN_DURATION; // SCOLD_COOLDOWN_DURATION秒間は満足してシロクマを無視する
 				StopLivelyEffect();
+				manager->AddFollower(m_owner);
 			}
 
 			if (m_scoldCooldown > 0.0f)
@@ -948,16 +977,19 @@ namespace app
 
 				Vector3 whirlpoolPos = Vector3::Zero;
 				bool foundWhirlpool = false;
-				float minDistSq = WHIRLPOOL_TRIGGER_DISTANCE * WHIRLPOOL_TRIGGER_DISTANCE;
+				float minDistSq = FLT_MAX;
 
 				nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* wp)
 					{
 						if (wp->GetState() == nature::Whirlpool::EnWhirlpoolState::None) return;
 
+						const float wpRadius = wp->GetMaxRadius();
+						const float triggerDistSq = (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius) * (WHIRLPOOL_TRIGGER_DISTANCE + wpRadius);
+
 						const Vector3& pos = wp->GetTransform().m_position;
 						float distSq = (pos - myPos).LengthSq();
 
-						if (distSq <= minDistSq)
+						if (distSq <= minDistSq && distSq <= triggerDistSq)
 						{
 							minDistSq = distSq;
 							whirlpoolPos = pos;
@@ -985,6 +1017,10 @@ namespace app
 					if (auto* lm = GameLogManager::GetInstance())
 						lm->QueueEvent({ {"ev", "naughty_disobey"}, {"penguin_id", m_owner->GetLogId()}, {"toward", "bear"}, {"bear_id", targetBear->GetLogId()} });
 
+					// いたずらを決意した瞬間にリアクションを要求する
+					// 優先度Highのため、この後のRemoveFollower()が発行するTrouble(Normal)には上書きされない
+					BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Happy, ui::EnCPReactionPriority::High);
+
 					// シロクマに向かうため、隊列や徘徊からは離脱する
 					if (m_isFollowing)
 					{
@@ -1005,6 +1041,10 @@ namespace app
 					m_naughtyStateMachine->SetWhirlpoolTargetPos(whirlpoolPos);
 					if (auto* lm = GameLogManager::GetInstance())
 						lm->QueueEvent({ {"ev", "naughty_disobey"}, {"penguin_id", m_owner->GetLogId()}, {"toward", "whirlpool"} });
+
+					// いたずらを決意した瞬間にリアクションを要求する
+					// 優先度Highのため、この後のRemoveFollower()が発行するTrouble(Normal)には上書きされない
+					BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Happy, ui::EnCPReactionPriority::High);
 
 					if (m_isFollowing) { manager->RemoveFollower(m_owner); m_isFollowing = false; }
 					if (manager->IsRoaming(m_owner)) { manager->UnregisterRoaming(m_owner); }
@@ -1289,7 +1329,21 @@ namespace app
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
 			/** Managerに登録されている転倒・スリップ中フラグで判定する */
-			if (manager->IsDowning(m_owner))
+			const bool isDowningNow = manager->IsDowning(m_owner);
+
+			/** 転倒・スリップから起き上がった瞬間を検出する（前フレームDowning中→今フレームDowningでない） */
+			if (m_wasDowning && !isDowningNow)
+			{
+				if (m_wasHelpedThisDowning)
+				{
+					// 世話焼きペンギンに助けてもらって起き上がった瞬間にリアクションを要求する
+					BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Happy, ui::EnCPReactionPriority::High);
+				}
+				m_wasHelpedThisDowning = false;
+			}
+			m_wasDowning = isDowningNow;
+
+			if (isDowningNow)
 			{
 				/** 転倒・スリップ中は移動入力をゼロにして固有ステートの評価を妨げないようにする */
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
@@ -1348,6 +1402,10 @@ namespace app
 				{
 					m_clumsyStateMachine->SetIsSlipped(true);
 					m_wasSliding = false;
+
+					// 転んだ瞬間にリアクションを要求する
+					m_wasHelpedThisDowning = false;
+					BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Trouble, ui::EnCPReactionPriority::High);
 					return;
 				}
 			}
@@ -1373,6 +1431,10 @@ namespace app
 				if (RollUnit() < tripChancePerFrame)
 				{
 					m_clumsyStateMachine->SetIsTripped(true);
+
+					// 転んだ瞬間にリアクションを要求する
+					m_wasHelpedThisDowning = false;
+					BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Trouble, ui::EnCPReactionPriority::High);
 				}
 			}
 		}
@@ -1381,6 +1443,9 @@ namespace app
 		void ClumsyChildPenguinAI::HelpedByCaringPenguin()
 		{
 			m_clumsyStateMachine->SetIsHelped(true);
+
+			// 起き上がった瞬間にHappyを出すためのフラグ（ApplyIntervention()から毎フレーム呼ばれるため、ここでは単純にtrueを立てるだけでよい）
+			m_wasHelpedThisDowning = true;
 		}
 
 

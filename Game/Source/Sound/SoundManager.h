@@ -5,21 +5,12 @@
  */
 #pragma once
 #include "Source/Sound/Types.h"
+#include "Source/Sound/SoundHandle.h"
 #include <optional>
 
 
 namespace app
 {
-	/** SE用のハンドル名 */
-	using SEHandle = uint32_t;
-	/** ハンドル無効値 */
-	static constexpr SEHandle INVALID_SE_HANDLE = 0xffffffff;
-
-	/** Voice用のハンドル名 */
-	using VoiceHandle = uint32_t;
-	/** ハンドル無効値 */
-	static constexpr VoiceHandle INVALID_VOICE_HANDLE = 0xffffffff;
-
 	/** 無効な音量値 */
 	static constexpr float INVALID_VOLUME = -1.0f;
 	static constexpr float DEFAULT_VOLUME_MAGNIFICATION = 1.0f;

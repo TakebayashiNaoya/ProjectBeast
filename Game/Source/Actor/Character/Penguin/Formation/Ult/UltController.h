@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "UltContext.h"
+#include "Source/Sound/SoundHandle.h"
 
 
 namespace app
@@ -27,6 +28,15 @@ namespace app
 		class UltController
 		{
 		public:
+			UltController() = default;
+			/**
+			 * @brief デストラクタ
+			 * @details 再生中のループSE（チャージ・ディスチャージ）を止めてから破棄する。
+			 *          通常はシーン破棄時の StopAllSE で止まるが、それを経由しない破棄経路でも
+			 *          鳴りっぱなしにならないよう保険として停止する。
+			 */
+			~UltController();
+
 			/**
 			 * @brief ウルトチェーンをセットする（陣形切り替え時に呼ぶ）
 			 * @param ult      陣形のウルトエフェクトチェーン（IFormation が所有する）
@@ -77,12 +87,32 @@ namespace app
 
 
 		private:
+			/**
+			 * @brief チャージSEの再生状態をゲージ蓄積状態に同期する
+			 * @details ゲージ蓄積中（クールダウン中）はループ再生し、満タン・発動中は停止する。
+			 *          ゲーム開始直後の初回チャージとウルト使用後のチャージの両方を拾う。
+			 */
+			void UpdateChargeSe();
+
+			/**
+			 * @brief ディスチャージSEの再生状態をウルト発動状態に同期する
+			 * @details 発動中（効果持続中）はループ再生し、発動が終わったら停止する。
+			 */
+			void UpdateDischargeSe();
+
+
+		private:
 			FormationEffectChain* m_ult          = nullptr;  /** 非所有ポインタ。IFormation が所有する */
 			float                 m_duration      = 0.0f;
 			float                 m_timer         = 0.0f;
 			float                 m_cooldown      = 0.0f;
 			float                 m_cooldownTimer = 0.0f;
 			bool                  m_isActive      = false;
+
+			/** チャージ（ゲージ蓄積）中に再生しているループSEのハンドル */
+			SEHandle              m_chargeSeHandle    = INVALID_SE_HANDLE;
+			/** ディスチャージ（発動中）に再生しているループSEのハンドル */
+			SEHandle              m_dischargeSeHandle = INVALID_SE_HANDLE;
 		};
 	}
 }

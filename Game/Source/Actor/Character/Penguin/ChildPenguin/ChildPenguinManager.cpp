@@ -16,12 +16,13 @@
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Manager/BattleManager.h"
 #include "Source/Manager/FeverTimeManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
-#include "Source/UI/CPReaction/CPReactionMenu.h"
-#include "Source/UI/CPReaction/CPReactionSystem.h"
+#include "Source/UI/CPReaction/CPReactionTypes.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
+#include "Source/Sound/SoundManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include <random>
@@ -59,6 +60,9 @@ namespace app
 			const Vector3 GHOST_SCALE_UP = Vector3(0.8f, 1.0f, 1.0f);
 			/** 方向正規化の平方 */
 			constexpr float GHOST_DIR_NORMALIZE_SQ = 0.0001f;
+
+			/** 陣形選択（スワイプ）SEの音量倍率 */
+			constexpr float FORMATION_SWIPE_SE_VOLUME = 1.0f;
 		}
 
 
@@ -124,12 +128,16 @@ namespace app
 					const int next = (static_cast<int>(m_formationController.GetCurrentType()) + 1) % static_cast<int>(EnFormationType::Num);
 					m_formationController.SwitchFormation(static_cast<EnFormationType>(next));
 					m_formationController.StartSwitchTransition();
+					// 次の陣形へ（右方向）の選択SEを鳴らす
+					SoundManager::Get().PlaySE(enSoundKind_UltSwipeRight, FORMATION_SWIPE_SE_VOLUME);
 				}
 				else if (g_pad[0]->IsTrigger(enButtonLB1))
 				{
 					const int prev = (static_cast<int>(m_formationController.GetCurrentType()) + static_cast<int>(EnFormationType::Num) - 1) % static_cast<int>(EnFormationType::Num);
 					m_formationController.SwitchFormation(static_cast<EnFormationType>(prev));
 					m_formationController.StartSwitchTransition();
+					// 前の陣形へ（左方向）の選択SEを鳴らす
+					SoundManager::Get().PlaySE(enSoundKind_UltSwipeLeft, FORMATION_SWIPE_SE_VOLUME);
 				}
 			}
 
@@ -467,7 +475,7 @@ namespace app
 			if (it == m_followers.end()) {
 				m_followers.push_back(penguin);
 				ScoreManager::GetInstance().AddCollectedCount();
-				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Happy);
+				BattleManager::GetInstance().NotifyCPReactionChanged(penguin, ui::EnCPReactionType::Happy);
 
 				if (auto* menu = InGameUIManager::GetInstance()->GetRemainingChildMenu())
 				{
@@ -491,7 +499,7 @@ namespace app
 			if (it != m_followers.end()) {
 				m_followers.erase(it);
 				ScoreManager::GetInstance().SubCollectedCount();
-				InGameUIManager::GetInstance()->GetCPReactionSystem()->SetTarget(penguin, ui::EnReactionType::Trouble);
+				BattleManager::GetInstance().NotifyCPReactionChanged(penguin, ui::EnCPReactionType::Trouble);
 				if (auto* lm = GameLogManager::GetInstance())
 					lm->QueueEvent({ {"ev", "penguin_leave"}, {"penguin_id", penguin->GetLogId()} });
 			}
