@@ -5,7 +5,7 @@
            {
                 "type":"UICircleGauge",
                 "name":"JumpStaminaGaugeA",
-                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerInnerCircle.dds",
+                "asset":"Assets/spriteData/UI/Gauge/PenguinStamina/PenguinStaminaInnerCircle.dds",
                 "fx":"Assets/shader/CircleGauge.fx",
                 "width":150,
                 "height":150,
@@ -21,7 +21,7 @@
             {
                 "type":"UICircleGauge",
                 "name":"JumpStaminaGaugeB",
-                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerOuterCircle.dds",
+                "asset":"Assets/spriteData/UI/Gauge/PenguinStamina/PenguinStaminaOuterCircle.dds",
                 "fx":"Assets/shader/CircleGauge.fx",
                 "width":150,
                 "height":150,
@@ -37,7 +37,7 @@
             {
                 "type":"UICircleGauge",
                 "name":"SlideStaminaGaugeA",
-                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerInnerCircle.dds",
+                "asset":"Assets/spriteData/UI/Gauge/PenguinStamina/PenguinStaminaInnerCircle.dds",
                 "fx":"Assets/shader/CircleGauge.fx",
                 "width":150,
                 "height":150,
@@ -53,7 +53,7 @@
             {
                 "type":"UICircleGauge",
                 "name":"SlideStaminaGaugeB",
-                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerOuterCircle.dds",
+                "asset":"Assets/spriteData/UI/Gauge/PenguinStamina/PenguinStaminaOuterCircle.dds",
                 "fx":"Assets/shader/CircleGauge.fx",
                 "width":150,
                 "height":150,

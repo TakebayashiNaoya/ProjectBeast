@@ -130,7 +130,7 @@ namespace app
 					}
 					else {
 						gaugeA->m_isDraw = true;
-						gaugeB->m_isDraw = true;
+						gaugeB->m_isDraw = false;
 					}
 				};
 
