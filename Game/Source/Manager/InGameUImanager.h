@@ -226,6 +226,9 @@ namespace app
 		std::unique_ptr<ui::DangerArrowSystem> m_dangerArrowSystem;
 		std::unique_ptr<ui::BearReactionSystem> m_bearReactionSystem;
 
+		/** ボタンUIのスタミナゲージ通知用に、親ペンギンのポインタをキャッシュしておく */
+		actor::DaddyPenguin* m_daddyPenguin = nullptr;
+
 
 		//============================================//
 		// シングルトン関連

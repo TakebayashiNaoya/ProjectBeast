@@ -31,17 +31,19 @@ namespace app
 			const std::vector<std::string> digitNames,
 			const Vector3 startOffset,
 			float duration,
-			const std::vector<std::string> textNames
+			const std::vector<std::string> textNames,
+			const std::vector<std::string> gaugeNames
 		)
 		{
 			if (menu == nullptr) return;
 			m_menu = menu;
 			m_startOffset = startOffset;
 			m_duration = util::clamp(duration, 0.1f, 10.0f);
-			m_totalSize = iconNames.size() + digitNames.size() + textNames.size();
+			m_totalSize = iconNames.size() + digitNames.size() + textNames.size() + gaugeNames.size();
 			m_iconNames = iconNames;
 			m_digitNames = digitNames;
 			m_textNames = textNames;
+			m_gaugeNames = gaugeNames;
 
 			m_uiParts.reserve(m_totalSize);
 
@@ -120,6 +122,8 @@ namespace app
 				m_uiParts.push_back(m_menu->GetUI<UIDigit>(Hash32(name.c_str())));
 			for (const auto& name : m_textNames)
 				m_uiParts.push_back(m_menu->GetUI<UIText>(Hash32(name.c_str())));
+			for (const auto& name : m_gaugeNames)
+				m_uiParts.push_back(m_menu->GetUI<UICircleGauge>(Hash32(name.c_str())));
 		}
 	}
 }

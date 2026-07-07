@@ -15,6 +15,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 
 #include "Source/UI/Layout.h"
 
@@ -192,6 +193,9 @@ namespace app
 		auto& bm = BattleManager::GetInstance();
 
 		auto* daddyPenguin = bm.GetDaddyPenguin();
+
+		// スタミナゲージUI通知用にキャッシュしておく
+		m_daddyPenguin = daddyPenguin;
 
 		// UIがnullptrでないかをチェックするラムダ
 		auto CheckMenu = [](ui::MenuBase* menu)
@@ -374,6 +378,19 @@ namespace app
 			if (auto* listMenu = m_achievementPacket->GetMenu())
 			{
 				listMenu->SetDraw(!isShowing);
+			}
+		}
+
+		// ジャンプ・スライドのスタミナ状態をボタンUIへ通知する（毎フレーム）
+		if (m_daddyPenguin && m_inGameButtonPacket)
+		{
+			if (auto* menu = m_inGameButtonPacket->GetMenu())
+			{
+				if (auto* sm = m_daddyPenguin->GetStateMachine())
+				{
+					menu->SetJumpStaminaInfo(sm->GetJumpStaminaRatio(), !sm->CanUseJump());
+					menu->SetSlideStaminaInfo(sm->GetSlideStaminaRatio(), !sm->CanUseSlide());
+				}
 			}
 		}
 

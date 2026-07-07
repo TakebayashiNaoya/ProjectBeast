@@ -1,0 +1,44 @@
+{
+    "animations":[
+      {
+        "comment":"ジャンプスタミナゲージ ロック演出（通常色→ロック色）",
+        "key":"jumpGaugeLockAnim",
+        "valueType":"Vector4",
+        "startValue":{"x":1.0,"y":1.0,"z":1.0,"w":1.0},
+        "endValue":{"x":0.5,"y":0.5,"z":0.5,"w":1.0},
+        "duration":0.2,
+        "easing":"Linear",
+        "loop":"Once"
+      },
+      {
+        "comment":"ジャンプスタミナゲージ 復帰演出（ロック色→通常色）",
+        "key":"jumpGaugeUnlockAnim",
+        "valueType":"Vector4",
+        "startValue":{"x":0.5,"y":0.5,"z":0.5,"w":1.0},
+        "endValue":{"x":1.0,"y":1.0,"z":1.0,"w":1.0},
+        "duration":0.3,
+        "easing":"Linear",
+        "loop":"Once"
+      },
+      {
+        "comment":"スライドスタミナゲージ ロック演出（通常色→ロック色）",
+        "key":"slideGaugeLockAnim",
+        "valueType":"Vector4",
+        "startValue":{"x":1.0,"y":1.0,"z":1.0,"w":1.0},
+        "endValue":{"x":0.5,"y":0.5,"z":0.5,"w":1.0},
+        "duration":0.2,
+        "easing":"Linear",
+        "loop":"Once"
+      },
+      {
+        "comment":"スライドスタミナゲージ 復帰演出（ロック色→通常色）",
+        "key":"slideGaugeUnlockAnim",
+        "valueType":"Vector4",
+        "startValue":{"x":0.5,"y":0.5,"z":0.5,"w":1.0},
+        "endValue":{"x":1.0,"y":1.0,"z":1.0,"w":1.0},
+        "duration":0.3,
+        "easing":"Linear",
+        "loop":"Once"
+      }
+    ]
+}

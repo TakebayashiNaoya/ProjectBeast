@@ -1,6 +1,72 @@
 {
     "canvas":{
         "elements":[
+
+           {
+                "type":"UICircleGauge",
+                "name":"JumpStaminaGaugeA",
+                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerInnerCircle.dds",
+                "fx":"Assets/shader/CircleGauge.fx",
+                "width":150,
+                "height":150,
+                "position":[640,-390,0],
+                "scale":[1.2,1.2,1.2],
+                "rotation":0,
+                "pivot":[0.5,0.5],
+                "gaugeColor":[255,255,255,0],
+                "bgColor":[255,255,255,255],
+                "innerRadius":0.0,
+                "outerRadius":0.25
+            },
+            {
+                "type":"UICircleGauge",
+                "name":"JumpStaminaGaugeB",
+                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerOuterCircle.dds",
+                "fx":"Assets/shader/CircleGauge.fx",
+                "width":150,
+                "height":150,
+                "position":[640,-390,0],
+                "scale":[1.2,1.2,1.2],
+                "rotation":0,
+                "pivot":[0.5,0.5],
+                "gaugeColor":[255,255,255,255],
+                "bgColor":[255,255,255,120],
+                "innerRadius":0.25,
+                "outerRadius":0.30
+            },
+            {
+                "type":"UICircleGauge",
+                "name":"SlideStaminaGaugeA",
+                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerInnerCircle.dds",
+                "fx":"Assets/shader/CircleGauge.fx",
+                "width":150,
+                "height":150,
+                "position":[535,-280,0],
+                "scale":[1.2,1.2,1.2],
+                "rotation":0,
+                "pivot":[0.5,0.5],
+                "gaugeColor":[255,255,255,0],
+                "bgColor":[255,255,255,255],
+                "innerRadius":0.0,
+                "outerRadius":0.25
+            },
+            {
+                "type":"UICircleGauge",
+                "name":"SlideStaminaGaugeB",
+                "asset":"Assets/spriteData/UI/Gauge/PBTimerGauge/PBTimerOuterCircle.dds",
+                "fx":"Assets/shader/CircleGauge.fx",
+                "width":150,
+                "height":150,
+                "position":[535,-280,0],
+                "scale":[1.2,1.2,1.2],
+                "rotation":0,
+                "pivot":[0.5,0.5],
+                "gaugeColor":[255,255,255,255],
+                "bgColor":[255,255,255,120],
+                "innerRadius":0.25,
+                "outerRadius":0.30
+            },
+
             {
                 "type":"UIIcon",
                 "name":"NotInputJumpIcon",

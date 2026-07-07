@@ -50,6 +50,12 @@ namespace app
 			/** リザルト画面用のUIAnimationKey */
 			constexpr uint32_t SCORE_POPUP_FADE_IN_ANIM_KEY = Hash32("scorePopupFadeIn");
 			constexpr uint32_t SCORE_POPUP_FADE_OUT_ANIM_KEY = Hash32("scorePopupFadeOut");
+
+			/** インゲームボタンのスタミナゲージ専用のUIAnimationKey */
+			constexpr uint32_t JUMP_GAUGE_LOCK_ANIM_KEY = Hash32("jumpGaugeLockAnim");
+			constexpr uint32_t JUMP_GAUGE_UNLOCK_ANIM_KEY = Hash32("jumpGaugeUnlockAnim");
+			constexpr uint32_t SLIDE_GAUGE_LOCK_ANIM_KEY = Hash32("slideGaugeLockAnim");
+			constexpr uint32_t SLIDE_GAUGE_UNLOCK_ANIM_KEY = Hash32("slideGaugeUnlockAnim");
 		}
 	}
 }
