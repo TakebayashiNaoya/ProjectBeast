@@ -4,7 +4,7 @@
  * @author 忽那
  */
 #pragma once
-#include "Source/UI/Parts/UIParts.h"
+#include "Source/UI/UIParts.h"
 
 
 namespace app
@@ -21,7 +21,7 @@ namespace app
 		class MenuBase : public Noncopyable
 		{
 		public:
-			MenuBase(){}
+			MenuBase() {}
 			virtual ~MenuBase() { Clear(); }
 
 			/** 更新処理 */
@@ -49,14 +49,14 @@ namespace app
 			 * @param canvas　新しいキャンバスを設定
 			 */
 			void SetCanvas(UICanvas* canvas) { m_canvas.reset(canvas); }
-			
+
 			/**
 			 * @brief キャンバスを取得
 			 * @return キャンバスのポインタを取得
 			 */
 			UICanvas* GetCanvas() { return m_canvas.get(); }
 
-			/** 
+			/**
 			 * @brief UIを登録
 			 * @param key キー
 			 * @param ui UI
@@ -101,12 +101,12 @@ namespace app
 				m_uiMap.clear();
 			}
 
-			/** 
+			/**
 			 * @brief UIのロジック初期化処理
 			 * @brief ここに「ボタンが押された時の処理」等を書く
 			 * @brief 純粋仮想関数。MenuBaseを継承したクラスは必ずこの関数を実装する必要がある。
 			 */
-			virtual void InitializeLogic(){}
+			virtual void InitializeLogic() {}
 
 
 		protected:

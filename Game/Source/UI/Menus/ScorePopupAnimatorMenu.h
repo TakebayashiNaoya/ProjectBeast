@@ -5,7 +5,7 @@
  */
 #pragma once
 #include "Source/UI/Model/ScorePopupAnimStatus.h"
-#include "Source/UI/Parts/UIParts.h"
+#include "Source/UI/UIParts.h"
 
 
 namespace app

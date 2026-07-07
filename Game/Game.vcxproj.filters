@@ -40,9 +40,6 @@
     <Filter Include="Source\Nature">
       <UniqueIdentifier>{b6ca2941-3d62-46dc-a3a0-425d9f251aaf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI\Parts">
-      <UniqueIdentifier>{6688680a-f2a0-456e-8b43-c4e3bf2b07a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\UI\Animation">
       <UniqueIdentifier>{f5985fd0-9809-47c3-9b73-7ba13e9b0744}</UniqueIdentifier>
     </Filter>
@@ -57,9 +54,6 @@
     </Filter>
     <Filter Include="Source\UI\WpWarning">
       <UniqueIdentifier>{8fe50806-f46e-44b2-9c3c-384aa9f4e29d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\UI\SystemBase">
-      <UniqueIdentifier>{5baf1a1c-6f2f-454d-820e-fe2856b8490a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Actor">
       <UniqueIdentifier>{e868b53b-57d1-4329-9910-c48a40ebf6cd}</UniqueIdentifier>
@@ -94,9 +88,6 @@
     <Filter Include="Source\UI\RemainingChild">
       <UniqueIdentifier>{761969bc-a80d-46bd-b94a-fd6e027c74ef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI\InGameStartingAnimLogic">
-      <UniqueIdentifier>{45839254-7808-43c3-a769-ff8baf219a91}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\UI\MiniMap">
       <UniqueIdentifier>{4948fc8c-fd5e-4b23-b2dd-3fcfeaa6d56b}</UniqueIdentifier>
     </Filter>
@@ -124,8 +115,20 @@
     <Filter Include="Source\UI\BearReaction">
       <UniqueIdentifier>{65fa1729-2cfa-455d-96f1-6b17d7826e6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI\Input">
+    <Filter Include="Source\UI\Modules">
+      <UniqueIdentifier>{28efbe8c-ea57-472e-94b7-3e6e0fecdd84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Modules\Input">
       <UniqueIdentifier>{20a7d61a-4eea-4a5b-976b-e562f84acf2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Modules\InGameStartingAnimLogic">
+      <UniqueIdentifier>{45839254-7808-43c3-a769-ff8baf219a91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Modules\SystemPacket">
+      <UniqueIdentifier>{5baf1a1c-6f2f-454d-820e-fe2856b8490a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI\Modules\FrontChecker">
+      <UniqueIdentifier>{79145728-3639-4801-90bd-867ec9ce8236}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -400,9 +403,6 @@
     <ClCompile Include="Source\UI\Animation\UIAnimation.cpp">
       <Filter>Source\UI\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Parts\UIParts.cpp">
-      <Filter>Source\UI\Parts</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Model\PBWakingUpTimerStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
@@ -471,9 +471,6 @@
     </ClCompile>
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp">
       <Filter>Source\UI\RemainingChild</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp">
-      <Filter>Source\UI\InGameStartingAnimLogic</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp">
       <Filter>Source\UI\MiniMap</Filter>
@@ -589,11 +586,20 @@
     <ClCompile Include="Source\UI\Model\ScorePopupAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Input\UIInputController.cpp">
-      <Filter>Source\UI\Input</Filter>
+    <ClCompile Include="Source\UI\UIParts.cpp">
+      <Filter>Source\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Input\UICursorSelector.cpp">
-      <Filter>Source\UI\Input</Filter>
+    <ClCompile Include="Source\UI\Modules\Input\UIInputController.cpp">
+      <Filter>Source\UI\Modules\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Modules\Input\UICursorSelector.cpp">
+      <Filter>Source\UI\Modules\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Modules\InGameStartingAnimLogic\InGameStartingAnimLogic.cpp">
+      <Filter>Source\UI\Modules\InGameStartingAnimLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Modules\FrontChecker\FrontChecker.cpp">
+      <Filter>Source\UI\Modules\FrontChecker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -664,6 +670,9 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h">
       <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sound\SoundHandle.h">
+      <Filter>Source\Sound</Filter>
     </ClInclude>
     <ClInclude Include="Source\Sound\SoundManager.h">
       <Filter>Source\Sound</Filter>
@@ -882,9 +891,6 @@
     <ClInclude Include="Source\UI\Animation\UIAnimationParameter.h">
       <Filter>Source\UI\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Parts\UIParts.h">
-      <Filter>Source\UI\Parts</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Model\PBWakingUpTimerStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
@@ -951,9 +957,6 @@
     <ClInclude Include="Source\UI\WpWarning\WpWarningSystem.h">
       <Filter>Source\UI\WpWarning</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\System\SystemPacket.h">
-      <Filter>Source\UI\SystemBase</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
       <Filter>Source\UI\WpWarning</Filter>
     </ClInclude>
@@ -971,9 +974,6 @@
     </ClInclude>
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h">
       <Filter>Source\UI\RemainingChild</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\InGameStartingAnimLogic\InGameStartingAnimLogic.h">
-      <Filter>Source\UI\InGameStartingAnimLogic</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h">
       <Filter>Source\UI\MiniMap</Filter>
@@ -1098,20 +1098,47 @@
     <ClInclude Include="Source\UI\MiniMap\MiniMapTypes.h">
       <Filter>Source\UI\MiniMap</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h" />
-    <ClInclude Include="Source\UI\BearReaction\BearReactionSystem.h" />
-    <ClInclude Include="Source\UI\BearReaction\BearReactionTypes.h" />
-    <ClInclude Include="Source\UI\BearReaction\MasterBearReactionParameter.h" />
-    <ClInclude Include="Source\UI\Menus\ScorePopupAnimatorMenu.h" />
-    <ClInclude Include="Source\UI\Model\ScorePopupAnimStatus.h" />
-    <ClInclude Include="Source\UI\Input\UIInputController.h">
-      <Filter>Source\UI\Input</Filter>
+    <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h">
+      <Filter>Source\UI\BearReaction</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Input\UICursorSelector.h">
-      <Filter>Source\UI\Input</Filter>
+    <ClInclude Include="Source\UI\BearReaction\BearReactionSystem.h">
+      <Filter>Source\UI\BearReaction</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Input\Types.h">
-      <Filter>Source\UI\Input</Filter>
+    <ClInclude Include="Source\UI\BearReaction\BearReactionTypes.h">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\BearReaction\MasterBearReactionParameter.h">
+      <Filter>Source\UI\BearReaction</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\ScorePopupAnimatorMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\ScorePopupAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\UIParts.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Modules\System\SystemPacket.h">
+      <Filter>Source\UI\Modules\SystemPacket</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Modules\Input\UICursorSelector.h">
+      <Filter>Source\UI\Modules\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Modules\Input\UIInputController.h">
+      <Filter>Source\UI\Modules\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Modules\Input\Types.h">
+      <Filter>Source\UI\Modules\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Modules\InGameStartingAnimLogic\InGameStartingAnimLogic.h">
+      <Filter>Source\UI\Modules\InGameStartingAnimLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Modules\FrontChecker\FrontChecker.h">
+      <Filter>Source\UI\Modules\FrontChecker</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\CPReaction\CPReactionTypes.h">
+      <Filter>Source\UI\CPReaction</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

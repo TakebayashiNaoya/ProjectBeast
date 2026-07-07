@@ -5,7 +5,8 @@
  */
 #pragma once
 #include "BearReactionTypes.h"
-#include "Source/UI/System/SystemPacket.h"
+#include "Source/UI/Modules/FrontChecker/FrontChecker.h"
+#include "Source/UI/Modules/System/SystemPacket.h"
 
 
 namespace app

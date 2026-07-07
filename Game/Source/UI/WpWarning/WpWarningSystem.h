@@ -4,20 +4,13 @@
  * @author 藤谷
  */
 #pragma once
-#include "Source/UI/System/SystemPacket.h"
+#include "Source/UI/Modules/FrontChecker/FrontChecker.h"
+#include "Source/UI/Modules/System/SystemPacket.h"
 
-#include "WpWarningMenu.h"
 
 
 namespace app
 {
-	namespace actor
-	{
-		/** 前方宣言 */
-		class DaddyPenguin;
-	}
-
-
 	namespace ui
 	{
 		/** パケットの数 */
@@ -26,6 +19,7 @@ namespace app
 
 		/** 前方宣言 */
 		class WpWarningStatus;
+		class WpWarningMenu;
 
 
 		/**
@@ -40,13 +34,31 @@ namespace app
 
 		public:
 			/**
-			 * @brief 親ペンギンのセット
-			 * @param daddyPenguin 親ペンギンのポインタ
+			 * @brief 親ペンギンの位置を設定
+			 * @param trs 親ペンギンのトランスフォーム
 			 */
-			void SetDaddyPenguin(actor::DaddyPenguin* daddyPenguin)
+			void SetDaddyTRS(const core::Transform& trs)
 			{
-				m_daddyPenguin = daddyPenguin;
+				m_daddyTransform.m_position = trs.m_position;
+				m_daddyTransform.m_rotation = trs.m_rotation;
+				m_daddyTransform.m_scale = trs.m_scale;
 			}
+
+
+			/**
+			 * @brief 渦潮の位置を設定
+			 * @param positions 渦潮の位置の配列
+			 */
+			void SetWhirlpoolPositions(const std::vector<Vector3>& positions)
+			{
+				m_whirlpoolPositions = positions;
+			}
+
+
+			/**
+			 * @brief 描画フラグの更新
+			 */
+			void UpdateDrawFlags();
 
 
 		public:
@@ -61,29 +73,15 @@ namespace app
 
 
 		private:
-			/** @brief 描画フラグの更新 */
-			void UpdateDrawFlags();
-
-
-		private:
 			/** パケットの配列 */
-			std::array<SystemPacket<WpWarningMenu>, PACKET_NUM> m_packets;
+			std::array<UIPacket<WpWarningMenu>, PACKET_NUM> m_packets;
 			/** 親ステータス */
 			std::unique_ptr<WpWarningStatus> m_parentStatus;
-			/** 親ペンギン */
-			actor::DaddyPenguin* m_daddyPenguin;
 
-
-		private:
-			/** 渦潮の情報を格納する構造体 */
-			struct WpInfo
-			{
-				float lengthSq;
-				nature::Whirlpool* wp;
-			};
-
-			/** 渦潮の情報の配列 */
-			std::vector<WpInfo> m_wpInfos;
+			/** 親ペンギンの変換 */
+			core::Transform m_daddyTransform;
+			/** 渦潮の位置の配列 */
+			std::vector<Vector3> m_whirlpoolPositions;
 		};
 	}
 }

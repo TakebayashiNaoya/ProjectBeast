@@ -6,11 +6,10 @@
 #include "stdafx.h"
 #include "WpWarningSystem.h"
 
+#include "WpWarningMenu.h"
 #include "WpWarningStatus.h"
 
-#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
-#include "Source/Nature/Whirlpool.h"
-#include "Source/Nature/WhirlpoolManager.h"
+#include "Source/UI/Modules/FrontChecker/FrontChecker.h"
 
 
 namespace app
@@ -24,8 +23,8 @@ namespace app
 		WpWarningSystem::WpWarningSystem()
 			: m_packets()
 			, m_parentStatus(nullptr)
-			, m_daddyPenguin(nullptr)
-			, m_wpInfos(0)
+			, m_daddyTransform()
+			, m_whirlpoolPositions{}
 		{}
 
 
@@ -43,20 +42,17 @@ namespace app
 			for (auto& packet : m_packets)
 			{
 				// packetの中身を生成、初期化
-				packet.Initialize("Assets/parameter/UI/wpWarning/WpWarning.json");
-				// packetのMenuにステータスをセット
-				packet.GetMenu()->SetStatus(m_parentStatus.get());
+				InitUIPacket(packet, "Assets/parameter/UI/wpWarning/WpWarning.json");
+				packet->GetMenu()->SetStatus(m_parentStatus.get());
 			}
 		}
 
 
 		void WpWarningSystem::Update()
 		{
-			UpdateDrawFlags();
-
 			for (auto& packet : m_packets)
 			{
-				packet.Update();
+				packet->Update();
 			}
 		}
 
@@ -65,86 +61,87 @@ namespace app
 		{
 			for (auto& packet : m_packets)
 			{
-				packet.Render(rc);
+				packet->Render(rc);
 			}
 		}
 
 
 		void WpWarningSystem::UpdateDrawFlags()
 		{
-			// 渦潮マネージャーを取得
-			auto* manager = nature::WhirlpoolManager::GetInstance();
-			if (!manager) return;
-
 			// 親ペンギンの位置を取得
-			if (!m_daddyPenguin) return;
 			const Vector3 dpPosition = Vector3(
-				m_daddyPenguin->GetTransform().m_position.x,
+				m_daddyTransform.m_position.x,
 				0.0f,
-				m_daddyPenguin->GetTransform().m_position.z
+				m_daddyTransform.m_position.z
 			);
+
 
 			// 描画距離の2乗と比較して、描画フラグを更新する
 			constexpr float drawableLengthSq = DRAWABLE_LENGTH * DRAWABLE_LENGTH;
 
+			auto& posses = m_whirlpoolPositions;
 
-			// 規定距離よりも近い渦潮に対して距離とポインタを保存する
-			m_wpInfos.clear();
-
-			// 渦潮を走査
-			// 規定の距離よりも近い渦潮を描画フラグ更新の対象とする
-			manager->ForEach([&](nature::Whirlpool* info)
-				{
-					// 渦潮の位置を取得
-					const Vector3 wpPosition = Vector3(
-						info->GetTransform().m_position.x,
-						0.0f,
-						info->GetTransform().m_position.z
-					);
-
-					// 親ペンギンと渦潮の距離の2乗を計算
-					const float diffSq = (dpPosition - wpPosition).LengthSq();
-
-
-					if (diffSq <= drawableLengthSq)
+			// 規定距離よりも長いものを除外する
+			m_whirlpoolPositions.erase(
+				std::remove_if(posses.begin(), posses.end(),
+					[drawableLengthSq, dpPosition](const Vector3& position)
 					{
-						m_wpInfos.push_back({ diffSq, info });
+						const float diffSq = (dpPosition - position).LengthSq();
+						return diffSq > drawableLengthSq;
 					}
-				});
-
-			// 範囲内に存在する渦潮の数が規定よりも多い場合、パケットの数に絞る
-			const size_t dataNum = std::min<size_t>(m_wpInfos.size(), PACKET_NUM);
-
-			// 距離の近いものを取得
-			std::partial_sort(
-				m_wpInfos.begin(),
-				m_wpInfos.begin() + dataNum,
-				m_wpInfos.end(),
-				[](const WpInfo& a, const WpInfo& b)
-				{
-					return a.lengthSq < b.lengthSq;
-				}
+				),
+				posses.end()
 			);
+			// 上位3つ手前にソート
+			const size_t size = std::min<size_t>(PACKET_NUM, posses.size());
 
+			auto distanceLess = [dpPosition](const Vector3& a, const Vector3& b)
+				{
+					const float diffSqA = (dpPosition - a).LengthSq();
+					const float diffSqB = (dpPosition - b).LengthSq();
+					return diffSqA < diffSqB;
+				};
 
-			// 描画フラグを更新
-			for (size_t i = 0; i < m_packets.size(); ++i)
+			// 渦潮数がPACKET_NUMより多い場合のみ、上位size個を前方に集める
+			// (size == posses.size() の場合、nth が end() になり並び替えが不要なため)
+			if (posses.size() > size)
 			{
-				// パケットからMenuを取得
-				auto* menu = m_packets.at(i).GetMenu();
-				if (!menu) continue;
+				std::nth_element(posses.begin(), posses.begin() + size, posses.end(), distanceLess);
+			}
 
-				// 近くに渦潮が存在しない場合描画しない
-				if (i < dataNum)
+			// UIスロットの割当がフレーム間で入れ替わらないよう、先頭size個を距離順に確定させる
+			std::sort(posses.begin(), posses.begin() + size, distanceLess);
+
+			for (uint8_t i = 0; i < PACKET_NUM; ++i)
+			{
+				auto* menu = m_packets.at(i)->GetMenu();
+
+				if (i >= posses.size())
 				{
-					menu->SetIsDraw(true);
-					menu->SetWhirlpool(m_wpInfos.at(i).wp);
-				}
-				else
-				{
+					menu->SetTargetPosition(Vector3::Zero);
 					menu->SetIsDraw(false);
-					menu->SetWhirlpool(nullptr);
+					continue;
 				}
+
+				// 3d座標を2d座標に変換して、UIの位置を更新する
+				Vector2 screenPosition = Vector2::Zero;
+				CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPosition, posses.at(i));
+
+				const Vector3 uiPosition = Vector3(
+					screenPosition.x,
+					screenPosition.y + m_parentStatus->GetIconOffsetY(),
+					0.0f
+				);
+				menu->SetTargetPosition(uiPosition);
+
+				const bool isDraw = FrontChecker::IsInFront(
+					m_daddyTransform.m_position,
+					m_daddyTransform.m_rotation,
+					posses.at(i)
+				);
+
+
+				menu->SetIsDraw(isDraw);
 			}
 		}
 	}

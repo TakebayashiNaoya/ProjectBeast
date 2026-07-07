@@ -5,8 +5,9 @@
  */
 #pragma once
 #include "Source/UI/Menu.h"
-#include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
+
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
+#include "Source/UI/Modules/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
 namespace app
@@ -95,22 +96,22 @@ namespace app
 			int m_fromSlot[4] = { 0, 1, 2, -1 };
 
 			/** FormationWheelTuning.json からホットリロードされる見た目パラメーター */
-			float m_centerX	    = 640.0f;  /** 中央X座標 */
-			float m_rowY	    = -80.0f;  /** 中央Y座標 */
+			float m_centerX = 640.0f;  /** 中央X座標 */
+			float m_rowY = -80.0f;  /** 中央Y座標 */
 			float m_slotSpacing = 80.0f;   /** スロット間のX座標間隔 */
 			float m_currentSize = 80.0f;   /** 中央アイコンのサイズ */
-			float m_sideSize    = 50.0f;   /** 隣接アイコンのサイズ */
-			float m_sideAlpha   = 0.78f;   /** 隣接アイコンのアルファ値 */
+			float m_sideSize = 50.0f;   /** 隣接アイコンのサイズ */
+			float m_sideAlpha = 0.78f;   /** 隣接アイコンのアルファ値 */
 			Vector3 m_iconColor = Vector3(255.0f, 255.0f, 255.0f);   /** アイコンのRGB色 */
 			float m_pulseAmplitude = 0.15f;   /** パルス演出の振幅(等倍1.0に対する割合) */
-			float m_pulseSpeed     = 6.0f;    /** パルス演出の速さ(ラジアン/秒) */
+			float m_pulseSpeed = 6.0f;    /** パルス演出の速さ(ラジアン/秒) */
 
 			/** パルス演出用の経過時間(常時加算し続ける) */
 			float m_pulseTimer = 0.0f;
 
 #if defined(APP_DEBUG)
 			time_t m_tuningLastWriteTime = 0;    /** チューニングJSONの最終更新日時 */
-			float  m_tuningReloadTimer   = 0.0f; /** チューニングJSONの変更チェック用タイマー */
+			float  m_tuningReloadTimer = 0.0f; /** チューニングJSONの変更チェック用タイマー */
 #endif
 
 			/** ゲーム開始時に画面外右からスライドインさせる演出 */

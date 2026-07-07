@@ -169,15 +169,31 @@ namespace app
 
 
 			// 渦潮の座標を取得する
-			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* whirlpool)
-				{
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool)).push_back(whirlpool->GetTransform().m_position);
-				});
-
-
+			if (auto* wm = nature::WhirlpoolManager::GetInstance())
+			{
+				wm->ForEach([&](nature::Whirlpool* whirlpool)
+					{
+						positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool)).push_back(whirlpool->GetTransform().m_position);
+					});
+			}
 
 
 			m_onMiniMapChanged(positions);
+		}
+
+
+
+		//--------------------------------------------//
+		// 渦潮の警告座標の通知
+		//--------------------------------------------//
+		if (m_wpWarningChanged)
+		{
+			std::vector<Vector3> warningPositions;
+			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* whirlpool)
+				{
+					warningPositions.push_back(whirlpool->GetTransform().m_position);
+				});
+			m_wpWarningChanged(warningPositions);
 		}
 
 
@@ -360,6 +376,8 @@ namespace app
 		m_onSleepingEnemyChanged = nullptr;
 		m_onBearReactionChanged = nullptr;
 		m_onMiniMapChanged = nullptr;
+		m_wpWarningChanged = nullptr;
+		m_onCPReactionChanged = nullptr;
 	}
 
 

@@ -8,7 +8,6 @@
 #include "Source/Achivement/AchievementManager.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Menu.h"
-#include "Source/UI/Parts/UIParts.h"
 
 
 namespace app
