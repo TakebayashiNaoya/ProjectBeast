@@ -6,6 +6,8 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
+#include "Source/UI/InGameButton/InGameButtonGaugeAnimStatus.h"
+#include "Source/UI/InGameButton/InGameButtonGaugeStatus.h"
 #include "Source/UI/InGameStartingAnimLogic/InGameStartingAnimLogic.h"
 
 
@@ -25,6 +27,28 @@ namespace app
 			void Update() override;
 			void InitializeLogic() override;
 
+			/**
+			 * @brief ジャンプのスタミナ状態を設定する（毎フレーム外部から渡される）
+			 * @param ratio 0.0(空)〜1.0(満タン)の割合
+			 * @param isLocked クールダウン中かどうか
+			 */
+			inline void SetJumpStaminaInfo(float ratio, bool isLocked)
+			{
+				m_jumpStaminaRatio = ratio;
+				m_isJumpStaminaLocked = isLocked;
+			}
+
+			/**
+			 * @brief スライドのスタミナ状態を設定する（毎フレーム外部から渡される）
+			 * @param ratio 0.0(空)〜1.0(満タン)の割合
+			 * @param isLocked クールダウン中かどうか
+			 */
+			inline void SetSlideStaminaInfo(float ratio, bool isLocked)
+			{
+				m_slideStaminaRatio = ratio;
+				m_isSlideStaminaLocked = isLocked;
+			}
+
 
 		private:
 			/** ボタンのアイコンの更新処理 */
@@ -32,6 +56,9 @@ namespace app
 
 			/** スニーク関連アイコンのカラーをグレー / 通常に切り替える */
 			void UpdateSneakIconColor();
+
+			/** ジャンプ・スライドのスタミナサークルゲージの更新処理（追従イージング＋色演出） */
+			void UpdateStaminaGauge();
 
 			bool IsInputAButton() const;
 			bool IsInputBButton() const;
@@ -42,6 +69,29 @@ namespace app
 		private:
 			InGameStartingAnimLogic m_startingAnimLogic;
 
+			/** スタミナゲージ専用のステータス（追従速度などの数値設定） */
+			std::unique_ptr<InGameButtonGaugeStatus> m_gaugeStatus;
+			/** スタミナゲージ専用のアニメーションステータス（色演出） */
+			std::unique_ptr<InGameButtonGaugeAnimStatus> m_gaugeAnimStatus;
+
+			/** ジャンプスタミナの割合(0〜1、実値) */
+			float m_jumpStaminaRatio = 1.0f;
+			/** ジャンプスタミナがクールダウン中かどうか */
+			bool m_isJumpStaminaLocked = false;
+			/** ジャンプスタミナの表示用割合(0〜1、なめらかに追従する値) */
+			float m_jumpDisplayRatio = 1.0f;
+			/** 直前フレームでジャンプスタミナがロック中だったか（エッジ検出用） */
+			bool m_wasJumpStaminaLocked = false;
+
+			/** スライドスタミナの割合(0〜1、実値) */
+			float m_slideStaminaRatio = 1.0f;
+			/** スライドスタミナがクールダウン中かどうか */
+			bool m_isSlideStaminaLocked = false;
+			/** スライドスタミナの表示用割合(0〜1、なめらかに追従する値) */
+			float m_slideDisplayRatio = 1.0f;
+			/** 直前フレームでスライドスタミナがロック中だったか（エッジ検出用） */
+			bool m_wasSlideStaminaLocked = false;
 		};
+
 	}
 }
