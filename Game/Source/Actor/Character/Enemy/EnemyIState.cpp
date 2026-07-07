@@ -346,6 +346,11 @@ namespace app
 			m_owner->PlayAnimation(EnEnemyAnimationType::Swim);
 
 			m_splashEffectTimer = 0.0f;
+
+			if (m_owner->IsDebuffReturnHome())
+			{
+				m_owner->PlayDebuff();
+			}
 		}
 
 
@@ -424,6 +429,11 @@ namespace app
 			m_attackTimer = 0.0f;
 			m_hasFiredEffect = false;
 			m_owner->SetIsAttack(true);
+
+			if (m_owner->IsDebuffReturnHome())
+			{
+				m_owner->PlayDebuff();
+			}
 		}
 
 
@@ -503,6 +513,10 @@ namespace app
 
 			m_stepSE = app::SoundManager::Get().PlaySE(enSoundKind_EnemyStep, true);
 
+			if (m_owner->IsDebuffReturnHome())
+			{
+				m_owner->PlayDebuff();
+			}
 		}
 
 
@@ -616,6 +630,8 @@ namespace app
 
 			if (auto* lm = GameLogManager::GetInstance())
 				lm->QueueEvent({{"ev", "bear_sleep_end"}, {"bear_id", m_owner->GetOwner()->GetLogId()}, {"woken_by_noise", m_owner->IsSearch()}});
+
+			m_owner->StopDebuff();
 		}
 
 
@@ -634,6 +650,10 @@ namespace app
 			m_owner->SetMoveVector(Vector3::Zero);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Buff);
 
+			if (m_owner->IsDebuffReturnHome())
+			{
+				m_owner->PlayDebuff();
+			}
 		}
 
 

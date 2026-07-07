@@ -14,6 +14,15 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** エフェクトのスケール */
+			const Vector3 EFFECT_SCALE = { 5.0f,5.0f,5.0f };
+			/** デバフエフェクトのY軸オフセット */
+			const Vector3 POSITION_OFFSET_Y = { 0.0f,80.0f,0.0f };
+		}
+
+
 		EnemyStateMachine::EnemyStateMachine(Enemy* enemy)
 			: CharacterStateMachine(enemy)
 			, m_owner(enemy)
@@ -39,6 +48,7 @@ namespace app
 			, m_isAttackImpact(false)
 			, m_wakeUpGauge(0.0f)
 			, m_sleepTimer(0.0f)
+			, m_debuffHandle(INVALID_EFFECT_HANDLE)
 			, m_searchTargetPos(Vector3::Zero)
 		{
 			// ステートの追加
@@ -59,6 +69,34 @@ namespace app
 
 			// TODO: 初期座標のハードコーディング。必要に応じてパラメータ化を検討
 			m_transform.m_position = Vector3(0.0f, 10.0f, 100.0f);
+		}
+
+
+		void EnemyStateMachine::PlayDebuff()
+		{
+			if (m_debuffHandle != INVALID_EFFECT_HANDLE) return;
+
+			m_debuffHandle = EffectManager::Get().PlayEffect(
+				EnEffectKind::ToEnemyDebuff,
+				m_transform.m_position,
+				Quaternion::Identity,
+				EFFECT_SCALE
+			);
+			// エフェクトの位置を追従させる。
+			EffectManager::Get().AttachEffect(
+				m_debuffHandle,
+				&m_transform.m_position
+			);
+		}
+
+
+		void EnemyStateMachine::StopDebuff()
+		{
+			if (m_debuffHandle != INVALID_EFFECT_HANDLE)
+			{
+				EffectManager::Get().StopEffect(m_debuffHandle);
+				m_debuffHandle = INVALID_EFFECT_HANDLE;
+			}
 		}
 
 
@@ -185,6 +223,22 @@ namespace app
 				return true;
 			}
 			return false;
+		}
+
+
+		void EnemyStateMachine::SetDebuffReturnHome(const bool debuffReturnHome)
+		{
+			m_isDebuffReturnHome = debuffReturnHome;
+
+			if (m_isDebuffReturnHome)
+			{
+				// デバフがかかっている間はエフェクトを再生する（PlayDebuff側で多重再生は防止済み）
+				PlayDebuff();
+			}
+			else
+			{
+				StopDebuff();
+			}
 		}
 
 
