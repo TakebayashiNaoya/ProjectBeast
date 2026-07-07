@@ -206,8 +206,46 @@ namespace app
 			// 今の総数と異なっていたら
 			if (m_totalNum != num)
 			{
+				/** 増えるアニメーション（フィーバーで新たに降ってきた時など） */
+				if (m_totalNum < num)
+				{
+					// 0番目にアクセスする。
+					auto& seq = m_sequences[static_cast<int>(SeqType::TotalPlus)];
+
+					// 総数増加アニメーションを消去。
+					totalText->RemoveAnimation(animKey::RESCUE_TOTAL_TLANSLATE_UP_ANIM_KEY);
+					totalText->RemoveAnimation(animKey::RESCUE_TOTAL_BOUNCE_DOWN_ANIM_KEY);
+
+					// 座標アニメーションを登録。
+					UIAnimationFactory::Attach<UITranslateAnimation>(totalText, animKey::RESCUE_TOTAL_TLANSLATE_UP_ANIM_KEY);
+					// 座標アニメーションを登録。(バウンドあり)
+					UIAnimationFactory::Attach<UITranslateAnimation>(totalText, animKey::RESCUE_TOTAL_BOUNCE_DOWN_ANIM_KEY);
+
+					// シーケンスをクリア。
+					seq.Clear();
+
+					// メソッドチェーンシーケンスにアニメーションとSEを追加。
+					seq
+						// アニメーション開始時にSEを再生する。
+						.Add(animKey::RESCUE_TOTAL_TLANSLATE_UP_ANIM_KEY, 0.0f
+							, [totalText]()
+							{
+								// SEを再生。
+								SoundManager::Get().PlaySE(enSoundKind_RemainPlus, 2.0f);
+							}
+							, []() {})
+						// アニメーション完了後にSEを停止する。
+						.Add(animKey::RESCUE_TOTAL_BOUNCE_DOWN_ANIM_KEY, 0.0f
+							, []() {}
+							, []() {}
+						);
+
+					// シーケンスを再生。
+					seq.Play(totalText);
+				}
+
 				/** 減るアニメーション */
-				if (m_totalNum > num)
+				else if (m_totalNum > num)
 				{
 					// 2番目にアクセスする。
 					auto& seq = m_sequences[static_cast<int>(SeqType::TotalMinus)];

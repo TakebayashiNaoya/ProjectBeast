@@ -316,6 +316,7 @@
     <ClCompile Include="Source\GameLog\GameLogManager.cpp" />
     <ClCompile Include="Source\Graphics\PBRStatus.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
+    <ClCompile Include="Source\Manager\FeverTimeManager.cpp" />
     <ClCompile Include="Source\Manager\IglooManager.cpp" />
     <ClCompile Include="Source\Manager\InGameUImanager.cpp" />
     <ClCompile Include="Source\Manager\ScoreManager.cpp" />
@@ -345,6 +346,7 @@
     <ClCompile Include="Source\UI\CPReaction\MasterCPReactionParameter.cpp" />
     <ClCompile Include="Source\UI\DangerArrow\DangerArrowMenu.cpp" />
     <ClCompile Include="Source\UI\DangerArrow\DangerArrowSystem.cpp" />
+    <ClCompile Include="Source\UI\Fever\FeverIconMenu.cpp" />
     <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeStatus.cpp" />
@@ -491,6 +493,7 @@
     <ClInclude Include="Source\Graphics\PBRParameter.h" />
     <ClInclude Include="Source\Graphics\PBRStatus.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
+    <ClInclude Include="Source\Manager\FeverTimeManager.h" />
     <ClInclude Include="Source\Manager\IglooManager.h" />
     <ClInclude Include="Source\Manager\InGameUImanager.h" />
     <ClInclude Include="Source\Manager\ScoreManager.h" />
@@ -535,6 +538,7 @@
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowCalc.h" />
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowMenu.h" />
     <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h" />
+    <ClInclude Include="Source\UI\Fever\FeverIconMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeStatus.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />

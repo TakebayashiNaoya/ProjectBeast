@@ -93,12 +93,14 @@ namespace app
 		enSoundKind_InGame = enSoundKind_BGM,
 		enSoundKind_Title,
 		enSoundKind_Result,
+		enSoundKind_FeverTime,
 
 		// =========================================================================
 		// Voice (ボイス)
 		// =========================================================================
 		enSoundKind_Voice,
 		enSoundKind_bootA = enSoundKind_Voice,
+		enSoundKind_fever,
 
 		// =========================================================================
 		// 全体の最大数定義
@@ -198,10 +200,12 @@ namespace app
 		SoundInformation("Assets/sound/BGM/inGame.wav"),
 		SoundInformation("Assets/sound/BGM/title.wav"),
 		SoundInformation("Assets/sound/BGM/result.wav"),
+		SoundInformation("Assets/sound/BGM/FeverTime.wav"),
 
 		// -------------------------------------------------------------------------
 		// Voice (ボイス)
 		// -------------------------------------------------------------------------
-		SoundInformation("Assets/sound/Voice/bootA.wav")
+		SoundInformation("Assets/sound/Voice/bootA.wav"),
+		SoundInformation("Assets/sound/Voice/fever.wav")
 	};
 }

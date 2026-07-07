@@ -110,6 +110,21 @@ namespace app
 		for (auto& infoList : m_seInfomationList) {
 			infoList.clear();
 		}
+
+		/** BGMフェードアウトの進行 */
+		if (m_isBgmFading && m_bgm != nullptr)
+		{
+			m_bgmFadeTimer += g_gameTime->GetFrameDeltaTime();
+			const float t = std::clamp(m_bgmFadeTimer / m_bgmFadeDuration, 0.0f, 1.0f);
+			const float volumeMagn = m_bgmInformation ? m_bgmInformation->m_volumeMagnification : DEFAULT_VOLUME_MAGNIFICATION;
+			m_bgm->SetVolume(m_masterVolume * m_bgmVolume * volumeMagn * (1.0f - t));
+
+			if (t >= 1.0f)
+			{
+				m_isBgmFading = false;
+				StopBGM();
+			}
+		}
 	}
 
 
@@ -131,16 +146,39 @@ namespace app
 		m_bgm->Init(kind);
 		m_bgm->Play(m_bgmInformation->m_isLoop); // 必ずtrue（ループ再生）
 
+		/** 新しいBGMを再生し直すので、進行中のフェードアウトは打ち切る */
+		m_isBgmFading = false;
+
 		ApplyBGMVolume();
 	}
 
 
 	void SoundManager::StopBGM()
 	{
+		/** 進行中のフェードアウトがあれば打ち切る（停止済みの音源に対してフェードが動き続けるのを防ぐ） */
+		m_isBgmFading = false;
+
 		if (m_bgm == nullptr) {
 			return;
 		}
 		m_bgm->Stop();
+	}
+
+
+	void SoundManager::FadeOutBGM(const float duration)
+	{
+		if (m_bgm == nullptr) return;
+
+		/** 0秒以下が指定された場合は即座に停止する */
+		if (duration <= 0.0f)
+		{
+			StopBGM();
+			return;
+		}
+
+		m_isBgmFading = true;
+		m_bgmFadeTimer = 0.0f;
+		m_bgmFadeDuration = duration;
 	}
 
 

@@ -23,6 +23,7 @@
 #include "Source/UI/BearReaction/BearReactionTypes.h"
 #include "Source/UI/CPReaction/CPReactionSystem.h"
 #include "Source/UI/DangerArrow/DangerArrowSystem.h"
+#include "Source/UI/Fever/FeverIconMenu.h"
 #include "Source/UI/FormationWheel/FormationWheelMenu.h"
 #include "Source/UI/InGameButton/InGameButtonMenu.h"
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
@@ -126,6 +127,8 @@ namespace app
 		ui::InitUIPacket(m_achievementPacket, "Assets/parameter/UI/inGameAchievement/InGameAchievement.json");
 		// インゲームボタンを生成
 		ui::InitUIPacket(m_inGameButtonPacket, "Assets/parameter/UI/inGameButton/InGameButton.json");
+		// フィーバータイム落下アイコンを生成
+		ui::InitUIPacket(m_feverIconPacket, "Assets/parameter/UI/fever/FeverIcon.json");
 		// 陣形/ウルトのボタン表示を生成
 		ui::InitUIPacket(m_formationWheelPacket, "Assets/parameter/UI/formationWheel/FormationWheel.json");
 		// 子ペンギンリアクションシステムを生成
@@ -422,6 +425,7 @@ namespace app
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Update();
 		if (m_formationWheelPacket) m_formationWheelPacket->Update();
 		if (m_debufPacket) m_debufPacket->Update();
+		if (m_feverIconPacket) m_feverIconPacket->Update();
 	}
 
 
@@ -481,6 +485,7 @@ namespace app
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Render(rc);
 		if (m_formationWheelPacket) m_formationWheelPacket->Render(rc);
 		if (m_debufPacket) m_debufPacket->Render(rc);
+		if (m_feverIconPacket) m_feverIconPacket->Render(rc);
 	}
 
 
