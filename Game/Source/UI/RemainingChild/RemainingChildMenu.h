@@ -56,6 +56,7 @@ namespace app
 			{
 				RemainPlus,
 				RemainMinus,
+				TotalPlus,
 				TotalMinus,
 				Max
 			};
