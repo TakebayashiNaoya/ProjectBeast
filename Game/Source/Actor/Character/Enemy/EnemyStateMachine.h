@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Actor/Character/CharacterStateMachine.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -139,7 +140,7 @@ namespace app
 			 * @brief デバフで帰巣するかの設定
 			 * @param debuffReturnHome デバフでの帰巣フラグ
 			 */
-			void SetDebuffReturnHome(const bool debuffReturnHome) { m_isDebuffReturnHome = debuffReturnHome; }
+			void SetDebuffReturnHome(const bool debuffReturnHome);
 			/**
 			 * @brief デバフで帰巣するかの取得
 			 * @return デバフで帰巣するかのフラグ
@@ -225,6 +226,11 @@ namespace app
 			const char* GetStateNameForLog() const;
 
 
+			public:
+				void PlayDebuff();
+				void StopDebuff();
+
+
 		private:
 			// --- マジックナンバー排除用の内部定数 ---
 			/** スティック入力の閾値 */
@@ -304,6 +310,8 @@ namespace app
 			float m_sleepTimer;
 			/** 索敵時の目標座標 */
 			Vector3 m_searchTargetPos;
+			/** デバフエフェクトハンドル */
+			app::EffectHandle m_debuffHandle;
 		};
 	}
 }

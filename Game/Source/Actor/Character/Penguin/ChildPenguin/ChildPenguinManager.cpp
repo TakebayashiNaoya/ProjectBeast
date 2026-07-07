@@ -905,7 +905,7 @@ namespace app
 						// シロクマのステートマシーンを取得。
 						EnemyStateMachine* sm = info->target->GetEnemyStateMachine();
 						
-						// 寝ている状態かつすでに帰巣中でなければデバフを発動!
+						// デバフを発動!
 						if (!sm->IsCoolDown() && !sm->IsReturnHome())
 						{
 							// デバフが発動したことをシロクマに通知。
@@ -931,7 +931,6 @@ namespace app
 					Vector3 bearPos = info->target->GetEnemyStateMachine()->GetPosition();
 					info->position = bearPos - info->modelRender.GetPosition();
 
-					// ベクトルの長さが0に限りなく近い場合は正規化しない。
 					if (info->position.LengthSq() > GHOST_DIR_NORMALIZE_SQ)
 					{
 						info->position.Normalize();
