@@ -1,7 +1,7 @@
 ﻿/**
  * @file InGameButtonGaugeAnimStatus.h
  * @brief インゲームボタンのスタミナゲージ専用のアニメーションステータスクラス
- * @author
+ * @author 立山
  */
 #pragma once
 #include "Source/UI/Animation/UIAnimationFactory.h"
@@ -18,7 +18,7 @@ namespace app
 		 */
 		class InGameButtonGaugeAnimStatus : public UIAnimationStatus
 		{
-		private:
+		public:
 			/** JSONから読み込むときの構造体のAnimデータ */
 			struct AnimData
 			{
@@ -30,27 +30,26 @@ namespace app
 			};
 
 
+		public:
+			InGameButtonGaugeAnimStatus();
+			virtual ~InGameButtonGaugeAnimStatus() override;
+
+			/** 構造体のゲッター群 */
+			AnimData GetJumpLockAnimData() const { return m_jumpLockAnimData; }
+			AnimData GetJumpUnlockAnimData() const { return m_jumpUnlockAnimData; }
+			AnimData GetSlideLockAnimData() const { return m_slideLockAnimData; }
+			AnimData GetSlideUnlockAnimData() const { return m_slideUnlockAnimData; }
+
+			void SetUp() override;
+			void Update() override;
+
+
+		private:
 			/** これらにJSONの情報を入れていく */
 			AnimData m_jumpLockAnimData;
 			AnimData m_jumpUnlockAnimData;
 			AnimData m_slideLockAnimData;
 			AnimData m_slideUnlockAnimData;
-
-
-		public:
-			InGameButtonGaugeAnimStatus();
-			virtual ~InGameButtonGaugeAnimStatus() override;
-
-
-			/** 構造体のゲッター群 */
-			AnimData GetJumpLockAnimData()const { return m_jumpLockAnimData; }
-			AnimData GetJumpUnlockAnimData()const { return m_jumpUnlockAnimData; }
-			AnimData GetSlideLockAnimData()const { return m_slideLockAnimData; }
-			AnimData GetSlideUnlockAnimData()const { return m_slideUnlockAnimData; }
-
-
-			void SetUp()override;
-			void Update()override;
 		};
 	}
 }

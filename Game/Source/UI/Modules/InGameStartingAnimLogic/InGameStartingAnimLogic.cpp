@@ -18,6 +18,7 @@ namespace app
 			: m_totalSize(0)
 			, m_iconNames{}
 			, m_digitNames{}
+			, m_gaugeNames{}
 			, m_uiParts{}
 			, m_menu(nullptr)
 			, m_startOffset(Vector3::Zero)
@@ -124,7 +125,7 @@ namespace app
 			for (const auto& name : m_textNames)
 				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
 			for (const auto& name : m_gaugeNames)
-				m_uiParts.push_back(m_menu->GetUI<UICircleGauge>(Hash32(name.c_str())));
+				m_uiParts.push_back(m_menu->GetUI<UIBase>(Hash32(name.c_str())));
 		}
 	}
 }

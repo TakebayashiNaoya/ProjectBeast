@@ -1,7 +1,7 @@
-/**
+﻿/**
  * @file MasterInGameButtonGaugeParameter.h
  * @brief インゲームボタンのスタミナゲージ専用のパラメーター管理クラス
- * @author 
+ * @author 立山
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"
@@ -19,7 +19,7 @@ namespace app
 		{
 			appParameter(MasterInGameButtonGaugeParameter);
 #if defined(APP_PARAM_HOT_RELOAD)
-			void Load(const nlohmann::json& j)override
+			void Load(const nlohmann::json& j) override
 			{
 				load(j, *this);
 			}

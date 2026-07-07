@@ -1,7 +1,7 @@
 ﻿/**
  * @file InGameButtonGaugeAnimStatus.cpp
  * @brief インゲームボタンのスタミナゲージ専用のアニメーションステータスクラス
- * @author
+ * @author 立山
  */
 #include "stdafx.h"
 #include "InGameButtonGaugeAnimStatus.h"
@@ -32,13 +32,10 @@ namespace app
 
 		void InGameButtonGaugeAnimStatus::SetUp()
 		{
-			// UIAnimationParameterのシングルトンインスタンスを取得。
 			const auto& param = UIAnimationParameter::Get();
 
 			// ジャンプゲージのロック演出の定義を取得。
-			const auto* jumpLock = param.Find(animKey::JUMP_GAUGE_LOCK_ANIM_KEY);
-			if (!jumpLock)return;
-			if (jumpLock)
+			if (const auto* jumpLock = param.Find(animKey::JUMP_GAUGE_LOCK_ANIM_KEY))
 			{
 				m_jumpLockAnimData.startColor = jumpLock->startV4;
 				m_jumpLockAnimData.endColor = jumpLock->endV4;
@@ -47,9 +44,7 @@ namespace app
 				m_jumpLockAnimData.loopMode = jumpLock->loopMode;
 			}
 			// ジャンプゲージの復帰演出の定義を取得。
-			const auto* jumpUnlock = param.Find(animKey::JUMP_GAUGE_UNLOCK_ANIM_KEY);
-			if (!jumpUnlock)return;
-			if (jumpUnlock)
+			if (const auto* jumpUnlock = param.Find(animKey::JUMP_GAUGE_UNLOCK_ANIM_KEY))
 			{
 				m_jumpUnlockAnimData.startColor = jumpUnlock->startV4;
 				m_jumpUnlockAnimData.endColor = jumpUnlock->endV4;
@@ -58,9 +53,7 @@ namespace app
 				m_jumpUnlockAnimData.loopMode = jumpUnlock->loopMode;
 			}
 			// スライドゲージのロック演出の定義を取得。
-			const auto* slideLock = param.Find(animKey::SLIDE_GAUGE_LOCK_ANIM_KEY);
-			if (!slideLock)return;
-			if (slideLock)
+			if (const auto* slideLock = param.Find(animKey::SLIDE_GAUGE_LOCK_ANIM_KEY))
 			{
 				m_slideLockAnimData.startColor = slideLock->startV4;
 				m_slideLockAnimData.endColor = slideLock->endV4;
@@ -69,9 +62,7 @@ namespace app
 				m_slideLockAnimData.loopMode = slideLock->loopMode;
 			}
 			// スライドゲージの復帰演出の定義を取得。
-			const auto* slideUnlock = param.Find(animKey::SLIDE_GAUGE_UNLOCK_ANIM_KEY);
-			if (!slideUnlock)return;
-			if (slideUnlock)
+			if (const auto* slideUnlock = param.Find(animKey::SLIDE_GAUGE_UNLOCK_ANIM_KEY))
 			{
 				m_slideUnlockAnimData.startColor = slideUnlock->startV4;
 				m_slideUnlockAnimData.endColor = slideUnlock->endV4;

@@ -25,10 +25,10 @@ namespace app
 			, m_sneakSpeed(0.0f)
 			, m_slideSpeed(0.0f)
 			, m_jumpPower(0.0f)
-			, m_jumpStaminaMax(0.0f)              // ← 追加
-			, m_jumpStaminaRecoverSpeed(0.0f)     // ← 追加
-			, m_slideStaminaMax(0.0f)             // ← 追加
-			, m_slideStaminaDecreaseSpeed(0.0f)   // ← 追加
+			, m_jumpStaminaMax(0.0f)
+			, m_jumpStaminaRecoverSpeed(0.0f)
+			, m_slideStaminaMax(0.0f)
+			, m_slideStaminaDecreaseSpeed(0.0f)
 			, m_slideStaminaRecoverSpeed(0.0f)
 		{}
 

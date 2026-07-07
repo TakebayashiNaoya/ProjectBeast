@@ -65,8 +65,6 @@ namespace app
 			bool IsInputXButton() const;
 			bool IsInputYButton() const;
 
-
-		private:
 			InGameStartingAnimLogic m_startingAnimLogic;
 
 			/** スタミナゲージ専用のステータス（追従速度などの数値設定） */

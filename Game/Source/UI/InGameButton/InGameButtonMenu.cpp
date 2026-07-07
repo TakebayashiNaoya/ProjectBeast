@@ -74,13 +74,8 @@ namespace app
 					// ゲームからのスタミナ残量(0.0〜1.0)を安全にクランプ
 					float targetRatio = util::clamp(rawTargetRatio, 0.0f, 1.0f);
 
-					// 【最終修正ポイント：イージングの撤廃】
-					// 実際のスタミナ値はゲームロジック側で既になめらかに計算されています。
-					// UI側で遅延をかけると「一瞬で消費する」動きに追いつけないため、
-					// そのまま代入して即座に画面に反映（BotW仕様）させます！
 					displayRatio = targetRatio;
 
-					// BotW仕様：12時(0.0f)を起点に displayRatio までを描画する
 					// （時計回りに削れていき、反時計回りに回復する）
 					gaugeA->SetProgressRange(0.0f, displayRatio);
 
@@ -123,7 +118,6 @@ namespace app
 
 					wasLocked = isLocked;
 
-					// スタミナが完全に満タンの時は非表示にし、少しでも減っていれば表示する（BotW仕様）
 					if (displayRatio >= 1.0f && targetRatio >= 1.0f) {
 						gaugeA->m_isDraw = false;
 						gaugeB->m_isDraw = false;
@@ -149,11 +143,12 @@ namespace app
 		void InGameButtonMenu::ButtonIconUpdate()
 		{
 			// UI表示を切り替えるラムダ式（ローカル関数）
-			auto updateUI = [&](bool isInput, const char* notInputAct, const char* inputAct, const char* notInputBtn, const char* inputBtn) {
-				if (auto* ui = GetUI<UIIcon>(Hash32(notInputAct))) ui->m_isDraw = !isInput;
-				if (auto* ui = GetUI<UIIcon>(Hash32(inputAct)))    ui->m_isDraw = isInput;
-				if (auto* ui = GetUI<UIIcon>(Hash32(notInputBtn))) ui->m_isDraw = !isInput;
-				if (auto* ui = GetUI<UIIcon>(Hash32(inputBtn)))    ui->m_isDraw = isInput;
+			auto updateUI = [&](bool isInput, const char* notInputAct, const char* inputAct, const char* notInputBtn, const char* inputBtn)
+				{
+					if (auto* ui = GetUI<UIIcon>(Hash32(notInputAct))) ui->m_isDraw = !isInput;
+					if (auto* ui = GetUI<UIIcon>(Hash32(inputAct)))    ui->m_isDraw = isInput;
+					if (auto* ui = GetUI<UIIcon>(Hash32(notInputBtn))) ui->m_isDraw = !isInput;
+					if (auto* ui = GetUI<UIIcon>(Hash32(inputBtn)))    ui->m_isDraw = isInput;
 				};
 
 			// スニークが使用可能かどうか（シロクマとの距離）

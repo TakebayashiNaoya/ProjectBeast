@@ -77,7 +77,7 @@ namespace app
 			// Statusのセットアップがまだ済んでいない場合、最大値が0のままなので次のフレームに再試行する。
 			if (status->GetJumpStaminaMax() <= 0.0f && status->GetSlideStaminaMax() <= 0.0f) return;
 
-			m_jumpStaminaGauge.Initialize(status->GetJumpStaminaMax(), 0.0f, status->GetJumpStaminaRecoverSpeed());
+			m_jumpStaminaGauge.Initialize(status->GetJumpStaminaMax(), JUMP_STAMINA_DECREASE_SPEED, status->GetJumpStaminaRecoverSpeed());
 			m_slideStaminaGauge.Initialize(status->GetSlideStaminaMax(), status->GetSlideStaminaDecreaseSpeed(), status->GetSlideStaminaRecoverSpeed());
 
 			m_isStaminaGaugeSetup = true;
