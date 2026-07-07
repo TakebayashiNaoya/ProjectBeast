@@ -8,6 +8,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -42,7 +43,7 @@ namespace app
 			if (!ctx.penguinManager || !ctx.daddyPenguin) return;
 
 			const Vector3 daddyPos = ctx.penguinManager->GetDaddyPosition();
-			const float   distSq   = (*m_callDistance) * (*m_callDistance);
+			const float   distSq = (*m_callDistance) * (*m_callDistance);
 
 			for (ChildPenguin* penguin : ctx.penguinManager->GetChildPenguin())
 			{
@@ -62,15 +63,74 @@ namespace app
 		/****************************************/
 
 
+		namespace
+		{
+			/** エフェクトの拡大倍率 */
+			constexpr float EFFECT_SCALE = 200.0f;
+		}
+
+
 		void BearAttackNullifyEffect::Enter(const UltContext& ctx)
 		{
 			// TODO: シロクマ攻撃無効化フラグを有効にする
 			// DaddyPenguin や EnemyManager に無敵フラグのAPIが用意できたら実装する
+
+			m_ultHandle = EffectManager::Get().PlayEffect(
+				EnEffectKind::BarrierBegin,
+				ctx.daddyPenguin->GetTransform().m_position,
+				ctx.daddyPenguin->GetTransform().m_rotation,
+				Vector3(EFFECT_SCALE, EFFECT_SCALE, EFFECT_SCALE)
+			);
+
+			EffectManager::Get().AttachEffect(
+				m_ultHandle,
+				&ctx.daddyPenguin->GetTransform().m_position
+			);
+		}
+
+		void BearAttackNullifyEffect::Update(float dt, const UltContext& ctx)
+		{
+			// エフェクト処理
+			auto& em = EffectManager::Get();
+			auto* effect = em.FindEffect(m_ultHandle);
+			// 見つからなければBarrierBeginエフェクト終了
+			if (!effect)
+			{
+				// BarrierLoopエフェクトを再生
+
+				m_ultHandle = em.PlayEffect(
+					EnEffectKind::BarrierLoop,
+					ctx.daddyPenguin->GetTransform().m_position,
+					ctx.daddyPenguin->GetTransform().m_rotation,
+					Vector3(EFFECT_SCALE, EFFECT_SCALE, EFFECT_SCALE)
+				);
+
+				em.AttachEffect(
+					m_ultHandle,
+					&ctx.daddyPenguin->GetTransform().m_position
+				);
+			}
 		}
 
 		void BearAttackNullifyEffect::Exit(const UltContext& ctx)
 		{
 			// TODO: シロクマ攻撃無効化フラグを解除する
+
+
+			// BarrierLoopエフェクトを終了し、BarrierEndエフェクトを再生
+			auto& em = EffectManager::Get();
+			em.StopEffect(m_ultHandle);
+			em.PlayEffect(
+				EnEffectKind::BarrierEnd,
+				ctx.daddyPenguin->GetTransform().m_position,
+				ctx.daddyPenguin->GetTransform().m_rotation,
+				Vector3(EFFECT_SCALE, EFFECT_SCALE, EFFECT_SCALE)
+			);
+
+			em.AttachEffect(
+				m_ultHandle,
+				&ctx.daddyPenguin->GetTransform().m_position
+			);
 		}
 	}
 }

@@ -76,7 +76,7 @@ namespace app
 			{}
 
 			void  Update(float dt, const UltContext& ctx) override;
-			void  Exit  (const UltContext& ctx) override;
+			void  Exit(const UltContext& ctx) override;
 			float GetSpeedMultiplier(int level) const override;
 		};
 
@@ -118,7 +118,13 @@ namespace app
 		{
 		public:
 			void Enter(const UltContext& ctx) override;
-			void Exit (const UltContext& ctx) override;
+			void Update(float dt, const UltContext& ctx) override;
+			void Exit(const UltContext& ctx) override;
+
+
+		private:
+			/** @brief ウルト用のエフェクトハンドル */
+			EffectHandle m_ultHandle;
 		};
 	}
 }
