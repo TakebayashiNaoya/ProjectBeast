@@ -30,6 +30,13 @@ namespace app
 			/** UIのロジック初期化処理 */
 			void InitializeLogic() override;
 
+			/**
+			 * @brief 演出を強制的に打ち切り、全文字を即座に非表示にする
+			 * @detail ラウンドがFINISH演出に移行するとUpdate()が呼ばれなくなるため、
+			 *         登場・退場アニメーションの途中で呼び出し側から明示的に呼ぶ
+			 */
+			void ForceHide();
+
 
 		private:
 			/** 演出の進行状態 */

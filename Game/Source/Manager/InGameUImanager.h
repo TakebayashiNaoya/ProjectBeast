@@ -148,6 +148,8 @@ namespace app
 		/** @brief フィニッシュMenuを取得 */
 		//inline ui::FinishMenu* GetFinishMenu() const { return m_finishMenu; }
 		inline ui::FinishMenu* GetFinishMenu() const { return m_finishPacket->GetMenu(); }
+		/** @brief フィーバーアイコンMenuを取得 */
+		inline ui::FeverIconMenu* GetFeverIconMenu() const { return m_feverIconPacket->GetMenu(); }
 		/** @brief ポーズMenuを取得 */
 		//inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pauseMenu; }
 		inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pausePacket->GetMenu(); }

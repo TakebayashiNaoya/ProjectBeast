@@ -240,5 +240,13 @@ namespace app
 				if (letter.icon) letter.icon->m_isDraw = false;
 			}
 		}
+
+
+		void FeverIconMenu::ForceHide()
+		{
+			m_state = EnState::Idle;
+			m_stateTimer = 0.0f;
+			HideAllLetters();
+		}
 	}
 }

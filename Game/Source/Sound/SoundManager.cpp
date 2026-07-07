@@ -155,6 +155,9 @@ namespace app
 
 	void SoundManager::StopBGM()
 	{
+		/** 進行中のフェードアウトがあれば打ち切る（停止済みの音源に対してフェードが動き続けるのを防ぐ） */
+		m_isBgmFading = false;
+
 		if (m_bgm == nullptr) {
 			return;
 		}
