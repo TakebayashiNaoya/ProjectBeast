@@ -27,9 +27,7 @@ namespace app
 		PenguinClumsy,        // おっちょこちょい
 		PenguinCaring,        // 世話焼き
 		Bear,                 // シロクマ
-		BearNest,             // シロクマの巣
 		Igloo,                // イグルー（かまくら）
-		Ocean,                // 海（水中接触で発火）
 		Whirlpool,            // 渦潮
 		Max
 	};
@@ -92,6 +90,7 @@ namespace app
 
 
 	private:
+		/** @brief トリガー対象の総数（Max を含む配列サイズ） */
 		static constexpr int TARGET_COUNT = static_cast<int>(EnTutorialTarget::Max);
 
 		/**
@@ -106,7 +105,6 @@ namespace app
 			EnTutorialTarget::PenguinClumsy,
 			EnTutorialTarget::PenguinCaring,
 			EnTutorialTarget::Bear,
-			EnTutorialTarget::BearNest,
 			EnTutorialTarget::Igloo,
 			EnTutorialTarget::Whirlpool,
 		};
