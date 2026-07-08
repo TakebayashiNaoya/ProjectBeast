@@ -110,11 +110,24 @@ namespace app
 			 */
 			float GetJoinRadius() const;
 
-			/** 
-			 * @brief 陣形レベルを取得する（フォロワー数 / FOLLOWERS_PER_LEVEL）
+			/**
+			 * @brief 陣形レベルを取得する（満員になったリングの数）
 			 * @return 陣形レベル
 			 */
 			int GetFormationLevel() const { return m_formationLevel; }
+
+			/**
+			 * @brief 現在進行中のリング（次のレベルアップ）に集まっているフォロワー数を取得する
+			 * @return 現在のリング内の進行人数
+			 */
+			int GetCurrentRingProgress() const { return m_ringProgress; }
+
+			/**
+			 * @brief 現在進行中のリング（次のレベルアップ）に必要な人数を取得する
+			 * @details リング k（1始まり）は FOLLOWERS_PER_LEVEL*k 人で満員になるため、レベルが上がるほど増える
+			 * @return 現在のリングの満員人数
+			 */
+			int GetCurrentRingRequirement() const { return m_ringRequirement; }
 
 			/**
 			 * @brief レベルアップ時のコールバックを設定する
@@ -224,6 +237,8 @@ namespace app
 			IFormation*     m_currentFormation = nullptr;					/** 現在の陣形インスタンスへのポインタ */
 			EnFormationType m_currentType      = EnFormationType::Circle;	/** 現在の陣形種別 */
 			int             m_formationLevel   = 0;							/** 現在の陣形レベル */
+			int             m_ringProgress     = 0;							/** 現在進行中のリング内の進行人数 */
+			int             m_ringRequirement  = FOLLOWERS_PER_LEVEL;			/** 現在進行中のリングの満員人数 */
 
 			std::function<void(int)> m_onLevelUp;  /** レベルアップ時のコールバック */
 
