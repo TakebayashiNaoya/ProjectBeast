@@ -90,6 +90,7 @@ namespace app
 
 
 	private:
+		/** @brief トリガー対象の総数（Max を含む配列サイズ） */
 		static constexpr int TARGET_COUNT = static_cast<int>(EnTutorialTarget::Max);
 
 		/**

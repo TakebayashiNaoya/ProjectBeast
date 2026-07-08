@@ -53,6 +53,15 @@
 namespace
 {
 	const Vector3 SKY_CUBE_SCALE = Vector3(1000.0f, 800.0f, 1000.0f);
+
+	/** シーン遷移までの待機時間（秒） */
+	constexpr float SCENE_TRANSITION_WAIT_TIME = 0.5f;
+
+	/** FINISH演出に合わせたBGMフェードアウト時間（秒） */
+	constexpr float FINISH_BGM_FADE_DURATION = 3.0f;
+
+	/** ゲームログの記録間隔（秒） */
+	constexpr float LOG_TICK_INTERVAL = 1.0f;
 }
 
 namespace app
@@ -449,9 +458,9 @@ namespace app
 
 			/** ログ毎秒ティック */
 			m_logTickTimer += g_gameTime->GetFrameDeltaTime();
-			if (m_logTickTimer >= 1.0f)
+			if (m_logTickTimer >= LOG_TICK_INTERVAL)
 			{
-				m_logTickTimer -= 1.0f;
+				m_logTickTimer -= LOG_TICK_INTERVAL;
 				if (auto* lm = GameLogManager::GetInstance())
 					lm->RecordTick(m_daddyPenguin);
 			}
@@ -467,7 +476,7 @@ namespace app
 				SoundManager::Get().StopAllSE();
 
 				/** FINISH演出（3秒）に合わせてBGMを徐々にフェードアウトする */
-				SoundManager::Get().FadeOutBGM(3.0f);
+				SoundManager::Get().FadeOutBGM(FINISH_BGM_FADE_DURATION);
 
 				/** フィーバー演出中にラウンドが終わった場合、途中の状態で固まらないよう強制的に消す
 				 *  （Finishingフェーズに入るとUpdatePlaying経由のUpdate()が呼ばれなくなるため） */
@@ -748,11 +757,11 @@ namespace app
 		{
 			SoundManager::Get().StopAllSE();
 
-			// 追加: 環境音などを全て止めた直後に、タイトルへ戻る決定音を鳴らす
+			// 環境音などを全て止めた直後に、タイトルへ戻る決定音を鳴らす
 			SoundManager::Get().PlaySE(enSoundKind_ButtonEnter);
 
 			id = TitleScene::ID();
-			waitTime = 0.5f;
+			waitTime = SCENE_TRANSITION_WAIT_TIME;
 			return true;
 		}
 		/** リザルトへ */
@@ -760,7 +769,7 @@ namespace app
 		{
 			SoundManager::Get().StopAllSE();
 			id = ResultScene::ID();
-			waitTime = 0.5f;
+			waitTime = SCENE_TRANSITION_WAIT_TIME;
 			return true;
 		}
 		return false;

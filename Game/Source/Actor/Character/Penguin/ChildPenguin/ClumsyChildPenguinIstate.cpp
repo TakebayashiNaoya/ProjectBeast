@@ -38,7 +38,7 @@ namespace app
 
 		void ClumsyTripState::Enter()
 		{
-			m_owner->SetActionInput(Vector3::Zero, false, false, false, false); // 追加
+			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
 			m_owner->SetMoveSpeed(0.0f);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Trip);
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());

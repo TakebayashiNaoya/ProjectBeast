@@ -40,7 +40,6 @@ namespace app
 			, m_countUpTimer(0.0f)
 			, m_totalScoreShown(false)
 			, m_titleButtonShown(false)
-			, m_drumRollHandle(app::INVALID_SE_HANDLE)
 		{}
 
 
