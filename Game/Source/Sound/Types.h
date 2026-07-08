@@ -84,6 +84,9 @@ namespace app
 		enSoundKind_UltSwipeLeft,   // 陣形切り替え（前へ・左スワイプ）
 		enSoundKind_UltSwipeRight,  // 陣形切り替え（次へ・右スワイプ）
 
+		// --- 幽霊ペンギン ---
+		enSoundKind_GhostPenguinReaction,
+
 		enSoundKind_SE_Max,
 
 		// =========================================================================
@@ -193,6 +196,9 @@ namespace app
 		SoundInformation("Assets/sound/SE/UI/ult/ult_discharge.wav"),
 		SoundInformation("Assets/sound/SE/UI/ult/ult_swipe_left.wav"),
 		SoundInformation("Assets/sound/SE/UI/ult/ult_swipe_right.wav"),
+
+		// --- 幽霊ペンギン出現音 ---
+		SoundInformation("Assets/sound/SE/penguin/childPenguin/ghostPenguinReaction.wav"),
 
 		// -------------------------------------------------------------------------
 		// BGM
