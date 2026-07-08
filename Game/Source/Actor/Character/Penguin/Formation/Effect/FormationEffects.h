@@ -28,7 +28,16 @@ namespace app
 				: m_multiplier(multiplier)
 			{}
 
+
+			void Enter(const UltContext& ctx) override;
+			void Update(float dt, const UltContext& ctx) override;
+			void Exit(const UltContext& ctx) override;
+
 			float GetSpeedMultiplier(int level) const override { return *m_multiplier; }
+
+
+		private:
+			EffectHandle m_ultHandle;
 		};
 
 

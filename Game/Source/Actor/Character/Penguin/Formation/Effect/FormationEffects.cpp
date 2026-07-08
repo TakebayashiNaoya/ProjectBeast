@@ -15,6 +15,61 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** エフェクトの拡大倍率 */
+			constexpr float ULT_SCALE = 8.0f;
+			/** エフェクトのY座標オフセット */
+			constexpr float OFFSET_Y = 10.0f;
+		}
+
+
+		void SpeedModifierEffect::Enter(const UltContext& ctx)
+		{
+			auto& em = EffectManager::Get();
+			m_ultHandle = em.PlayEffect(
+				EnEffectKind::SpeedBoostBegin,
+				ctx.daddyPenguin->GetTransform().m_position,
+				Quaternion::Identity,
+				Vector3(Vector3::One * ULT_SCALE)
+			);
+
+
+			em.AttachEffect(
+				m_ultHandle,
+				&ctx.daddyPenguin->GetTransform().m_position,
+				Vector3(0.0f, OFFSET_Y, 0.0f)
+			);
+		}
+
+
+		void SpeedModifierEffect::Update(float dt, const UltContext& ctx)
+		{}
+
+
+		void SpeedModifierEffect::Exit(const UltContext& ctx)
+		{
+			auto& em = EffectManager::Get();
+			em.StopEffect(m_ultHandle);
+			m_ultHandle = em.PlayEffect(
+				EnEffectKind::SpeedBoostEnd,
+				ctx.daddyPenguin->GetTransform().m_position,
+				Quaternion::Identity,
+				Vector3(Vector3::One * ULT_SCALE)
+			);
+			em.AttachEffect(
+				m_ultHandle,
+				&ctx.daddyPenguin->GetTransform().m_position,
+				Vector3(0.0f, OFFSET_Y, 0.0f)
+			);
+		}
+
+
+
+
+		/****************************************/
+
+
 		void WhirlpoolSpeedBoostEffect::Update(float dt, const UltContext& ctx)
 		{
 			// TODO: 渦潮との近接判定を実装する
@@ -63,27 +118,19 @@ namespace app
 		/****************************************/
 
 
-		namespace
-		{
-			/** エフェクトの拡大倍率 */
-			const Vector3 EFFECT_SCALE = Vector3(8.0f, 8.0f, 8.0f);
-			constexpr float OFFSET_Y = 10.0f;
-		}
-
-
 		void BearAttackNullifyEffect::Enter(const UltContext& ctx)
 		{
 			// TODO: シロクマ攻撃無効化フラグを有効にする
 			// DaddyPenguin や EnemyManager に無敵フラグのAPIが用意できたら実装する
-
-			m_ultHandle = EffectManager::Get().PlayEffect(
+			auto& em = EffectManager::Get();
+			m_ultHandle = em.PlayEffect(
 				EnEffectKind::BarrierBegin,
 				ctx.daddyPenguin->GetTransform().m_position,
 				Quaternion::Identity,
-				EFFECT_SCALE
+				Vector3(Vector3::One * ULT_SCALE)
 			);
 
-			EffectManager::Get().AttachEffect(
+			em.AttachEffect(
 				m_ultHandle,
 				&ctx.daddyPenguin->GetTransform().m_position,
 				Vector3(0.0f, OFFSET_Y, 0.0f)
@@ -105,7 +152,7 @@ namespace app
 				EnEffectKind::BarrierEnd,
 				ctx.daddyPenguin->GetTransform().m_position,
 				ctx.daddyPenguin->GetTransform().m_rotation,
-				EFFECT_SCALE
+				Vector3(Vector3::One * ULT_SCALE)
 			);
 
 			em.AttachEffect(

@@ -32,6 +32,8 @@ namespace app
 		ToEnemyDebuff,
 		BarrierBegin,
 		BarrierEnd,
+		SpeedBoostBegin,
+		SpeedBoostEnd,
 		Max,
 		None = Max,
 	};
@@ -67,7 +69,9 @@ namespace app
 		EffectInformation(u"Assets/effect/childPenguin/childPenguinCaringSweat.efk", 100.0f),
 		EffectInformation(u"Assets/effect/childPenguin/childPenguinNaugtyLively.efk", 100.0f),
 		EffectInformation(u"Assets/effect/enemy/Gloomy.efk",100.0f),
-		EffectInformation(u"Assets/effect/barrier/barrierBegin.efk", 150.0f),
-		EffectInformation(u"Assets/effect/barrier/barrierEnd.efk", 150.0f),
+		EffectInformation(u"Assets/effect/ult/barrierBegin.efk", 150.0f),
+		EffectInformation(u"Assets/effect/ult/barrierEnd.efk", 150.0f),
+		EffectInformation(u"Assets/effect/ult/speedAuraBegin.efk", 150.0f),
+		EffectInformation(u"Assets/effect/ult/speedAuraEnd.efk", 150.0f),
 	};
 }

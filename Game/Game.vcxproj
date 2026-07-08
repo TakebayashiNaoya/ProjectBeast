@@ -392,6 +392,7 @@
     <ClCompile Include="Source\UI\RemainingChild\RemainingAnimStatus.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
+    <ClCompile Include="Source\UI\Ult\SpeedLineMenu.cpp" />
     <ClCompile Include="Source\UI\WpWarning\MasterWpWarningParameter.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningAnimStatus.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningMenu.cpp" />
@@ -588,6 +589,7 @@
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingChildMenu.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
+    <ClInclude Include="Source\UI\Ult\SpeedLineMenu.h" />
     <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningMenu.h" />
