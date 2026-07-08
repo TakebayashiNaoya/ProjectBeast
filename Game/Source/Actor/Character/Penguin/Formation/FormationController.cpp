@@ -23,6 +23,30 @@ namespace app
 			constexpr const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/formation/FormationParameter.bin";
 			/** 陣形切り替え演出（スライド）時間のチューニングファイルパス（ホットリロード対応） */
 			constexpr const char* SWITCH_TUNING_JSON_PATH = "Assets/parameter/character/penguin/formation/FormationSwitchTuning.json";
+
+			/**
+			 * @brief フォロワー数から陣形レベルと現在進行中のリングの内訳を求める
+			 * @details リング k（1始まり）は followersPerLevel*k 人で満員になる。
+			 *          レベルは満員になったリングの数（= 完了したリング数）。
+			 * @param count 現在のフォロワー数
+			 * @param followersPerLevel リング1個あたりの基準人数
+			 * @param outRingStart 現在進行中のリングが始まった時点の累計人数
+			 * @param outRingSize 現在進行中のリングの満員人数
+			 * @return 陣形レベル（0始まり）
+			 */
+			int ComputeFormationLevel(int count, int followersPerLevel, int& outRingStart, int& outRingSize)
+			{
+				int ringStart = 0;
+				int k = 1;
+				while (ringStart + k * followersPerLevel <= count)
+				{
+					ringStart += k * followersPerLevel;
+					k++;
+				}
+				outRingStart = ringStart;
+				outRingSize  = k * followersPerLevel;
+				return k - 1;
+			}
 		}
 
 
@@ -123,11 +147,15 @@ namespace app
 
 			// レベル判定は countForLevel で行う（-1 の場合は count を使う）
 			const int effective = (countForLevel < 0) ? count : countForLevel;
-			const int newLevel = effective / FOLLOWERS_PER_LEVEL;
+			int ringStart = 0;
+			int ringSize  = 0;
+			const int newLevel = ComputeFormationLevel(effective, FOLLOWERS_PER_LEVEL, ringStart, ringSize);
 			if (newLevel > m_formationLevel && m_onLevelUp){
 				m_onLevelUp(newLevel);
 			}
-			m_formationLevel = newLevel;
+			m_formationLevel   = newLevel;
+			m_ringProgress     = effective - ringStart;
+			m_ringRequirement  = ringSize;
 		}
 
 
@@ -188,17 +216,11 @@ namespace app
 			// 現在の m_outerRadius を保存（呼び出し後に復元する）
 			const float savedRadius = m_currentFormation->GetOuterRadius();
 
-			// 現在充填中のリング k の末尾インデックスを求める
-			// リング k のスロット数 = k * FOLLOWERS_PER_LEVEL
-			// リング 1〜k-1 の累計 = 1+2+...+(k-1) のスロット数 = ringStart
+			// 現在充填中のリングの末尾インデックス（= リングが満員になったときの累計人数）を求める
 			int ringStart = 0;
-			int k = 1;
-			while (ringStart + k * FOLLOWERS_PER_LEVEL <= occupied)
-			{
-				ringStart += k * FOLLOWERS_PER_LEVEL;
-				k++;
-			}
-			const int nextCount = ringStart + k * FOLLOWERS_PER_LEVEL;
+			int ringSize  = 0;
+			ComputeFormationLevel(occupied, FOLLOWERS_PER_LEVEL, ringStart, ringSize);
+			const int nextCount = ringStart + ringSize;
 
 			out.clear();
 			m_currentFormation->CalculatePositions(center, forward, out, nextCount);
