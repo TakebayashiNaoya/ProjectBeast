@@ -39,7 +39,7 @@ namespace app
 
 		void FormationWheelMenu::Update()
 		{
-			// ゲーム開始時のスライドイン演出（画面外右から所定の位置へ）
+			// ゲーム開始時のスライドイン演出（画面外下から所定の位置へ）
 			if (!m_startingAnimLogic.IsAnimationStarted())
 			{
 				m_startingAnimLogic.Initialize(
@@ -51,7 +51,7 @@ namespace app
 						"LevelText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
-					Vector3(300.0f, 0.0f, 0.0f)
+					Vector3(0.0f, -300.0f, 0.0f)
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())
