@@ -1,0 +1,18 @@
+{
+    "canvas":{
+        "elements":[
+            {
+                "comment":"陣形レベルアップ時に親ペンギンの頭上へ表示するアイコン",
+                "type":"UIIcon",
+                "name":"levelUpIcon",
+                "asset":"Assets/spriteData/UI/Icon/LevelUp.DDS",
+                "width":300,
+                "height":225,
+                "position":[0,0,0],
+                "scale":[1,1,1],
+                "rotation":0,
+                "color":[255,255,255,255]
+            }
+        ]
+    }
+}
