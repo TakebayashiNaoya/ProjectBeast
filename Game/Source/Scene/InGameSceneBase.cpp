@@ -550,6 +550,15 @@ namespace app
 
 	void InGameSceneBase::PauseUpdate()
 	{
+		/**
+		 * フェードアウト中など、実際にポーズボタンが押されていないのに
+		 * PauseUpdate() が呼ばれた場合は、ポーズ用の処理をスキップする
+		 */
+		if (!SceneManager::GetInstance()->IsPause())
+		{
+			return;
+		}
+
 		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする
 		 *  チュートリアルポーズを含むすべてのポーズ種別に適用するため
 		 *  OnPauseUpdate() の前に実行する
@@ -738,6 +747,10 @@ namespace app
 		if (m_goTitle)
 		{
 			SoundManager::Get().StopAllSE();
+
+			// 追加: 環境音などを全て止めた直後に、タイトルへ戻る決定音を鳴らす
+			SoundManager::Get().PlaySE(enSoundKind_ButtonEnter);
+
 			id = TitleScene::ID();
 			waitTime = 0.5f;
 			return true;

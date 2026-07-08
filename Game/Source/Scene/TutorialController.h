@@ -27,9 +27,7 @@ namespace app
 		PenguinClumsy,        // おっちょこちょい
 		PenguinCaring,        // 世話焼き
 		Bear,                 // シロクマ
-		BearNest,             // シロクマの巣
 		Igloo,                // イグルー（かまくら）
-		Ocean,                // 海（水中接触で発火）
 		Whirlpool,            // 渦潮
 		Max
 	};
@@ -106,7 +104,6 @@ namespace app
 			EnTutorialTarget::PenguinClumsy,
 			EnTutorialTarget::PenguinCaring,
 			EnTutorialTarget::Bear,
-			EnTutorialTarget::BearNest,
 			EnTutorialTarget::Igloo,
 			EnTutorialTarget::Whirlpool,
 		};
