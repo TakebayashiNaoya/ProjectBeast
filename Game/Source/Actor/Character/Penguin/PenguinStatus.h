@@ -55,6 +55,31 @@ namespace app
 			 */
 			inline float GetJumpPower() const { return m_jumpPower; }
 			/**
+			 * @brief ジャンプのスタミナ最大値を取得
+			 * @return ジャンプのスタミナ最大値
+			 */
+			inline float GetJumpStaminaMax() const { return m_jumpStaminaMax; }
+			/**
+			 * @brief ジャンプのスタミナ回復速度を取得
+			 * @return ジャンプのスタミナ回復速度(1秒あたり)
+			 */
+			inline float GetJumpStaminaRecoverSpeed() const { return m_jumpStaminaRecoverSpeed; }
+			/**
+			 * @brief スライドのスタミナ最大値を取得
+			 * @return スライドのスタミナ最大値
+			 */
+			inline float GetSlideStaminaMax() const { return m_slideStaminaMax; }
+			/**
+			 * @brief スライドのスタミナ減少速度を取得
+			 * @return スライドのスタミナ減少速度(1秒あたり)
+			 */
+			inline float GetSlideStaminaDecreaseSpeed() const { return m_slideStaminaDecreaseSpeed; }
+			/**
+			 * @brief スライドのスタミナ回復速度を取得
+			 * @return スライドのスタミナ回復速度(1秒あたり)
+			 */
+			inline float GetSlideStaminaRecoverSpeed() const { return m_slideStaminaRecoverSpeed; }
+			/**
 			 * @brief ノイズレベルを取得 (0.0f ～ 1.0f)
 			 * @return ノイズレベル
 			 */
@@ -94,6 +119,16 @@ namespace app
 			float m_slideSpeed;
 			/** ジャンプパワー */
 			float m_jumpPower;
+			/** ジャンプのスタミナ最大値 */
+			float m_jumpStaminaMax;
+			/** ジャンプのスタミナ回復速度(1秒あたり) */
+			float m_jumpStaminaRecoverSpeed;
+			/** スライドのスタミナ最大値 */
+			float m_slideStaminaMax;
+			/** スライドのスタミナ減少速度(1秒あたり) */
+			float m_slideStaminaDecreaseSpeed;
+			/** スライドのスタミナ回復速度(1秒あたり) */
+			float m_slideStaminaRecoverSpeed;
 			/** ノイズレベル(音の大きさや見つかりやすさの指標) */
 			float m_noiseLevel = 0.0f;
 		};

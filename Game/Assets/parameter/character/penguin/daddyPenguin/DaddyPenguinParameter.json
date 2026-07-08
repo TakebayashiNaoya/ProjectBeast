@@ -9,6 +9,11 @@
     "sneakSpeed": 70.0,
     "slideSpeed": 180.0,
     "jumpPower": 300.0,
+    "jumpStaminaMax": 100.0,
+    "jumpStaminaRecoverSpeed": 50.0,
+    "slideStaminaMax": 100.0,
+    "slideStaminaDecreaseSpeed": 50.0,
+    "slideStaminaRecoverSpeed": 25.0,
     "radius": 10.0,
     "height": 70.0,
     "enableCommandRange": 40
