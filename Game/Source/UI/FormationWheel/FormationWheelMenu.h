@@ -99,8 +99,8 @@ namespace app
 			int m_fromSlot[4] = { 0, 1, 2, -1 };
 
 			/** FormationWheelTuning.json からホットリロードされる見た目パラメーター */
-			float m_centerX = 640.0f;  /** 中央X座標 */
-			float m_rowY = -80.0f;  /** 中央Y座標 */
+			float m_centerX = 0.0f;  /** 中央X座標 */
+			float m_rowY = -400.0f;  /** 中央Y座標 */
 			float m_slotSpacing = 80.0f;   /** スロット間のX座標間隔 */
 			float m_currentSize = 80.0f;   /** 中央アイコンのサイズ */
 			float m_sideSize = 50.0f;   /** 隣接アイコンのサイズ */
