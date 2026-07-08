@@ -66,8 +66,8 @@ namespace app
 		namespace
 		{
 			/** エフェクトの拡大倍率 */
-			const Vector3 EFFECT_SCALE = Vector3(15.0f, 5.0f, 15.0f);
-			constexpr float OFFSET_Y = 20.0f;
+			const Vector3 EFFECT_SCALE = Vector3(8.0f, 8.0f, 8.0f);
+			constexpr float OFFSET_Y = 10.0f;
 		}
 
 
@@ -79,7 +79,7 @@ namespace app
 			m_ultHandle = EffectManager::Get().PlayEffect(
 				EnEffectKind::BarrierBegin,
 				ctx.daddyPenguin->GetTransform().m_position,
-				ctx.daddyPenguin->GetTransform().m_rotation,
+				Quaternion::Identity,
 				EFFECT_SCALE
 			);
 
@@ -91,29 +91,7 @@ namespace app
 		}
 
 		void BearAttackNullifyEffect::Update(float dt, const UltContext& ctx)
-		{
-			// エフェクト処理
-			auto& em = EffectManager::Get();
-			auto* effect = em.FindEffect(m_ultHandle);
-			// 見つからなければBarrierBeginエフェクト終了
-			if (!effect)
-			{
-				// BarrierLoopエフェクトを再生
-
-				m_ultHandle = em.PlayEffect(
-					EnEffectKind::BarrierLoop,
-					ctx.daddyPenguin->GetTransform().m_position,
-					ctx.daddyPenguin->GetTransform().m_rotation,
-					EFFECT_SCALE
-				);
-
-				em.AttachEffect(
-					m_ultHandle,
-					&ctx.daddyPenguin->GetTransform().m_position,
-					Vector3(0.0f, OFFSET_Y, 0.0f)
-				);
-			}
-		}
+		{}
 
 		void BearAttackNullifyEffect::Exit(const UltContext& ctx)
 		{
@@ -123,7 +101,7 @@ namespace app
 			// BarrierLoopエフェクトを終了し、BarrierEndエフェクトを再生
 			auto& em = EffectManager::Get();
 			em.StopEffect(m_ultHandle);
-			em.PlayEffect(
+			m_ultHandle = em.PlayEffect(
 				EnEffectKind::BarrierEnd,
 				ctx.daddyPenguin->GetTransform().m_position,
 				ctx.daddyPenguin->GetTransform().m_rotation,
