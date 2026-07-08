@@ -47,7 +47,6 @@ namespace app
 			void Render(RenderContext& rc);
 			void InitializeLogic() override;
 
-
 			/**
 			 * @brief シーンからスコアなどのデータを受け取り、初期化する
 			 * @param collectedPenguin 収集したペンギンの数
@@ -58,7 +57,6 @@ namespace app
 			void SetResultData(int collectedPenguin, float totalScore,
 				const std::vector<app::achievement::AchievementBase*>& achievements,
 				float scorePerAchieve);
-
 
 			// Aボタンでの次シーン遷移が可能な状態か判定する
 			bool IsReadyToNextScene() const { return m_titleButtonShown; }
@@ -82,7 +80,7 @@ namespace app
 			float m_totalScore;
 			std::vector<app::achievement::AchievementBase*> m_allAchievementList;
 
-			app::SEHandle m_drumRollHandle;
+			app::SEHandle m_drumRollHandle = app::INVALID_SE_HANDLE;
 
 			bool m_dataSet = false;               // SetResultData が呼ばれたか
 			ResultDynamicLayout m_dynLayout;      // JSON から読み込んだレイアウト設定
