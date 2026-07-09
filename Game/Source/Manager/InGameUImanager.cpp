@@ -57,7 +57,7 @@ namespace app
 		constexpr float SLEEPING_ENEMY_SEARCH_RANGE = 1000.0f;
 
 		/** レベルアップSEの音量倍率 */
-		constexpr float LEVEL_UP_SE_VOLUME = 10.0f;
+		constexpr float LEVEL_UP_SE_VOLUME = 2.0f;
 	}
 
 
