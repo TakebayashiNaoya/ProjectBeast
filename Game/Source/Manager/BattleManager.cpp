@@ -394,9 +394,18 @@ namespace app
 		const int total = ScoreManager::GetInstance().GetTotalCount();
 		const bool isTimeUp = TimeManager::GetInstance().IsTimeUp();
 
+		auto* feverManager = FeverTimeManager::GetInstance();
+
+		/** ステージ上の全員を救助した瞬間、まだフィーバーが発生していなければ、
+		 *  終了とせず即座にフィーバータイムへ入る（feverEnabledがfalseのステージでは何もしない） */
+		if (collected == total && !feverManager->HasPendingDrops())
+		{
+			feverManager->TryStartFeverOnAllCaught();
+		}
+
 		/** フィーバー中、まだ投下待ちの子ペンギンがいる間は総数がこれから増える予定なので、
 		 *  瞬間的に collected == total になっても全員救助扱いにしない */
-		const bool feverPending = FeverTimeManager::GetInstance()->HasPendingDrops();
+		const bool feverPending = feverManager->HasPendingDrops();
 
 		/**
 		 *	[終了条件]

@@ -5,7 +5,6 @@
  */
 #include "stdafx.h"
 #include "FeverTimeManager.h"
-#include "TimeManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/Util/JsonConverter.h"
@@ -21,24 +20,15 @@ namespace app
 		nlohmann::json json;
 		if (!util::JsonConverter::IsLoadJsonFile(json, parameterJsonPath)) return;
 
-		m_feverStartTime = util::JsonConverter::ToFloat(json, "feverStartTime", m_feverStartTime);
 		m_dropInterval   = util::JsonConverter::ToFloat(json, "dropInterval", m_dropInterval);
 		m_dropHeight     = util::JsonConverter::ToFloat(json, "dropHeight", m_dropHeight);
 		m_feverDropCount = util::JsonConverter::ToInt(json, "feverDropCount", m_feverDropCount);
+		m_feverEnabled   = util::JsonConverter::ToBool(json, "feverEnabled", m_feverEnabled);
 	}
 
 
 	void FeverTimeManager::Update()
 	{
-		if (!m_isActive)
-		{
-			/** 残り時間が閾値を下回った瞬間に一度だけフィーバータイムへ入る */
-			const float curTime = TimeManager::GetInstance().GetCurTime();
-			if (curTime <= 0.0f || curTime > m_feverStartTime) return;
-
-			StartFever();
-		}
-
 		if (m_pendingDropCount <= 0) return;
 
 		m_dropTimer += g_gameTime->GetFrameDeltaTime();
@@ -50,9 +40,19 @@ namespace app
 	}
 
 
+	void FeverTimeManager::TryStartFeverOnAllCaught()
+	{
+		/** フィーバー無効なステージ（チュートリアル等）、または既に発生済みなら何もしない */
+		if (!m_feverEnabled || m_hasTriggered) return;
+
+		StartFever();
+	}
+
+
 	void FeverTimeManager::StartFever()
 	{
 		m_isActive = true;
+		m_hasTriggered = true;
 		m_dropTimer = 0.0f;
 
 		/** フィーバー中BGMに切り替える */
