@@ -209,13 +209,14 @@ namespace app
 			const auto* cm = actor::ChildPenguinManager::GetInstance();
 			const bool isUlt = cm->IsUltActive();
 			const bool isTriangle = cm->GetCurrentFormationType() == actor::EnFormationType::Triangle;
+			const bool isCircle = cm->GetCurrentFormationType() == actor::EnFormationType::Circle;
 
 			const auto* dsm = m_daddyPenguin->GetStateMachine();
 			const bool isDash = dsm->GetIsDash();
 			const bool isSwim = dsm->IsSwimming();
 			const bool isMove = isDash || isSwim;
 
-			m_speedLineChanged(isUlt && isTriangle && isMove);
+			m_speedLineChanged(isUlt && (isTriangle || isCircle) && isMove);
 		}
 
 

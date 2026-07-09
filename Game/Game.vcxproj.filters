@@ -631,6 +631,9 @@
     <ClCompile Include="Source\UI\Ult\SpeedLineMenu.cpp">
       <Filter>Source\UI\Ult</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.cpp">
+      <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -1190,6 +1193,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Ult\SpeedLineMenu.h">
       <Filter>Source\UI\Ult</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.h">
+      <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

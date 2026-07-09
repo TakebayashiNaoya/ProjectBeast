@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file FormationController.cpp
  * @brief 陣形の切り替えと座標計算を管理するコントローラー
  * @author 竹林
@@ -164,9 +164,10 @@ namespace app
 			m_currentType      = type;
 			m_currentFormation = m_formations[static_cast<size_t>(type)].get();
 
-			// 陣形切り替えと同時にウルトチェーンも差し替える
+			// 陣形切り替えと同時にウルトチェーンと演出も差し替える
 			m_ultController.SetUlt(
 				&m_currentFormation->GetUlt(),
+				m_currentFormation->GetUltVisual(),
 				m_currentFormation->GetUltDuration(),
 				m_currentFormation->GetUltCooldown()
 			);

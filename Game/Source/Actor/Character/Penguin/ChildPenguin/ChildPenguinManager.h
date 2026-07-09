@@ -4,12 +4,12 @@
  * @author 立山、竹林
  */
 #pragma once
-#include <random>
-#include <unordered_set>
 #include "ChildPenguinTypes.h"
-#include "Source/Util/Curve.h"
 #include "Source/Actor/Character/Penguin/Formation/FormationController.h"
 #include "Source/Actor/Character/Penguin/Formation/FormationRangeVisualizer.h"
+#include "Source/Util/Curve.h"
+#include <random>
+#include <unordered_set>
 
 
 namespace app
@@ -378,7 +378,7 @@ namespace app
 
 
 
-      
+
 			//============================================//
 			// 追従命令と待機命令のフラグ管理
 			//============================================//
@@ -616,7 +616,7 @@ namespace app
 			 * @param penguin 登録するペンギンのポインタ
 			 * @param target ゴーストペンギンのデバフ対象となるシロクマ
 			 */
-			void RegisterGhostPenguin(ChildPenguin* penguin,Enemy* target);
+			void RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target);
 
 			/**
 			 * @brief ゴーストペンギンを更新する

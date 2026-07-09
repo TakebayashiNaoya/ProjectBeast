@@ -4,8 +4,10 @@
  * @author 竹林
  */
 #pragma once
+#include <memory>
 #include <vector>
 #include "Source/Actor/Character/Penguin/Formation/Effect/FormationEffectChain.h"
+#include "Source/Actor/Character/Penguin/Formation/Ult/IUltEffect.h"
 
 
 namespace app
@@ -21,9 +23,11 @@ namespace app
 		 *   m_outerRadius が更新され、GetJoinRadius() が
 		 *   現在の人数に応じた入隊判定半径を返す。
 		 *
-		 *   m_passive: 常時有効なエフェクトチェーン
-		 *   m_ult:     ウルト発動中のみ有効なエフェクトチェーン
-		 *   FormationController が2本を組み合わせて速度倍率・渦潮耐性を返す。
+		 *   m_passive:   常時有効なエフェクトチェーン（ロジックのみ）
+		 *   m_ult:       ウルト発動中のみ有効なエフェクトチェーン（ロジックのみ）
+		 *   m_ultVisual: ウルトの演出（ビジュアルエフェクト）。効果とは分離して所有する。
+		 *   FormationController がパッシブ・ウルトの2本を組み合わせて速度倍率・渦潮耐性を返し、
+		 *   UltController が m_ult と m_ultVisual の両方に Enter/Update/Exit を転送する。
 		 */
 		class IFormation
 		{
@@ -42,6 +46,12 @@ namespace app
 
 			/** @brief ウルトエフェクトチェーンを返す（UltController が Enter/Update/Exit を呼ぶ） */
 			FormationEffectChain& GetUlt() { return m_ult; }
+
+			/**
+			 * @brief ウルトの演出を返す（UltController が Enter/Update/Exit を呼ぶ）
+			 * @return 演出インスタンス。演出を持たない陣形は nullptr
+			 */
+			IUltEffect* GetUltVisual() { return m_ultVisual.get(); }
 
 			/**
 			 * @brief ウルト持続時間を返す（秒）
@@ -94,8 +104,10 @@ namespace app
 		protected:
 			float m_outerRadius = 0.0f;  /** 最外半径 */
 
-			FormationEffectChain m_passive;  /** 常時有効なエフェクトチェーン */
-			FormationEffectChain m_ult;      /** ウルト発動中のみ有効なエフェクトチェーン */
+			FormationEffectChain m_passive;  /** 常時有効なエフェクトチェーン（ロジックのみ） */
+			FormationEffectChain m_ult;      /** ウルト発動中のみ有効なエフェクトチェーン（ロジックのみ） */
+
+			std::unique_ptr<IUltEffect> m_ultVisual;  /** ウルトの演出（ビジュアルエフェクト） */
 
 			const MasterFormationParameter* m_param;  /** 陣形パラメーターへの非所有ポインタ（ホットリロード対応） */
 		};
@@ -152,6 +164,7 @@ namespace app
 		 * @details
 		 *   パッシブ: なし。
 		 *   ウルト: 速度up ＋ 渦潮免疫 ＋ ペンギン呼び出し（MasterFormationParameter で調整）。
+		 *   演出: UltEffectCircle（NormalUltAura）。
 		 */
 		class CircleFormation : public RingFormation
 		{
@@ -171,6 +184,7 @@ namespace app
 		 * @details
 		 *   パッシブ: 速度down ＋ 渦潮耐性。
 		 *   ウルト: 渦潮近傍で速度up ＋ シロクマ攻撃無効化（MasterFormationParameter で調整）。
+		 *   演出: UltEffectCluster（Barrier）。
 		 */
 		class ClusterFormation : public RingFormation
 		{
@@ -190,6 +204,7 @@ namespace app
 		 * @details
 		 *   パッシブ: なし。
 		 *   ウルト: ペンギン呼び出し（MasterFormationParameter で調整）。
+		 *   演出: UltEffectScatter（CallAura）。
 		 */
 		class ScatterFormation : public RingFormation
 		{
@@ -209,6 +224,7 @@ namespace app
 		 * @details
 		 *   パッシブ: レベル連動速度（MasterFormationParameter で調整）。
 		 *   ウルト: 純粋なスピード特化（MasterFormationParameter で調整）。
+		 *   演出: UltEffectTriangle（SpeedBoost）。
 		 */
 		class TriangleFormation : public IFormation
 		{

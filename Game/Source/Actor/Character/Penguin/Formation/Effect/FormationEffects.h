@@ -1,11 +1,10 @@
-﻿/**
+/**
  * @file FormationEffects.h
  * @brief 陣形効果の具体クラス群
  * @author 竹林
  */
 #pragma once
 #include "IFormationEffect.h"
-#include "Source/Effect/Types.h"
 
 
 namespace app
@@ -28,16 +27,7 @@ namespace app
 				: m_multiplier(multiplier)
 			{}
 
-
-			void Enter(const UltContext& ctx) override;
-			void Update(float dt, const UltContext& ctx) override;
-			void Exit(const UltContext& ctx) override;
-
 			float GetSpeedMultiplier(int level) const override { return *m_multiplier; }
-
-
-		private:
-			EffectHandle m_ultHandle;
 		};
 
 
@@ -90,6 +80,7 @@ namespace app
 			float GetSpeedMultiplier(int level) const override;
 		};
 
+
 		/**
 		 * @brief 渦潮耐性エフェクト
 		 * @details HasWhirlpoolResistance() を常に true にする。
@@ -100,6 +91,7 @@ namespace app
 		public:
 			bool HasWhirlpoolResistance() const override { return true; }
 		};
+
 
 		/**
 		 * @brief ペンギン呼び出しエフェクト
@@ -128,13 +120,7 @@ namespace app
 		{
 		public:
 			void Enter(const UltContext& ctx) override;
-			void Update(float dt, const UltContext& ctx) override;
 			void Exit(const UltContext& ctx) override;
-
-
-		private:
-			/** @brief ウルト用のエフェクトハンドル */
-			EffectHandle m_ultHandle;
 		};
 	}
 }

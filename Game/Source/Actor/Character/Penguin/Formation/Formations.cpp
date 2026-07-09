@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Formations.cpp
  * @brief 陣形インターフェースと全具体クラスの実装
  * @author 竹林
@@ -118,6 +118,9 @@ namespace app
 			{
 				m_ult.AddEffect(std::make_unique<PenguinCallEffect>(&param.ultCallDistance));
 			}
+
+			// 演出: 通常ウルトオーラ
+			m_ultVisual = std::make_unique<UltEffectCircle>();
 		}
 
 
@@ -141,6 +144,9 @@ namespace app
 			{
 				m_ult.AddEffect(std::make_unique<BearAttackNullifyEffect>());
 			}
+
+			// 演出: バリア
+			m_ultVisual = std::make_unique<UltEffectCluster>();
 		}
 
 
@@ -157,6 +163,9 @@ namespace app
 			{
 				m_ult.AddEffect(std::make_unique<PenguinCallEffect>(&param.ultCallDistance));
 			}
+
+			// 演出: 呼び出しオーラ
+			m_ultVisual = std::make_unique<UltEffectScatter>();
 		}
 
 
@@ -173,6 +182,9 @@ namespace app
 
 			// ウルト: 純粋なスピード特化
 			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));
+
+			// 演出: スピードブースト
+			m_ultVisual = std::make_unique<UltEffectTriangle>();
 		}
 
 
