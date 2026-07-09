@@ -87,6 +87,14 @@ namespace app
 			virtual float GetJoinRadius(int count) const { return GetJoinRadius(); }
 
 			/**
+			 * @brief ウルト発動中のみ入隊判定半径を拡大する距離を返す（未使用の陣形は0）
+			 * @details FormationController::GetJoinRadius() がウルト発動中のみ、
+			 *          通常の入隊判定半径とこの値の大きい方を採用する。
+			 *          デフォルトは0（拡大なし）。散開陣のみオーバーライドする。
+			 */
+			virtual float GetUltJoinRadius() const { return 0.0f; }
+
+			/**
 			 * @brief 陣形座標を計算する
 			 * @param center  親ペンギンの座標
 			 * @param forward 親ペンギンの前方向（正規化済み）
@@ -203,7 +211,8 @@ namespace app
 		 * @brief 散開陣（広間隔）
 		 * @details
 		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameter で調整）。
-		 *   ウルト: ペンギン呼び出し（MasterFormationParameter で調整）。
+		 *   ウルト: 発動中だけ入隊判定半径が一時的に拡大する（MasterFormationParameter の
+		 *   ultCallDistance で調整。ウルトが終わると通常の半径に戻る）。
 		 *   演出: UltEffectScatter（CallAura）。
 		 */
 		class ScatterFormation : public RingFormation
@@ -211,6 +220,9 @@ namespace app
 		public:
 			/** @param param JSONから読み込んだ散開陣のパラメーター */
 			explicit ScatterFormation(const MasterFormationParameter& param);
+
+			/** @brief ウルト発動中はこの距離まで入隊判定半径を拡大する */
+			float GetUltJoinRadius() const override;
 		};
 
 

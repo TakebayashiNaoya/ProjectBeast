@@ -94,6 +94,8 @@ namespace app
 
 			/**
 			 * @brief 指定フォロワー数に対応する入隊判定半径を返す
+			 * @details ウルト発動中は、陣形固有の拡大距離（現状は散開陣のみ非0）との
+			 *          大きい方が採用され、入隊範囲が一時的に拡大する。
 			 * @param count フォロワー数
 			 */
 			float GetJoinRadius(int count) const;
@@ -104,8 +106,10 @@ namespace app
 			 */
 			float GetOuterRadius() const;
 
-			/** 
+			/**
 			 * @brief 入隊判定半径を取得する（最外半径 + 入隊マージン）
+			 * @details ウルト発動中は、陣形固有の拡大距離（現状は散開陣のみ非0）との
+			 *          大きい方が採用され、入隊範囲が一時的に拡大する。
 			 * @return 入隊判定半径
 			 */
 			float GetJoinRadius() const;
