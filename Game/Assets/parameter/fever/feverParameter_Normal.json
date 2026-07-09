@@ -1,5 +1,6 @@
 {
   "feverEnabled": true,
+  "feverStartTime": 30.0,
   "dropInterval": 0.1,
   "dropHeight": 1500.0,
   "feverDropCount": 100

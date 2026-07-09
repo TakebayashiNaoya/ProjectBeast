@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "FeverTimeManager.h"
+#include "TimeManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/Util/JsonConverter.h"
@@ -20,6 +21,7 @@ namespace app
 		nlohmann::json json;
 		if (!util::JsonConverter::IsLoadJsonFile(json, parameterJsonPath)) return;
 
+		m_feverStartTime = util::JsonConverter::ToFloat(json, "feverStartTime", m_feverStartTime);
 		m_dropInterval   = util::JsonConverter::ToFloat(json, "dropInterval", m_dropInterval);
 		m_dropHeight     = util::JsonConverter::ToFloat(json, "dropHeight", m_dropHeight);
 		m_feverDropCount = util::JsonConverter::ToInt(json, "feverDropCount", m_feverDropCount);
@@ -29,7 +31,27 @@ namespace app
 
 	void FeverTimeManager::Update()
 	{
-		if (m_pendingDropCount <= 0) return;
+		if (!m_isActive && !m_hasTriggered)
+		{
+			/** 残り時間が閾値を下回った瞬間に一度だけフィーバータイムへ入る
+			 *  （全員捕獲トリガーとは別経路。どちらか早い方が優先される） */
+			const float curTime = TimeManager::GetInstance().GetCurTime();
+			if (curTime > 0.0f && curTime <= m_feverStartTime)
+			{
+				TryStartFever();
+			}
+		}
+
+		if (m_pendingDropCount <= 0)
+		{
+			/** 今回のフィーバーで積む予定の総数まで使い切っていれば、投下待ちが再び増えることはない
+			 *  （捕獲による補充はfeverDropCountに達するまでしか起きないため）ので、ここでフィーバーを終了する */
+			if (m_isActive && m_totalQueuedCount >= m_feverDropCount)
+			{
+				m_isActive = false;
+			}
+			return;
+		}
 
 		m_dropTimer += g_gameTime->GetFrameDeltaTime();
 		if (m_dropTimer < m_dropInterval) return;
@@ -41,6 +63,12 @@ namespace app
 
 
 	void FeverTimeManager::TryStartFeverOnAllCaught()
+	{
+		TryStartFever();
+	}
+
+
+	void FeverTimeManager::TryStartFever()
 	{
 		/** フィーバー無効なステージ（チュートリアル等）、または既に発生済みなら何もしない */
 		if (!m_feverEnabled || m_hasTriggered) return;

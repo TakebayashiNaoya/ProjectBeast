@@ -10,7 +10,8 @@ namespace app
 {
 	/**
 	 * @brief フィーバータイムを管理するクラス
-	 * @detail ステージ上の子ペンギンを全て捕獲した瞬間にフィーバータイムへ入り、
+	 * @detail ステージ上の子ペンギンを全て捕獲した瞬間、または残り時間がfeverStartTimeを
+	 *         下回った瞬間のどちらか早い方でフィーバータイムへ入り、
 	 *         それまでの捕獲数によらず固定数の子ペンギンを上空から降らせる。
 	 *         フィーバー中にプレイヤーが子ペンギンを捕獲するたびに、
 	 *         捕獲した分だけ投下キューへ追加され連続して降り続けるが、
@@ -66,6 +67,12 @@ namespace app
 
 	private:
 		/**
+		 * @brief feverEnabled・未発生の条件を満たしていればフィーバータイムを開始する
+		 * @detail TryStartFeverOnAllCaught()と、残り時間による自動トリガーの共通経路
+		 */
+		void TryStartFever();
+
+		/**
 		 * @brief フィーバータイムを開始し、投下キューの初期数を積む
 		 */
 		void StartFever();
@@ -78,6 +85,7 @@ namespace app
 
 	private:
 		float m_dropTimer		 = 0.0f;	 /** 投下間隔用タイマー */
+		float m_feverStartTime	 = 30.0f;	 /** 残りこの秒数を下回ったら自動でフィーバータイムへ入る（JSONで上書きされる） */
 		float m_dropInterval	 = 0.3f;	 /** 投下間隔（秒）（JSONで上書きされる） */
 		float m_dropHeight		 = 1500.0f;  /** 投下する上空の高さ（地面からのオフセット）（JSONで上書きされる） */
 		int   m_feverDropCount	 = 100;		 /** 1回のフィーバーで投下する総数の上限（JSONで上書きされる） */
