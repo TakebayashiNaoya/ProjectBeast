@@ -121,6 +121,16 @@ namespace app
 				else if (multiplier > 1.0f) { m_speedMultiplier = 1.0f; }
 				else { m_speedMultiplier = multiplier; }
 			}
+			/**
+			 * @brief 外部要因による移動速度の倍率を設定
+			 * @details 陣形のパッシブ/ウルト速度倍率など、1.0f を超えうる倍率に使用する。
+			 *          減速・ブレーキ用の SetSpeedMultiplier() とは別枠で Move() に乗算される。
+			 * @param multiplier 倍率（上限・下限クランプなし）
+			 */
+			inline void SetExternalSpeedMultiplier(const float multiplier)
+			{
+				m_externalSpeedMultiplier = multiplier;
+			}
 
 
 			/**
@@ -217,6 +227,9 @@ namespace app
 
 			/** 移動速度の倍率（減速・アナログスティック用：0.0f ~ 1.0f） */
 			float m_speedMultiplier;
+
+			/** 外部要因による移動速度の倍率（陣形速度など：クランプなし、既定 1.0f） */
+			float m_externalSpeedMultiplier;
 
 			/** ダッシュしているかどうか */
 			bool m_isDash;

@@ -334,6 +334,9 @@ namespace app
 			// 計算した倍率をステートマシンに渡し、物理処理(Lerp)の目標速度を落とす
 			m_stateMachine->SetSpeedMultiplier(speedMultiplier);
 
+			// 陣形のパッシブ/ウルト速度倍率を反映する（1.0f超もありうるためクランプなしの別枠に渡す）
+			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
+
 			/** フェーズに応じてAIControllerInputを組み立てる */
 			switch (m_movePhase)
 			{
