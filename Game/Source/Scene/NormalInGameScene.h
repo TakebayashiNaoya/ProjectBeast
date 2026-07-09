@@ -19,9 +19,9 @@ namespace app
 		appScene(NormalInGameScene);
 
 	protected:
-		float GetTimeLimit() const override 
+		float GetTimeLimit() const override
 		{
-			return 180.0f; 
+			return 150.0f;
 		}
 
 		Vector3 GetDaddySpawnPos() const override
@@ -31,7 +31,7 @@ namespace app
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 0, 0, 35, 35, 30, 5000.0f, 1500.0f };
+			return { 0, 0, 35, 35, 30, 3500.0f, 1500.0f };
 		}
 
 		const char* GetStageJsonPath() const override

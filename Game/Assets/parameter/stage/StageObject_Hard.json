@@ -5,9 +5,9 @@
         "objectName" : "wall",
         "fileName" : "Assets/modelData/stage/Wall/iceWall.tkm",
         "isNeedCollision" : true,
-        "position" : [0, 1000, 0],
+        "position" : [-1200, 1000, -100],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [0.4, 3, 0.4],
+        "scale" : [0.35, 3, 0.3],
         "pbrName" : "wall"
       },
       {

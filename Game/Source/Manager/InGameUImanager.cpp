@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file InGameUIManager.cpp
  * @brief インゲームUIの生成・更新・描画・配線を管理するクラス
  * @author 竹林
