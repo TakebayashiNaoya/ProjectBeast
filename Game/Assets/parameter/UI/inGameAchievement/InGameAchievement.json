@@ -6,8 +6,8 @@
         "name": "AchieveBackGroundIcon",
         "asset": "Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.dds",
         "width": 450,
-        "height": 550,
-        "position": [570, 70, 0],
+        "height": 450,
+        "position": [570, 110, 0],
         "scale": [1, 1, 1],
         "rotation": 0,
         "color": [255, 255, 255, 100]
