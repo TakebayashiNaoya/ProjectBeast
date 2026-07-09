@@ -10,6 +10,7 @@
 #include "Source/Util/Curve.h"
 #include "Source/Actor/Character/Penguin/Formation/FormationController.h"
 #include "Source/Actor/Character/Penguin/Formation/FormationRangeVisualizer.h"
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -596,6 +597,8 @@ namespace app
 				bool isHidden;
 				bool isDebuffActive;
 				Vector3 position;
+
+				EffectHandle handle;
 
 				GhostPenguinInfo();
 			};

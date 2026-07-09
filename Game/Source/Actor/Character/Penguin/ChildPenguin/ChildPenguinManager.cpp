@@ -64,6 +64,13 @@ namespace app
 
 			/** ゴーストペンギン出現音の音量倍率 */
 			constexpr float SPAWN_GHOST_PENGUIN_SE_VOLUME = 1.0f;
+
+			/** 青い火の玉オフセット */
+			const Vector3 BLUR_FIRE_BALL_OFFSET = Vector3(0.0f, 30.0f, 0.0f);
+			/** 青い火の玉の初期回転 */
+			const Quaternion BLUR_FIRE_BALL_ROTATION = Quaternion::Identity;
+			/** 青い火の玉の初期スケール */
+			const Vector3 BLUR_FIRE_BALL_SCALE_UP = Vector3(10.0f, 10.0f, 10.0f);
 		}
 
 
@@ -910,6 +917,7 @@ namespace app
 			, isHidden(false)
 			, isDebuffActive(false)
 			, position(Vector3::Zero)
+			, handle(INVALID_EFFECT_HANDLE)
 		{}
 
 
@@ -927,6 +935,25 @@ namespace app
 			info->floatCurve.Play();
 			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
 			info->modelRender.Update();
+
+			// 青い火の玉エフェクトを再生。
+			info->handle = EffectManager::Get().PlayEffect(
+				EnEffectKind::GhostPenguinBlurFireBall,
+				info->modelRender.GetPosition(),
+				Quaternion::Identity,
+				BLUR_FIRE_BALL_SCALE_UP
+			);
+
+			// エフェクト追従。
+			EffectManager::Get().AttachEffect(
+				info->handle,
+				&info->modelRender.GetPosition(),
+				BLUR_FIRE_BALL_OFFSET
+			);
+
+			//if(info->handle == INVALID_EFFECT_HANDLE)
+			//{
+			//}
 
 			// ゴーストペンギンの出現音を再生。
 			SoundManager::Get().PlaySE(enSoundKind_GhostPenguinReaction, SPAWN_GHOST_PENGUIN_SE_VOLUME, enSoundPriority_Hight);
@@ -967,6 +994,14 @@ namespace app
 				if (info->timer >= GHOST_HIDDEN_WAIT_TIME && !info->isHidden)
 				{
 					info->isHidden = true;
+
+					// 青い火の玉エフェクトを停止。
+					if (info->handle != INVALID_EFFECT_HANDLE)
+					{
+						EffectManager::Get().StopEffect(info->handle);
+						info->handle = INVALID_EFFECT_HANDLE;
+					}
+
 					// nullチェック。
 					if (info->target != nullptr)
 					{
