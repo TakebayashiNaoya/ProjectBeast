@@ -1,8 +1,8 @@
 [
   {
     "comment": "円陣（通常）：パッシブでレベル連動加速（他陣形と共通）／ウルトで速度1.5倍＋渦潮免疫＋ペンギン呼び戻し",
-    "ultDuration": 8.0,
-    "ultCooldown": 30.0,
+    "ultDuration": 10.0,
+    "ultCooldown": 20.0,
     "passiveSpeedMultiplier": 1.0,
     "passiveSpeedBase": 1.0,
     "passiveSpeedPerLevel": 0.2,
@@ -20,8 +20,8 @@
   },
   {
     "comment": "三角陣（スピード特化）：パッシブで初期値のみ高い（伸び率は他陣形と共通）／ウルトで速度1.5倍",
-    "ultDuration": 8.0,
-    "ultCooldown": 30.0,
+    "ultDuration": 10.0,
+    "ultCooldown": 20.0,
     "passiveSpeedMultiplier": 1.0,
     "passiveSpeedBase": 1.5,
     "passiveSpeedPerLevel": 0.2,
@@ -39,8 +39,8 @@
   },
   {
     "comment": "密集陣（防御特化）：パッシブでレベル連動加速（他陣形と共通）＋渦潮耐性／ウルトで渦潮近傍加速＋シロクマ攻撃無効化",
-    "ultDuration": 8.0,
-    "ultCooldown": 30.0,
+    "ultDuration": 10.0,
+    "ultCooldown": 20.0,
     "passiveSpeedMultiplier": 1.0,
     "passiveSpeedBase": 1.0,
     "passiveSpeedPerLevel": 0.2,
@@ -58,8 +58,8 @@
   },
   {
     "comment": "散開陣（収集特化）：パッシブでレベル連動加速（他陣形と共通）／ウルトで遠距離ペンギン呼び戻し",
-    "ultDuration": 8.0,
-    "ultCooldown": 30.0,
+    "ultDuration": 10.0,
+    "ultCooldown": 20.0,
     "passiveSpeedMultiplier": 1.0,
     "passiveSpeedBase": 1.0,
     "passiveSpeedPerLevel": 0.2,
