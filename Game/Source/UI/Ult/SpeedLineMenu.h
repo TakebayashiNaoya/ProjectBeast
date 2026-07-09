@@ -16,8 +16,8 @@ namespace app
 		class SpeedLineMenu : public MenuBase
 		{
 		public:
-			SpeedLineMenu() {}
-			virtual ~SpeedLineMenu() {}
+			SpeedLineMenu();
+			~SpeedLineMenu();
 
 
 			void InitializeLogic() override;
@@ -40,6 +40,15 @@ namespace app
 			 * @brief 集中線が現在見えているかどうか
 			 */
 			bool IsVisible() const { return m_currentAlpha > 0.01f; }
+
+			/**
+			 * @brief 集中線の表示/非表示を設定する
+			 * @param active true: 表示する, false: 非表示にする
+			 */
+			void SetActive(const bool active)
+			{
+				m_isActive = active;
+			}
 
 
 		private:
@@ -66,6 +75,8 @@ namespace app
 			int m_flickerCounter;
 			/** 現在のちらつき回転角(度) */
 			float m_flickerDeg;
+			/** 集中線の表示/非表示フラグ */
+			bool m_isActive = false;
 
 
 		private:
@@ -78,7 +89,7 @@ namespace app
 			 * @param flickerDeg  ちらつき回転角(度)
 			 * @param pulseScale  脈動スケール倍率
 			 */
-			static void ApplyToLine(
+			void ApplyToLine(
 				UIIcon* line
 				, const Vector3& baseScale
 				, const Vector4& baseColor

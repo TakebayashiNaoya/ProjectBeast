@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file SpeedLineMenu.cpp
  * @brief 加速時に集中線(スピードライン)を表示するメニュー
  */
@@ -6,9 +6,10 @@
 #include "SpeedLineMenu.h"
 
 #include "Source/Util/CRC32.h"
+#include "Source/Util/RandomDevice.h"
 
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
 
 
 namespace
@@ -43,7 +44,7 @@ namespace
 	/** 0.0f～1.0fの乱数 */
 	float Random01()
 	{
-		return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+		return app::util::RandomDevice::Random(0.0f, 1.0f);
 	}
 }
 
@@ -52,13 +53,33 @@ namespace app
 {
 	namespace ui
 	{
+		SpeedLineMenu::SpeedLineMenu()
+			: m_mainLine(nullptr)
+			, m_subLine(nullptr)
+			, m_mainBaseScale(Vector3::One)
+			, m_subBaseScale(Vector3::One)
+			, m_mainBaseColor(Vector4::White)
+			, m_subBaseColor(Vector4::White)
+			, m_targetAlpha(0.0f)
+			, m_currentAlpha(0.0f)
+			, m_time(0.0f)
+			, m_flickerCounter(0)
+			, m_flickerDeg(0.0f)
+			, m_isActive(false)
+		{}
+
+
+		SpeedLineMenu::~SpeedLineMenu()
+		{}
+
+
 		void SpeedLineMenu::InitializeLogic()
 		{
 			// ホットリロードでUIが作り直されるため、ポインタは毎回取り直す
 			m_mainLine = GetUI<UIIcon>(Hash32("SpeedLineMain"));
-			m_subLine  = GetUI<UIIcon>(Hash32("SpeedLineSub"));
+			m_subLine = GetUI<UIIcon>(Hash32("SpeedLineSub"));
 
-			K2_ASSERT(m_mainLine != nullptr, "レイアウトJSONに \"SpeedLineMain\" (UIIcon) がありません。\n");
+			K2_ASSERT(m_mainLine != nullptr, "取得失敗");
 
 			// JSONで指定された初期値を演出の基準として保存しておく
 			if (m_mainLine)
@@ -86,7 +107,7 @@ namespace app
 		void SpeedLineMenu::SetAcceleration(float accel01)
 		{
 			// 0.0f～1.0fにクランプしてから目標アルファへ変換
-			accel01 = (accel01 < 0.0f) ? 0.0f : (accel01 > 1.0f) ? 1.0f : accel01;
+			accel01 = std::clamp(accel01, 0.0f, 1.0f);;
 			m_targetAlpha = accel01 * kMaxAlpha;
 		}
 
@@ -95,6 +116,12 @@ namespace app
 		{
 			if (m_mainLine)
 			{
+				if (!m_isActive)
+				{
+					m_targetAlpha = 0.0f;
+				}
+
+
 				// -----------------------------------------------------
 				// 1. アルファを目標値へ滑らかに追従させる
 				//    (加速開始→素早く出現、減速→余韻を残して消える)
@@ -148,8 +175,7 @@ namespace app
 				}
 			}
 
-			// 最後に基底のUpdateを呼び、UIIcon::Update()に
-			// ここで設定した m_color / m_transform を反映させる
+
 			MenuBase::Update();
 		}
 

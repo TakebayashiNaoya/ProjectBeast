@@ -14,6 +14,8 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Manager/FeverTimeManager.h"
 #include "Source/Nature/Whirlpool.h"
@@ -196,6 +198,26 @@ namespace app
 				});
 			m_wpWarningChanged(warningPositions);
 		}
+
+
+
+		//--------------------------------------------//
+		// スピードアップ中の通知
+		//--------------------------------------------//
+		if (m_speedLineChanged)
+		{
+			const auto* cm = actor::ChildPenguinManager::GetInstance();
+			const bool isUlt = cm->IsUltActive();
+			const bool isTriangle = cm->GetCurrentFormationType() == actor::EnFormationType::Triangle;
+
+			const auto* dsm = m_daddyPenguin->GetStateMachine();
+			const bool isDash = dsm->GetIsDash();
+			const bool isSwim = dsm->IsSwimming();
+			const bool isMove = isDash || isSwim;
+
+			m_speedLineChanged(isUlt && isTriangle && isMove);
+		}
+
 
 
 		//--------------------------------------------//

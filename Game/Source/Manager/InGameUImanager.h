@@ -37,6 +37,7 @@ namespace app
 		class FormationWheelMenu;
 		class DebufMenu;
 		class FeverIconMenu;
+		class SpeedLineMenu;
 
 		class CPReactionSystem;
 		class WpWarningSystem;
@@ -151,22 +152,13 @@ namespace app
 		/** @brief フィーバーアイコンMenuを取得 */
 		inline ui::FeverIconMenu* GetFeverIconMenu() const { return m_feverIconPacket->GetMenu(); }
 		/** @brief ポーズMenuを取得 */
-		//inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pauseMenu; }
 		inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pausePacket->GetMenu(); }
 		/** @brief サウンドオプションMenuを取得 */
-		//inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionMenu; }
 		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionPacket->GetMenu(); }
 		/** @brief チュートリアルMenuを取得 */
-		//inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialMenu; }
 		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialPacket->GetMenu(); }
-		/** @brief 子ペンギンリアクションシステムを取得 */
-		inline ui::CPReactionSystem* GetCPReactionSystem() const { return m_cpReactionSystem.get(); }
-		/** @brief WpWarningSystemを取得 */
-		inline ui::WpWarningSystem* GetWpWarningSystem() const { return m_wpWarningSystem.get(); }
 		/** @brief 救助数Menuを取得 */
 		inline ui::RemainingChildMenu* GetRemainingChildMenu() const { return m_remainingChildPacket->GetMenu(); }
-		/** @brief デバフMenuを取得 */
-		inline ui::DebufMenu* GetDebufMenu() const { return m_debufPacket->GetMenu(); }
 		/** @brief イグループプロンプトMenuを取得 */
 		inline ui::IglooPromptMenu* GetIglooPromptMenu() const { return m_iglooPromptPacket->GetMenu(); }
 
@@ -225,6 +217,7 @@ namespace app
 		ui::UIPacket<ui::FormationWheelMenu> m_formationWheelPacket;
 		ui::UIPacket<ui::DebufMenu> m_debufPacket;
 		ui::UIPacket<ui::FeverIconMenu> m_feverIconPacket;
+		ui::UIPacket<ui::SpeedLineMenu> m_speedLinePacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;

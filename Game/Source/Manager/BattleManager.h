@@ -200,6 +200,16 @@ namespace app
 
 
 		/**
+		 * @brief 速度ラインUI更新通知を設定
+		 * @param func 引数：速度ラインの表示状態
+		 */
+		inline void SetOnSpeedLineChanged(std::function<void(const bool)> func)
+		{
+			m_speedLineChanged = std::move(func);
+		}
+
+
+		/**
 		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
 		 */
 		void ResetObservers();
@@ -232,6 +242,17 @@ namespace app
 		/** 子ペンギンリアクションUI更新通知 */
 		std::function<void(actor::ChildPenguin*, ui::EnCPReactionType, ui::EnCPReactionPriority)> m_onCPReactionChanged;
 
+
+		//============================================//
+		// 速度ラインUI更新通知
+		//============================================//
+	private:
+		/** 速度ラインUI更新通知 */
+		std::function<void(const bool)> m_speedLineChanged;
+		/** 前フレームの位置 */
+		Vector3 m_lastPosition;
+		/** 現在の位置 */
+		Vector3 m_currentPosition;
 
 
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file InGameUIManager.cpp
  * @brief インゲームUIの生成・更新・描画・配線を管理するクラス
  * @author 竹林
@@ -42,6 +42,7 @@
 #include "Source/UI/Menus/TutorialMenu.h"
 #include "Source/UI/MiniMap/MiniMapMenu.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
+#include "Source/UI/Ult/SpeedLineMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
 
 
@@ -131,6 +132,9 @@ namespace app
 		ui::InitUIPacket(m_feverIconPacket, "Assets/parameter/UI/fever/FeverIcon.json");
 		// 陣形/ウルトのボタン表示を生成
 		ui::InitUIPacket(m_formationWheelPacket, "Assets/parameter/UI/formationWheel/FormationWheel.json");
+
+		ui::InitUIPacket(m_speedLinePacket, "Assets/parameter/UI/ult/SpeedLine.json");
+
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
 		m_cpReactionSystem->Initialize();
@@ -360,6 +364,22 @@ namespace app
 				m_wpWarningSystem->UpdateDrawFlags();
 			}
 		);
+
+
+		//--------------------------------------------//
+		// スピードアップ中の通知
+		//--------------------------------------------//
+		bm.SetOnSpeedLineChanged(
+			[this, CheckMenu](bool isSpeedUp)
+			{
+				const float acceleration = isSpeedUp ? 1.0f : 0.0f;
+
+				auto* menu = m_speedLinePacket->GetMenu();
+				CheckMenu(menu);
+				menu->SetActive(isSpeedUp);
+				menu->SetAcceleration(acceleration);
+			}
+		);
 	}
 
 
@@ -391,6 +411,7 @@ namespace app
 		if (m_miniMapPacket) m_miniMapPacket->Update();
 		if (m_achievementPacket) m_achievementPacket->Update();
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Update();
+		if (m_speedLinePacket) m_speedLinePacket->Update();
 
 		if (m_achievementPacket)
 		{
@@ -467,6 +488,7 @@ namespace app
 
 	void InGameUIManager::RenderPlaying(RenderContext& rc)
 	{
+		if (m_speedLinePacket) m_speedLinePacket->Render(rc);
 		for (auto& packet : m_searchPackets)
 		{
 			if (packet) packet->Render(rc);
