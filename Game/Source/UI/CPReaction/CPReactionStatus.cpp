@@ -17,6 +17,7 @@ namespace app
 		CPReactionStatus::CPReactionStatus()
 			: m_swayTime(0.0f)
 			, m_iconOffsetY(0.0f)
+			, m_drawableDistance(0.0f)
 			, m_speechBubbleOffset(Vector3::Zero)
 			, m_troubleReactionOffset(Vector3::Zero)
 			, m_happyReactionOffset(Vector3::Zero)
@@ -31,6 +32,7 @@ namespace app
 				{
 					parameter.swayTime = util::JsonConverter::ToFloat(j, "swayTime");
 					parameter.iconOffsetY = util::JsonConverter::ToFloat(j, "iconOffsetY");
+					parameter.drawableDistance = util::JsonConverter::ToFloat(j, "drawableDistance");
 					parameter.speechBubbleOffset = util::JsonConverter::ToVector3(j, "speechBubbleOffset");
 					parameter.troubleReactionOffset = util::JsonConverter::ToVector3(j, "troubleReactionOffset");
 					parameter.happyReactionOffset = util::JsonConverter::ToVector3(j, "happyReactionOffset");
@@ -56,6 +58,7 @@ namespace app
 			if (!parameter) return;
 			m_swayTime = parameter->swayTime;
 			m_iconOffsetY = parameter->iconOffsetY;
+			m_drawableDistance = parameter->drawableDistance;
 			m_speechBubbleOffset = parameter->speechBubbleOffset;
 			m_troubleReactionOffset = parameter->troubleReactionOffset;
 			m_happyReactionOffset = parameter->happyReactionOffset;

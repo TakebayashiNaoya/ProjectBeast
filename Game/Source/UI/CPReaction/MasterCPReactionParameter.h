@@ -29,6 +29,8 @@ namespace app
 			float swayTime;
 			/** アイコンのYオフセット */
 			float iconOffsetY;
+			/** プレイヤーからこの距離より離れた子ペンギンの吹き出しは表示しない */
+			float drawableDistance;
 			/** 吹き出しのオフセット */
 			Vector3 speechBubbleOffset;
 			/** 困りリアクションのオフセット */

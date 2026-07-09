@@ -36,6 +36,8 @@ namespace app
 			inline float GetSwayTime() const { return m_swayTime; }
 			/** @brief アイコンのYオフセットを取得する */
 			inline float GetIconOffsetY() const { return m_iconOffsetY; }
+			/** @brief 吹き出しを表示する距離を取得する */
+			inline float GetDrawableDistance() const { return m_drawableDistance; }
 			/** @brief 吹き出しのオフセットを取得する */
 			inline Vector3 GetSpeechBubbleOffset() const { return m_speechBubbleOffset; }
 			/** @brief トラブルリアクションのオフセットを取得する */
@@ -59,6 +61,8 @@ namespace app
 			float m_swayTime;
 			/** アイコンのYオフセット */
 			float m_iconOffsetY;
+			/** 吹き出しを表示する距離 */
+			float m_drawableDistance;
 			/** 吹き出しのオフセット */
 			Vector3 m_speechBubbleOffset;
 			/** 困りリアクションのオフセット */
