@@ -278,6 +278,7 @@
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\TerrainCircle.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\Formations.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffects.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\UltController.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.cpp" />
@@ -394,6 +395,7 @@
     <ClCompile Include="Source\UI\RemainingChild\RemainingAnimStatus.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
+    <ClCompile Include="Source\UI\Ult\SpeedLineMenu.cpp" />
     <ClCompile Include="Source\UI\WpWarning\MasterWpWarningParameter.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningAnimStatus.cpp" />
     <ClCompile Include="Source\UI\WpWarning\WpWarningMenu.cpp" />
@@ -401,6 +403,7 @@
     <ClCompile Include="Source\UI\WpWarning\WpWarningSystem.cpp" />
     <ClCompile Include="Source\Util\Curve.cpp" />
     <ClCompile Include="Source\Util\JsonConverter.cpp" />
+    <ClCompile Include="Source\Util\RandomDevice.cpp" />
     <ClCompile Include="Source\Vfx\HomingParticleRender.cpp" />
     <ClCompile Include="Source\Vfx\Particle.cpp" />
     <ClCompile Include="Source\Vfx\ParticleEffectLoader.cpp" />
@@ -453,6 +456,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\IFormationEffect.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffectChain.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffects.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\UltContext.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\UltController.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.h" />
@@ -591,6 +595,7 @@
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingChildMenu.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
+    <ClInclude Include="Source\UI\Ult\SpeedLineMenu.h" />
     <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h" />
     <ClInclude Include="Source\UI\WpWarning\WpWarningMenu.h" />
@@ -599,6 +604,7 @@
     <ClInclude Include="Source\Util\CRC32.h" />
     <ClInclude Include="Source\Util\Curve.h" />
     <ClInclude Include="Source\Util\JsonConverter.h" />
+    <ClInclude Include="Source\Util\RandomDevice.h" />
     <ClInclude Include="Source\Vfx\HomingParticleRender.h" />
     <ClInclude Include="Source\Vfx\Particle.h" />
     <ClInclude Include="Source\Vfx\ParticleEffectLoader.h" />

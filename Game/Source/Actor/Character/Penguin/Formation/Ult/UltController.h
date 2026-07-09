@@ -4,8 +4,8 @@
  * @author 竹林
  */
 #pragma once
-#include "UltContext.h"
 #include "Source/Sound/SoundHandle.h"
+#include "UltContext.h"
 
 
 namespace app
@@ -13,16 +13,18 @@ namespace app
 	namespace actor
 	{
 		class FormationEffectChain;
+		class IUltEffect;
 
 
 		/**
 		 * @brief ウルトコントローラー
 		 * @details
-		 *   FormationEffectChain（非所有ポインタ）を保持し、発動・更新・終了を管理する。
-		 *   チェーンの所有権は IFormation が持つ。
+		 *   FormationEffectChain（効果・非所有ポインタ）と IUltEffect（演出・非所有ポインタ）を保持し、
+		 *   発動・更新・終了を管理する。チェーンと演出の所有権はどちらも IFormation が持つ。
 		 *   陣形切り替え時は FormationController が SetUlt() を呼び直す。
 		 *
-		 *   ウルト発動時に Enter()、毎フレーム Update()、終了時に Exit() を転送する。
+		 *   ウルト発動時に Enter()、毎フレーム Update()、終了時に Exit() を
+		 *   効果チェーンと演出の両方に転送する。
 		 *   速度倍率・渦潮耐性の取得は FormationController が直接チェーンに問い合わせる。
 		 */
 		class UltController
@@ -38,18 +40,19 @@ namespace app
 			~UltController();
 
 			/**
-			 * @brief ウルトチェーンをセットする（陣形切り替え時に呼ぶ）
+			 * @brief ウルトチェーンと演出をセットする（陣形切り替え時に呼ぶ）
 			 * @param ult      陣形のウルトエフェクトチェーン（IFormation が所有する）
+			 * @param visual   陣形のウルト演出（IFormation が所有する）。演出なしは nullptr 可
 			 * @param duration 持続時間（秒）
 			 * @param cooldown クールダウン（秒）
 			 */
-			void SetUlt(FormationEffectChain* ult, float duration, float cooldown);
+			void SetUlt(FormationEffectChain* ult, IUltEffect* visual, float duration, float cooldown);
 
 			/** @brief 発動可能か（未発動 かつ クールダウン終了） */
 			bool CanActivate() const;
 
 			/**
-			 * @brief ウルトを発動する（チェーンの Enter を呼ぶ）
+			 * @brief ウルトを発動する（チェーンと演出の Enter を呼ぶ）
 			 * @param ctx ウルト発動時のコンテキスト情報
 			 */
 			void Activate(const UltContext& ctx);
@@ -102,15 +105,16 @@ namespace app
 
 
 		private:
-			FormationEffectChain* m_ult          = nullptr;  /** 非所有ポインタ。IFormation が所有する */
-			float                 m_duration      = 0.0f;
-			float                 m_timer         = 0.0f;
-			float                 m_cooldown      = 0.0f;
+			FormationEffectChain* m_ult       = nullptr;  /** 効果チェーン。非所有ポインタ。IFormation が所有する */
+			IUltEffect*           m_ultVisual = nullptr;  /** ウルト演出。非所有ポインタ。IFormation が所有する */
+			float                 m_duration = 0.0f;
+			float                 m_timer = 0.0f;
+			float                 m_cooldown = 0.0f;
 			float                 m_cooldownTimer = 0.0f;
-			bool                  m_isActive      = false;
+			bool                  m_isActive = false;
 
 			/** チャージ（ゲージ蓄積）中に再生しているループSEのハンドル */
-			SEHandle              m_chargeSeHandle    = INVALID_SE_HANDLE;
+			SEHandle              m_chargeSeHandle = INVALID_SE_HANDLE;
 			/** ディスチャージ（発動中）に再生しているループSEのハンドル */
 			SEHandle              m_dischargeSeHandle = INVALID_SE_HANDLE;
 		};

@@ -4,14 +4,15 @@
  * @author 藤谷、竹林
  */
 #include "stdafx.h"
-#include "Whirlpool.h"
-#include "WhirlpoolPowerSystem.h"
-#include "WhirlpoolParameter.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Core/ParameterManager.h"
-#include <random>
+#include "Source/Util/RandomDevice.h"
+#include "Whirlpool.h"
+#include "WhirlpoolParameter.h"
+#include "WhirlpoolPowerSystem.h"
+
 
 using namespace nsK2EngineLow;
 
@@ -28,19 +29,6 @@ namespace app
 			const MasterWhirlpoolParameter* GetParam()
 			{
 				return core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
-			}
-
-			/**
-			 * @brief ランダムな浮動小数点値を生成する
-			 * @param min 最小値
-			 * @param max 最大値
-			 * @return min ～ max のランダム値
-			 */
-			float GenerateRandomFloat(const float min, const float max)
-			{
-				static std::mt19937 engine(std::random_device{}());
-				std::uniform_real_distribution<float> dist(min, max);
-				return dist(engine);
 			}
 		}
 
@@ -154,8 +142,8 @@ namespace app
 					it->angle = atan2f(it->toTargetVector.z, it->toTargetVector.x);
 					it->radiusOffset = 0.0f;
 					it->radiusOffsetTarget = 0.0f;
-					it->individualOrbitOffset = GenerateRandomFloat(-orbitOffsetVariation, orbitOffsetVariation);
-					it->individualRotateScale = 1.0f + GenerateRandomFloat(-rotateScaleVariation, rotateScaleVariation);
+					it->individualOrbitOffset = util::RandomDevice::Random(-orbitOffsetVariation, orbitOffsetVariation);
+					it->individualRotateScale = 1.0f + util::RandomDevice::Random(-rotateScaleVariation, rotateScaleVariation);
 
 					// 渦潮に飲まれた瞬間に隊から抜ける
 					m_cpManager->RemoveFollower(it->target);
@@ -257,7 +245,7 @@ namespace app
 				{
 					// 目標に到達したら次のランダム目標をセットする
 					info.radiusOffset = info.radiusOffsetTarget;
-					info.radiusOffsetTarget = GenerateRandomFloat(-orbitRadiusVariation, orbitRadiusVariation);
+					info.radiusOffsetTarget = util::RandomDevice::Random(-orbitRadiusVariation, orbitRadiusVariation);
 				}
 				else
 				{
