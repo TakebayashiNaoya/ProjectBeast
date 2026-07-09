@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file FormationEffects.h
  * @brief 陣形効果の具体クラス群
  * @author 竹林
@@ -76,9 +76,10 @@ namespace app
 			{}
 
 			void  Update(float dt, const UltContext& ctx) override;
-			void  Exit  (const UltContext& ctx) override;
+			void  Exit(const UltContext& ctx) override;
 			float GetSpeedMultiplier(int level) const override;
 		};
+
 
 		/**
 		 * @brief 渦潮耐性エフェクト
@@ -90,6 +91,7 @@ namespace app
 		public:
 			bool HasWhirlpoolResistance() const override { return true; }
 		};
+
 
 		/**
 		 * @brief ペンギン呼び出しエフェクト
@@ -118,7 +120,7 @@ namespace app
 		{
 		public:
 			void Enter(const UltContext& ctx) override;
-			void Exit (const UltContext& ctx) override;
+			void Exit(const UltContext& ctx) override;
 		};
 	}
 }

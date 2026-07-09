@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "UltController.h"
+#include "IUltEffect.h"
 #include "Source/Actor/Character/Penguin/Formation/Effect/FormationEffectChain.h"
 #include "Source/Sound/SoundManager.h"
 
@@ -34,11 +35,12 @@ namespace app
 		}
 
 
-		void UltController::SetUlt(FormationEffectChain* ult, float duration, float cooldown)
+		void UltController::SetUlt(FormationEffectChain* ult, IUltEffect* visual, float duration, float cooldown)
 		{
-			m_ult      = ult;
-			m_duration = duration;
-			m_cooldown = cooldown;
+			m_ult       = ult;
+			m_ultVisual = visual;
+			m_duration  = duration;
+			m_cooldown  = cooldown;
 		}
 
 
@@ -54,7 +56,10 @@ namespace app
 
 			m_isActive = true;
 			m_timer    = m_duration;
+
+			// 効果（ロジック）と演出（見た目）の両方に発動を通知する
 			m_ult->Enter(ctx);
+			if (m_ultVisual) m_ultVisual->Enter(ctx);
 
 			// ウルト発動SEを鳴らす
 			SoundManager::Get().PlaySE(enSoundKind_UltActivate, ULT_ACTIVATE_SE_VOLUME);
@@ -82,12 +87,14 @@ namespace app
 			{
 				m_timer -= dt;
 				m_ult->Update(dt, ctx);
+				if (m_ultVisual) m_ultVisual->Update(dt, ctx);
 
 				if (m_timer <= 0.0f)
 				{
 					m_isActive      = false;
 					m_cooldownTimer = m_cooldown;
 					m_ult->Exit(ctx);
+					if (m_ultVisual) m_ultVisual->Exit(ctx);
 				}
 			}
 

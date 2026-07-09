@@ -4,16 +4,16 @@
  * @author 忽那
  */
 #pragma once
-#include <random>
-#include <string>
 #include "Source/Util/Curve.h"
+#include "Source/Util/RandomDevice.h"
+#include <string>
 
 
 namespace app
 {
 	/**
 	 * @brief 値供給モード
-	 * @detail 
+	 * @detail
 	 * Fixed: 固定値
 	 * Random: 最小~最大の範囲でランダムな値
 	 * Curve: 開始値~終了値をイージングで補間
@@ -156,7 +156,7 @@ namespace app
 		 * @param rng 乱数生成器(シード値)
 		 * @return 初期値
 		 */
-		float ResolveInitial(std::mt19937& rng) const
+		float ResolveInitial() const
 		{
 			switch (m_valueMode)
 			{
@@ -167,8 +167,7 @@ namespace app
 			case EnValueMode::Random:
 			{
 				// 指定された範囲内で等確率に値を生成するための分布。
-				std::uniform_real_distribution<float> dist(m_minValue, m_maxValue);
-				return dist(rng);
+				return util::RandomDevice::Random(m_minValue, m_maxValue);
 			}
 			case EnValueMode::Curve:
 			{
@@ -176,8 +175,7 @@ namespace app
 			}
 			case EnValueMode::RandomCurve:
 			{
-				std::uniform_real_distribution<float> dist(m_minValue, m_maxValue);
-				return dist(rng);
+				return util::RandomDevice::Random(m_minValue, m_maxValue);
 			}
 			}
 			return m_fixedValue; // デフォ値
@@ -193,8 +191,7 @@ namespace app
 		{
 			if (m_valueMode == EnValueMode::RandomCurve)
 			{
-				std::uniform_real_distribution<float> dist(m_startValue, m_endValue);
-				return dist(rng);
+				return util::RandomDevice::Random(m_startValue, m_endValue);
 			}
 			return m_endValue;
 		}
@@ -327,9 +324,9 @@ namespace app
 		 * @brief uniformがtrueのとき、Xプロバイダの結果をもとにYプロバイダにもコピーをする(2DなのでZは独立)
 		 * @param rng 乱数生成器(シード値)
 		 */
-		Vector3 ResolveInitial(std::mt19937& rng) const
+		Vector3 ResolveInitial() const
 		{
-			float xVal = m_x.ResolveInitial(rng);
+			float xVal = m_x.ResolveInitial();
 			float yVal;
 			if (m_uniform)
 			{
@@ -337,9 +334,9 @@ namespace app
 			}
 			else
 			{
-				yVal = m_y.ResolveInitial(rng);
+				yVal = m_y.ResolveInitial();
 			}
-			float zVal = m_z.ResolveInitial(rng);
+			float zVal = m_z.ResolveInitial();
 			return Vector3(xVal, yVal, zVal);
 		}
 	};

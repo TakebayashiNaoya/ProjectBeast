@@ -16,8 +16,6 @@ namespace nsBeastEngine
 
 namespace app
 {
-	/** エフェクト用のハンドル名 */
-	using EffectHandle = uint32_t;
 	/** ハンドル無効値 */
 	static constexpr EffectHandle INVALID_EFFECT_HANDLE = 0xffffffff;
 

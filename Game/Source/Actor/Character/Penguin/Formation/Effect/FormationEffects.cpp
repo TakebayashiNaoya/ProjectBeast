@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file FormationEffects.cpp
  * @brief 陣形効果の具体クラス群の実装
  * @author 竹林
@@ -7,7 +7,6 @@
 #include "FormationEffects.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 
 
 namespace app
@@ -21,10 +20,12 @@ namespace app
 			m_isNearWhirlpool = false;
 		}
 
+
 		void WhirlpoolSpeedBoostEffect::Exit(const UltContext& ctx)
 		{
 			m_isNearWhirlpool = false;
 		}
+
 
 		float WhirlpoolSpeedBoostEffect::GetSpeedMultiplier(int level) const
 		{
@@ -59,6 +60,7 @@ namespace app
 
 
 
+
 		/****************************************/
 
 
@@ -67,6 +69,7 @@ namespace app
 			// TODO: シロクマ攻撃無効化フラグを有効にする
 			// DaddyPenguin や EnemyManager に無敵フラグのAPIが用意できたら実装する
 		}
+
 
 		void BearAttackNullifyEffect::Exit(const UltContext& ctx)
 		{
