@@ -26,12 +26,12 @@ namespace app
 
 		Vector3 GetDaddySpawnPos() const override
 		{
-			return { 0.0f, 274.0f, 100.0f };
+			return { 0.0f, 137.0f, 79.0f };
 		}
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 30, 30, 30, 30, 30, 6500.0f, 3000.0f };
+			return { 20, 20, 20, 20, 20, 3500.0f, 1500.0f };
 		}
 
 		const char* GetStageJsonPath() const override
