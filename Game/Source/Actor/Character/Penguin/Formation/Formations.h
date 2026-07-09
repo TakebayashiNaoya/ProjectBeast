@@ -162,8 +162,8 @@ namespace app
 		/**
 		 * @brief 円陣（標準間隔）
 		 * @details
-		 *   パッシブ: なし。
-		 *   ウルト: 速度up ＋ 渦潮免疫 ＋ ペンギン呼び出し（MasterFormationParameter で調整）。
+		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameter で調整）。
+		 *   ウルト: 速度1.5倍 ＋ 渦潮免疫 ＋ ペンギン呼び出し（MasterFormationParameter で調整）。
 		 *   演出: UltEffectCircle（NormalUltAura）。
 		 */
 		class CircleFormation : public RingFormation
@@ -182,7 +182,7 @@ namespace app
 		/**
 		 * @brief 密集陣（狭間隔）
 		 * @details
-		 *   パッシブ: 速度down ＋ 渦潮耐性。
+		 *   パッシブ: レベル連動速度（他陣形と共通）＋ 渦潮耐性（MasterFormationParameter で調整）。
 		 *   ウルト: 渦潮近傍で速度up ＋ シロクマ攻撃無効化（MasterFormationParameter で調整）。
 		 *   演出: UltEffectCluster（Barrier）。
 		 */
@@ -202,7 +202,7 @@ namespace app
 		/**
 		 * @brief 散開陣（広間隔）
 		 * @details
-		 *   パッシブ: なし。
+		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameter で調整）。
 		 *   ウルト: ペンギン呼び出し（MasterFormationParameter で調整）。
 		 *   演出: UltEffectScatter（CallAura）。
 		 */
@@ -222,8 +222,8 @@ namespace app
 		/**
 		 * @brief 三角陣
 		 * @details
-		 *   パッシブ: レベル連動速度（MasterFormationParameter で調整）。
-		 *   ウルト: 純粋なスピード特化（MasterFormationParameter で調整）。
+		 *   パッシブ: レベル連動速度（初期値のみ他陣形より高い。伸び率は他陣形と共通、MasterFormationParameter で調整）。
+		 *   ウルト: 速度1.5倍（MasterFormationParameter で調整）。
 		 *   演出: UltEffectTriangle（SpeedBoost）。
 		 */
 		class TriangleFormation : public IFormation

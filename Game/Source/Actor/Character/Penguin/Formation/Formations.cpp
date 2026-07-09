@@ -107,7 +107,9 @@ namespace app
 
 		CircleFormation::CircleFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: なし
+			// パッシブ: レベル連動速度（他陣形と共通）
+			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+
 			// ウルト: 速度up + 渦潮免疫 + ペンギン呼び出し
 			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));
 			if (param.ultWhirlpoolResistance)
@@ -131,8 +133,8 @@ namespace app
 
 		ClusterFormation::ClusterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: 速度down + 渦潮耐性
-			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
+			// パッシブ: レベル連動速度（他陣形と共通）+ 渦潮耐性
+			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
 			if (param.passiveWhirlpoolResistance)
 			{
 				m_passive.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
@@ -157,7 +159,9 @@ namespace app
 
 		ScatterFormation::ScatterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: なし
+			// パッシブ: レベル連動速度（他陣形と共通）
+			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+
 			// ウルト: ペンギン呼び出し
 			if (param.ultCallDistance > 0.0f)
 			{

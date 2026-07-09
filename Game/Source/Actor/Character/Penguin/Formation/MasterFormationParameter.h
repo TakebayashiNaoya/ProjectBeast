@@ -37,11 +37,11 @@ namespace app
 			float ultDuration;
 			/** ウルトクールダウン（秒） */
 			float ultCooldown;
-			/** パッシブ: 固定速度倍率（未使用の陣形は1.0） */
+			/** パッシブ: 固定速度倍率（未使用、全陣形とも passiveSpeedBase/PerLevel のレベル連動速度に統一） */
 			float passiveSpeedMultiplier;
-			/** パッシブ: レベル0の速度倍率（三角陣のみ使用） */
+			/** パッシブ: レベル0の速度倍率（全陣形で使用） */
 			float passiveSpeedBase;
-			/** パッシブ: レベルごとの速度増分（三角陣のみ使用） */
+			/** パッシブ: レベルごとの速度増分（全陣形で共通の値を使用） */
 			float passiveSpeedPerLevel;
 			/** ウルト: 固定速度倍率（未使用の陣形は1.0） */
 			float ultSpeedMultiplier;
