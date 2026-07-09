@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file InGameUIManager.cpp
  * @brief インゲームUIの生成・更新・描画・配線を管理するクラス
  * @author 竹林
@@ -45,6 +45,8 @@
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
 
+#include "Source/Sound/SoundManager.h"
+
 
 namespace app
 {
@@ -52,6 +54,9 @@ namespace app
 	{
 		/** 睡眠中クマの探索半径 */
 		constexpr float SLEEPING_ENEMY_SEARCH_RANGE = 1000.0f;
+
+		/** レベルアップSEの音量倍率 */
+		constexpr float LEVEL_UP_SE_VOLUME = 10.0f;
 	}
 
 
@@ -365,6 +370,9 @@ namespace app
 
 				menu->SetTargetPosition(daddyPenguin->GetTransform().m_position);
 				menu->Play();
+
+				// レベルアップSEを再生。
+				SoundManager::Get().PlaySE(enSoundKind_LevelUp, LEVEL_UP_SE_VOLUME, false, false, enSoundPriority_Hight);
 			}
 		);
 
