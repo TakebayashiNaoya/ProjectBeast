@@ -21,7 +21,7 @@ namespace app
 	protected:
 		float GetTimeLimit() const override
 		{
-			return 300.0f;
+			return 180.0f;
 		}
 
 		Vector3 GetDaddySpawnPos() const override
