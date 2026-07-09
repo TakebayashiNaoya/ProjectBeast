@@ -61,7 +61,7 @@ namespace
 	constexpr float FINISH_BGM_FADE_DURATION = 3.0f;
 
 	/** ゲームログの記録間隔（秒） */
-	constexpr float LOG_TICK_INTERVAL = 1.0f;
+	constexpr float LOG_TICK_INTERVAL = 0.1f;
 }
 
 namespace app

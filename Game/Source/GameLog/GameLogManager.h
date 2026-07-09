@@ -38,7 +38,7 @@ namespace app
 	class GameLogManager
 	{
 	public:
-		/** @brief 毎秒 InGameSceneBase から呼ぶ。全エンティティのスナップショットを記録 */
+		/** @brief 毎秒 InGameSceneBase から呼ぶ。全エンティティ・カメラのスナップショットを記録 */
 		void RecordTick(actor::DaddyPenguin* daddy);
 
 		/**

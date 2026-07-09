@@ -16,6 +16,7 @@
 #include "Source/Nature/WhirlpoolManager.h"
 #include "Source/Nature/Whirlpool.h"
 #include "Source/Manager/TimeManager.h"
+#include "Source/Camera/CameraManager.h"
 #include <fstream>
 #include <filesystem>
 #include <chrono>
@@ -236,6 +237,16 @@ namespace app
 			});
 		}
 		snap["whirlpools"] = std::move(whirlpoolsArr);
+
+		// ------ カメラ ------
+		{
+			const auto& camData = camera::CameraManager::Get().GetCurrentCameraData();
+			snap["camera"] = {
+				{ "pos",    V3toJson(camData.position) },
+				{ "target", V3toJson(camData.target)   },
+				{ "fov",    camData.fov                }
+			};
+		}
 
 		return snap;
 	}
