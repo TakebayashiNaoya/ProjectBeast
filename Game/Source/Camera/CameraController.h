@@ -44,6 +44,38 @@ namespace app
 
 
 
+		/**
+		 * リプレイ再生用カメラコントローラー
+		 * NOTE: ReplaySceneが呼ぶ
+		 */
+		class ReplayCamera : public ICameraController
+		{
+			appCameraController(ReplayCamera);
+
+
+		private:
+			CameraData m_data;
+
+
+		public:
+			/**
+			 * 外部から状態をセットする
+			 * NOTE: ReplaySceneが再生中のtickから補間した値を毎フレームセットする
+			 */
+			void SetState(const CameraData& data)
+			{
+				m_data = data;
+			}
+
+			void Update() override
+			{}
+
+			const CameraData& GetCameraData() const override { return m_data; }
+		};
+
+
+
+
 #if defined(APP_DEBUG)
 		/**
 		 * デバッグ用カメラコントローラー

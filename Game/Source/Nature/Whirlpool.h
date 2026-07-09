@@ -112,6 +112,20 @@ namespace app
 			 */
 			void SetPosition(const Vector3& position) { m_transform.m_position = position; }
 			/**
+			 * @brief スケールXZを直接設定する
+			 * @details StateMachine()（Update()経由）を呼ばずに外部からスケールを固定したい場合に使う
+			 *          （例: リプレイ再生でログの scale_xz をそのまま反映する）
+			 * @param scaleXZ スケールXZ
+			 */
+			void SetScaleXZ(const float scaleXZ) { m_transform.m_scale = Vector3(scaleXZ, 1.0f, scaleXZ); }
+			/**
+			 * @brief 渦潮エフェクトを停止する
+			 * @details 通常はUpdate()経由のStateMachine()（縮小完了時）かデストラクタでしか止まらない。
+			 *          Update()を呼ばない外部運用（リプレイ再生など）で、Start()が自動再生した
+			 *          エフェクトを明示的に止めたい場合に使う。
+			 */
+			void StopEffect() { StopWhirlpoolEffect(); }
+			/**
 			 * @brief トランスフォームを取得
 			 * @return トランスフォームの参照
 			 */

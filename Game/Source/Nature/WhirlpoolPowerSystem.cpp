@@ -59,6 +59,9 @@ namespace app
 
 		void WhirlpoolPowerSytem::InitializeWhirlpoolInfo()
 		{
+			// ChildPenguinManager が生成されていない文脈（リプレイ再生など）では何もしない
+			if (!m_cpManager) return;
+
 			const Vector3& whirlpoolPos = m_owner->GetTransform().m_position;
 
 			auto childPenguins = m_cpManager->GetChildPenguin();
