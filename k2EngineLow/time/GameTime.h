@@ -99,6 +99,19 @@ namespace nsK2EngineLow {
 			}
 		}
 		/// <summary>
+		/// 移動平均キューをリセットする
+		/// </summary>
+		/// <remark>
+		/// シーン読み込み完了直後など、ロード中の重い同期処理でdeltaTimeが
+		/// 異常に大きくなったフレームを含む古い履歴を破棄したい場合に呼ぶ。
+		/// </remark>
+		void ResetFrameDeltaTime()
+		{
+			m_frameDeltaTimeQue.clear();
+			m_frameDeltaTime = 1.0f / 60.0f;
+			m_rawDeltaTime = 1.0f / 60.0f;
+		}
+		/// <summary>
 		/// 計測開始
 		/// </summary>
 		/// <remark>
