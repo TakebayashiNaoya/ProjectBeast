@@ -81,8 +81,6 @@ namespace app
 			{
 				m_owner->PlayAnimation(EnEnemyAnimationType::Idle);
 			}
-
-			SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
 		}
 
 
@@ -649,6 +647,8 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 			m_owner->PlayAnimation(EnEnemyAnimationType::Buff);
+
+			SoundManager::Get().PlaySE(enSoundKind_EnemyGrowl);
 
 			if (m_owner->IsDebuffReturnHome())
 			{

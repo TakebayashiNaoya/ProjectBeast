@@ -173,13 +173,11 @@ namespace app
 
 
 				// 海にいる子ペンギンはアニメーションを再生させる
-				if (m_stateMachine)
+				// ステートマシンのUpdate()は呼ばない：カウントダウン中はキャラクターコントローラーの
+				// 接地判定がまだ安定しておらず、誤ってジャンプステートに遷移してSEが鳴ってしまうため
+				if (m_stateMachine && m_stateMachine->IsInWater() && m_modelRender.IsPlayingAnimation())
 				{
-					m_stateMachine->Update();
-					if (m_stateMachine->IsSwimming() && m_modelRender.IsPlayingAnimation())
-					{
-						m_modelRender.PlayAnimation(static_cast<int>(EnPenguinAnimationID::MoveSwim));
-					}
+					m_modelRender.PlayAnimation(static_cast<int>(EnPenguinAnimationID::MoveSwim));
 				}
 
 				// ロード完了済み → 行列更新
