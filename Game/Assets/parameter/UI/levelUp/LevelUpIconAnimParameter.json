@@ -1,0 +1,24 @@
+{
+  "animations": [
+    {
+      "comment": "レベルアップアイコンをフェードインさせる（透明→不透明）",
+      "key": "levelUpIconFadeIn",
+      "valueType": "Vector4",
+      "startValue": { "x": 1.0, "y": 1.0, "z": 1.0, "w": 0.0 },
+      "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0, "w": 1.0 },
+      "duration": 0.3,
+      "easing": "EaseOut",
+      "loop": "Once"
+    },
+    {
+      "comment": "レベルアップアイコンをフェードアウトさせる（不透明→透明）",
+      "key": "levelUpIconFadeOut",
+      "valueType": "Vector4",
+      "startValue": { "x": 1.0, "y": 1.0, "z": 1.0, "w": 1.0 },
+      "endValue":   { "x": 1.0, "y": 1.0, "z": 1.0, "w": 0.0 },
+      "duration": 0.5,
+      "easing": "EaseIn",
+      "loop": "Once"
+    }
+  ]
+}

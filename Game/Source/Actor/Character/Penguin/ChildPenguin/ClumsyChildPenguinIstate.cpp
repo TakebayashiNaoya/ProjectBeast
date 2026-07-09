@@ -38,12 +38,12 @@ namespace app
 
 		void ClumsyTripState::Enter()
 		{
-			m_owner->SetActionInput(Vector3::Zero, false, false, false, false); // 追加
+			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
 			m_owner->SetMoveSpeed(0.0f);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Trip);
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
 			if (auto* lm = GameLogManager::GetInstance())
-				lm->QueueEvent({{"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "trip"}});
+				lm->QueueEvent({ {"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "trip"} });
 		}
 
 
@@ -55,7 +55,7 @@ namespace app
 		{
 			if (!m_owner->GetIsHelped())
 			{
-				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, 1.0f, false, false, enSoundPriority_Hight);
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
 				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
@@ -125,7 +125,7 @@ namespace app
 			/** Managerに転倒中であることを登録する */
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
 			if (auto* lm = GameLogManager::GetInstance())
-				lm->QueueEvent({{"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "slip"}});
+				lm->QueueEvent({ {"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "slip"} });
 		}
 
 
@@ -137,7 +137,7 @@ namespace app
 		{
 			if (!m_owner->GetIsHelped())
 			{
-				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, false, false, enSoundPriority_Hight);
+				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, 1.0f, false, false, enSoundPriority_Hight);
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
 

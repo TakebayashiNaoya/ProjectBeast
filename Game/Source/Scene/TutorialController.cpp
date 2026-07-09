@@ -25,8 +25,7 @@ namespace app
 
 	static constexpr const char* TUTORIAL_STEP_NAMES[] = {
 		"PenguinSerious", "PenguinClingy", "PenguinNaughty", "PenguinClumsy",
-		"PenguinCaring",  "Bear",          "BearNest",        "Igloo",
-		"Ocean",          "Whirlpool"
+		"PenguinCaring",  "Bear",          "Igloo",           "Whirlpool"
 	};
 
 	const char* const TutorialController::WINDOW_JSON_PATHS[TARGET_COUNT] =
@@ -37,9 +36,7 @@ namespace app
 		"Assets/parameter/Tutorial/TutorialWindow_PenguinClumsy.json",
 		"Assets/parameter/Tutorial/TutorialWindow_PenguinCaring.json",
 		"Assets/parameter/Tutorial/TutorialWindow_Bear.json",
-		"Assets/parameter/Tutorial/TutorialWindow_BearNest.json",
 		"Assets/parameter/Tutorial/TutorialWindow_Igloo.json",
-		"Assets/parameter/Tutorial/TutorialWindow_Ocean.json",
 		"Assets/parameter/Tutorial/TutorialWindow_Whirlpool.json",
 	};
 
@@ -61,20 +58,6 @@ namespace app
 
 		const Vector3 daddyPos = m_daddy->GetTransform().m_position;
 		const float triggerRadSq = TRIGGER_RADIUS * TRIGGER_RADIUS;
-
-		// Ocean トリガー: 水中に入ったとき
-		{
-			const int oi = static_cast<int>(EnTutorialTarget::Ocean);
-			if (!m_triggered[oi])
-			{
-				auto* sm = m_daddy->GetStateMachine();
-				if (sm && sm->IsSwimming())
-				{
-					m_triggered[oi] = true;
-					m_queue.push(EnTutorialTarget::Ocean);
-				}
-			}
-		}
 
 		// 近接トリガー検知
 		for (int i = 0; i < PROXIMITY_TARGET_COUNT; i++)
@@ -164,15 +147,6 @@ namespace app
 		case EnTutorialTarget::Bear:
 			return actor::EnemyManager::GetInstance()->GetNearestEnemyPosition(
 				m_daddy->GetTransform().m_position, outPos);
-
-		case EnTutorialTarget::BearNest:
-		{
-			const Vector3 pos = actor::StageSystem::GetInstance()->GetNearestBearNestPosition(
-				m_daddy->GetTransform().m_position);
-			if (pos.LengthSq() < 0.001f) return false;
-			outPos = pos;
-			return true;
-		}
 
 		case EnTutorialTarget::Igloo:
 		{
