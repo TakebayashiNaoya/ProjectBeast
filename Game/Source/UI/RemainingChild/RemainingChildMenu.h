@@ -72,6 +72,10 @@ namespace app
 			int m_childNum;
 			/** ステージ上の総ペンギン数 */
 			int m_totalNum;
+			/** 救助数の初回反映が済んだかどうか（ゲーム開始直後の初期表示を増加演出扱いしないためのガード） */
+			bool m_isChildNumInitialized;
+			/** 総数の初回反映が済んだかどうか（ゲーム開始直後の初期表示を増加演出扱いしないためのガード） */
+			bool m_isTotalNumInitialized;
 			/** パーティクルのターゲット位置 */
 			Vector3 m_targetPosition;
 			/** ゲーム開始時のアニメーションロジック */

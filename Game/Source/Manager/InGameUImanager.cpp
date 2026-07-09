@@ -34,6 +34,7 @@
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
 #include "Source/UI/Menus/InGameAchievementMenu.h"
+#include "Source/UI/Menus/LevelUpIconMenu.h"
 #include "Source/UI/Menus/PauseScreenMenu.h"
 #include "Source/UI/Menus/PBWakingUpTimerMenu.h"
 #include "Source/UI/Menus/SearchMenu.h"
@@ -45,6 +46,8 @@
 #include "Source/UI/Ult/SpeedLineMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
 
+#include "Source/Sound/SoundManager.h"
+
 
 namespace app
 {
@@ -52,6 +55,9 @@ namespace app
 	{
 		/** 睡眠中クマの探索半径 */
 		constexpr float SLEEPING_ENEMY_SEARCH_RANGE = 1000.0f;
+
+		/** レベルアップSEの音量倍率 */
+		constexpr float LEVEL_UP_SE_VOLUME = 10.0f;
 	}
 
 
@@ -130,6 +136,8 @@ namespace app
 		ui::InitUIPacket(m_inGameButtonPacket, "Assets/parameter/UI/inGameButton/InGameButton.json");
 		// フィーバータイム落下アイコンを生成
 		ui::InitUIPacket(m_feverIconPacket, "Assets/parameter/UI/fever/FeverIcon.json");
+		// 陣形レベルアップアイコンを生成
+		ui::InitUIPacket(m_levelUpIconPacket, "Assets/parameter/UI/levelUp/LevelUpIcon.json");
 		// 陣形/ウルトのボタン表示を生成
 		ui::InitUIPacket(m_formationWheelPacket, "Assets/parameter/UI/formationWheel/FormationWheel.json");
 
@@ -354,6 +362,24 @@ namespace app
 
 
 		//--------------------------------------------//
+		// 陣形レベルアップUI通知
+		//--------------------------------------------//
+		bm.SetOnFormationLevelUp(
+			[this](int)
+			{
+				if (!m_levelUpIconPacket) return;
+
+				auto* menu = m_levelUpIconPacket->GetMenu();
+				if (!menu) return;
+
+				menu->Play();
+
+				// レベルアップSEを再生。
+				SoundManager::Get().PlaySE(enSoundKind_LevelUp, LEVEL_UP_SE_VOLUME, false, false, enSoundPriority_Hight);
+			}
+		);
+
+		//--------------------------------------------//
 		// 渦潮UI通知
 		//--------------------------------------------//
 		bm.SetOnWpWarningChanged(
@@ -447,6 +473,19 @@ namespace app
 		if (m_formationWheelPacket) m_formationWheelPacket->Update();
 		if (m_debufPacket) m_debufPacket->Update();
 		if (m_feverIconPacket) m_feverIconPacket->Update();
+
+		// 陣形レベルアップアイコンを親ペンギンの頭上へ追従させる（再生中に位置がずれないよう毎フレーム更新）
+		if (m_levelUpIconPacket)
+		{
+			if (m_daddyPenguin)
+			{
+				if (auto* menu = m_levelUpIconPacket->GetMenu())
+				{
+					menu->SetTargetPosition(m_daddyPenguin->GetTransform().m_position);
+				}
+			}
+			m_levelUpIconPacket->Update();
+		}
 	}
 
 
@@ -508,6 +547,7 @@ namespace app
 		if (m_formationWheelPacket) m_formationWheelPacket->Render(rc);
 		if (m_debufPacket) m_debufPacket->Render(rc);
 		if (m_feverIconPacket) m_feverIconPacket->Render(rc);
+		if (m_levelUpIconPacket) m_levelUpIconPacket->Render(rc);
 	}
 
 

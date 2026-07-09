@@ -95,6 +95,14 @@ namespace app
 			m_rangeVisualizer.Init();
 			g_renderingEngine->RegisterCustomRenderer(&m_rangeVisualizer);
 
+			// 陣形レベルアップ時にBattleManager経由でUIへ通知する
+			m_formationController.SetOnLevelUp(
+				[](const int level)
+				{
+					BattleManager::GetInstance().NotifyFormationLevelUp(level);
+				}
+			);
+
 			/** 各子ペンギンのStartを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
