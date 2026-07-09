@@ -14,6 +14,8 @@
 #include "Source/Actor/Character/Penguin/Formation/FormationDebugMonitor.h"
 #endif
 #include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
@@ -22,11 +24,9 @@
 #include "Source/Manager/FeverTimeManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
+#include "Source/Sound/SoundManager.h"
 #include "Source/UI/CPReaction/CPReactionTypes.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
-#include "Source/Sound/SoundManager.h"
-#include "Source/Actor/Character/Enemy/Enemy.h"
-#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include <random>
 
 
@@ -124,7 +124,10 @@ namespace app
 			m_formationController.UpdateSwitchLock(g_gameTime->GetFrameDeltaTime());
 
 			/** L1/R1 で陣形を循環切り替え（スライド演出中は入力を無視する） */
-			if (!m_formationController.IsSwitchingFormation())
+			const bool isSwitching = m_formationController.IsSwitchingFormation();
+			const bool isUltActive = m_formationController.IsUltActive();
+
+			if (!isSwitching && !isUltActive)
 			{
 				if (g_pad[0]->IsTrigger(enButtonRB1))
 				{
@@ -245,12 +248,12 @@ namespace app
 		)
 		{
 			// フィーバータイムの比率抽選・ランダム配置に再利用するためキャッシュしておく
-			m_seriousNum      = seriousNum;
-			m_clingyNum       = clingyNum;
-			m_naughtyNum      = naughtyNum;
-			m_clumsyNum       = clumsyNum;
-			m_caringNum       = caringNum;
-			m_spawnRadius     = spawnRadius;
+			m_seriousNum = seriousNum;
+			m_clingyNum = clingyNum;
+			m_naughtyNum = naughtyNum;
+			m_clumsyNum = clumsyNum;
+			m_caringNum = caringNum;
+			m_spawnRadius = spawnRadius;
 			m_groundRayStartY = groundRayStartY;
 
 			// フィーバー時のタイプ抽選器を一度だけ構築しておく（毎回再構築しない）
@@ -960,7 +963,7 @@ namespace app
 					{
 						// シロクマのステートマシーンを取得。
 						EnemyStateMachine* sm = info->target->GetEnemyStateMachine();
-						
+
 						// デバフを発動!
 						if (!sm->IsCoolDown() && !sm->IsReturnHome())
 						{
