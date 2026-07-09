@@ -48,6 +48,10 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// 1フレームの経過時間を取得(単位・秒)
 		/// </summary>
+		/// <remark>
+		/// 直近30フレームの移動平均かつ最大0.1秒でクランプ済みの値。
+		/// Lerp係数など、揺れを抑えたい処理向け。
+		/// </remark>
 		/// <returns></returns>
 		const float GetFrameDeltaTime() const
 		{
@@ -55,8 +59,24 @@ namespace nsK2EngineLow {
 				// 1フレームの経過時間が固定化されている。
 				return m_fixedFrameDeltaTime;
 			}
-			
+
 			return m_frameDeltaTime;
+		}
+
+		/// <summary>
+		/// 直前フレームの実経過時間を取得(単位・秒、平均化・クランプなし)
+		/// </summary>
+		/// <remark>
+		/// タイマー・クールダウンなど、実時間と正確に一致させたい処理向け。
+		/// </remark>
+		/// <returns></returns>
+		const float GetDeltaTime() const
+		{
+			if (m_isFixedFrameDeltaTime) {
+				return m_fixedFrameDeltaTime;
+			}
+
+			return m_rawDeltaTime;
 		}
 
 		/// <summary>
@@ -65,6 +85,8 @@ namespace nsK2EngineLow {
 		/// <param name="deltaTime">経過時間</param>
 		void PushFrameDeltaTime(float deltaTime)
 		{
+			m_rawDeltaTime = deltaTime;
+
 			m_frameDeltaTimeQue.push_back(deltaTime);
 			if (m_frameDeltaTimeQue.size() > 30.0f) {
 				float totalTime = 0.0f;
@@ -94,17 +116,21 @@ namespace nsK2EngineLow {
 		/// <remark>
 		/// 本関数はエンジン内でのみ使用します。
 		/// ユーザーは使用しないでください。
+		/// 計測後は即座に次の区間の計測を再開する（application->Update() の時間も
+		/// 次フレームの経過時間に含めるため、Start/Stop の間を空けない）。
 		/// </remark>
 		void EndMeasurement()
 		{
 			m_sw.Stop();
 			PushFrameDeltaTime(static_cast<float>(m_sw.GetElapsed()));
+			m_sw.Start();
 		}
 	private:
 		friend class K2EngineLow;
 		Stopwatch m_sw;
 		std::list<float> m_frameDeltaTimeQue;
-		float		m_frameDeltaTime = 1.0f / 60.0f;	// 1フレームの経過時間。
+		float		m_frameDeltaTime = 1.0f / 60.0f;	// 1フレームの経過時間（移動平均・クランプ済み）。
+		float		m_rawDeltaTime = 1.0f / 60.0f;		// 直前フレームの実経過時間（平均化・クランプなし）。
 		bool		m_isFixedFrameDeltaTime = false;		// 1フレームの経過時間を固定化する。
 		float		m_fixedFrameDeltaTime = 1.0f / 60.0f;	// 固定経過時間。
 	};

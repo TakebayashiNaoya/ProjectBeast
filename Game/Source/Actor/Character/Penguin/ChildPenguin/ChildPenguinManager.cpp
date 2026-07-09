@@ -132,7 +132,7 @@ namespace app
 			if (m_daddyPenguin != nullptr)
 			{
 				UltContext ctx{ this, m_daddyPenguin };
-				m_formationController.UpdateUlt(g_gameTime->GetFrameDeltaTime(), ctx);
+				m_formationController.UpdateUlt(g_gameTime->GetDeltaTime(), ctx);
 			}
 
 			/** 陣形切り替え演出（スライドUI）のロックタイマー更新 */
