@@ -87,6 +87,9 @@ namespace app
 		// --- 幽霊ペンギン ---
 		enSoundKind_GhostPenguinReaction,
 
+		// --- レベルアップ ---
+		enSoundKind_LevelUp,
+
 		enSoundKind_SE_Max,
 
 		// =========================================================================
@@ -199,6 +202,9 @@ namespace app
 
 		// --- 幽霊ペンギン出現音 ---
 		SoundInformation("Assets/sound/SE/penguin/childPenguin/ghostPenguinReaction.wav"),
+
+		// --- レベルアップ音 ---
+		SoundInformation("Assets/sound/SE/UI/LevelUp.wav"),
 
 		// -------------------------------------------------------------------------
 		// BGM

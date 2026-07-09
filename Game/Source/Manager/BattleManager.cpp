@@ -379,6 +379,7 @@ namespace app
 		m_onMiniMapChanged = nullptr;
 		m_wpWarningChanged = nullptr;
 		m_onCPReactionChanged = nullptr;
+		m_onFormationLevelUp = nullptr;
 	}
 
 
