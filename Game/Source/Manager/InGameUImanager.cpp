@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file InGameUIManager.cpp
  * @brief インゲームUIの生成・更新・描画・配線を管理するクラス
  * @author 竹林
@@ -361,14 +361,13 @@ namespace app
 		// 陣形レベルアップUI通知
 		//--------------------------------------------//
 		bm.SetOnFormationLevelUp(
-			[this, daddyPenguin](int)
+			[this](int)
 			{
 				if (!m_levelUpIconPacket) return;
 
 				auto* menu = m_levelUpIconPacket->GetMenu();
 				if (!menu) return;
 
-				menu->SetTargetPosition(daddyPenguin->GetTransform().m_position);
 				menu->Play();
 
 				// レベルアップSEを再生。
