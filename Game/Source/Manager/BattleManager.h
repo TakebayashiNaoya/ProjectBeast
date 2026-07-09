@@ -200,6 +200,27 @@ namespace app
 
 
 		/**
+		 * @brief 陣形レベルアップUI通知functionを設定
+		 * @param func 引数：新しい陣形レベル
+		 */
+		inline void SetOnFormationLevelUp(std::function<void(int)> func)
+		{
+			m_onFormationLevelUp = std::move(func);
+		}
+
+		/**
+		 * @brief 陣形レベルアップを通知する
+		 * @detail 他のUI通知（タイム・ミニマップ等）と異なり、Update()内でのポーリングではなく、
+		 *         レベルが上昇した瞬間（FormationController::CalculatePositions内）に
+		 *         呼び出し側から明示的に呼ぶ。
+		 * @param level 新しい陣形レベル
+		 */
+		inline void NotifyFormationLevelUp(const int level)
+		{
+			if (m_onFormationLevelUp) m_onFormationLevelUp(level);
+		}
+
+		/**
 		 * @brief 全UI通知functionをリセット（InGameUIManager破棄時に呼ぶ）
 		 */
 		void ResetObservers();
@@ -231,6 +252,9 @@ namespace app
 
 		/** 子ペンギンリアクションUI更新通知 */
 		std::function<void(actor::ChildPenguin*, ui::EnCPReactionType, ui::EnCPReactionPriority)> m_onCPReactionChanged;
+
+		/** 陣形レベルアップUI更新通知 */
+		std::function<void(int)> m_onFormationLevelUp;
 
 
 

@@ -17,6 +17,8 @@ namespace app
 		RemainingChildMenu::RemainingChildMenu()
 			: m_childNum(0)
 			, m_totalNum(0)
+			, m_isChildNumInitialized(false)
+			, m_isTotalNumInitialized(false)
 		{
 			// アニメーションステータスを生成。
 			m_remainAnimStatus = std::make_unique<RemainingAnimStatus>();
@@ -111,6 +113,14 @@ namespace app
 
 			if (!remainText) return;
 
+			// 初回はゲーム開始時の初期表示のため、増加演出・SEを鳴らさず即座に反映する
+			if (!m_isChildNumInitialized)
+			{
+				m_childNum = num;
+				m_isChildNumInitialized = true;
+				return;
+			}
+
 			// 今の救助数と異なっていたら
 			if (m_childNum != num)
 			{
@@ -202,6 +212,14 @@ namespace app
 			auto* totalText = GetUI<UIText>(Hash32("TotalNum"));
 
 			if (!totalText) return;
+
+			// 初回はゲーム開始時の初期表示のため、増加演出・SEを鳴らさず即座に反映する
+			if (!m_isTotalNumInitialized)
+			{
+				m_totalNum = num;
+				m_isTotalNumInitialized = true;
+				return;
+			}
 
 			// 今の総数と異なっていたら
 			if (m_totalNum != num)

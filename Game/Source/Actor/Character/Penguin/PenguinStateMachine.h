@@ -104,6 +104,16 @@ namespace app
 				return m_isInWhirlpool;
 			}
 			/**
+			 * @brief 現在水の中にいるかどうかを取得
+			 * @details Update()によるステート遷移を経由せずに判定できるよう公開している
+			 *          （カウントダウン中など、ステートマシンのUpdate()を呼ばずに水中判定だけ行いたい場合に使う）
+			 * @return 水の中にいるかどうか
+			 */
+			inline bool IsInWater() const
+			{
+				return CharacterStateMachine::IsInWater();
+			}
+			/**
 			 * @brief エフェクトステータスを取得
 			 * @return エフェクトステータスのポインタ
 			 */

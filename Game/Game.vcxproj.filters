@@ -595,6 +595,12 @@
     <ClCompile Include="Source\UI\Model\ScorePopupAnimStatus.cpp">
       <Filter>Source\UI\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Menus\LevelUpIconMenu.cpp">
+      <Filter>Source\UI\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Model\LevelUpIconAnimStatus.cpp">
+      <Filter>Source\UI\Model</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\UIParts.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
@@ -1138,6 +1144,12 @@
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Model\ScorePopupAnimStatus.h">
+      <Filter>Source\UI\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Menus\LevelUpIconMenu.h">
+      <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\Model\LevelUpIconAnimStatus.h">
       <Filter>Source\UI\Model</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\UIParts.h">
