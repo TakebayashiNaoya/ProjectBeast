@@ -10,6 +10,7 @@
 #include "Source/Util/Curve.h"
 #include <random>
 #include <unordered_set>
+#include "Source/Effect/EffectManager.h"
 
 
 namespace app
@@ -596,6 +597,8 @@ namespace app
 				bool isHidden;
 				bool isDebuffActive;
 				Vector3 position;
+
+				EffectHandle handle;
 
 				GhostPenguinInfo();
 			};

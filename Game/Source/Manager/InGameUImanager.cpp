@@ -98,7 +98,7 @@ namespace app
 		// 睡眠中クマの起床ゲージを生成
 		ui::InitUIPacket(m_enemySleepingPacket, "Assets/parameter/UI/enemySleepGauge/sleepGauge.json");
 		// デバフメニューを生成
-		ui::InitUIPacket(m_debufPacket, "Assets/parameter/UI/penguinDebuf/Debuf.json");
+		ui::InitUIPacket(m_debufPacket, "Assets/parameter/UI/penguinDebuff/Debuf.json");
 
 		if (auto* menu = m_debufPacket->GetMenu()) menu->SetDraw(false);
 

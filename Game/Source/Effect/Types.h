@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file Types.h
  * @brief エフェクト用の定数など必要な情報を定義するファイル
  * @author 藤谷、竹林
@@ -11,7 +11,6 @@ namespace app
 {
 	/** エフェクト用のハンドル名 */
 	using EffectHandle = uint32_t;
-
 
 	/** エフェクトの種類 */
 	enum class EnEffectKind : uint8_t
@@ -30,6 +29,7 @@ namespace app
 		CaringPenguinSweat,
 		NaughtyPenguinLively,
 		ToEnemyDebuff,
+		GhostPenguinBlurFireBall,
 		ClusterUltBegin,
 		ClusterUltEnd,
 		TriangleUltBegin,
@@ -40,7 +40,6 @@ namespace app
 		Max,
 		None = Max,
 	};
-
 
 	/** エフェクトの情報の構造体 */
 	struct EffectInformation
@@ -54,7 +53,6 @@ namespace app
 			, baseRadius(radius)
 		{}
 	};
-
 
 	/** 情報を保持 */
 	static EffectInformation effectInformation[static_cast<uint8_t>(EnEffectKind::Max)] =
@@ -71,7 +69,8 @@ namespace app
 		EffectInformation(u"Assets/effect/childPenguin/childPenguinClingyHart.efk", 200.0f),
 		EffectInformation(u"Assets/effect/childPenguin/childPenguinCaringSweat.efk", 100.0f),
 		EffectInformation(u"Assets/effect/childPenguin/childPenguinNaugtyLively.efk", 100.0f),
-		EffectInformation(u"Assets/effect/enemy/Gloomy.efk",100.0f),
+		EffectInformation(u"Assets/effect/enemy/Gloomy.efk", 100.0f),
+		EffectInformation(u"Assets/effect/childPenguin/ghostPenguinBlurFireBall.efk", 100.0f),
 		EffectInformation(u"Assets/effect/ult/clusterBegin.efk", 150.0f),
 		EffectInformation(u"Assets/effect/ult/clusterEnd.efk", 150.0f),
 		EffectInformation(u"Assets/effect/ult/triangleBegin.efk", 150.0f),
