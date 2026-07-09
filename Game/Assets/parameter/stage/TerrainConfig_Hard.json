@@ -2,8 +2,8 @@
   "TerrainConfig": {
     "heightmapPath": "Assets/modelData/stage/Terrain/HardStageHeightMap.dds",
     "splatmapPath":  "Assets/modelData/stage/Terrain/HardStageSplatMap.dds",
-    "totalWidth":  15200.0,
-    "totalDepth":  15200.0,
+    "totalWidth":  12000.0,
+    "totalDepth":  12000.0,
     "heightScale": 2000.0,
     "subsample":   4,
     "uvTile":      0.05,

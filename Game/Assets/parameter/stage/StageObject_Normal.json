@@ -7,7 +7,7 @@
         "isNeedCollision" : true,
         "position" : [0, 1000, 0],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [0.2, 2, 0.2],
+        "scale" : [0.11, 2, 0.11],
         "pbrName" : "wall"
       },
       {
@@ -78,8 +78,8 @@
         "objectName" : "igloo_1",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
-        "position" : [-725, 60, 1600],
-        "rotationDeg" : [0, 240, -20],
+        "position" : [-600, 100, 1500],
+        "rotationDeg" : [0, 250, -0],
         "scale" : [4, 4, 4],
         "pbrName" : "igloo"
       },
@@ -87,8 +87,8 @@
         "objectName" : "igloo_2",
         "fileName" : "Assets/modelData/stage/Igloo/igloo.tkm",
         "isNeedCollision" : true,
-        "position" : [1440, 45, -1760],
-        "rotationDeg" : [0, 40, -20],
+        "position" : [1020, 110, -1730],
+        "rotationDeg" : [0, 60, 0],
         "scale" : [4, 4, 4],
         "pbrName" : "igloo"
       },

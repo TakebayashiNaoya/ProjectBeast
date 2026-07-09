@@ -7,7 +7,7 @@
         "isNeedCollision" : true,
         "position" : [-1200, 1000, -100],
         "rotationDeg" : [0, 0, 0],
-        "scale" : [0.35, 3, 0.3],
+        "scale" : [0.2, 3, 0.2],
         "pbrName" : "wall"
       },
       {
