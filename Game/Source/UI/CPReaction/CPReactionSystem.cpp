@@ -9,6 +9,7 @@
 #include "CPReactionStatus.h"
 
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 
 
 
@@ -145,10 +146,20 @@ namespace app
 
 				if (!target) continue;
 
-				// 前方判定は行わず、ターゲットが存在する限り常に描画する
-				menu->SetIsDraw(true);
-
 				const Vector3 targetPosition = target->GetTransform().m_position;
+
+				// プレイヤーから一定距離より離れている場合は吹き出しを表示しない
+				const Vector3 daddyPosition = actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
+				const float drawableDistance = m_reactionStatusParent->GetDrawableDistance();
+				const float distanceSq = (targetPosition - daddyPosition).LengthSq();
+				if (distanceSq > drawableDistance * drawableDistance)
+				{
+					menu->SetIsDraw(false);
+					continue;
+				}
+
+				// 前方判定は行わず、規定距離内であれば常に描画する
+				menu->SetIsDraw(true);
 
 				Vector2 screenPosition = Vector2::Zero;
 				CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPosition, targetPosition);

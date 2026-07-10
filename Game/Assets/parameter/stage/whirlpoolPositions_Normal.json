@@ -1,23 +1,76 @@
 {
   "whirlpoolPositions": [
-    { "index": 0,  "position": [-2700, 0, -2700] },
-    { "index": 1,  "position": [-2000, 0, -2800] },
-    { "index": 2,  "position": [-1400, 0,   465] },
-    { "index": 3,  "position": [-1170, 0,  3300] },
-    { "index": 4,  "position": [-1000, 0,  -640] },
-    { "index": 5,  "position": [ -900, 0, -2131] },
-    { "index": 6,  "position": [ -815, 0, -7341] },
-    { "index": 7,  "position": [ -460, 0, -2029] },
-    { "index": 8,  "position": [ -423, 0, -3591] },
-    { "index": 9,  "position": [ -373, 0,  3858] },
-    { "index": 10, "position": [  -92, 0, -1972] },
-    { "index": 11, "position": [  150, 0,   815] },
-    { "index": 12, "position": [  460, 0,  4200] },
-    { "index": 13, "position": [  770, 0,  2534] },
-    { "index": 14, "position": [  950, 0, -1150] },
-    { "index": 15, "position": [ 1500, 0,  2377] },
-    { "index": 16, "position": [ 1640, 0,  3777] },
-    { "index": 17, "position": [ 3038, 0,  2527] },
-    { "index": 18, "position": [ 3533, 0, -1552] }
+    {
+      "index": 0,
+      "position": [-1841, 0, -1841]
+    },
+    {
+      "index": 1,
+      "position": [-1364, 0, -1909]
+    },
+    {
+      "index": 2,
+      "position": [-955, 0, 317]
+    },
+    {
+      "index": 3,
+      "position": [-798, 0, 2250]
+    },
+    {
+      "index": 4,
+      "position": [-682, 0, -436]
+    },
+    {
+      "index": 5,
+      "position": [-614, 0, -1453]
+    },
+    {
+      "index": 6,
+      "position": [-556, 0, -5005]
+    },
+    {
+      "index": 7,
+      "position": [-314, 0, -1383]
+    },
+    {
+      "index": 9,
+      "position": [-254, 0, 2630]
+    },
+    {
+      "index": 10,
+      "position": [-63, 0, -1345]
+    },
+    {
+      "index": 11,
+      "position": [102, 0, 556]
+    },
+    {
+      "index": 12,
+      "position": [314, 0, 2864]
+    },
+    {
+      "index": 13,
+      "position": [525, 0, 1728]
+    },
+    {
+      "index": 14,
+      "position": [648, 0, -784]
+    },
+    {
+      "index": 15,
+      "position": [1023, 0, 1621]
+    },
+    {
+      "index": 16,
+      "position": [1118, 0, 2575]
+    },
+    {
+      "index": 17,
+      "position": [2071, 0, 1723]
+    },
+    {
+      "index": 18,
+      "position": [2409, 0, -1058]
+    }
   ]
 }

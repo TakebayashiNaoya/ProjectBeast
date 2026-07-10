@@ -103,6 +103,9 @@ namespace app
 				// ローディングサークルをフェードイン開始前に非表示にする
 				// FadingIn 中は m_state == FadeIn のため背景は描画され続け黒画面にならない
 				core::Fade::Get().HideLoadingCircle();
+				// ロード中の重い同期処理(Ocean::Start()等)で膨らんだdeltaTimeの
+				// 移動平均履歴を破棄し、フェードイン中に海などが高速に動くのを防ぐ。
+				g_gameTime->ResetFrameDeltaTime();
 				core::Fade::Get().FadeIn(m_fadeDuration);
 				m_transitionState = TransitionState::FadingIn;
 			}

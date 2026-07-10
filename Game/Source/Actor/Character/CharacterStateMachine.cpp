@@ -29,7 +29,7 @@ namespace app
 			// --- 慣性と摩擦の計算 ---
 			if (m_moveDirection.LengthSq() > FLT_EPSILON)
 			{
-				Vector3 targetVelocity = m_moveDirection * (m_moveSpeed * m_speedMultiplier);
+				Vector3 targetVelocity = m_moveDirection * (m_moveSpeed * m_speedMultiplier * m_externalSpeedMultiplier);
 
 				// ★修正：1.0f の代わりに MAX_LERP_FACTOR を使う
 				float lerpFactor = min(MAX_LERP_FACTOR, m_acceleration * deltaTime);
@@ -134,6 +134,7 @@ namespace app
 			, m_moveDirection(Vector3::Zero)
 			, m_moveSpeed(0.0f)
 			, m_speedMultiplier(1.0f)
+			, m_externalSpeedMultiplier(1.0f)
 			, m_isDash(false)
 			, m_isSwimming(false)
 			, m_prevPositionY(0.0f)

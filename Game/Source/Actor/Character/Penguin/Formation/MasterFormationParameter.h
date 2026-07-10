@@ -37,17 +37,17 @@ namespace app
 			float ultDuration;
 			/** ウルトクールダウン（秒） */
 			float ultCooldown;
-			/** パッシブ: 固定速度倍率（未使用の陣形は1.0） */
+			/** パッシブ: 固定速度倍率（未使用、全陣形とも passiveSpeedBase/PerLevel のレベル連動速度に統一） */
 			float passiveSpeedMultiplier;
-			/** パッシブ: レベル0の速度倍率（三角陣のみ使用） */
+			/** パッシブ: レベル0の速度倍率（全陣形で使用） */
 			float passiveSpeedBase;
-			/** パッシブ: レベルごとの速度増分（三角陣のみ使用） */
+			/** パッシブ: レベルごとの速度増分（全陣形で共通の値を使用） */
 			float passiveSpeedPerLevel;
 			/** ウルト: 固定速度倍率（未使用の陣形は1.0） */
 			float ultSpeedMultiplier;
 			/** ウルト: 渦潮近傍時の速度倍率（密集陣のみ使用） */
 			float ultWhirlpoolBoostMultiplier;
-			/** ウルト: ペンギン呼び戻し距離（未使用なら0） */
+			/** ウルト: 発動中に入隊判定半径をこの距離まで拡大する（RingFormation系で使用、未使用なら0） */
 			float ultCallDistance;
 			/** 形状: リングの半径増分（RingFormation系のみ使用。陣形の広さを決める） */
 			float radiusPerRing;

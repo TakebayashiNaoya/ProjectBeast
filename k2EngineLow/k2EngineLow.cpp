@@ -48,11 +48,15 @@ namespace nsK2EngineLow {
 		}
 #endif
 		g_engine = this;
+
+		// ゲームループ全体（application->Update() を含む）を計測区間に収めるため、
+		// 最初の一回だけここで計測を開始する。以降は EndMeasurement() が
+		// 計測終了と同時に次の区間を継続して開始する。
+		m_gameTime.BeginMeasurement();
 	}
 	void K2EngineLow::BeginFrame()
 	{
 		m_fpsLimitter.BeginFrame();
-		m_gameTime.BeginMeasurement();
 		m_graphicsEngine->BeginRender();
 		EffectEngine::GetInstance()->BeginFrame();
 		for (auto& pad : m_pad) {

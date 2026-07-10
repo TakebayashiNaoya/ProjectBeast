@@ -21,17 +21,17 @@ namespace app
 	protected:
 		float GetTimeLimit() const override 
 		{
-			return 180.0f; 
+			return 150.0f; 
 		}
 
 		Vector3 GetDaddySpawnPos() const override
 		{
-			return { 0.0f, 200.0f, 0.0f };
+			return { 0.0f, 140.0f, 0.0f };
 		}
 
 		PenguinSpawnConfig GetPenguinConfig() const override
 		{
-			return { 0, 0, 35, 35, 30, 5000.0f, 1500.0f };
+			return { 0, 0, 10, 10, 80, 3500.0f, 1050.0f };
 		}
 
 		const char* GetStageJsonPath() const override

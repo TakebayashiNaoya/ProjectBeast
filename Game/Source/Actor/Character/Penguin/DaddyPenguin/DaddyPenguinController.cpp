@@ -208,6 +208,9 @@ namespace app
 			// ステートマシンへ一括入力
 			// =========================================================
 
+			// 陣形のパッシブ/ウルト速度倍率を親ペンギン自身にも反映する（1.0f超もありうるためクランプなしの別枠に渡す）
+			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
+
 			// SlideEnd アニメーション中はプレイヤー入力を無視し、
 			// 自然に滑り止まるのを待つ
 			if (m_stateMachine->IsEqualCurrentState(PenguinSlideEndState::ID()))
