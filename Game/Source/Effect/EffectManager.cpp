@@ -5,8 +5,8 @@
  */
 #include "stdafx.h"
 #include "EffectManager.h"
-#include "graphics/effect/BeastEffectEmitter.h"
 #include "Geometry/Frustum.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 
 
 namespace app
@@ -32,7 +32,10 @@ namespace app
 
 
 	EffectManager::~EffectManager()
-	{}
+	{
+		StopAllEffect();
+		m_effectList.clear();
+	}
 
 
 	void EffectManager::Update(const nsBeastEngine::Frustum& frustum)
@@ -106,6 +109,18 @@ namespace app
 		// ダングリングポインタアクセスを防ぐため、停止前に追従を解除する
 		it->second.followTarget = nullptr;
 		it->second.emitter->Stop();
+	}
+
+
+	void EffectManager::StopAllEffect()
+	{
+		for (auto& it : m_effectList)
+		{
+			if (it.second.emitter != nullptr) {
+				it.second.followTarget = nullptr;
+				it.second.emitter->Stop();
+			}
+		}
 	}
 
 

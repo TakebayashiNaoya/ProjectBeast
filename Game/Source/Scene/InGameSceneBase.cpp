@@ -752,6 +752,7 @@ namespace app
 		if (m_goTitle)
 		{
 			SoundManager::Get().StopAllSE();
+			EffectManager::Get().StopAllEffect();
 
 			// 環境音などを全て止めた直後に、タイトルへ戻る決定音を鳴らす
 			SoundManager::Get().PlaySE(enSoundKind_ButtonEnter);
@@ -764,6 +765,7 @@ namespace app
 		if (m_nextScene)
 		{
 			SoundManager::Get().StopAllSE();
+			EffectManager::Get().StopAllEffect();
 			id = ResultScene::ID();
 			waitTime = SCENE_TRANSITION_WAIT_TIME;
 			return true;
