@@ -54,6 +54,12 @@ namespace app
 		}
 
 
+		float RingFormation::GetUltJoinRadius() const
+		{
+			return m_param->ultCallDistance;
+		}
+
+
 		void RingFormation::CalculatePositions(
 			const Vector3& center,
 			const Vector3& forward,
@@ -163,20 +169,14 @@ namespace app
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
 
 			// ウルト: 入隊判定半径の一時拡大のみ（速度・渦潮などの効果は無し）
-			// 拡大自体は GetUltJoinRadius() 経由で FormationController::GetJoinRadius() が処理する
+			// 拡大自体は RingFormation::GetUltJoinRadius() 経由で FormationController::GetJoinRadius() が処理する
 
 			// 演出: 呼び出しオーラ
 			m_ultVisual = std::make_unique<UltEffectScatter>();
 		}
 
 
-		float ScatterFormation::GetUltJoinRadius() const
-		{
-			return m_param->ultCallDistance;
-		}
 
-
-		
 
 		/****************************************/
 

@@ -1,6 +1,6 @@
 [
   {
-    "comment": "円陣（通常）：パッシブでレベル連動加速（他陣形と共通）／ウルトで速度1.5倍＋渦潮免疫＋ペンギン呼び戻し",
+    "comment": "円陣（通常）：パッシブでレベル連動加速（他陣形と共通）／ウルトで速度1.5倍＋渦潮免疫＋ペンギン呼び戻し＋入隊半径拡大（密集陣と散開陣の中間）",
     "ultDuration": 10.0,
     "ultCooldown": 20.0,
     "passiveSpeedMultiplier": 1.0,
@@ -11,7 +11,7 @@
     "ultWhirlpoolResistance": true,
     "ultWhirlpoolBoostMultiplier": 1.0,
     "ultBearAttackNullify": false,
-    "ultCallDistance": 250.0,
+    "ultCallDistance": 350.0,
     "radiusPerRing": 35.0,
     "joinMargin": 20.0,
     "rowSpacing": 0.0,
@@ -38,7 +38,7 @@
     "baseFollowers": 0
   },
   {
-    "comment": "密集陣（防御特化）：パッシブでレベル連動加速（他陣形と共通）＋渦潮耐性／ウルトで渦潮近傍加速＋シロクマ攻撃無効化",
+    "comment": "密集陣（防御特化）：パッシブでレベル連動加速（他陣形と共通）＋渦潮耐性／ウルトで渦潮に飛び込むと速度2倍＋シロクマ攻撃無効化＋入隊半径を控えめに拡大",
     "ultDuration": 10.0,
     "ultCooldown": 20.0,
     "passiveSpeedMultiplier": 1.0,
@@ -47,9 +47,9 @@
     "passiveWhirlpoolResistance": true,
     "ultSpeedMultiplier": 1.0,
     "ultWhirlpoolResistance": false,
-    "ultWhirlpoolBoostMultiplier": 1.5,
+    "ultWhirlpoolBoostMultiplier": 2.0,
     "ultBearAttackNullify": true,
-    "ultCallDistance": 0.0,
+    "ultCallDistance": 150.0,
     "radiusPerRing": 8.0,
     "joinMargin": 20.0,
     "rowSpacing": 0.0,

@@ -159,6 +159,12 @@ namespace app
 			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
 			 */
 			float GetJoinRadius(int count) const override;
+
+			/**
+			 * @brief ウルト発動中はこの距離まで入隊判定半径を拡大する
+			 * @details Circle・Cluster・Scatter で共通。ultCallDistance が0の陣形は拡大なし。
+			 */
+			float GetUltJoinRadius() const override;
 		};
 
 
@@ -171,7 +177,8 @@ namespace app
 		 * @brief 円陣（標準間隔）
 		 * @details
 		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameter で調整）。
-		 *   ウルト: 速度1.5倍 ＋ 渦潮免疫 ＋ ペンギン呼び出し（MasterFormationParameter で調整）。
+		 *   ウルト: 速度1.5倍 ＋ 渦潮免疫 ＋ ペンギン呼び出し ＋ 入隊判定半径の一時拡大
+		 *   （拡大幅は密集陣と散開陣の中間程度、MasterFormationParameter の ultCallDistance で調整）。
 		 *   演出: UltEffectCircle（NormalUltAura）。
 		 */
 		class CircleFormation : public RingFormation
@@ -191,7 +198,8 @@ namespace app
 		 * @brief 密集陣（狭間隔）
 		 * @details
 		 *   パッシブ: レベル連動速度（他陣形と共通）＋ 渦潮耐性（MasterFormationParameter で調整）。
-		 *   ウルト: 渦潮近傍で速度up ＋ シロクマ攻撃無効化（MasterFormationParameter で調整）。
+		 *   ウルト: 渦潮に飛び込んでいる間だけ速度2倍 ＋ シロクマ攻撃無効化 ＋ 入隊判定半径の
+		 *   一時拡大（拡大幅は控えめ、MasterFormationParameter で調整）。
 		 *   演出: UltEffectCluster（Barrier）。
 		 */
 		class ClusterFormation : public RingFormation
@@ -220,9 +228,6 @@ namespace app
 		public:
 			/** @param param JSONから読み込んだ散開陣のパラメーター */
 			explicit ScatterFormation(const MasterFormationParameter& param);
-
-			/** @brief ウルト発動中はこの距離まで入隊判定半径を拡大する */
-			float GetUltJoinRadius() const override;
 		};
 
 
