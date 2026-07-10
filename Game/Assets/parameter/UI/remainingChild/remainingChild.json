@@ -41,7 +41,7 @@
                 "asset":"Assets/spriteData/UI/Icon/SlashIcon.dds",
                 "width":30,
                 "height":45,
-                "position":[-600,95,0],
+                "position":[-575,95,0],
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
@@ -53,7 +53,7 @@
                 "fontSize":0.9,
                 "fontScaleX":1.0,
                 "fontScaleY":1.0,
-                "position":[-515,95,0],
+                "position":[-500,95,0],
                 "rotation":0,
                 "color":[255,255,255,255],
                 "pivot":[0.5, 0.5]
