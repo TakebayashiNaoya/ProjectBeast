@@ -9,6 +9,13 @@
 
 namespace app
 {
+	namespace actor
+	{
+		/** 前方宣言 */
+		class ChildPenguin;
+	}
+
+
 	namespace nature
 	{
 		/** 前方宣言 */
@@ -68,6 +75,13 @@ namespace app
 			{
 				return static_cast<uint8_t>(m_positionMap.size());
 			}
+
+			/**
+			 * @brief 削除される子ペンギンを全渦潮の追跡対象から無効化する
+			 * @details ChildPenguinManager::RemoveAndDestroy() から呼ばれる
+			 * @param penguin 削除される子ペンギンのポインタ
+			 */
+			void NotifyPenguinDestroyed(actor::ChildPenguin* penguin);
 
 
 		private:

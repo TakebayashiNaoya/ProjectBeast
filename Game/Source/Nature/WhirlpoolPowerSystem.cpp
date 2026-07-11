@@ -261,6 +261,21 @@ namespace app
 		}
 
 
+		void WhirlpoolPowerSytem::OnPenguinDestroyed(actor::ChildPenguin* penguin)
+		{
+			// target を直接 nullptr 化する。実際のリストからの除去は
+			// UpdateWhirlpoolInfo() 側の「target == nullptr なら erase」処理に任せる
+			for (auto& info : m_wpPowerInfos)
+			{
+				if (info.target == penguin)
+				{
+					info.target = nullptr;
+					break;
+				}
+			}
+		}
+
+
 		void WhirlpoolPowerSytem::UpdateSpiral(WhirlpoolPowerInfo& info, float newRadius, float deltaTime)
 		{
 			const MasterWhirlpoolParameter* param = GetParam();

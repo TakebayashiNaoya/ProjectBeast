@@ -24,6 +24,7 @@
 #include "Source/Manager/FeverTimeManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Manager/InGameUIManager.h"
+#include "Source/Nature/WhirlpoolManager.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/CPReaction/CPReactionTypes.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
@@ -472,6 +473,12 @@ namespace app
 
 			/** 可聴セットからも取り除く */
 			m_audiblePenguins.erase(penguin);
+
+			/** 渦潮側が保持している target ポインタも無効化しておく（解放後の参照を防ぐ） */
+			if (auto* wpMng = nature::WhirlpoolManager::GetInstance())
+			{
+				wpMng->NotifyPenguinDestroyed(penguin);
+			}
 
 			/** 即座に m_childPenguinList から erase したり delete したりせず、 */
 			/** 削除予定リストに登録するだけに留める */
