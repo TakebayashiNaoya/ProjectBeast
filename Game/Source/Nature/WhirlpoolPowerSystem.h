@@ -73,6 +73,16 @@ namespace app
 				return m_wpPowerInfos;
 			}
 
+			/**
+			 * @brief 削除される子ペンギンを追跡対象から無効化する
+			 * @details ChildPenguinManager::RemoveAndDestroy() から呼ばれる。
+			 *          m_wpPowerInfos は子ペンギンの総数が変化したフレームでしか再構築されないため、
+			 *          delete前にここで target を明示的に nullptr 化しておかないと、
+			 *          死亡数と新規生成数が同フレームで一致した場合に解放済みポインタを参照してしまう。
+			 * @param penguin 削除される子ペンギンのポインタ
+			 */
+			void OnPenguinDestroyed(actor::ChildPenguin* penguin);
+
 
 		private:
 			/**
