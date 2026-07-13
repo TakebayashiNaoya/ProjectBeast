@@ -182,6 +182,15 @@ namespace app
 		}
 
 
+		void WhirlpoolManager::NotifyPenguinDestroyed(actor::ChildPenguin* penguin)
+		{
+			ForEach([&](Whirlpool* whirlpool)
+				{
+					whirlpool->NotifyPenguinDestroyed(penguin);
+				});
+		}
+
+
 		void WhirlpoolManager::LoadPositionMap(const nlohmann::json& json)
 		{
 			if (!json.contains(WHIRLPOOL_POSITIONS_KEY)) return;

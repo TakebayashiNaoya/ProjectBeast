@@ -592,6 +592,15 @@ namespace app
 		}
 
 
+		void Whirlpool::NotifyPenguinDestroyed(actor::ChildPenguin* penguin)
+		{
+			if (m_whirlpoolPowerSystem)
+			{
+				m_whirlpoolPowerSystem->OnPenguinDestroyed(penguin);
+			}
+		}
+
+
 		void Whirlpool::UpdateWhirlpoolEffectScale()
 		{
 			if (m_effectHandle == INVALID_EFFECT_HANDLE) return;

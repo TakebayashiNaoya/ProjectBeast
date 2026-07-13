@@ -136,6 +136,13 @@ namespace app
 			 */
 			float GetMaxScaleXZ() const { return m_maxScaleXZ; }
 
+			/**
+			 * @brief 削除される子ペンギンを追跡対象から無効化する
+			 * @details ChildPenguinManager::RemoveAndDestroy() から呼ばれる。WhirlpoolPowerSytem に委譲する
+			 * @param penguin 削除される子ペンギンのポインタ
+			 */
+			void NotifyPenguinDestroyed(actor::ChildPenguin* penguin);
+
 
 		public:
 			void Start() override;

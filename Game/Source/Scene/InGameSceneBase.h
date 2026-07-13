@@ -172,8 +172,5 @@ namespace app
 
 		/** ホイッスルを鳴らしたかどうか（Finishing フェーズで1回だけ鳴らすためのフラグ） */
 		bool m_isWhistlePlayed = false;
-
-		/** ログの毎秒ティック用タイマー */
-		float m_logTickTimer = 0.0f;
 	};
 }

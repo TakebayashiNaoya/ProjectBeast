@@ -59,9 +59,6 @@ namespace
 
 	/** FINISH演出に合わせたBGMフェードアウト時間（秒） */
 	constexpr float FINISH_BGM_FADE_DURATION = 3.0f;
-
-	/** ゲームログの記録間隔（秒） */
-	constexpr float LOG_TICK_INTERVAL = 0.1f;
 }
 
 namespace app
@@ -456,14 +453,9 @@ namespace app
 
 			app::achievement::AchievementManager::GetInstance()->Update();
 
-			/** ログ毎秒ティック */
-			m_logTickTimer += g_gameTime->GetFrameDeltaTime();
-			if (m_logTickTimer >= LOG_TICK_INTERVAL)
-			{
-				m_logTickTimer -= LOG_TICK_INTERVAL;
-				if (auto* lm = GameLogManager::GetInstance())
-					lm->RecordTick(m_daddyPenguin);
-			}
+			/** ログ毎フレームティック */
+			if (auto* lm = GameLogManager::GetInstance())
+				lm->RecordTick(m_daddyPenguin);
 
 			/** ノイズリストをクリア */
 			NoiseManager::GetInstance().ClearNoises();

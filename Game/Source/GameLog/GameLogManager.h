@@ -4,15 +4,15 @@
  * @author 竹林
  *
  * @details
- * ゲーム中に発生するイベントと毎秒ティックを JSONL 形式で記録し、
+ * ゲーム中に発生するイベントと毎フレームティックを JSONL 形式で記録し、
  * ゲーム終了時にファイルへ書き出す。
  *
  * 出力ファイル構成（Logs/<session_id>/）:
  *   session.json  … セッション情報
- *   ticks.jsonl   … 毎秒スナップショット (type="tick" + 埋め込みイベント)
+ *   ticks.jsonl   … 毎フレームスナップショット (type="tick" + 埋め込みイベント)
  *
  * 利用側が呼ぶメソッド:
- *   RecordTick()       … 毎秒 InGameSceneBase から呼ぶ
+ *   RecordTick()       … 毎フレーム InGameSceneBase から呼ぶ
  *   QueueEvent(json)   … イベント発生時に呼ぶ（次 tick に埋め込まれる）
  *   RecordSpawn(...)   … エンティティ生成時
  *   RecordDespawn(...) … エンティティ消滅時
@@ -38,7 +38,7 @@ namespace app
 	class GameLogManager
 	{
 	public:
-		/** @brief 毎秒 InGameSceneBase から呼ぶ。全エンティティ・カメラのスナップショットを記録 */
+		/** @brief 毎フレーム InGameSceneBase から呼ぶ。全エンティティ・カメラのスナップショットを記録 */
 		void RecordTick(actor::DaddyPenguin* daddy);
 
 		/**
@@ -106,7 +106,7 @@ namespace app
 		/** セッション開始時刻文字列（Flush で使用） */
 		std::string m_sessionId;
 
-		/** tick の最大記録件数（10Hz × 60分 = 36000件。超過分は記録しない） */
+		/** tick の最大記録件数（60fps 換算で約10分。1プレイのステージ最長時間より十分大きい。超過分は記録しない） */
 		static constexpr size_t MAX_TICKS = 36000;
 
 
