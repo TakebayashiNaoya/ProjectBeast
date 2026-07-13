@@ -25,14 +25,15 @@ namespace app
 	namespace
 	{
 		/**
-		 * @brief RecordTick() が呼ばれる間隔（秒）
-		 * @details InGameSceneBase.cpp の LOG_TICK_INTERVAL と同じ値。
-		 *          記録データの "t" は TimeManager の残り時間（カウントダウン）を
+		 * @brief 1倍速再生時に1秒あたり何tick進めるか
+		 * @details 記録データの "t" は TimeManager の残り時間（カウントダウン）を
 		 *          そのまま使っており単調増加しないため、再生の時間軸には使えない。
-		 *          代わりに、確実に1ずつ増える "frame"（tick連番）にこの間隔を掛けて
-		 *          経過時間を求める。
+		 *          "frame"（tick連番、確実に1ずつ増える）を直接タイムライン単位として使い、
+		 *          "何秒間隔で記録されたログか"（InGameSceneBase.cpp の LOG_TICK_INTERVAL）には
+		 *          依存しない。LOG_TICK_INTERVAL は過去に値を変更した経緯があり、
+		 *          ログごとに実際の記録間隔が異なりうるため。
 		 */
-		constexpr float TICK_INTERVAL_SEC = 0.1f;
+		constexpr float TICKS_PER_SECOND = 10.0f;
 
 		/**
 		 * @brief シロクマのアイドルアニメーションのクリップ番号
@@ -262,7 +263,7 @@ namespace app
 					m_isPlaying = false;
 				}
 				ImGui::SameLine();
-				ImGui::Text(u8"再生時間: %.1f秒", m_playbackTime);
+				ImGui::Text(u8"再生時間: %.1f秒相当", m_playbackTime / TICKS_PER_SECOND);
 			}
 
 			ImGui::SliderFloat(u8"再生速度", &m_playbackSpeed, 0.1f, 4.0f);
@@ -291,7 +292,7 @@ namespace app
 		if (m_ticks.empty()) return;
 
 		m_isPlaying = true;
-		m_playbackTime = m_ticks.front().value("frame", 0) * TICK_INTERVAL_SEC;
+		m_playbackTime = static_cast<float>(m_ticks.front().value("frame", 0));
 		m_currentTickIndex = 0;
 	}
 
@@ -304,11 +305,11 @@ namespace app
 			return;
 		}
 
-		m_playbackTime += deltaTime * m_playbackSpeed;
+		m_playbackTime += deltaTime * m_playbackSpeed * TICKS_PER_SECOND;
 
 		// 現在の再生時間を含むtickペアまでインデックスを進める
 		while (m_currentTickIndex + 1 < m_ticks.size() &&
-			m_ticks[m_currentTickIndex + 1].value("frame", 0) * TICK_INTERVAL_SEC <= m_playbackTime)
+			m_ticks[m_currentTickIndex + 1].value("frame", 0) <= m_playbackTime)
 		{
 			m_currentTickIndex++;
 		}
@@ -322,8 +323,8 @@ namespace app
 		const nlohmann::json& tick0 = m_ticks[m_currentTickIndex];
 		const nlohmann::json& tick1 = m_ticks[min(m_currentTickIndex + 1, m_ticks.size() - 1)];
 
-		const float t0 = tick0.value("frame", 0) * TICK_INTERVAL_SEC;
-		const float t1 = tick1.value("frame", 0) * TICK_INTERVAL_SEC;
+		const float t0 = static_cast<float>(tick0.value("frame", 0));
+		const float t1 = static_cast<float>(tick1.value("frame", 0));
 		float alpha = (t1 > t0) ? (m_playbackTime - t0) / (t1 - t0) : 0.0f;
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
 

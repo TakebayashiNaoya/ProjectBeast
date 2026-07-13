@@ -7,6 +7,10 @@
 #include "FormationEffects.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
+#include "Source/Core/ParameterManager.h"
+#include "Source/Nature/Whirlpool.h"
+#include "Source/Nature/WhirlpoolManager.h"
+#include "Source/Nature/WhirlpoolParameter.h"
 
 
 namespace app
@@ -15,9 +19,37 @@ namespace app
 	{
 		void WhirlpoolSpeedBoostEffect::Update(float dt, const UltContext& ctx)
 		{
-			// TODO: 渦潮との近接判定を実装する
-			// WhirlpoolPowerSystem や Whirlpool クラスから近傍判定APIが用意できたら置き換える
 			m_isNearWhirlpool = false;
+			if (!ctx.penguinManager) return;
+
+			const auto* wpParam = core::ParameterManager::Get()->GetParameter<nature::MasterWhirlpoolParameter>();
+			const float baseRadius = (wpParam != nullptr) ? wpParam->whirlpoolRadius : 0.0f;
+			if (baseRadius <= 0.0f) return;
+
+			const Vector3 daddyPos = ctx.penguinManager->GetDaddyPosition();
+
+			// 親ペンギンがいずれかの渦潮の実効半径（Bigger中はスケール比率で拡大）の中にいるか判定する
+			nature::WhirlpoolManager::GetInstance()->ForEach([&](nature::Whirlpool* wp)
+				{
+					if (m_isNearWhirlpool) return;
+					if (wp->GetState() == nature::Whirlpool::EnWhirlpoolState::None) return;
+
+					float effectiveRadius = baseRadius;
+					if (wp->GetState() == nature::Whirlpool::EnWhirlpoolState::Bigger)
+					{
+						const float currentScaleXZ = wp->GetTransform().m_scale.x;
+						const float maxScaleXZ     = wp->GetMaxScaleXZ();
+						const float ratio          = (maxScaleXZ > 0.0f) ? (currentScaleXZ / maxScaleXZ) : 1.0f;
+						effectiveRadius = baseRadius * ratio;
+					}
+
+					Vector3 diff = daddyPos - wp->GetTransform().m_position;
+					diff.y = 0.0f;
+					if (diff.LengthSq() <= effectiveRadius * effectiveRadius)
+					{
+						m_isNearWhirlpool = true;
+					}
+				});
 		}
 
 

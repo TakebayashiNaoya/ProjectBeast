@@ -79,6 +79,13 @@ namespace app
 		 */
 		void StopEffect(const EffectHandle handle);
 
+
+		/**
+		 * @brief 全てのエフェクトを停止する
+		 */
+		void StopAllEffect();
+
+
 		/**
 		 * @brief ハンドルからエフェクトを取得する
 		 * @param handle エフェクトのハンドル

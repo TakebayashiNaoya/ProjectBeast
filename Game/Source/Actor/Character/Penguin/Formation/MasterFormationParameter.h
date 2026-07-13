@@ -47,7 +47,7 @@ namespace app
 			float ultSpeedMultiplier;
 			/** ウルト: 渦潮近傍時の速度倍率（密集陣のみ使用） */
 			float ultWhirlpoolBoostMultiplier;
-			/** ウルト: ペンギン呼び戻し距離（未使用なら0） */
+			/** ウルト: 発動中に入隊判定半径をこの距離まで拡大する（RingFormation系で使用、未使用なら0） */
 			float ultCallDistance;
 			/** 形状: リングの半径増分（RingFormation系のみ使用。陣形の広さを決める） */
 			float radiusPerRing;

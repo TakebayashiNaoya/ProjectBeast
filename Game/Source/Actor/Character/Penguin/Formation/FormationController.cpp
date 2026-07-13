@@ -201,7 +201,16 @@ namespace app
 
 		float FormationController::GetJoinRadius(int count) const
 		{
-			return m_currentFormation ? m_currentFormation->GetJoinRadius(count) : 0.0f;
+			if (!m_currentFormation) return 0.0f;
+
+			float radius = m_currentFormation->GetJoinRadius(count);
+
+			// ウルト発動中は、陣形固有の拡大距離（散開陣のみ非0）との大きい方を採用する
+			if (m_ultController.IsActive())
+			{
+				radius = max(radius, m_currentFormation->GetUltJoinRadius());
+			}
+			return radius;
 		}
 
 
@@ -239,9 +248,16 @@ namespace app
 
 		float FormationController::GetJoinRadius() const
 		{
-			return m_currentFormation
-				? m_currentFormation->GetJoinRadius()
-				: 0.0f;
+			if (!m_currentFormation) return 0.0f;
+
+			float radius = m_currentFormation->GetJoinRadius();
+
+			// ウルト発動中は、陣形固有の拡大距離（散開陣のみ非0）との大きい方を採用する
+			if (m_ultController.IsActive())
+			{
+				radius = max(radius, m_currentFormation->GetUltJoinRadius());
+			}
+			return radius;
 		}
 	}
 }
