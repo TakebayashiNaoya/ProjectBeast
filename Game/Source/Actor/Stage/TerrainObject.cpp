@@ -4,16 +4,16 @@
  * @author 竹林
  */
 #include "stdafx.h"
-#include "TerrainObject.h"
 #include "DirectXTex/DirectXTex.h"
+#include "TerrainObject.h"
 
 
 namespace
 {
 	/** ハイトマップ */
-	static const wchar_t* HEIGHTMAP_PATH  = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";
+	static const wchar_t* HEIGHTMAP_PATH = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";
 	/** スプラットマップ */
-	static const wchar_t* SPLATMAP_PATH   = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";
+	static const wchar_t* SPLATMAP_PATH = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";
 
 	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
 	static const char* TERRAIN_TKM_KEY = "terrain_generated";
@@ -21,17 +21,17 @@ namespace
 	static const char* TERRAIN_CHUNK_KEY_PREFIX = "terrain_chunk";
 
 	/** 地形テクスチャ（スプラットマップの R=snow, G=grass, B=rock） */
-	static const wchar_t* TEX_PATH_SNOW   = L"Assets/modelData/stage/Terrain/snow.DDS";
-	static const wchar_t* TEX_PATH_GRASS  = L"Assets/modelData/stage/Terrain/grass.DDS";
-	static const wchar_t* TEX_PATH_ROCK   = L"Assets/modelData/stage/Terrain/rock.DDS";
+	static const wchar_t* TEX_PATH_SNOW = L"Assets/modelData/stage/Terrain/snow.DDS";
+	static const wchar_t* TEX_PATH_GRASS = L"Assets/modelData/stage/Terrain/grass.DDS";
+	static const wchar_t* TEX_PATH_ROCK = L"Assets/modelData/stage/Terrain/rock.DDS";
 
 	/** PBR テクスチャ */
-	static const wchar_t* TEX_PATH_SNOW_NORMAL     = L"Assets/modelData/stage/Terrain/snow_Normal.DDS";
-	static const wchar_t* TEX_PATH_SNOW_ROUGHNESS  = L"Assets/modelData/stage/Terrain/snow_Roughness.DDS";
-	static const wchar_t* TEX_PATH_GRASS_NORMAL    = L"Assets/modelData/stage/Terrain/grass_Normal.DDS";
+	static const wchar_t* TEX_PATH_SNOW_NORMAL = L"Assets/modelData/stage/Terrain/snow_Normal.DDS";
+	static const wchar_t* TEX_PATH_SNOW_ROUGHNESS = L"Assets/modelData/stage/Terrain/snow_Roughness.DDS";
+	static const wchar_t* TEX_PATH_GRASS_NORMAL = L"Assets/modelData/stage/Terrain/grass_Normal.DDS";
 	static const wchar_t* TEX_PATH_GRASS_ROUGHNESS = L"Assets/modelData/stage/Terrain/grass_Roughness.DDS";
-	static const wchar_t* TEX_PATH_ROCK_NORMAL     = L"Assets/modelData/stage/Terrain/rock_Normal.DDS";
-	static const wchar_t* TEX_PATH_ROCK_ROUGHNESS  = L"Assets/modelData/stage/Terrain/rock_Roughness.DDS";
+	static const wchar_t* TEX_PATH_ROCK_NORMAL = L"Assets/modelData/stage/Terrain/rock_Normal.DDS";
+	static const wchar_t* TEX_PATH_ROCK_ROUGHNESS = L"Assets/modelData/stage/Terrain/rock_Roughness.DDS";
 }
 
 
@@ -42,23 +42,23 @@ namespace app
 		namespace
 		{
 			/**
-			 * @brief ハイトマップ画素 (px, pz) → ワールド高さ値（境界外はクランプ）		
-			 * 
+			 * @brief ハイトマップ画素 (px, pz) → ワールド高さ値（境界外はクランプ）
+			 *
 			 * @param pixels      ハイトマップ画素配列（uint16_t）
 			 * @param W           ハイトマップ横幅（画素数）
 			 * @param H		      ハイトマップ縦幅（画素数）
 			 * @param heightScale ハイトマップの最大高さ（ワールド単位）
 			 * @param px		  ハイトマップ画素 X 座標
 			 * @param pz		  ハイトマップ画素 Z 座標
-			 * 
+			 *
 			 * @return ワールド高さ値（ワールド単位）
 			 */
 			float SampleHeight(
-				const std::vector<uint16_t>& pixels, 
-				int W, 
-				int H, 
+				const std::vector<uint16_t>& pixels,
+				int W,
+				int H,
 				float heightScale,
-				int px, 
+				int px,
 				int pz
 			)
 			{
@@ -70,7 +70,7 @@ namespace app
 
 			/**
 			 * @brief チャンク担当範囲の頂点バッファを生成する
-			 * 
+			 *
 			 * @param heights ハイトマップの高さ値配列（ワールド単位）
 			 * @param hmPixels  ハイトマップの画素配列（uint16_t）
 			 * @param W         ハイトマップ横幅（画素数）
@@ -84,21 +84,21 @@ namespace app
 			 * @param vxEnd     チャンク担当範囲の頂点 X 終了インデックス（非包含）
 			 * @param vzStart   チャンク担当範囲の頂点 Z 開始インデックス
 			 * @param vzEnd     チャンク担当範囲の頂点 Z 終了インデックス（非包含）
-			 * 
+			 *
 			 * @return 頂点バッファ配列
 			 */
 			std::vector<TkmFile::SVertex> BuildChunkVertices(
 				const std::vector<float>& heights,
-				const std::vector<uint16_t>& hmPixels, 
-				int W, 
+				const std::vector<uint16_t>& hmPixels,
+				int W,
 				int H,
-				float cellSizeX, 
-				float cellSizeZ, 
-				float originX, 
+				float cellSizeX,
+				float cellSizeZ,
+				float originX,
 				float originY,
 				const TerrainObject::TerrainConfig& cfg,
 				int vxStart,
-				int vxEnd, 
+				int vxEnd,
 				int vzStart,
 				int vzEnd
 			)
@@ -111,7 +111,7 @@ namespace app
 				{
 					for (int vx = vxStart; vx < vxEnd; ++vx)
 					{
-						const float h  = heights[vz * W + vx];                                       // この頂点の高さ
+						const float h = heights[vz * W + vx];                                       // この頂点の高さ
 						const float hR = SampleHeight(hmPixels, W, H, cfg.heightScale, vx + 1, vz);  // 右隣 (Right)
 						const float hL = SampleHeight(hmPixels, W, H, cfg.heightScale, vx - 1, vz);  // 左隣 (Left)
 						const float hU = SampleHeight(hmPixels, W, H, cfg.heightScale, vx, vz + 1);  // 奥隣 (Up/Forward)
@@ -125,12 +125,12 @@ namespace app
 						normal.Normalize();
 
 						TkmFile::SVertex v;
-						v.pos         = Vector3(originX + vx * cellSizeX, originY + vz * cellSizeZ, h + cfg.yOffset);
-						v.normal      = normal;
-						v.tangent     = Vector3(1.0f, 0.0f, 0.0f);
-						v.binormal    = Vector3(0.0f, 1.0f, 0.0f);
-						v.uv          = Vector2(vx * cfg.uvTile, vz * cfg.uvTile);
-						v.indices[0]  = v.indices[1] = v.indices[2] = v.indices[3] = 0;
+						v.pos = Vector3(originX + vx * cellSizeX, originY + vz * cellSizeZ, h + cfg.yOffset);
+						v.normal = normal;
+						v.tangent = Vector3(1.0f, 0.0f, 0.0f);
+						v.binormal = Vector3(0.0f, 1.0f, 0.0f);
+						v.uv = Vector2(vx * cfg.uvTile, vz * cfg.uvTile);
+						v.indices[0] = v.indices[1] = v.indices[2] = v.indices[3] = 0;
 						v.skinWeights = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
 						vertices.push_back(v);
 					}
@@ -141,7 +141,7 @@ namespace app
 
 			/**
 			 * @brief チャンク担当範囲のインデックスバッファを生成する
-			 * 
+			 *
 			 * @param heights   ハイトマップの高さ値配列（ワールド単位）
 			 * @param W         ハイトマップ横幅（画素数）
 			 * @param minHeight この高さ未満の頂点を含むクワッドはポリゴンを生成しない（ワールド単位）
@@ -152,7 +152,7 @@ namespace app
 			 * @param vxStart   チャンク担当範囲の頂点 X 開始インデックス
 			 * @param vzStart   チャンク担当範囲の頂点 Z 開始インデックス
 			 * @param localW    チャンク内の頂点横方向数
-			 * 
+			 *
 			 * @return インデックスバッファ配列
 			 */
 			std::vector<uint32_t> BuildChunkIndices(
@@ -161,7 +161,7 @@ namespace app
 				float minHeight,
 				int cxStart,
 				int cxEnd,
-				int czStart, 
+				int czStart,
 				int czEnd,
 				int vxStart,
 				int vzStart,
@@ -181,9 +181,9 @@ namespace app
 							// クワッドを構成する 4 頂点の高さ
 							//   h0(cz,cx)    h1(cz,cx+1)
 							//   h2(cz+1,cx)  h3(cz+1,cx+1)
-							const float h0 = heights[ cz      * W +  cx     ];
-							const float h1 = heights[ cz      * W + (cx + 1)];
-							const float h2 = heights[(cz + 1) * W +  cx     ];
+							const float h0 = heights[cz * W + cx];
+							const float h1 = heights[cz * W + (cx + 1)];
+							const float h2 = heights[(cz + 1) * W + cx];
 							const float h3 = heights[(cz + 1) * W + (cx + 1)];
 							if (h0 < minHeight && h1 < minHeight && h2 < minHeight && h3 < minHeight)
 								continue;
@@ -236,7 +236,7 @@ namespace app
 				TkmFile::SMesh mesh;
 				mesh.isFlatShading = false;
 				mesh.materials.push_back(mat);
-				mesh.vertexBuffer  = std::move(vertices);
+				mesh.vertexBuffer = std::move(vertices);
 				mesh.indexBuffer32Array.push_back(std::move(ib));
 
 				std::vector<TkmFile::SMesh> meshes;
@@ -265,6 +265,7 @@ namespace app
 			if (m_isInited) return;
 			m_config = config;
 			LoadHeightmap();
+			LoadSplatmapCpu();
 			GenerateMesh();
 			InitRenderer();
 			StartWrapper();
@@ -347,12 +348,12 @@ namespace app
 			}
 
 			// img は R32_FLOAT に統一済み（1 pixel = 4 bytes = float 1 個）
-			const int    srcW     = static_cast<int>(img->width);
-			const int    srcH     = static_cast<int>(img->height);
+			const int    srcW = static_cast<int>(img->width);
+			const int    srcH = static_cast<int>(img->height);
 			const int    rowPitch = static_cast<int>(img->rowPitch) / sizeof(float);
-			const float* pixels   = reinterpret_cast<const float*>(img->pixels);
+			const float* pixels = reinterpret_cast<const float*>(img->pixels);
 
-			m_heightmap.width  = srcW / m_config.subsample;
+			m_heightmap.width = srcW / m_config.subsample;
 			m_heightmap.height = srcH / m_config.subsample;
 			m_heightmap.pixels.assign(m_heightmap.width * m_heightmap.height, 0);
 
@@ -391,11 +392,11 @@ namespace app
 			// 物理用フルメッシュ（描画には使わず当たり判定のみ）
 			{
 				// チャンク担当範囲の頂点バッファを生成する（全頂点を使う）
-				auto verts   = BuildChunkVertices(heights, m_heightmap.pixels, W, H, cellSizeX, cellSizeZ, originX, originY, m_config, 0, W, 0, H);
+				auto verts = BuildChunkVertices(heights, m_heightmap.pixels, W, H, cellSizeX, cellSizeZ, originX, originY, m_config, 0, W, 0, H);
 				// チャンク担当範囲のインデックスバッファを生成する（全セルを使う）
-				auto indices = BuildChunkIndices (heights, W, m_config.minHeight, 0, W - 1, 0, H - 1, 0, 0, W);
+				auto indices = BuildChunkIndices(heights, W, m_config.minHeight, 0, W - 1, 0, H - 1, 0, 0, W);
 				// TkmFile を組み立ててバンクに登録する
-				m_tkmFile    = AssembleChunkTkm(std::move(verts), std::move(indices), TERRAIN_TKM_KEY);
+				m_tkmFile = AssembleChunkTkm(std::move(verts), std::move(indices), TERRAIN_TKM_KEY);
 			}
 
 			// チャンク別描画メッシュ
@@ -477,35 +478,35 @@ namespace app
 			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);
 
 			// PBR テクスチャ（Normal / Roughness）
-			m_snowNormal.    InitFromDDSFile(TEX_PATH_SNOW_NORMAL);
-			m_snowRoughness. InitFromDDSFile(TEX_PATH_SNOW_ROUGHNESS);
-			m_grassNormal.   InitFromDDSFile(TEX_PATH_GRASS_NORMAL);
+			m_snowNormal.InitFromDDSFile(TEX_PATH_SNOW_NORMAL);
+			m_snowRoughness.InitFromDDSFile(TEX_PATH_SNOW_ROUGHNESS);
+			m_grassNormal.InitFromDDSFile(TEX_PATH_GRASS_NORMAL);
 			m_grassRoughness.InitFromDDSFile(TEX_PATH_GRASS_ROUGHNESS);
-			m_rockNormal.    InitFromDDSFile(TEX_PATH_ROCK_NORMAL);
-			m_rockRoughness. InitFromDDSFile(TEX_PATH_ROCK_ROUGHNESS);
+			m_rockNormal.InitFromDDSFile(TEX_PATH_ROCK_NORMAL);
+			m_rockRoughness.InitFromDDSFile(TEX_PATH_ROCK_ROUGHNESS);
 
 			// ModelInitData の共通パラメータをセットするヘルパー
 			auto buildInitData = [&](const char* tkmKey) -> ModelInitData
-			{
-				ModelInitData initData;
-				initData.m_tkmFilePath              = tkmKey;
-				initData.m_fxFilePath               = "Assets/shader/Terrain.fx";
-				initData.m_expandConstantBuffer     = &m_terrainCb;
-				initData.m_expandConstantBufferSize = static_cast<int>(sizeof(TerrainCb));
+				{
+					ModelInitData initData;
+					initData.m_tkmFilePath = tkmKey;
+					initData.m_fxFilePath = "Assets/shader/Terrain.fx";
+					initData.m_expandConstantBuffer = &m_terrainCb;
+					initData.m_expandConstantBufferSize = static_cast<int>(sizeof(TerrainCb));
 
-				initData.m_expandShaderResoruceView[0]  = &m_splatmap;
-				initData.m_expandShaderResoruceView[1]  = &m_terrainTextures[0];  // snow
-				initData.m_expandShaderResoruceView[2]  = &m_terrainTextures[1];  // grass
-				initData.m_expandShaderResoruceView[3]  = &m_terrainTextures[2];  // rock
-				// [4] は t14 に対応するが未使用のため nullptr のまま
-				initData.m_expandShaderResoruceView[5]  = &m_snowNormal;
-				initData.m_expandShaderResoruceView[6]  = &m_snowRoughness;
-				initData.m_expandShaderResoruceView[7]  = &m_grassNormal;
-				initData.m_expandShaderResoruceView[8]  = &m_grassRoughness;
-				initData.m_expandShaderResoruceView[9]  = &m_rockNormal;
-				initData.m_expandShaderResoruceView[10] = &m_rockRoughness;
-				return initData;
-			};
+					initData.m_expandShaderResoruceView[0] = &m_splatmap;
+					initData.m_expandShaderResoruceView[1] = &m_terrainTextures[0];  // snow
+					initData.m_expandShaderResoruceView[2] = &m_terrainTextures[1];  // grass
+					initData.m_expandShaderResoruceView[3] = &m_terrainTextures[2];  // rock
+					// [4] は t14 に対応するが未使用のため nullptr のまま
+					initData.m_expandShaderResoruceView[5] = &m_snowNormal;
+					initData.m_expandShaderResoruceView[6] = &m_snowRoughness;
+					initData.m_expandShaderResoruceView[7] = &m_grassNormal;
+					initData.m_expandShaderResoruceView[8] = &m_grassRoughness;
+					initData.m_expandShaderResoruceView[9] = &m_rockNormal;
+					initData.m_expandShaderResoruceView[10] = &m_rockRoughness;
+					return initData;
+				};
 
 			// 物理コリジョン用 ModelRender（描画には使わない）
 			m_modelRender.SetGBufferFxFilePath("Assets/shader/Terrain.fx");
@@ -538,6 +539,130 @@ namespace app
 				m_chunkRenders[i]->Update();
 				nsBeastEngine::OcclusionDitherManager::Get().Register(m_chunkRenders[i].get());
 			}
+		}
+
+
+		void TerrainObject::LoadSplatmapCpu()
+		{
+			DirectX::ScratchImage image;
+			HRESULT hr = DirectX::LoadFromDDSFile(m_config.splatmapPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
+			if (FAILED(hr))
+			{
+				m_splatmapCpu.width = m_splatmapCpu.height = 0;
+				return;
+			}
+
+			const DirectX::Image* img = image.GetImage(0, 0, 0);
+
+			DirectX::ScratchImage decompressed;
+			if (DirectX::IsCompressed(img->format))
+			{
+				if (FAILED(DirectX::Decompress(*img, DXGI_FORMAT_R8G8B8A8_UNORM, decompressed)))
+				{
+					m_splatmapCpu.width = m_splatmapCpu.height = 0;
+					return;
+				}
+				img = decompressed.GetImage(0, 0, 0);
+			}
+
+			DirectX::ScratchImage converted;
+			if (img->format != DXGI_FORMAT_R8G8B8A8_UNORM)
+			{
+				if (FAILED(DirectX::Convert(
+					*img, DXGI_FORMAT_R8G8B8A8_UNORM,
+					DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT,
+					converted)))
+				{
+					m_splatmapCpu.width = m_splatmapCpu.height = 0;
+					return;
+				}
+				img = converted.GetImage(0, 0, 0);
+			}
+
+			const int srcW = static_cast<int>(img->width);
+			const int srcH = static_cast<int>(img->height);
+			const int rowPitch = static_cast<int>(img->rowPitch);
+
+			m_splatmapCpu.width = srcW;
+			m_splatmapCpu.height = srcH;
+			m_splatmapCpu.pixels.assign(srcW * srcH * 4, 0);
+
+			for (int y = 0; y < srcH; ++y)
+			{
+				memcpy(&m_splatmapCpu.pixels[y * srcW * 4], img->pixels + y * rowPitch, srcW * 4);
+			}
+		}
+
+
+		TerrainObject::SurfaceType TerrainObject::GetSurfaceTypeAt(const Vector3& worldPos) const
+		{
+			if (m_splatmapCpu.pixels.empty()) return SurfaceType::Snow;
+
+			// ★GenerateMesh()の座標変換に合わせて逆算（worldZが増えるほどvzは減る点に注意）
+			const float u = (worldPos.x + m_terrainCb.halfWidth) / (m_terrainCb.halfWidth * 2.0f);
+			const float v = (m_terrainCb.halfDepth - worldPos.z) / (m_terrainCb.halfDepth * 2.0f);
+
+			int px = static_cast<int>(u * m_splatmapCpu.width);
+			int pz = static_cast<int>(v * m_splatmapCpu.height);
+			px = max(0, min(m_splatmapCpu.width - 1, px));
+			pz = max(0, min(m_splatmapCpu.height - 1, pz));
+
+			const int idx = (pz * m_splatmapCpu.width + px) * 4;
+			const uint8_t r = m_splatmapCpu.pixels[idx + 0]; // 雪
+			const uint8_t g = m_splatmapCpu.pixels[idx + 1]; // 草
+			const uint8_t b = m_splatmapCpu.pixels[idx + 2]; // 岩
+
+			if (g >= r && g >= b) return SurfaceType::Grass;
+			if (b >= r && b >= g) return SurfaceType::Rock;
+			return SurfaceType::Snow;
+		}
+
+
+		float TerrainObject::SampleHeightBilinear(float fx, float fz) const
+		{
+			const int W = m_heightmap.width;
+			const int H = m_heightmap.height;
+			if (W <= 0 || H <= 0) return 0.0f;
+
+			fx = max(0.0f, min(float(W - 1), fx));
+			fz = max(0.0f, min(float(H - 1), fz));
+
+			const int x0 = static_cast<int>(fx);
+			const int z0 = static_cast<int>(fz);
+			const int x1 = min(W - 1, x0 + 1);
+			const int z1 = min(H - 1, z0 + 1);
+
+			const float tx = fx - x0;
+			const float tz = fz - z0;
+
+			auto sample = [&](int x, int z) -> float
+				{
+					return m_heightmap.pixels[z * W + x] / 65535.0f * m_config.heightScale;
+				};
+
+			const float h00 = sample(x0, z0);
+			const float h10 = sample(x1, z0);
+			const float h01 = sample(x0, z1);
+			const float h11 = sample(x1, z1);
+
+			const float h0 = h00 + (h10 - h00) * tx;
+			const float h1 = h01 + (h11 - h01) * tx;
+			return h0 + (h1 - h0) * tz;
+		}
+
+
+		float TerrainObject::GetHeightAt(const Vector3& worldPos) const
+		{
+			if (m_heightmap.pixels.empty()) return 0.0f;
+
+			const int W = m_heightmap.width;
+			const int H = m_heightmap.height;
+
+			// ワールド座標 → ハイトマップ画素座標（GenerateMesh()の座標変換の逆算）
+			const float fx = (worldPos.x + m_terrainCb.halfWidth) / (m_terrainCb.halfWidth * 2.0f) * (W - 1);
+			const float fz = (m_terrainCb.halfDepth - worldPos.z) / (m_terrainCb.halfDepth * 2.0f) * (H - 1);
+
+			return SampleHeightBilinear(fx, fz) + m_config.yOffset;
 		}
 	}
 }

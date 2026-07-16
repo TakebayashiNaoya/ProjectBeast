@@ -640,6 +640,12 @@
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.cpp">
       <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Effect\Decal.cpp">
+      <Filter>Source\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Effect\DecalManager.cpp">
+      <Filter>Source\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -1208,6 +1214,12 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.h">
       <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect\Decal.h">
+      <Filter>Source\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect\DecalManager.h">
+      <Filter>Source\Effect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

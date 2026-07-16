@@ -47,8 +47,8 @@ namespace app
 			 */
 			inline EnChildPenguinType GetChildPenguinType() const { return m_type; }
 
-			inline int  GetLogId() const   { return m_logId; }
-			inline void SetLogId(int id)   { m_logId = id;   }
+			inline int  GetLogId() const { return m_logId; }
+			inline void SetLogId(int id) { m_logId = id; }
 
 			/** ログ用：タイプ名を文字列で返す */
 			const char* GetChildPenguinTypeStr() const
@@ -84,6 +84,7 @@ namespace app
 			 */
 			void CreateAIController();
 
+			virtual float GetFootprintSize() const override { return 6.0f; }
 
 		public:
 			void SetIglooFixedPos(const Vector3& pos) { m_iglooFixedPos = pos; }

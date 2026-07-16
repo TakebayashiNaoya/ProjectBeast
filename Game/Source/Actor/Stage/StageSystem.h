@@ -145,6 +145,9 @@ namespace app
 			 */
 			const ObjectMap& GetObjectMap() { return m_objectMap; }
 
+			/** @brief 地形オブジェクトを取得する（未生成の場合は nullptr） */
+			TerrainObject* GetTerrain() const { return m_terrain.get(); }
+
 
 		public:
 			Vector3 GetObjectPosition(const std::string& key)const;
