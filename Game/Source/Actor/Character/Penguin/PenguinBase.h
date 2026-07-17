@@ -36,6 +36,12 @@ namespace app
 			 */
 			virtual float GetFootprintSize() const { return 12.0f; }
 
+			/**
+			 * @brief ペンギンの足跡の優先度を取得
+			 * @return 足跡の優先度（大きいほど優先度が高い）
+			 */
+			virtual int GetFootprintPriority() const { return 1; }
+
 		protected:
 			virtual void Start() override;
 			virtual void Update() override;

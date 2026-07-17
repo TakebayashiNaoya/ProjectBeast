@@ -88,7 +88,9 @@ namespace app
 
 				app::effect::DecalManager::Get().SpawnFootprint(
 					spawnPos, yaw, app::effect::DecalKind::SnowFootprint,
-					size, 1.0f, 0.5f, { 0.2f, 0.5f, 1.0f, 1.0f }
+					size, 1.0f, 0.5f, { 0.2f, 0.5f, 1.0f, 1.0f },
+					true,
+					GetFootprintPriority()
 				);
 
 				m_lastFootprintPos = currentPos;

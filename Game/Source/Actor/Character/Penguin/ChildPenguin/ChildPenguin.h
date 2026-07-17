@@ -86,6 +86,8 @@ namespace app
 
 			virtual float GetFootprintSize() const override { return 6.0f; }
 
+			virtual int GetFootprintPriority() const override { return 0; }
+
 		public:
 			void SetIglooFixedPos(const Vector3& pos) { m_iglooFixedPos = pos; }
 

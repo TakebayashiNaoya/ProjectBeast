@@ -473,6 +473,7 @@ namespace app
 		{
 			// BaseColor
 			m_splatmap.InitFromDDSFile(m_config.splatmapPath.c_str());
+			m_heightmapTextureGpu.InitFromDDSFile(m_config.heightmapPath.c_str());
 			m_terrainTextures[0].InitFromDDSFile(TEX_PATH_SNOW);
 			m_terrainTextures[1].InitFromDDSFile(TEX_PATH_GRASS);
 			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);

@@ -1,32 +1,22 @@
-﻿/**
- * @file Decal.h
- * @brief 投影デカール（地形の凹凸に沿った足跡）1枚分の本体クラス
- * @details 呼び出しのたびに、地形の高さに沿った小さな格子メッシュを組み立てて描画する。
- *          直接使わず、DecalManager::Get().SpawnFootprint(...) 経由で生成すること。
- */
-#pragma once
+﻿#pragma once
 #include "Resource/ModelResource.h"
 #include <memory>
 #include <string>
-#include <vector>
 
-namespace app
-{
-	namespace effect
-	{
-		/** @brief デカールの見た目種別（地面によって変えたい場合に使用） */
-		enum class DecalKind
-		{
-			SnowFootprint,
-			GrassFootprint,
-			RockFootprint,
+namespace app {
+	namespace effect {
+		enum class DecalKind { SnowFootprint, GrassFootprint, RockFootprint };
+
+		// ★追加: 地形の凹凸判定に必要な情報をまとめた構造体
+		struct TerrainHeightInfo {
+			nsK2EngineLow::Texture* heightmapTex = nullptr; // 地形のハイトマップ（GPU用、フル解像度）
+			float halfWidth = 1.0f;
+			float halfDepth = 1.0f;
+			float heightScale = 1.0f;
+			float yOffset = 0.0f;
 		};
 
-		/**
-		 * @brief 投影デカール1枚分の本体クラス
-		 */
-		class Decal
-		{
+		class Decal {
 		public:
 			Decal() = default;
 			~Decal() = default;
@@ -36,69 +26,42 @@ namespace app
 			Decal(Decal&&) noexcept = default;
 			Decal& operator=(Decal&&) noexcept = default;
 
-			/**
-			 * @brief 軽い準備処理（ModelRenderの確保と、自分専用バンクキーの決定のみ）
-			 * @param slotIndex プール内での自分のスロット番号（バンクキーの一意化に使う）
-			 */
-			void Prepare(int slotIndex);
+			void Prepare();
+			// ★変更: 深度バッファ方式をやめ、地形法線(normal)＋ハイトマップ(terrainInfo)方式に変更
+			void Spawn(const Vector3& pos, const Vector3& normal, float yaw, float size, DecalKind kind,
+				nsK2EngineLow::Texture* texture, const Vector4& color, float lifeSeconds, float fadeOutSeconds,
+				int priority, const char* sharedTkmKey, const TerrainHeightInfo& terrainInfo);
 
-			/**
-			 * @brief 地形の高さに沿った格子メッシュを再構築し、表示を開始する
-			 * @param gridPositions  格子頂点のワールド座標（gridResolution×gridResolution個、行優先で格納）
-			 * @param gridResolution 1辺あたりの頂点数（例: 5なら5x5=25頂点）
-			 * @param texture        貼り付けるテクスチャ
-			 * @param color          テクスチャに掛けるティント色
-			 */
-			void SetupProjected(
-				const std::vector<Vector3>& gridPositions,
-				int gridResolution,
-				nsK2EngineLow::Texture* texture,
-				const Vector4& color
-			);
-
-			/**
-			 * @brief 更新処理（寿命管理）
-			 * @return 生存していれば true、寿命切れなら false
-			 */
 			bool Update(float deltaTime);
-
-			/** @brief 描画処理 */
 			void Render(RenderContext& rc);
 
-			/** @brief このデカールが表示中かどうか */
 			bool IsActive() const { return m_isActive; }
-
-			/** @brief 残り表示時間を取得する（Manager側での使い回し判定用） */
 			float GetRemainingLife() const { return m_remainingLife; }
-
-			/** @brief 寿命とフェードアウト時間を設定する */
-			void SetLife(float lifeSeconds, float fadeOutSeconds)
-			{
-				m_remainingLife = lifeSeconds;
-				m_fadeOutSeconds = fadeOutSeconds;
-			}
+			int GetPriority() const { return m_priority; }
 
 		private:
-			/** 定数バッファ(b2)用の構造体 */
-			struct cbDecal
-			{
+			struct cbDecal {
 				float alpha = 1.0f;
-				float padding[3] = { 0.0f, 0.0f, 0.0f };
+				float padding[3] = { 0 };
+			};
+			// ★追加: 地形の凹凸判定用の定数バッファ(b1)。TerrainObjectのTerrainCbとは別物。
+			struct cbTerrainHeight {
+				float halfWidth = 1.0f;
+				float halfDepth = 1.0f;
+				float heightScale = 1.0f;
+				float yOffset = 0.0f;
 			};
 
-			/** @brief 格子頂点からTkmFileを組み立て、自分専用のバンクキーに登録する */
-			void BuildGridMesh(const std::vector<Vector3>& gridPositions, int gridResolution);
-
-		private:
 			std::unique_ptr<nsBeastEngine::ModelRender> m_modelRender;
-			cbDecal m_cb;
+			cbDecal         m_cb;
+			cbTerrainHeight m_terrainCb; // ★追加
 
-			/** @brief このスロット専用のTkmFileバンクキー（"decal_patch_0"など） */
-			std::string m_tkmKey;
-
+			DecalKind m_kind = DecalKind::SnowFootprint;
 			float m_remainingLife = 0.0f;
 			float m_fadeOutSeconds = 0.5f;
+			int   m_priority = 0;
 			bool  m_isActive = false;
+			bool  m_isModelInited = false;
 		};
 	}
 }

@@ -85,6 +85,15 @@ namespace app
 			 */
 			float GetHeightAt(const Vector3& worldPos) const;
 
+			/** @brief 足跡デカールが地形の高さをGPU上でサンプリングするためのハイトマップテクスチャを取得する */
+			nsK2EngineLow::Texture& GetHeightmapTextureGpu() { return m_heightmapTextureGpu; }
+
+			// ★追加: デカール側でワールド座標→UV変換をするために必要な値を公開する
+			float GetHalfWidth()   const { return m_terrainCb.halfWidth; }
+			float GetHalfDepth()   const { return m_terrainCb.halfDepth; }
+			float GetHeightScale() const { return m_config.heightScale; }
+			float GetYOffset()     const { return m_config.yOffset; }
+
 		protected:
 			void Start()  override {}
 			void Update() override;
@@ -150,6 +159,9 @@ namespace app
 			TerrainCb     m_terrainCb;	// 地形定数バッファ（b1 レジスタ）
 
 			bool m_isInited = false;	// 初期化済みフラグ
+
+			// シェーダーでサンプリングするためのGPUテクスチャは別途フル解像度で持つ
+			nsK2EngineLow::Texture m_heightmapTextureGpu;
 		};
 	}
 }
