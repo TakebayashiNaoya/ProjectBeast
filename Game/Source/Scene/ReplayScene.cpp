@@ -14,6 +14,9 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Nature/Ocean.h"
+#include "Source/Graphics/PBRStatus.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -41,6 +44,9 @@ namespace app
 		 *          （0 = "Assets/animData/bear/idle.tka"）。Enemyはenum非公開のため直値で持つ。
 		 */
 		constexpr int BEAR_IDLE_ANIM_INDEX = 0;
+
+		/** InGameSceneBase.cpp の SKY_CUBE_SCALE と同じ値 */
+		const Vector3 SKY_CUBE_SCALE = Vector3(1000.0f, 800.0f, 1000.0f);
 
 		/** json配列 [x,y,z] を Vector3 に変換する */
 		Vector3 JsonToV3(const nlohmann::json& j)
@@ -70,6 +76,7 @@ namespace app
 	ReplayScene::~ReplayScene()
 	{
 		camera::CameraManager::Get().Unregister(camera::ReplayCamera::ID());
+		UnloadBackground();
 	}
 
 
@@ -91,6 +98,12 @@ namespace app
 			m_backToTitle = true;
 		}
 
+		if (m_backgroundLoaded)
+		{
+			actor::StageSystem::GetInstance()->Update();
+			nature::Ocean::GetInstance()->Update();
+		}
+
 		if (m_isPlaying)
 		{
 			UpdatePlayback(g_gameTime->GetFrameDeltaTime());
@@ -105,6 +118,11 @@ namespace app
 	void ReplayScene::Render(RenderContext& rc)
 	{
 		DrawUI();
+
+		if (m_backgroundLoaded)
+		{
+			actor::StageSystem::GetInstance()->Render(rc);
+		}
 
 		if (m_parentActor)
 		{
@@ -211,6 +229,14 @@ namespace app
 		std::fill(m_bearSlotActive.begin(), m_bearSlotActive.end(), false);
 		std::fill(m_penguinSlotActive.begin(), m_penguinSlotActive.end(), false);
 		std::fill(m_whirlpoolSlotActive.begin(), m_whirlpoolSlotActive.end(), false);
+
+		// このセッションのステージに合わせて背景を読み込む
+		const auto it = std::find_if(m_sessions.begin(), m_sessions.end(),
+			[&](const SessionEntry& s) { return s.id == sessionId; });
+		if (it != m_sessions.end() && !it->stage.empty())
+		{
+			LoadBackground(it->stage);
+		}
 	}
 
 
@@ -497,6 +523,54 @@ namespace app
 
 			m_replayCamera->SetState(data);
 		}
+	}
+
+
+	void ReplayScene::LoadBackground(const std::string& stageName)
+	{
+		if (m_backgroundLoaded && m_loadedStageName == stageName) return;
+
+		UnloadBackground();
+
+		// InGameSceneBase の各ステージシーン（例: NormalInGameScene）が返すパスと同じ命名規則
+		const std::string stageJsonPath  = "Assets/parameter/stage/StageObject_" + stageName + ".json";
+		const std::string terrainJsonPath = "Assets/parameter/stage/TerrainConfig_" + stageName + ".json";
+		const std::string oceanJsonPath  = "Assets/parameter/nature/oceanParameter_" + stageName + ".json";
+		const std::string oceanBinPath   = "Assets/parameter/nature/oceanParameter_" + stageName + ".bin";
+
+		// StageSystem・Oceanが内部でPBRパラメータ・ParameterManagerを参照するため生成しておく
+		graphics::PBRStatus::CreateInstance();
+
+		actor::StageSystem::CreateInstance();
+		actor::StageSystem::GetInstance()->LoadStageObjectsFromJson(stageJsonPath);
+		actor::StageSystem::GetInstance()->InitTerrainFromJson(terrainJsonPath);
+
+		m_skyCube = NewGO<SkyCube>(0);
+		m_skyCube->SetType(enSkyCubeType_Clear);
+		m_skyCube->SetScale(SKY_CUBE_SCALE);
+		m_skyCube->SetLuminance(0.8f);
+
+		nature::Ocean::CreateInstance();
+		nature::Ocean::GetInstance()->Start(oceanBinPath.c_str(), oceanJsonPath.c_str());
+
+		m_backgroundLoaded = true;
+		m_loadedStageName = stageName;
+	}
+
+
+	void ReplayScene::UnloadBackground()
+	{
+		if (!m_backgroundLoaded) return;
+
+		DeleteGO(m_skyCube);
+		m_skyCube = nullptr;
+
+		nature::Ocean::DestroyInstance();
+		actor::StageSystem::DestroyInstance();
+		graphics::PBRStatus::DestroyInstance();
+
+		m_backgroundLoaded = false;
+		m_loadedStageName.clear();
 	}
 
 

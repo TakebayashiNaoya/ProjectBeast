@@ -68,6 +68,18 @@ namespace app
 		void LoadSession(const std::string& sessionId);
 
 		/**
+		 * @brief 背景（ステージ地形・海・空）を読み込む
+		 * @details InGameSceneBase の LoadPhase::Stage 〜 Ocean と同じ手順を、
+		 *          ゲームプレイ用マネージャー（BattleManager等）を生成せずに行う。
+		 *          既に同じステージが読み込み済みなら何もしない。
+		 * @param stageName "Tutorial" / "Normal" / "Easy" / "Hard"
+		 */
+		void LoadBackground(const std::string& stageName);
+
+		/** 背景（ステージ地形・海・空）を破棄する */
+		void UnloadBackground();
+
+		/**
 		 * @brief セッション選択UIを描画する
 		 * @details DebugWindow はデバッグビルドでしか描画されないため使わず、
 		 *          ビルド構成によらず常に見えるよう自前でImGuiウィンドウを描画する
@@ -162,5 +174,16 @@ namespace app
 
 		/** リプレイ再生用のカメラコントローラー */
 		std::shared_ptr<camera::ReplayCamera> m_replayCamera;
+
+
+	private:
+		/** 空（NewGO/DeleteGOで管理するゲームオブジェクト） */
+		SkyCube* m_skyCube = nullptr;
+
+		/** 背景（ステージ地形・海・空）を読み込み済みか */
+		bool m_backgroundLoaded = false;
+
+		/** 現在読み込んでいる背景のステージ名（別ステージのログに切り替わったら読み直す） */
+		std::string m_loadedStageName;
 	};
 }
