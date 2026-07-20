@@ -1,4 +1,9 @@
-﻿#include "stdafx.h"
+﻿/**
+ * @file DecalManager.cpp
+ * @brief デカールを管理するクラス
+ * @author 立山
+ */
+#include "stdafx.h"
 
 #include "DecalManager.h"
 #include "Physics/Physics.h"
@@ -9,8 +14,13 @@ namespace {
 	const wchar_t* TEX_PATH_SNOW_FOOTPRINT = L"Assets/effect/decal/snowFootprint.DDS";
 	const wchar_t* TEX_PATH_GRASS_FOOTPRINT = L"Assets/effect/decal/grassFootprint.DDS";
 	const wchar_t* TEX_PATH_ROCK_FOOTPRINT = L"Assets/effect/decal/rockFootprint.DDS";
-	const wchar_t* TEX_PATH_BEAR_FOOTPRINT = L"Assets/effect/decal/bearFootprint.DDS"; // ★追加
+	const wchar_t* TEX_PATH_BEAR_FOOTPRINT = L"Assets/effect/decal/bearFootprint.DDS";
 	const char* SHARED_QUAD_TKM_KEY = "decal_shared_quad";
+
+	const Vector4 COLOR_GRASS_FOOTPRINT(0.35f, 0.42f, 0.20f, 1.0f);
+	const Vector4 COLOR_ROCK_FOOTPRINT(0.35f, 0.35f, 0.35f, 1.0f);
+	const Vector4 COLOR_SNOW_FOOTPRINT(0.55f, 0.70f, 0.90f, 1.0f);
+
 }
 
 namespace app {
@@ -31,6 +41,7 @@ namespace app {
 			return info;
 		}
 
+
 		void DecalManager::EnsureInited() {
 			if (m_isInited) return;
 
@@ -45,7 +56,7 @@ namespace app {
 				m_decals.back().Prepare();
 			}
 
-			// ★メッシュは板ではなく「箱（Box）」を1回だけ作って共有する！
+
 			if (g_engine->GetTkmFileFromBank(SHARED_QUAD_TKM_KEY) == nullptr) {
 				std::vector<TkmFile::SVertex> vertices(4);
 				// 板の4頂点。XZ平面上（Y=0）に配置
@@ -54,7 +65,7 @@ namespace app {
 				vertices[2].pos = Vector3(-0.5f, -0.5f, 0.0f); // 後左
 				vertices[3].pos = Vector3(0.5f, -0.5f, 0.0f); // 後右
 
-				// ★修正: 旧コードは全頂点UVが(0,0)固定でテクスチャの絵柄が
+				// 旧コードは全頂点UVが(0,0)固定でテクスチャの絵柄が
 				// 正しく貼られない不具合があった。四隅に0～1のUVを割り当てる。
 				vertices[0].uv = Vector2(1.0f, 1.0f);
 				vertices[1].uv = Vector2(0.0f, 1.0f);
@@ -82,14 +93,16 @@ namespace app {
 			m_isInited = true;
 		}
 
+
 		nsK2EngineLow::Texture* DecalManager::GetTextureForKind(DecalKind kind) {
 			switch (kind) {
 			case DecalKind::GrassFootprint: return &m_grassFootprintTex;
 			case DecalKind::RockFootprint:  return &m_rockFootprintTex;
-			case DecalKind::BearFootprint:  return &m_bearFootprintTex; // ★追加
+			case DecalKind::BearFootprint:  return &m_bearFootprintTex;
 			case DecalKind::SnowFootprint: default: return &m_snowFootprintTex;
 			}
 		}
+
 
 		DecalManager::GroundHitInfo DecalManager::RaycastGround(const Vector3& fromPosXZ) const {
 			GroundHitInfo result;
@@ -99,13 +112,14 @@ namespace app {
 
 			if (nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(rayStart, rayEnd, hit, nsBeastEngine::nsCollision::ALL_COLLISION_ATTRIBUTE_MASK)) {
 				result.isHit = true;
-				// ★修正: 板(Quad)は地形の表面とぴったり同じ高さに置くと
+				// 板(Quad)は地形の表面とぴったり同じ高さに置くと
 				// Zファイティングで消えてしまうため、法線方向にわずかに浮かせる
 				result.position = Vector3(hit.point.x, hit.point.y, hit.point.z) + hit.normal * PROJECTED_SURFACE_OFFSET;
 				result.normal = hit.normal;
 			}
 			return result;
 		}
+
 
 		void DecalManager::SpawnFootprint(const Vector3& position, float yawRadian, DecalKind kind, float size, float lifeSeconds, float fadeOutSeconds, const Vector4& color, bool autoDetectSurface, int priority) {
 			EnsureInited();
@@ -118,9 +132,9 @@ namespace app {
 				if (auto* stageSystem = actor::StageSystem::GetInstance()) {
 					if (auto* terrain = stageSystem->GetTerrain()) {
 						switch (terrain->GetSurfaceTypeAt(hit.position)) {
-						case actor::TerrainObject::SurfaceType::Grass: finalKind = DecalKind::GrassFootprint; finalColor = Vector4(0.35f, 0.42f, 0.20f, 1.0f); break;
-						case actor::TerrainObject::SurfaceType::Rock:  finalKind = DecalKind::RockFootprint;  finalColor = Vector4(0.35f, 0.35f, 0.35f, 1.0f); break;
-						case actor::TerrainObject::SurfaceType::Snow: default: finalKind = DecalKind::SnowFootprint; finalColor = Vector4(0.55f, 0.70f, 0.90f, 1.0f); break;
+						case actor::TerrainObject::SurfaceType::Grass: finalKind = DecalKind::GrassFootprint; finalColor = COLOR_GRASS_FOOTPRINT; break;
+						case actor::TerrainObject::SurfaceType::Rock:  finalKind = DecalKind::RockFootprint;  finalColor = COLOR_ROCK_FOOTPRINT; break;
+						case actor::TerrainObject::SurfaceType::Snow: default: finalKind = DecalKind::SnowFootprint; finalColor = COLOR_SNOW_FOOTPRINT; break;
 						}
 					}
 				}
@@ -154,13 +168,14 @@ namespace app {
 				lifeSeconds, fadeOutSeconds, priority, SHARED_QUAD_TKM_KEY, terrainInfo);
 		}
 
-		// (Update と Render はそのまま変更なし)
+
 		void DecalManager::Update() {
 			if (!m_isInited) return;
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			for (auto& decal : m_decals) decal.Update(deltaTime);
 		}
+
 
 		void DecalManager::Render(RenderContext& rc) {
 			if (!m_isInited) return;

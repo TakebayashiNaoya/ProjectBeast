@@ -18,6 +18,8 @@ namespace app
 		namespace
 		{
 			constexpr float GRAVITY = -9.8f * 150; // 重力の値
+			constexpr float FOOTPRINT_LIFE_SECONDS = 1.0f;     // 足跡の残存時間
+			constexpr float FOOTPRINT_FADE_OUT_SECONDS = 0.5f; // 足跡のフェードアウト時間
 		}
 
 
@@ -179,7 +181,7 @@ namespace app
 
 				app::effect::DecalManager::Get().SpawnFootprint(
 					spawnPos, yaw, GetFootprintKind(),
-					GetFootprintSize(), 1.0f, 0.5f, GetFootprintColor(),
+					GetFootprintSize(), FOOTPRINT_LIFE_SECONDS, FOOTPRINT_FADE_OUT_SECONDS, GetFootprintColor(),
 					GetFootprintAutoDetectSurface(),
 					GetFootprintPriority()
 				);

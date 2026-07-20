@@ -1,13 +1,19 @@
-﻿#pragma once
+﻿/**
+ * @file Decal.h
+ * @brief でかい足跡などのデカールを描画するクラス
+ * @author 立山
+ */
+#pragma once
 #include "Resource/ModelResource.h"
 #include <memory>
 #include <string>
 
+
 namespace app {
 	namespace effect {
-		enum class DecalKind { SnowFootprint, GrassFootprint, RockFootprint, BearFootprint }; // ★追加
+		enum class DecalKind { SnowFootprint, GrassFootprint, RockFootprint, BearFootprint };
 
-		// ★追加: 地形の凹凸判定に必要な情報をまとめた構造体
+		// 地形の凹凸判定に必要な情報をまとめた構造体
 		struct TerrainHeightInfo {
 			nsK2EngineLow::Texture* heightmapTex = nullptr; // 地形のハイトマップ（GPU用、フル解像度）
 			float halfWidth = 1.0f;
@@ -27,7 +33,7 @@ namespace app {
 			Decal& operator=(Decal&&) noexcept = default;
 
 			void Prepare();
-			// ★変更: 深度バッファ方式をやめ、地形法線(normal)＋ハイトマップ(terrainInfo)方式に変更
+			// 深度バッファ方式をやめ、地形法線(normal)＋ハイトマップ(terrainInfo)方式に変更
 			void Spawn(const Vector3& pos, const Vector3& normal, float yaw, float size, DecalKind kind,
 				nsK2EngineLow::Texture* texture, const Vector4& color, float lifeSeconds, float fadeOutSeconds,
 				int priority, const char* sharedTkmKey, const TerrainHeightInfo& terrainInfo);
@@ -39,12 +45,13 @@ namespace app {
 			float GetRemainingLife() const { return m_remainingLife; }
 			int GetPriority() const { return m_priority; }
 
+
 		private:
 			struct cbDecal {
 				float alpha = 1.0f;
 				float padding[3] = { 0 };
 			};
-			// ★追加: 地形の凹凸判定用の定数バッファ(b1)。TerrainObjectのTerrainCbとは別物。
+			// 地形の凹凸判定用の定数バッファ(b1)。TerrainObjectのTerrainCbとは別物。
 			struct cbTerrainHeight {
 				float halfWidth = 1.0f;
 				float halfDepth = 1.0f;
@@ -54,7 +61,7 @@ namespace app {
 
 			std::unique_ptr<nsBeastEngine::ModelRender> m_modelRender;
 			cbDecal         m_cb;
-			cbTerrainHeight m_terrainCb; // ★追加
+			cbTerrainHeight m_terrainCb;
 
 			DecalKind m_kind = DecalKind::SnowFootprint;
 			float m_remainingLife = 0.0f;

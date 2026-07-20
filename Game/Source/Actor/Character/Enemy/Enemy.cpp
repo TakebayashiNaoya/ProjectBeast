@@ -74,9 +74,7 @@ namespace app
 
 		bool Enemy::ShouldSuppressFootprint() const
 		{
-			// ★TODO: 実際の遊泳ステートのIDに置き換えてください（例: EnemySwimmingState::ID()）
-			// swim.tka / idle_UnderWater.tka があるので、水中にいるステートの間は
-			// 足跡を出したくない場合はここに判定を書きます。今は仮でfalse（常に出す）。
+			// TODO: 実際の遊泳ステートのIDに置き換える（例: EnemySwimmingState::ID()）
 			return false;
 		}
 

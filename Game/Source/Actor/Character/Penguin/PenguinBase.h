@@ -34,13 +34,13 @@ namespace app
 			 * @brief ペンギンの足跡のサイズを取得
 			 * @return デフォルトの足跡のサイズ
 			 */
-			virtual float GetFootprintSize() const { return 12.0f; }
+			virtual float GetFootprintSize() const override { return 12.0f; }
 
 			/**
 			 * @brief ペンギンの足跡の優先度を取得
 			 * @return 足跡の優先度（大きいほど優先度が高い）
 			 */
-			virtual int GetFootprintPriority() const { return 1; }
+			virtual int GetFootprintPriority() const override { return 1; }
 
 		protected:
 			virtual void Start() override;
