@@ -150,6 +150,8 @@ namespace app
 		 *          （スキン・アニメーション・見た目を本物と完全に一致させるため）。
 		 */
 		std::unique_ptr<actor::DaddyPenguin> m_parentActor;
+		/** 親ペンギンが直前に再生していた記録上のstate（変化を検知してPlayAnimationし直すため） */
+		std::string m_parentLastState;
 
 		/** シロクマのゴーストActorプール（idごとに1体、使い捨てで増える） */
 		std::vector<std::unique_ptr<actor::Enemy>> m_bearActors;
@@ -157,6 +159,8 @@ namespace app
 		std::vector<int> m_bearSlotIds;
 		/** m_bearActors[i] を今フレーム描画すべきか */
 		std::vector<bool> m_bearSlotActive;
+		/** m_bearActors[i] が直前に再生していた記録上のstate（同じ長さ） */
+		std::vector<std::string> m_bearLastState;
 
 		/** 子ペンギンのゴーストActorプール（idごとに1体、使い捨てで増える） */
 		std::vector<std::unique_ptr<actor::ChildPenguin>> m_penguinActors;
@@ -164,6 +168,8 @@ namespace app
 		std::vector<int> m_penguinSlotIds;
 		/** m_penguinActors[i] を今フレーム描画すべきか */
 		std::vector<bool> m_penguinSlotActive;
+		/** m_penguinActors[i] が直前に再生していた記録上のstate（同じ長さ） */
+		std::vector<std::string> m_penguinLastState;
 
 		/** 渦潮のゴーストプール（idごとに1体、使い捨てで増える） */
 		std::vector<std::unique_ptr<nature::Whirlpool>> m_whirlpoolModels;

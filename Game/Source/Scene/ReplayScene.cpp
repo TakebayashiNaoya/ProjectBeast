@@ -14,6 +14,7 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Actor/Character/Enemy/EnemyTypes.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Nature/Ocean.h"
 #include "Source/Graphics/PBRStatus.h"
@@ -38,13 +39,6 @@ namespace app
 		 */
 		constexpr float TICKS_PER_SECOND = 10.0f;
 
-		/**
-		 * @brief シロクマのアイドルアニメーションのクリップ番号
-		 * @details Enemy.cpp の ANIMATION_DATA[] の並び順に対応する固定インデックス
-		 *          （0 = "Assets/animData/bear/idle.tka"）。Enemyはenum非公開のため直値で持つ。
-		 */
-		constexpr int BEAR_IDLE_ANIM_INDEX = 0;
-
 		/** InGameSceneBase.cpp の SKY_CUBE_SCALE と同じ値 */
 		const Vector3 SKY_CUBE_SCALE = Vector3(1000.0f, 800.0f, 1000.0f);
 
@@ -63,6 +57,50 @@ namespace app
 			if (typeStr == "Clumsy")  return actor::EnChildPenguinType::Clumsy;
 			if (typeStr == "Caring")  return actor::EnChildPenguinType::Caring;
 			return actor::EnChildPenguinType::Serious;
+		}
+
+		/**
+		 * @brief ペンギン（親・子共通、PenguinStateMachine::GetStateNameForLog()）の
+		 *        記録stateから対応するアニメーションクリップ番号を返す
+		 * @details PenguinIState.cpp の各ステートEnter()が実際に呼ぶPlayAnimation()と対応させている
+		 */
+		int PenguinAnimIndexForState(const std::string& state)
+		{
+			using AnimID = actor::EnPenguinAnimationID;
+			if (state == "Run")         return static_cast<int>(AnimID::MoveRun);
+			if (state == "Sneak")       return static_cast<int>(AnimID::MoveWalk);
+			if (state == "Jump")        return static_cast<int>(AnimID::JumpWalking);
+			if (state == "SlideStart")  return static_cast<int>(AnimID::SlideStart);
+			if (state == "Slide")       return static_cast<int>(AnimID::Sliding);
+			if (state == "SlideEnd")    return static_cast<int>(AnimID::StandUp);
+			if (state == "Swim")        return static_cast<int>(AnimID::MoveSwim);
+			if (state == "InWhirlpool") return static_cast<int>(AnimID::MoveSwim);
+			if (state == "Dying")       return static_cast<int>(AnimID::DeathFaceDown);
+			if (state == "Dead")        return static_cast<int>(AnimID::DeathFaceDown);
+			// "Idle" / "Damaged"（Damagedは実ゲームでも専用アニメが無く直前の姿勢を継続する）/ 未知の値
+			return static_cast<int>(AnimID::IdleStanding);
+		}
+
+		/**
+		 * @brief シロクマ（EnemyStateMachine::GetStateNameForLog()）の記録stateから
+		 *        対応するアニメーションクリップ番号を返す
+		 * @details EnemyIState.cpp の各ステートEnter()が実際に呼ぶPlayAnimation()と対応させている
+		 *          （水中判定は記録していないため、陸上時のアニメーションのみを使う）
+		 */
+		int BearAnimIndexForState(const std::string& state)
+		{
+			using AnimID = EnEnemyAnimationType;
+			if (state == "Chase")  return static_cast<int>(AnimID::Run);
+			if (state == "Attack") return static_cast<int>(AnimID::Attack);
+			if (state == "Roar")   return static_cast<int>(AnimID::Buff);
+			if (state == "Stun")   return static_cast<int>(AnimID::Stun);
+			if (state == "Search") return static_cast<int>(AnimID::BackWalk);
+			if (state == "Walk")   return static_cast<int>(AnimID::Walk);
+			if (state == "Swim")   return static_cast<int>(AnimID::Swim);
+			if (state == "Sleep")  return static_cast<int>(AnimID::Sleep);
+			if (state == "Return") return static_cast<int>(AnimID::Walk);
+			// "Idle" / "Jump"（専用アニメ無し）/ 未知の値
+			return static_cast<int>(AnimID::Idle);
 		}
 	}
 
@@ -378,14 +416,15 @@ namespace app
 			m_parentActor->SetRotation(rot);
 			m_parentActor->UpdateModelOnly();
 
-			// UpdateModelOnly() はAI/ステートマシンを動かさないため、
-			// PlayAnimation()で自然に切り替わる機会が無い。Init()直後は
-			// クリップ0（CommandShout、ループ無し）が自動再生されて即停止してしまうため、
-			// ロード完了を待ってから明示的にアイドルへ切り替える
+			// UpdateModelOnly() はAI/ステートマシンを動かさないため、PlayAnimation()で
+			// 自然に切り替わる機会が無い。記録されたstateが変わったとき（またはInit()直後で
+			// クリップ0=CommandShoutが自動再生されて止まっているとき）に明示的に切り替える
+			const std::string parentState = p0.value("state", "Idle");
 			auto& parentModel = m_parentActor->GetModelRender();
-			if (!parentModel.IsPlayingAnimation())
+			if (!parentModel.IsPlayingAnimation() || parentState != m_parentLastState)
 			{
-				parentModel.PlayAnimation(static_cast<int>(actor::EnPenguinAnimationID::IdleStanding));
+				parentModel.PlayAnimation(PenguinAnimIndexForState(parentState));
+				m_parentLastState = parentState;
 			}
 		}
 
@@ -425,12 +464,13 @@ namespace app
 				m_bearActors[slot]->SetRotation(rot);
 				m_bearActors[slot]->UpdateModelOnly();
 
-				// 親ペンギンと同様、UpdateModelOnly()だけではPlayAnimation()が呼ばれる機会が無いため、
-				// ロード完了後に明示的にアイドルへ切り替える
+				// 親ペンギンと同様、記録されたstateの変化に応じて明示的にアニメーションを切り替える
+				const std::string bearState = b0.value("state", "Idle");
 				auto& bearModel = m_bearActors[slot]->GetModelRender();
-				if (!bearModel.IsPlayingAnimation())
+				if (!bearModel.IsPlayingAnimation() || bearState != m_bearLastState[slot])
 				{
-					bearModel.PlayAnimation(BEAR_IDLE_ANIM_INDEX);
+					bearModel.PlayAnimation(BearAnimIndexForState(bearState));
+					m_bearLastState[slot] = bearState;
 				}
 			}
 		}
@@ -469,6 +509,16 @@ namespace app
 				m_penguinActors[slot]->SetPosition(pos);
 				m_penguinActors[slot]->SetRotation(rot);
 				m_penguinActors[slot]->UpdateAtCountDownTime();
+
+				// UpdateAtCountDownTime() は泳ぎ判定以外でアニメーションを切り替えないため、
+				// 親ペンギン・シロクマと同様に記録されたstateの変化に応じて明示的に切り替える
+				const std::string penguinState = c0.value("state", "Idle");
+				auto& penguinModel = m_penguinActors[slot]->GetModelRender();
+				if (!penguinModel.IsPlayingAnimation() || penguinState != m_penguinLastState[slot])
+				{
+					penguinModel.PlayAnimation(PenguinAnimIndexForState(penguinState));
+					m_penguinLastState[slot] = penguinState;
+				}
 			}
 		}
 
@@ -586,6 +636,7 @@ namespace app
 		m_bearActors.push_back(std::move(enemy));
 		m_bearSlotIds.push_back(id);
 		m_bearSlotActive.push_back(false);
+		m_bearLastState.push_back("");
 
 		return m_bearSlotIds.size() - 1;
 	}
@@ -604,6 +655,7 @@ namespace app
 		m_penguinActors.push_back(std::move(penguin));
 		m_penguinSlotIds.push_back(id);
 		m_penguinSlotActive.push_back(false);
+		m_penguinLastState.push_back("");
 
 		return m_penguinSlotIds.size() - 1;
 	}
