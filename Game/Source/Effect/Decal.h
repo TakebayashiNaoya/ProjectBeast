@@ -5,7 +5,7 @@
 
 namespace app {
 	namespace effect {
-		enum class DecalKind { SnowFootprint, GrassFootprint, RockFootprint };
+		enum class DecalKind { SnowFootprint, GrassFootprint, RockFootprint, BearFootprint }; // ★追加
 
 		// ★追加: 地形の凹凸判定に必要な情報をまとめた構造体
 		struct TerrainHeightInfo {

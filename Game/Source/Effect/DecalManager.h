@@ -36,6 +36,7 @@ namespace app {
 			nsK2EngineLow::Texture m_snowFootprintTex;
 			nsK2EngineLow::Texture m_grassFootprintTex;
 			nsK2EngineLow::Texture m_rockFootprintTex;
+			nsK2EngineLow::Texture m_bearFootprintTex;
 
 			bool m_isInited = false;
 

@@ -42,61 +42,8 @@ namespace app
 		void PenguinBase::Update()
 		{
 			CharacterBase::Update();
-			UpdateFootprints();
 		}
 
-		void PenguinBase::UpdateFootprints()
-		{
-			// ジャンプ中、泳ぎ中、スライド中は出さない
-			if (m_characterStateMachine->IsEqualCurrentState(PenguinJumpState::ID()) ||
-				m_characterStateMachine->IsEqualCurrentState(PenguinSwimmingState::ID()) ||
-				m_characterStateMachine->IsEqualCurrentState(PenguinSlidingState::ID()))
-			{
-				m_lastFootprintPos = m_transform.m_position;
-				return;
-			}
-
-			Vector3 currentPos = m_transform.m_position;
-
-			// ★演算子 '-' の代わりに Subtract メソッドを使用
-			Vector3 diff;
-			diff.Subtract(currentPos, m_lastFootprintPos);
-			diff.y = 0.0f;
-
-			// 距離の二乗比較
-			if (diff.LengthSq() > 15.0f * 15.0f)
-			{
-				// 向きの計算
-				Vector3 forward = Vector3::AxisZ;
-				m_transform.m_rotation.Apply(forward);
-				float yaw = atan2f(forward.x, forward.z);
-
-				// 左右のズレ（右方向ベクトルの取得）
-				Vector3 right = Vector3::AxisX;
-				m_transform.m_rotation.Apply(right);
-
-				// ★演算子 '*' の代わりに Scale メソッドを使用
-				float offsetAmount = 3.0f;
-				if (!m_isRightFoot) offsetAmount *= -1.0f; // 左足なら反転
-				right.Scale(offsetAmount);
-
-				// ★演算子 '+' の代わりに Add メソッドを使用
-				Vector3 spawnPos;
-				spawnPos.Add(currentPos, right);
-
-				float size = GetFootprintSize();
-
-				app::effect::DecalManager::Get().SpawnFootprint(
-					spawnPos, yaw, app::effect::DecalKind::SnowFootprint,
-					size, 1.0f, 0.5f, { 0.2f, 0.5f, 1.0f, 1.0f },
-					true,
-					GetFootprintPriority()
-				);
-
-				m_lastFootprintPos = currentPos;
-				m_isRightFoot = !m_isRightFoot;
-			}
-		}
 
 		void PenguinBase::Render(RenderContext& rc)
 		{
@@ -154,6 +101,15 @@ namespace app
 
 			m_modelRender.SetTRS(m_transform.m_position, m_slideModelRotation, m_transform.m_scale);
 			m_modelRender.Update();
+		}
+
+
+		bool PenguinBase::ShouldSuppressFootprint() const
+		{
+			// ジャンプ中、泳ぎ中、スライド中は出さない
+			return m_characterStateMachine->IsEqualCurrentState(PenguinJumpState::ID()) ||
+				m_characterStateMachine->IsEqualCurrentState(PenguinSwimmingState::ID()) ||
+				m_characterStateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
 		}
 	}
 }

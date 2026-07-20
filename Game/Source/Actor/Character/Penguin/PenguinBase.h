@@ -54,10 +54,7 @@ namespace app
 			 */
 			void UpdateSlideTilt();
 
-			/**
-			 * @brief 足跡の描画を更新する
-			 */
-			void UpdateFootprints();
+			bool ShouldSuppressFootprint() const override;
 
 		protected:
 			/** スライド中の地形傾斜に合わせたモデル描画用回転（補間済み） */
@@ -65,8 +62,6 @@ namespace app
 
 			std::unique_ptr<PenguinEffectStatus> m_effectStatus;
 
-			Vector3 m_lastFootprintPos = Vector3::Zero;
-			bool m_isRightFoot = true;
 		};
 	}
 }

@@ -9,6 +9,7 @@ namespace {
 	const wchar_t* TEX_PATH_SNOW_FOOTPRINT = L"Assets/effect/decal/snowFootprint.DDS";
 	const wchar_t* TEX_PATH_GRASS_FOOTPRINT = L"Assets/effect/decal/grassFootprint.DDS";
 	const wchar_t* TEX_PATH_ROCK_FOOTPRINT = L"Assets/effect/decal/rockFootprint.DDS";
+	const wchar_t* TEX_PATH_BEAR_FOOTPRINT = L"Assets/effect/decal/bearFootprint.DDS"; // ★追加
 	const char* SHARED_QUAD_TKM_KEY = "decal_shared_quad";
 }
 
@@ -36,6 +37,7 @@ namespace app {
 			m_snowFootprintTex.InitFromDDSFile(TEX_PATH_SNOW_FOOTPRINT);
 			m_grassFootprintTex.InitFromDDSFile(TEX_PATH_GRASS_FOOTPRINT);
 			m_rockFootprintTex.InitFromDDSFile(TEX_PATH_ROCK_FOOTPRINT);
+			m_bearFootprintTex.InitFromDDSFile(TEX_PATH_BEAR_FOOTPRINT);
 
 			m_decals.reserve(MAX_DECAL_NUM);
 			for (int i = 0; i < MAX_DECAL_NUM; ++i) {
@@ -54,10 +56,10 @@ namespace app {
 
 				// ★修正: 旧コードは全頂点UVが(0,0)固定でテクスチャの絵柄が
 				// 正しく貼られない不具合があった。四隅に0～1のUVを割り当てる。
-				vertices[0].uv = Vector2(0.0f, 0.0f);
-				vertices[1].uv = Vector2(1.0f, 0.0f);
-				vertices[2].uv = Vector2(0.0f, 1.0f);
-				vertices[3].uv = Vector2(1.0f, 1.0f);
+				vertices[0].uv = Vector2(1.0f, 1.0f);
+				vertices[1].uv = Vector2(0.0f, 1.0f);
+				vertices[2].uv = Vector2(1.0f, 0.0f);
+				vertices[3].uv = Vector2(0.0f, 0.0f);
 
 				for (auto& v : vertices) {
 					v.normal = Vector3::Up; v.tangent = Vector3::Right; v.binormal = Vector3::Front;
@@ -84,6 +86,7 @@ namespace app {
 			switch (kind) {
 			case DecalKind::GrassFootprint: return &m_grassFootprintTex;
 			case DecalKind::RockFootprint:  return &m_rockFootprintTex;
+			case DecalKind::BearFootprint:  return &m_bearFootprintTex; // ★追加
 			case DecalKind::SnowFootprint: default: return &m_snowFootprintTex;
 			}
 		}
