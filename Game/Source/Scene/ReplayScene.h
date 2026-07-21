@@ -11,6 +11,7 @@
 #include "Json/json.hpp"
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 
@@ -149,7 +150,8 @@ namespace app
 		size_t AcquirePenguinSlot(int id, const std::string& typeStr);
 
 		/** @brief 渦潮版の AcquireBearSlot */
-		size_t AcquireWhirlpoolSlot(std::vector<int>& slotIds, std::vector<bool>& slotActive, int id);
+		size_t AcquireWhirlpoolSlot(std::vector<int>& slotIds, std::vector<bool>& slotActive,
+			std::unordered_map<int, size_t>& slotIndexById, int id);
 
 
 	private:
@@ -161,6 +163,14 @@ namespace app
 
 		/** 読み込んだ tick データ */
 		std::vector<nlohmann::json> m_ticks;
+
+		/**
+		 * @brief このログの実際の記録レート（tick/秒）
+		 * @details 記録間隔は仕様変更で何度か変わっている（0.1秒間隔 → 毎フレーム等）ため、
+		 *          固定値を仮定せず、tickの"t"（TimeManagerの残り時間＝実時間で1秒に1減る）と
+		 *          "frame"（tick通し番号）から、ログ読み込み時に自動算出する。
+		 */
+		float m_effectiveTicksPerSecond = 10.0f;
 
 		/** Bボタンでタイトルへ戻る要求が来ているか */
 		bool m_backToTitle = false;
@@ -198,6 +208,8 @@ namespace app
 		std::vector<bool> m_bearSlotActive;
 		/** m_bearActors[i] が直前に再生していた記録上のstate（同じ長さ） */
 		std::vector<std::string> m_bearLastState;
+		/** 記録上のid → m_bearSlotIds上のインデックスの逆引き（AcquireBearSlotをO(1)にするため） */
+		std::unordered_map<int, size_t> m_bearSlotIndexById;
 
 		/** 子ペンギンのゴーストActorプール（idごとに1体、使い捨てで増える） */
 		std::vector<std::unique_ptr<actor::ChildPenguin>> m_penguinActors;
@@ -207,6 +219,8 @@ namespace app
 		std::vector<bool> m_penguinSlotActive;
 		/** m_penguinActors[i] が直前に再生していた記録上のstate（同じ長さ） */
 		std::vector<std::string> m_penguinLastState;
+		/** 記録上のid → m_penguinSlotIds上のインデックスの逆引き（AcquirePenguinSlotをO(1)にするため） */
+		std::unordered_map<int, size_t> m_penguinSlotIndexById;
 
 		/** 渦潮のゴーストプール（idごとに1体、使い捨てで増える） */
 		std::vector<std::unique_ptr<nature::Whirlpool>> m_whirlpoolModels;
@@ -214,6 +228,8 @@ namespace app
 		std::vector<int> m_whirlpoolSlotIds;
 		/** m_whirlpoolModels[i] を今フレーム描画すべきか */
 		std::vector<bool> m_whirlpoolSlotActive;
+		/** 記録上のid → m_whirlpoolSlotIds上のインデックスの逆引き（AcquireWhirlpoolSlotをO(1)にするため） */
+		std::unordered_map<int, size_t> m_whirlpoolSlotIndexById;
 
 		/**
 		 * @brief 渦のUV回転角度（ラジアン、全渦潮共通で進める）

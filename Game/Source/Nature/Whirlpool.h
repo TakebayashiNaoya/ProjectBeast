@@ -127,12 +127,6 @@ namespace app
 			 */
 			void SetUvRotation(const float uvRotation) { m_uvRotation = uvRotation; }
 			/**
-			 * @brief 直近のRender()呼び出しでカリング後に可視だったインデックス数を取得する
-			 * @details デバッグ用。0ならこのフレームは視錐台カリングで完全に除外され、
-			 *          描画コマンドが発行されなかったことを意味する。
-			 */
-			size_t GetLastVisibleIndexCount() const { return m_visibleIndexArray.size(); }
-			/**
 			 * @brief 渦潮エフェクトを停止する
 			 * @details 通常はUpdate()経由のStateMachine()（縮小完了時）かデストラクタでしか止まらない。
 			 *          Update()を呼ばない外部運用（リプレイ再生など）で、Start()が自動再生した

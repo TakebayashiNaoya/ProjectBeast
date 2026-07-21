@@ -22,10 +22,12 @@
 #include "Source/Manager/TimeManager.h"
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
+#include "Source/GameLog/LogCompression.h"
 
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <sstream>
 
 
 namespace app
@@ -33,15 +35,17 @@ namespace app
 	namespace
 	{
 		/**
-		 * @brief 1倍速再生時に1秒あたり何tick進めるか
+		 * @brief 1倍速再生時に1秒あたり何tick進めるかのフォールバック値
 		 * @details 記録データの "t" は TimeManager の残り時間（カウントダウン）を
 		 *          そのまま使っており単調増加しないため、再生の時間軸には使えない。
-		 *          "frame"（tick連番、確実に1ずつ増える）を直接タイムライン単位として使い、
-		 *          "何秒間隔で記録されたログか"（InGameSceneBase.cpp の LOG_TICK_INTERVAL）には
-		 *          依存しない。LOG_TICK_INTERVAL は過去に値を変更した経緯があり、
-		 *          ログごとに実際の記録間隔が異なりうるため。
+		 *          "frame"（tick連番、確実に1ずつ増える）を直接タイムライン単位として使う。
+		 *          実際の1秒あたりのtick数（記録レート）はログごとに異なる
+		 *          （LOG_TICK_INTERVALは過去に0.1秒間隔→毎フレームと変更された経緯があり、
+		 *          このLOG_TICK_INTERVAL自体もログごとに違いうる）ため、本来はこの固定値ではなく
+		 *          m_effectiveTicksPerSecond（LoadSession()でログ自身から自動算出）を使う。
+		 *          この定数はログが短すぎて算出できない場合のフォールバックとしてのみ使う。
 		 */
-		constexpr float TICKS_PER_SECOND = 10.0f;
+		constexpr float DEFAULT_TICKS_PER_SECOND = 10.0f;
 
 		/** InGameSceneBase.cpp の SKY_CUBE_SCALE と同じ値 */
 		const Vector3 SKY_CUBE_SCALE = Vector3(1000.0f, 800.0f, 1000.0f);
@@ -50,6 +54,194 @@ namespace app
 		Vector3 JsonToV3(const nlohmann::json& j)
 		{
 			return Vector3(j[0].get<float>(), j[1].get<float>(), j[2].get<float>());
+		}
+
+		/** json配列の指定indexの値を取得する。配列でない/範囲外ならデフォルト値を返す */
+		template <typename T>
+		T ArrGet(const nlohmann::json& arr, size_t index, T defaultValue)
+		{
+			return (arr.is_array() && arr.size() > index) ? arr[index].get<T>() : defaultValue;
+		}
+
+		/**
+		 * @brief bears/penguins/whirlpools配列内の1エンティティのidだけを取り出す
+		 * @details 新旧フォーマット両対応（新: 配列の先頭要素がid／旧: {"id":...}）。
+		 *          tick1側でtick0と同じidの要素を探す処理で、フルパースせず軽く使う
+		 */
+		int GetEntityId(const nlohmann::json& j, int defaultId)
+		{
+			return j.is_array() ? ArrGet<int>(j, 0, defaultId) : j.value("id", defaultId);
+		}
+
+		/**
+		 * @brief json配列の指定indexの値を真偽値として取得する
+		 * @details GameLogManagerはログサイズ削減のため in_formation/is_alive を
+		 *          JSONのtrue/false（4〜5文字）ではなく0/1（1文字）の数値で書き出すようになった。
+		 *          nlohmann::jsonは型に厳格で、数値を素の get<bool>() で読むと例外になるため、
+		 *          数値・真偽値のどちらで記録されていても読めるようにする
+		 */
+		bool ArrGetBool(const nlohmann::json& arr, size_t index, bool defaultValue)
+		{
+			if (!arr.is_array() || arr.size() <= index) return defaultValue;
+			const auto& v = arr[index];
+			if (v.is_boolean()) return v.get<bool>();
+			if (v.is_number()) return v.get<int>() != 0;
+			return defaultValue;
+		}
+
+		/** @brief 親ペンギン1体分の記録データ */
+		struct ParentFields
+		{
+			Vector3 pos;
+			float rotY = 0.0f;
+			std::string state = "Idle";
+		};
+
+		/**
+		 * @brief 親ペンギンの記録データをパースする（新旧フォーマット両対応）
+		 * @details 新: [pos, rot_y, state]／旧: {"pos":..., "rot_y":..., "state":...}
+		 *          新フォーマットはGameLogManagerがファイルサイズ削減のため導入したもの
+		 *          （キー名を毎回書き出す代わりに固定順の配列で記録する）。
+		 */
+		ParentFields ParseParent(const nlohmann::json& j)
+		{
+			ParentFields f;
+			if (j.is_array())
+			{
+				f.pos = JsonToV3(j[0]);
+				f.rotY = ArrGet<float>(j, 1, 0.0f);
+				f.state = ArrGet<std::string>(j, 2, "Idle");
+			}
+			else
+			{
+				f.pos = JsonToV3(j["pos"]);
+				f.rotY = j.value("rot_y", 0.0f);
+				f.state = j.value("state", "Idle");
+			}
+			return f;
+		}
+
+		/** @brief シロクマ1体分の記録データ */
+		struct BearFields
+		{
+			int id = -1;
+			Vector3 pos;
+			float rotY = 0.0f;
+			std::string state = "Idle";
+		};
+
+		/** @brief シロクマの記録データをパースする（新: [id, pos, rot_y, state, sleep_timer]／旧: オブジェクト形式） */
+		BearFields ParseBear(const nlohmann::json& j)
+		{
+			BearFields f;
+			if (j.is_array())
+			{
+				f.id = ArrGet<int>(j, 0, -1);
+				f.pos = JsonToV3(j[1]);
+				f.rotY = ArrGet<float>(j, 2, 0.0f);
+				f.state = ArrGet<std::string>(j, 3, "Idle");
+			}
+			else
+			{
+				f.id = j.value("id", -1);
+				f.pos = JsonToV3(j["pos"]);
+				f.rotY = j.value("rot_y", 0.0f);
+				f.state = j.value("state", "Idle");
+			}
+			return f;
+		}
+
+		/** @brief 子ペンギン1体分の記録データ */
+		struct PenguinFields
+		{
+			int id = -1;
+			std::string type = "Serious";
+			Vector3 pos;
+			float rotY = 0.0f;
+			std::string state = "Idle";
+			bool inFormation = false;
+			bool isAlive = true;
+		};
+
+		/** @brief 子ペンギンの記録データをパースする（新: [id, type, pos, rot_y, state, in_formation, is_alive]／旧: オブジェクト形式） */
+		PenguinFields ParsePenguin(const nlohmann::json& j)
+		{
+			PenguinFields f;
+			if (j.is_array())
+			{
+				f.id = ArrGet<int>(j, 0, -1);
+				f.type = ArrGet<std::string>(j, 1, "Serious");
+				f.pos = JsonToV3(j[2]);
+				f.rotY = ArrGet<float>(j, 3, 0.0f);
+				f.state = ArrGet<std::string>(j, 4, "Idle");
+				f.inFormation = ArrGetBool(j, 5, false);
+				f.isAlive = ArrGetBool(j, 6, true);
+			}
+			else
+			{
+				f.id = j.value("id", -1);
+				f.type = j.value("type", "Serious");
+				f.pos = JsonToV3(j["pos"]);
+				f.rotY = j.value("rot_y", 0.0f);
+				f.state = j.value("state", "Idle");
+				f.inFormation = j.value("in_formation", false);
+				f.isAlive = j.value("is_alive", true);
+			}
+			return f;
+		}
+
+		/** @brief 渦潮1体分の記録データ */
+		struct WhirlpoolFields
+		{
+			int id = -1;
+			Vector3 pos;
+			float scaleXZ = 1.0f;
+		};
+
+		/** @brief 渦潮の記録データをパースする（新: [id, pos, state, scale_xz]／旧: オブジェクト形式） */
+		WhirlpoolFields ParseWhirlpool(const nlohmann::json& j)
+		{
+			WhirlpoolFields f;
+			if (j.is_array())
+			{
+				f.id = ArrGet<int>(j, 0, -1);
+				f.pos = JsonToV3(j[1]);
+				f.scaleXZ = ArrGet<float>(j, 3, 1.0f);
+			}
+			else
+			{
+				f.id = j.value("id", -1);
+				f.pos = JsonToV3(j["pos"]);
+				f.scaleXZ = j.value("scale_xz", 1.0f);
+			}
+			return f;
+		}
+
+		/** @brief カメラ1件分の記録データ */
+		struct CameraFields
+		{
+			Vector3 pos;
+			Vector3 target;
+			float fov = 60.0f;
+		};
+
+		/** @brief カメラの記録データをパースする（新: [pos, target, fov]／旧: オブジェクト形式） */
+		CameraFields ParseCamera(const nlohmann::json& j)
+		{
+			CameraFields f;
+			if (j.is_array())
+			{
+				f.pos = JsonToV3(j[0]);
+				f.target = JsonToV3(j[1]);
+				f.fov = ArrGet<float>(j, 2, 60.0f);
+			}
+			else
+			{
+				f.pos = JsonToV3(j["pos"]);
+				f.target = JsonToV3(j["target"]);
+				f.fov = j.value("fov", 60.0f);
+			}
+			return f;
 		}
 
 		/** GameLogManager が記録したタイプ名文字列を EnChildPenguinType に変換する */
@@ -169,7 +361,7 @@ namespace app
 		{
 			if (m_isPlaying)
 			{
-				float newTime = m_playbackTime + g_gameTime->GetFrameDeltaTime() * m_playbackSpeed * TICKS_PER_SECOND;
+				float newTime = m_playbackTime + g_gameTime->GetFrameDeltaTime() * m_playbackSpeed * m_effectiveTicksPerSecond;
 				const float maxTime = GetMaxPlaybackTime();
 
 				// 終端・先頭に到達したら止める（早送り・巻き戻し両対応）
@@ -301,11 +493,35 @@ namespace app
 	{
 		m_ticks.clear();
 
-		std::ifstream ifs("Logs/" + sessionId + "/ticks.jsonl");
-		if (!ifs) return;
+		// GameLogManagerは書き出し時にログ全体を圧縮して ticks.jsonl.cmp として保存する
+		// （数十MBになる非圧縮JSONLをそのまま置かないため）。旧セッションは非圧縮の
+		// ticks.jsonl のまま残っているため、そちらも読めるようにフォールバックする
+		const std::string compressedPath = "Logs/" + sessionId + "/ticks.jsonl.cmp";
+		const std::string plainPath = "Logs/" + sessionId + "/ticks.jsonl";
 
+		std::string jsonl;
+		if (std::filesystem::exists(compressedPath))
+		{
+			std::ifstream ifs(compressedPath, std::ios::binary);
+			if (!ifs) return;
+
+			const std::vector<uint8_t> compressed(
+				(std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+			jsonl = DecompressLogData(compressed);
+		}
+		else
+		{
+			std::ifstream ifs(plainPath);
+			if (!ifs) return;
+
+			std::ostringstream oss;
+			oss << ifs.rdbuf();
+			jsonl = oss.str();
+		}
+
+		std::istringstream jsonlStream(jsonl);
 		std::string line;
-		while (std::getline(ifs, line))
+		while (std::getline(jsonlStream, line))
 		{
 			if (line.empty()) continue;
 
@@ -324,6 +540,25 @@ namespace app
 		// カメラ情報が1件でも記録されているログか（古いログには無い場合がある）
 		m_hasCameraData = std::any_of(m_ticks.begin(), m_ticks.end(),
 			[](const nlohmann::json& t) { return t.contains("camera"); });
+
+		// このログの実際の記録レート（tick/秒）をログ自身から算出する。
+		// tickの"t"（TimeManagerの残り時間）は実時間で1秒に1減るカウントダウンなので、
+		// 先頭tickと末尾tickの"t"の差 ＝ 実際に経過した秒数として使える
+		// （session.jsonのdurationは、記録経路によっては0のまま保存されることがあり信頼できない）
+		m_effectiveTicksPerSecond = DEFAULT_TICKS_PER_SECOND;
+		if (m_ticks.size() >= 2)
+		{
+			const float tFirst = m_ticks.front().value("t", 0.0f);
+			const float tLast = m_ticks.back().value("t", 0.0f);
+			const float frameFirst = static_cast<float>(m_ticks.front().value("frame", 0));
+			const float frameLast = static_cast<float>(m_ticks.back().value("frame", 0));
+			const float elapsedRealSeconds = tFirst - tLast;
+			const float elapsedFrames = frameLast - frameFirst;
+			if (elapsedRealSeconds > 0.1f && elapsedFrames > 0.0f)
+			{
+				m_effectiveTicksPerSecond = elapsedFrames / elapsedRealSeconds;
+			}
+		}
 
 		// 再生状態をリセット
 		m_isPlaying = false;
@@ -396,7 +631,7 @@ namespace app
 			// --- 巻き戻し / 再生・一時停止 / 早送り ---
 			if (ImGui::Button(u8"<< -5s"))
 			{
-				SeekToTime(m_playbackTime - 5.0f * TICKS_PER_SECOND);
+				SeekToTime(m_playbackTime - 5.0f * m_effectiveTicksPerSecond);
 			}
 			ImGui::SameLine();
 
@@ -425,7 +660,7 @@ namespace app
 			ImGui::SameLine();
 			if (ImGui::Button(u8"+5s >>"))
 			{
-				SeekToTime(m_playbackTime + 5.0f * TICKS_PER_SECOND);
+				SeekToTime(m_playbackTime + 5.0f * m_effectiveTicksPerSecond);
 			}
 
 			// 再生速度（負値で巻き戻し再生。Update()側でm_playbackSpeedの符号に応じて
@@ -440,32 +675,13 @@ namespace app
 			}
 
 			// --- タイムライン（好きな位置へシーク可能） ---
-			const float maxTimeSeconds = maxPlaybackTime / TICKS_PER_SECOND;
-			float currentSeconds = m_playbackTime / TICKS_PER_SECOND;
+			const float maxTimeSeconds = maxPlaybackTime / m_effectiveTicksPerSecond;
+			float currentSeconds = m_playbackTime / m_effectiveTicksPerSecond;
 			if (ImGui::SliderFloat(u8"タイムライン", &currentSeconds, 0.0f, maxTimeSeconds, u8"%.1f秒"))
 			{
-				SeekToTime(currentSeconds * TICKS_PER_SECOND);
+				SeekToTime(currentSeconds * m_effectiveTicksPerSecond);
 			}
-			ImGui::Text(u8"再生時間: %.1f / %.1f 秒相当", m_playbackTime / TICKS_PER_SECOND, maxTimeSeconds);
-
-			// --- 渦潮デバッグ表示（原因切り分け用。表示できたら削除する） ---
-			{
-				ImGui::Separator();
-				const size_t activeCount = std::count(m_whirlpoolSlotActive.begin(), m_whirlpoolSlotActive.end(), true);
-				ImGui::Text(u8"[デバッグ] 渦潮プール数:%d アクティブ:%d",
-					static_cast<int>(m_whirlpoolModels.size()), static_cast<int>(activeCount));
-				for (size_t i = 0; i < m_whirlpoolModels.size(); i++)
-				{
-					if (!m_whirlpoolSlotActive[i]) continue;
-					const auto& t = m_whirlpoolModels[i]->GetTransform();
-					ImGui::Text(u8"  #%d id=%d pos=(%.0f,%.0f,%.0f) scale=%.3f state=%d 可視idx=%d",
-						static_cast<int>(i), m_whirlpoolSlotIds[i],
-						t.m_position.x, t.m_position.y, t.m_position.z,
-						t.m_scale.x,
-						static_cast<int>(m_whirlpoolModels[i]->GetState()),
-						static_cast<int>(m_whirlpoolModels[i]->GetLastVisibleIndexCount()));
-				}
-			}
+			ImGui::Text(u8"再生時間: %.1f / %.1f 秒相当", m_playbackTime / m_effectiveTicksPerSecond, maxTimeSeconds);
 
 			if (!m_hasCameraData)
 			{
@@ -574,9 +790,10 @@ namespace app
 			int liveRescued = 0;
 			for (const auto& p : tick0["penguins"])
 			{
-				if (!p.value("is_alive", true)) continue; // 死亡直後・削除待ちの個体は総数に含めない
+				const PenguinFields f = ParsePenguin(p);
+				if (!f.isAlive) continue; // 死亡直後・削除待ちの個体は総数に含めない
 				liveTotal++;
-				if (p.value("in_formation", false)) liveRescued++;
+				if (f.inFormation) liveRescued++;
 			}
 
 			auto* remainingChildMenu = InGameUIManager::GetInstance()->GetRemainingChildMenu();
@@ -587,14 +804,11 @@ namespace app
 		// ------ 親ペンギン ------
 		if (tick0.contains("parent"))
 		{
-			const auto& p0 = tick0["parent"];
-			const auto& p1 = tick1.contains("parent") ? tick1["parent"] : p0;
+			const ParentFields p0 = ParseParent(tick0["parent"]);
+			const ParentFields p1 = tick1.contains("parent") ? ParseParent(tick1["parent"]) : p0;
 
 			Vector3 pos;
-			pos.Lerp(alpha, JsonToV3(p0["pos"]), JsonToV3(p1["pos"]));
-
-			const float rotY0 = p0.value("rot_y", 0.0f);
-			const float rotY1 = p1.value("rot_y", rotY0);
+			pos.Lerp(alpha, p0.pos, p1.pos);
 
 			if (!m_parentActor)
 			{
@@ -603,7 +817,7 @@ namespace app
 			}
 
 			Quaternion rot;
-			rot.SetRotationDegY(rotY0 + (rotY1 - rotY0) * alpha);
+			rot.SetRotationDegY(p0.rotY + (p1.rotY - p0.rotY) * alpha);
 			m_parentActor->SetPosition(pos);
 			m_parentActor->SetRotation(rot);
 			m_parentActor->UpdateModelOnly();
@@ -611,12 +825,11 @@ namespace app
 			// UpdateModelOnly() はAI/ステートマシンを動かさないため、PlayAnimation()で
 			// 自然に切り替わる機会が無い。記録されたstateが変わったとき（またはInit()直後で
 			// クリップ0=CommandShoutが自動再生されて止まっているとき）に明示的に切り替える
-			const std::string parentState = p0.value("state", "Idle");
 			auto& parentModel = m_parentActor->GetModelRender();
-			if (!parentModel.IsPlayingAnimation() || parentState != m_parentLastState)
+			if (!parentModel.IsPlayingAnimation() || p0.state != m_parentLastState)
 			{
-				parentModel.PlayAnimation(PenguinAnimIndexForState(parentState));
-				m_parentLastState = parentState;
+				parentModel.PlayAnimation(PenguinAnimIndexForState(p0.state));
+				m_parentLastState = p0.state;
 			}
 		}
 
@@ -628,41 +841,41 @@ namespace app
 			const auto& bears0 = tick0["bears"];
 			const auto& bears1 = tick1.contains("bears") ? tick1["bears"] : bears0;
 
-			for (const auto& b0 : bears0)
+			// tick1側をid→要素のマップにしておく。エンティティ数が多いログで毎回線形探索すると
+			// O(N^2)になりフレームレートに影響するため、O(N)で一度だけ引けるようにする
+			std::unordered_map<int, const nlohmann::json*> bears1ById;
+			bears1ById.reserve(bears1.size());
+			for (const auto& cand : bears1)
 			{
-				const int id = b0.value("id", -1);
+				bears1ById.emplace(GetEntityId(cand, -2), &cand);
+			}
+
+			for (const auto& b0json : bears0)
+			{
+				const BearFields b0 = ParseBear(b0json);
 
 				// tick1側で同じidを探す。見つからなければ補間せずtick0の値をそのまま使う
-				const nlohmann::json* b1 = nullptr;
-				for (const auto& cand : bears1)
-				{
-					if (cand.value("id", -2) == id) { b1 = &cand; break; }
-				}
+				const auto it1 = bears1ById.find(b0.id);
+				const BearFields b1 = (it1 != bears1ById.end()) ? ParseBear(*it1->second) : b0;
 
-				const size_t slot = AcquireBearSlot(id);
+				const size_t slot = AcquireBearSlot(b0.id);
 				m_bearSlotActive[slot] = true;
 
-				Vector3 pos0 = JsonToV3(b0["pos"]);
-				Vector3 pos1 = b1 ? JsonToV3((*b1)["pos"]) : pos0;
 				Vector3 pos;
-				pos.Lerp(alpha, pos0, pos1);
-
-				const float rotY0 = b0.value("rot_y", 0.0f);
-				const float rotY1 = b1 ? b1->value("rot_y", rotY0) : rotY0;
+				pos.Lerp(alpha, b0.pos, b1.pos);
 
 				Quaternion rot;
-				rot.SetRotationDegY(rotY0 + (rotY1 - rotY0) * alpha);
+				rot.SetRotationDegY(b0.rotY + (b1.rotY - b0.rotY) * alpha);
 				m_bearActors[slot]->SetPosition(pos);
 				m_bearActors[slot]->SetRotation(rot);
 				m_bearActors[slot]->UpdateModelOnly();
 
 				// 親ペンギンと同様、記録されたstateの変化に応じて明示的にアニメーションを切り替える
-				const std::string bearState = b0.value("state", "Idle");
 				auto& bearModel = m_bearActors[slot]->GetModelRender();
-				if (!bearModel.IsPlayingAnimation() || bearState != m_bearLastState[slot])
+				if (!bearModel.IsPlayingAnimation() || b0.state != m_bearLastState[slot])
 				{
-					bearModel.PlayAnimation(BearAnimIndexForState(bearState));
-					m_bearLastState[slot] = bearState;
+					bearModel.PlayAnimation(BearAnimIndexForState(b0.state));
+					m_bearLastState[slot] = b0.state;
 				}
 			}
 		}
@@ -675,41 +888,41 @@ namespace app
 			const auto& penguins0 = tick0["penguins"];
 			const auto& penguins1 = tick1.contains("penguins") ? tick1["penguins"] : penguins0;
 
-			for (const auto& c0 : penguins0)
+			// 子ペンギンはステージに同時に100〜200体存在することがあり、毎tick線形探索すると
+			// O(N^2)になりフレームレートに影響するため、bears同様にid→要素のマップを先に作る
+			std::unordered_map<int, const nlohmann::json*> penguins1ById;
+			penguins1ById.reserve(penguins1.size());
+			for (const auto& cand : penguins1)
 			{
-				const int id = c0.value("id", -1);
+				penguins1ById.emplace(GetEntityId(cand, -2), &cand);
+			}
 
-				const nlohmann::json* c1 = nullptr;
-				for (const auto& cand : penguins1)
-				{
-					if (cand.value("id", -2) == id) { c1 = &cand; break; }
-				}
+			for (const auto& c0json : penguins0)
+			{
+				const PenguinFields c0 = ParsePenguin(c0json);
 
-				const size_t slot = AcquirePenguinSlot(id, c0.value("type", "Serious"));
+				const auto it1 = penguins1ById.find(c0.id);
+				const PenguinFields c1 = (it1 != penguins1ById.end()) ? ParsePenguin(*it1->second) : c0;
+
+				const size_t slot = AcquirePenguinSlot(c0.id, c0.type);
 				m_penguinSlotActive[slot] = true;
 
-				Vector3 pos0 = JsonToV3(c0["pos"]);
-				Vector3 pos1 = c1 ? JsonToV3((*c1)["pos"]) : pos0;
 				Vector3 pos;
-				pos.Lerp(alpha, pos0, pos1);
-
-				const float rotY0 = c0.value("rot_y", 0.0f);
-				const float rotY1 = c1 ? c1->value("rot_y", rotY0) : rotY0;
+				pos.Lerp(alpha, c0.pos, c1.pos);
 
 				Quaternion rot;
-				rot.SetRotationDegY(rotY0 + (rotY1 - rotY0) * alpha);
+				rot.SetRotationDegY(c0.rotY + (c1.rotY - c0.rotY) * alpha);
 				m_penguinActors[slot]->SetPosition(pos);
 				m_penguinActors[slot]->SetRotation(rot);
 				m_penguinActors[slot]->UpdateAtCountDownTime();
 
 				// UpdateAtCountDownTime() は泳ぎ判定以外でアニメーションを切り替えないため、
 				// 親ペンギン・シロクマと同様に記録されたstateの変化に応じて明示的に切り替える
-				const std::string penguinState = c0.value("state", "Idle");
 				auto& penguinModel = m_penguinActors[slot]->GetModelRender();
-				if (!penguinModel.IsPlayingAnimation() || penguinState != m_penguinLastState[slot])
+				if (!penguinModel.IsPlayingAnimation() || c0.state != m_penguinLastState[slot])
 				{
-					penguinModel.PlayAnimation(PenguinAnimIndexForState(penguinState));
-					m_penguinLastState[slot] = penguinState;
+					penguinModel.PlayAnimation(PenguinAnimIndexForState(c0.state));
+					m_penguinLastState[slot] = c0.state;
 				}
 			}
 		}
@@ -730,29 +943,28 @@ namespace app
 			const auto& wp0 = tick0["whirlpools"];
 			const auto& wp1 = tick1.contains("whirlpools") ? tick1["whirlpools"] : wp0;
 
-			for (const auto& w0 : wp0)
+			std::unordered_map<int, const nlohmann::json*> wp1ById;
+			wp1ById.reserve(wp1.size());
+			for (const auto& cand : wp1)
 			{
-				const int id = w0.value("id", -1);
+				wp1ById.emplace(GetEntityId(cand, -2), &cand);
+			}
 
-				const nlohmann::json* w1 = nullptr;
-				for (const auto& cand : wp1)
-				{
-					if (cand.value("id", -2) == id) { w1 = &cand; break; }
-				}
+			for (const auto& w0json : wp0)
+			{
+				const WhirlpoolFields w0 = ParseWhirlpool(w0json);
 
-				const size_t slot = AcquireWhirlpoolSlot(m_whirlpoolSlotIds, m_whirlpoolSlotActive, id);
+				const auto it1 = wp1ById.find(w0.id);
+				const WhirlpoolFields w1 = (it1 != wp1ById.end()) ? ParseWhirlpool(*it1->second) : w0;
+
+				const size_t slot = AcquireWhirlpoolSlot(m_whirlpoolSlotIds, m_whirlpoolSlotActive, m_whirlpoolSlotIndexById, w0.id);
 				m_whirlpoolSlotActive[slot] = true;
 
-				Vector3 pos0 = JsonToV3(w0["pos"]);
-				Vector3 pos1 = w1 ? JsonToV3((*w1)["pos"]) : pos0;
 				Vector3 pos;
-				pos.Lerp(alpha, pos0, pos1);
-
-				const float scale0 = w0.value("scale_xz", 1.0f);
-				const float scale1 = w1 ? w1->value("scale_xz", scale0) : scale0;
+				pos.Lerp(alpha, w0.pos, w1.pos);
 
 				m_whirlpoolModels[slot]->SetPosition(pos);
-				m_whirlpoolModels[slot]->SetScaleXZ(scale0 + (scale1 - scale0) * alpha);
+				m_whirlpoolModels[slot]->SetScaleXZ(w0.scaleXZ + (w1.scaleXZ - w0.scaleXZ) * alpha);
 				m_whirlpoolModels[slot]->SetUvRotation(m_whirlpoolUvRotation);
 			}
 		}
@@ -760,17 +972,14 @@ namespace app
 		// ------ カメラ ------
 		if (tick0.contains("camera") && m_replayCamera)
 		{
-			const auto& cam0 = tick0["camera"];
-			const auto& cam1 = tick1.contains("camera") ? tick1["camera"] : cam0;
+			const CameraFields cam0 = ParseCamera(tick0["camera"]);
+			const CameraFields cam1 = tick1.contains("camera") ? ParseCamera(tick1["camera"]) : cam0;
 
 			camera::CameraData data;
-			data.position.Lerp(alpha, JsonToV3(cam0["pos"]), JsonToV3(cam1["pos"]));
-			data.target.Lerp(alpha, JsonToV3(cam0["target"]), JsonToV3(cam1["target"]));
+			data.position.Lerp(alpha, cam0.pos, cam1.pos);
+			data.target.Lerp(alpha, cam0.target, cam1.target);
 			data.up = Vector3::Up;
-
-			const float fov0 = cam0.value("fov", data.fov);
-			const float fov1 = cam1.value("fov", fov0);
-			data.fov = fov0 + (fov1 - fov0) * alpha;
+			data.fov = cam0.fov + (cam1.fov - cam0.fov) * alpha;
 
 			m_replayCamera->SetState(data);
 		}
@@ -981,9 +1190,11 @@ namespace app
 
 	size_t ReplayScene::AcquireBearSlot(int id)
 	{
-		for (size_t i = 0; i < m_bearSlotIds.size(); i++)
+		// 長時間のログでは同時に存在するシロクマ・子ペンギン数が多くなり、毎tick・毎エンティティで
+		// 線形探索するとO(N^2)になってフレームレートに影響するため、id→スロット番号をO(1)で引く
+		if (const auto it = m_bearSlotIndexById.find(id); it != m_bearSlotIndexById.end())
 		{
-			if (m_bearSlotIds[i] == id) return i;
+			return it->second;
 		}
 
 		auto enemy = std::make_unique<actor::Enemy>();
@@ -993,15 +1204,17 @@ namespace app
 		m_bearSlotActive.push_back(false);
 		m_bearLastState.push_back("");
 
-		return m_bearSlotIds.size() - 1;
+		const size_t slot = m_bearSlotIds.size() - 1;
+		m_bearSlotIndexById.emplace(id, slot);
+		return slot;
 	}
 
 
 	size_t ReplayScene::AcquirePenguinSlot(int id, const std::string& typeStr)
 	{
-		for (size_t i = 0; i < m_penguinSlotIds.size(); i++)
+		if (const auto it = m_penguinSlotIndexById.find(id); it != m_penguinSlotIndexById.end())
 		{
-			if (m_penguinSlotIds[i] == id) return i;
+			return it->second;
 		}
 
 		auto penguin = std::make_unique<actor::ChildPenguin>();
@@ -1012,15 +1225,18 @@ namespace app
 		m_penguinSlotActive.push_back(false);
 		m_penguinLastState.push_back("");
 
-		return m_penguinSlotIds.size() - 1;
+		const size_t slot = m_penguinSlotIds.size() - 1;
+		m_penguinSlotIndexById.emplace(id, slot);
+		return slot;
 	}
 
 
-	size_t ReplayScene::AcquireWhirlpoolSlot(std::vector<int>& slotIds, std::vector<bool>& slotActive, int id)
+	size_t ReplayScene::AcquireWhirlpoolSlot(std::vector<int>& slotIds, std::vector<bool>& slotActive,
+		std::unordered_map<int, size_t>& slotIndexById, int id)
 	{
-		for (size_t i = 0; i < slotIds.size(); i++)
+		if (const auto it = slotIndexById.find(id); it != slotIndexById.end())
 		{
-			if (slotIds[i] == id) return i;
+			return it->second;
 		}
 
 		auto whirlpool = std::make_unique<nature::Whirlpool>();
@@ -1032,6 +1248,8 @@ namespace app
 		slotIds.push_back(id);
 		slotActive.push_back(false);
 
-		return slotIds.size() - 1;
+		const size_t slot = slotIds.size() - 1;
+		slotIndexById.emplace(id, slot);
+		return slot;
 	}
 }

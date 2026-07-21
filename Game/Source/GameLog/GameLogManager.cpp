@@ -5,6 +5,7 @@
  */
 #include "stdafx.h"
 #include "GameLogManager.h"
+#include "LogCompression.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
@@ -29,18 +30,40 @@ namespace app
 {
 	namespace
 	{
-		/** Quaternion の Apply で進行方向を取得し Yaw 角度（度）を返す */
-		float GetYawDeg(const Quaternion& rot)
+		/**
+		 * @brief 記録用に数値を丸める（ログファイルサイズ削減）
+		 * @details float値をnlohmann::jsonへ代入するとnumber_float_t（double）へ暗黙昇格するため、
+		 *          json側のシリアライズ（丸め誤差なく復元できる最短の10進表現を選ぶ方式）が、
+		 *          元のfloatの精度ではなくdoubleの精度で桁数を決めてしまい、
+		 *          "1572.363037109375" のように再現に不要な桁まで書き出されてしまう。
+		 *          丸め計算自体をfloat精度で行うと、丸めた"つもり"の値がdoubleへ昇格する際に
+		 *          誤差が復活し "0.09100000560283661" のようになってしまうため、
+		 *          丸め計算はdouble精度で行い、結果もdoubleのまま返す（floatへ戻さない）
+		 * @param v         丸める値
+		 * @param precision 丸めの単位（例: 0.01なら小数第2位まで）
+		 */
+		double RoundForLog(float v, double precision)
+		{
+			return std::round(static_cast<double>(v) / precision) * precision;
+		}
+
+		/** Quaternion の Apply で進行方向を取得し Yaw 角度（度）を返す（整数度に丸める。1度未満は見た目に影響しない） */
+		double GetYawDeg(const Quaternion& rot)
 		{
 			Vector3 forward = Vector3::AxisZ;
 			rot.Apply(forward);
-			return atan2f(forward.x, forward.z) * (180.0f / 3.14159265f);
+			const float deg = atan2f(forward.x, forward.z) * (180.0f / 3.14159265f);
+			return RoundForLog(deg, 1.0);
 		}
 
-		/** Vector3 を json 配列に変換 */
+		/** Vector3 を json 配列に変換（座標は数百〜数千単位のため整数に丸めても見た目に影響しない） */
 		nlohmann::json V3toJson(const Vector3& v)
 		{
-			return nlohmann::json::array({ v.x, v.y, v.z });
+			return nlohmann::json::array({
+				RoundForLog(v.x, 1.0),
+				RoundForLog(v.y, 1.0),
+				RoundForLog(v.z, 1.0)
+			});
 		}
 
 		/** 渦潮の状態名を返す */
@@ -136,13 +159,21 @@ namespace app
 			ofs << session.dump(2) << "\n";
 		}
 
-		// --- ticks.jsonl ---
+		// --- ticks.jsonl（圧縮して .cmp として書き出す） ---
+		// 記録件数が多いログは非圧縮で数十MBになるため、書き出し時に丸ごと圧縮する。
+		// ReplayScene側は選んだセッションを読み込む瞬間に1回展開するだけで、
+		// 再生中はメモリ上に展開済みのデータを使うため負荷への影響はない
 		{
-			std::ofstream ofs(dir + "/ticks.jsonl");
+			std::string jsonl;
 			for (const auto& rec : m_ticks)
 			{
-				ofs << rec.dump() << "\n";
+				jsonl += rec.dump();
+				jsonl += '\n';
 			}
+
+			const std::vector<uint8_t> compressed = CompressLogData(jsonl);
+			std::ofstream ofs(dir + "/ticks.jsonl.cmp", std::ios::binary);
+			ofs.write(reinterpret_cast<const char*>(compressed.data()), compressed.size());
 		}
 
 		m_ticks.clear();
@@ -153,7 +184,10 @@ namespace app
 
 	float GameLogManager::GetGameTime() const
 	{
-		return TimeManager::GetInstance().GetCurTime();
+		// "t"は全レコード（tick・spawn・despawn・event）に付与されファイル全体で頻出するため、
+		// 整数秒に丸めてログサイズを抑える（HUDのタイマー表示・タイムライン算出には十分な精度）。
+		// 整数値はfloatでも誤差なく表現できるため、floatに戻してもdouble昇格時の桁化けは起きない
+		return static_cast<float>(RoundForLog(TimeManager::GetInstance().GetCurTime(), 1.0));
 	}
 
 
@@ -162,18 +196,23 @@ namespace app
 		nlohmann::json snap;
 
 		// ------ 親ペンギン ------
+		// フィールド名をキーとして毎tick書き出すとログサイズが膨れ上がる（数百体分×数千tick）ため、
+		// 固定順の配列で記録する。読み込み側（ReplayScene）はオブジェクト形式の旧ログも
+		// 判別して読めるようにしてあるため、過去に記録したログも引き続き再生できる
+		// 配列レイアウト: [pos, rot_y, state]
 		if (daddy)
 		{
 			auto* sm = daddy->GetStateMachine();
 			const auto& tf = daddy->GetTransform();
-			snap["parent"] = {
-				{ "pos",   V3toJson(tf.m_position)                         },
-				{ "rot_y", GetYawDeg(tf.m_rotation)                        },
-				{ "state", sm ? sm->GetStateNameForLog() : "Unknown" }
-			};
+			snap["parent"] = nlohmann::json::array({
+				V3toJson(tf.m_position),
+				GetYawDeg(tf.m_rotation),
+				sm ? sm->GetStateNameForLog() : "Unknown"
+			});
 		}
 
 		// ------ シロクマ ------
+		// 配列レイアウト: [id, pos, rot_y, state, sleep_timer]
 		auto* em = actor::EnemyManager::GetInstance();
 		nlohmann::json bearsArr = nlohmann::json::array();
 		if (em)
@@ -185,18 +224,22 @@ namespace app
 				if (!enemy) continue;
 				auto* sm = enemy->GetEnemyStateMachine();
 				const auto& tf = enemy->GetTransform();
-				bearsArr.push_back({
-					{ "id",          static_cast<int>(i)                      },
-					{ "pos",         V3toJson(tf.m_position)                  },
-					{ "rot_y",       GetYawDeg(tf.m_rotation)                 },
-					{ "state",       sm ? sm->GetStateNameForLog() : "Unknown" },
-					{ "sleep_timer", sm ? sm->GetSleepTimer() : 0.0f          }
-				});
+				bearsArr.push_back(nlohmann::json::array({
+					static_cast<int>(i),
+					V3toJson(tf.m_position),
+					GetYawDeg(tf.m_rotation),
+					sm ? sm->GetStateNameForLog() : "Unknown",
+					RoundForLog(sm ? sm->GetSleepTimer() : 0.0f, 1.0)
+				}));
 			}
 		}
 		snap["bears"] = std::move(bearsArr);
 
 		// ------ 子ペンギン ------
+		// 配列レイアウト: [id, type, pos, rot_y, state, in_formation, is_alive]
+		// in_formation/is_aliveはJSONのtrue/false（4〜5文字）ではなく0/1（1文字）で書き出す。
+		// 子ペンギン1体につき2個×最大200体×数千tick分積み重なるため、この差だけでもログ全体で
+		// 1割前後サイズが変わる。読み込み側（ReplayScene::ArrGetBool）は数値・真偽値のどちらでも読める
 		auto* cpm = actor::ChildPenguinManager::GetInstance();
 		nlohmann::json penguinsArr = nlohmann::json::array();
 		if (cpm)
@@ -206,20 +249,21 @@ namespace app
 				if (!child) continue;
 				auto* sm = child->GetStateMachine();
 				const auto& tf = child->GetTransform();
-				penguinsArr.push_back({
-					{ "id",           child->GetLogId()                               },
-					{ "type",         child->GetChildPenguinTypeStr()                 },
-					{ "pos",          V3toJson(tf.m_position)                         },
-					{ "rot_y",        GetYawDeg(tf.m_rotation)                        },
-					{ "state",        sm ? sm->GetStateNameForLog() : "Unknown"       },
-					{ "in_formation", cpm->IsFollower(child)                          },
-					{ "is_alive",     sm ? !sm->GetPenguinStatus()->IsDead() : false  }
-				});
+				penguinsArr.push_back(nlohmann::json::array({
+					child->GetLogId(),
+					child->GetChildPenguinTypeStr(),
+					V3toJson(tf.m_position),
+					GetYawDeg(tf.m_rotation),
+					sm ? sm->GetStateNameForLog() : "Unknown",
+					cpm->IsFollower(child) ? 1 : 0,
+					(sm ? !sm->GetPenguinStatus()->IsDead() : false) ? 1 : 0
+				}));
 			}
 		}
 		snap["penguins"] = std::move(penguinsArr);
 
 		// ------ 渦潮 ------
+		// 配列レイアウト: [id, pos, state, scale_xz]
 		auto* wm = nature::WhirlpoolManager::GetInstance();
 		nlohmann::json whirlpoolsArr = nlohmann::json::array();
 		if (wm)
@@ -228,24 +272,28 @@ namespace app
 			{
 				if (!wp) return;
 				const auto& tf = wp->GetTransform();
-				whirlpoolsArr.push_back({
-					{ "id",       static_cast<int>(wp->GetIndex())  },
-					{ "pos",      V3toJson(tf.m_position)           },
-					{ "state",    WhirlpoolStateName(wp->GetState()) },
-					{ "scale_xz", tf.m_scale.x                      }
-				});
+				whirlpoolsArr.push_back(nlohmann::json::array({
+					static_cast<int>(wp->GetIndex()),
+					V3toJson(tf.m_position),
+					WhirlpoolStateName(wp->GetState()),
+					RoundForLog(tf.m_scale.x, 0.001)
+				}));
 			});
 		}
 		snap["whirlpools"] = std::move(whirlpoolsArr);
 
 		// ------ カメラ ------
+		// 配列レイアウト: [pos, target, fov]
+		// scale_xz・fovはpos/rot_yと違って値の範囲自体が小さい（scale_xzは実測で0〜0.12程度、
+		// fovもラジアン単位で1前後）ため、整数に丸めると渦潮が消えたりFOVが崩れたりしてしまう。
+		// そのため意味のある変化が残る精度のまま丸める
 		{
 			const auto& camData = camera::CameraManager::Get().GetCurrentCameraData();
-			snap["camera"] = {
-				{ "pos",    V3toJson(camData.position) },
-				{ "target", V3toJson(camData.target)   },
-				{ "fov",    camData.fov                }
-			};
+			snap["camera"] = nlohmann::json::array({
+				V3toJson(camData.position),
+				V3toJson(camData.target),
+				RoundForLog(camData.fov, 0.01)
+			});
 		}
 
 		return snap;
