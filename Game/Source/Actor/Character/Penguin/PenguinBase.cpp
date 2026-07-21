@@ -10,6 +10,7 @@
 #include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinEffectStatus.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Effect/DecalManager.h"
 
 
 namespace app
@@ -100,6 +101,15 @@ namespace app
 
 			m_modelRender.SetTRS(m_transform.m_position, m_slideModelRotation, m_transform.m_scale);
 			m_modelRender.Update();
+		}
+
+
+		bool PenguinBase::ShouldSuppressFootprint() const
+		{
+			// ジャンプ中、泳ぎ中、スライド中は出さない
+			return m_characterStateMachine->IsEqualCurrentState(PenguinJumpState::ID()) ||
+				m_characterStateMachine->IsEqualCurrentState(PenguinSwimmingState::ID()) ||
+				m_characterStateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
 		}
 	}
 }

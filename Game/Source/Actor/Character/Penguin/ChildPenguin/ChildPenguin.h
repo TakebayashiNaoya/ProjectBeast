@@ -47,8 +47,8 @@ namespace app
 			 */
 			inline EnChildPenguinType GetChildPenguinType() const { return m_type; }
 
-			inline int  GetLogId() const   { return m_logId; }
-			inline void SetLogId(int id)   { m_logId = id;   }
+			inline int  GetLogId() const { return m_logId; }
+			inline void SetLogId(int id) { m_logId = id; }
 
 			/** ログ用：タイプ名を文字列で返す */
 			const char* GetChildPenguinTypeStr() const
@@ -84,6 +84,12 @@ namespace app
 			 */
 			void CreateAIController();
 
+			/** @brief 子ペンギンの足跡サイズ（小さめ） */
+			virtual float GetFootprintSize() const override { return 6.0f; }
+
+			/** @brief 子ペンギンの足跡優先度（最優先で消される） */
+			virtual int GetFootprintPriority() const override { return 0; }
+
 
 		public:
 			void SetIglooFixedPos(const Vector3& pos) { m_iglooFixedPos = pos; }
@@ -92,7 +98,6 @@ namespace app
 			bool IsInsideIgloo() const { return m_isInsideIgloo; }
 
 
-		public:
 			ChildPenguin();
 			virtual ~ChildPenguin() override = default;
 

@@ -7,6 +7,7 @@
 #include "CharacterBase.h"
 #include "CharacterStateMachine.h"
 #include "CharacterStatus.h"
+#include "Source/Effect/DecalManager.h"
 #include "Source/Nature/Ocean.h"
 
 
@@ -17,6 +18,8 @@ namespace app
 		namespace
 		{
 			constexpr float GRAVITY = -9.8f * 150; // 重力の値
+			constexpr float FOOTPRINT_LIFE_SECONDS = 1.0f;     // 足跡の残存時間
+			constexpr float FOOTPRINT_FADE_OUT_SECONDS = 0.5f; // 足跡のフェードアウト時間
 		}
 
 
@@ -74,6 +77,9 @@ namespace app
 			// モデルの行列を更新
 			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
 			m_modelRender.Update();
+
+			// 足跡の更新（Penguin/Enemy共通。違いは仮想関数側で吸収する）
+			UpdateFootprints();
 		}
 
 
@@ -138,6 +144,50 @@ namespace app
 
 				m_characterStateMachine->ReEnterCurrentState();
 				return;
+			}
+		}
+
+
+		void CharacterBase::UpdateFootprints()
+		{
+			if (ShouldSuppressFootprint())
+			{
+				m_lastFootprintPos = m_transform.m_position;
+				return;
+			}
+
+			Vector3 currentPos = m_transform.m_position;
+
+			Vector3 diff;
+			diff.Subtract(currentPos, m_lastFootprintPos);
+			diff.y = 0.0f;
+
+			const float stepDistance = GetFootprintStepDistance();
+			if (diff.LengthSq() > stepDistance * stepDistance)
+			{
+				Vector3 forward = Vector3::AxisZ;
+				m_transform.m_rotation.Apply(forward);
+				float yaw = atan2f(forward.x, forward.z);
+
+				Vector3 right = Vector3::AxisX;
+				m_transform.m_rotation.Apply(right);
+
+				float offsetAmount = GetFootprintStanceWidth();
+				if (!m_isRightFoot) offsetAmount *= -1.0f;
+				right.Scale(offsetAmount);
+
+				Vector3 spawnPos;
+				spawnPos.Add(currentPos, right);
+
+				app::effect::DecalManager::Get().SpawnFootprint(
+					spawnPos, yaw, GetFootprintKind(),
+					GetFootprintSize(), FOOTPRINT_LIFE_SECONDS, FOOTPRINT_FADE_OUT_SECONDS, GetFootprintColor(),
+					GetFootprintAutoDetectSurface(),
+					GetFootprintPriority()
+				);
+
+				m_lastFootprintPos = currentPos;
+				m_isRightFoot = !m_isRightFoot;
 			}
 		}
 	}
