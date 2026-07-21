@@ -124,10 +124,9 @@ namespace app
 
 			for (auto& it : removeIndexes)
 			{
-				auto iter = m_whirlpoolMap.find(it);
-				if (iter != m_whirlpoolMap.end())
+				if (it < m_whirlpoolSlots.size())
 				{
-					m_whirlpoolMap.erase(iter);
+					m_whirlpoolSlots[it].reset();
 				}
 			}
 		}
@@ -163,7 +162,7 @@ namespace app
 		{
 			// RenderingEngineから自身の登録を解除する
 			g_renderingEngine->UnregisterNatureObject(this);
-			m_whirlpoolMap.clear();
+			m_whirlpoolSlots.clear();
 
 			// パラメーターをアンロードする
 			core::ParameterManager::Get()->UnloadParameter<MasterWhirlpoolParameter>();
@@ -172,12 +171,10 @@ namespace app
 
 		void WhirlpoolManager::ForEach(std::function<void(Whirlpool* info)> cb)
 		{
-			if (m_whirlpoolMap.empty()) return;
-
-			for (auto& it : m_whirlpoolMap)
+			for (auto& whirlpool : m_whirlpoolSlots)
 			{
-				if (!it.second) continue;
-				cb(it.second.get());
+				if (!whirlpool) continue;
+				cb(whirlpool.get());
 			}
 		}
 
@@ -214,7 +211,8 @@ namespace app
 			std::vector<uint8_t> candidates;
 			for (const auto& entry : m_positionMap)
 			{
-				if (m_whirlpoolMap.find(entry.first) == m_whirlpoolMap.end())
+				const bool isOccupied = entry.first < m_whirlpoolSlots.size() && m_whirlpoolSlots[entry.first];
+				if (!isOccupied)
 				{
 					candidates.push_back(entry.first);
 				}
@@ -234,7 +232,13 @@ namespace app
 			newWhirlpool->SetPosition(position);
 			newWhirlpool->SetIndex(index);
 			newWhirlpool->StartWrapper();
-			m_whirlpoolMap.insert({ index, std::move(newWhirlpool) });
+
+			// 配置インデックスをそのまま添字として使う（既存の渦潮の添字がずれないようにするため）
+			if (m_whirlpoolSlots.size() <= index)
+			{
+				m_whirlpoolSlots.resize(index + 1);
+			}
+			m_whirlpoolSlots[index] = std::move(newWhirlpool);
 		}
 	}
 }

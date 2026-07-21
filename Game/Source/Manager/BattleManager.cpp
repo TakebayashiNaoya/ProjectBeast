@@ -172,11 +172,25 @@ namespace app
 
 
 			// 渦潮の座標を取得する
+			// 配置インデックスをそのまま添字にした固定長配列として渡すことで、
+			// 他の渦潮の生成・削除によって既存の渦潮の配列位置がずれないようにする
+			// （ミニマップ側は配列位置だけでアイコンと渦潮を対応付けているため、
+			//   ずれると既存アイコンが別の渦潮の座標を指してしまい点滅して見える）。
+			// 未使用の添字はミニマップの表示範囲外になる座標で埋めておき、非表示のままにする。
 			if (auto* wm = nature::WhirlpoolManager::GetInstance())
 			{
+				const Vector3 OUT_OF_MAP_RANGE_POS(1.0e8f, 0.0f, 1.0e8f);
+
+				auto& whirlpoolPositions = positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool));
+				whirlpoolPositions.assign(wm->GetWhirlpoolCountMax(), OUT_OF_MAP_RANGE_POS);
+
 				wm->ForEach([&](nature::Whirlpool* whirlpool)
 					{
-						positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool)).push_back(whirlpool->GetTransform().m_position);
+						const uint8_t index = whirlpool->GetIndex();
+						if (index < whirlpoolPositions.size())
+						{
+							whirlpoolPositions[index] = whirlpool->GetTransform().m_position;
+						}
 					});
 			}
 

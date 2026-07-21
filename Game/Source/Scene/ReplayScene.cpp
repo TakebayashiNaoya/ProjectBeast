@@ -64,6 +64,27 @@ namespace app
 		}
 
 		/**
+		 * @brief json配列の指定indexの要素をVector3として取得する
+		 * @details JsonToV3(j[index])を直接呼ぶと、配列の要素数が足りない壊れたログ
+		 *          （破損した.cmpファイル等）に対して範囲外アクセスの未定義動作になりうるため、
+		 *          ArrGet同様に範囲チェックしてから読む
+		 */
+		Vector3 ArrGetV3(const nlohmann::json& arr, size_t index, const Vector3& defaultValue)
+		{
+			return (arr.is_array() && arr.size() > index) ? JsonToV3(arr[index]) : defaultValue;
+		}
+
+		/**
+		 * @brief jsonオブジェクトの指定キーの要素をVector3として取得する
+		 * @details 旧フォーマット（オブジェクト形式）用。j[key]をconst jsonに対して直接呼ぶと
+		 *          キーが存在しない場合に例外を投げるため、contains()で確認してから読む
+		 */
+		Vector3 ObjGetV3(const nlohmann::json& j, const char* key, const Vector3& defaultValue)
+		{
+			return j.contains(key) ? JsonToV3(j[key]) : defaultValue;
+		}
+
+		/**
 		 * @brief bears/penguins/whirlpools配列内の1エンティティのidだけを取り出す
 		 * @details 新旧フォーマット両対応（新: 配列の先頭要素がid／旧: {"id":...}）。
 		 *          tick1側でtick0と同じidの要素を探す処理で、フルパースせず軽く使う
@@ -108,13 +129,13 @@ namespace app
 			ParentFields f;
 			if (j.is_array())
 			{
-				f.pos = JsonToV3(j[0]);
+				f.pos = ArrGetV3(j, 0, Vector3(0.0f, 0.0f, 0.0f));
 				f.rotY = ArrGet<float>(j, 1, 0.0f);
 				f.state = ArrGet<std::string>(j, 2, "Idle");
 			}
 			else
 			{
-				f.pos = JsonToV3(j["pos"]);
+				f.pos = ObjGetV3(j, "pos", Vector3(0.0f, 0.0f, 0.0f));
 				f.rotY = j.value("rot_y", 0.0f);
 				f.state = j.value("state", "Idle");
 			}
@@ -137,14 +158,14 @@ namespace app
 			if (j.is_array())
 			{
 				f.id = ArrGet<int>(j, 0, -1);
-				f.pos = JsonToV3(j[1]);
+				f.pos = ArrGetV3(j, 1, Vector3(0.0f, 0.0f, 0.0f));
 				f.rotY = ArrGet<float>(j, 2, 0.0f);
 				f.state = ArrGet<std::string>(j, 3, "Idle");
 			}
 			else
 			{
 				f.id = j.value("id", -1);
-				f.pos = JsonToV3(j["pos"]);
+				f.pos = ObjGetV3(j, "pos", Vector3(0.0f, 0.0f, 0.0f));
 				f.rotY = j.value("rot_y", 0.0f);
 				f.state = j.value("state", "Idle");
 			}
@@ -171,7 +192,7 @@ namespace app
 			{
 				f.id = ArrGet<int>(j, 0, -1);
 				f.type = ArrGet<std::string>(j, 1, "Serious");
-				f.pos = JsonToV3(j[2]);
+				f.pos = ArrGetV3(j, 2, Vector3(0.0f, 0.0f, 0.0f));
 				f.rotY = ArrGet<float>(j, 3, 0.0f);
 				f.state = ArrGet<std::string>(j, 4, "Idle");
 				f.inFormation = ArrGetBool(j, 5, false);
@@ -181,7 +202,7 @@ namespace app
 			{
 				f.id = j.value("id", -1);
 				f.type = j.value("type", "Serious");
-				f.pos = JsonToV3(j["pos"]);
+				f.pos = ObjGetV3(j, "pos", Vector3(0.0f, 0.0f, 0.0f));
 				f.rotY = j.value("rot_y", 0.0f);
 				f.state = j.value("state", "Idle");
 				f.inFormation = j.value("in_formation", false);
@@ -205,13 +226,13 @@ namespace app
 			if (j.is_array())
 			{
 				f.id = ArrGet<int>(j, 0, -1);
-				f.pos = JsonToV3(j[1]);
+				f.pos = ArrGetV3(j, 1, Vector3(0.0f, 0.0f, 0.0f));
 				f.scaleXZ = ArrGet<float>(j, 3, 1.0f);
 			}
 			else
 			{
 				f.id = j.value("id", -1);
-				f.pos = JsonToV3(j["pos"]);
+				f.pos = ObjGetV3(j, "pos", Vector3(0.0f, 0.0f, 0.0f));
 				f.scaleXZ = j.value("scale_xz", 1.0f);
 			}
 			return f;
@@ -231,14 +252,14 @@ namespace app
 			CameraFields f;
 			if (j.is_array())
 			{
-				f.pos = JsonToV3(j[0]);
-				f.target = JsonToV3(j[1]);
+				f.pos = ArrGetV3(j, 0, Vector3(0.0f, 0.0f, 0.0f));
+				f.target = ArrGetV3(j, 1, Vector3(0.0f, 0.0f, 0.0f));
 				f.fov = ArrGet<float>(j, 2, 60.0f);
 			}
 			else
 			{
-				f.pos = JsonToV3(j["pos"]);
-				f.target = JsonToV3(j["target"]);
+				f.pos = ObjGetV3(j, "pos", Vector3(0.0f, 0.0f, 0.0f));
+				f.target = ObjGetV3(j, "target", Vector3(0.0f, 0.0f, 0.0f));
 				f.fov = j.value("fov", 60.0f);
 			}
 			return f;
@@ -492,6 +513,7 @@ namespace app
 	void ReplayScene::LoadSession(const std::string& sessionId)
 	{
 		m_ticks.clear();
+		m_lastLoadError.clear();
 
 		// GameLogManagerは書き出し時にログ全体を圧縮して ticks.jsonl.cmp として保存する
 		// （数十MBになる非圧縮JSONLをそのまま置かないため）。旧セッションは非圧縮の
@@ -503,16 +525,35 @@ namespace app
 		if (std::filesystem::exists(compressedPath))
 		{
 			std::ifstream ifs(compressedPath, std::ios::binary);
-			if (!ifs) return;
+			if (!ifs)
+			{
+				m_lastLoadError = u8"ticks.jsonl.cmp を開けませんでした";
+				return;
+			}
 
 			const std::vector<uint8_t> compressed(
 				(std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-			jsonl = DecompressLogData(compressed);
+
+			// 圧縮ファイル自体が空（0tickで記録されたセッション）なのと、中身はあるのに
+			// 展開に失敗した（壊れたファイル）のは区別する。後者だけ明確な読み込み失敗として扱う
+			if (!compressed.empty())
+			{
+				jsonl = DecompressLogData(compressed);
+				if (jsonl.empty())
+				{
+					m_lastLoadError = u8"ticks.jsonl.cmp の展開に失敗しました（ファイルが壊れている可能性があります）";
+					return;
+				}
+			}
 		}
 		else
 		{
 			std::ifstream ifs(plainPath);
-			if (!ifs) return;
+			if (!ifs)
+			{
+				m_lastLoadError = u8"ticks.jsonl を開けませんでした";
+				return;
+			}
 
 			std::ostringstream oss;
 			oss << ifs.rdbuf();
@@ -602,6 +643,12 @@ namespace app
 		if (m_loadedSessionId.empty())
 		{
 			ImGui::Text(u8"再生するログを選択してください");
+
+			if (!m_lastLoadError.empty())
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), u8"読み込みエラー: %s", m_lastLoadError.c_str());
+			}
+
 			ImGui::Separator();
 
 			if (m_sessions.empty())
@@ -766,6 +813,11 @@ namespace app
 
 	void ReplayScene::ApplyCurrentTick()
 	{
+		// 壊れた/想定外の形式のtickデータ（破損した.cmpファイル、手編集されたログ等）に対して
+		// nlohmann::jsonが例外（型不一致・必須キー欠落など）を投げても、リプレイシーン全体を
+		// クラッシュさせないよう、このフレームの反映だけをスキップして次のtickでの復帰を試みる
+		try
+		{
 		const nlohmann::json& tick0 = m_ticks[m_currentTickIndex];
 		const nlohmann::json& tick1 = m_ticks[min(m_currentTickIndex + 1, m_ticks.size() - 1)];
 
@@ -778,28 +830,6 @@ namespace app
 		// tickの"t"はTimeManagerの残り時間をそのまま記録したもの（単調増加しないため
 		// 再生の時間軸には使えないが、表示用の値としてはそのまま使える）
 		InGameUIManager::GetInstance()->GetTimerMenu()->SetTime(tick0.value("t", 0.0f));
-
-		// ------ 救助数・総数 ------
-		// 実際のScoreManagerは「死亡で総数-1」「出現で総数+1」「救助（隊列入り）では総数は変わらない」
-		// という増減をする。tick0の penguins[] には現存する（削除待ちを除く）子ペンギンが
-		// 全て記録されているため、is_alive を除いた頭数=総数、in_formation の数=救助数として
-		// 毎tickライブに再現できる（session.jsonの最終値ではなく、その時点の値を表示する）
-		if (tick0.contains("penguins"))
-		{
-			int liveTotal = 0;
-			int liveRescued = 0;
-			for (const auto& p : tick0["penguins"])
-			{
-				const PenguinFields f = ParsePenguin(p);
-				if (!f.isAlive) continue; // 死亡直後・削除待ちの個体は総数に含めない
-				liveTotal++;
-				if (f.inFormation) liveRescued++;
-			}
-
-			auto* remainingChildMenu = InGameUIManager::GetInstance()->GetRemainingChildMenu();
-			remainingChildMenu->SetTotalNum(liveTotal);
-			remainingChildMenu->SetChildNum(liveRescued);
-		}
 
 		// ------ 親ペンギン ------
 		if (tick0.contains("parent"))
@@ -880,7 +910,10 @@ namespace app
 			}
 		}
 
-		// ------ 子ペンギン ------
+		// ------ 子ペンギン・救助数・総数 ------
+		// 救助数・総数の集計はここで同時に行う（以前は専用ループでParsePenguin()を
+		// 呼んでいたが、更新ループでも同じ要素を再度ParsePenguin()しており、
+		// 最大200体規模のログで毎フレーム二重にパースするコストがかかっていたため統合した）
 		if (tick0.contains("penguins"))
 		{
 			std::fill(m_penguinSlotActive.begin(), m_penguinSlotActive.end(), false);
@@ -897,9 +930,22 @@ namespace app
 				penguins1ById.emplace(GetEntityId(cand, -2), &cand);
 			}
 
+			// 実際のScoreManagerは「死亡で総数-1」「出現で総数+1」「救助（隊列入り）では総数は変わらない」
+			// という増減をする。tick0の penguins[] には現存する（削除待ちを除く）子ペンギンが
+			// 全て記録されているため、is_alive を除いた頭数=総数、in_formation の数=救助数として
+			// 毎tickライブに再現できる（session.jsonの最終値ではなく、その時点の値を表示する）
+			int liveTotal = 0;
+			int liveRescued = 0;
+
 			for (const auto& c0json : penguins0)
 			{
 				const PenguinFields c0 = ParsePenguin(c0json);
+
+				if (c0.isAlive) // 死亡直後・削除待ちの個体は総数に含めない
+				{
+					liveTotal++;
+					if (c0.inFormation) liveRescued++;
+				}
 
 				const auto it1 = penguins1ById.find(c0.id);
 				const PenguinFields c1 = (it1 != penguins1ById.end()) ? ParsePenguin(*it1->second) : c0;
@@ -925,6 +971,10 @@ namespace app
 					m_penguinLastState[slot] = c0.state;
 				}
 			}
+
+			auto* remainingChildMenu = InGameUIManager::GetInstance()->GetRemainingChildMenu();
+			remainingChildMenu->SetTotalNum(liveTotal);
+			remainingChildMenu->SetChildNum(liveRescued);
 		}
 
 		// ------ 渦潮 ------
@@ -982,6 +1032,11 @@ namespace app
 			data.fov = cam0.fov + (cam1.fov - cam0.fov) * alpha;
 
 			m_replayCamera->SetState(data);
+		}
+		}
+		catch (const nlohmann::json::exception&)
+		{
+			// このtickの反映はスキップする（ゴースト・カメラ・HUDは直前の状態のまま維持される）
 		}
 	}
 

@@ -161,6 +161,13 @@ namespace app
 		/** 読み込み済みセッションID（未選択なら空） */
 		std::string m_loadedSessionId;
 
+		/**
+		 * @brief 直近のLoadSession()で発生した読み込みエラーメッセージ（無ければ空）
+		 * @details ticks.jsonl(.cmp)が開けない・展開に失敗した等の場合に設定される。
+		 *          0tickで正常に記録された空セッションとは区別する（そちらはエラーにしない）。
+		 */
+		std::string m_lastLoadError;
+
 		/** 読み込んだ tick データ */
 		std::vector<nlohmann::json> m_ticks;
 

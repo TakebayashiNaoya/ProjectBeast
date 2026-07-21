@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Nature/INatureObject.h"
+#include <vector>
 
 
 namespace app
@@ -63,7 +64,12 @@ namespace app
 			 */
 			uint8_t GetWhirlpoolCount() const
 			{
-				return static_cast<uint8_t>(m_whirlpoolMap.size());
+				uint8_t count = 0;
+				for (const auto& whirlpool : m_whirlpoolSlots)
+				{
+					if (whirlpool) ++count;
+				}
+				return count;
 			}
 
 
@@ -98,9 +104,20 @@ namespace app
 
 
 		private:
-			/** 渦潮のマップ */
-			std::unordered_map<uint8_t, std::unique_ptr<Whirlpool>> m_whirlpoolMap;
-			/** 渦潮の座標マップ（JSONから読み込んだインデックスと座標の対応表） */
+			/**
+			 * @brief 渦潮のスロット配列（配置インデックスそのものを添字として使う）
+			 * @details CreateWhirlpool()は空いている配置インデックスをランダムに選んで生成するため、
+			 *          std::map等の「キー順にソートされたコンテナ」だと、新しい渦潮が既存の渦潮より
+			 *          小さいインデックスで生成された瞬間、既存の渦潮のイテレーション順（＝ForEach()での
+			 *          出現位置）がずれてしまう。ミニマップはこの出現位置だけでアイコンと渦潮を対応付けて
+			 *          いるため、順序がずれると既存アイコンが別の渦潮の座標を指してしまい、
+			 *          瞬間移動したように見えてしまっていた。
+			 *          配置インデックスを配列の添字にそのまま使えば、他の渦潮の生成・削除が
+			 *          既存の渦潮の位置（添字）に一切影響しなくなり、この問題が起きない。
+			 *          （配置インデックスは連番とは限らないため、未使用の添字はnullptrのまま空けておく）
+			 */
+			std::vector<std::unique_ptr<Whirlpool>> m_whirlpoolSlots;
+			/** 渦潮の座標マップ（JSONから読み込んだインデックスと座標の対応表。読み込み後は不変なので走査順の変動は起きない） */
 			std::unordered_map<uint8_t, Vector3> m_positionMap;
 			/** 渦潮の生成タイマー */
 			float m_timer;
