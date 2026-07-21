@@ -32,6 +32,8 @@ namespace app {
 
 				initData.m_modelUpAxis = EnModelUpAxis::enModelUpAxisZ;
 
+				initData.m_alphaBlendMode = AlphaBlendMode_Trans;
+
 				m_modelRender->SetForwardRendering(true);
 
 				m_cb.alpha = 1.0f;

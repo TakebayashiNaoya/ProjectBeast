@@ -58,6 +58,12 @@ namespace app {
 			 */
 			GroundHitInfo RaycastGround(const Vector3& fromPosXZ) const;
 
+			/**
+			 * @brief 現在のステージ地形から、デカール描画に必要な凹凸判定用パラメータを構築する
+			 * @return 地形の高さ情報（ハイトマップ・サイズ・スケール等）
+			 */
+			TerrainHeightInfo BuildTerrainHeightInfo() const;
+
 
 			static constexpr int MAX_DECAL_NUM = 64;
 			static constexpr int MAX_CHILD_DECAL_NUM = 40;
@@ -67,7 +73,7 @@ namespace app {
 
 			static constexpr float DEFAULT_FOOTPRINT_SIZE = 40.0f;
 			static constexpr float DEFAULT_LIFE_SECONDS = 8.0f;
-			static constexpr float DEFAULT_FADE_OUT_SECONDS = 1.5f;
+			static constexpr float DEFAULT_FADE_OUT_SECONDS = 5.0f;
 			static inline const Vector4 DEFAULT_FOOTPRINT_COLOR = { 1.0f, 1.0f, 1.0f, 1.0f };
 			static constexpr int DEFAULT_PRIORITY = 1;
 
@@ -79,12 +85,6 @@ namespace app {
 			nsK2EngineLow::Texture m_bearFootprintTex;
 
 			bool m_isInited = false;
-
-			/**
-			 * @brief 現在のステージ地形から、デカール描画に必要な凹凸判定用パラメータを構築する
-			 * @return 地形の高さ情報（ハイトマップ・サイズ・スケール等）
-			 */
-			TerrainHeightInfo BuildTerrainHeightInfo() const;
 		};
 	}
 }
