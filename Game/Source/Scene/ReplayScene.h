@@ -98,11 +98,20 @@ namespace app
 		 */
 		void DrawUI();
 
-		/** 再生を開始する（読み込み済みログの先頭から） */
-		void StartPlayback();
+		/**
+		 * @brief 任意の再生位置へシークする
+		 * @details 二分探索で該当するtickペアを探し直す。早送り・巻き戻し・
+		 *          タイムラインバーのドラッグなど、位置が連続的に進むとは限らない
+		 *          操作からも安全に呼べる。
+		 * @param playbackTime シーク先の再生位置（tick単位。"frame"の値と同じスケール）
+		 */
+		void SeekToTime(float playbackTime);
 
-		/** 再生中のtick補間・モデル追従・カメラ追従の更新 */
-		void UpdatePlayback(float deltaTime);
+		/** @brief 読み込み済みログの最大再生位置（tick単位、最終tickの"frame"の値）を取得する */
+		float GetMaxPlaybackTime() const;
+
+		/** @brief 現在の再生位置（m_currentTickIndex・アルファ）をゴースト・カメラ・HUDへ反映する */
+		void ApplyCurrentTick();
 
 		/**
 		 * @brief カメラ情報が記録されていないログ用のフォールバックカメラ更新

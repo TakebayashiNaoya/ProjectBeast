@@ -18,6 +18,10 @@
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Nature/Ocean.h"
 #include "Source/Graphics/PBRStatus.h"
+#include "Source/Manager/InGameUIManager.h"
+#include "Source/Manager/TimeManager.h"
+#include "Source/UI/InGameTimer/InGameTimerMenu.h"
+#include "Source/UI/RemainingChild/RemainingChildMenu.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -116,6 +120,8 @@ namespace app
 		camera::CameraManager::Get().Unregister(camera::ReplayCamera::ID());
 		UnloadBackground();
 		g_renderingEngine->UnregisterNatureObject(this);
+		InGameUIManager::DestroyInstance();
+		TimeManager::DestroyInstance();
 	}
 
 
@@ -131,6 +137,14 @@ namespace app
 		// 背景（Ocean）読み込み前の暫定登録。LoadBackground()でOceanの後ろに登録し直す
 		// （Nature Objectは登録順に描画されるため、渦潮をOceanより後＝海面の上に描く必要がある）
 		g_renderingEngine->RegisterNatureObject(this);
+
+		// HUD（タイマー・救助数のみ）。BattleManager等は生成せず、値は再生側から直接設定する
+		InGameUIManager::CreateInstance();
+		InGameUIManager::GetInstance()->Initialize();
+
+		// InGameTimerMenu::Update()がTimeManager::GetInstance().GetMaxTime()を無条件参照するため、
+		// 生成だけしておく（Update()はBattleManagerに依存するので呼ばない。最大値はLoadSession()で設定）
+		TimeManager::CreateInstance();
 
 		return true;
 	}
@@ -149,9 +163,33 @@ namespace app
 			nature::Ocean::GetInstance()->Update();
 		}
 
-		if (m_isPlaying)
+		InGameUIManager::GetInstance()->UpdateTimerAndScoreOnly();
+
+		if (!m_ticks.empty())
 		{
-			UpdatePlayback(g_gameTime->GetFrameDeltaTime());
+			if (m_isPlaying)
+			{
+				float newTime = m_playbackTime + g_gameTime->GetFrameDeltaTime() * m_playbackSpeed * TICKS_PER_SECOND;
+				const float maxTime = GetMaxPlaybackTime();
+
+				// 終端・先頭に到達したら止める（早送り・巻き戻し両対応）
+				if (newTime >= maxTime)
+				{
+					newTime = maxTime;
+					m_isPlaying = false;
+				}
+				else if (newTime <= 0.0f)
+				{
+					newTime = 0.0f;
+					m_isPlaying = false;
+				}
+
+				SeekToTime(newTime);
+			}
+
+			// 再生中でなくても（一時停止中・タイムラインをドラッグした直後も）
+			// 現在位置を毎フレーム反映する
+			ApplyCurrentTick();
 		}
 
 		// カメラ情報が無いログでは、一時停止中も自由に見回せるよう毎フレーム更新する
@@ -192,6 +230,9 @@ namespace app
 
 		// 渦潮はINatureObject版のRender(rc, view)（下記）で、GBuffer/ライティング/
 		// フォワードパスの後という正しいタイミングに描画される
+
+		// HUD（タイマー・救助数のみ）
+		InGameUIManager::GetInstance()->RenderTimerAndScoreOnly(rc);
 	}
 
 
@@ -299,6 +340,21 @@ namespace app
 		{
 			LoadBackground(it->stage);
 		}
+
+		// 救助数（分子）・総数（分母）はどちらもApplyCurrentTick()が毎tickの
+		// penguins[].in_formation / is_alive からライブ算出する（実際のScoreManagerの
+		// 総数も出現・死亡のたびに増減するため、最終値の固定表示ではなく再現する）
+
+		// InGameTimerMenuの時計表示（残り時間の割合）が使う最大値。session.jsonには
+		// 記録されていないため、ログ全体で観測された"t"の最大値（≒ステージ開始直後の値）を使う
+		{
+			float maxTimeSeen = 0.0f;
+			for (const auto& tick : m_ticks)
+			{
+				maxTimeSeen = max(maxTimeSeen, tick.value("t", 0.0f));
+			}
+			TimeManager::GetInstance().SetMaxTime(max(maxTimeSeen, 1.0f));
+		}
 	}
 
 
@@ -337,24 +393,60 @@ namespace app
 			ImGui::Text(u8"tick数: %d", static_cast<int>(m_ticks.size()));
 			ImGui::Separator();
 
+			// --- 巻き戻し / 再生・一時停止 / 早送り ---
+			if (ImGui::Button(u8"<< -5s"))
+			{
+				SeekToTime(m_playbackTime - 5.0f * TICKS_PER_SECOND);
+			}
+			ImGui::SameLine();
+
+			const float maxPlaybackTime = GetMaxPlaybackTime();
+			const bool atEnd = m_playbackTime >= maxPlaybackTime;
 			if (!m_isPlaying)
 			{
-				if (ImGui::Button(u8"再生"))
+				if (ImGui::Button(atEnd ? u8"再生（最初から）" : u8"再生"))
 				{
-					StartPlayback();
+					// 末尾で止まっている状態から押した場合のみ先頭に戻す。
+					// 一時停止からの再開では現在位置をそのまま引き継ぐ
+					if (atEnd)
+					{
+						SeekToTime(0.0f);
+					}
+					m_isPlaying = true;
 				}
 			}
 			else
 			{
-				if (ImGui::Button(u8"停止"))
+				if (ImGui::Button(u8"一時停止"))
 				{
 					m_isPlaying = false;
 				}
-				ImGui::SameLine();
-				ImGui::Text(u8"再生時間: %.1f秒相当", m_playbackTime / TICKS_PER_SECOND);
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"+5s >>"))
+			{
+				SeekToTime(m_playbackTime + 5.0f * TICKS_PER_SECOND);
 			}
 
-			ImGui::SliderFloat(u8"再生速度", &m_playbackSpeed, 0.1f, 4.0f);
+			// 再生速度（負値で巻き戻し再生。Update()側でm_playbackSpeedの符号に応じて
+			// タイムラインを逆方向に進める）
+			// ドラッグ操作だけでは1.0にぴったり戻すのが難しいため、Ctrl+クリックでの
+			// 直接数値入力に加えて等倍リセットボタンも用意する
+			ImGui::SliderFloat(u8"再生速度", &m_playbackSpeed, -4.0f, 4.0f);
+			ImGui::SameLine();
+			if (ImGui::Button(u8"x1"))
+			{
+				m_playbackSpeed = 1.0f;
+			}
+
+			// --- タイムライン（好きな位置へシーク可能） ---
+			const float maxTimeSeconds = maxPlaybackTime / TICKS_PER_SECOND;
+			float currentSeconds = m_playbackTime / TICKS_PER_SECOND;
+			if (ImGui::SliderFloat(u8"タイムライン", &currentSeconds, 0.0f, maxTimeSeconds, u8"%.1f秒"))
+			{
+				SeekToTime(currentSeconds * TICKS_PER_SECOND);
+			}
+			ImGui::Text(u8"再生時間: %.1f / %.1f 秒相当", m_playbackTime / TICKS_PER_SECOND, maxTimeSeconds);
 
 			// --- 渦潮デバッグ表示（原因切り分け用。表示できたら削除する） ---
 			{
@@ -425,39 +517,39 @@ namespace app
 	}
 
 
-	void ReplayScene::StartPlayback()
+	float ReplayScene::GetMaxPlaybackTime() const
 	{
-		if (m_ticks.empty()) return;
-
-		m_isPlaying = true;
-		m_playbackTime = static_cast<float>(m_ticks.front().value("frame", 0));
-		m_currentTickIndex = 0;
+		if (m_ticks.empty()) return 0.0f;
+		return static_cast<float>(m_ticks.back().value("frame", 0));
 	}
 
 
-	void ReplayScene::UpdatePlayback(float deltaTime)
+	void ReplayScene::SeekToTime(float playbackTime)
 	{
 		if (m_ticks.empty())
 		{
-			m_isPlaying = false;
+			m_playbackTime = 0.0f;
+			m_currentTickIndex = 0;
 			return;
 		}
 
-		m_playbackTime += deltaTime * m_playbackSpeed * TICKS_PER_SECOND;
+		m_playbackTime = std::clamp(playbackTime, 0.0f, GetMaxPlaybackTime());
 
-		// 現在の再生時間を含むtickペアまでインデックスを進める
-		while (m_currentTickIndex + 1 < m_ticks.size() &&
-			m_ticks[m_currentTickIndex + 1].value("frame", 0) <= m_playbackTime)
+		// "frame" <= m_playbackTime を満たす最後のインデックスを二分探索で求める。
+		// 早送り・巻き戻し・タイムラインのドラッグなど、非連続な移動からも安全に呼べる
+		size_t lo = 0, hi = m_ticks.size() - 1;
+		while (lo < hi)
 		{
-			m_currentTickIndex++;
+			const size_t mid = lo + (hi - lo + 1) / 2;
+			if (m_ticks[mid].value("frame", 0) <= m_playbackTime) lo = mid;
+			else hi = mid - 1;
 		}
+		m_currentTickIndex = lo;
+	}
 
-		// 最終tickに到達したら再生終了（最後の姿勢のまま止める）
-		if (m_currentTickIndex + 1 >= m_ticks.size())
-		{
-			m_isPlaying = false;
-		}
 
+	void ReplayScene::ApplyCurrentTick()
+	{
 		const nlohmann::json& tick0 = m_ticks[m_currentTickIndex];
 		const nlohmann::json& tick1 = m_ticks[min(m_currentTickIndex + 1, m_ticks.size() - 1)];
 
@@ -465,6 +557,32 @@ namespace app
 		const float t1 = static_cast<float>(tick1.value("frame", 0));
 		float alpha = (t1 > t0) ? (m_playbackTime - t0) / (t1 - t0) : 0.0f;
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+		// ------ タイマー ------
+		// tickの"t"はTimeManagerの残り時間をそのまま記録したもの（単調増加しないため
+		// 再生の時間軸には使えないが、表示用の値としてはそのまま使える）
+		InGameUIManager::GetInstance()->GetTimerMenu()->SetTime(tick0.value("t", 0.0f));
+
+		// ------ 救助数・総数 ------
+		// 実際のScoreManagerは「死亡で総数-1」「出現で総数+1」「救助（隊列入り）では総数は変わらない」
+		// という増減をする。tick0の penguins[] には現存する（削除待ちを除く）子ペンギンが
+		// 全て記録されているため、is_alive を除いた頭数=総数、in_formation の数=救助数として
+		// 毎tickライブに再現できる（session.jsonの最終値ではなく、その時点の値を表示する）
+		if (tick0.contains("penguins"))
+		{
+			int liveTotal = 0;
+			int liveRescued = 0;
+			for (const auto& p : tick0["penguins"])
+			{
+				if (!p.value("is_alive", true)) continue; // 死亡直後・削除待ちの個体は総数に含めない
+				liveTotal++;
+				if (p.value("in_formation", false)) liveRescued++;
+			}
+
+			auto* remainingChildMenu = InGameUIManager::GetInstance()->GetRemainingChildMenu();
+			remainingChildMenu->SetTotalNum(liveTotal);
+			remainingChildMenu->SetChildNum(liveRescued);
+		}
 
 		// ------ 親ペンギン ------
 		if (tick0.contains("parent"))
@@ -603,7 +721,11 @@ namespace app
 
 			// Update()（StateMachine）を呼ばないためUV回転は自前で進める
 			// （MasterWhirlpoolParameterのuvRotationSpeedのデフォルト値と同じ1.5rad/秒を使う）
-			m_whirlpoolUvRotation += deltaTime * m_playbackSpeed * 1.5f;
+			// 一時停止・シーク中は他の見た目と同様に止めておく（再生中のみ進める）
+			if (m_isPlaying)
+			{
+				m_whirlpoolUvRotation += g_gameTime->GetFrameDeltaTime() * m_playbackSpeed * 1.5f;
+			}
 
 			const auto& wp0 = tick0["whirlpools"];
 			const auto& wp1 = tick1.contains("whirlpools") ? tick1["whirlpools"] : wp0;
