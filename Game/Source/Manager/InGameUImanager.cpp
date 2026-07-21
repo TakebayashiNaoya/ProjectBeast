@@ -197,6 +197,20 @@ namespace app
 	}
 
 
+	void InGameUIManager::UpdateTimerAndScoreOnly()
+	{
+		if (m_timerPacket) m_timerPacket->Update();
+		if (m_remainingChildPacket) m_remainingChildPacket->Update();
+	}
+
+
+	void InGameUIManager::RenderTimerAndScoreOnly(RenderContext& rc)
+	{
+		if (m_timerPacket) m_timerPacket->Render(rc);
+		if (m_remainingChildPacket) m_remainingChildPacket->Render(rc);
+	}
+
+
 	void InGameUIManager::InitializeReactionSystem(const uint8_t enemyNum)
 	{
 		// クマのリアクションシステムを生成
