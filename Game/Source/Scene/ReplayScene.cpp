@@ -115,6 +115,7 @@ namespace app
 	{
 		camera::CameraManager::Get().Unregister(camera::ReplayCamera::ID());
 		UnloadBackground();
+		g_renderingEngine->UnregisterNatureObject(this);
 	}
 
 
@@ -124,6 +125,12 @@ namespace app
 		m_replayCamera = std::make_shared<camera::ReplayCamera>();
 		camera::CameraManager::Get().Register(camera::ReplayCamera::ID(), m_replayCamera);
 		camera::CameraManager::Get().SwitchCamera(camera::ReplayCamera::ID(), 0.0f);
+
+		// 渦潮（nature::Whirlpool）はGBuffer/ライティング/フォワードパスの後という
+		// 専用タイミングでしか正しく描画されないため、Nature Objectとして登録する。
+		// 背景（Ocean）読み込み前の暫定登録。LoadBackground()でOceanの後ろに登録し直す
+		// （Nature Objectは登録順に描画されるため、渦潮をOceanより後＝海面の上に描く必要がある）
+		g_renderingEngine->RegisterNatureObject(this);
 
 		return true;
 	}
@@ -145,6 +152,12 @@ namespace app
 		if (m_isPlaying)
 		{
 			UpdatePlayback(g_gameTime->GetFrameDeltaTime());
+		}
+
+		// カメラ情報が無いログでは、一時停止中も自由に見回せるよう毎フレーム更新する
+		if (!m_hasCameraData)
+		{
+			UpdateFallbackCamera();
 		}
 	}
 
@@ -177,9 +190,16 @@ namespace app
 			if (m_penguinSlotActive[i]) m_penguinActors[i]->RenderWrapper(rc);
 		}
 
+		// 渦潮はINatureObject版のRender(rc, view)（下記）で、GBuffer/ライティング/
+		// フォワードパスの後という正しいタイミングに描画される
+	}
+
+
+	void ReplayScene::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
+	{
 		for (size_t i = 0; i < m_whirlpoolModels.size(); i++)
 		{
-			if (m_whirlpoolSlotActive[i]) m_whirlpoolModels[i]->RenderWrapper(rc);
+			if (m_whirlpoolSlotActive[i]) m_whirlpoolModels[i]->Render(rc, view);
 		}
 	}
 
@@ -260,6 +280,10 @@ namespace app
 
 		m_loadedSessionId = sessionId;
 
+		// カメラ情報が1件でも記録されているログか（古いログには無い場合がある）
+		m_hasCameraData = std::any_of(m_ticks.begin(), m_ticks.end(),
+			[](const nlohmann::json& t) { return t.contains("camera"); });
+
 		// 再生状態をリセット
 		m_isPlaying = false;
 		m_playbackTime = 0.0f;
@@ -331,6 +355,56 @@ namespace app
 			}
 
 			ImGui::SliderFloat(u8"再生速度", &m_playbackSpeed, 0.1f, 4.0f);
+
+			// --- 渦潮デバッグ表示（原因切り分け用。表示できたら削除する） ---
+			{
+				ImGui::Separator();
+				const size_t activeCount = std::count(m_whirlpoolSlotActive.begin(), m_whirlpoolSlotActive.end(), true);
+				ImGui::Text(u8"[デバッグ] 渦潮プール数:%d アクティブ:%d",
+					static_cast<int>(m_whirlpoolModels.size()), static_cast<int>(activeCount));
+				for (size_t i = 0; i < m_whirlpoolModels.size(); i++)
+				{
+					if (!m_whirlpoolSlotActive[i]) continue;
+					const auto& t = m_whirlpoolModels[i]->GetTransform();
+					ImGui::Text(u8"  #%d id=%d pos=(%.0f,%.0f,%.0f) scale=%.3f state=%d 可視idx=%d",
+						static_cast<int>(i), m_whirlpoolSlotIds[i],
+						t.m_position.x, t.m_position.y, t.m_position.z,
+						t.m_scale.x,
+						static_cast<int>(m_whirlpoolModels[i]->GetState()),
+						static_cast<int>(m_whirlpoolModels[i]->GetLastVisibleIndexCount()));
+				}
+			}
+
+			if (!m_hasCameraData)
+			{
+				ImGui::Separator();
+				ImGui::TextDisabled(u8"※このログにはカメラ情報が記録されていません");
+
+				int mode = static_cast<int>(m_noCameraDataMode);
+				bool modeChanged = false;
+				modeChanged |= ImGui::RadioButton(u8"親ペンギン追従", &mode, static_cast<int>(NoCameraDataMode::FollowParent));
+				ImGui::SameLine();
+				modeChanged |= ImGui::RadioButton(u8"インスペクター（自由視点）", &mode, static_cast<int>(NoCameraDataMode::Inspector));
+
+				if (m_noCameraDataMode == NoCameraDataMode::FollowParent)
+				{
+					ImGui::TextDisabled(u8"右スティック:視点回転（追従したまま回せます）");
+				}
+				else
+				{
+					ImGui::TextDisabled(u8"左スティック:移動　右スティック:視点回転　RB1+左スティックY:FOV");
+				}
+
+				if (modeChanged)
+				{
+					m_noCameraDataMode = static_cast<NoCameraDataMode>(mode);
+					if (m_noCameraDataMode == NoCameraDataMode::Inspector)
+					{
+						// 切り替え時に現在のカメラ状態から始める（視点が急に飛ばないように）
+						m_inspectorCameraData = camera::CameraManager::Get().GetCurrentCameraData();
+					}
+				}
+			}
 
 			ImGui::Separator();
 			if (ImGui::Button(u8"別のログを選び直す"))
@@ -527,6 +601,10 @@ namespace app
 		{
 			std::fill(m_whirlpoolSlotActive.begin(), m_whirlpoolSlotActive.end(), false);
 
+			// Update()（StateMachine）を呼ばないためUV回転は自前で進める
+			// （MasterWhirlpoolParameterのuvRotationSpeedのデフォルト値と同じ1.5rad/秒を使う）
+			m_whirlpoolUvRotation += deltaTime * m_playbackSpeed * 1.5f;
+
 			const auto& wp0 = tick0["whirlpools"];
 			const auto& wp1 = tick1.contains("whirlpools") ? tick1["whirlpools"] : wp0;
 
@@ -553,6 +631,7 @@ namespace app
 
 				m_whirlpoolModels[slot]->SetPosition(pos);
 				m_whirlpoolModels[slot]->SetScaleXZ(scale0 + (scale1 - scale0) * alpha);
+				m_whirlpoolModels[slot]->SetUvRotation(m_whirlpoolUvRotation);
 			}
 		}
 
@@ -573,6 +652,155 @@ namespace app
 
 			m_replayCamera->SetState(data);
 		}
+	}
+
+
+	void ReplayScene::UpdateFallbackCamera()
+	{
+		if (!m_replayCamera) return;
+
+		if (m_noCameraDataMode == NoCameraDataMode::FollowParent)
+		{
+			if (!m_parentActor) return;
+
+			// 右スティックでターゲット（親ペンギン）中心にオフセットを回転させる
+			const float rotX = g_pad[0]->GetRStickXF() * 0.05f;
+			const float rotY = g_pad[0]->GetRStickYF() * 0.05f;
+			if (rotX != 0.0f || rotY != 0.0f)
+			{
+				Quaternion yRotation;
+				yRotation.SetRotationY(rotX);
+				yRotation.Apply(m_followCameraOffset);
+
+				Vector3 rightDir;
+				rightDir.Cross(Vector3::Up, m_followCameraOffset);
+				rightDir.Normalize();
+
+				Quaternion xzRotation;
+				xzRotation.SetRotation(rightDir, rotY);
+				xzRotation.Apply(m_followCameraOffset);
+
+				// 上下角度をクランプ（真上・真下まで回り込みすぎないように）
+				const float length = m_followCameraOffset.Length();
+				const float maxAngle = Math::DegToRad(80.0f);
+				const float minAngle = Math::DegToRad(-30.0f);
+				const float maxY = sinf(maxAngle) * length;
+				const float minY = sinf(minAngle) * length;
+				m_followCameraOffset.y = std::clamp(m_followCameraOffset.y, minY, maxY);
+
+				const float xzLenSq = length * length - m_followCameraOffset.y * m_followCameraOffset.y;
+				const float xzLen = (xzLenSq > 0.0f) ? sqrtf(xzLenSq) : 0.0f;
+				Vector3 xzDir(m_followCameraOffset.x, 0.0f, m_followCameraOffset.z);
+				if (xzDir.LengthSq() > FLT_EPSILON)
+				{
+					xzDir.Normalize();
+				}
+				else
+				{
+					xzDir.Set(0.0f, 0.0f, -1.0f);
+				}
+				m_followCameraOffset.x = xzDir.x * xzLen;
+				m_followCameraOffset.z = xzDir.z * xzLen;
+			}
+
+			// ターゲット自体は毎フレーム親ペンギンの現在座標に追従する
+			const Vector3& targetPos = m_parentActor->GetTransform().m_position;
+			camera::CameraData data;
+			data.target = targetPos + Vector3(0.0f, 60.0f, 0.0f);
+			data.position = data.target + m_followCameraOffset;
+			data.up = Vector3::Up;
+
+			m_replayCamera->SetState(data);
+		}
+		else
+		{
+			UpdateInspectorCamera();
+		}
+	}
+
+
+	void ReplayScene::UpdateInspectorCamera()
+	{
+		if (!m_replayCamera) return;
+
+		// fov調整
+		if (g_pad[0]->IsPress(enButtonRB1))
+		{
+			const float value = g_pad[0]->GetLStickYF();
+			m_inspectorCameraData.fov += value * 0.05f;
+			m_replayCamera->SetState(m_inspectorCameraData);
+			return;
+		}
+
+		// 左スティックで平行移動
+		{
+			Vector3 inputDirection;
+			inputDirection.x = g_pad[0]->GetLStickXF();
+			inputDirection.z = g_pad[0]->GetLStickYF();
+
+			Vector3 forward = CameraSystem::Get().GetMainCamera().GetForward();
+			Vector3 right = CameraSystem::Get().GetMainCamera().GetRight();
+			forward.y = 0.0f;
+			right.y = 0.0f;
+
+			right *= inputDirection.x;
+			forward *= inputDirection.z;
+
+			Vector3 direction = right + forward;
+			direction.Normalize();
+			direction.Scale(10.0f);
+
+			m_inspectorCameraData.position += direction;
+			m_inspectorCameraData.target += direction;
+		}
+
+		// 右スティックでターゲット中心に回転
+		{
+			const float rotX = g_pad[0]->GetRStickXF() * 0.05f;
+			const float rotY = g_pad[0]->GetRStickYF() * 0.05f;
+
+			Quaternion yRotation;
+			yRotation.SetRotationY(rotX);
+			Vector3 toVector = m_inspectorCameraData.position - m_inspectorCameraData.target;
+			yRotation.Apply(toVector);
+
+			Vector3 rightDir;
+			rightDir.Cross(Vector3::Up, toVector);
+			rightDir.Normalize();
+
+			Quaternion xzRotation;
+			xzRotation.SetRotation(rightDir, rotY);
+			xzRotation.Apply(toVector);
+
+			const float length = toVector.Length();
+			const float maxAngle = Math::DegToRad(85.0f);
+			const float minAngle = Math::DegToRad(-85.0f);
+			const float maxY = sinf(maxAngle) * length;
+			const float minY = sinf(minAngle) * length;
+
+			toVector.y = std::clamp(toVector.y, minY, maxY);
+
+			const float xzLenSq = length * length - toVector.y * toVector.y;
+			const float xzLen = (xzLenSq > 0.0f) ? sqrtf(xzLenSq) : 0.0f;
+
+			Vector3 xzDir;
+			xzDir.Set(toVector.x, 0.0f, toVector.z);
+			if (xzDir.LengthSq() > FLT_EPSILON)
+			{
+				xzDir.Normalize();
+			}
+			else
+			{
+				xzDir.Set(0.0f, 0.0f, -1.0f);
+			}
+
+			toVector.x = xzDir.x * xzLen;
+			toVector.z = xzDir.z * xzLen;
+
+			m_inspectorCameraData.position = m_inspectorCameraData.target + toVector;
+		}
+
+		m_replayCamera->SetState(m_inspectorCameraData);
 	}
 
 
@@ -602,6 +830,11 @@ namespace app
 
 		nature::Ocean::CreateInstance();
 		nature::Ocean::GetInstance()->Start(oceanBinPath.c_str(), oceanJsonPath.c_str());
+
+		// Nature Objectは登録順に描画される。渦潮用のReplayScene自身の登録がOceanより先に
+		// 済んでいると、海面が渦潮の上から描かれて隠れてしまうため、Oceanの後ろに登録し直す
+		g_renderingEngine->UnregisterNatureObject(this);
+		g_renderingEngine->RegisterNatureObject(this);
 
 		m_backgroundLoaded = true;
 		m_loadedStageName = stageName;

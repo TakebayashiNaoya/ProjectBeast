@@ -5,6 +5,8 @@
  */
 #pragma once
 #include "IScene.h"
+#include "Source/Camera/CameraCommon.h"
+#include "Nature/INatureObject.h"
 
 #include "Json/json.hpp"
 #include <memory>
@@ -31,7 +33,14 @@ namespace app
 		class ChildPenguin;
 	}
 
-	class ReplayScene : public IScene
+	/**
+	 * @brief プレイログを再生するリプレイシーン
+	 * @details 渦潮（nature::Whirlpool）はGBuffer・ライティング・フォワードパスの「後」に
+	 *          描画される専用タイミング（RenderingEngine::RenderNatureObjects）でしか
+	 *          正しく表示されないため、ReplayScene自身が nsBeastEngine::INatureObject を
+	 *          実装し、g_renderingEngine に登録することでそのタイミングに乗る。
+	 */
+	class ReplayScene : public IScene, public nsBeastEngine::INatureObject
 	{
 		appScene(ReplayScene);
 
@@ -44,6 +53,9 @@ namespace app
 		void Update() override;
 		void PauseUpdate() override;
 		void Render(RenderContext& rc) override;
+
+		/** @brief INatureObject 側の描画（渦潮専用。RenderingEngineから正しいタイミングで呼ばれる） */
+		void Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view) override;
 
 		bool RequesutScene(uint32_t& id, float& waitTime) override;
 
@@ -91,6 +103,22 @@ namespace app
 
 		/** 再生中のtick補間・モデル追従・カメラ追従の更新 */
 		void UpdatePlayback(float deltaTime);
+
+		/**
+		 * @brief カメラ情報が記録されていないログ用のフォールバックカメラ更新
+		 * @details m_noCameraDataMode に応じて「親ペンギン追従」か「インスペクター（自由視点）」を行う。
+		 *          再生中かどうかに関わらず毎フレーム呼ぶ（一時停止中も自由に見回せるようにするため）。
+		 */
+		void UpdateFallbackCamera();
+
+		/**
+		 * @brief インスペクターモードの自由視点カメラを更新する
+		 * @details CameraController.cpp の DebugCamera（APP_DEBUG限定）と同じ操作感を
+		 *          ビルド構成によらず使えるようにReplayScene内に複製したもの。
+		 *          左スティックで平行移動、右スティックでターゲット中心に回転、
+		 *          RB1+左スティックYでFOV調整。
+		 */
+		void UpdateInspectorCamera();
 
 		/**
 		 * @brief 記録された "id" に対応するシロクマの表示スロットを探す。無ければ新規に確保する
@@ -178,8 +206,38 @@ namespace app
 		/** m_whirlpoolModels[i] を今フレーム描画すべきか */
 		std::vector<bool> m_whirlpoolSlotActive;
 
+		/**
+		 * @brief 渦のUV回転角度（ラジアン、全渦潮共通で進める）
+		 * @details 本来は渦潮ごとにUpdate()内で個別に進むが、見た目だけの再現なので
+		 *          共通の1つで十分（同じ速度で回るため見分けがつかない）
+		 */
+		float m_whirlpoolUvRotation = 0.0f;
+
 		/** リプレイ再生用のカメラコントローラー */
 		std::shared_ptr<camera::ReplayCamera> m_replayCamera;
+
+		/** @brief カメラ情報が記録されていないログでのカメラの挙動 */
+		enum class NoCameraDataMode
+		{
+			FollowParent, /** 親ペンギンに追従 */
+			Inspector,    /** 自由視点（ゲームパッドで手動操作） */
+		};
+
+		/** 読み込み中のログにカメラ情報が1件でも記録されているか */
+		bool m_hasCameraData = false;
+
+		/** カメラ情報が無いログでの挙動選択（UIから切り替え可能） */
+		NoCameraDataMode m_noCameraDataMode = NoCameraDataMode::FollowParent;
+
+		/** インスペクターモードで操作中のカメラ状態（モード切替時に現在のカメラから初期化） */
+		camera::CameraData m_inspectorCameraData;
+
+		/**
+		 * @brief 親ペンギン追従カメラの、ターゲット（親ペンギン）からの相対オフセット
+		 * @details 右スティックでこのオフセットを回転させることで、追従したまま視点を回せる。
+		 *          ターゲット自体は毎フレーム親ペンギンの現在座標に追従する。
+		 */
+		Vector3 m_followCameraOffset = Vector3(0.0f, 120.0f, -220.0f);
 
 
 	private:
