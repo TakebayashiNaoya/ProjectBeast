@@ -72,6 +72,12 @@ namespace app
 		}
 
 
+		bool Enemy::ShouldSuppressFootprint() const
+		{
+			return m_stateMachine->IsSwim();
+		}
+
+
 		void Enemy::Render(RenderContext& rc)
 		{
 			CharacterBase::Render(rc);

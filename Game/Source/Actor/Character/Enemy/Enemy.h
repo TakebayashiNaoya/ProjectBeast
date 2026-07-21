@@ -38,8 +38,8 @@ namespace app
 			 */
 			EnemyStateMachine* GetEnemyStateMachine() { return m_stateMachine.get(); }
 
-			inline int  GetLogId() const          { return m_logId; }
-			inline void SetLogId(int id)           { m_logId = id;   }
+			inline int  GetLogId() const { return m_logId; }
+			inline void SetLogId(int id) { m_logId = id; }
 
 
 		public:
@@ -52,6 +52,17 @@ namespace app
 			void Update() override final;
 			void Render(RenderContext& rc)override final;
 
+			// シロクマ用の足跡パラメータ
+			float GetFootprintSize() const override { return 30.0f; }         // 体格に合わせて調整
+			int   GetFootprintPriority() const override { return 2; }         // 通常のペンギンより消されにくくする
+			float GetFootprintStanceWidth() const override { return 20.0f; }  // 左右の足跡の間隔を広げる
+			float GetFootprintStepDistance() const override { return 40.0f; } // 歩幅（前後の間隔）も広めに
+			bool  ShouldSuppressFootprint() const override;
+
+			// 肉球専用テクスチャを常に使う（地形による自動切り替えはしない）
+			app::effect::DecalKind GetFootprintKind() const override { return app::effect::DecalKind::BearFootprint; }
+			bool GetFootprintAutoDetectSurface() const override { return false; }
+			Vector4 GetFootprintColor() const override { return { 0.55f, 0.55f, 0.60f, 1.0f }; } // 雪面に残る影っぽいグレー
 
 		private:
 			/** ステートマシン */

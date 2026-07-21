@@ -30,6 +30,17 @@ namespace app
 			 */
 			inline PenguinEffectStatus* GetEffectStatus() const { return m_effectStatus.get(); }
 
+			/**
+			 * @brief ペンギンの足跡のサイズを取得
+			 * @return デフォルトの足跡のサイズ
+			 */
+			virtual float GetFootprintSize() const override { return 12.0f; }
+
+			/**
+			 * @brief ペンギンの足跡の優先度を取得
+			 * @return 足跡の優先度（大きいほど優先度が高い）
+			 */
+			virtual int GetFootprintPriority() const override { return 1; }
 
 		protected:
 			virtual void Start() override;
@@ -43,12 +54,14 @@ namespace app
 			 */
 			void UpdateSlideTilt();
 
+			bool ShouldSuppressFootprint() const override;
 
 		protected:
 			/** スライド中の地形傾斜に合わせたモデル描画用回転（補間済み） */
 			Quaternion m_slideModelRotation;
 
 			std::unique_ptr<PenguinEffectStatus> m_effectStatus;
+
 		};
 	}
 }

@@ -5,6 +5,7 @@
 #include "Source/Core/DebugWindow.h"
 #include "Source/Core/Fade.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Effect/DecalManager.h"
 #include "Source/Effect/EffectManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Scene/SceneManager.h"
@@ -52,6 +53,8 @@ namespace app
 		// ModelRenderの既存カリングと同じ挙動であり、許容される仕様
 		EffectManager::Get().Update(g_renderingEngine->GetFrustum());
 		core::Fade::Get().Update();
+
+		app::effect::DecalManager::Get().Update();
 	}
 
 
@@ -61,6 +64,9 @@ namespace app
 		DebugWindow::Get().Render();
 #endif
 		SceneManager::GetInstance()->Render(rc);
+
+		app::effect::DecalManager::Get().Render(rc);
+
 		core::Fade::Get().Render(rc);
 	}
 }
