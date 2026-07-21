@@ -32,8 +32,27 @@ namespace app {
 			Decal(Decal&&) noexcept = default;
 			Decal& operator=(Decal&&) noexcept = default;
 
+			/**
+			 * @brief デカール用モデルレンダーの実体を生成する
+			 * @details インスタンスの使い回しを前提とし、初回のみ生成する
+			 */
 			void Prepare();
-			// 深度バッファ方式をやめ、地形法線(normal)＋ハイトマップ(terrainInfo)方式に変更
+
+			/**
+			 * @brief デカールを指定位置に生成・再配置する
+			 * @param pos 生成位置
+			 * @param normal 地形法線（板を地形に沿わせるために使用）
+			 * @param yaw Y軸回転（ラジアン）
+			 * @param size デカールのサイズ
+			 * @param kind デカールの種類
+			 * @param texture 使用するテクスチャ
+			 * @param color 乗算カラー
+			 * @param lifeSeconds 生存時間（秒）
+			 * @param fadeOutSeconds フェードアウトにかける時間（秒）
+			 * @param priority 優先度（大きいほど消されにくい）
+			 * @param sharedTkmKey 共有メッシュのバンクキー
+			 * @param terrainInfo 地形の凹凸判定用パラメータ
+			 */
 			void Spawn(const Vector3& pos, const Vector3& normal, float yaw, float size, DecalKind kind,
 				nsK2EngineLow::Texture* texture, const Vector4& color, float lifeSeconds, float fadeOutSeconds,
 				int priority, const char* sharedTkmKey, const TerrainHeightInfo& terrainInfo);
@@ -41,8 +60,13 @@ namespace app {
 			bool Update(float deltaTime);
 			void Render(RenderContext& rc);
 
+			/** @brief 現在アクティブかどうかを取得する */
 			bool IsActive() const { return m_isActive; }
+
+			/** @brief 残り生存時間を取得する */
 			float GetRemainingLife() const { return m_remainingLife; }
+
+			/** @brief 優先度を取得する（大きいほど消されにくい） */
 			int GetPriority() const { return m_priority; }
 
 

@@ -21,12 +21,12 @@ namespace {
 	const Vector4 COLOR_ROCK_FOOTPRINT(0.35f, 0.35f, 0.35f, 1.0f);
 	const Vector4 COLOR_SNOW_FOOTPRINT(0.55f, 0.70f, 0.90f, 1.0f);
 
+
+
 }
 
 namespace app {
 	namespace effect {
-
-
 		TerrainHeightInfo DecalManager::BuildTerrainHeightInfo() const {
 			TerrainHeightInfo info;
 			if (auto* stageSystem = actor::StageSystem::GetInstance()) {

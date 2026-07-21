@@ -74,8 +74,7 @@ namespace app
 
 		bool Enemy::ShouldSuppressFootprint() const
 		{
-			// TODO: 実際の遊泳ステートのIDに置き換える（例: EnemySwimmingState::ID()）
-			return false;
+			return m_stateMachine->IsSwim();
 		}
 
 
