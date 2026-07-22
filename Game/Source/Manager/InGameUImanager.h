@@ -160,6 +160,8 @@ namespace app
 		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialPacket->GetMenu(); }
 		/** @brief 救助数Menuを取得 */
 		inline ui::RemainingChildMenu* GetRemainingChildMenu() const { return m_remainingChildPacket->GetMenu(); }
+		/** @brief タイマーMenuを取得（外部から直接値を設定したい場合に使用） */
+		inline ui::InGameTimerMenu* GetTimerMenu() const { return m_timerPacket->GetMenu(); }
 		/** @brief イグループプロンプトMenuを取得 */
 		inline ui::IglooPromptMenu* GetIglooPromptMenu() const { return m_iglooPromptPacket->GetMenu(); }
 
@@ -194,6 +196,17 @@ namespace app
 		 * @param daddyPenguin 親ペンギンのポインタ
 		 */
 		void RegisterObservers();
+
+		/**
+		 * @brief タイマー・救助数UIだけを更新する
+		 * @detail BattleManager等のシーン専用シングルトンを経由せず、外部（リプレイ再生など）
+		 *         から直接値を設定して表示したい場合に、UpdatePlaying()の代わりに使う軽量版。
+		 *         ミニマップ・実績通知等の他のUIには一切触れない。
+		 */
+		void UpdateTimerAndScoreOnly();
+
+		/** @brief タイマー・救助数UIだけを描画する（UpdateTimerAndScoreOnly()と対で使う） */
+		void RenderTimerAndScoreOnly(RenderContext& rc);
 
 
 	private:

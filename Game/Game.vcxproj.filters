@@ -103,6 +103,12 @@
     <Filter Include="Source\GameLog">
       <UniqueIdentifier>{9ed61377-067e-46fb-b431-ad3cf0abcdde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Third Party">
+      <UniqueIdentifier>{5c9e6a3b-2f4d-4b8a-9c1e-7a6d8f3b2e1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Third Party\miniz">
+      <UniqueIdentifier>{7d1f8c2a-3e5b-4a9d-8f2c-6b4e9a1d3c5f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Vfx">
       <UniqueIdentifier>{283f31a8-a0a6-437e-b46e-10de1f9b5c85}</UniqueIdentifier>
     </Filter>
@@ -163,6 +169,9 @@
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scene\IScene.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene\ReplayScene.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scene\SceneManager.cpp">
@@ -553,6 +562,18 @@
     <ClCompile Include="Source\GameLog\GameLogManager.cpp">
       <Filter>Source\GameLog</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameLog\LogCompression.cpp">
+      <Filter>Source\GameLog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Third Party\miniz\miniz.c">
+      <Filter>Third Party\miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Third Party\miniz\miniz_tdef.c">
+      <Filter>Third Party\miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Third Party\miniz\miniz_tinfl.c">
+      <Filter>Third Party\miniz</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -672,6 +693,9 @@
       <Filter>Source\Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\IScene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene\ReplayScene.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\SceneManager.h">
@@ -1097,6 +1121,27 @@
     </ClInclude>
     <ClInclude Include="Source\GameLog\GameLogManager.h">
       <Filter>Source\GameLog</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameLog\LogCompression.h">
+      <Filter>Source\GameLog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Third Party\miniz\miniz.h">
+      <Filter>Third Party\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Third Party\miniz\miniz_common.h">
+      <Filter>Third Party\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Third Party\miniz\miniz_export.h">
+      <Filter>Third Party\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Third Party\miniz\miniz_tdef.h">
+      <Filter>Third Party\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Third Party\miniz\miniz_tinfl.h">
+      <Filter>Third Party\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Third Party\miniz\miniz_zip.h">
+      <Filter>Third Party\miniz</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\StageSelectMenu.h">
       <Filter>Source\UI\Menus</Filter>

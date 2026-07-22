@@ -64,6 +64,13 @@ namespace app
 
 
 	private:
+		/** 隠しコマンド（Ctrl+Alt+R）の連続保持時間 */
+		float m_hiddenComboTimer = 0.0f;
+		/** 隠しコマンドが成立するまでの保持時間（秒） */
+		static constexpr float kHiddenComboHoldTime = 1.2f;
+
+
+	private:
 		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
 		ui::UIPacket<ui::SoundOptionMenu> m_soundOptionPacket;
 		ui::UIPacket<ui::TutorialMenu> m_tutorialPacket;

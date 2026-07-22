@@ -119,6 +119,18 @@ namespace nsBeastEngine
 		// IMGUIの更新
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
+
+		// バックバッファ（スワップチェイン）はFRAME_BUFFER_W/Hで固定作成されたまま、
+		// ウィンドウの最大化・リサイズに合わせて動的に作り直されることはない。
+		// ImGui_ImplWin32_NewFrame()は実際のクライアント領域をDisplaySizeに設定するが、
+		// それをそのまま使うとImGuiが実際のバックバッファより大きい（あるいは小さい）
+		// キャンバスがあるものとしてレイアウト・描画してしまい、見た目が崩れる。
+		// 常にバックバッファと同じFRAME_BUFFER_W/Hに固定することで、ImGuiは常にバックバッファに
+		// ぴったり収まるよう描画される。DXGIのPresentがバックバッファ全体をクライアント領域へ
+		// 引き伸ばすため、結果的にゲーム本編と同じ比率でImGuiも一緒に拡大縮小表示される
+		// （クリック判定側の変換はGame/Source/system/system.cppのWM_MOUSEMOVE処理で対応する）
+		ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(FRAME_BUFFER_W), static_cast<float>(FRAME_BUFFER_H));
+
 		ImGui::NewFrame();
 
 		// k2EngineLowの更新処理

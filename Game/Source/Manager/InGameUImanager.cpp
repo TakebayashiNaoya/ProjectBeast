@@ -70,8 +70,13 @@ namespace app
 
 	InGameUIManager::~InGameUIManager()
 	{
-		/** BattleManagerのfunctionをリセットして、dangling参照を防ぐ */
-		BattleManager::GetInstance().ResetObservers();
+		// BattleManagerのfunctionをリセットして、dangling参照を防ぐ。
+		// BattleManagerを生成しないシーン（ReplayScene等）でも InGameUIManager は
+		// 使われるため、未生成時にGetInstance()を呼んでクラッシュしないようガードする
+		if (BattleManager::IsCreated())
+		{
+			BattleManager::GetInstance().ResetObservers();
+		}
 
 		// パケットはunique_ptrで自動的に破棄されるため、処理はいらない
 		m_searchPackets.clear();
@@ -194,6 +199,20 @@ namespace app
 		}
 
 		m_searchPackets.push_back(std::move(searchPacket));
+	}
+
+
+	void InGameUIManager::UpdateTimerAndScoreOnly()
+	{
+		if (m_timerPacket) m_timerPacket->Update();
+		if (m_remainingChildPacket) m_remainingChildPacket->Update();
+	}
+
+
+	void InGameUIManager::RenderTimerAndScoreOnly(RenderContext& rc)
+	{
+		if (m_timerPacket) m_timerPacket->Render(rc);
+		if (m_remainingChildPacket) m_remainingChildPacket->Render(rc);
 	}
 
 

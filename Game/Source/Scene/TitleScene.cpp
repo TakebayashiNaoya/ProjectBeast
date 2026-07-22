@@ -10,6 +10,7 @@
 #include "EasyInGameScene.h"
 #include "HardInGameScene.h"
 #include "NormalInGameScene.h"
+#include "ReplayScene.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/StageSelectMenu.h"
@@ -127,6 +128,29 @@ namespace app
 			waitTime = 3.0f;
 			return true;
 		}
+
+		// 隠しコマンド: Ctrl+Alt+R を一定時間押し続けるとリプレイシーンへ（プレイヤーには非公開）
+		// ※リプレイ画面のログ選択はマウス操作のImGui前提のため、入場もゲームパッドではなくキーボードにしている
+		const bool comboPressed =
+			(GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
+			(GetAsyncKeyState(VK_MENU)    & 0x8000) &&
+			(GetAsyncKeyState('R')        & 0x8000);
+
+		if (comboPressed)
+		{
+			m_hiddenComboTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_hiddenComboTimer >= kHiddenComboHoldTime)
+			{
+				id = ReplayScene::ID();
+				waitTime = 1.0f;
+				return true;
+			}
+		}
+		else
+		{
+			m_hiddenComboTimer = 0.0f;
+		}
+
 		return false;
 	}
 

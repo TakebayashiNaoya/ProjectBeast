@@ -125,9 +125,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;MINIZ_NO_ARCHIVE_APIS;MINIZ_NO_ARCHIVE_WRITING_APIS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(ProjectDir)..\Third Party\imgui;$(ProjectDir)..\Third Party\imgui\backends;$(ProjectDir)..\Third Party\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -140,13 +140,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>K2_DEBUG;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>K2_DEBUG;_DEBUG;_WINDOWS;MINIZ_NO_ARCHIVE_APIS;MINIZ_NO_ARCHIVE_WRITING_APIS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(ProjectDir)..\Third Party\imgui;$(ProjectDir)..\Third Party\imgui\backends;$(ProjectDir)..\Third Party\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -163,9 +163,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;MINIZ_NO_ARCHIVE_APIS;MINIZ_NO_ARCHIVE_WRITING_APIS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(ProjectDir)..\Third Party\imgui;$(ProjectDir)..\Third Party\imgui\backends;$(ProjectDir)..\Third Party\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -182,9 +182,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;MINIZ_NO_ARCHIVE_APIS;MINIZ_NO_ARCHIVE_WRITING_APIS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(ProjectDir)..\Third Party\imgui;$(ProjectDir)..\Third Party\imgui\backends;$(ProjectDir)..\Third Party\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -201,13 +201,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;MINIZ_NO_ARCHIVE_APIS;MINIZ_NO_ARCHIVE_WRITING_APIS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(ProjectDir)..\Third Party\imgui;$(ProjectDir)..\Third Party\imgui\backends;$(ProjectDir)..\Third Party\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -225,12 +225,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>K2_DEBUG;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>K2_DEBUG;NDEBUG;_WINDOWS;MINIZ_NO_ARCHIVE_APIS;MINIZ_NO_ARCHIVE_WRITING_APIS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderOutputFile>$(Platform)\$(Configuration)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(SolutionDir)Third Party\imgui;$(SolutionDir)Third Party\imgui\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\k2EngineLow\ExEngine\bulletPhysics\src;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\Effekseer;$(ProjectDir)..\k2EngineLow\ExEngine\effekseer\install_msvc2019\include\EffekseerRendererDX12;$(ProjectDir)..\k2EngineLow\ExEngine\Photon;$(ProjectDir)..\Third Party\imgui;$(ProjectDir)..\Third Party\imgui\backends;$(ProjectDir)..\Third Party\miniz;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableAnalyzeExternal>true</DisableAnalyzeExternal>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -317,6 +317,16 @@
     <ClCompile Include="Source\Effect\DecalManager.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
     <ClCompile Include="Source\GameLog\GameLogManager.cpp" />
+    <ClCompile Include="Source\GameLog\LogCompression.cpp" />
+    <ClCompile Include="..\Third Party\miniz\miniz.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Third Party\miniz\miniz_tdef.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Third Party\miniz\miniz_tinfl.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\Graphics\PBRStatus.cpp" />
     <ClCompile Include="Source\Manager\BattleManager.cpp" />
     <ClCompile Include="Source\Manager\FeverTimeManager.cpp" />
@@ -332,6 +342,7 @@
     <ClCompile Include="Source\Scene\DebugScene.cpp" />
     <ClCompile Include="Source\Scene\InGameSceneBase.cpp" />
     <ClCompile Include="Source\Scene\IScene.cpp" />
+    <ClCompile Include="Source\Scene\ReplayScene.cpp" />
     <ClCompile Include="Source\Scene\ResultScene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Scene\TitleScene.cpp" />
@@ -500,6 +511,13 @@
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
     <ClInclude Include="Source\GameLog\GameLogManager.h" />
+    <ClInclude Include="Source\GameLog\LogCompression.h" />
+    <ClInclude Include="..\Third Party\miniz\miniz.h" />
+    <ClInclude Include="..\Third Party\miniz\miniz_common.h" />
+    <ClInclude Include="..\Third Party\miniz\miniz_export.h" />
+    <ClInclude Include="..\Third Party\miniz\miniz_tdef.h" />
+    <ClInclude Include="..\Third Party\miniz\miniz_tinfl.h" />
+    <ClInclude Include="..\Third Party\miniz\miniz_zip.h" />
     <ClInclude Include="Source\Graphics\PBRParameter.h" />
     <ClInclude Include="Source\Graphics\PBRStatus.h" />
     <ClInclude Include="Source\Manager\BattleManager.h" />
@@ -521,6 +539,7 @@
     <ClInclude Include="Source\Scene\HardInGameScene.h" />
     <ClInclude Include="Source\Scene\InGameSceneBase.h" />
     <ClInclude Include="Source\Scene\IScene.h" />
+    <ClInclude Include="Source\Scene\ReplayScene.h" />
     <ClInclude Include="Source\Scene\ResultScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\Scene\TitleScene.h" />

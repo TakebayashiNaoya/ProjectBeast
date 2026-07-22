@@ -8,8 +8,11 @@
  * ゲーム終了時にファイルへ書き出す。
  *
  * 出力ファイル構成（Logs/<session_id>/）:
- *   session.json  … セッション情報
- *   ticks.jsonl   … 毎フレームスナップショット (type="tick" + 埋め込みイベント)
+ *   session.json     … セッション情報
+ *   ticks.jsonl.cmp  … 毎フレームスナップショット (type="tick" + 埋め込みイベント) を
+ *                       JSONL化した上でLogCompressionにより圧縮したもの。
+ *                       非圧縮のticks.jsonlのまま残っている旧セッションも
+ *                       ReplayScene側で引き続き読める
  *
  * 利用側が呼ぶメソッド:
  *   RecordTick()       … 毎フレーム InGameSceneBase から呼ぶ
@@ -38,7 +41,7 @@ namespace app
 	class GameLogManager
 	{
 	public:
-		/** @brief 毎フレーム InGameSceneBase から呼ぶ。全エンティティのスナップショットを記録 */
+		/** @brief 毎フレーム InGameSceneBase から呼ぶ。全エンティティ・カメラのスナップショットを記録 */
 		void RecordTick(actor::DaddyPenguin* daddy);
 
 		/**

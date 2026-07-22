@@ -374,6 +374,15 @@ namespace app
 		{
 			return *m_instance;
 		}
+		/**
+		 * @brief インスタンスが生成済みか
+		 * @details BattleManagerを生成しないシーン（ReplayScene等）から間接的に
+		 *          参照されうる箇所で、GetInstance()の呼び出し前にガードするために使う
+		 */
+		static bool IsCreated()
+		{
+			return m_instance != nullptr;
+		}
 		/** インスタンスの破棄 */
 		static void DestroyInstance()
 		{
