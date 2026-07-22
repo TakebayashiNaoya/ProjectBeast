@@ -85,13 +85,12 @@ namespace nsK2EngineLow {
 
 	void K2EngineLow::ExecuteUpdate()
 	{
+		// GameObjectManagerとEffectEngineの更新はBeastEngine::BeginExecute()側で行う。
+		// ポーズ中も動き続けるべきパッド・サウンドのみここで更新する。
 		for (auto& pad : m_pad) {
 			pad.Update();
 		}
 		g_soundEngine->Update();
-		GameObjectManager::GetInstance()->ExecuteUpdate();
-		// エフェクトエンジンの更新。
-		EffectEngine::GetInstance()->Update(g_gameTime->GetFrameDeltaTime());
 	}
 	/// <summary>
 	/// 描画処理を実行。

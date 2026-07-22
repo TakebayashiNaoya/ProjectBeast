@@ -75,7 +75,9 @@ namespace nsK2EngineLow {
 		EffekseerRendererDX12::BeginCommandList(m_commandList[backBufferNo], g_graphicsEngine->GetCommandList());
 		m_renderer[backBufferNo]->SetCommandList(m_commandList[backBufferNo]);
 
-		m_manager->Update();
+		// Effekseerのdeltaフレームは60fps基準（1.0 = 1/60秒）のため、秒単位のdeltaTimeをフレーム換算する。
+		// ポーズ中はdeltaTimeが0で渡されるため、再生位置がそのまま凍結される。
+		m_manager->Update(deltaTime * 60.0f);
 
 		//レンダラーにカメラ行列を設定。
 		m_renderer[backBufferNo]->SetCameraMatrix(*(const Effekseer::Matrix44*)&g_camera3D->GetViewMatrix());

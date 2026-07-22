@@ -133,8 +133,15 @@ namespace nsBeastEngine
 
 		ImGui::NewFrame();
 
-		// k2EngineLowの更新処理
+		// k2EngineLowの更新処理（パッド・サウンドのみ。ポーズ中も継続する）
 		g_engine->ExecuteUpdate();
+
+		// GameObjectManager・EffectEngineの更新。
+		// ポーズ中はエフェクトや自動更新オブジェクトの見た目を凍結したいため、
+		// EffectEngineへ渡すdeltaTimeを0にして再生位置を止める（Stopとは違い状態は保持する）。
+		GameObjectManager::GetInstance()->ExecuteUpdate();
+		const float effectDeltaTime = m_isPause ? 0.0f : g_gameTime->GetFrameDeltaTime();
+		EffectEngine::GetInstance()->Update(effectDeltaTime);
 
 		// カメラの更新
 		SubCameraManager::Get().Update();
