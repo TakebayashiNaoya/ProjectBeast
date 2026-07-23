@@ -57,6 +57,25 @@ namespace nsBeastEngine
 		void EndExecute();
 
 
+		//============================================//
+		// ポーズ関連
+		//============================================//
+
+	public:
+		/**
+		 * @brief ポーズフラグを設定
+		 * @details ポーズ中はBeginExecute()内でGameObjectManagerとEffectEngineの更新を止める
+		 * @param isPause ポーズフラグ
+		 */
+		inline void SetPause(const bool isPause) { m_isPause = isPause; }
+
+		/**
+		 * @brief ポーズ中かどうかを取得
+		 * @return ポーズ中ならtrue
+		 */
+		inline bool IsPause() const { return m_isPause; }
+
+
 	private:
 		/** ImGui用のSRVヒープを追加 */
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_imguiSrvHeap;
@@ -64,6 +83,8 @@ namespace nsBeastEngine
 		K2EngineLow m_k2EngineLow;
 		/** レンダリングエンジン */
 		RenderingEngine m_renderingEngine;
+		/** ポーズフラグ */
+		bool m_isPause = false;
 
 
 		//============================================//
