@@ -6,7 +6,7 @@
     "totalDepth":  12000.0,
     "heightScale": 1000.0,
     "subsample":   4,
-    "uvTile":      0.05,
+    "uvTile":      0.2,
     "albedoScale": 1.0,
     "yOffset":     -100.0,
     "minHeight":   75.0,
