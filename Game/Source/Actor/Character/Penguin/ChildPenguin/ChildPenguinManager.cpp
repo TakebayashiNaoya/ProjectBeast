@@ -57,6 +57,8 @@ namespace app
 			constexpr float GHOST_POSITION_OFFSET_Y = 0.2f;
 			// 浮上アニメーション持続時間。
 			constexpr float GHOST_SURFACING_ANIM_DURATION = 3.0f;
+			/** 消える直前のフェードアウト時間(GHOST_HIDDEN_WAIT_TIME以下にすること) */
+			constexpr float GHOST_FADE_OUT_DURATION = 1.0f;
 			/** スケールアップ */
 			const Vector3 GHOST_SCALE_UP = Vector3(0.8f, 1.0f, 1.0f);
 			/** 方向正規化の平方 */
@@ -918,9 +920,11 @@ namespace app
 		ChildPenguinManager::GhostPenguinInfo::GhostPenguinInfo()
 			: modelRender()
 			, floatCurve()
+			, alphaCurve()
 			, target(nullptr)
 			, timer(0.0f)
 			, isHidden(false)
+			, isFadingOut(false)
 			, isDebuffActive(false)
 			, position(Vector3::Zero)
 			, handle(INVALID_EFFECT_HANDLE)
@@ -941,6 +945,11 @@ namespace app
 			info->floatCurve.Play();
 			info->modelRender.SetTRS(dethPos, dethRot, dethScale);
 			info->modelRender.Update();
+
+			// 透明→実体化のフェードインを浮上アニメーションと同じ時間で再生。
+			info->modelRender.SetAlpha(0.0f);
+			info->alphaCurve.Initialize(0.0f, 1.0f, GHOST_SURFACING_ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
+			info->alphaCurve.Play();
 
 			// 青い火の玉エフェクトを再生。
 			info->handle = EffectManager::Get().PlayEffect(
@@ -990,16 +999,37 @@ namespace app
 					info->modelRender.SetPosition(nextPosition);
 					info->modelRender.Update();
 
+					// 浮上と同時に透明→実体化のフェードインを進める。
+					info->alphaCurve.Update(deltaTime);
+					info->modelRender.SetAlpha(info->alphaCurve.GetCurrentValue());
+
 					continue;
 				}
 
 				// これ以降はアニメーション終了時の処理。
 				info->timer += deltaTime;
 
+				// 非表示になる直前から実体化→透明のフェードアウトを開始する。
+				if (!info->isFadingOut && !info->isHidden &&
+					info->timer >= GHOST_HIDDEN_WAIT_TIME - GHOST_FADE_OUT_DURATION)
+				{
+					info->isFadingOut = true;
+					info->alphaCurve.Initialize(1.0f, 0.0f, GHOST_FADE_OUT_DURATION, util::EasingType::Linear, util::LoopMode::Once);
+					info->alphaCurve.Play();
+				}
+
+				// フェードアウト中は透明度を更新する。
+				if (info->isFadingOut && info->alphaCurve.IsPlaying())
+				{
+					info->alphaCurve.Update(deltaTime);
+					info->modelRender.SetAlpha(info->alphaCurve.GetCurrentValue());
+				}
+
 				// 2秒待機後に非表示にする。
 				if (info->timer >= GHOST_HIDDEN_WAIT_TIME && !info->isHidden)
 				{
 					info->isHidden = true;
+					info->modelRender.SetAlpha(0.0f);
 
 					// 青い火の玉エフェクトを停止。
 					if (info->handle != INVALID_EFFECT_HANDLE)
