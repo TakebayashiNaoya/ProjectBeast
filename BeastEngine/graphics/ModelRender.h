@@ -191,6 +191,17 @@ namespace nsBeastEngine
 		void SetMulColor(const Vector4& mulColor);
 
 		/**
+		 * @brief モデルの透明度を設定する
+		 * @details
+		 *   model.fxを使用するモデル（m_model・m_forwardRenderModel）には
+		 *   乗算カラーのα成分として渡され、実際の半透明ブレンドで反映される。
+		 *   GBufferパス（m_renderToGBufferModel）は本来アルファブレンドができないため、
+		 *   代わりにモデル単位ディザリング（b4）の透過率として反映する。
+		 * @param alpha 透明度（1.0f=不透明, 0.0f=完全透明）
+		 */
+		void SetAlpha(const float alpha);
+
+		/**
 		 * @brief PBR補正パラメータを設定する
 		 * @details Init呼び出し前に設定すること。
 		 *          RenderToGBuffer.fx の b2 スロットに渡される。
