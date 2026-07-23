@@ -98,6 +98,15 @@ namespace nsBeastEngine
 		}
 
 		/**
+		 * @brief モデルの透明度(乗算カラーのα成分)を設定する
+		 * @param alpha 透明度(1.0f=不透明, 0.0f=完全透明)
+		 */
+		void SetAlpha(const float alpha)
+		{
+			m_meshParts.SetAlpha(alpha);
+		}
+
+		/**
 		 * @brief 拡張定数バッファ（b2）のデータポインタをInit後に差し替える
 		 * @param data 新しいデータポインタ
 		 */

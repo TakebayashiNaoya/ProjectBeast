@@ -591,10 +591,12 @@ namespace app
 			{
 				ModelRender modelRender;
 				util::FloatCurve floatCurve;
+				util::FloatCurve alphaCurve;
 
 				Enemy* target;
 				float timer;
 				bool isHidden;
+				bool isFadingOut;
 				bool isDebuffActive;
 				Vector3 position;
 

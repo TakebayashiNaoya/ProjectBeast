@@ -48,6 +48,7 @@ cbuffer ModelCb : register(b0)
     float4x4 mWorld;
     float4x4 mView;
     float4x4 mProj;
+    float4   mulColor; //乗算カラー(RGBA)。SetAlpha()で設定したα値はここのwに入る
 };
 
 //ライトの定数バッファー
@@ -165,8 +166,12 @@ float4 PSMain( SPSIn psIn ) : SV_Target0
     float4 finalColor = albedoColor;
     //finalColor.xyz *= lig;
     //finalColor.xyz = float3(1.0f, 0.0f, 1.0f); //環境光を足す
-    finalColor.xyz = reflect; 
-    
+    finalColor.xyz = reflect;
+
+    //乗算カラーを適用(αは透明度として使用)
+    finalColor.rgb *= mulColor.rgb;
+    finalColor.a *= mulColor.a;
+
     return finalColor;
 }
 
