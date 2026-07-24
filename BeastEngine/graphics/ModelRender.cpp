@@ -427,6 +427,27 @@ namespace nsBeastEngine
 	}
 
 
+	Vector3 ModelRender::GetBoneWorldPosition(const wchar_t* boneName) const
+	{
+		if (!m_hasSkeleton || m_skeletonRef == nullptr || !m_skeletonRef->IsInited())
+		{
+			K2_ASSERT(false, "スケルトンを持たないモデルに対してボーン座標を要求しました。");
+			return m_position;
+		}
+
+		const int boneNo = m_skeletonRef->FindBoneID(boneName);
+		K2_ASSERT(boneNo != -1, "指定した名前のボーンが見つかりませんでした。");
+		if (boneNo == -1)
+		{
+			return m_position;
+		}
+
+		// v[3] がワールド行列の平行移動成分（ボーンのワールド座標）
+		const Matrix& boneWorldMatrix = m_skeletonRef->GetBone(boneNo)->GetWorldMatrix();
+		return Vector3(boneWorldMatrix.v[3].x, boneWorldMatrix.v[3].y, boneWorldMatrix.v[3].z);
+	}
+
+
 	void ModelRender::UpdateWorldAABB()
 	{
 		if (m_hasSkeleton && m_skeletonRef != nullptr && m_skeletonRef->IsInited())

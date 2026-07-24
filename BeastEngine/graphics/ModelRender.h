@@ -139,6 +139,14 @@ namespace nsBeastEngine
 		inline const Vector3& GetPosition() const { return m_position; }
 
 		/**
+		 * @brief 指定した名前のボーンのワールド座標を取得する
+		 * @details エフェクトの発生位置など、特定ボーンに追従させたい場合に使用する。
+		 * @param boneName ボーン名
+		 * @return ボーンのワールド座標。スケルトンが無い、またはボーンが見つからない場合は GetPosition() を返す
+		 */
+		Vector3 GetBoneWorldPosition(const wchar_t* boneName) const;
+
+		/**
 		 * @brief 回転の設定
 		 * @param rot 回転
 		 */
