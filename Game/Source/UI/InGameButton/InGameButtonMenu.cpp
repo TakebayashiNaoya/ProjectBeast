@@ -19,13 +19,13 @@ namespace app
 		namespace
 		{
 			/** 命令標識が回りきるまでの時間(秒) */
-			static constexpr float SIGN_FLIP_DURATION = 0.4f;
+			constexpr float SIGN_FLIP_DURATION = 0.4f;
 			/** 命令標識が回るときの半回転の回数。奇数にすると必ず反対の面を向いて止まる */
-			static constexpr int SIGN_FLIP_HALF_TURN_COUNT = 1;
+			constexpr int SIGN_FLIP_HALF_TURN_COUNT = 1;
 			/** 命令標識の表(GO)のUI名 */
-			const char* SIGN_GO_UI_NAME = "OrderSignGoIcon";
+			constexpr const char* SIGN_GO_UI_NAME = "OrderSignGoIcon";
 			/** 命令標識の裏(WAIT)のUI名 */
-			const char* SIGN_WAIT_UI_NAME = "OrderSignWaitIcon";
+			constexpr const char* SIGN_WAIT_UI_NAME = "OrderSignWaitIcon";
 		}
 
 
@@ -176,8 +176,10 @@ namespace app
 			if (isWaitCommand != m_wasWaitCommand)
 			{
 				m_wasWaitCommand = isWaitCommand;
+				// 回転中にもう一度切り替わったら今の角度から続きを回す
+				// (0に戻すと縮んでいた横幅が一瞬で元に戻ってしまう)
+				m_signFlipTimer = m_isSignFlipping ? SIGN_FLIP_DURATION - m_signFlipTimer : 0.0f;
 				m_isSignFlipping = true;
-				m_signFlipTimer = 0.0f;
 			}
 
 			if (m_isSignFlipping)
@@ -200,11 +202,15 @@ namespace app
 			waitSign->m_isDraw = isShowingWait;
 
 			// 横幅を回転角のコサインで縮めて、板が左右にくるっと回っているように見せる
-			Vector3 signScale = m_signBaseScale;
-			signScale.x *= fabsf(cosf(Math::PI * turnProgress));
+			const float widthRate = fabsf(cosf(Math::PI * turnProgress));
 
-			goSign->m_transform.m_localTransform.m_scale = signScale;
-			waitSign->m_transform.m_localTransform.m_scale = signScale;
+			Vector3 goSignScale = m_goSignBaseScale;
+			goSignScale.x *= widthRate;
+			goSign->m_transform.m_localTransform.m_scale = goSignScale;
+
+			Vector3 waitSignScale = m_waitSignBaseScale;
+			waitSignScale.x *= widthRate;
+			waitSign->m_transform.m_localTransform.m_scale = waitSignScale;
 		}
 
 
@@ -266,14 +272,14 @@ namespace app
 			}
 
 			// 命令標識は回転演出の基準になるスケールをJsonから拾っておく
-			// (表と裏で同じスケールを指定している前提なので、表の値を両方に使う)
 			if (auto* goSign = GetUI<UIIcon>(Hash32(SIGN_GO_UI_NAME)))
 			{
-				m_signBaseScale = goSign->m_transform.m_localTransform.m_scale;
+				m_goSignBaseScale = goSign->m_transform.m_localTransform.m_scale;
 				goSign->m_isDraw = false;
 			}
 			if (auto* waitSign = GetUI<UIIcon>(Hash32(SIGN_WAIT_UI_NAME)))
 			{
+				m_waitSignBaseScale = waitSign->m_transform.m_localTransform.m_scale;
 				waitSign->m_isDraw = false;
 			}
 

@@ -93,8 +93,10 @@ namespace app
 			/** 直前フレームでスライドスタミナがロック中だったか（エッジ検出用） */
 			bool m_wasSlideStaminaLocked = false;
 
-			/** 命令標識のJsonで指定された等倍時のスケール（回転演出の基準値） */
-			Vector3 m_signBaseScale = Vector3::One;
+			/** 命令標識の表(GO)のJsonで指定されたスケール（回転演出の基準値） */
+			Vector3 m_goSignBaseScale = Vector3::One;
+			/** 命令標識の裏(WAIT)のJsonで指定されたスケール（回転演出の基準値） */
+			Vector3 m_waitSignBaseScale = Vector3::One;
 			/** 命令標識が回り始めてからの経過時間(秒) */
 			float m_signFlipTimer = 0.0f;
 			/** 命令標識が回転中かどうか */
