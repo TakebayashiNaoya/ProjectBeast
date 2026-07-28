@@ -60,6 +60,9 @@ namespace app
 			/** ジャンプ・スライドのスタミナサークルゲージの更新処理（追従イージング＋色演出） */
 			void UpdateStaminaGauge();
 
+			/** 命令標識（表:GO / 裏:WAIT）の更新処理（命令の切り替わり検出＋回転演出） */
+			void UpdateCommandSign();
+
 			bool IsInputAButton() const;
 			bool IsInputBButton() const;
 			bool IsInputXButton() const;
@@ -89,6 +92,17 @@ namespace app
 			float m_slideDisplayRatio = 1.0f;
 			/** 直前フレームでスライドスタミナがロック中だったか（エッジ検出用） */
 			bool m_wasSlideStaminaLocked = false;
+
+			/** 命令標識の表(GO)のJsonで指定されたスケール（回転演出の基準値） */
+			Vector3 m_goSignBaseScale = Vector3::One;
+			/** 命令標識の裏(WAIT)のJsonで指定されたスケール（回転演出の基準値） */
+			Vector3 m_waitSignBaseScale = Vector3::One;
+			/** 命令標識が回り始めてからの経過時間(秒) */
+			float m_signFlipTimer = 0.0f;
+			/** 命令標識が回転中かどうか */
+			bool m_isSignFlipping = false;
+			/** 直前フレームの命令が待機命令だったか（切り替わりのエッジ検出用） */
+			bool m_wasWaitCommand = false;
 		};
 
 	}

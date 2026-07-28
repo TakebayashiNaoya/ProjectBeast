@@ -59,7 +59,7 @@ namespace app
 				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonBack);
 			}
 
-			m_isPause = !m_isPause;
+			SetPause(!m_isPause);
 		}
 
 		switch (m_transitionState)
@@ -136,6 +136,13 @@ namespace app
 			}
 			m_currentScene->Render(rc);
 		}
+	}
+
+
+	void SceneManager::SetPause(const bool isPause)
+	{
+		m_isPause = isPause;
+		nsBeastEngine::BeastEngine::GetInstance()->SetPause(isPause);
 	}
 
 

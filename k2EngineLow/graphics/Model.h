@@ -119,6 +119,13 @@ namespace nsK2EngineLow {
 			m_meshParts.SetMulColor(mulColor);
 		}
 		/// <summary>
+		/// モデルの透明度(乗算カラーのα成分)を設定する。
+		/// </summary>
+		void SetAlpha(const float alpha)
+		{
+			m_meshParts.SetAlpha(alpha);
+		}
+		/// <summary>
 		/// ユーザー拡張の定数バッファ（b2）のデータポインタを差し替える。
 		/// </summary>
 		void SetExpandData2(void* data)

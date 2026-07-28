@@ -139,6 +139,14 @@ namespace nsBeastEngine
 		inline const Vector3& GetPosition() const { return m_position; }
 
 		/**
+		 * @brief 指定した名前のボーンのワールド座標を取得する
+		 * @details エフェクトの発生位置など、特定ボーンに追従させたい場合に使用する。
+		 * @param boneName ボーン名
+		 * @return ボーンのワールド座標。スケルトンが無い、またはボーンが見つからない場合は GetPosition() を返す
+		 */
+		Vector3 GetBoneWorldPosition(const wchar_t* boneName) const;
+
+		/**
 		 * @brief 回転の設定
 		 * @param rot 回転
 		 */
@@ -189,6 +197,17 @@ namespace nsBeastEngine
 		 * @param mulColor 乗算カラー (RGBA, 1.0f=変更なし)
 		 */
 		void SetMulColor(const Vector4& mulColor);
+
+		/**
+		 * @brief モデルの透明度を設定する
+		 * @details
+		 *   model.fxを使用するモデル（m_model・m_forwardRenderModel）には
+		 *   乗算カラーのα成分として渡され、実際の半透明ブレンドで反映される。
+		 *   GBufferパス（m_renderToGBufferModel）は本来アルファブレンドができないため、
+		 *   代わりにモデル単位ディザリング（b4）の透過率として反映する。
+		 * @param alpha 透明度（1.0f=不透明, 0.0f=完全透明）
+		 */
+		void SetAlpha(const float alpha);
 
 		/**
 		 * @brief PBR補正パラメータを設定する

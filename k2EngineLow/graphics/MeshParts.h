@@ -99,6 +99,13 @@ namespace nsK2EngineLow {
 			m_mulColor = mulColor;
 		}
 		/// <summary>
+		/// モデルの透明度(乗算カラーのα成分)を設定する。
+		/// </summary>
+		void SetAlpha(const float alpha)
+		{
+			m_mulColor.w = alpha;
+		}
+		/// <summary>
 		/// ユーザー拡張の定数バッファ（b2）のデータポインタを差し替える。
 		/// NOTE: Init後にOcclusionDitherManagerからDraw前に呼ばれる。
 		///       ConstantBufferの実体はInitFromTkmFile時に生成済みのため、

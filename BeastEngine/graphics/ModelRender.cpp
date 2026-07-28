@@ -45,6 +45,27 @@ namespace nsBeastEngine
 	}
 
 
+	void ModelRender::SetAlpha(const float alpha)
+	{
+		m_model.SetAlpha(alpha);
+		m_renderToGBufferModel->SetAlpha(alpha);
+		m_forwardRenderModel->SetAlpha(alpha);
+
+		if (m_toonModel != nullptr)
+		{
+			m_toonModel->SetAlpha(alpha);
+		}
+		if (m_outlineModel != nullptr)
+		{
+			m_outlineModel->SetAlpha(alpha);
+		}
+
+		// GBufferパスは本来アルファブレンドができないため、
+		// モデル単位ディザリング（b4）の透過率として代わりに反映する
+		m_modelDitherCb.modelDitherAlpha = 1.0f - alpha;
+	}
+
+
 	void ModelRender::SetExpandConstantBuffer2(void* data)
 	{
 		// GBufferモデルはb2をPBRParamで使用しているため設定しない
@@ -90,6 +111,8 @@ namespace nsBeastEngine
 		if (islighting)
 		{
 			modelInitData.m_fxFilePath = "Assets/shader/model.fx";
+			// model.fxはSetAlpha()による透明化に対応するため常に半透明ブレンドを有効にする
+			modelInitData.m_alphaBlendMode = AlphaBlendMode_Trans;
 		}
 		else
 		{
@@ -116,7 +139,11 @@ namespace nsBeastEngine
 		{
 			m_forwardRenderModel->Init(modelInitData);
 		}
-		else
+
+		// GBuffer・トゥーンの各モデルはブレンド対象外のため元のブレンドモードに戻す
+		modelInitData.m_alphaBlendMode = AlphaBlendMode_None;
+
+		if (!m_isForwardRender)
 		{
 			InitRenderToGBufferModel(modelInitData);
 		}
@@ -397,6 +424,27 @@ namespace nsBeastEngine
 		}
 
 		m_localAABB.Init(vMax, vMin);
+	}
+
+
+	Vector3 ModelRender::GetBoneWorldPosition(const wchar_t* boneName) const
+	{
+		if (!m_hasSkeleton || m_skeletonRef == nullptr || !m_skeletonRef->IsInited())
+		{
+			K2_ASSERT(false, "スケルトンを持たないモデルに対してボーン座標を要求しました。");
+			return m_position;
+		}
+
+		const int boneNo = m_skeletonRef->FindBoneID(boneName);
+		K2_ASSERT(boneNo != -1, "指定した名前のボーンが見つかりませんでした。");
+		if (boneNo == -1)
+		{
+			return m_position;
+		}
+
+		// v[3] がワールド行列の平行移動成分（ボーンのワールド座標）
+		const Matrix& boneWorldMatrix = m_skeletonRef->GetBone(boneNo)->GetWorldMatrix();
+		return Vector3(boneWorldMatrix.v[3].x, boneWorldMatrix.v[3].y, boneWorldMatrix.v[3].z);
 	}
 
 

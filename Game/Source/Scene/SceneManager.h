@@ -60,12 +60,10 @@ namespace app
 	public:
 		/**
 		 * @brief Pauseフラグの設定
+		 * @details BeastEngineのポーズフラグにも反映し、GameObjectManager/EffectEngineの更新を連動させる
 		 * @param isPause Pauseフラグ
 		 */
-		void SetPause(const bool isPause)
-		{
-			m_isPause = isPause;
-		}
+		void SetPause(const bool isPause);
 
 
 		/**

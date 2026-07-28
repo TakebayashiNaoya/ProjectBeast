@@ -248,6 +248,30 @@
                 "scale":[1,1,1],
                 "rotation":0,
                 "color":[255,255,255,255]
+            },
+
+
+            {
+                "type":"UIIcon",
+                "name":"OrderSignGoIcon",
+                "asset":"Assets/spriteData/UI/Icon/GO.DDS",
+                "width":110,
+                "height":110,
+                "position":[ 720, -150, 0],
+                "scale":[0.7,0.7,0.7],
+                "rotation":0,
+                "color":[255,255,255,255]
+            },
+            {
+                "type":"UIIcon",
+                "name":"OrderSignWaitIcon",
+                "asset":"Assets/spriteData/UI/Icon/WAIT.DDS",
+                "width":110,
+                "height":110,
+                "position":[ 720, -150, 0],
+                "scale":[0.7,0.7,0.7],
+                "rotation":0,
+                "color":[255,255,255,255]
             }
         ]
     }
