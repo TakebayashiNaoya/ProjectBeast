@@ -7,6 +7,8 @@
 #include "Enemy.h"
 #include "EnemyStateMachine.h"
 #include "EnemyStatus.h"
+#include "Physics/Physics.h"
+#include "Source/Actor/Stage/StageSystem.h"
 
 
 namespace app
@@ -15,6 +17,11 @@ namespace app
 	{
 		namespace
 		{
+			/** 地形法線に沿わせる補間速度 */
+			constexpr float GROUND_TILT_SLERP_SPEED = 10.0f;
+			/** 真下レイの射程距離 */
+			constexpr float GROUND_TILT_RAY_LENGTH = 400.0f;
+
 			AnimationData ANIMATION_DATA[] =
 			{
 				{ "Assets/animData/bear/idle.tka", true },
@@ -69,6 +76,92 @@ namespace app
 			m_stateMachine->Update();
 
 			CharacterBase::Update();
+
+			if (m_modelReady && !m_legIKInited)
+			{
+				InitLegIK();
+				m_legIKInited = true;
+			}
+
+			if (m_legIKInited)
+			{
+				UpdateGroundTilt();
+
+				m_legIK.SetTerrain(StageSystem::GetInstance()->GetTerrain());
+
+				m_legIK.Update(&m_skeleton);
+			}
+		}
+
+
+		void Enemy::UpdateGroundTilt()
+		{
+			if (!m_modelReady) return;
+
+			/** 真下にレイを飛ばして地形法線を取得する（PenguinBase::UpdateSlideTiltと同じ） */
+			const Vector3& pos = m_transform.m_position;
+			const Vector3 rayStart = pos;
+			const Vector3 rayEnd = Vector3(pos.x, pos.y - GROUND_TILT_RAY_LENGTH, pos.z);
+
+			nsBeastEngine::nsCollision::RaycastHit hit;
+			Vector3 groundNormal = Vector3::Up;
+			if (nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(rayStart, rayEnd, hit))
+			{
+				groundNormal = hit.normal;
+			}
+
+			/** 進行方向由来のY軸回転（水平の向き）はアニメーション側の回転をそのまま使う */
+			Quaternion yRot = m_transform.m_rotation;
+
+			/** Up → groundNormal への最短回転 */
+			Quaternion tiltRot;
+			tiltRot.SetRotation(Vector3::Up, groundNormal);
+
+			/** 「まず地形に合わせて傾け、次に進行方向を向く」合成 */
+			Quaternion targetRotation;
+			targetRotation.Multiply(yRot, tiltRot);
+
+			/** 補間して急激な回転変化を抑える */
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+			const float slerpFactor = min(1.0f, GROUND_TILT_SLERP_SPEED * deltaTime);
+			m_groundTiltRotation.Slerp(slerpFactor, m_groundTiltRotation, targetRotation);
+
+			m_modelRender.SetTRS(m_transform.m_position, m_groundTiltRotation, m_transform.m_scale);
+			//m_modelRender.Update();
+		}
+
+
+		void Enemy::InitLegIK()
+		{
+			bool ok = true;
+
+			ok &= m_legIK.AddLegByBoneNames(
+				&m_skeleton, L"Hip_L", L"Knee_L", L"Ankle_L",
+				Vector3(0.0f, -1.0f, 1.0f), 1.0f, 0.0f,
+				{ L"Toes1_L", L"MiddleToe1_L", L"MiddleToe2_L" });
+
+			ok &= m_legIK.AddLegByBoneNames(
+				&m_skeleton, L"Hip_R", L"Knee_R", L"Ankle_R",
+				Vector3(0.0f, -1.0f, 1.0f), 1.0f, 0.0f,
+				{ L"Toes1_R", L"MiddleToe1_R", L"MiddleToe2_R" });
+
+			ok &= m_legIK.AddLegByBoneNames(
+				&m_skeleton, L"Shoulder_L", L"Elbow_L", L"Wrist_L",
+				Vector3(0.0f, -1.0f, -1.0f), 1.0f, 0.0f,
+				{ L"Fingers1_L", L"MiddleFinger1_L", L"MiddleFinger2_L" },
+				{ L"ShoulderPart1_L" },
+				{ L"ElbowPart1_L", L"ElbowPart2_L" });
+
+			ok &= m_legIK.AddLegByBoneNames(
+				&m_skeleton, L"Shoulder_R", L"Elbow_R", L"Wrist_R",
+				Vector3(0.0f, -1.0f, -1.0f), 1.0f, 0.0f,
+				{ L"Fingers1_R", L"MiddleFinger1_R", L"MiddleFinger2_R" },
+				{ L"ShoulderPart1_R" },
+				{ L"ElbowPart1_R", L"ElbowPart2_R" });
+
+			// ボーン名のtypoやリグ変更にすぐ気づけるよう、開発中は止める
+			// （NDEBUGビルド＝リリース版ではassertは無効化されるので本番影響なし）
+			assert(ok && "InitLegIK: ボーンが見つからず脚IKの登録に失敗した箇所があります");
 		}
 
 

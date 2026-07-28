@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Actor/Character/CharacterBase.h"
+#include "Source/Actor/IK/LegIKComponent.h"
 
 
 namespace app
@@ -52,6 +53,18 @@ namespace app
 			void Update() override final;
 			void Render(RenderContext& rc)override final;
 
+			/** 脚IKのセットアップ（ボーン名はここで指定する。モデルロード完了後に1回だけ呼ぶ） */
+			void InitLegIK();
+
+			/**
+			 * @brief 地形の傾きに合わせて胴体を傾ける描画補正を行う
+			 * @details PenguinBase::UpdateSlideTilt()と同じ考え方。
+			 *          物理・ステート判定用のm_transformには触れず、
+			 *          描画（＝スケルトンのワールド行列）だけを傾ける。
+			 *          脚IKより先に呼ぶことで、IKは残差の微調整だけを担当する。
+			 */
+			void UpdateGroundTilt();
+
 			// シロクマ用の足跡パラメータ
 			float GetFootprintSize() const override { return 30.0f; }         // 体格に合わせて調整
 			int   GetFootprintPriority() const override { return 2; }         // 通常のペンギンより消されにくくする
@@ -71,6 +84,14 @@ namespace app
 			Vector3 m_homePosition;
 			/** ログ用の連番ID（EnemyManager が生成順に割り当てる） */
 			int m_logId = -1;
+
+			/** 脚IK(4本分) */
+			app::actor::ik::LegIKComponent m_legIK;
+			/** InitLegIK()を呼び終えたかのフラグ */
+			bool m_legIKInited = false;
+
+			/** 地形傾斜に合わせた胴体描画用回転（補間済み） */
+			Quaternion m_groundTiltRotation;
 		};
 	}
 }
