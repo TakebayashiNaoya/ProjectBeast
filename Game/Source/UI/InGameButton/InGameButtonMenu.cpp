@@ -6,8 +6,9 @@
 #include "stdafx.h"
 #include "InGameButtonGaugeAnimStatus.h"
 #include "InGameButtonMenu.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Manager/BattleManager.h"
-#include "Source/UI/Animation/UIAnimationFactory.h"  
+#include "Source/UI/Animation/UIAnimationFactory.h"
 #include "Source/Util/CRC32.h"
 
 
@@ -15,6 +16,19 @@ namespace app
 {
 	namespace ui
 	{
+		namespace
+		{
+			/** 命令標識が回りきるまでの時間(秒) */
+			static constexpr float SIGN_FLIP_DURATION = 0.4f;
+			/** 命令標識が回るときの半回転の回数。奇数にすると必ず反対の面を向いて止まる */
+			static constexpr int SIGN_FLIP_HALF_TURN_COUNT = 1;
+			/** 命令標識の表(GO)のUI名 */
+			const char* SIGN_GO_UI_NAME = "OrderSignGoIcon";
+			/** 命令標識の裏(WAIT)のUI名 */
+			const char* SIGN_WAIT_UI_NAME = "OrderSignWaitIcon";
+		}
+
+
 		InGameButtonMenu::InGameButtonMenu()
 		{
 			// スタミナゲージ専用のステータスを生成。
@@ -37,7 +51,8 @@ namespace app
 						"NotInputJumpIcon", "NotInputSneakIcon", "NotInputSlideIcon", "NotInputOrderIcon",
 						"InputJumpIcon",    "InputSneakIcon",    "InputSlideIcon",    "InputOrderIcon",
 						"NotInputAbuttonIcon", "NotInputBbuttonIcon", "NotInputXbuttonIcon", "NotInputYbuttonIcon",
-						"InputAbuttonIcon",    "InputBbuttonIcon",    "InputXbuttonIcon",    "InputYbuttonIcon"
+						"InputAbuttonIcon",    "InputBbuttonIcon",    "InputXbuttonIcon",    "InputYbuttonIcon",
+						SIGN_GO_UI_NAME,       SIGN_WAIT_UI_NAME
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
 					Vector3(300.0f, 0.0f, 0.0f),
@@ -53,6 +68,7 @@ namespace app
 
 			ButtonIconUpdate();
 			UpdateStaminaGauge();
+			UpdateCommandSign();
 			MenuBase::Update();
 		}
 
@@ -140,6 +156,58 @@ namespace app
 		}
 
 
+		void InGameButtonMenu::UpdateCommandSign()
+		{
+			auto* goSign = GetUI<UIIcon>(Hash32(SIGN_GO_UI_NAME));
+			auto* waitSign = GetUI<UIIcon>(Hash32(SIGN_WAIT_UI_NAME));
+			if (!goSign || !waitSign) return;
+
+			// 子ペンギンがいないシーンでは命令自体が存在しないので標識も出さない
+			auto* childPenguinManager = actor::ChildPenguinManager::GetInstance();
+			if (childPenguinManager == nullptr)
+			{
+				goSign->m_isDraw = false;
+				waitSign->m_isDraw = false;
+				return;
+			}
+
+			// Yボタンで命令が切り替わった瞬間を捉えて、標識を回し始める
+			const bool isWaitCommand = childPenguinManager->GetCommand() == actor::ChildPenguinManager::EnPenguinCommand::Wait;
+			if (isWaitCommand != m_wasWaitCommand)
+			{
+				m_wasWaitCommand = isWaitCommand;
+				m_isSignFlipping = true;
+				m_signFlipTimer = 0.0f;
+			}
+
+			if (m_isSignFlipping)
+			{
+				m_signFlipTimer += g_gameTime->GetFrameDeltaTime();
+				if (m_signFlipTimer >= SIGN_FLIP_DURATION)
+				{
+					m_signFlipTimer = SIGN_FLIP_DURATION;
+					m_isSignFlipping = false;
+				}
+			}
+
+			// 何回半回転したかを求める。0.5回転ごと(板が真横を向いて見えなくなる瞬間)に
+			// 手前の面が入れ替わるので、0.5足した値の偶奇でどちらの面が見えているかを判定する
+			const float turnProgress = (m_signFlipTimer / SIGN_FLIP_DURATION) * SIGN_FLIP_HALF_TURN_COUNT;
+			const bool isShowingNewFace = (static_cast<int>(turnProgress + 0.5f) % 2) != 0;
+			const bool isShowingWait = isShowingNewFace ? isWaitCommand : !isWaitCommand;
+
+			goSign->m_isDraw = !isShowingWait;
+			waitSign->m_isDraw = isShowingWait;
+
+			// 横幅を回転角のコサインで縮めて、板が左右にくるっと回っているように見せる
+			Vector3 signScale = m_signBaseScale;
+			signScale.x *= fabsf(cosf(Math::PI * turnProgress));
+
+			goSign->m_transform.m_localTransform.m_scale = signScale;
+			waitSign->m_transform.m_localTransform.m_scale = signScale;
+		}
+
+
 		void InGameButtonMenu::ButtonIconUpdate()
 		{
 			// UI表示を切り替えるラムダ式（ローカル関数）
@@ -196,6 +264,26 @@ namespace app
 					ui->m_isDraw = false;
 				}
 			}
+
+			// 命令標識は回転演出の基準になるスケールをJsonから拾っておく
+			// (表と裏で同じスケールを指定している前提なので、表の値を両方に使う)
+			if (auto* goSign = GetUI<UIIcon>(Hash32(SIGN_GO_UI_NAME)))
+			{
+				m_signBaseScale = goSign->m_transform.m_localTransform.m_scale;
+				goSign->m_isDraw = false;
+			}
+			if (auto* waitSign = GetUI<UIIcon>(Hash32(SIGN_WAIT_UI_NAME)))
+			{
+				waitSign->m_isDraw = false;
+			}
+
+			// 回転しきった状態から始めて、今の命令の面をそのまま見せる
+			m_signFlipTimer = SIGN_FLIP_DURATION;
+			m_isSignFlipping = false;
+
+			auto* childPenguinManager = actor::ChildPenguinManager::GetInstance();
+			m_wasWaitCommand = childPenguinManager != nullptr
+				&& childPenguinManager->GetCommand() == actor::ChildPenguinManager::EnPenguinCommand::Wait;
 		}
 
 
