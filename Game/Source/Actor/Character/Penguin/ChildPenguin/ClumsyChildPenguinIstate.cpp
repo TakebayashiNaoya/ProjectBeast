@@ -11,6 +11,7 @@
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Effect/EffectManager.h"
 #include "Source/Sound/SoundManager.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 
 #include "Source/Noise/NoiseManager.h"
 
@@ -23,6 +24,8 @@ namespace app
 		{
 			/** 転んだ時のエフェクトのスケール */
 			const Vector3 CRY_EFFECT_SCALE = { 6.0f, 6.0f, 6.0f };
+			/** 泣きエフェクトを発生させるボーン名（頭） */
+			const wchar_t* CRY_EFFECT_BONE_NAME = L"Head";
 		}
 
 
@@ -59,6 +62,18 @@ namespace app
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
 				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
+
+				// エフェクトは頭のボーン座標から発生させる
+				const Vector3 headPos = m_owner->GetOwnerChildPenguin()->GetModelRender().GetBoneWorldPosition(CRY_EFFECT_BONE_NAME);
+
+				// エフェクト再生（ハンドルをステートマシンに保存）
+				const EffectHandle handle = EffectManager::Get().PlayEffect(
+					EnEffectKind::ChildPenguinCry,
+					headPos,
+					Quaternion::Identity,
+					CRY_EFFECT_SCALE
+				);
+				m_owner->SetCryEffectHandle(handle);
 			}
 
 			/** 転倒フラグをリセットする */
@@ -84,7 +99,22 @@ namespace app
 
 
 		void ClumsyStandUpState::Update()
-		{}
+		{
+			// 泣きエフェクトの再生中は座標を頭のボーンに追従させる
+			const EffectHandle handle = m_owner->GetCryEffectHandle();
+			if (handle == INVALID_EFFECT_HANDLE) return;
+
+			auto* effect = EffectManager::Get().FindEffect(handle);
+			if (effect == nullptr)
+			{
+				// エフェクトが自己削除済みの場合はハンドルを無効化する
+				m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
+				return;
+			}
+
+			const Vector3 headPos = m_owner->GetOwnerChildPenguin()->GetModelRender().GetBoneWorldPosition(CRY_EFFECT_BONE_NAME);
+			effect->SetPosition(headPos);
+		}
 
 
 		void ClumsyStandUpState::Exit()
@@ -143,11 +173,13 @@ namespace app
 
 				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
 
+				// エフェクトは頭のボーン座標から発生させる
+				const Vector3 headPos = m_owner->GetOwnerChildPenguin()->GetModelRender().GetBoneWorldPosition(CRY_EFFECT_BONE_NAME);
 
 				// エフェクト再生（ハンドルをステートマシンに保存）
 				const EffectHandle handle = EffectManager::Get().PlayEffect(
 					EnEffectKind::ChildPenguinCry,
-					pos,
+					headPos,
 					Quaternion::Identity,
 					CRY_EFFECT_SCALE
 				);
