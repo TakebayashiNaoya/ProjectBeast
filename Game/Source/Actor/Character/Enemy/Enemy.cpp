@@ -19,8 +19,10 @@ namespace app
 		{
 			/** 地形法線に沿わせる補間速度 */
 			constexpr float GROUND_TILT_SLERP_SPEED = 10.0f;
-			/** 真下レイの射程距離 */
-			constexpr float GROUND_TILT_RAY_LENGTH = 400.0f;
+			/** レイの発射点を、キャラクター座標からどれだけ上にずらすか（地形より確実に高くするため） */
+			constexpr float GROUND_TILT_RAY_START_UP_OFFSET = 500.0f;
+			/** 真下レイの射程距離（発射点を上げた分、長めに取っておく） */
+			constexpr float GROUND_TILT_RAY_LENGTH = 1000.0f;
 
 			AnimationData ANIMATION_DATA[] =
 			{
@@ -87,7 +89,9 @@ namespace app
 			{
 				UpdateGroundTilt();
 
-				m_legIK.SetTerrain(StageSystem::GetInstance()->GetTerrain());
+				TerrainObject* terrain = StageSystem::GetInstance()->GetTerrain();
+
+				m_legIK.SetTerrain(terrain);
 
 				m_legIK.Update(&m_skeleton);
 			}
@@ -100,12 +104,24 @@ namespace app
 
 			/** 真下にレイを飛ばして地形法線を取得する（PenguinBase::UpdateSlideTiltと同じ） */
 			const Vector3& pos = m_transform.m_position;
-			const Vector3 rayStart = pos;
+
+			TerrainObject* terrain = StageSystem::GetInstance()->GetTerrain();
+			if (terrain)
+			{
+				float terrainHeight = terrain->GetHeightAt(pos);
+				char buf[256];
+				sprintf_s(buf, "EnemyPosY=%.1f TerrainHeight=%.1f Diff=%.1f\n", pos.y, terrainHeight, pos.y - terrainHeight);
+				OutputDebugStringA(buf);
+			}
+
+			const Vector3 rayStart = Vector3(pos.x, pos.y + GROUND_TILT_RAY_START_UP_OFFSET, pos.z);
 			const Vector3 rayEnd = Vector3(pos.x, pos.y - GROUND_TILT_RAY_LENGTH, pos.z);
 
 			nsBeastEngine::nsCollision::RaycastHit hit;
 			Vector3 groundNormal = Vector3::Up;
-			if (nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(rayStart, rayEnd, hit))
+			bool hitSuccess = nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(rayStart, rayEnd, hit);
+
+			if (hitSuccess)
 			{
 				groundNormal = hit.normal;
 			}
@@ -126,8 +142,22 @@ namespace app
 			const float slerpFactor = min(1.0f, GROUND_TILT_SLERP_SPEED * deltaTime);
 			m_groundTiltRotation.Slerp(slerpFactor, m_groundTiltRotation, targetRotation);
 
-			m_modelRender.SetTRS(m_transform.m_position, m_groundTiltRotation, m_transform.m_scale);
-			//m_modelRender.Update();
+			// ★修正: m_modelRender.Update()を呼ぶとアニメーション再生時間が
+			//         CharacterBase::Update()内の分と合わせて二重に進んでしまう（倍速の原因）。
+			//         Skeleton::Update()はアニメーション時間を進めず行列を掛け合わせるだけなので、
+			//         こちらを直接呼び、今フレーム分すでに計算済みのローカル行列（＝アニメのポーズ）は
+			//         そのままに、ワールド行列だけを「傾いたルート行列」で再計算する。
+			Vector3 rowX = Vector3::AxisX; m_groundTiltRotation.Apply(rowX); rowX = rowX * m_transform.m_scale.x;
+			Vector3 rowY = Vector3::AxisY; m_groundTiltRotation.Apply(rowY); rowY = rowY * m_transform.m_scale.y;
+			Vector3 rowZ = Vector3::AxisZ; m_groundTiltRotation.Apply(rowZ); rowZ = rowZ * m_transform.m_scale.z;
+
+			Matrix tiltedWorld;
+			tiltedWorld.v[0].Set(rowX.x, rowX.y, rowX.z, 0.0f);
+			tiltedWorld.v[1].Set(rowY.x, rowY.y, rowY.z, 0.0f);
+			tiltedWorld.v[2].Set(rowZ.x, rowZ.y, rowZ.z, 0.0f);
+			tiltedWorld.v[3].Set(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z, 1.0f);
+
+			m_skeleton.Update(tiltedWorld);
 		}
 
 
