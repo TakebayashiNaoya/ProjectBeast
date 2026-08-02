@@ -91,7 +91,7 @@ namespace app
 			bool m_legIKInited = false;
 
 			/** 地形傾斜に合わせた胴体描画用回転（補間済み） */
-			Quaternion m_groundTiltRotation;
+			Quaternion m_groundTiltRotation = Quaternion::Identity;
 		};
 	}
 }
