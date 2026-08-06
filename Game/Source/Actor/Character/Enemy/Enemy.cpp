@@ -19,18 +19,30 @@ namespace app
 		{
 			/** 地形法線に沿わせる補間速度 */
 			constexpr float GROUND_TILT_SLERP_SPEED = 10.0f;
-			/** 傾きの最大角度（ラジアン）。急な形状で過度に傾いて埋まって見えるのを防ぐための上限（約35度） */
-			constexpr float GROUND_TILT_MAX_ANGLE = 0.6109f;
+			/** ★修正: 崖のような急斜面を反映できるよう、35度→約70度まで引き上げ。
+			 *  この値はサンプリングで検出できる傾きの理論上限も兼ねているため、
+			 *  ここを上げないとサンプリング距離をどれだけ縮めても35度で頭打ちだった。 */
+			constexpr float GROUND_TILT_MAX_ANGLE = 1.5533f; // 約70度
 			/** レイの発射点を、キャラクター座標からどれだけ上にずらすか（地形より確実に高くするため） */
 			constexpr float GROUND_TILT_RAY_START_UP_OFFSET = 500.0f;
 			/** 真下レイの射程距離（発射点を上げた分、長めに取っておく） */
 			constexpr float GROUND_TILT_RAY_LENGTH = 1000.0f;
-			/** 地面法線を計算する際に、キャラ位置からXZ方向にサンプリングする距離 */
-			constexpr float GROUND_TILT_NORMAL_SAMPLE_OFFSET = 40.0f;
+			/** ★修正: 40だと坂の途中の平らな部分（崖の上や下）まで一緒にサンプリングしてしまい、
+			 *  傾きが平均化されて実際より緩やかに見積もられていた。足元の局所的な傾きを
+			 *  拾えるよう、キャラの体格（GetFootprintStanceWidth=20程度）に合わせて狭める。 */
+			constexpr float GROUND_TILT_NORMAL_SAMPLE_OFFSET = 12.0f;
 			/** キャラY座標とGetHeightAtの結果の差がこれを超えたら、
 			 *  「ハイトマップ地形の上に立っていない」とみなして傾き計算をスキップする
 			 *  （台座オブジェクトの上に立っている場合や、地形との不整合を弾くため） */
 			constexpr float GROUND_TILT_MAX_HEIGHT_DIFF = 8.0f;
+			/** キャラY座標とGetHeightAtの結果の差がこの範囲内なら、地形の上に立っているとみなし
+ *  地形法線でしっかり傾ける */
+			constexpr float GROUND_TILT_MAX_HEIGHT_DIFF_FULL = 8.0f;
+			/** ★修正: この値を超えたら「地形の上に立っていない」（台座オブジェクトの上など）とみなし
+			 *  傾きを完全にゼロにする。FULL～ZEROの間はDiffが大きくなるほど徐々に傾きを弱める
+			 *  （旧GROUND_TILT_MAX_HEIGHT_DIFFの0/1判定だと、坂を登っている途中で接地判定が
+			 *  追いついていないだけのケースまで弾いてしまい、坂で全く傾かない原因になっていた） */
+			constexpr float GROUND_TILT_MAX_HEIGHT_DIFF_ZERO = 80.0f;
 
 
 			AnimationData ANIMATION_DATA[] =
@@ -90,8 +102,8 @@ namespace app
 
 			if (m_modelReady && !m_legIKInited)
 			{
-				InitLegIK();
-				m_legIKInited = true;
+
+				m_legIKInited = InitLegIK();
 			}
 
 			if (m_legIKInited)
@@ -138,19 +150,29 @@ namespace app
 			//         水平（Up）のまま扱う。
 			Vector3 groundNormal = Vector3::Up;
 			bool isSwimming = m_stateMachine && m_stateMachine->IsSwim();
-			bool isOnMappedGround = terrain && (fabsf(pos.y - terrainHeightAtPos) <= GROUND_TILT_MAX_HEIGHT_DIFF);
 
-			if (terrain && !isSwimming && isOnMappedGround)
+			// ★修正: 0/1の完全スキップをやめ、Diffの大きさに応じて0.0～1.0のブレンド係数にする
+			float groundTiltWeight = 0.0f;
+			if (terrain && !isSwimming)
+			{
+				float diff = fabsf(pos.y - terrainHeightAtPos);
+				if (diff <= GROUND_TILT_MAX_HEIGHT_DIFF_FULL)
+				{
+					groundTiltWeight = 1.0f;
+				}
+				else if (diff < GROUND_TILT_MAX_HEIGHT_DIFF_ZERO)
+				{
+					float t = (diff - GROUND_TILT_MAX_HEIGHT_DIFF_FULL) /
+						(GROUND_TILT_MAX_HEIGHT_DIFF_ZERO - GROUND_TILT_MAX_HEIGHT_DIFF_FULL);
+					groundTiltWeight = 1.0f - t; // 線形フェード
+				}
+				// diff >= ZERO のときは 0.0f のまま（台座等とみなし傾けない）
+			}
+
+			if (terrain && !isSwimming && groundTiltWeight > 0.0f)
 			{
 				const float sampleOffset = GROUND_TILT_NORMAL_SAMPLE_OFFSET;
 
-				// ★修正: 1点でも極端に高さが違うサンプル（近くの装飾物、崖、
-				//         水中地形などを拾ってしまった場合）が混ざると、法線の
-				//         "方向"自体が大きく歪んでしまう。最終的にtiltAngleを
-				//         GROUND_TILT_MAX_ANGLEでクランプしていても、法線の向き
-				//         そのものが歪んでいては意味がないため、サンプリングの
-				//         時点で「中心の高さから見て、最大許容角度で届く範囲」に
-				//         あらかじめクランプしておく。
 				const float maxSampleDelta = sampleOffset * tanf(GROUND_TILT_MAX_ANGLE);
 				auto ClampHeight = [terrainHeightAtPos, maxSampleDelta](float h)
 					{
@@ -161,7 +183,6 @@ namespace app
 						return h;
 					};
 
-				// ※GetHeightAtはY成分を無視するので、第2引数は0.0fでOK
 				float hL = ClampHeight(terrain->GetHeightAt(Vector3(pos.x - sampleOffset, 0.0f, pos.z)));
 				float hR = ClampHeight(terrain->GetHeightAt(Vector3(pos.x + sampleOffset, 0.0f, pos.z)));
 				float hD = ClampHeight(terrain->GetHeightAt(Vector3(pos.x, 0.0f, pos.z - sampleOffset)));
@@ -170,7 +191,6 @@ namespace app
 				Vector3 tangentX(2.0f * sampleOffset, hR - hL, 0.0f);
 				Vector3 tangentZ(0.0f, hU - hD, 2.0f * sampleOffset);
 
-				// tangentZ × tangentX で、平坦なら(0,1,0)になる向きの外積を取る
 				Vector3 normal;
 				normal.x = tangentZ.y * tangentX.z - tangentZ.z * tangentX.y;
 				normal.y = tangentZ.z * tangentX.x - tangentZ.x * tangentX.z;
@@ -179,7 +199,15 @@ namespace app
 				if (normal.LengthSq() > FLT_EPSILON)
 				{
 					normal.Normalize();
-					groundNormal = normal;
+
+					// ★修正: 求めた地形法線をそのまま使うのではなく、Diffに応じたweightで
+					//         Vector3::Up とブレンドする。Diffが大きいほどUpに近づく。
+					Vector3 blended = Vector3::Up * (1.0f - groundTiltWeight) + normal * groundTiltWeight;
+					if (blended.LengthSq() > FLT_EPSILON)
+					{
+						blended.Normalize();
+						groundNormal = blended;
+					}
 				}
 			}
 
@@ -206,10 +234,12 @@ namespace app
 			// 原因切り分けができたら消してOK。
 			{
 				char buf[256];
-				//sprintf_s(buf, "groundNormal=(%.3f,%.3f,%.3f) dot=%.5f tiltAngle(deg)=%.2f\n",
-				//	groundNormal.x, groundNormal.y, groundNormal.z,
-				//	dotUpNormal, tiltAngle * 180.0f / 3.14159265f);
-				//OutputDebugStringA(buf);
+				sprintf_s(buf, "[Enemy#%d] terrain=%s isSwimming=%d diffSigned=%.1f weight=%.2f groundNormal=(%.3f,%.3f,%.3f) dot=%.5f tiltAngle(deg)=%.2f\n",
+					m_logId, terrain ? "OK" : "NULL", isSwimming ? 1 : 0,
+					pos.y - terrainHeightAtPos, groundTiltWeight,
+					groundNormal.x, groundNormal.y, groundNormal.z,
+					dotUpNormal, tiltAngle * 180.0f / 3.14159265f);
+				OutputDebugStringA(buf);
 			}
 
 			// ★修正: groundNormalがVector3::Upとほぼ同じ方向（平坦な地形、または
@@ -233,44 +263,39 @@ namespace app
 				}
 			}
 
-			/** 「まず地形に合わせて傾け、次に進行方向を向く」合成 */
-			Quaternion targetRotation;
-			targetRotation.Multiply(yRot, tiltRot);
+			// ★修正: 以前はここでyRotとtiltRotを合成してからm_groundTiltRotationに
+			//         Slerpしていましたが、それだとm_groundTiltRotationが「傾き」だけでなく
+			//         「向き(ヨー)」も一緒に補間する形になってしまいます。
+			//         キャラが歩き回って向きを変え続けている間、Slerpは常に
+			//         「向きへの追いつき」をやり続けることになり、しかも真上ベクトルは
+			//         ヨー回転だけでは変化しないため、向きへの追いつきが終わらない限り
+			//         finalUpが(0,1,0)に張り付いて見えてしまいます。
+			//         「一部のエネミーだけ傾きがまったく反映されない」症状の正体はこれだと
+			//         考えられます。対策として、m_groundTiltRotationには「傾きのみ」を持たせ、
+			//         向き(yRot)は毎フレーム素の値をそのまま掛け合わせる形にしました。
+			//         Slerpが扱うのは常に0～GROUND_TILT_MAX_ANGLE程度の小さい回転だけになるので、
+			//         キャラがどれだけ速く向きを変えても傾きの補間には影響しません。
 
-			// ★修正: クォータニオンは q と -q が同じ回転を表す「二重被覆」の性質を持つ。
-			//         内積が負の場合、そのままSlerpすると"長い方の経路"で補間してしまい、
-			//         その過程で一瞬（あるいは追いつかず持続的に）上下逆さまのような
-			//         おかしな姿勢を経由してしまう。
-			//         ダイブ演出のようにyRot（進行方向の回転）が短時間で大きく変化する
-			//         状況ほど、この符号の食い違いが起きやすい。
-			//         ※x/y/z/wというメンバー名は仮定です。Quaternion.hの実際の
-			//         メンバー変数名（または既存のDot()相当のメソッド）に合わせて
-			//         調整してください。
-			float dotRot = m_groundTiltRotation.x * targetRotation.x
-				+ m_groundTiltRotation.y * targetRotation.y
-				+ m_groundTiltRotation.z * targetRotation.z
-				+ m_groundTiltRotation.w * targetRotation.w;
+			// クォータニオンの二重被覆対策（m_groundTiltRotationとtiltRotはどちらも「傾きのみ」なので比較可能）
+			// ※x/y/z/wというメンバー名は仮定です。Quaternion.hの実際の
+			//   メンバー変数名（または既存のDot()相当のメソッド）に合わせて調整してください。
+			float dotRot = m_groundTiltRotation.x * tiltRot.x
+				+ m_groundTiltRotation.y * tiltRot.y
+				+ m_groundTiltRotation.z * tiltRot.z
+				+ m_groundTiltRotation.w * tiltRot.w;
 
 			if (dotRot < 0.0f)
 			{
-				targetRotation.x = -targetRotation.x;
-				targetRotation.y = -targetRotation.y;
-				targetRotation.z = -targetRotation.z;
-				targetRotation.w = -targetRotation.w;
+				tiltRot.x = -tiltRot.x;
+				tiltRot.y = -tiltRot.y;
+				tiltRot.z = -tiltRot.z;
+				tiltRot.w = -tiltRot.w;
 			}
 
-			// ★デバッグ: 符号反転が実際に起きているかを確認する。
-			//            ダイブ演出中にdotRot<0が頻発していれば、今回の仮説が正しい。
-			//{
-			//	char buf[256];
-			//	sprintf_s(buf, "[Enemy#%d] dotRot=%.5f (negative=flip-corrected)\n", m_logId, dotRot);
-			//	OutputDebugStringA(buf);
-			//}
-
-			/** 補間して急激な回転変化を抑える */
+			/** 傾きだけを補間して急激な変化を抑える */
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 			const float slerpFactor = min(1.0f, GROUND_TILT_SLERP_SPEED * deltaTime);
-			m_groundTiltRotation.Slerp(slerpFactor, m_groundTiltRotation, targetRotation);
+			m_groundTiltRotation.Slerp(slerpFactor, m_groundTiltRotation, tiltRot);
 
 			{
 				Vector3 finalUp = Vector3::Up;
@@ -279,25 +304,48 @@ namespace app
 				float finalTiltDeg = acosf(finalDot) * 180.0f / 3.14159265f;
 
 				char buf[256];
-				//sprintf_s(buf, "[Enemy#%d] FINAL applied tilt = %.2f deg (finalUp=(%.3f,%.3f,%.3f)) isSwimming=%d\n",
-				//	m_logId, finalTiltDeg, finalUp.x, finalUp.y, finalUp.z, isSwimming ? 1 : 0);
-				//OutputDebugStringA(buf);
+				sprintf_s(buf, "[Enemy#%d] FINAL applied tilt = %.2f deg (finalUp=(%.3f,%.3f,%.3f)) isSwimming=%d\n",
+					m_logId, finalTiltDeg, finalUp.x, finalUp.y, finalUp.z, isSwimming ? 1 : 0);
+				OutputDebugStringA(buf);
 			}
+
+			// ★修正: 向き(yRot)は補間しない生の値をここで合成する。
+			//         スムーズな向き変更自体はステートマシン/アニメーション側の役割。
+			Quaternion finalRotation;
+			finalRotation.Multiply(yRot, m_groundTiltRotation);
 
 			// ★修正: m_modelRender.Update()を呼ぶとアニメーション再生時間が
 			//         CharacterBase::Update()内の分と合わせて二重に進んでしまう（倍速の原因）。
 			//         Skeleton::Update()はアニメーション時間を進めず行列を掛け合わせるだけなので、
 			//         こちらを直接呼び、今フレーム分すでに計算済みのローカル行列（＝アニメのポーズ）は
 			//         そのままに、ワールド行列だけを「傾いたルート行列」で再計算する。
-			Vector3 rowX = Vector3::AxisX; m_groundTiltRotation.Apply(rowX); rowX = rowX * m_transform.m_scale.x;
-			Vector3 rowY = Vector3::AxisY; m_groundTiltRotation.Apply(rowY); rowY = rowY * m_transform.m_scale.y;
-			Vector3 rowZ = Vector3::AxisZ; m_groundTiltRotation.Apply(rowZ); rowZ = rowZ * m_transform.m_scale.z;
+			Vector3 rowX = Vector3::AxisX; finalRotation.Apply(rowX); rowX = rowX * m_transform.m_scale.x;
+			Vector3 rowY = Vector3::AxisY; finalRotation.Apply(rowY); rowY = rowY * m_transform.m_scale.y;
+			Vector3 rowZ = Vector3::AxisZ; finalRotation.Apply(rowZ); rowZ = rowZ * m_transform.m_scale.z;
 
-			Matrix tiltedWorld;
-			tiltedWorld.v[0].Set(rowX.x, rowX.y, rowX.z, 0.0f);
-			tiltedWorld.v[1].Set(rowY.x, rowY.y, rowY.z, 0.0f);
-			tiltedWorld.v[2].Set(rowZ.x, rowZ.y, rowZ.z, 0.0f);
-			tiltedWorld.v[3].Set(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z, 1.0f);
+			Matrix trs;
+			trs.v[0].Set(rowX.x, rowX.y, rowX.z, 0.0f);
+			trs.v[1].Set(rowY.x, rowY.y, rowY.z, 0.0f);
+			trs.v[2].Set(rowZ.x, rowZ.y, rowZ.z, 0.0f);
+			trs.v[3].Set(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z, 1.0f);
+
+			// ★修正: ここで組み直しているtiltedWorldは、Model::CalcWorldMatrix()が
+			//         本来作るワールド行列を丸ごと置き換えてSkeleton::Update()に
+			//         渡している。CalcWorldMatrix()側はupAxis==Zのモデル（WhiteBear等）
+			//         に対してX軸-90度の補正(mBias)を含めているが、ここではTRSだけを
+			//         組んでいたためmBiasが抜け落ち、モデル全体がローカルX軸まわりに
+			//         90度ズレて見えていた（＝頭が地面側に傾き、脚IKだけは正しく
+			//         ワールド空間の地面ターゲットに足を伸ばそうとするので、
+			//         結果的に「胴体は傾いているのに足だけ地面に真っ直ぐ」という
+			//         見た目になっていた）。
+			//         Model.cppのCalcWorldMatrix()と同じ補正をここでも掛ける。
+			Matrix mBias = Matrix::Identity;
+			if (m_upAxis == EnModelUpAxis::enModelUpAxisZ)
+			{
+				mBias.MakeRotationX(Math::PI * -0.5f);
+			}
+
+			Matrix tiltedWorld = mBias * trs;
 
 			Skeleton* skeleton = m_modelRender.GetSkeleton();
 			if (skeleton)
@@ -307,13 +355,22 @@ namespace app
 		}
 
 
-		void Enemy::InitLegIK()
+		bool Enemy::InitLegIK()
 		{
 			// IKで動かす対象は、実際の描画・スキニングに使われている
 			// m_modelRender側のスケルトンでなければならない。
 			Skeleton* skeleton = m_modelRender.GetSkeleton();
-			assert(skeleton && "Enemy::InitLegIK: ModelRenderからSkeletonが取得できません。");
-			if (!skeleton) return;
+			if (!skeleton)
+			{
+				// ★修正: ここでassertして止めない。m_modelReady直後の数フレームは
+				//         Skeletonがまだ完全に組み上がっていないだけの可能性があるため、
+				//         falseを返して次フレームの再試行に委ねる。
+				return false;
+			}
+
+			// ★修正: 前回の呼び出しで一部の脚だけ登録できてしまっている場合に備え、
+			//         毎回クリアしてから登録し直す（再試行時に脚が重複登録されるのを防ぐ）。
+			m_legIK.Clear();
 
 			bool ok = true;
 
@@ -345,8 +402,16 @@ namespace app
 			// （NDEBUGビルド＝リリース版ではassertは無効化されるので本番影響なし）
 			assert(ok && "InitLegIK: ボーンが見つからず脚IKの登録に失敗した箇所があります");
 
-			m_groundTiltRotation = m_transform.m_rotation;
+			if (!ok)
+			{
+				// ★修正: 1本でも失敗していたら中途半端な状態のまま確定させず、
+				//         クリアして次フレーム再試行する。
+				m_legIK.Clear();
+				return false;
+			}
 
+			//m_groundTiltRotation = m_transform.m_rotation;
+			return true;
 		}
 
 

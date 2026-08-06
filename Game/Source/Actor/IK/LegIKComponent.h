@@ -37,6 +37,13 @@ namespace app
 				void AddLeg(const LegIKChain& chain) { m_legs.push_back(chain); }
 
 				/**
+				 * @brief 登録済みの脚をすべて削除する
+				 * @details InitLegIK()などが途中で失敗して再試行する際、
+				 *          前回分の脚が重複登録されるのを防ぐために使う。
+				 */
+				void Clear() { m_legs.clear(); }
+
+				/**
 				 * @brief ボーン名から脚のチェーンを追加
 				 * @return ボーンが見つからず追加できなかった場合はfalse
 				 */

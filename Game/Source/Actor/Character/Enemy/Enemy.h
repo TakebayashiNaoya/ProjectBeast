@@ -54,7 +54,7 @@ namespace app
 			void Render(RenderContext& rc)override final;
 
 			/** 脚IKのセットアップ（ボーン名はここで指定する。モデルロード完了後に1回だけ呼ぶ） */
-			void InitLegIK();
+			bool InitLegIK();
 
 			/**
 			 * @brief 地形の傾きに合わせて胴体を傾ける描画補正を行う
