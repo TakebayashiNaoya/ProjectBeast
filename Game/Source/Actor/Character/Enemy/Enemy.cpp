@@ -19,30 +19,16 @@ namespace app
 		{
 			/** 地形法線に沿わせる補間速度 */
 			constexpr float GROUND_TILT_SLERP_SPEED = 10.0f;
-			/** ★修正: 崖のような急斜面を反映できるよう、35度→約70度まで引き上げ。
-			 *  この値はサンプリングで検出できる傾きの理論上限も兼ねているため、
-			 *  ここを上げないとサンプリング距離をどれだけ縮めても35度で頭打ちだった。 */
+			/** 胴体を傾ける角度の上限。
+			 *  接地判定はカプセル基準なので、真下レイの法線のほうが急な角度を返すことがある
+			 *  （崖の肩にカプセルが乗っている場合など）。そのまま適用すると体が倒れて見えるため、
+			 *  ここでクランプする。 */
 			constexpr float GROUND_TILT_MAX_ANGLE = 1.5533f; // 約70度
-			/** レイの発射点を、キャラクター座標からどれだけ上にずらすか（地形より確実に高くするため） */
-			constexpr float GROUND_TILT_RAY_START_UP_OFFSET = 500.0f;
-			/** 真下レイの射程距離（発射点を上げた分、長めに取っておく） */
-			constexpr float GROUND_TILT_RAY_LENGTH = 1000.0f;
-			/** ★修正: 40だと坂の途中の平らな部分（崖の上や下）まで一緒にサンプリングしてしまい、
-			 *  傾きが平均化されて実際より緩やかに見積もられていた。足元の局所的な傾きを
-			 *  拾えるよう、キャラの体格（GetFootprintStanceWidth=20程度）に合わせて狭める。 */
-			constexpr float GROUND_TILT_NORMAL_SAMPLE_OFFSET = 12.0f;
-			/** キャラY座標とGetHeightAtの結果の差がこれを超えたら、
-			 *  「ハイトマップ地形の上に立っていない」とみなして傾き計算をスキップする
-			 *  （台座オブジェクトの上に立っている場合や、地形との不整合を弾くため） */
-			constexpr float GROUND_TILT_MAX_HEIGHT_DIFF = 8.0f;
-			/** キャラY座標とGetHeightAtの結果の差がこの範囲内なら、地形の上に立っているとみなし
- *  地形法線でしっかり傾ける */
-			constexpr float GROUND_TILT_MAX_HEIGHT_DIFF_FULL = 8.0f;
-			/** ★修正: この値を超えたら「地形の上に立っていない」（台座オブジェクトの上など）とみなし
-			 *  傾きを完全にゼロにする。FULL～ZEROの間はDiffが大きくなるほど徐々に傾きを弱める
-			 *  （旧GROUND_TILT_MAX_HEIGHT_DIFFの0/1判定だと、坂を登っている途中で接地判定が
-			 *  追いついていないだけのケースまで弾いてしまい、坂で全く傾かない原因になっていた） */
-			constexpr float GROUND_TILT_MAX_HEIGHT_DIFF_ZERO = 80.0f;
+
+			// ★削除: GROUND_TILT_NORMAL_SAMPLE_OFFSET / GROUND_TILT_MAX_HEIGHT_DIFF*
+			//         / GROUND_TILT_RAY_* は、ハイトマップの4点サンプリングで法線を推定して
+			//         いた頃の定数。CharacterControllerの真下レイから実コリジョンの法線を
+			//         直接受け取るようになったため、すべて不要になった。
 
 
 			AnimationData ANIMATION_DATA[] =
@@ -108,11 +94,25 @@ namespace app
 
 			if (m_legIKInited)
 			{
+				// UpdateGroundTilt()は前フレームに求まったルート下げ量を使ってスケルトンを組み直す。
+				// そのあとでIKを解き、次フレーム用の下げ量を更新する順番になっている。
 				UpdateGroundTilt();
 
 				TerrainObject* terrain = StageSystem::GetInstance()->GetTerrain();
 
 				m_legIK.SetTerrain(terrain);
+				// 急斜面の滑落中・ジャンプ中・遊泳中はCharacterControllerが接地扱いしないので、
+				// その間はIKを切ってアニメーションのポーズに戻す
+				m_legIK.SetGrounded(m_characterController.IsOnGround());
+				// 睡眠など、足を地面に貼り付けると姿勢が崩れるアニメーションの間は脚IKを切る
+				m_legIK.SetEnable(!m_stateMachine->IsLegIKSuppressed());
+				// ルート下げ量は「カプセルが止まった高さ」と「真下レイが拾った実際の地面の高さ」の差。
+				// 法線も渡して、その角度で浮いていて当然の量を上限に使う。
+				m_legIK.SetCharacterPosition(m_transform.m_position);
+				m_legIK.SetGroundInfo(
+					m_characterController.IsGroundInfoValid(),
+					m_characterController.GetGroundHeight(),
+					m_characterController.GetGroundNormal());
 
 				// CharacterBase::m_skeletonは実際の描画には使われていない孤立コピー。
 				// 実際にスキニングに使われているのはm_modelRenderが内部で持つスケルトンなので、
@@ -120,7 +120,7 @@ namespace app
 				Skeleton* skeleton = m_modelRender.GetSkeleton();
 				if (skeleton)
 				{
-					m_legIK.Update(skeleton);
+					m_legIK.Update(skeleton, g_gameTime->GetFrameDeltaTime());
 				}
 			}
 		}
@@ -130,117 +130,43 @@ namespace app
 		{
 			if (!m_modelReady) return;
 
-			/** 真下にレイを飛ばして地形法線を取得する（PenguinBase::UpdateSlideTiltと同じ） */
-			const Vector3& pos = m_transform.m_position;
-
-			TerrainObject* terrain = StageSystem::GetInstance()->GetTerrain();
-			float terrainHeightAtPos = pos.y;
-			if (terrain)
-			{
-				terrainHeightAtPos = terrain->GetHeightAt(pos);
-				char buf[256];
-				//sprintf_s(buf, "[Enemy#%d] EnemyPosY=%.1f TerrainHeight=%.1f Diff=%.1f\n",
-				//	m_logId, pos.y, terrainHeightAtPos, pos.y - terrainHeightAtPos);
-				//OutputDebugStringA(buf);
-			}
-
-			// ★修正: 泳いでいる間はキャラが実際に地形の上に立っていないため、
-			//         近傍の地形サンプリング（水中の海底地形を拾ってしまう等）
-			//         は意味を持たない。泳いでいる間は傾き計算そのものをスキップし、
-			//         水平（Up）のまま扱う。
+			// ★修正: ハイトマップの4点サンプリングをやめ、CharacterControllerが真下レイで
+			//         取得した「実コリジョンの法線」をそのまま使う。旧実装には
+			//         次の問題があり、いずれもこの変更で根本から無くなる。
+			//         ・岩など、ハイトマップに存在しない配置オブジェクトの上では
+			//           まったく違う法線になっていた
+			//         ・サンプリング距離に依存して検出できる角度に上限があった
+			//         ・「キャラY - ハイトマップ高さ」の差で重み付けしていたが、斜面では
+			//           カプセルの浮きでこの差が正常に大きくなるため、急斜面ほど傾きが
+			//           弱まるという逆の挙動になっていた（52度の斜面で14度しか傾かない等）
+			//
+			//         泳いでいる間はキャラが地面の上に立っていないので、
+			//         従来どおり水平（Up）のまま扱う。
+			//
+			// ★修正: 接地していない間（急斜面の滑落中・ジャンプ中）も傾けない。
+			//         滑落中は真下レイが崖の壁面（80度前後）を拾うため、そのまま適用すると
+			//         胴体が上限の70度まで倒れて横倒しに見えてしまう。
+			//         旧実装では「キャラY - ハイトマップ高さ」の差による重み付けが
+			//         結果的にこれを抑えていたが、その重みを廃止したので明示的に弾く。
+			//         脚IK側の条件（IsOnGround）とも揃う。
 			Vector3 groundNormal = Vector3::Up;
-			bool isSwimming = m_stateMachine && m_stateMachine->IsSwim();
+			const bool isSwimming = m_stateMachine && m_stateMachine->IsSwim();
 
-			// ★修正: 0/1の完全スキップをやめ、Diffの大きさに応じて0.0～1.0のブレンド係数にする
-			float groundTiltWeight = 0.0f;
-			if (terrain && !isSwimming)
+			if (!isSwimming && m_characterController.IsOnGround() && m_characterController.IsGroundInfoValid())
 			{
-				float diff = fabsf(pos.y - terrainHeightAtPos);
-				if (diff <= GROUND_TILT_MAX_HEIGHT_DIFF_FULL)
+				const Vector3& hitNormal = m_characterController.GetGroundNormal();
+				if (hitNormal.LengthSq() > FLT_EPSILON)
 				{
-					groundTiltWeight = 1.0f;
-				}
-				else if (diff < GROUND_TILT_MAX_HEIGHT_DIFF_ZERO)
-				{
-					float t = (diff - GROUND_TILT_MAX_HEIGHT_DIFF_FULL) /
-						(GROUND_TILT_MAX_HEIGHT_DIFF_ZERO - GROUND_TILT_MAX_HEIGHT_DIFF_FULL);
-					groundTiltWeight = 1.0f - t; // 線形フェード
-				}
-				// diff >= ZERO のときは 0.0f のまま（台座等とみなし傾けない）
-			}
-
-			if (terrain && !isSwimming && groundTiltWeight > 0.0f)
-			{
-				const float sampleOffset = GROUND_TILT_NORMAL_SAMPLE_OFFSET;
-
-				const float maxSampleDelta = sampleOffset * tanf(GROUND_TILT_MAX_ANGLE);
-				auto ClampHeight = [terrainHeightAtPos, maxSampleDelta](float h)
-					{
-						float minH = terrainHeightAtPos - maxSampleDelta;
-						float maxH = terrainHeightAtPos + maxSampleDelta;
-						if (h < minH) h = minH;
-						if (h > maxH) h = maxH;
-						return h;
-					};
-
-				float hL = ClampHeight(terrain->GetHeightAt(Vector3(pos.x - sampleOffset, 0.0f, pos.z)));
-				float hR = ClampHeight(terrain->GetHeightAt(Vector3(pos.x + sampleOffset, 0.0f, pos.z)));
-				float hD = ClampHeight(terrain->GetHeightAt(Vector3(pos.x, 0.0f, pos.z - sampleOffset)));
-				float hU = ClampHeight(terrain->GetHeightAt(Vector3(pos.x, 0.0f, pos.z + sampleOffset)));
-
-				Vector3 tangentX(2.0f * sampleOffset, hR - hL, 0.0f);
-				Vector3 tangentZ(0.0f, hU - hD, 2.0f * sampleOffset);
-
-				Vector3 normal;
-				normal.x = tangentZ.y * tangentX.z - tangentZ.z * tangentX.y;
-				normal.y = tangentZ.z * tangentX.x - tangentZ.x * tangentX.z;
-				normal.z = tangentZ.x * tangentX.y - tangentZ.y * tangentX.x;
-
-				if (normal.LengthSq() > FLT_EPSILON)
-				{
-					normal.Normalize();
-
-					// ★修正: 求めた地形法線をそのまま使うのではなく、Diffに応じたweightで
-					//         Vector3::Up とブレンドする。Diffが大きいほどUpに近づく。
-					Vector3 blended = Vector3::Up * (1.0f - groundTiltWeight) + normal * groundTiltWeight;
-					if (blended.LengthSq() > FLT_EPSILON)
-					{
-						blended.Normalize();
-						groundNormal = blended;
-					}
+					groundNormal = hitNormal;
 				}
 			}
 
 			/** 進行方向由来のY軸回転（水平の向き）はアニメーション側の回転をそのまま使う */
 			Quaternion yRot = m_transform.m_rotation;
 
-			{
-				Vector3 yRotUp = Vector3::Up;
-				yRot.Apply(yRotUp);
-				float yRotDot = max(-1.0f, min(1.0f, Vector3::Up.Dot(yRotUp)));
-				float yRotTiltDeg = acosf(yRotDot) * 180.0f / 3.14159265f;
-
-				char buf[256];
-				//sprintf_s(buf, "[Enemy#%d] yRot alone tilts Up by %.2f deg (yRotUp=(%.3f,%.3f,%.3f))\n",
-				//	m_logId, yRotTiltDeg, yRotUp.x, yRotUp.y, yRotUp.z);
-				//OutputDebugStringA(buf);
-			}
-
 			float dotUpNormal = Vector3::Up.Dot(groundNormal);
 			dotUpNormal = max(-1.0f, min(1.0f, dotUpNormal)); // acosに渡す前のクランプ（NaN対策）
 			float tiltAngle = acosf(dotUpNormal);
-
-			// デバッグ: 実際にどんな値になっているか確認するためのログ。
-			// 原因切り分けができたら消してOK。
-			{
-				char buf[256];
-				sprintf_s(buf, "[Enemy#%d] terrain=%s isSwimming=%d diffSigned=%.1f weight=%.2f groundNormal=(%.3f,%.3f,%.3f) dot=%.5f tiltAngle(deg)=%.2f\n",
-					m_logId, terrain ? "OK" : "NULL", isSwimming ? 1 : 0,
-					pos.y - terrainHeightAtPos, groundTiltWeight,
-					groundNormal.x, groundNormal.y, groundNormal.z,
-					dotUpNormal, tiltAngle * 180.0f / 3.14159265f);
-				OutputDebugStringA(buf);
-			}
 
 			// ★修正: groundNormalがVector3::Upとほぼ同じ方向（平坦な地形、または
 			//         terrainがnullでUpのままの場合など）のとき、SetRotationに渡す
@@ -297,18 +223,6 @@ namespace app
 			const float slerpFactor = min(1.0f, GROUND_TILT_SLERP_SPEED * deltaTime);
 			m_groundTiltRotation.Slerp(slerpFactor, m_groundTiltRotation, tiltRot);
 
-			{
-				Vector3 finalUp = Vector3::Up;
-				m_groundTiltRotation.Apply(finalUp);
-				float finalDot = max(-1.0f, min(1.0f, Vector3::Up.Dot(finalUp)));
-				float finalTiltDeg = acosf(finalDot) * 180.0f / 3.14159265f;
-
-				char buf[256];
-				sprintf_s(buf, "[Enemy#%d] FINAL applied tilt = %.2f deg (finalUp=(%.3f,%.3f,%.3f)) isSwimming=%d\n",
-					m_logId, finalTiltDeg, finalUp.x, finalUp.y, finalUp.z, isSwimming ? 1 : 0);
-				OutputDebugStringA(buf);
-			}
-
 			// ★修正: 向き(yRot)は補間しない生の値をここで合成する。
 			//         スムーズな向き変更自体はステートマシン/アニメーション側の役割。
 			Quaternion finalRotation;
@@ -323,11 +237,15 @@ namespace app
 			Vector3 rowY = Vector3::AxisY; finalRotation.Apply(rowY); rowY = rowY * m_transform.m_scale.y;
 			Vector3 rowZ = Vector3::AxisZ; finalRotation.Apply(rowZ); rowZ = rowZ * m_transform.m_scale.z;
 
+			// ★修正: 斜面ではCharacterControllerのカプセルが側面で接地するため、キャラ原点は
+			//         真下の地面より radius*(1/cosθ-1) だけ高い位置で止まる。これが
+			//         「急斜面で足がつかない」直接の原因。物理・ステート判定用のm_transformには
+			//         手を加えず、描画用のルートだけをLegIKComponentが算出した量ぶん下げる。
 			Matrix trs;
 			trs.v[0].Set(rowX.x, rowX.y, rowX.z, 0.0f);
 			trs.v[1].Set(rowY.x, rowY.y, rowY.z, 0.0f);
 			trs.v[2].Set(rowZ.x, rowZ.y, rowZ.z, 0.0f);
-			trs.v[3].Set(m_transform.m_position.x, m_transform.m_position.y, m_transform.m_position.z, 1.0f);
+			trs.v[3].Set(m_transform.m_position.x, m_transform.m_position.y - m_legIK.GetRootDropOffset(), m_transform.m_position.z, 1.0f);
 
 			// ★修正: ここで組み直しているtiltedWorldは、Model::CalcWorldMatrix()が
 			//         本来作るワールド行列を丸ごと置き換えてSkeleton::Update()に
@@ -409,6 +327,17 @@ namespace app
 				m_legIK.Clear();
 				return false;
 			}
+
+			// 斜面での想定浮き量 radius*(1/cosθ-1) を計算するのに使う。
+			// これがルート下げ量の上限になり、急角度ほど自動的に大きくなる。
+			const auto* status = GetStatus<CharacterStatus>();
+			if (status)
+			{
+				m_legIK.SetCapsuleRadius(status->GetRadius());
+			}
+
+			// 足元へ飛ばすレイが自分のカプセルに当たらないよう、除外対象として渡しておく
+			m_legIK.SetSelfCollisionObject(m_characterController.GetRigidBody()->GetBody());
 
 			//m_groundTiltRotation = m_transform.m_rotation;
 			return true;

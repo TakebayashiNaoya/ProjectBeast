@@ -154,6 +154,8 @@ namespace nsBeastEngine
 		CharacterController::CharacterController()
 			: m_position(Vector3::Zero)
 			, m_prevPosition(Vector3::Zero)
+			, m_groundNormal(Vector3::Up)
+			, m_groundHeight(-FLT_MAX)
 			, m_verticalVelocity(0.0f)
 			, m_gravity(0.0f)
 			, m_radius(0.0f)
@@ -163,6 +165,7 @@ namespace nsBeastEngine
 			, m_isJump(false)
 			, m_isOnGround(true)
 			, m_isRequestTeleport(false)
+			, m_isGroundInfoValid(false)
 		{}
 
 
@@ -327,6 +330,9 @@ namespace nsBeastEngine
 						m_position.y += upAmount;
 					}
 					m_isOnGround = false;
+
+					// 上昇中は足元の地面情報を更新しない（前フレームの値を残さない）
+					m_isGroundInfoValid = false;
 				}
 				else
 				{
@@ -351,6 +357,46 @@ namespace nsBeastEngine
 					callback.me = m_rigidBody.GetBody();
 
 					PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+
+					// カプセルのスイープは「そこに立てるか」の判定には正しいが、斜面では
+					// カプセルが側面で接地するため、接地Yは真下の地面より radius*(1/cosθ-1)
+					// だけ高い位置になる。見た目を地面に合わせたい側（脚IKなど）のために、
+					// キャラのXZから真下へ細いレイを飛ばして「本当の地面の高さと法線」も取っておく。
+					// ※物理挙動そのものは従来どおりカプセル基準のままで変えていない。
+					{
+						// start/end はカプセル「中心」の移動区間なので、レイにはそのまま使えない。
+						// レイはキャラの足元(m_position)基準で撃つ。
+						// 下方向は斜面での想定浮き量（63度で radius*1.2、尾根ではもう少し）を
+						// カバーできる長さが必要なので radius*2 を確保する。
+						const float rayDownReach = m_radius * 2.0f + checkDist;
+						const Vector3 rayStart(m_position.x, m_position.y + stepOffset, m_position.z);
+						const Vector3 rayEnd(m_position.x, m_position.y - rayDownReach, m_position.z);
+
+						const btCollisionObject* me = m_rigidBody.GetBody();
+						RaycastHit rayHit;
+						const bool isRayHit = PhysicsWorld::Get().Raycast(
+							rayStart, rayEnd, rayHit, ALL_COLLISION_ATTRIBUTE_MASK,
+							[me](const btCollisionObject& obj) {
+								if (&obj == me) return false;
+								if (obj.getInternalType() == btCollisionObject::CO_GHOST_OBJECT) return false;
+								return true;
+							});
+
+						if (isRayHit) {
+							m_groundHeight = rayHit.point.y;
+							m_groundNormal = rayHit.normal;
+							// 裏面を拾った場合に法線が下を向くことがあるので反転しておく
+							if (m_groundNormal.y < 0.0f) {
+								m_groundNormal.x = -m_groundNormal.x;
+								m_groundNormal.y = -m_groundNormal.y;
+								m_groundNormal.z = -m_groundNormal.z;
+							}
+							m_isGroundInfoValid = true;
+						}
+						else {
+							m_isGroundInfoValid = false;
+						}
+					}
 
 					if (callback.isHit) {
 						// ぶつかった地点のY座標を計算
