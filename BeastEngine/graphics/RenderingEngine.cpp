@@ -105,11 +105,8 @@ namespace nsBeastEngine
 		// メインカメラの描画パスを実行する
 		ExecuteViewPass(rc, m_mainView);
 
-		// ポストエフェクトの描画処理
-		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
-		PostEffect(rc);
-
-		// ブルーム完了後、mainRTをRTV状態に戻してエフェクトの描画先として設定する
+		// エフェクトの描画先としてmainRTを設定する
+		// ※GBufferの深度を引き継ぐため、DSVはgBuffer[enGBuffer_Albedo]を使用する
 		rc.WaitUntilToPossibleSetRenderTarget(m_mainView.renderTarget);
 		rc.SetRenderTarget(
 			m_mainView.renderTarget.GetRTVCpuDescriptorHandle(),
@@ -117,8 +114,16 @@ namespace nsBeastEngine
 		);
 
 		// エフェクトを描画
-		// ※PostEffect()完了後に呼び出すことでブルームの影響を受けないようにする
+		// ※ポストエフェクトより前に描くことで、ブルームとトーンマップの対象に含める
 		EffectEngine::GetInstance()->Draw();
+
+		// エフェクト描画後もメインRTがレンダリングターゲット状態のままなので、
+		// 以降のパスでテクスチャとして読めるように状態を戻す
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainView.renderTarget);
+
+		// ポストエフェクトの描画処理（ブルーム → トーンマップ）
+		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
+		PostEffect(rc);
 
 		// 2D描画処理（小窓スプライトの描画も含む）
 		Render2D(rc);
@@ -271,11 +276,13 @@ namespace nsBeastEngine
 
 	void RenderingEngine::InitPostEffectManager()
 	{
-		// ブルームの種別・ブラーの種別をここで切り替える
+		// ブルーム・ブラー・トーンマップの種別をここで切り替える
 		m_postEffectManager.Init(
 			m_mainView.renderTarget,
-			EnBloomType::enKawase,   // enNone / enNormal / enKawase
-			EnBlurType::enGaussian   // enAverage / enGaussian
+			EnBloomType::enKawase,        // enNone / enNormal / enKawase
+			EnBlurType::enGaussian,       // enAverage / enGaussian
+			EnToneMapType::enReinhard     // enNone / enExposure / enReinhard /
+										  // enReinhardExtended / enACES / enUncharted2
 		);
 	}
 

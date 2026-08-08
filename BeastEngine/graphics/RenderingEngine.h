@@ -89,6 +89,13 @@ namespace nsBeastEngine
 		 */
 		RenderTarget& GetSubCameraRenderTarget() { return m_subView.renderTarget; }
 
+		/**
+		 * @brief ポストエフェクトマネージャーを取得する
+		 * @details デバッグUIから実行中にパラメーターを調整するために使う
+		 * @return ポストエフェクトマネージャーの参照
+		 */
+		__forceinline PostEffectManager& GetPostEffectManager() { return m_postEffectManager; }
+
 
 		//============================================//
 		// 登録・解除用の関数
@@ -242,8 +249,9 @@ namespace nsBeastEngine
 		void RenderNatureObjects(RenderContext& rc, RenderViewContext& view);
 
 		/**
-		 * @brief ポストエフェクトの描画処理
-		 * @details 3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ。
+		 * @brief ポストエフェクトの描画処理（ブルーム → トーンマップ）
+		 * @details エフェクトを含む3D描画完了後・UI描画前に実行することで、
+		 *          エフェクトもポストエフェクトの対象にしつつUIへの影響を防ぐ。
 		 * @param rc レンダリングコンテキスト
 		 */
 		void PostEffect(RenderContext& rc);
