@@ -531,12 +531,13 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief ディレクションライトのライトビュープロジェクション行列の取得
+		 * @details RenderingEngine::RenderShadowMap() が毎フレーム更新する。
+		 *          海や渦潮など、独自シェーダーで影を受けるオブジェクトが参照する。
+		 * @return ライトビュープロジェクション行列の参照
 		 */
 		Matrix& GetLVP()
 		{
-			static Matrix m;
-			return m;
-			//return m_light.m_directionLight.m_LVP;
+			return m_light.m_directionLight.m_LVP;
 		}
 
 		// 現在未使用（実装時に有効化）

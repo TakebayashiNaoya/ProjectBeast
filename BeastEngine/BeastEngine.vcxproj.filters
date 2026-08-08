@@ -114,6 +114,9 @@
     <ClCompile Include="Graphics\PostEffect\ToneMap.cpp">
       <Filter>Graphics\PostEffect</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Shadow\ShadowMap.cpp">
+      <Filter>Graphics\Shadow</Filter>
+    </ClCompile>
     <ClCompile Include="Graphics\Camera\CameraSystem.cpp">
       <Filter>Graphics\Camera</Filter>
     </ClCompile>
@@ -280,6 +283,9 @@
     <ClInclude Include="Graphics\PostEffect\ToneMap.h">
       <Filter>Graphics\PostEffect</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Shadow\ShadowMap.h">
+      <Filter>Graphics\Shadow</Filter>
+    </ClInclude>
     <ClInclude Include="Graphics\Camera\CameraSystem.h">
       <Filter>Graphics\Camera</Filter>
     </ClInclude>
@@ -332,6 +338,9 @@
     </Filter>
     <Filter Include="Graphics\PostEffect">
       <UniqueIdentifier>{bcefc37c-22a6-4efc-b9a2-2bc5dc31efd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Shadow">
+      <UniqueIdentifier>{428a15ba-c1a3-4c93-926d-4fa3f486fb52}</UniqueIdentifier>
     </Filter>
     <Filter Include="Graphics\Camera">
       <UniqueIdentifier>{dd545e6b-93f7-4982-9eee-6b29d68b62e6}</UniqueIdentifier>

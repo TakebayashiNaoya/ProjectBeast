@@ -12,6 +12,7 @@
 #include "Geometry/Frustum.h"
 #include "Graphics/PostEffect/PostEffectManager.h"
 #include "Graphics/PostEffect/PostEffectTypes.h"
+#include "Graphics/Shadow/ShadowMap.h"
 
 
 namespace nsBeastEngine
@@ -94,7 +95,13 @@ namespace nsBeastEngine
 		 * @details デバッグUIから実行中にパラメーターを調整するために使う
 		 * @return ポストエフェクトマネージャーの参照
 		 */
-		__forceinline PostEffectManager& GetPostEffectManager() { return m_postEffectManager; }
+		PostEffectManager& GetPostEffectManager() { return m_postEffectManager; }
+
+		/**
+		 * @brief シャドウマップを取得する
+		 * @return シャドウマップの参照
+		 */
+		ShadowMap& GetShadowMap() { return m_shadowMap; }
 
 
 		//============================================//
@@ -207,6 +214,14 @@ namespace nsBeastEngine
 		 */
 		void InitPostEffectManager();
 
+		/**
+		 * @brief シャドウマップへの描画処理
+		 * @details GBufferへの描画より前に実行する必要がある。
+		 *          ディファードライティングでシャドウマップを参照するため。
+		 * @param rc レンダリングコンテキスト
+		 */
+		void RenderShadowMap(RenderContext& rc);
+
 
 		//============================================//
 		// Execute内で呼ばれる描画処理
@@ -288,6 +303,8 @@ namespace nsBeastEngine
 
 		/** ポストエフェクトマネージャー */
 		PostEffectManager m_postEffectManager;
+		/** シャドウマップ */
+		ShadowMap m_shadowMap;
 
 		/** ディファードモデルリスト */
 		std::vector<ModelRender*> m_deferredModelList;

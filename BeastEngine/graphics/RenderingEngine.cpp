@@ -34,6 +34,11 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Init()
 	{
+		// シャドウマップの初期化
+		// ディファードライティング用スプライトが初期化時にシャドウマップの
+		// テクスチャを参照するため、必ずInitDeferredLightingSpriteより先に行うこと
+		m_shadowMap.Init();
+
 		// メインビューの初期化
 		m_mainView.width = g_graphicsEngine->GetFrameBufferWidth();
 		m_mainView.height = g_graphicsEngine->GetFrameBufferHeight();
@@ -101,6 +106,10 @@ namespace nsBeastEngine
 #else
 		m_mainView.frustum.Update(viewProjMatrix);
 #endif
+
+		// シャドウマップへの描画
+		// ※ディファードライティングで参照するため、GBuffer描画より前に行う
+		RenderShadowMap(rc);
 
 		// メインカメラの描画パスを実行する
 		ExecuteViewPass(rc, m_mainView);
@@ -215,12 +224,18 @@ namespace nsBeastEngine
 
 	void RenderingEngine::InitDeferredLightingSprite(RenderViewContext& view)
 	{
+		// GBufferのSRVスロットはGBufferの添字と一致している必要がある
+		static_assert(enDeferredLightingSrv_Albedo == enGBuffer_Albedo, "SRVスロットとGBufferの添字が食い違っています");
+		static_assert(enDeferredLightingSrv_Normal == enGBuffer_Normal, "SRVスロットとGBufferの添字が食い違っています");
+		static_assert(enDeferredLightingSrv_Specular == enGBuffer_Specular, "SRVスロットとGBufferの添字が食い違っています");
+
 		SpriteInitData spriteInitData;
 		spriteInitData.m_width = view.width;
 		spriteInitData.m_height = view.height;
-		spriteInitData.m_textures[enGBuffer_Albedo] = &view.gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
-		spriteInitData.m_textures[enGBuffer_Normal] = &view.gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
-		spriteInitData.m_textures[enGBuffer_Specular] = &view.gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
+		spriteInitData.m_textures[enDeferredLightingSrv_Albedo] = &view.gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
+		spriteInitData.m_textures[enDeferredLightingSrv_Normal] = &view.gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
+		spriteInitData.m_textures[enDeferredLightingSrv_Specular] = &view.gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
+		spriteInitData.m_textures[enDeferredLightingSrv_ShadowMap] = &m_shadowMap.GetShadowMapTexture();
 		spriteInitData.m_fxFilePath = "Assets/shader/DeferredLighting.fx";
 		spriteInitData.m_expandConstantBuffer = m_sceneLight.GetLight();
 		spriteInitData.m_expandConstantBufferSize = sizeof(Light);
@@ -284,6 +299,21 @@ namespace nsBeastEngine
 			EnToneMapType::enReinhard     // enNone / enExposure / enReinhard /
 										  // enReinhardExtended / enACES / enUncharted2
 		);
+	}
+
+
+	void RenderingEngine::RenderShadowMap(RenderContext& rc)
+	{
+		// シャドウマップで覆う範囲の中心はメインカメラの注視点にする
+		// カメラが見ている場所に影の解像度を集中させるため
+		const Vector3 focusPosition = CameraSystem::Get().GetMainCamera().GetTarget();
+		const Vector3 lightDirection = m_sceneLight.GetLight()->m_directionLight.m_direction;
+
+		m_shadowMap.Render(rc, lightDirection, focusPosition, m_deferredModelList, m_forwardModelList);
+
+		// 計算されたライトビュープロジェクション行列を定数バッファへ反映する
+		// ディファードライティングがこの行列でシャドウマップを引く
+		m_sceneLight.GetLight()->m_directionLight.m_LVP = m_shadowMap.GetLVPMatrix();
 	}
 
 

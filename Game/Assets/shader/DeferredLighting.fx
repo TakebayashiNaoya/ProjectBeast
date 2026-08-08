@@ -119,8 +119,73 @@ Texture2D<float4> g_normalTexture        : register(t1);	// 法線
 //   b = ambientScale（環境光強度倍率）
 //   a = smooth
 Texture2D<float4> g_metaricSmoothTexture : register(t2);	// メタリックスムース
+Texture2D<float4> g_shadowMap            : register(t3);	// シャドウマップ（ライト空間の深度）
+
+// レジスタ番号は C++ 側の EnDeferredLightingSrv（RenderViewContext.h）と一致させること。
+// RenderingEngine::InitDeferredLightingSprite() がその順番でテクスチャを設定している。
 
 sampler g_sampler : register(s0);
+
+
+///////////////////////////////////////
+// シャドウ
+///////////////////////////////////////
+
+/** シャドウマップの解像度。ShadowMap.cpp の SHADOW_MAP_SIZE と一致させること */
+static const float SHADOW_MAP_SIZE = 2048.0f;
+
+/**
+ * @brief シャドウアクネを防ぐための深度バイアス
+ * @details 自分自身の深度と比較して誤って影と判定される（縞模様が出る）のを防ぐ。
+ *          大きくしすぎると影が実際の位置からずれる（ピーターパン現象）。
+ */
+static const float SHADOW_DEPTH_BIAS = 0.0015f;
+
+/*!
+ * @brief 影になっている割合を計算する
+ * @details ワールド座標をライト空間へ変換し、シャドウマップの深度と比較する。
+ *          3x3のPCFで周囲も参照して輪郭を柔らかくしている。
+ * @param worldPos ワールド座標
+ * @return 光が当たっている割合（0.0=完全な影 1.0=影なし）
+ */
+float CalcShadowRate(float3 worldPos)
+{
+    // ライトから見たクリップ空間へ変換する
+    float4 posInLVP = mul(dirLightLVP, float4(worldPos, 1.0f));
+    float3 lvpPos = posInLVP.xyz / posInLVP.w;
+
+    // クリップ空間(-1〜1)からUV(0〜1)へ変換する。yは上下が逆になる
+    float2 shadowUV = float2(0.5f, -0.5f) * lvpPos.xy + 0.5f;
+
+    // シャドウマップの範囲外は影を落とさない
+    // 範囲は注視点まわりに限定しているため、遠景は必ずここに来る
+    if (shadowUV.x < 0.0f || shadowUV.x > 1.0f ||
+        shadowUV.y < 0.0f || shadowUV.y > 1.0f ||
+        lvpPos.z < 0.0f || lvpPos.z > 1.0f)
+    {
+        return 1.0f;
+    }
+
+    // 自分の深度がシャドウマップの深度より奥なら影
+    float depthFromLight = lvpPos.z - SHADOW_DEPTH_BIAS;
+    float texelOffset = 1.0f / SHADOW_MAP_SIZE;
+
+    // 3x3のPCFで平均を取り、輪郭のジャギを緩和する
+    float lightRate = 0.0f;
+    [unroll]
+    for (int y = -1; y <= 1; y++)
+    {
+        [unroll]
+        for (int x = -1; x <= 1; x++)
+        {
+            float2 uv = shadowUV + float2(x, y) * texelOffset;
+            float shadowMapDepth = g_shadowMap.Sample(g_sampler, uv).r;
+            lightRate += (depthFromLight <= shadowMapDepth) ? 1.0f : 0.0f;
+        }
+    }
+
+    return lightRate / 9.0f;
+}
 
 
 ///////////////////////////////////////
@@ -304,6 +369,10 @@ float3 CalcDirectionLight(
     // 滑らかさが高ければ拡散反射は弱くなる
     float3 lig = diffuse * (1.0f - smooth) + spec;
 
+    // 影を適用する
+    // 環境光より前に掛けることで、影の中でも環境光は残り真っ黒にならない
+    lig *= CalcShadowRate(worldPos);
+
     // 補正済み環境光を加算する
     lig += ambientLightColor * albedo * ambientScale;
 
@@ -356,6 +425,9 @@ float4 PSMain(PSInput In) : SV_Target0
 
     // ワールド座標を復元
     float3 worldPos = CalcWorldPosFromUVZ(In.uv, albedo.w, mViewProjInv);
+
+
+
 
     // PBRベースのディレクションライトを計算する（補正値込み）
     float3 lig = CalcDirectionLight(normal, worldPos, albedo.rgb, metallic, smooth, dirLightScale, ambientScale);

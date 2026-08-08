@@ -20,9 +20,16 @@ namespace nsBeastEngine
 	public:
 		/**
 		 * @brief シャドウマップへの描画パスから呼ばれる処理
-		 * @param rc レンダリングコンテキスト
+		 * @details カメラではなくライトから見た行列で描画するため、
+		 *          ビュー行列とプロジェクション行列を受け取る。
+		 * @param rc                レンダリングコンテキスト
+		 * @param lightViewMatrix   ライトのビュー行列
+		 * @param lightProjMatrix   ライトのプロジェクション行列
 		 */
-		virtual void OnRenderShadowMap(nsK2EngineLow::RenderContext& rc) {}
+		virtual void OnRenderShadowMap(
+			nsK2EngineLow::RenderContext& rc,
+			const nsK2EngineLow::Matrix& lightViewMatrix,
+			const nsK2EngineLow::Matrix& lightProjMatrix) {}
 
 		/**
 		 * @brief 2D描画パスから呼ばれる処理

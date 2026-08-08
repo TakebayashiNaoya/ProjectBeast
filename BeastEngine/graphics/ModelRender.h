@@ -447,14 +447,33 @@ namespace nsBeastEngine
 		 */
 		void Update();
 
-
-	private:
 		/**
 		 * @brief シャドウマップへの描画パスから呼ばれる処理
-		 * @param rc レンダリングコンテキスト
+		 * @details ShadowMap から呼ばれる。カメラではなくライトの行列で描画する。
+		 * @param rc                レンダリングコンテキスト
+		 * @param lightViewMatrix   ライトのビュー行列
+		 * @param lightProjMatrix   ライトのプロジェクション行列
 		 */
-		void OnRenderShadowMap(RenderContext& rc) override;
+		void OnRenderShadowMap(
+			RenderContext& rc,
+			const Matrix& lightViewMatrix,
+			const Matrix& lightProjMatrix
+		) override;
 
+		/**
+		 * @brief 影を落とすかどうかを設定
+		 * @param isCastShadow 影を落とすかどうか
+		 */
+		void SetCastShadow(const bool isCastShadow) { m_isCastShadow = isCastShadow; }
+
+		/**
+		 * @brief 影を落とすかどうかを取得
+		 * @return 影を落とすかどうか
+		 */
+		bool IsCastShadow() const { return m_isCastShadow; }
+
+
+	private:
 		/**
 		 * @brief スケルトンの初期化用関数
 		 * @param filePath ファイルパス
@@ -478,6 +497,14 @@ namespace nsBeastEngine
 		 * @param baseInitData m_modelの初期化データをベースに使用する
 		 */
 		void InitRenderToGBufferModel(const ModelInitData& baseInitData);
+
+		/**
+		 * @brief シャドウマップ描画用モデルの初期化
+		 * @details 深度だけを書き込む shadowMap.fx で初期化する。
+		 *          同じtkmを別シェーダーで持つ点は GBuffer 用モデルと同じ作り。
+		 * @param baseInitData m_modelの初期化データをベースに使用する
+		 */
+		void InitShadowModel(const ModelInitData& baseInitData);
 
 		/**
 		 * @brief トゥーンモデル・アウトラインモデルの初期化
@@ -528,6 +555,10 @@ namespace nsBeastEngine
 		Model          m_model;
 		/** シャドウマップ用モデル */
 		Model          m_shadowModels;
+		/** シャドウマップ用モデルを初期化済みか */
+		bool           m_isShadowModelInited = false;
+		/** 影を落とすかどうか */
+		bool           m_isCastShadow = true;
 
 		/**
 		 * @brief GBuffer描画用モデル（BeastModel、前方宣言のためunique_ptrで保持）
