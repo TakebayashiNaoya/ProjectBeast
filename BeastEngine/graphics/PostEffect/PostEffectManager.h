@@ -55,7 +55,7 @@ namespace nsBeastEngine
 		 * @details デバッグUIから実行中にパラメーターを調整するために使う
 		 * @return トーンマップの参照
 		 */
-		__forceinline ToneMap& GetToneMap() { return m_toneMap; }
+		ToneMap& GetToneMap() { return m_toneMap; }
 
 
 	private:
