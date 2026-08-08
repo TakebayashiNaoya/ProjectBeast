@@ -10,6 +10,7 @@
 #include "Source/Actor/Stage/TerrainObject.h" 
 #include <cfloat>
 
+
 namespace app
 {
 	namespace actor
@@ -192,11 +193,11 @@ namespace app
 					if (L1 < FLT_EPSILON || L2 < FLT_EPSILON) continue;
 
 					// XZはアニメーションのまま、Yだけ地面の高さに合わせる。
-					// ★修正: ハイトマップ(GetHeightAt)ではなく実コリジョンへのレイを使う。
-					//         岩などハイトマップに存在しないオブジェクトの上に立つと、
-					//         体はレイ基準で正しい高さに降りているのに足だけが
-					//         オブジェクトを突き抜けた地形（数十単位下）を狙ってしまい、
-					//         届かずにフェードアウトしていたため。
+					// ハイトマップ(GetHeightAt)ではなく実コリジョンへのレイを使う。
+					// 岩などハイトマップに存在しないオブジェクトの上に立つと、
+					// 体はレイ基準で正しい高さに降りているのに足だけが
+					// オブジェクトを突き抜けた地形（数十単位下）を狙ってしまい、
+					// 届かずにフェードアウトしていたため。
 					Vector3 target = footPos;
 					target.y = CalcFootGroundHeight(footPos) + leg.footGroundOffset;
 
@@ -224,10 +225,10 @@ namespace app
 				// 接地していない間（ジャンプ中・遊泳中・急斜面の滑落中）や、真下に地面が無い
 				// （崖の縁にカプセルだけ乗っている）ときは下げない。
 				//
-				// ★SetEnable(false)のとき（睡眠アニメ中など）も下げない。
-				//  睡眠は巣の中で行われるが、真下レイは巣を貫通してその下の地面を拾うため、
-				//  下げ続けるとモデルが巣に埋まってしまう。またこれらの状態ではキャラが
-				//  移動しないので、斜面への追従自体が不要でもある。
+				// SetEnable(false)のとき（睡眠アニメ中など）も下げない。
+				// 睡眠は巣の中で行われるが、真下レイは巣を貫通してその下の地面を拾うため、
+				// 下げ続けるとモデルが巣に埋まってしまう。またこれらの状態ではキャラが
+				// 移動しないので、斜面への追従自体が不要でもある。
 				float desiredDrop = 0.0f;
 				const bool isOnGroundSurface = CalcDesiredRootDrop(desiredDrop);
 				const bool canDrop = m_isGrounded && m_isEnable && isOnGroundSurface;

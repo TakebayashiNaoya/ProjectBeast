@@ -5,12 +5,23 @@
  */
 #pragma once
 
+
 namespace app
 {
 	namespace actor
 	{
 		namespace ik
 		{
+			namespace
+			{
+				/** 2方向がほぼ同一とみなす内積のしきい値 */
+				constexpr float PARALLEL_DOT_THRESHOLD = 0.9999f;
+				/** 2方向がほぼ真逆とみなす内積のしきい値 */
+				constexpr float ANTI_PARALLEL_DOT_THRESHOLD = -0.9999f;
+				/** 真逆時に任意軸を選ぶ際、a.xがこの値未満ならX軸を基準軸候補にする */
+				constexpr float ARBITRARY_AXIS_X_THRESHOLD = 0.9f;
+			}
+
 			/**
 			 * @brief 外積 (a × b)
 			 */
@@ -74,15 +85,15 @@ namespace app
 				b.Normalize();
 
 				float dot = a.Dot(b);
-				if (dot > 0.9999f) {
+				if (dot > PARALLEL_DOT_THRESHOLD) {
 					// ほぼ同じ方向。回転不要。
 					return;
 				}
 
 				Vector3 axis;
-				if (dot < -0.9999f) {
+				if (dot < ANTI_PARALLEL_DOT_THRESHOLD) {
 					// ほぼ真逆（レアケース）。任意の直交軸を使って180度回転。
-					Vector3 arbitrary = (fabsf(a.x) < 0.9f) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
+					Vector3 arbitrary = (fabsf(a.x) < ARBITRARY_AXIS_X_THRESHOLD) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
 					axis = CrossProduct(a, arbitrary);
 					if (axis.LengthSq() < FLT_EPSILON) {
 						axis = Vector3(0.0f, 0.0f, 1.0f);
@@ -103,6 +114,14 @@ namespace app
 				row2 = RotateAroundAxis(row2, axis, angle);
 			}
 
+			/**
+			 * @brief oldDirからnewDirへの最小回転（回転軸・回転角）を求める
+			 * @param oldDir  回転前の方向ベクトル
+			 * @param newDir  回転後の方向ベクトル
+			 * @param[out] outAxis  回転軸（正規化済み）
+			 * @param[out] outAngle 回転角度[rad]
+			 * @return 回転が必要な場合はtrue（ほぼ同方向で回転不要の場合はfalse）
+			 */
 			inline bool CalcMinimalRotation(const Vector3& oldDir, const Vector3& newDir,
 				Vector3& outAxis, float& outAngle)
 			{
@@ -115,14 +134,14 @@ namespace app
 				b.Normalize();
 
 				float dot = a.Dot(b);
-				if (dot > 0.9999f) {
+				if (dot > PARALLEL_DOT_THRESHOLD) {
 					// ほぼ同じ方向。回転不要。
 					return false;
 				}
 
-				if (dot < -0.9999f) {
+				if (dot < ANTI_PARALLEL_DOT_THRESHOLD) {
 					// ほぼ真逆（レアケース）。任意の直交軸を使って180度回転。
-					Vector3 arbitrary = (fabsf(a.x) < 0.9f) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
+					Vector3 arbitrary = (fabsf(a.x) < ARBITRARY_AXIS_X_THRESHOLD) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
 					outAxis = CrossProduct(a, arbitrary);
 					if (outAxis.LengthSq() < FLT_EPSILON) {
 						outAxis = Vector3(0.0f, 0.0f, 1.0f);
@@ -138,6 +157,15 @@ namespace app
 				return true;
 			}
 
+			/**
+			 * @brief 位置と姿勢（基底3軸）を、pivotを中心にaxis周りへangle[rad]回転させる
+			 * @param[in,out] pos  回転させる位置（ワールド座標）
+			 * @param[in,out] row0,row1,row2 回転させる姿勢の基底3軸
+			 * @param oldPivot 回転前のピボット位置
+			 * @param newPivot 回転後のピボット位置
+			 * @param axis     回転軸（正規化済み）
+			 * @param angle    回転角度[rad]
+			 */
 			inline void RotateRigidAroundPivot(Vector3& pos, Vector3& row0, Vector3& row1, Vector3& row2,
 				const Vector3& oldPivot, const Vector3& newPivot, const Vector3& axis, float angle)
 			{

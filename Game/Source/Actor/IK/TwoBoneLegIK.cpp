@@ -10,6 +10,7 @@
 #include <cfloat>
 #include <cmath>
 
+
 namespace app
 {
 	namespace actor
@@ -18,11 +19,15 @@ namespace app
 		{
 			namespace
 			{
+				/** 到達距離クランプに使う安全マージン（プロジェクトの単位系cm/mに合わせて調整） */
+				constexpr float DISTANCE_CLAMP_EPSILON = 0.5f;
+
 				/** ワールド行列からVector3の平行移動成分を取り出す*/
 				inline Vector3 GetTranslation(const Matrix& m)
 				{
 					return Vector3(m.v[3].x, m.v[3].y, m.v[3].z);
 				}
+
 
 				/** ワールド行列から3本の基底ベクトルをVector3として取り出す */
 				inline void GetBasisRows(const Matrix& m, Vector3& row0, Vector3& row1, Vector3& row2)
@@ -31,6 +36,7 @@ namespace app
 					row1 = Vector3(m.v[1].x, m.v[1].y, m.v[1].z);
 					row2 = Vector3(m.v[2].x, m.v[2].y, m.v[2].z);
 				}
+
 
 				/** 基底ベクトル3本と位置から行列を組み立てる */
 				inline void BuildMatrix(Matrix& outMat, const Vector3& row0, const Vector3& row1, const Vector3& row2, const Vector3& pos)
@@ -41,6 +47,7 @@ namespace app
 					outMat.v[3].Set(pos.x, pos.y, pos.z, 1.0f);
 				}
 			}
+
 
 			bool SolveTwoBoneLegIK(nsK2EngineLow::Skeleton* skeleton, const LegIKChain& chain, const Vector3& targetWorldPos)
 			{
@@ -70,10 +77,9 @@ namespace app
 				float D = toTarget.Length();
 				if (D < FLT_EPSILON) return false; // ターゲットが股関節と重なる異常値
 
-				const float epsilon = 0.5f; // ※プロジェクトの単位系（cm/m）に合わせて調整してください
 				float maxD = (L1 + L2) * chain.maxReachRatio;
-				float minD = fabsf(L1 - L2) + epsilon;
-				if (maxD < minD) maxD = minD + epsilon;
+				float minD = fabsf(L1 - L2) + DISTANCE_CLAMP_EPSILON;
+				if (maxD < minD) maxD = minD + DISTANCE_CLAMP_EPSILON;
 
 				if (D > maxD) D = maxD;
 				if (D < minD) D = minD;

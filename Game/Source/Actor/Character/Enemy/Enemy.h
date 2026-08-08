@@ -51,7 +51,7 @@ namespace app
 		private:
 			void Start() override final;
 			void Update() override final;
-			void Render(RenderContext& rc)override final;
+			void Render(RenderContext& rc) override final;
 
 			/** 脚IKのセットアップ（ボーン名はここで指定する。モデルロード完了後に1回だけ呼ぶ） */
 			bool InitLegIK();
@@ -76,6 +76,7 @@ namespace app
 			app::effect::DecalKind GetFootprintKind() const override { return app::effect::DecalKind::BearFootprint; }
 			bool GetFootprintAutoDetectSurface() const override { return false; }
 			Vector4 GetFootprintColor() const override { return { 0.55f, 0.55f, 0.60f, 1.0f }; } // 雪面に残る影っぽいグレー
+
 
 		private:
 			/** ステートマシン */

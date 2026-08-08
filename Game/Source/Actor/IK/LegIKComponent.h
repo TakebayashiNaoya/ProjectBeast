@@ -7,6 +7,7 @@
 #include "TwoBoneLegIK.h"
 #include <vector>
 
+
 namespace nsK2EngineLow
 {
 	class Skeleton;
@@ -145,6 +146,7 @@ namespace app
 				/** 登録済みの脚の数（デバッグ表示等に） */
 				size_t GetLegCount() const { return m_legs.size(); }
 
+
 			private:
 				/** 1フレーム分の脚ごとの計算結果（毎フレームのヒープ確保を避けるためメンバに持つ） */
 				struct LegSolveInfo
@@ -180,6 +182,7 @@ namespace app
 				 * @return 地面の上に立っていると判断できたか（falseならIKごと切る）
 				 */
 				bool CalcDesiredRootDrop(float& outDrop) const;
+
 
 			private:
 				std::vector<LegIKChain> m_legs;

@@ -6,6 +6,7 @@
 #include "BeastEnginePreCompile.h"
 #include "CharacterController.h"
 
+
 namespace nsBeastEngine
 {
 	namespace nsCollision
