@@ -1,8 +1,9 @@
 ﻿/**
  * @file TwoBoneLegIK.cpp
  * @brief 2ボーン解析式IK（脚1本分）の実装
+ * @author 立山
  */
-#include "stdafx.h" // ※プロジェクトのプリコンパイル済みヘッダ名に合わせて調整してください
+#include "stdafx.h" 
 #include "../../../../k2EngineLow/graphics/Skeleton.h"
 #include "IKMath.h"
 #include "TwoBoneLegIK.h"
@@ -17,7 +18,7 @@ namespace app
 		{
 			namespace
 			{
-				/** ワールド行列からVector3の平行移動成分を取り出す（v[3]はVector4想定） */
+				/** ワールド行列からVector3の平行移動成分を取り出す*/
 				inline Vector3 GetTranslation(const Matrix& m)
 				{
 					return Vector3(m.v[3].x, m.v[3].y, m.v[3].z);

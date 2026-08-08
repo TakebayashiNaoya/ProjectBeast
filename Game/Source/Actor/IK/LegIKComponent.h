@@ -1,10 +1,7 @@
 ﻿/**
  * @file LegIKComponent.h
  * @brief キャラクター1体分の脚IKをまとめて管理するコンポーネント
- * @details
- *  2足（ペンギン）でも4足（シロクマ）でも、脚の本数分 AddLeg / AddLegByBoneNames を
- *  呼んでおけば同じ仕組みで動きます（ペンギンなら2回、シロクマなら4回）。
- *  毎フレーム、Skeleton::Update() のあとに Update() を呼んでください。
+ * @author 立山
  */
 #pragma once
 #include "TwoBoneLegIK.h"
@@ -15,7 +12,7 @@ namespace nsK2EngineLow
 	class Skeleton;
 }
 
-/** レイキャストで自分自身を除外するために型だけ必要（Bulletのヘッダは.cpp側で読む） */
+/** レイキャストで自分自身を除外するために型だけ必要 */
 class btCollisionObject;
 
 namespace app

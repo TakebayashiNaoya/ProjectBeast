@@ -1,12 +1,13 @@
 ﻿/**
  * @file LegIKComponent.cpp
  * @brief キャラクター1体分の脚IKをまとめて管理するコンポーネントの実装
+ * @author 立山
  */
-#include "stdafx.h" // ※プロジェクトのプリコンパイル済みヘッダ名に合わせて調整してください
+#include "stdafx.h" 
 #include "../../../../k2EngineLow/graphics/Skeleton.h"
 #include "LegIKComponent.h"
 #include "Physics/Physics.h"
-#include "Source/Actor/Stage/TerrainObject.h" // ※実際のインクルードパスに合わせて調整してください
+#include "Source/Actor/Stage/TerrainObject.h" 
 #include <cfloat>
 
 namespace app

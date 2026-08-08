@@ -1,15 +1,7 @@
 ﻿/**
  * @file TwoBoneLegIK.h
  * @brief 2ボーン解析式IK（脚1本分）
- * @details
- *  股関節(hip) - 膝(knee) - 足首(foot) の3ボーンチェーンを、
- *  余弦定理を使って解析的に解く「Two Bone IK」です。
- *  CCDやFABRIKのような反復計算が不要なため軽量で、
- *  脚のような単純な2関節チェーンには最も一般的な手法です。
- *
- *  ※Matrix.v[0]～v[3] は行ベクトル4本（Skeleton.cppのCalcWorldTRSで
- *    確認した構造）で、v[0]～v[2]が回転+スケール、v[3]が平行移動(w=1)
- *    という前提で実装しています。
+ * @author 立山
  */
 #pragma once
 
@@ -70,8 +62,6 @@ namespace app
 			 * @brief 脚1本分の2ボーンIKを解いて、Skeletonのボーン行列に直接反映する
 			 * @details
 			 *  Skeleton::Update() が計算し終えたあとに呼び出してください。
-			 *  GetBoneMatricesTopAddress() 経由でスキニング用行列に直接書き込むため、
-			 *  エンジン側（Skeleton.h/.cpp）の改造は一切不要です。
 			 * @param skeleton         対象のスケルトン（Skeleton::Update()実行済みのもの）
 			 * @param chain            脚の設定
 			 * @param targetWorldPos   足先を置きたいワールド座標

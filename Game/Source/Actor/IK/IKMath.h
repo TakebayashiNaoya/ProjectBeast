@@ -1,12 +1,7 @@
 ﻿/**
  * @file IKMath.h
  * @brief IK計算用の汎用ベクトル演算ヘルパー
- * @details
- *  Vector3/Matrix側に同名のメンバー関数（Cross等）が既にあるかもしれませんが、
- *  未確認のAPIには依存せず、x/y/z の直接アクセスと四則演算子（+ - * のみ確認済み）と
- *  .Dot() / .Normalize() / .Length() / .LengthSq()（すべてCharacterController.cppで
- *  使用実績あり）だけで組んであります。
- *  もし Vector3::Cross() 等が既にあれば、そちらに差し替えてもらって構いません。
+ * @author 立山
  */
 #pragma once
 
