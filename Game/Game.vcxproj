@@ -297,6 +297,8 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStatus.cpp" />
+    <ClCompile Include="Source\Actor\IK\LegIKComponent.cpp" />
+    <ClCompile Include="Source\Actor\IK\TwoBoneLegIK.cpp" />
     <ClCompile Include="Source\Actor\Stage\IStage.cpp" />
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
     <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp" />
@@ -489,6 +491,9 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
+    <ClInclude Include="Source\Actor\IK\IKMath.h" />
+    <ClInclude Include="Source\Actor\IK\LegIKComponent.h" />
+    <ClInclude Include="Source\Actor\IK\TwoBoneLegIK.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
     <ClInclude Include="Source\Actor\Stage\TerrainObject.h" />

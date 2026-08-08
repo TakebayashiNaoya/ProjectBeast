@@ -222,13 +222,22 @@ namespace app
 
 			bool IsSwim() const;
 
+			/**
+			 * @brief 脚IKを抑制すべき状態か
+			 * @details 睡眠のように「足を地面に貼り付けると姿勢が崩れる」アニメーションの間は
+			 *          脚IKを切る。対象の状態を増やしたい場合は
+			 *          EnemyStateMachine.cpp の実装に条件を足すこと。
+			 * @return 脚IKを切るべきなら true
+			 */
+			bool IsLegIKSuppressed() const;
+
 			/** ログ用：現在の状態名を返す（EnemyStateMachine.cpp で定義） */
 			const char* GetStateNameForLog() const;
 
 
-			public:
-				void PlayDebuff();
-				void StopDebuff();
+		public:
+			void PlayDebuff();
+			void StopDebuff();
 
 
 		private:
