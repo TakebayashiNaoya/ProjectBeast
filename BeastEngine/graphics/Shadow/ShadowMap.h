@@ -203,8 +203,15 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief キャスターがこのカスケードの範囲に関係するかを判定する
-		 * @details 影を落としうるかの判定なので、ライトの方向へ範囲を伸ばして判定する。
-		 *          範囲の外にあっても、ライト側にあるものは中へ影を落としうるため。
+		 * @details 実際に描かれる範囲（直交投影の箱）とAABBが交わるかを、
+		 *          ライト空間で判定する。
+		 * @details 球で判定してはいけない。直交投影が覆うのは一辺2rの正方形で、
+		 *          隅は中心から半径のsqrt(2)倍まで届く。
+		 *          球で弾くと、受け手は影を受ける範囲なのにキャスターだけ落とされ、
+		 *          カメラが動くたびに球の内外を出入りして影が点滅する。
+		 * @details ライト方向（奥行き）は投影の近クリップ側に余裕（LIGHT_MARGIN）が
+		 *          あるので、その範囲で判定する。
+		 *          範囲より手前（ライト側）にあるものも中へ影を落とすため。
 		 * @param cascadeIndex カスケードの番号
 		 * @param aabbMin      キャスターのワールドAABBの最小値
 		 * @param aabbMax      キャスターのワールドAABBの最大値
@@ -229,17 +236,27 @@ namespace nsBeastEngine
 
 		/** カスケードごとの担当区間の終端距離（カメラからの距離） */
 		std::array<float, NUM_SHADOW_CASCADES> m_cascadeFarDistances = {};
-		/** カスケードごとの覆う範囲の中心（キャスターのカリングに使う） */
+		/**
+		 * @brief カスケードごとの覆う範囲の中心（ライト空間。キャスターのカリングに使う）
+		 * @details テクセル単位に丸めた後の値を持つ。
+		 */
 		// Vector3 の既定コンストラクタは explicit のため、
 		// "= {}" によるコピーリスト初期化は使えない（C2512）。初期化子なしで直接初期化させる。
-		std::array<Vector3, NUM_SHADOW_CASCADES> m_cascadeCenters;
+		std::array<Vector3, NUM_SHADOW_CASCADES> m_cascadeCentersInLight;
 		/** カスケードごとの覆う範囲の半径（キャスターのカリングに使う） */
 		std::array<float, NUM_SHADOW_CASCADES> m_cascadeRadii = {};
 		/** カスケードごとの1テクセルあたりのワールド空間の大きさ（デバッグ表示用） */
 		std::array<float, NUM_SHADOW_CASCADES> m_texelWorldSizes = {};
 
-		/** ライトの向き（キャスターのカリングに使う） */
-		Vector3 m_lightDirection = Vector3::Down;
+		/** ライト空間の上方向（ライトが真上・真下を向いた場合の縮退を避けて選ぶ） */
+		Vector3 m_lightUp = Vector3::Up;
+		/**
+		 * @brief ワールド座標をライト空間へ変換する行列
+		 * @details ライトの向きだけで決まるため全カスケードで共通。
+		 *          テクセル単位の丸めと、キャスターのカリングに使う。
+		 *          ワールド原点を基準にすることで升目がワールドに固定される。
+		 */
+		Matrix m_lightSpaceMatrix;
 
 		/** シャドウマップが有効かどうか */
 		bool m_isEnable = true;

@@ -183,44 +183,31 @@ namespace nsBeastEngine
 		float sphereRadius = 0.0f;
 		CalcFrustumSphere(camera, nearZ, farZ, sphereCenter, sphereRadius);
 
-		// ライトが真上・真下を向いていると上方向ベクトルが縮退するため、
-		// その場合だけ別の軸を上方向に使う
-		Vector3 up = Vector3::Up;
-		if (fabsf(lightDirection.y) > 0.99f)
-		{
-			up = Vector3::Front;
-		}
-
 		const float areaSize = sphereRadius * 2.0f;
 		m_texelWorldSizes[cascadeIndex] = areaSize / static_cast<float>(SHADOW_MAP_SIZE);
 
 		// カメラが動くたびに影の輪郭がちらつくのを防ぐため、
-		// 覆う範囲の中心をライト空間でテクセル単位に丸める。
-		//
-		// 丸める基準の座標系は「ワールド原点から見たライト空間」にする。
-		// カメラ追従の点を原点にすると物差し自体が毎フレーム動いてしまい、
-		// 丸めても升目が固定されずちらつきが消えない。
-		Matrix lightSpaceMatrix;
-		lightSpaceMatrix.MakeLookAt(Vector3::Zero, lightDirection, up);
-
+		// 覆う範囲の中心をライト空間でテクセル単位に丸める
 		Vector3 centerInLight = sphereCenter;
-		lightSpaceMatrix.Apply(centerInLight);
+		m_lightSpaceMatrix.Apply(centerInLight);
 
 		const float texelSize = m_texelWorldSizes[cascadeIndex];
 		centerInLight.x = floorf(centerInLight.x / texelSize) * texelSize;
 		centerInLight.y = floorf(centerInLight.y / texelSize) * texelSize;
 
-		Matrix invLightSpaceMatrix;
-		invLightSpaceMatrix.Inverse(lightSpaceMatrix);
-		invLightSpaceMatrix.Apply(centerInLight);
-
-		// カリング用に、丸めた後の範囲を控えておく
-		m_cascadeCenters[cascadeIndex] = centerInLight;
+		// カリング用に、丸めた後の範囲をライト空間のまま控えておく
+		m_cascadeCentersInLight[cascadeIndex] = centerInLight;
 		m_cascadeRadii[cascadeIndex] = sphereRadius;
 
+		// 丸めた中心をワールドへ戻す
+		Vector3 centerInWorld = centerInLight;
+		Matrix invLightSpaceMatrix;
+		invLightSpaceMatrix.Inverse(m_lightSpaceMatrix);
+		invLightSpaceMatrix.Apply(centerInWorld);
+
 		// 丸めた中心で本番のライト行列を作る
-		const Vector3 lightPosition = centerInLight - lightDirection * (sphereRadius + LIGHT_MARGIN);
-		m_lightViewMatrices[cascadeIndex].MakeLookAt(lightPosition, centerInLight, up);
+		const Vector3 lightPosition = centerInWorld - lightDirection * (sphereRadius + LIGHT_MARGIN);
+		m_lightViewMatrices[cascadeIndex].MakeLookAt(lightPosition, centerInWorld, m_lightUp);
 
 		// 遠クリップはライト位置から球の裏側まで届く距離にする
 		const float shadowFar = sphereRadius * 2.0f + LIGHT_MARGIN;
@@ -237,33 +224,41 @@ namespace nsBeastEngine
 		const Vector3& aabbMin,
 		const Vector3& aabbMax) const
 	{
-		const Vector3& center = m_cascadeCenters[cascadeIndex];
+		const Vector3& center = m_cascadeCentersInLight[cascadeIndex];
 		const float radius = m_cascadeRadii[cascadeIndex];
 
-		// AABBと球の最近接距離で判定する。
-		// ライト側にあるキャスターは球の外でも中へ影を落とすため、
-		// ライトの方向にだけ範囲を伸ばした位置でも判定する。
-		Vector3 extendedCenter = center - m_lightDirection * radius;
+		// AABBの8頂点をライト空間へ移し、包む範囲を求める
+		Vector3 casterMin(FLT_MAX, FLT_MAX, FLT_MAX);
+		Vector3 casterMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			const Vector3& testCenter = (i == 0) ? center : extendedCenter;
+			Vector3 corner(
+				(i & 1) ? aabbMax.x : aabbMin.x,
+				(i & 2) ? aabbMax.y : aabbMin.y,
+				(i & 4) ? aabbMax.z : aabbMin.z
+			);
+			m_lightSpaceMatrix.Apply(corner);
 
-			const float closestX = max(aabbMin.x, min(testCenter.x, aabbMax.x));
-			const float closestY = max(aabbMin.y, min(testCenter.y, aabbMax.y));
-			const float closestZ = max(aabbMin.z, min(testCenter.z, aabbMax.z));
+			casterMin.x = min(casterMin.x, corner.x);
+			casterMin.y = min(casterMin.y, corner.y);
+			casterMin.z = min(casterMin.z, corner.z);
 
-			const float dx = closestX - testCenter.x;
-			const float dy = closestY - testCenter.y;
-			const float dz = closestZ - testCenter.z;
-
-			if (dx * dx + dy * dy + dz * dz <= radius * radius)
-			{
-				return true;
-			}
+			casterMax.x = max(casterMax.x, corner.x);
+			casterMax.y = max(casterMax.y, corner.y);
+			casterMax.z = max(casterMax.z, corner.z);
 		}
 
-		return false;
+		// 直交投影が覆うのは一辺 radius*2 の正方形。球で判定すると隅が抜ける
+		if (casterMax.x < center.x - radius || casterMin.x > center.x + radius) { return false; }
+		if (casterMax.y < center.y - radius || casterMin.y > center.y + radius) { return false; }
+
+		// 奥行きはライトの手前側に LIGHT_MARGIN のぶん余裕がある。
+		// 範囲より手前（ライト側）にあるものも中へ影を落とすため、そこまでを対象にする
+		if (casterMax.z < center.z - radius - LIGHT_MARGIN) { return false; }
+		if (casterMin.z > center.z + radius) { return false; }
+
+		return true;
 	}
 
 
@@ -324,7 +319,13 @@ namespace nsBeastEngine
 
 		BeginGPUEvent("ShadowMap");
 
-		m_lightDirection = lightDirection;
+		// ライト空間はライトの向きだけで決まるため、カスケードごとに作り直さず一度だけ求める。
+		// ライトが真上・真下を向いていると上方向ベクトルが縮退するため、その場合だけ別の軸を使う
+		m_lightUp = (fabsf(lightDirection.y) > 0.99f) ? Vector3::Front : Vector3::Up;
+		// 基準をワールド原点にすることで升目がワールドに固定される。
+		// カメラ追従の点を原点にすると物差し自体が毎フレーム動き、丸めてもちらつきが消えない
+		m_lightSpaceMatrix.MakeLookAt(Vector3::Zero, lightDirection, m_lightUp);
+
 		UpdateCascadeDistances(camera);
 
 		for (int i = 0; i < NUM_SHADOW_CASCADES; i++)
