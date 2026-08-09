@@ -425,6 +425,16 @@ namespace app
 			whirlpoolCb.padding[0] = 0.0f;
 			whirlpoolCb.padding[1] = 0.0f;
 			whirlpoolCb.padding[2] = 0.0f;
+			// キャラクターや地形の影を渦潮に映すために、毎フレームのライト行列を渡す
+			for (int i = 0; i < nsBeastEngine::NUM_SHADOW_CASCADES; i++)
+			{
+				whirlpoolCb.lvpMatrix[i] = g_sceneLight->GetLVP(i);
+			}
+			// 影の濃さはデバッグUIから変更されるため毎フレーム取り直す
+			whirlpoolCb.shadowAmbientRate = g_renderingEngine->GetShadowMap().GetAmbientRate();
+			whirlpoolCb.padding2[0] = 0.0f;
+			whirlpoolCb.padding2[1] = 0.0f;
+			whirlpoolCb.padding2[2] = 0.0f;
 			m_whirlpoolConstantBuffer.CopyToVRAM(whirlpoolCb);
 
 			// 描画コマンドの共通セットアップを発行する
@@ -480,7 +490,7 @@ namespace app
 				&samplerDesc,
 				1,	// サンプラー数
 				2,	// CBV数（b0, b1）
-				1,	// SRV数（t0）
+				1 + nsBeastEngine::NUM_SHADOW_CASCADES,	// SRV数（t0 + カスケードシャドウマップ）
 				1	// UAV=0だと内部でシリアライズ失敗するので最低1にする
 			);
 		}
@@ -549,6 +559,16 @@ namespace app
 			m_descriptorHeap.RegistConstantBuffer(0, m_commonConstantBuffer);
 			m_descriptorHeap.RegistConstantBuffer(1, m_whirlpoolConstantBuffer);
 			m_descriptorHeap.RegistShaderResource(0, m_albedoMap);
+
+			// キャラクターや地形の影を渦潮に映すためのカスケードシャドウマップ
+			// 渦潮自身は影を落とさない（キャスターには登録していない）
+			// Whirlpool.fx の shadowMap0〜2 (t1〜t3) に対応する
+			for (int i = 0; i < nsBeastEngine::NUM_SHADOW_CASCADES; i++)
+			{
+				m_descriptorHeap.RegistShaderResource(
+					1 + i, g_renderingEngine->GetShadowMap().GetShadowMapTexture(i));
+			}
+
 			m_descriptorHeap.Commit();
 		}
 

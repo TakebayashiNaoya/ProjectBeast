@@ -14,17 +14,32 @@ cbuffer CommonCb : register(b0)
 };
 
 // 渦潮定数バッファ（b1）
+// C++側 Whirlpool::SWhirlpoolConstantBuffer と一致させること
 cbuffer WhirlpoolCb : register(b1)
 {
-	float uvRotation;	// UV回転角度（ラジアン）
-	float3 padding;
+	float    uvRotation;		// UV回転角度（ラジアン）
+	float3   padding;
+	float4x4 lvpMatrix0;		// ライトビュープロジェクション行列（近景）
+	float4x4 lvpMatrix1;		// ライトビュープロジェクション行列（中景）
+	float4x4 lvpMatrix2;		// ライトビュープロジェクション行列（遠景）
+	float    shadowAmbientRate;	// 影の中で明るさを何割残すか
+	float3   padding2;
 };
 
 // アルベドマップ（t0）
 Texture2D<float4> albedoMap : register(t0);
+// キャラクターや地形の影を渦潮に映すためのカスケードシャドウマップ
+// 渦潮自身は影を落とさない（キャスターには登録していない）
+// C++側 Whirlpool::InitDescriptorHeap() の登録順と一致させること
+Texture2D<float4> shadowMap0 : register(t1);
+Texture2D<float4> shadowMap1 : register(t2);
+Texture2D<float4> shadowMap2 : register(t3);
 
 // サンプラー（s0）
 SamplerState albedoSampler : register(s0);
+
+// 影の判定は Shadow.h の CalcShadowRate() を使う（海・ディファードと共通）
+#include "Shadow.h"
 
 
 // 頂点シェーダーの入力
@@ -42,8 +57,9 @@ struct VSInput
 // ピクセルシェーダーの入力（頂点シェーダーの出力）
 struct PSInput
 {
-	float4 pos : SV_POSITION;
-	float2 uv  : TEXCOORD0;
+	float4 pos      : SV_POSITION;
+	float2 uv       : TEXCOORD0;
+	float3 worldPos : TEXCOORD1;	// 影の判定に使うワールド座標
 };
 
 
@@ -59,6 +75,7 @@ PSInput VSMain(VSInput input)
 	float4 viewPos  = mul(mView,  worldPos);
 	output.pos      = mul(mProj,  viewPos);
 	output.uv       = input.uv;
+	output.worldPos = worldPos.xyz;
 
 	return output;
 }
@@ -87,6 +104,16 @@ float4 PSMain(PSInput input) : SV_Target
 
 	// mulColorを乗算する
 	color *= mulColor;
+
+	// キャラクターや地形の影を受ける（渦潮自身は影を落とさない）
+	// 渦潮はライティングを行わないため、影の割合をそのまま暗さとして掛ける。
+	// 濃さはデバッグUIから調整できる
+	float shadowRate = CalcShadowRate(
+		input.worldPos,
+		lvpMatrix0, lvpMatrix1, lvpMatrix2,
+		shadowMap0, shadowMap1, shadowMap2,
+		albedoSampler);
+	color.rgb *= lerp(shadowAmbientRate, 1.0f, shadowRate);
 
 	return color;
 }

@@ -351,13 +351,18 @@ namespace nsBeastEngine
 		shadowInitData.m_expandConstantBuffer2 = nullptr;
 		shadowInitData.m_expandConstantBufferSize2 = 0;
 
-		m_shadowModels.Init(shadowInitData);
+		// カスケードごとに定数バッファを分けるため、同じ設定でカスケード数ぶん初期化する
+		for (auto& shadowModel : m_shadowModels)
+		{
+			shadowModel.Init(shadowInitData);
+		}
 		m_isShadowModelInited = true;
 	}
 
 
 	void ModelRender::OnRenderShadowMap(
 		RenderContext& rc,
+		const int cascadeIndex,
 		const Matrix& lightViewMatrix,
 		const Matrix& lightProjMatrix)
 	{
@@ -365,7 +370,8 @@ namespace nsBeastEngine
 		if (!m_visible || !m_isCastShadow || !m_isShadowModelInited) return;
 
 		// カメラではなくライトの行列で描画する
-		m_shadowModels.Draw(rc, lightViewMatrix, lightProjMatrix, m_maxInstance);
+		// カスケード専用のモデルを使うことで、行列が他のカスケードに上書きされない
+		m_shadowModels[cascadeIndex].Draw(rc, lightViewMatrix, lightProjMatrix, m_maxInstance);
 	}
 
 
@@ -413,7 +419,10 @@ namespace nsBeastEngine
 		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_renderToGBufferModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_forwardRenderModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
-		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		for (auto& shadowModel : m_shadowModels)
+		{
+			shadowModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		}
 
 		if (m_toonModel != nullptr)
 		{

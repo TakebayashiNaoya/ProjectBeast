@@ -104,6 +104,14 @@ cbuffer LightCB : register(b1)
     float3   rimLightColor;      // offset: 128
     float    pad4;               // offset: 140
     float4x4 mViewProjInv;       // offset: 144
+    float    shadowDirectRate;   // offset: 208  影の中で直接光を何割残すか
+    float    shadowAmbientRate;  // offset: 212  影の中で環境光を何割残すか
+    float    pad5;               // offset: 216
+    float    pad6;               // offset: 220
+    // カスケードシャドウマップのライトビュープロジェクション行列
+    float4x4 shadowLVP0;         // offset: 224
+    float4x4 shadowLVP1;         // offset: 288
+    float4x4 shadowLVP2;         // offset: 352
 };
 
 
@@ -119,7 +127,10 @@ Texture2D<float4> g_normalTexture        : register(t1);	// 法線
 //   b = ambientScale（環境光強度倍率）
 //   a = smooth
 Texture2D<float4> g_metaricSmoothTexture : register(t2);	// メタリックスムース
-Texture2D<float4> g_shadowMap            : register(t3);	// シャドウマップ（ライト空間の深度）
+// カスケードシャドウマップ（t3が最も近景）
+Texture2D<float4> g_shadowMap0           : register(t3);
+Texture2D<float4> g_shadowMap1           : register(t4);
+Texture2D<float4> g_shadowMap2           : register(t5);
 
 // レジスタ番号は C++ 側の EnDeferredLightingSrv（RenderViewContext.h）と一致させること。
 // RenderingEngine::InitDeferredLightingSprite() がその順番でテクスチャを設定している。
@@ -131,61 +142,8 @@ sampler g_sampler : register(s0);
 // シャドウ
 ///////////////////////////////////////
 
-/** シャドウマップの解像度。ShadowMap.cpp の SHADOW_MAP_SIZE と一致させること */
-static const float SHADOW_MAP_SIZE = 2048.0f;
-
-/**
- * @brief シャドウアクネを防ぐための深度バイアス
- * @details 自分自身の深度と比較して誤って影と判定される（縞模様が出る）のを防ぐ。
- *          大きくしすぎると影が実際の位置からずれる（ピーターパン現象）。
- */
-static const float SHADOW_DEPTH_BIAS = 0.0015f;
-
-/*!
- * @brief 影になっている割合を計算する
- * @details ワールド座標をライト空間へ変換し、シャドウマップの深度と比較する。
- *          3x3のPCFで周囲も参照して輪郭を柔らかくしている。
- * @param worldPos ワールド座標
- * @return 光が当たっている割合（0.0=完全な影 1.0=影なし）
- */
-float CalcShadowRate(float3 worldPos)
-{
-    // ライトから見たクリップ空間へ変換する
-    float4 posInLVP = mul(dirLightLVP, float4(worldPos, 1.0f));
-    float3 lvpPos = posInLVP.xyz / posInLVP.w;
-
-    // クリップ空間(-1〜1)からUV(0〜1)へ変換する。yは上下が逆になる
-    float2 shadowUV = float2(0.5f, -0.5f) * lvpPos.xy + 0.5f;
-
-    // シャドウマップの範囲外は影を落とさない
-    // 範囲は注視点まわりに限定しているため、遠景は必ずここに来る
-    if (shadowUV.x < 0.0f || shadowUV.x > 1.0f ||
-        shadowUV.y < 0.0f || shadowUV.y > 1.0f ||
-        lvpPos.z < 0.0f || lvpPos.z > 1.0f)
-    {
-        return 1.0f;
-    }
-
-    // 自分の深度がシャドウマップの深度より奥なら影
-    float depthFromLight = lvpPos.z - SHADOW_DEPTH_BIAS;
-    float texelOffset = 1.0f / SHADOW_MAP_SIZE;
-
-    // 3x3のPCFで平均を取り、輪郭のジャギを緩和する
-    float lightRate = 0.0f;
-    [unroll]
-    for (int y = -1; y <= 1; y++)
-    {
-        [unroll]
-        for (int x = -1; x <= 1; x++)
-        {
-            float2 uv = shadowUV + float2(x, y) * texelOffset;
-            float shadowMapDepth = g_shadowMap.Sample(g_sampler, uv).r;
-            lightRate += (depthFromLight <= shadowMapDepth) ? 1.0f : 0.0f;
-        }
-    }
-
-    return lightRate / 9.0f;
-}
+// 影の判定は Shadow.h の CalcShadowRate() を使う（海・渦潮と共通）
+#include "Shadow.h"
 
 
 ///////////////////////////////////////
@@ -369,12 +327,20 @@ float3 CalcDirectionLight(
     // 滑らかさが高ければ拡散反射は弱くなる
     float3 lig = diffuse * (1.0f - smooth) + spec;
 
-    // 影を適用する
-    // 環境光より前に掛けることで、影の中でも環境光は残り真っ黒にならない
-    lig *= CalcShadowRate(worldPos);
+    // 影の割合を求める（0=完全な影 1=影なし）
+    float shadowRate = CalcShadowRate(
+        worldPos,
+        shadowLVP0, shadowLVP1, shadowLVP2,
+        g_shadowMap0, g_shadowMap1, g_shadowMap2,
+        g_sampler);
+
+    // 直接光に影を適用する
+    lig *= lerp(shadowDirectRate, 1.0f, shadowRate);
 
     // 補正済み環境光を加算する
-    lig += ambientLightColor * albedo * ambientScale;
+    // 環境光にも影を掛ける。環境光が強いシーンではここを落とさないと
+    // 影の中が環境光で埋まってしまい、トーンマップ後にほぼ見えなくなる
+    lig += ambientLightColor * albedo * ambientScale * lerp(shadowAmbientRate, 1.0f, shadowRate);
 
     // リムライトを加算する
     lig += CalcRimLight(normal, toEye);

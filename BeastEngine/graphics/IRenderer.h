@@ -22,12 +22,19 @@ namespace nsBeastEngine
 		 * @brief シャドウマップへの描画パスから呼ばれる処理
 		 * @details カメラではなくライトから見た行列で描画するため、
 		 *          ビュー行列とプロジェクション行列を受け取る。
+		 * @details カスケードの番号も受け取る。
+		 *          モデルの定数バッファはメッシュごとに1つしかないため、
+		 *          1フレームに同じモデルを複数のカスケードへ描くと行列が上書きされてしまう。
+		 *          カスケードごとに別のモデル（別の定数バッファ）を使う必要があり、
+		 *          そのためにどのカスケードを描いているかを渡している。
 		 * @param rc                レンダリングコンテキスト
+		 * @param cascadeIndex      カスケードの番号（0が最も近景）
 		 * @param lightViewMatrix   ライトのビュー行列
 		 * @param lightProjMatrix   ライトのプロジェクション行列
 		 */
 		virtual void OnRenderShadowMap(
 			nsK2EngineLow::RenderContext& rc,
+			const int cascadeIndex,
 			const nsK2EngineLow::Matrix& lightViewMatrix,
 			const nsK2EngineLow::Matrix& lightProjMatrix) {}
 

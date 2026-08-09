@@ -63,6 +63,12 @@ namespace nsBeastEngine
 		m_modelRender.SetForwardRendering(true);
 		m_modelRender.InitFromLoaded(initData);
 
+		/** 天球はシーン全体を球状に囲むため、影のキャスターにすると
+		 *  ライトから見た深度がシャドウマップ全体を地面より手前で覆い、
+		 *  全カスケードの全域が影になってしまう（プレイヤー中心の同心円状のアーティファクト）。
+		 *  天球は影を落とさないのでキャスターから除外する。 */
+		m_modelRender.SetCastShadow(false);
+
 		m_modelRender.SetTRS(m_position, g_quatIdentity, m_scale);
 		m_modelRender.Update();
 

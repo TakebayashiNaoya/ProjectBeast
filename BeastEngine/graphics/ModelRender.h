@@ -451,11 +451,13 @@ namespace nsBeastEngine
 		 * @brief シャドウマップへの描画パスから呼ばれる処理
 		 * @details ShadowMap から呼ばれる。カメラではなくライトの行列で描画する。
 		 * @param rc                レンダリングコンテキスト
+		 * @param cascadeIndex      カスケードの番号（0が最も近景）
 		 * @param lightViewMatrix   ライトのビュー行列
 		 * @param lightProjMatrix   ライトのプロジェクション行列
 		 */
 		void OnRenderShadowMap(
 			RenderContext& rc,
+			const int cascadeIndex,
 			const Matrix& lightViewMatrix,
 			const Matrix& lightProjMatrix
 		) override;
@@ -553,8 +555,16 @@ namespace nsBeastEngine
 		 * @details トライアングルカリングは不要なためそのまま使用する
 		 */
 		Model          m_model;
-		/** シャドウマップ用モデル */
-		Model          m_shadowModels;
+		/**
+		 * @brief シャドウマップ用モデル（カスケードごとに1つ）
+		 * @details モデルの定数バッファ（mWorld/mView/mProj）はメッシュごとに1つしかなく、
+		 *          描画のたびに同じ場所へ上書きされる。
+		 *          1フレームに同じモデルを複数のカスケードへ描くと、
+		 *          コマンドが実行される時点では最後に書いたカスケードの行列しか残らず、
+		 *          全カスケードが同じ（最も広い）範囲で描かれてしまう。
+		 *          カスケードごとに別のモデルを持たせて定数バッファを分ける。
+		 */
+		std::array<Model, NUM_SHADOW_CASCADES> m_shadowModels;
 		/** シャドウマップ用モデルを初期化済みか */
 		bool           m_isShadowModelInited = false;
 		/** 影を落とすかどうか */

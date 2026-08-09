@@ -49,6 +49,13 @@ struct Light
     float3         rimLightColor;     // m_rimLightColor（12バイト）
     float          padding2;          // パディング（4バイト）
     float4x4       mViewProjInv;      // m_mViewProjInv（64バイト）
+    float          shadowDirectRate;  // m_shadowDirectLightRate（4バイト）
+    float          shadowAmbientRate; // m_shadowAmbientRate（4バイト）
+    float          padding3;          // パディング（4バイト）
+    float          padding4;          // パディング（4バイト）
+    float4x4       shadowLVP0;        // m_shadowLVP[0]（64バイト）
+    float4x4       shadowLVP1;        // m_shadowLVP[1]（64バイト）
+    float4x4       shadowLVP2;        // m_shadowLVP[2]（64バイト）
 };
 
 ////////////////////////////////////////////////
@@ -89,7 +96,16 @@ cbuffer OceanCb : register(b1)
 Texture2D<float4> g_albedo      : register(t0);
 Texture2D<float4> g_normalMap   : register(t1);
 Texture2D<float4> g_specularMap : register(t2);
+// キャラクターや地形の影を海に映すためのカスケードシャドウマップ
+// 海自身は影を落とさない（キャスターには登録していない）
+// C++側 OceanMesh::InitDescriptorHeap() の登録順と一致させること
+Texture2D<float4> g_shadowMap0  : register(t3);
+Texture2D<float4> g_shadowMap1  : register(t4);
+Texture2D<float4> g_shadowMap2  : register(t5);
 sampler           g_sampler     : register(s0);
+
+// 影の判定は Shadow.h の CalcShadowRate() を使う（ディファードライティングと共通）
+#include "Shadow.h"
 
 ////////////////////////////////////////////////
 // 関数宣言。
@@ -184,6 +200,21 @@ float4 PSMain(SPSIn psIn) : SV_Target0
 
     // ambientScale は 1.0 を超えてHDR値として使用するため saturate() を使わない
     float3 ambient = light.ambientLightColor * ambientScale;
+
+    // キャラクターや地形の影を受ける（海自身は影を落とさない）
+    float shadowRate = CalcShadowRate(
+        psIn.worldPos,
+        light.shadowLVP0, light.shadowLVP1, light.shadowLVP2,
+        g_shadowMap0, g_shadowMap1, g_shadowMap2,
+        g_sampler);
+
+
+    // 直接光と環境光それぞれに、調整値で加減した影を掛ける
+    // 環境光側も落とさないと、影の中が環境光で埋まって見えなくなる
+    float directRate = lerp(light.shadowDirectRate, 1.0f, shadowRate);
+    diff *= directRate;
+    spec *= directRate;
+    ambient *= lerp(light.shadowAmbientRate, 1.0f, shadowRate);
 
     float4 litColor  = albedoColor;
 

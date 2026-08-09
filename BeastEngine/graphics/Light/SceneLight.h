@@ -420,6 +420,19 @@ namespace nsBeastEngine
 		float				padding2;						// パディング（16バイトアラインメントのため）
 		Matrix				m_mViewProjInv;					// カメラのビュープロジェクション行列の逆行列
 
+		// ここから下は影の見え方を調整するパラメータ。
+		// 新しいメンバは必ず「末尾」に足すこと。
+		// 途中に挿入すると、Lightを参照している既存シェーダー
+		// （DeferredLighting.fx / Ocean.fx / toon.fx）のオフセットが全てずれる。
+		float				m_shadowDirectLightRate;		// 影の中で直接光を何割残すか（0=完全に遮る）
+		float				m_shadowAmbientRate;			// 影の中で環境光を何割残すか（1=そのまま）
+		float				padding3;						// パディング（16バイトアラインメントのため）
+		float				padding4;						// パディング（16バイトアラインメントのため）
+		// カスケードシャドウマップのライトビュープロジェクション行列。
+		// 要素数は ShadowMap.h の NUM_SHADOW_CASCADES と一致させること。
+		// m_directionLight.m_LVP は使わない（カスケード化以前の名残）。
+		Matrix				m_shadowLVP[3];
+
 
 		/**
 		 * @brief コンストラクタ
@@ -432,7 +445,16 @@ namespace nsBeastEngine
 			, m_rimLightColor(Vector3::Zero)
 			, padding2(0.0f)
 			, m_mViewProjInv(Matrix::Identity)
-		{}
+			, m_shadowDirectLightRate(0.0f)
+			, m_shadowAmbientRate(1.0f)
+			, padding3(0.0f)
+			, padding4(0.0f)
+		{
+			for (auto& lvp : m_shadowLVP)
+			{
+				lvp = Matrix::Identity;
+			}
+		}
 
 		/**
 		 * @brief カメラの位置の設定
@@ -530,14 +552,15 @@ namespace nsBeastEngine
 		}
 
 		/**
-		 * @brief ディレクションライトのライトビュープロジェクション行列の取得
+		 * @brief 指定したカスケードのライトビュープロジェクション行列の取得
 		 * @details RenderingEngine::RenderShadowMap() が毎フレーム更新する。
 		 *          海や渦潮など、独自シェーダーで影を受けるオブジェクトが参照する。
+		 * @param cascadeIndex カスケードの番号（0が最も近景）
 		 * @return ライトビュープロジェクション行列の参照
 		 */
-		Matrix& GetLVP()
+		Matrix& GetLVP(const int cascadeIndex)
 		{
-			return m_light.m_directionLight.m_LVP;
+			return m_light.m_shadowLVP[cascadeIndex];
 		}
 
 		// 現在未使用（実装時に有効化）

@@ -287,14 +287,17 @@ namespace app
 		void TerrainObject::Render(RenderContext& rc)
 		{
 			if (!m_isInited) return;
-			const auto& frustum = g_renderingEngine->GetActiveFrustum();
+
+			// ここではカリングせず、全チャンクを描画リストへ登録する。
+			// 以前はカメラの視錐台で弾いていたが、そうすると画面外のチャンクが
+			// シャドウマップのキャスターからも外れてしまい、カメラを回すたびに
+			// 地形の影が消えたり現れたりしていた。
+			// 描画側のカリングは RenderingEngine::RenderToGBuffer() が、
+			// 影側のカリングは ShadowMap がそれぞれの範囲で行う。
 			const int numChunks = static_cast<int>(m_chunkRenders.size());
 			for (int i = 0; i < numChunks; i++)
 			{
 				if (!m_chunkRenders[i]) continue;
-				if (!frustum.IsIntersectAABBWorld(m_chunkAABBs[i].GetMin(), m_chunkAABBs[i].GetMax())) {
-					continue;
-				}
 				m_chunkRenders[i]->Draw(rc);
 			}
 		}

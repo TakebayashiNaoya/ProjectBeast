@@ -50,6 +50,9 @@ namespace
 		const Quaternion rotation = JC::ToRotation(json, "rotationDeg");
 		const Vector3 scale = JC::ToVector3(json, "scale");
 
+		// 影を落とすかどうか。指定が無ければ落とす
+		object->SetCastShadow(json.value("castShadow", true));
+
 		object->SetIsNeedCollision(isNeedCollision);
 		object->SetPosition(position);
 		object->SetRotation(rotation);

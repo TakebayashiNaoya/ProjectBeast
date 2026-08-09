@@ -30,11 +30,13 @@ namespace nsBeastEngine
 	 */
 	enum EnDeferredLightingSrv
 	{
-		enDeferredLightingSrv_Albedo = 0,  /** アルベド		 (t0) */
-		enDeferredLightingSrv_Normal,      /** 法線			 (t1) */
-		enDeferredLightingSrv_Specular,    /** PBRパラメータ (t2) */
-		enDeferredLightingSrv_ShadowMap,   /** シャドウマップ(t3) */
-		enDeferredLightingSrv_Num,         /** スロットの数	     */
+		enDeferredLightingSrv_Albedo = 0,    /** アルベド			  (t0) */
+		enDeferredLightingSrv_Normal,        /** 法線				  (t1) */
+		enDeferredLightingSrv_Specular,      /** PBRパラメータ		  (t2) */
+		enDeferredLightingSrv_ShadowMap0,    /** シャドウマップ 近景  (t3) */
+		enDeferredLightingSrv_ShadowMap1,    /** シャドウマップ 中景  (t4) */
+		enDeferredLightingSrv_ShadowMap2,    /** シャドウマップ 遠景  (t5) */
+		enDeferredLightingSrv_Num,           /** スロットの数			   */
 	};
 
 

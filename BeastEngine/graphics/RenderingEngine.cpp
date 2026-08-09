@@ -235,7 +235,15 @@ namespace nsBeastEngine
 		spriteInitData.m_textures[enDeferredLightingSrv_Albedo] = &view.gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
 		spriteInitData.m_textures[enDeferredLightingSrv_Normal] = &view.gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
 		spriteInitData.m_textures[enDeferredLightingSrv_Specular] = &view.gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
-		spriteInitData.m_textures[enDeferredLightingSrv_ShadowMap] = &m_shadowMap.GetShadowMapTexture();
+		// カスケードシャドウマップは連続したスロットへ順に割り当てる
+		static_assert(
+			enDeferredLightingSrv_ShadowMap0 + NUM_SHADOW_CASCADES == enDeferredLightingSrv_Num,
+			"シャドウマップのSRVスロット数がカスケード数と食い違っています");
+		for (int i = 0; i < NUM_SHADOW_CASCADES; i++)
+		{
+			spriteInitData.m_textures[enDeferredLightingSrv_ShadowMap0 + i] =
+				&m_shadowMap.GetShadowMapTexture(i);
+		}
 		spriteInitData.m_fxFilePath = "Assets/shader/DeferredLighting.fx";
 		spriteInitData.m_expandConstantBuffer = m_sceneLight.GetLight();
 		spriteInitData.m_expandConstantBufferSize = sizeof(Light);
@@ -304,16 +312,24 @@ namespace nsBeastEngine
 
 	void RenderingEngine::RenderShadowMap(RenderContext& rc)
 	{
-		// シャドウマップで覆う範囲の中心はメインカメラの注視点にする
-		// カメラが見ている場所に影の解像度を集中させるため
-		const Vector3 focusPosition = CameraSystem::Get().GetMainCamera().GetTarget();
+		// 覆う範囲はメインカメラの視錐台に合わせる
+		// 画面に映っている場所へ解像度を集中させ、カメラ後方には配らないため
+		auto& mainCamera = CameraSystem::Get().GetMainCamera();
 		const Vector3 lightDirection = m_sceneLight.GetLight()->m_directionLight.m_direction;
 
-		m_shadowMap.Render(rc, lightDirection, focusPosition, m_deferredModelList, m_forwardModelList);
+		m_shadowMap.Render(rc, lightDirection, mainCamera, m_deferredModelList, m_forwardModelList);
 
 		// 計算されたライトビュープロジェクション行列を定数バッファへ反映する
-		// ディファードライティングがこの行列でシャドウマップを引く
-		m_sceneLight.GetLight()->m_directionLight.m_LVP = m_shadowMap.GetLVPMatrix();
+		// 受け手はこの行列でシャドウマップを引く
+		for (int i = 0; i < NUM_SHADOW_CASCADES; i++)
+		{
+			m_sceneLight.GetLight()->m_shadowLVP[i] = m_shadowMap.GetLVPMatrix(i);
+		}
+
+		// 影の濃さの調整値も定数バッファへ反映する
+		// デバッグUIから実行中に変更されるため毎フレーム転送する
+		m_sceneLight.GetLight()->m_shadowDirectLightRate = m_shadowMap.GetDirectLightRate();
+		m_sceneLight.GetLight()->m_shadowAmbientRate = m_shadowMap.GetAmbientRate();
 	}
 
 
