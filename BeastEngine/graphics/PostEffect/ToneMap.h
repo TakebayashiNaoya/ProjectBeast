@@ -68,49 +68,49 @@ namespace nsBeastEngine
 		 * @brief トーンマップの種別を取得
 		 * @return トーンマップの種別
 		 */
-		__forceinline EnToneMapType GetToneMapType() const { return m_toneMapType; }
+		EnToneMapType GetToneMapType() const { return m_toneMapType; }
 
 		/**
 		 * @brief 実行中に種別を切り替えられるか
 		 * @return 切り替え可能かどうか
 		 */
-		__forceinline bool IsSwitchable() const { return m_isInitialized; }
+		bool IsSwitchable() const { return m_isInitialized; }
 
 		/**
 		 * @brief 露出倍率を設定
 		 * @param exposure 露出倍率
 		 */
-		__forceinline void SetExposure(const float exposure) { m_toneMapCb.exposure = exposure; }
+		void SetExposure(const float exposure) { m_toneMapCb.exposure = exposure; }
 
 		/**
 		 * @brief 露出倍率を取得
 		 * @return 露出倍率
 		 */
-		__forceinline float GetExposure() const { return m_toneMapCb.exposure; }
+		float GetExposure() const { return m_toneMapCb.exposure; }
 
 		/**
 		 * @brief 白とみなす輝度を設定
 		 * @param whitePoint 白とみなす輝度
 		 */
-		__forceinline void SetWhitePoint(const float whitePoint) { m_toneMapCb.whitePoint = whitePoint; }
+		void SetWhitePoint(const float whitePoint) { m_toneMapCb.whitePoint = whitePoint; }
 
 		/**
 		 * @brief 白とみなす輝度を取得
 		 * @return 白とみなす輝度
 		 */
-		__forceinline float GetWhitePoint() const { return m_toneMapCb.whitePoint; }
+		float GetWhitePoint() const { return m_toneMapCb.whitePoint; }
 
 		/**
 		 * @brief sRGBエンコードを行うかを設定
 		 * @param isApplyGamma sRGBエンコードを行うかどうか
 		 */
-		__forceinline void SetApplyGamma(const bool isApplyGamma) { m_toneMapCb.applyGamma = isApplyGamma ? 1.0f : 0.0f; }
+		void SetApplyGamma(const bool isApplyGamma) { m_toneMapCb.applyGamma = isApplyGamma ? 1.0f : 0.0f; }
 
 		/**
 		 * @brief sRGBエンコードを行うかを取得
 		 * @return sRGBエンコードを行うかどうか
 		 */
-		__forceinline bool IsApplyGamma() const { return m_toneMapCb.applyGamma > 0.5f; }
+		bool IsApplyGamma() const { return m_toneMapCb.applyGamma > 0.5f; }
 
 		/**
 		 * @brief 輝度ベースで適用するかを設定
@@ -118,13 +118,13 @@ namespace nsBeastEngine
 		 *          輝度ベースは色比を保つので彩度が残る。
 		 * @param isLuminanceBased 輝度ベースで適用するかどうか
 		 */
-		__forceinline void SetLuminanceBased(const bool isLuminanceBased) { m_toneMapCb.isLuminanceBased = isLuminanceBased ? 1.0f : 0.0f; }
+		void SetLuminanceBased(const bool isLuminanceBased) { m_toneMapCb.isLuminanceBased = isLuminanceBased ? 1.0f : 0.0f; }
 
 		/**
 		 * @brief 輝度ベースで適用するかを取得
 		 * @return 輝度ベースで適用するかどうか
 		 */
-		__forceinline bool IsLuminanceBased() const { return m_toneMapCb.isLuminanceBased > 0.5f; }
+		bool IsLuminanceBased() const { return m_toneMapCb.isLuminanceBased > 0.5f; }
 
 
 	private:
