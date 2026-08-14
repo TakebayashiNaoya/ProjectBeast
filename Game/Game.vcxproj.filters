@@ -142,6 +142,9 @@
     <Filter Include="Source\UI\Ult">
       <UniqueIdentifier>{0322ab75-2fbc-4ff0-a739-654fef038f85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Actor\IK">
+      <UniqueIdentifier>{0100f162-d084-4604-b33f-cbcf9405e8aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -666,6 +669,12 @@
     </ClCompile>
     <ClCompile Include="Source\Effect\DecalManager.cpp">
       <Filter>Source\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\IK\TwoBoneLegIK.cpp">
+      <Filter>Source\Actor\IK</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\IK\LegIKComponent.cpp">
+      <Filter>Source\Actor\IK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1265,6 +1274,15 @@
     </ClInclude>
     <ClInclude Include="Source\Effect\DecalManager.h">
       <Filter>Source\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\IK\IKMath.h">
+      <Filter>Source\Actor\IK</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\IK\LegIKComponent.h">
+      <Filter>Source\Actor\IK</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\IK\TwoBoneLegIK.h">
+      <Filter>Source\Actor\IK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

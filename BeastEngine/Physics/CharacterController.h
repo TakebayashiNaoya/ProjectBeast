@@ -79,6 +79,33 @@ namespace nsBeastEngine
 			inline bool IsOnGround() const { return m_isOnGround; }
 
 			/**
+			 * @brief 足元の地面情報が今フレーム取得できたか
+			 * @details 落下・接地処理のなかでキャラのXZから真下へレイを飛ばして更新している。
+			 *          上昇中（ジャンプ中）は更新しないためfalseになる。
+			 */
+			inline bool IsGroundInfoValid() const { return m_isGroundInfoValid; }
+
+			/**
+			 * @brief 足元の実際の地面の高さを取得
+			 * @details GetPosition().y はカプセルが斜面の側面で接地して止まった高さなので、
+			 *          真下の地面より radius*(1/cosθ-1) だけ高い。見た目を地面に合わせたい
+			 *          （脚IKなど）場合はこちらを使う。物理的な接地判定は従来どおりカプセル基準。
+			 */
+			inline float GetGroundHeight() const { return m_groundHeight; }
+
+			/**
+			 * @brief 足元の地面の法線を取得
+			 * @details 真下レイが拾った面の法線。斜面の角度そのものが欲しい場合に使う。
+			 */
+			inline const Vector3& GetGroundNormal() const { return m_groundNormal; }
+
+			/**
+			 * @brief カプセルの半径を取得
+			 * @return 半径
+			 */
+			inline float GetRadius() const { return m_radius; }
+
+			/**
 			 * @brief コライダーを取得
 			 * @return コライダー
 			 */
@@ -138,6 +165,10 @@ namespace nsBeastEngine
 			Vector3 m_position;
 			/** 前回の座標 */
 			Vector3 m_prevPosition;
+			/** 足元の地面の法線（真下レイの結果） */
+			Vector3 m_groundNormal;
+			/** 足元の実際の地面の高さ（真下レイの結果） */
+			float m_groundHeight;
 
 			/** 垂直方向の速度 */
 			float m_verticalVelocity;
@@ -158,6 +189,8 @@ namespace nsBeastEngine
 			bool m_isOnGround;
 			/** テレポートリクエストフラグ */
 			bool m_isRequestTeleport;
+			/** 足元の地面情報が有効か */
+			bool m_isGroundInfoValid;
 		};
 	}
 }

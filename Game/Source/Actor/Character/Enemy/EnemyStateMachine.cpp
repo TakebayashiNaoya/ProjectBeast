@@ -248,6 +248,16 @@ namespace app
 		}
 
 
+		bool EnemyStateMachine::IsLegIKSuppressed() const
+		{
+			// 睡眠中は体を横たえるポーズになるため、足を地面の高さへ引っ張ると姿勢が崩れる。
+			// ★脚IKを切りたいアニメーションが増えたら、ここに条件を足す。
+			if (IsEqualCurrentState(EnemyCoolDownState::ID())) return true;
+
+			return false;
+		}
+
+
 		void EnemyStateMachine::Setup(Enemy* owner)
 		{
 			m_owner = owner;

@@ -192,6 +192,16 @@ namespace nsBeastEngine
 		inline Model& GetModel() { return m_model; }
 
 		/**
+		 * @brief 実際の描画・スキニングに使用されているスケルトンを取得する
+		 * @details Init()なら内部で.tksから読み込んだ自前のm_skeletonへのポインタ、
+		 *          InitFromLoaded()なら外部から渡されたスケルトンへのポインタ（m_skeletonRef）を返す。
+		 *          いずれの場合も、GetBoneMatricesTopAddress()の中身が実際のスキニングに使われる本体。
+		 *          CharacterBase側で別途保持しているSkeletonとは別物なので注意すること。
+		 * @return スケルトンへのポインタ（スケルトンを持たないモデルの場合はnullptr）
+		 */
+		inline Skeleton* GetSkeleton() const { return m_skeletonRef; }
+
+		/**
 		 * @brief モデルの全マテリアルに乗算カラーを設定する
 		 * @details ディファード描画用の m_renderToGBufferModel にも同時に適用する
 		 * @param mulColor 乗算カラー (RGBA, 1.0f=変更なし)
