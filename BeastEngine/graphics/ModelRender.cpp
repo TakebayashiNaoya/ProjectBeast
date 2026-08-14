@@ -351,6 +351,12 @@ namespace nsBeastEngine
 		shadowInitData.m_expandConstantBuffer2 = nullptr;
 		shadowInitData.m_expandConstantBufferSize2 = 0;
 
+		// モデル単位ディザリングCB（b4）をGBufferモデルと共有する
+		// SetAlpha()/SetDitherAlpha()で透明化中のモデルが不透明な影を落とすのを防ぐため、
+		// shadowMap.fx側でもRenderToGBuffer.fxと同じclip()判定を行う
+		shadowInitData.m_expandConstantBuffer4 = &m_modelDitherCb;
+		shadowInitData.m_expandConstantBufferSize4 = sizeof(SModelDitherCb);
+
 		// カスケードごとに定数バッファを分けるため、同じ設定でカスケード数ぶん初期化する
 		for (auto& shadowModel : m_shadowModels)
 		{

@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Graphics/Camera/CameraSystem.h"
+#include "Graphics/Shadow/ShadowMap.h"
 
 
 namespace nsBeastEngine
@@ -429,7 +430,8 @@ namespace nsBeastEngine
 		float				padding3;						// パディング（16バイトアラインメントのため）
 		float				padding4;						// パディング（16バイトアラインメントのため）
 		// カスケードシャドウマップのライトビュープロジェクション行列。
-		// 要素数は ShadowMap.h の NUM_SHADOW_CASCADES と一致させること。
+		// 要素数は ShadowMap.h の NUM_SHADOW_CASCADES と一致させること
+		// （下のstatic_assertで食い違いを検出する）。
 		// m_directionLight.m_LVP は使わない（カスケード化以前の名残）。
 		Matrix				m_shadowLVP[3];
 
@@ -503,6 +505,16 @@ namespace nsBeastEngine
 		}
 	};
 
+	/**
+	 * @brief m_shadowLVPの要素数とカスケード数の食い違いを検出する
+	 * @details NUM_SHADOW_CASCADESを変更してもm_shadowLVP[3]は自動追従しないため、
+	 *          このチェックが無いとRenderingEngine::RenderShadowMap()での書き込みが
+	 *          Light構造体の範囲外（隣接メンバ）まで及んでも気付けない。
+	 */
+	static_assert(
+		sizeof(Light::m_shadowLVP) / sizeof(Light::m_shadowLVP[0]) == NUM_SHADOW_CASCADES,
+		"m_shadowLVPの要素数がNUM_SHADOW_CASCADESと食い違っています");
+
 
 
 
@@ -524,6 +536,22 @@ namespace nsBeastEngine
 		 * @brief 更新
 		 */
 		void Update();
+
+		/**
+		 * @brief 指定したカメラを基準にカメラ位置・逆ビュープロジェクション行列を更新する
+		 * @details Update()は毎フレームメインカメラ基準で更新するが、サブビュー（小窓）の
+		 *          DeferredLighting描画中だけはサブカメラ基準の値に一時的に差し替える必要がある。
+		 *          差し替えないとサブビューがメインカメラの行列でワールド座標を復元してしまい、
+		 *          スペキュラ・リムライト・影の判定が不整合を起こす。
+		 * @details 呼び出し側は、サブビューの描画が終わったら必ずメインカメラで呼び直し、
+		 *          元に戻すこと（RenderingEngine::Execute()参照）。
+		 * @param camera 基準にするカメラ
+		 */
+		void SetViewCamera(nsK2EngineLow::Camera& camera)
+		{
+			m_light.m_cameraPosition = camera.GetPosition();
+			m_light.m_mViewProjInv = camera.GetViewProjectionMatrixInv();
+		}
 
 		/**
 		 * @brief ディレクションライトの位置の設定

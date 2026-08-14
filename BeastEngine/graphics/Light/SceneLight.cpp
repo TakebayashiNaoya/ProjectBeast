@@ -40,11 +40,8 @@ namespace nsBeastEngine
 
 	void SceneLight::Update()
 	{
-		/** カメラの位置を更新する */
-		m_light.m_cameraPosition = CameraSystem::Get().GetMainCamera().GetPosition();
-
-		/** カメラのビュープロジェクション行列の逆行列を更新する */
-		m_light.m_mViewProjInv = CameraSystem::Get().GetMainCamera().GetViewProjectionMatrixInv();
+		/** カメラの位置・逆ビュープロジェクション行列をメインカメラ基準で更新する */
+		SetViewCamera(CameraSystem::Get().GetMainCamera());
 
 		/** ライトをカメラと見立てたビュー行列を計算する */
 		Vector3 lightPosition = m_lightPosition;

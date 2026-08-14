@@ -45,6 +45,11 @@ namespace app {
 				initData.m_expandConstantBufferSize = sizeof(cbTerrainHeight);
 
 				m_modelRender->InitFromLoaded(initData);
+
+				// デカールは板ポリ1枚を地形の起伏に合わせてシェーダー側で切り抜いているだけなので、
+				// 影のキャスターにすると切り抜き前の四角い板がそのまま影を落としてしまう
+				m_modelRender->SetCastShadow(false);
+
 				m_kind = kind;
 				m_isModelInited = true;
 			}

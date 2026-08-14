@@ -431,7 +431,11 @@ namespace app
 				whirlpoolCb.lvpMatrix[i] = g_sceneLight->GetLVP(i);
 			}
 			// 影の濃さはデバッグUIから変更されるため毎フレーム取り直す
-			whirlpoolCb.shadowAmbientRate = g_renderingEngine->GetShadowMap().GetAmbientRate();
+			// ※ShadowMap::GetAmbientRate()を直接見ると、影を無効化したときに
+			//   RenderingEngine::RenderShadowMap()が行う「無効時は1.0に強制」が
+			//   反映されず影が固まって見えてしまう。Light側は無効時に上書きされるため、
+			//   Ocean::Update()と同様にLight経由で取得する。
+			whirlpoolCb.shadowAmbientRate = g_sceneLight->GetLight()->m_shadowAmbientRate;
 			whirlpoolCb.padding2[0] = 0.0f;
 			whirlpoolCb.padding2[1] = 0.0f;
 			whirlpoolCb.padding2[2] = 0.0f;

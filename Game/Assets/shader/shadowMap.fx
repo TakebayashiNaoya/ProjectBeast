@@ -42,10 +42,33 @@ struct SPSIn
 {
     float4 pos   : SV_POSITION;   // ライトのクリップ空間座標
     float  depth : TEXCOORD0;     // ライト空間での深度（0〜1）
+    float2 uv    : TEXCOORD1;     // UV座標（アルファカットアウト判定用）
 };
+
+// アルベドマップ。RenderToGBuffer.fxと同じtkmモデルを描画するため、
+// マテリアルのテクスチャバインドはモデル側から自動的に引き継がれる。
+Texture2D<float4> g_albedo : register(t0);
+sampler g_sampler : register(s0);
 
 StructuredBuffer<float4x4> g_boneMatrix       : register(t3);    // ボーン行列（スキニング用）
 StructuredBuffer<float4x4> g_worldMatrixArray : register(t10);   // インスタンス用ワールド行列
+
+// モデル単位ディザリング用の定数バッファ（b4）
+// C++側 SModelDitherCb（ModelRender.h）・RenderToGBuffer.fxのModelDitherCbと一致させること
+cbuffer ModelDitherCb : register(b4)
+{
+    float  modelDitherAlpha;  // モデル単位の透過率（0.0f=オフ, 1.0f=完全消去）
+    float3 modelDitherPad;    // パディング
+};
+
+// Bayer 4x4 ディザリングパターン（RenderToGBuffer.fxと同じもの）
+static const int g_bayerPattern[4][4] =
+{
+    {  0, 32,  8, 40 },
+    { 48, 16, 56, 24 },
+    { 12, 44,  4, 36 },
+    { 60, 28, 52, 20 },
+};
 
 // スキン行列を計算する。
 float4x4 CalcSkinMatrix(SSkinVSIn skinVert)
@@ -96,6 +119,8 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
     // 直交投影なのでwは1になるが、透視投影へ変更した場合にも対応できるよう除算しておく
     psIn.depth = psIn.pos.z / psIn.pos.w;
 
+    psIn.uv = vsIn.uv;
+
     return psIn;
 }
 
@@ -124,5 +149,22 @@ SPSIn VSSkinInstancingMain(SVSIn vsIn)
 // ライト空間の深度をそのまま書き込む
 float4 PSMain(SPSIn psIn) : SV_Target0
 {
+    // アルファカットアウト（草・柵などのテクスチャ抜き）
+    // RenderToGBuffer.fxと同じ判定でないと、切り抜いたはずの部分が
+    // 四角いシルエットのまま影を落としてしまう
+    float albedoAlpha = g_albedo.Sample(g_sampler, psIn.uv).a;
+    clip(albedoAlpha - 0.2f);
+
+    // モデル単位ディザリング（SetAlpha()によるフェード演出用）
+    // GBufferパス（RenderToGBuffer.fx）と同じ判定を行わないと、
+    // フェード中で見えていないはずのモデルが不透明な影を落としてしまう
+    if (modelDitherAlpha > 0.0f)
+    {
+        int x = (int)fmod(psIn.pos.x, 4.0f);
+        int y = (int)fmod(psIn.pos.y, 4.0f);
+        float bayerValue = (float)g_bayerPattern[y][x] / 64.0f;
+        clip(bayerValue - modelDitherAlpha);
+    }
+
     return float4(psIn.depth, 0.0f, 0.0f, 1.0f);
 }

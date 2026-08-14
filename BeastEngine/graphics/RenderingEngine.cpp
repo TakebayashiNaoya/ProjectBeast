@@ -168,12 +168,22 @@ namespace nsBeastEngine
 			const UINT mainFrameIdx = g_graphicsEngine->GetBackBufferIndex();
 			g_graphicsEngine->SetFrameIndex(1 - mainFrameIdx);
 
+			// DeferredLightingのワールド座標復元・影判定をサブカメラ基準に一時的に切り替える
+			// ※切り替えないとメインカメラの行列のままサブビューを描いてしまい、
+			//   小窓のスペキュラ・リムライト・影がジオメトリと無関係な位置で判定される
+			m_sceneLight.SetViewCamera(*subCamera);
+
 			ExecuteViewPass(rc, m_subView);
 
 			// サブビューにもメインビューと同じトーンマップを適用し、小窓の色味を合わせる
 			// ※メインビューはPostEffect()内でブルームと合わせて処理するが、
 			//   小窓はブルームなし・トーンマップのみで簡易的に色味だけ揃える
 			m_subViewToneMap.Render(rc, m_subView.renderTarget);
+
+			// メインカメラ基準に戻す
+			// ※次フレームのUpdate()で上書きされるが、このフレーム内でまだ
+			//   メインカメラ基準の値を参照するコードが残っていても壊れないようにする
+			m_sceneLight.SetViewCamera(mainCamera);
 
 			g_graphicsEngine->SetFrameIndex(mainFrameIdx);
 		}
@@ -334,6 +344,19 @@ namespace nsBeastEngine
 		const Vector3 lightDirection = m_sceneLight.GetLight()->m_directionLight.m_direction;
 
 		m_shadowMap.Render(rc, lightDirection, mainCamera, m_deferredModelList, m_forwardModelList);
+
+		if (!m_shadowMap.IsEnable())
+		{
+			// 無効時はShadowMap::Render()が早期returnしており、シャドウマップ・LVPは
+			// 前フレームの内容のまま更新されない。そのままGetLVPMatrix()等を転送すると、
+			// 影が消えずに直前のカメラ位置で固まったように見えてしまう。
+			// direct/ambient両方を1.0にすると lerp(rate, 1.0f, shadowRate) が
+			// shadowRateの値に関わらず常に1.0（影なし）になるため、
+			// 古いシャドウマップの中身に関係なく確実に「影なし」にできる。
+			m_sceneLight.GetLight()->m_shadowDirectLightRate = 1.0f;
+			m_sceneLight.GetLight()->m_shadowAmbientRate = 1.0f;
+			return;
+		}
 
 		// 計算されたライトビュープロジェクション行列を定数バッファへ反映する
 		// 受け手はこの行列でシャドウマップを引く
