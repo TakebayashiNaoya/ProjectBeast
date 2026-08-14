@@ -222,6 +222,13 @@ namespace nsBeastEngine
 		 */
 		void RenderShadowMap(RenderContext& rc);
 
+		/**
+		 * @brief サブビュー用トーンマップの初期化
+		 * @details メインビューはPostEffectManager内でブルームと合わせて処理するが、
+		 *          小窓はトーンマップのみを掛けて色味をメインビューに合わせる。
+		 */
+		void InitSubViewToneMap();
+
 
 		//============================================//
 		// Execute内で呼ばれる描画処理
@@ -305,6 +312,14 @@ namespace nsBeastEngine
 		PostEffectManager m_postEffectManager;
 		/** シャドウマップ */
 		ShadowMap m_shadowMap;
+		/**
+		 * @brief サブビュー（小窓）専用のトーンマップ
+		 * @details サブビューはPostEffectManagerとは別の解像度のRenderTargetを使うため、
+		 *          メインビューと共有せず専用のインスタンスを持つ。
+		 *          方式・露出はメインビューと同じ既定値で初期化するが、
+		 *          デバッグUIからの調整はメインビュー側のみに反映される点に注意。
+		 */
+		ToneMap m_subViewToneMap;
 
 		/** ディファードモデルリスト */
 		std::vector<ModelRender*> m_deferredModelList;
