@@ -14,6 +14,105 @@
 
 namespace app
 {
+#if defined(_DEBUG) || defined(K2_DEBUG)
+	namespace
+	{
+		/** トーンマップのデバッグ表示のセクション名 */
+		constexpr const char* TONE_MAP_DEBUG_LABEL = u8"トーンマップ";
+
+
+		/**
+		 * @brief トーンマップのデバッグUIを描画する
+		 * @details 方式の切り替えと露出などの調整を実行中に行えるようにする。
+		 *          方式を変えると、その方式の既定露出が自動で適用される。
+		 */
+		void DrawToneMapDebug()
+		{
+			auto& toneMap = g_renderingEngine->GetPostEffectManager().GetToneMap();
+
+			// enNoneで初期化した場合はスプライトを作っていないので切り替えできない
+			if (!toneMap.IsSwitchable())
+			{
+				ImGui::TextWrapped(
+					u8"RenderingEngine::InitPostEffectManager() が enNone で初期化しているため、"
+					u8"実行中の切り替えはできません。enNone以外で起動してください。");
+				return;
+			}
+
+			// 方式の切り替え
+			int currentType = static_cast<int>(toneMap.GetToneMapType());
+			const int typeNum = static_cast<int>(nsBeastEngine::EnToneMapType::enNum);
+			if (ImGui::BeginCombo(u8"方式", nsBeastEngine::ToneMap::GetTypeName(toneMap.GetToneMapType())))
+			{
+				for (int i = 0; i < typeNum; i++)
+				{
+					const auto type = static_cast<nsBeastEngine::EnToneMapType>(i);
+					const bool isSelected = (i == currentType);
+					if (ImGui::Selectable(nsBeastEngine::ToneMap::GetTypeName(type), isSelected))
+					{
+						toneMap.SetToneMapType(type);
+					}
+					if (isSelected)
+					{
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+
+			// enNoneを選んでいる間はパラメーターが効かないので触らせない
+			const bool isNone = (toneMap.GetToneMapType() == nsBeastEngine::EnToneMapType::enNone);
+			if (isNone)
+			{
+				ImGui::TextDisabled(u8"トーンマップ無効（比較用の基準）");
+				return;
+			}
+
+			// 露出
+			float exposure = toneMap.GetExposure();
+			if (ImGui::SliderFloat(u8"露出", &exposure, 0.1f, 6.0f, "%.2f"))
+			{
+				toneMap.SetExposure(exposure);
+			}
+
+			// ホワイトポイントはenReinhardExtendedでのみ効く
+			const bool isExtended =
+				(toneMap.GetToneMapType() == nsBeastEngine::EnToneMapType::enReinhardExtended);
+			if (!isExtended)
+			{
+				ImGui::BeginDisabled();
+			}
+			float whitePoint = toneMap.GetWhitePoint();
+			if (ImGui::SliderFloat(u8"ホワイトポイント", &whitePoint, 1.0f, 16.0f, "%.2f"))
+			{
+				toneMap.SetWhitePoint(whitePoint);
+			}
+			if (!isExtended)
+			{
+				ImGui::EndDisabled();
+				ImGui::TextDisabled(u8"ホワイトポイントはenReinhardExtendedでのみ有効");
+			}
+
+			// 輝度ベース／RGBベースの切り替え
+			bool isLuminanceBased = toneMap.IsLuminanceBased();
+			if (ImGui::Checkbox(u8"輝度ベースで適用（彩度を保つ）", &isLuminanceBased))
+			{
+				toneMap.SetLuminanceBased(isLuminanceBased);
+			}
+			ImGui::TextDisabled(u8"OFFにするとRGB各チャンネル独立。明部の色が白へ抜ける");
+
+			// ガンマ補正
+			bool isApplyGamma = toneMap.IsApplyGamma();
+			if (ImGui::Checkbox(u8"sRGBエンコード（ガンマ補正）", &isApplyGamma))
+			{
+				toneMap.SetApplyGamma(isApplyGamma);
+			}
+			ImGui::TextDisabled(u8"ONにすると全体が大きく明るくなる。ライト強度の再調整が必要");
+		}
+	}
+#endif
+
+
 	Application::Application()
 	{
 		nsBeastEngine::nsCollision::PhysicsWorld::Initialize();
@@ -26,11 +125,17 @@ namespace app
 		SceneManager::CreateInstance();
 		EffectManager::CreateInstance();
 
+#if defined(_DEBUG) || defined(K2_DEBUG)
+		DebugWindow::Get().Register(TONE_MAP_DEBUG_LABEL, DrawToneMapDebug);
+#endif
 	}
 
 
 	Application::~Application()
 	{
+#if defined(_DEBUG) || defined(K2_DEBUG)
+		DebugWindow::Get().Unregister(TONE_MAP_DEBUG_LABEL);
+#endif
 		SceneManager::DestroyInstance();
 		NoiseManager::DestroyInstance();
 		SoundManager::DestroyInstance();

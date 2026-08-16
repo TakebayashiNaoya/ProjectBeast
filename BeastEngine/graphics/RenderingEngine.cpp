@@ -17,6 +17,15 @@ namespace nsBeastEngine
 		constexpr UINT SUB_CAMERA_RT_WIDTH = 480;
 		/** サブカメラのRenderTarget高さ */
 		constexpr UINT SUB_CAMERA_RT_HEIGHT = 270;
+
+		/**
+		 * @brief トーンマップの方式
+		 * @details メインビュー（PostEffectManager）とサブビュー（m_subViewToneMap）の
+		 *          両方で使うため、ここで一箇所にまとめる。
+		 *          片方だけ書き換えて色味がずれることを防ぐ。
+		 */
+		constexpr EnToneMapType TONE_MAP_TYPE = EnToneMapType::enReinhard;
+		// enNone / enExposure / enReinhard / enReinhardExtended / enACES / enUncharted2
 	}
 
 
@@ -73,6 +82,9 @@ namespace nsBeastEngine
 		// ポストエフェクトマネージャーの初期化
 		InitPostEffectManager();
 
+		// サブビュー用トーンマップの初期化
+		InitSubViewToneMap();
+
 		// アクティブフラスタムのデフォルトをメインビューに設定する
 		m_activeFrustum = &m_mainView.frustum;
 
@@ -105,11 +117,8 @@ namespace nsBeastEngine
 		// メインカメラの描画パスを実行する
 		ExecuteViewPass(rc, m_mainView);
 
-		// ポストエフェクトの描画処理
-		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
-		PostEffect(rc);
-
-		// ブルーム完了後、mainRTをRTV状態に戻してエフェクトの描画先として設定する
+		// エフェクトの描画先としてmainRTを設定する
+		// ※GBufferの深度を引き継ぐため、DSVはgBuffer[enGBuffer_Albedo]を使用する
 		rc.WaitUntilToPossibleSetRenderTarget(m_mainView.renderTarget);
 		rc.SetRenderTarget(
 			m_mainView.renderTarget.GetRTVCpuDescriptorHandle(),
@@ -117,8 +126,16 @@ namespace nsBeastEngine
 		);
 
 		// エフェクトを描画
-		// ※PostEffect()完了後に呼び出すことでブルームの影響を受けないようにする
+		// ※ポストエフェクトより前に描くことで、ブルームとトーンマップの対象に含める
 		EffectEngine::GetInstance()->Draw();
+
+		// エフェクト描画後もメインRTがレンダリングターゲット状態のままなので、
+		// 以降のパスでテクスチャとして読めるように状態を戻す
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainView.renderTarget);
+
+		// ポストエフェクトの描画処理（ブルーム → トーンマップ）
+		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
+		PostEffect(rc);
 
 		// 2D描画処理（小窓スプライトの描画も含む）
 		Render2D(rc);
@@ -143,6 +160,11 @@ namespace nsBeastEngine
 			g_graphicsEngine->SetFrameIndex(1 - mainFrameIdx);
 
 			ExecuteViewPass(rc, m_subView);
+
+			// サブビューにもメインビューと同じトーンマップを適用し、小窓の色味を合わせる
+			// ※メインビューはPostEffect()内でブルームと合わせて処理するが、
+			//   小窓はブルームなし・トーンマップのみで簡易的に色味だけ揃える
+			m_subViewToneMap.Render(rc, m_subView.renderTarget);
 
 			g_graphicsEngine->SetFrameIndex(mainFrameIdx);
 		}
@@ -271,12 +293,22 @@ namespace nsBeastEngine
 
 	void RenderingEngine::InitPostEffectManager()
 	{
-		// ブルームの種別・ブラーの種別をここで切り替える
+		// ブルーム・ブラーの種別をここで切り替える
 		m_postEffectManager.Init(
 			m_mainView.renderTarget,
-			EnBloomType::enKawase,   // enNone / enNormal / enKawase
-			EnBlurType::enGaussian   // enAverage / enGaussian
+			EnBloomType::enKawase,        // enNone / enNormal / enKawase
+			EnBlurType::enGaussian,       // enAverage / enGaussian
+			TONE_MAP_TYPE
 		);
+	}
+
+
+	void RenderingEngine::InitSubViewToneMap()
+	{
+		// メインビューと同じ方式・既定露出で初期化する
+		// （デバッグUIでの調整はメインビュー側のToneMapにしか反映されないため、
+		//   実行中に露出等を変えるとサブビューとの色味がずれる点に注意）
+		m_subViewToneMap.Init(m_subView.renderTarget, TONE_MAP_TYPE);
 	}
 
 

@@ -43,6 +43,7 @@
     <ClCompile Include="Graphics\PostEffect\Bloom.cpp" />
     <ClCompile Include="Graphics\PostEffect\GaussianBlur.cpp" />
     <ClCompile Include="Graphics\PostEffect\PostEffectManager.cpp" />
+    <ClCompile Include="Graphics\PostEffect\ToneMap.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
     <ClCompile Include="Graphics\SpriteRender.cpp" />
     <ClCompile Include="Graphics\Video\stb_image_impl.cpp">
@@ -99,6 +100,7 @@
     <ClInclude Include="Graphics\PostEffect\GaussianBlur.h" />
     <ClInclude Include="Graphics\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Graphics\PostEffect\PostEffectTypes.h" />
+    <ClInclude Include="Graphics\PostEffect\ToneMap.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />
     <ClInclude Include="Graphics\RenderViewContext.h" />
     <ClInclude Include="Graphics\SpriteRender.h" />

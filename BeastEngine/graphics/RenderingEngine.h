@@ -89,6 +89,13 @@ namespace nsBeastEngine
 		 */
 		RenderTarget& GetSubCameraRenderTarget() { return m_subView.renderTarget; }
 
+		/**
+		 * @brief ポストエフェクトマネージャーを取得する
+		 * @details デバッグUIから実行中にパラメーターを調整するために使う
+		 * @return ポストエフェクトマネージャーの参照
+		 */
+		PostEffectManager& GetPostEffectManager() { return m_postEffectManager; }
+
 
 		//============================================//
 		// 登録・解除用の関数
@@ -200,6 +207,13 @@ namespace nsBeastEngine
 		 */
 		void InitPostEffectManager();
 
+		/**
+		 * @brief サブビュー用トーンマップの初期化
+		 * @details メインビューはPostEffectManager内でブルームと合わせて処理するが、
+		 *          小窓はトーンマップのみを掛けて色味をメインビューに合わせる。
+		 */
+		void InitSubViewToneMap();
+
 
 		//============================================//
 		// Execute内で呼ばれる描画処理
@@ -242,8 +256,9 @@ namespace nsBeastEngine
 		void RenderNatureObjects(RenderContext& rc, RenderViewContext& view);
 
 		/**
-		 * @brief ポストエフェクトの描画処理
-		 * @details 3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ。
+		 * @brief ポストエフェクトの描画処理（ブルーム → トーンマップ）
+		 * @details エフェクトを含む3D描画完了後・UI描画前に実行することで、
+		 *          エフェクトもポストエフェクトの対象にしつつUIへの影響を防ぐ。
 		 * @param rc レンダリングコンテキスト
 		 */
 		void PostEffect(RenderContext& rc);
@@ -280,6 +295,14 @@ namespace nsBeastEngine
 
 		/** ポストエフェクトマネージャー */
 		PostEffectManager m_postEffectManager;
+		/**
+		 * @brief サブビュー（小窓）専用のトーンマップ
+		 * @details サブビューはPostEffectManagerとは別の解像度のRenderTargetを使うため、
+		 *          メインビューと共有せず専用のインスタンスを持つ。
+		 *          方式・露出はメインビューと同じ既定値で初期化するが、
+		 *          デバッグUIからの調整はメインビュー側のみに反映される点に注意。
+		 */
+		ToneMap m_subViewToneMap;
 
 		/** ディファードモデルリスト */
 		std::vector<ModelRender*> m_deferredModelList;
