@@ -12,6 +12,7 @@
 #include "Geometry/Frustum.h"
 #include "Graphics/PostEffect/PostEffectManager.h"
 #include "Graphics/PostEffect/PostEffectTypes.h"
+#include "Graphics/Shadow/ShadowMap.h"
 
 
 namespace nsBeastEngine
@@ -95,6 +96,12 @@ namespace nsBeastEngine
 		 * @return ポストエフェクトマネージャーの参照
 		 */
 		PostEffectManager& GetPostEffectManager() { return m_postEffectManager; }
+
+		/**
+		 * @brief シャドウマップを取得する
+		 * @return シャドウマップの参照
+		 */
+		ShadowMap& GetShadowMap() { return m_shadowMap; }
 
 
 		//============================================//
@@ -208,6 +215,14 @@ namespace nsBeastEngine
 		void InitPostEffectManager();
 
 		/**
+		 * @brief シャドウマップへの描画処理
+		 * @details GBufferへの描画より前に実行する必要がある。
+		 *          ディファードライティングでシャドウマップを参照するため。
+		 * @param rc レンダリングコンテキスト
+		 */
+		void RenderShadowMap(RenderContext& rc);
+
+		/**
 		 * @brief サブビュー用トーンマップの初期化
 		 * @details メインビューはPostEffectManager内でブルームと合わせて処理するが、
 		 *          小窓はトーンマップのみを掛けて色味をメインビューに合わせる。
@@ -295,6 +310,8 @@ namespace nsBeastEngine
 
 		/** ポストエフェクトマネージャー */
 		PostEffectManager m_postEffectManager;
+		/** シャドウマップ */
+		ShadowMap m_shadowMap;
 		/**
 		 * @brief サブビュー（小窓）専用のトーンマップ
 		 * @details サブビューはPostEffectManagerとは別の解像度のRenderTargetを使うため、

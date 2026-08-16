@@ -43,6 +43,8 @@ namespace app
 					}
 					m_modelRender.Init(m_pendingModelPath.c_str());
 					m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
+					// 影を落とすかどうかはモデル初期化後に反映する
+					m_modelRender.SetCastShadow(m_isCastShadow);
 					m_modelRender.Update();
 
 					if (m_IsNeedCollision)

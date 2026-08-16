@@ -104,6 +104,14 @@ cbuffer LightCB : register(b1)
     float3   rimLightColor;      // offset: 128
     float    pad4;               // offset: 140
     float4x4 mViewProjInv;       // offset: 144
+    float    shadowDirectRate;   // offset: 208  影の中で直接光を何割残すか
+    float    shadowAmbientRate;  // offset: 212  影の中で環境光を何割残すか
+    float    pad5;               // offset: 216
+    float    pad6;               // offset: 220
+    // カスケードシャドウマップのライトビュープロジェクション行列
+    float4x4 shadowLVP0;         // offset: 224
+    float4x4 shadowLVP1;         // offset: 288
+    float4x4 shadowLVP2;         // offset: 352
 };
 
 
@@ -119,8 +127,23 @@ Texture2D<float4> g_normalTexture        : register(t1);	// 法線
 //   b = ambientScale（環境光強度倍率）
 //   a = smooth
 Texture2D<float4> g_metaricSmoothTexture : register(t2);	// メタリックスムース
+// カスケードシャドウマップ（t3が最も近景）
+Texture2D<float4> g_shadowMap0           : register(t3);
+Texture2D<float4> g_shadowMap1           : register(t4);
+Texture2D<float4> g_shadowMap2           : register(t5);
+
+// レジスタ番号は C++ 側の EnDeferredLightingSrv（RenderViewContext.h）と一致させること。
+// RenderingEngine::InitDeferredLightingSprite() がその順番でテクスチャを設定している。
 
 sampler g_sampler : register(s0);
+
+
+///////////////////////////////////////
+// シャドウ
+///////////////////////////////////////
+
+// 影の判定は Shadow.h の CalcShadowRate() を使う（海・渦潮と共通）
+#include "Shadow.h"
 
 
 ///////////////////////////////////////
@@ -304,8 +327,20 @@ float3 CalcDirectionLight(
     // 滑らかさが高ければ拡散反射は弱くなる
     float3 lig = diffuse * (1.0f - smooth) + spec;
 
+    // 影の割合を求める（0=完全な影 1=影なし）
+    float shadowRate = CalcShadowRate(
+        worldPos,
+        shadowLVP0, shadowLVP1, shadowLVP2,
+        g_shadowMap0, g_shadowMap1, g_shadowMap2,
+        g_sampler);
+
+    // 直接光に影を適用する
+    lig *= lerp(shadowDirectRate, 1.0f, shadowRate);
+
     // 補正済み環境光を加算する
-    lig += ambientLightColor * albedo * ambientScale;
+    // 環境光にも影を掛ける。環境光が強いシーンではここを落とさないと
+    // 影の中が環境光で埋まってしまい、トーンマップ後にほぼ見えなくなる
+    lig += ambientLightColor * albedo * ambientScale * lerp(shadowAmbientRate, 1.0f, shadowRate);
 
     // リムライトを加算する
     lig += CalcRimLight(normal, toEye);
@@ -356,6 +391,9 @@ float4 PSMain(PSInput In) : SV_Target0
 
     // ワールド座標を復元
     float3 worldPos = CalcWorldPosFromUVZ(In.uv, albedo.w, mViewProjInv);
+
+
+
 
     // PBRベースのディレクションライトを計算する（補正値込み）
     float3 lig = CalcDirectionLight(normal, worldPos, albedo.rgb, metallic, smooth, dirLightScale, ambientScale);

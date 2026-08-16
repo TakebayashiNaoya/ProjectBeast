@@ -10,6 +10,13 @@
 
 namespace nsBeastEngine
 {
+	namespace
+	{
+		/** シャドウマップ書き込み用シェーダーのファイルパス */
+		constexpr const char* SHADOW_MAP_FX_PATH = "Assets/shader/shadowMap.fx";
+	}
+
+
 	bool ModelRender::s_isToonGlobalEnabled = false;
 
 
@@ -154,6 +161,10 @@ namespace nsBeastEngine
 			InitToonModels(modelInitData);
 		}
 
+		// シャドウマップ描画用モデルを初期化する
+		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
+		InitShadowModel(modelInitData);
+
 		// スケルトンを持つか記録する
 		m_hasSkeleton = m_skeletonRef->IsInited();
 
@@ -215,6 +226,10 @@ namespace nsBeastEngine
 		{
 			InitToonModels(modelInitData);
 		}
+
+		// シャドウマップ描画用モデルを初期化する
+		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
+		InitShadowModel(modelInitData);
 
 		// アニメーション初期化
 		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr)
@@ -314,9 +329,55 @@ namespace nsBeastEngine
 	}
 
 
-	void ModelRender::OnRenderShadowMap(RenderContext& rc)
+	void ModelRender::InitShadowModel(const ModelInitData& baseInitData)
 	{
-		m_shadowModels.Draw(rc);
+		ModelInitData shadowInitData = baseInitData;
+
+		// 深度だけを書き込むシェーダーに差し替える
+		shadowInitData.m_fxFilePath = SHADOW_MAP_FX_PATH;
+		shadowInitData.m_vsEntryPointFunc = "VSMain";
+		shadowInitData.m_vsSkinEntryPointFunc = "VSMainSkin";
+		shadowInitData.m_psEntryPointFunc = "PSMain";
+
+		// シャドウマップは深度のみのR32_FLOAT。半透明合成はしない
+		shadowInitData.m_alphaBlendMode = AlphaBlendMode_None;
+		shadowInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
+		for (int i = 1; i < MAX_RENDERING_TARGET; i++)
+		{
+			shadowInitData.m_colorBufferFormat[i] = DXGI_FORMAT_UNKNOWN;
+		}
+
+		// GBuffer用に差し込んでいた拡張定数バッファは不要なので外す
+		shadowInitData.m_expandConstantBuffer2 = nullptr;
+		shadowInitData.m_expandConstantBufferSize2 = 0;
+
+		// モデル単位ディザリングCB（b4）をGBufferモデルと共有する
+		// SetAlpha()/SetDitherAlpha()で透明化中のモデルが不透明な影を落とすのを防ぐため、
+		// shadowMap.fx側でもRenderToGBuffer.fxと同じclip()判定を行う
+		shadowInitData.m_expandConstantBuffer4 = &m_modelDitherCb;
+		shadowInitData.m_expandConstantBufferSize4 = sizeof(SModelDitherCb);
+
+		// カスケードごとに定数バッファを分けるため、同じ設定でカスケード数ぶん初期化する
+		for (auto& shadowModel : m_shadowModels)
+		{
+			shadowModel.Init(shadowInitData);
+		}
+		m_isShadowModelInited = true;
+	}
+
+
+	void ModelRender::OnRenderShadowMap(
+		RenderContext& rc,
+		const int cascadeIndex,
+		const Matrix& lightViewMatrix,
+		const Matrix& lightProjMatrix)
+	{
+		// 非表示・影を落とさない設定・未初期化のいずれかなら描かない
+		if (!m_visible || !m_isCastShadow || !m_isShadowModelInited) return;
+
+		// カメラではなくライトの行列で描画する
+		// カスケード専用のモデルを使うことで、行列が他のカスケードに上書きされない
+		m_shadowModels[cascadeIndex].Draw(rc, lightViewMatrix, lightProjMatrix, m_maxInstance);
 	}
 
 
@@ -364,7 +425,10 @@ namespace nsBeastEngine
 		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_renderToGBufferModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		m_forwardRenderModel->UpdateWorldMatrix(m_position, m_rotation, m_scale);
-		m_shadowModels.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		for (auto& shadowModel : m_shadowModels)
+		{
+			shadowModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		}
 
 		if (m_toonModel != nullptr)
 		{

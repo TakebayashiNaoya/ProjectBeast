@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Graphics/Camera/CameraSystem.h"
+#include "Graphics/Shadow/ShadowMap.h"
 
 
 namespace nsBeastEngine
@@ -420,6 +421,20 @@ namespace nsBeastEngine
 		float				padding2;						// パディング（16バイトアラインメントのため）
 		Matrix				m_mViewProjInv;					// カメラのビュープロジェクション行列の逆行列
 
+		// ここから下は影の見え方を調整するパラメータ。
+		// 新しいメンバは必ず「末尾」に足すこと。
+		// 途中に挿入すると、Lightを参照している既存シェーダー
+		// （DeferredLighting.fx / Ocean.fx / toon.fx）のオフセットが全てずれる。
+		float				m_shadowDirectLightRate;		// 影の中で直接光を何割残すか（0=完全に遮る）
+		float				m_shadowAmbientRate;			// 影の中で環境光を何割残すか（1=そのまま）
+		float				padding3;						// パディング（16バイトアラインメントのため）
+		float				padding4;						// パディング（16バイトアラインメントのため）
+		// カスケードシャドウマップのライトビュープロジェクション行列。
+		// 要素数は ShadowMap.h の NUM_SHADOW_CASCADES と一致させること
+		// （下のstatic_assertで食い違いを検出する）。
+		// m_directionLight.m_LVP は使わない（カスケード化以前の名残）。
+		Matrix				m_shadowLVP[3];
+
 
 		/**
 		 * @brief コンストラクタ
@@ -432,7 +447,16 @@ namespace nsBeastEngine
 			, m_rimLightColor(Vector3::Zero)
 			, padding2(0.0f)
 			, m_mViewProjInv(Matrix::Identity)
-		{}
+			, m_shadowDirectLightRate(0.0f)
+			, m_shadowAmbientRate(1.0f)
+			, padding3(0.0f)
+			, padding4(0.0f)
+		{
+			for (auto& lvp : m_shadowLVP)
+			{
+				lvp = Matrix::Identity;
+			}
+		}
 
 		/**
 		 * @brief カメラの位置の設定
@@ -481,6 +505,16 @@ namespace nsBeastEngine
 		}
 	};
 
+	/**
+	 * @brief m_shadowLVPの要素数とカスケード数の食い違いを検出する
+	 * @details NUM_SHADOW_CASCADESを変更してもm_shadowLVP[3]は自動追従しないため、
+	 *          このチェックが無いとRenderingEngine::RenderShadowMap()での書き込みが
+	 *          Light構造体の範囲外（隣接メンバ）まで及んでも気付けない。
+	 */
+	static_assert(
+		sizeof(Light::m_shadowLVP) / sizeof(Light::m_shadowLVP[0]) == NUM_SHADOW_CASCADES,
+		"m_shadowLVPの要素数がNUM_SHADOW_CASCADESと食い違っています");
+
 
 
 
@@ -502,6 +536,22 @@ namespace nsBeastEngine
 		 * @brief 更新
 		 */
 		void Update();
+
+		/**
+		 * @brief 指定したカメラを基準にカメラ位置・逆ビュープロジェクション行列を更新する
+		 * @details Update()は毎フレームメインカメラ基準で更新するが、サブビュー（小窓）の
+		 *          DeferredLighting描画中だけはサブカメラ基準の値に一時的に差し替える必要がある。
+		 *          差し替えないとサブビューがメインカメラの行列でワールド座標を復元してしまい、
+		 *          スペキュラ・リムライト・影の判定が不整合を起こす。
+		 * @details 呼び出し側は、サブビューの描画が終わったら必ずメインカメラで呼び直し、
+		 *          元に戻すこと（RenderingEngine::Execute()参照）。
+		 * @param camera 基準にするカメラ
+		 */
+		void SetViewCamera(nsK2EngineLow::Camera& camera)
+		{
+			m_light.m_cameraPosition = camera.GetPosition();
+			m_light.m_mViewProjInv = camera.GetViewProjectionMatrixInv();
+		}
 
 		/**
 		 * @brief ディレクションライトの位置の設定
@@ -530,13 +580,15 @@ namespace nsBeastEngine
 		}
 
 		/**
-		 * @brief ディレクションライトのライトビュープロジェクション行列の取得
+		 * @brief 指定したカスケードのライトビュープロジェクション行列の取得
+		 * @details RenderingEngine::RenderShadowMap() が毎フレーム更新する。
+		 *          海や渦潮など、独自シェーダーで影を受けるオブジェクトが参照する。
+		 * @param cascadeIndex カスケードの番号（0が最も近景）
+		 * @return ライトビュープロジェクション行列の参照
 		 */
-		Matrix& GetLVP()
+		Matrix& GetLVP(const int cascadeIndex)
 		{
-			static Matrix m;
-			return m;
-			//return m_light.m_directionLight.m_LVP;
+			return m_light.m_shadowLVP[cascadeIndex];
 		}
 
 		// 現在未使用（実装時に有効化）

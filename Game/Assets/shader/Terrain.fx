@@ -314,7 +314,10 @@ SPSOut PSMain(SPSIn psIn)
 
     // RenderToGBuffer.fx と同じ: w に NDC 深度を書く（デファードがワールド座標再構築に使う）
     psOut.albedo   = float4(albedo.rgb * mulColor.rgb * terrainAlbedoScale, 1.0f);
-    psOut.albedo.w = psIn.pos.z / psIn.pos.w;
+    // ピクセルシェーダーのSV_POSITIONは、zにNDC深度(0〜1)がすでに入っている。
+    // wにはクリップ空間のw（視点からの距離）が入るため、zをwで割ってはいけない。
+    // 割ってしまうとワールド座標の復元が破綻する（影の判定が成立しなくなる）。
+    psOut.albedo.w = psIn.pos.z;
     psOut.normal = float4(finalNormal * 0.5f + 0.5f, 1.0f);
     psOut.metaricSmoothMap = float4(
         saturate(0.0f + metallicOffset),

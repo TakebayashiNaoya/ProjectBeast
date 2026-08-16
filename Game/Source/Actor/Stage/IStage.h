@@ -64,6 +64,23 @@ namespace app
 			 */
 			bool IsVisible() const { return m_isVisible; }
 
+			/**
+			 * @brief 影を落とすかどうかを設定する
+			 * @details ステージ外周の壁のように、シーン全体を囲むほど大きいものを
+			 *          キャスターに含めると、1枚のシャドウマップに収めるために
+			 *          1テクセルが広い範囲を受け持つことになり、
+			 *          ステージの輪郭に沿った太い輪状の影が出てしまう。
+			 *          そういうオブジェクトはjsonの"castShadow"をfalseにして外す。
+			 * @param isCastShadow 影を落とす場合はtrue
+			 */
+			void SetCastShadow(const bool isCastShadow) { m_isCastShadow = isCastShadow; }
+
+			/**
+			 * @brief 影を落とすかどうかを取得する
+			 * @return 影を落とすならtrue
+			 */
+			bool IsCastShadow() const { return m_isCastShadow; }
+
 		private:
 			/** 物理判定が必要かどうか */
 			bool m_IsNeedCollision;
@@ -84,6 +101,8 @@ namespace app
 
 		private:
 			bool m_isVisible = true;
+			/** 影を落とすかどうか（jsonの"castShadow"で指定。既定は落とす） */
+			bool m_isCastShadow = true;
 		};
 	}
 }

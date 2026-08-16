@@ -429,7 +429,7 @@ namespace app
 				samplerDescArray,
 				2,	// サンプラー数
 				2,	// CBV数（b0, b1）
-				3,	// SRV数（t0, t1, t2）
+				3 + nsBeastEngine::NUM_SHADOW_CASCADES,	// SRV数（t0〜t2 + カスケードシャドウマップ）
 				1	// UAV=0だと内部でシリアライズ失敗するので最低1にする
 			);
 		}
@@ -482,7 +482,7 @@ namespace app
 		void OceanMesh::InitDescriptorHeap()
 		{
 			m_descriptorHeap.ResizeConstantBuffer(2);
-			m_descriptorHeap.ResizeShaderResource(3);
+			m_descriptorHeap.ResizeShaderResource(3 + nsBeastEngine::NUM_SHADOW_CASCADES);
 			m_descriptorHeap.ResizeUnorderAccessResource(1);
 
 			m_descriptorHeap.RegistConstantBuffer(0, m_commonConstantBuffer);
@@ -494,6 +494,15 @@ namespace app
 			m_descriptorHeap.RegistShaderResource(0, m_albedoMap);
 			m_descriptorHeap.RegistShaderResource(1, m_normalMap);
 			m_descriptorHeap.RegistShaderResource(2, m_specularMap);
+
+			// キャラクターや地形の影を海に映すためのカスケードシャドウマップ
+			// 海自身は影を落とさない（キャスターには登録していない）
+			// Ocean.fx の g_shadowMap0〜2 (t3〜t5) に対応する
+			for (int i = 0; i < nsBeastEngine::NUM_SHADOW_CASCADES; i++)
+			{
+				m_descriptorHeap.RegistShaderResource(
+					3 + i, g_renderingEngine->GetShadowMap().GetShadowMapTexture(i));
+			}
 
 			m_descriptorHeap.Commit();
 		}
@@ -896,6 +905,14 @@ namespace app
 
 		void Ocean::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
+			// カスケードごとのライトビュープロジェクション行列だけはここで取り直す。
+			// Update()はシャドウマップの描画より前に走るため、
+			// そこでコピーした行列は1フレーム古いものになってしまう。
+			for (int i = 0; i < nsBeastEngine::NUM_SHADOW_CASCADES; i++)
+			{
+				m_constantBuffer.light.m_shadowLVP[i] = g_sceneLight->GetLVP(i);
+			}
+
 			// DispatchWaveCS()・BuildChunkAABBs()はUpdate()で完了済みのため、
 			// ここでは描画コマンドのみを発行する
 			m_oceanMesh.Draw(rc, CalcWorldMatrix(), view);

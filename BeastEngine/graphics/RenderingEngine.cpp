@@ -43,6 +43,11 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Init()
 	{
+		// シャドウマップの初期化
+		// ディファードライティング用スプライトが初期化時にシャドウマップの
+		// テクスチャを参照するため、必ずInitDeferredLightingSpriteより先に行うこと
+		m_shadowMap.Init();
+
 		// メインビューの初期化
 		m_mainView.width = g_graphicsEngine->GetFrameBufferWidth();
 		m_mainView.height = g_graphicsEngine->GetFrameBufferHeight();
@@ -114,6 +119,10 @@ namespace nsBeastEngine
 		m_mainView.frustum.Update(viewProjMatrix);
 #endif
 
+		// シャドウマップへの描画
+		// ※ディファードライティングで参照するため、GBuffer描画より前に行う
+		RenderShadowMap(rc);
+
 		// メインカメラの描画パスを実行する
 		ExecuteViewPass(rc, m_mainView);
 
@@ -159,12 +168,22 @@ namespace nsBeastEngine
 			const UINT mainFrameIdx = g_graphicsEngine->GetBackBufferIndex();
 			g_graphicsEngine->SetFrameIndex(1 - mainFrameIdx);
 
+			// DeferredLightingのワールド座標復元・影判定をサブカメラ基準に一時的に切り替える
+			// ※切り替えないとメインカメラの行列のままサブビューを描いてしまい、
+			//   小窓のスペキュラ・リムライト・影がジオメトリと無関係な位置で判定される
+			m_sceneLight.SetViewCamera(*subCamera);
+
 			ExecuteViewPass(rc, m_subView);
 
 			// サブビューにもメインビューと同じトーンマップを適用し、小窓の色味を合わせる
 			// ※メインビューはPostEffect()内でブルームと合わせて処理するが、
 			//   小窓はブルームなし・トーンマップのみで簡易的に色味だけ揃える
 			m_subViewToneMap.Render(rc, m_subView.renderTarget);
+
+			// メインカメラ基準に戻す
+			// ※次フレームのUpdate()で上書きされるが、このフレーム内でまだ
+			//   メインカメラ基準の値を参照するコードが残っていても壊れないようにする
+			m_sceneLight.SetViewCamera(mainCamera);
 
 			g_graphicsEngine->SetFrameIndex(mainFrameIdx);
 		}
@@ -232,12 +251,26 @@ namespace nsBeastEngine
 
 	void RenderingEngine::InitDeferredLightingSprite(RenderViewContext& view)
 	{
+		// GBufferのSRVスロットはGBufferの添字と一致している必要がある
+		static_assert(enDeferredLightingSrv_Albedo == enGBuffer_Albedo, "SRVスロットとGBufferの添字が食い違っています");
+		static_assert(enDeferredLightingSrv_Normal == enGBuffer_Normal, "SRVスロットとGBufferの添字が食い違っています");
+		static_assert(enDeferredLightingSrv_Specular == enGBuffer_Specular, "SRVスロットとGBufferの添字が食い違っています");
+
 		SpriteInitData spriteInitData;
 		spriteInitData.m_width = view.width;
 		spriteInitData.m_height = view.height;
-		spriteInitData.m_textures[enGBuffer_Albedo] = &view.gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
-		spriteInitData.m_textures[enGBuffer_Normal] = &view.gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
-		spriteInitData.m_textures[enGBuffer_Specular] = &view.gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
+		spriteInitData.m_textures[enDeferredLightingSrv_Albedo] = &view.gBuffer[enGBuffer_Albedo].GetRenderTargetTexture();
+		spriteInitData.m_textures[enDeferredLightingSrv_Normal] = &view.gBuffer[enGBuffer_Normal].GetRenderTargetTexture();
+		spriteInitData.m_textures[enDeferredLightingSrv_Specular] = &view.gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
+		// カスケードシャドウマップは連続したスロットへ順に割り当てる
+		static_assert(
+			enDeferredLightingSrv_ShadowMap0 + NUM_SHADOW_CASCADES == enDeferredLightingSrv_Num,
+			"シャドウマップのSRVスロット数がカスケード数と食い違っています");
+		for (int i = 0; i < NUM_SHADOW_CASCADES; i++)
+		{
+			spriteInitData.m_textures[enDeferredLightingSrv_ShadowMap0 + i] =
+				&m_shadowMap.GetShadowMapTexture(i);
+		}
 		spriteInitData.m_fxFilePath = "Assets/shader/DeferredLighting.fx";
 		spriteInitData.m_expandConstantBuffer = m_sceneLight.GetLight();
 		spriteInitData.m_expandConstantBufferSize = sizeof(Light);
@@ -300,6 +333,42 @@ namespace nsBeastEngine
 			EnBlurType::enGaussian,       // enAverage / enGaussian
 			TONE_MAP_TYPE
 		);
+	}
+
+
+	void RenderingEngine::RenderShadowMap(RenderContext& rc)
+	{
+		// 覆う範囲はメインカメラの視錐台に合わせる
+		// 画面に映っている場所へ解像度を集中させ、カメラ後方には配らないため
+		auto& mainCamera = CameraSystem::Get().GetMainCamera();
+		const Vector3 lightDirection = m_sceneLight.GetLight()->m_directionLight.m_direction;
+
+		m_shadowMap.Render(rc, lightDirection, mainCamera, m_deferredModelList, m_forwardModelList);
+
+		if (!m_shadowMap.IsEnable())
+		{
+			// 無効時はShadowMap::Render()が早期returnしており、シャドウマップ・LVPは
+			// 前フレームの内容のまま更新されない。そのままGetLVPMatrix()等を転送すると、
+			// 影が消えずに直前のカメラ位置で固まったように見えてしまう。
+			// direct/ambient両方を1.0にすると lerp(rate, 1.0f, shadowRate) が
+			// shadowRateの値に関わらず常に1.0（影なし）になるため、
+			// 古いシャドウマップの中身に関係なく確実に「影なし」にできる。
+			m_sceneLight.GetLight()->m_shadowDirectLightRate = 1.0f;
+			m_sceneLight.GetLight()->m_shadowAmbientRate = 1.0f;
+			return;
+		}
+
+		// 計算されたライトビュープロジェクション行列を定数バッファへ反映する
+		// 受け手はこの行列でシャドウマップを引く
+		for (int i = 0; i < NUM_SHADOW_CASCADES; i++)
+		{
+			m_sceneLight.GetLight()->m_shadowLVP[i] = m_shadowMap.GetLVPMatrix(i);
+		}
+
+		// 影の濃さの調整値も定数バッファへ反映する
+		// デバッグUIから実行中に変更されるため毎フレーム転送する
+		m_sceneLight.GetLight()->m_shadowDirectLightRate = m_shadowMap.GetDirectLightRate();
+		m_sceneLight.GetLight()->m_shadowAmbientRate = m_shadowMap.GetAmbientRate();
 	}
 
 

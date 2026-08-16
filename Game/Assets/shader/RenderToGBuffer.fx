@@ -284,7 +284,10 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
     float4 albedoSample = g_albedo.Sample(g_sampler, psIn.uv);
     psOut.albedo = float4(albedoSample.rgb * mulColor.rgb, albedoSample.a);
     clip(psOut.albedo.a - 0.2f); // ピクセルキル
-    psOut.albedo.w = psIn.pos.z / psIn.pos.w;
+    // ピクセルシェーダーのSV_POSITIONは、zにNDC深度(0〜1)がすでに入っている。
+    // wにはクリップ空間のw（視点からの距離）が入るため、zをwで割ってはいけない。
+    // 割ってしまうとワールド座標の復元が破綻する（影の判定が成立しなくなる）。
+    psOut.albedo.w = psIn.pos.z;
 
     psOut.normal.xyz = normalize(CalcNormal(psIn));
 

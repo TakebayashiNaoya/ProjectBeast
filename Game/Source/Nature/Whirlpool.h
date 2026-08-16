@@ -77,8 +77,12 @@ namespace app
 			 */
 			struct SWhirlpoolConstantBuffer
 			{
-				float uvRotation;	/** UV回転角度（ラジアン） */
-				float padding[3];	/** パディング（16バイトアライン） */
+				float  uvRotation;			/** UV回転角度（ラジアン） */
+				float  padding[3];			/** パディング（16バイトアライン） */
+				/** カスケードごとのライトビュープロジェクション行列（影の判定用） */
+				Matrix lvpMatrix[nsBeastEngine::NUM_SHADOW_CASCADES];
+				float  shadowAmbientRate;	/** 影の中で明るさを何割残すか */
+				float  padding2[3];			/** パディング（16バイトアライン） */
 			};
 
 
