@@ -10,6 +10,7 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
@@ -137,6 +138,18 @@ namespace app
 	}
 
 
+	void GameLogManager::SetStageConfig(nlohmann::json config)
+	{
+		m_stageConfig = std::move(config);
+	}
+
+
+	void GameLogManager::SetResultDetail(nlohmann::json detail)
+	{
+		m_resultDetail = std::move(detail);
+	}
+
+
 	void GameLogManager::Flush(const std::string& stage,
 		float durationSec,
 		int   rescued,
@@ -152,8 +165,21 @@ namespace app
 			session["session_id"]            = m_sessionId;
 			session["stage"]                 = stage;
 			session["duration_sec"]          = durationSec;
+
+			// どの配合で取ったログかをログ自身に残す。これが無いと配合違いの比較ができない
+			if (!m_stageConfig.is_null())
+			{
+				session["stage_config"] = m_stageConfig;
+			}
+
 			session["result"]["rescued"]     = rescued;
 			session["result"]["score"]       = score;
+
+			// アチーブメントの達成状況などをリザルトへ統合する
+			if (m_resultDetail.is_object())
+			{
+				session["result"].update(m_resultDetail);
+			}
 
 			std::ofstream ofs(dir + "/session.json");
 			ofs << session.dump(2) << "\n";
@@ -178,6 +204,8 @@ namespace app
 
 		m_ticks.clear();
 		m_pendingEvents.clear();
+		m_stageConfig = nullptr;
+		m_resultDetail = nullptr;
 		m_frameCount = 0;
 	}
 
@@ -199,15 +227,20 @@ namespace app
 		// フィールド名をキーとして毎tick書き出すとログサイズが膨れ上がる（数百体分×数千tick）ため、
 		// 固定順の配列で記録する。読み込み側（ReplayScene）はオブジェクト形式の旧ログも
 		// 判別して読めるようにしてあるため、過去に記録したログも引き続き再生できる
-		// 配列レイアウト: [pos, rot_y, state]
+		// 配列レイアウト: [pos, rot_y, state, clingy_count, speed_mul]
+		// clingy_count/speed_mul は後から足した要素。読み込み側は範囲チェックしてから読むため、
+		// これらを持たない旧ログもそのまま再生できる
 		if (daddy)
 		{
 			auto* sm = daddy->GetStateMachine();
+			auto* ctrl = daddy->GetController();
 			const auto& tf = daddy->GetTransform();
 			snap["parent"] = nlohmann::json::array({
 				V3toJson(tf.m_position),
 				GetYawDeg(tf.m_rotation),
-				sm ? sm->GetStateNameForLog() : "Unknown"
+				sm ? sm->GetStateNameForLog() : "Unknown",
+				ctrl ? ctrl->GetClingyCount() : 0,
+				RoundForLog(ctrl ? ctrl->GetSpeedMultiplier() : 1.0f, 0.01)
 			});
 		}
 

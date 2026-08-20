@@ -45,8 +45,10 @@ namespace app
 			 * @param visual   陣形のウルト演出（IFormation が所有する）。演出なしは nullptr 可
 			 * @param duration 持続時間（秒）
 			 * @param cooldown クールダウン（秒）
+			 * @param formationName 陣形名（プレイログにどの陣形のウルトかを残すために使う）
 			 */
-			void SetUlt(FormationEffectChain* ult, IUltEffect* visual, float duration, float cooldown);
+			void SetUlt(FormationEffectChain* ult, IUltEffect* visual, float duration, float cooldown,
+				const char* formationName);
 
 			/** @brief 発動可能か（未発動 かつ クールダウン終了） */
 			bool CanActivate() const;
@@ -117,6 +119,9 @@ namespace app
 			SEHandle              m_chargeSeHandle = INVALID_SE_HANDLE;
 			/** ディスチャージ（発動中）に再生しているループSEのハンドル */
 			SEHandle              m_dischargeSeHandle = INVALID_SE_HANDLE;
+
+			/** 現在セットされている陣形の名前（プレイログ用。文字列リテラルを指すため所有しない） */
+			const char*           m_formationName = "Unknown";
 		};
 	}
 }

@@ -51,6 +51,20 @@ namespace app
 			void AddWhirlpoolCapture() { m_whirlpoolCaptureCount++; }
 
 			/**
+			 * @brief シロクマに倒された回数を取得する
+			 * @return 倒された回数
+			 * @note プレイログの記録に使う
+			 */
+			int GetBearKillCount() const { return m_bearKillCount; }
+
+			/**
+			 * @brief 渦潮に飲まれた回数を取得する
+			 * @return 飲まれた回数
+			 * @note プレイログの記録に使う
+			 */
+			int GetWhirlpoolCaptureCount() const { return m_whirlpoolCaptureCount; }
+
+			/**
 			 * @brief 達成済みのアチーブメントの配列を取得する
 			 */
 			std::vector<AchievementBase*> GetAllAchievements() const;

@@ -5,6 +5,7 @@
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"
+#include "Source/Noise/NoiseManager.h"
 #include "Source/Sound/SoundManager.h"
 
 
@@ -308,6 +309,9 @@ namespace app
 			static constexpr float GAUGE_RECOVERY_SPEED = 10.0f;
 			/** 睡眠タイマーの最大値（秒） */
 			static constexpr float MAX_SLEEP_TIME = 30.0f;
+
+			/** 起床の決め手になった音の主（Exit() でプレイログへ残す） */
+			app::NoiseSource m_wakeNoiseSource;
 		};
 
 

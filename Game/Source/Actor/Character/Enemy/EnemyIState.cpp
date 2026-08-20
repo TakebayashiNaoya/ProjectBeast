@@ -579,7 +579,8 @@ namespace app
 			// 音ゲージの更新
 			//------------------------------------------------------------
 			Vector3 loudestPos;
-			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos);
+			app::NoiseSource loudestSource;
+			float totalNoise = app::NoiseManager::GetInstance().CalculateTotalNoiseAt(m_owner->GetPosition(), loudestPos, loudestSource);
 
 			float wakeUpGauge = m_owner->GetWakeUpGauge();
 
@@ -617,6 +618,9 @@ namespace app
 				{
 					m_owner->SetSearch(true);
 					m_owner->SetSearchTargetPos(loudestPos);
+
+					// 泣き声・いたずら・足音のどれで起きたのかを Exit() でログへ残すため控えておく
+					m_wakeNoiseSource = loudestSource;
 				}
 			}
 		}
@@ -626,8 +630,21 @@ namespace app
 		{
 			m_owner->SetMoveVector(Vector3::Zero);
 
+			// 音で起きた場合は、その音の種類と出した子ペンギンも残す。
+			// 「なぜクマが起きたか」を配合ごとに切り分けるために使う
 			if (auto* lm = GameLogManager::GetInstance())
-				lm->QueueEvent({{"ev", "bear_sleep_end"}, {"bear_id", m_owner->GetOwner()->GetLogId()}, {"woken_by_noise", m_owner->IsSearch()}});
+			{
+				const bool wokenByNoise = m_owner->IsSearch();
+				lm->QueueEvent({
+					{ "ev",               "bear_sleep_end" },
+					{ "bear_id",          m_owner->GetOwner()->GetLogId() },
+					{ "woken_by_noise",   wokenByNoise },
+					{ "noise_type",       wokenByNoise ? app::NoiseTypeName(m_wakeNoiseSource.type) : "None" },
+					{ "noise_penguin_id", wokenByNoise ? m_wakeNoiseSource.penguinId : -1 }
+				});
+			}
+
+			m_wakeNoiseSource = app::NoiseSource();
 
 			m_owner->StopDebuff();
 		}

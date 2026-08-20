@@ -59,6 +59,13 @@ namespace app
 			inline void SetIsHelped(const bool isHelped)
 			{
 				m_isHelped = isHelped;
+
+				// m_isHelped は GetTypeSpecificChangeState() が遷移判定で消費してしまうため、
+				// 起き上がり完了まで残る記録用のフラグを別に立てておく
+				if (isHelped)
+				{
+					m_wasHelpedThisDown = true;
+				}
 			}
 
 			/**
@@ -107,6 +114,37 @@ namespace app
 				return m_cryEffectHandle;
 			}
 
+			/**
+			 * @brief 転倒の開始を記録する
+			 * @param time 転倒した時刻（残り秒数）
+			 * @note 復帰までにかかった秒数と、介助の有無をプレイログへ残すために使う
+			 */
+			inline void BeginDown(const float time)
+			{
+				m_downStartTime = time;
+				m_wasHelpedThisDown = false;
+			}
+
+			/**
+			 * @brief 転倒した時刻を取得する
+			 * @return 転倒した時刻（残り秒数）
+			 */
+			inline float GetDownStartTime() const
+			{
+				return m_downStartTime;
+			}
+
+			/**
+			 * @brief 今回の転倒で世話焼きペンギンの介助を受けたかを取得する
+			 * @return 介助を受けたならtrue
+			 * @note m_isHelped は起き上がりへ遷移する判定の中でクリアされるため、
+			 *       起き上がり完了時点まで残るこちらを記録に使う
+			 */
+			inline bool GetWasHelpedThisDown() const
+			{
+				return m_wasHelpedThisDown;
+			}
+
 
 		public:
 			ClumsyChildPenguinStateMachine(ChildPenguin* ownerChildPenguin);
@@ -132,6 +170,10 @@ namespace app
 			bool m_isHelped = false;
 			/** おっちょこちょいペンギンのエフェクトのハンドル */
 			EffectHandle m_cryEffectHandle = INVALID_EFFECT_HANDLE;
+			/** 転倒した時刻（残り秒数。復帰までの秒数をプレイログへ残すために保持する） */
+			float m_downStartTime = 0.0f;
+			/** 今回の転倒で世話焼きペンギンの介助を受けたか（記録用。遷移判定では消費しない） */
+			bool m_wasHelpedThisDown = false;
 		};
 	}
 }

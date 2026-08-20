@@ -69,13 +69,15 @@ namespace app
 		/**
 		 * @brief feverEnabled・未発生の条件を満たしていればフィーバータイムを開始する
 		 * @detail TryStartFeverOnAllCaught()と、残り時間による自動トリガーの共通経路
+		 * @param reason 突入のきっかけ（プレイログに残す。"time" か "all_caught"）
 		 */
-		void TryStartFever();
+		void TryStartFever(const char* reason);
 
 		/**
 		 * @brief フィーバータイムを開始し、投下キューの初期数を積む
+		 * @param reason 突入のきっかけ（プレイログに残す）
 		 */
-		void StartFever();
+		void StartFever(const char* reason);
 
 
 	private:

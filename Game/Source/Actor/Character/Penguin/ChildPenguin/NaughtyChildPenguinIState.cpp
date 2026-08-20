@@ -41,7 +41,7 @@ namespace app {
 			SoundManager::Get().PlaySE(enSoundKind_NaughtyPoke, false, false, enSoundPriority_Hight);
 
 			const Vector3& myPos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
-			NoiseManager::GetInstance().AddNoise(myPos, EnNoiseType::NaughtyPoke);
+			NoiseManager::GetInstance().AddNoise(myPos, EnNoiseType::NaughtyPoke, m_owner->GetOwnerChildPenguin()->GetLogId());
 			EffectManager::Get().PlayEffect(
 				EnEffectKind::ChildPenguinCry,
 				myPos,

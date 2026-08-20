@@ -96,6 +96,12 @@ namespace app
 		TimeManager::DestroyInstance();
 		FeverTimeManager::DestroyInstance();
 
+		/** プレイログ。最後まで遊んだ場合は書き出し時に破棄済みだが、
+		 *  途中でタイトルへ戻った場合はここまで残っている。破棄しないと
+		 *  CreateInstance() が既存インスタンスを再利用してしまい、
+		 *  中断したプレイのログが次のプレイへ合流してしまう */
+		GameLogManager::DestroyInstance();
+
 		/** シーン破棄時にサブカメラを強制停止する（タイトル遷移後に残らないよう） */
 		nsBeastEngine::SubCameraManager::Get().ForceEnd();
 
@@ -322,6 +328,28 @@ namespace app
 
 			InGameUIManager::GetInstance()->InitializeMapIcon();
 
+			/** どの配合・どのステージ設定で取ったログなのかをログ自身に残す。
+			 *  配合違いのセッションを比較するとき、これが無いとログだけでは区別できない */
+			if (auto* lm = GameLogManager::GetInstance())
+			{
+				const PenguinSpawnConfig cfg = GetPenguinConfig();
+				auto* em = actor::EnemyManager::GetInstance();
+				auto* fever = FeverTimeManager::GetInstance();
+				lm->SetStageConfig({
+					{ "serious",          cfg.serious },
+					{ "clingy",           cfg.clingy },
+					{ "naughty",          cfg.naughty },
+					{ "clumsy",           cfg.clumsy },
+					{ "caring",           cfg.caring },
+					{ "total",            cfg.serious + cfg.clingy + cfg.naughty + cfg.clumsy + cfg.caring },
+					{ "spawn_radius",     cfg.spawnRadius },
+					{ "time_limit_sec",   GetTimeLimit() },
+					{ "bear_count",       em ? static_cast<int>(em->GetEnemies().size()) : 0 },
+					{ "whirlpool_count",  static_cast<int>(whirlpoolCount) },
+					{ "fever_drop_count", fever ? fever->GetFeverDropCount() : 0 }
+				});
+			}
+
 			OnLoadComplete();
 			break;
 		}
@@ -519,27 +547,50 @@ namespace app
 				{
 					am->FinalizeAchievements();
 
-					// ResultScene::CalcTotalScore() と同じ式でスコアを算出してログに記録する
+					// ResultScene::CalcTotalScore() と同じ式でスコアを算出してログに記録する。
+					// プレイヤーがリザルト画面で見る数字とログの数字がずれないよう、式は必ず揃えること
 					int achievedCount = 0;
 					for (auto* achieve : am->GetAllAchievements())
 					{
 						if (achieve && achieve->IsAchieved()) achievedCount++;
 					}
-					constexpr int   MIN_ACHIEVE_MULTIPLIER = 1;
-					constexpr float BASE_TIME_MULTIPLIER = 1.0f;
-					constexpr float SCORE_TIME_DIVISOR = 100.0f;
-					constexpr float SCORE_BASE_MULTIPLIER = 100.0f;
 
-					const int   achieveMultiplier = (achievedCount > 0) ? achievedCount : MIN_ACHIEVE_MULTIPLIER;
-					const float timeMultiplier = BASE_TIME_MULTIPLIER + (clearTime / SCORE_TIME_DIVISOR);
+					/** アチーブメントの成否と各種カウンタをログへ残す。
+					 *  「条件が緩すぎて無条件達成」「厳しすぎて達成不能」の判定に使う */
+					if (auto* lm = GameLogManager::GetInstance())
+					{
+						nlohmann::json achievements = nlohmann::json::array();
+						for (auto* achieve : am->GetAllAchievements())
+						{
+							if (achieve == nullptr) continue;
+							achievements.push_back({
+								{ "name",         achieve->GetName() },
+								{ "achieved",     achieve->IsAchieved() },
+								{ "achieved_time", achieve->GetAchievedTime() }
+							});
+						}
+
+						lm->SetResultDetail({
+							{ "achieved_count",     achievedCount },
+							{ "achievements",       achievements },
+							{ "bear_kills",         am->GetBearKillCount() },
+							{ "whirlpool_captures", am->GetWhirlpoolCaptureCount() },
+							{ "remaining_sec",      clearTime }
+						});
+					}
+					constexpr float SCORE_BASE_MULTIPLIER = 100.0f;   // 救出数の基本スコア倍率
+					constexpr float SCORE_PER_ACHIEVEMENT = 2000.0f;  // アチーブメント達成1件ごとの加算スコア
+
 					logScore = static_cast<float>(rescued) * SCORE_BASE_MULTIPLIER
-						* static_cast<float>(achieveMultiplier) * timeMultiplier;
+						+ static_cast<float>(achievedCount) * SCORE_PER_ACHIEVEMENT;
 				}
 
-				/** ログをファイルへ書き出し */
+				/** ログをファイルへ書き出し
+				 *  clearTime は「残り時間」なので、経過時間へ直してから duration として渡す */
 				if (auto* lm = GameLogManager::GetInstance())
 				{
-					lm->Flush(GetStageName(), clearTime, rescued, logScore);
+					const float elapsedTime = GetTimeLimit() - clearTime;
+					lm->Flush(GetStageName(), elapsedTime, rescued, logScore);
 					GameLogManager::DestroyInstance();
 				}
 			}

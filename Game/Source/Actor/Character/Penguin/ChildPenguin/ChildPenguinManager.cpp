@@ -346,7 +346,8 @@ namespace app
 			child->GetStateMachine()->SetPosition(spawnPos);
 			child->StartWrapper();
 			if (auto* lm = GameLogManager::GetInstance())
-				lm->RecordSpawn("penguin", child->GetLogId(), { {"type", child->GetChildPenguinTypeStr()} });
+				// キー名を "type" にすると RecordSpawn 側がレコード種別で上書きしてしまうため、別名で渡す
+				lm->RecordSpawn("penguin", child->GetLogId(), { {"penguin_type", child->GetChildPenguinTypeStr()} });
 			return child;
 		}
 
