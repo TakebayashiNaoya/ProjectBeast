@@ -423,8 +423,22 @@ namespace app
 			 */
 			void StopAllCaringEffects() const;
 
+			/**
+			 * @brief 介入対象の変化を検出してプレイログへイベントを出す
+			 * @details 介入対象は Update() の複数の経路で設定・解除されるため、
+			 *          各所に記録を仕込まず、前フレームの対象と比較するエッジ検出で拾う。
+			 *          世話焼きが実際に働いているかを測るために使う
+			 */
+			void UpdateInterventionLog();
+
 			/** 現在介入中の対象ペンギン */
 			ChildPenguin* m_interventionTarget = nullptr;
+			/** 前フレームにログへ記録した介入対象（エッジ検出用） */
+			ChildPenguin* m_loggedInterventionTarget = nullptr;
+			/** 介入を開始した時刻（残り秒数） */
+			float m_interventionStartTime = 0.0f;
+			/** 現在の介入で対象まで到達できたか（空振りとの区別に使う） */
+			bool m_hasReachedInterventionTarget = false;
 			/**
 			 * @brief 介入対象を探す最大距離（JSONパラメーターから読み込む）
 			 * @details この距離より遠いペンギンには介入しない

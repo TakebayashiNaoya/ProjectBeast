@@ -49,8 +49,9 @@ namespace app
 			 */
 			inline bool IsAchieved() const { return m_isAchieved; }
 			/**
-			 * @brief アチーブメントが達成された時間を取得
-			 * @return アチーブメントが達成された時間を取得(秒)
+			 * @brief アチーブメントを達成した時刻を取得
+			 * @return 達成した時刻（残り秒数。未達成なら0）
+			 * @note ログの "t" と同じく残り秒数。経過秒数はステージの制限時間から引いて求める
 			 */
 			inline uint32_t GetAchievedTime() const { return m_achievedTime; }
 
@@ -82,6 +83,13 @@ namespace app
 
 		protected:
 			/**
+			 * @brief 達成済みにして達成時刻を記録する
+			 * @details 派生クラスは m_isAchieved を直接立てず、必ずこれを通すこと。
+			 *          達成時刻の記録漏れを防ぐため
+			 */
+			void MarkAchieved();
+
+			/**
 			 * @brief アチーブメントを初期化
 			 * @param name アチーブメントの名前
 			 * @param description アチーブメントの説明
@@ -111,7 +119,7 @@ namespace app
 			uint32_t m_id;
 			/** アチーブメントが達成されているかどうか */
 			bool m_isAchieved;
-			/** アチーブメントが達成された時間(秒) */
+			/** アチーブメントを達成した時刻（残り秒数。未達成なら0） */
 			uint32_t m_achievedTime;
 
 			int m_index = -1;

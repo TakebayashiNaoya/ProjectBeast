@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file FeverTimeManager.cpp
  * @brief フィーバータイムを管理するクラス
  * @author 竹林
@@ -38,7 +38,7 @@ namespace app
 			const float curTime = TimeManager::GetInstance().GetCurTime();
 			if (curTime > 0.0f && curTime <= m_feverStartTime)
 			{
-				TryStartFever();
+				TryStartFever("time");
 			}
 		}
 
@@ -64,20 +64,20 @@ namespace app
 
 	void FeverTimeManager::TryStartFeverOnAllCaught()
 	{
-		TryStartFever();
+		TryStartFever("all_caught");
 	}
 
 
-	void FeverTimeManager::TryStartFever()
+	void FeverTimeManager::TryStartFever(const char* reason)
 	{
 		/** フィーバー無効なステージ（チュートリアル等）、または既に発生済みなら何もしない */
 		if (!m_feverEnabled || m_hasTriggered) return;
 
-		StartFever();
+		StartFever(reason);
 	}
 
 
-	void FeverTimeManager::StartFever()
+	void FeverTimeManager::StartFever(const char* reason)
 	{
 		m_isActive = true;
 		m_hasTriggered = true;
@@ -89,6 +89,16 @@ namespace app
 		/** それまでの捕獲数によらず、固定数を投下キューの初期数にする */
 		m_pendingDropCount = m_feverDropCount;
 		m_totalQueuedCount = m_feverDropCount;
+
+		// 残り時間による自動突入か、全員捕獲による早期突入かを区別して記録する
+		if (auto* lm = GameLogManager::GetInstance())
+		{
+			lm->QueueEvent({
+				{ "ev",         "fever_start" },
+				{ "reason",     reason },
+				{ "drop_count", m_feverDropCount }
+			});
+		}
 	}
 
 

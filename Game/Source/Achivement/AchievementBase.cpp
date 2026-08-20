@@ -20,6 +20,17 @@ namespace app
 		}
 
 
+		void AchievementBase::MarkAchieved()
+		{
+			if (m_isAchieved) return;
+
+			m_isAchieved = true;
+
+			// ログの "t" と揃えて残り秒数で持つ。経過秒数はステージの制限時間から引いて求める
+			m_achievedTime = static_cast<uint32_t>(TimeManager::GetInstance().GetCurTime());
+		}
+
+
 		void AchievementBase::InitAchievementBase(const nlohmann::json& json)
 		{
 			m_name        = app::util::JsonConverter::ToString(json, "name");
@@ -60,7 +71,7 @@ namespace app
 			// 条件関数が設定されていれば評価して達成判定する
 			if (m_conditionFunc && m_conditionFunc())
 			{
-				m_isAchieved = true;
+				MarkAchieved();
 			}
 		}
 
@@ -126,7 +137,7 @@ namespace app
 		{
 			if (!m_isAchieved && m_conditionFunc && m_conditionFunc())
 			{
-				m_isAchieved = true;
+				MarkAchieved();
 			}
 		}
 
@@ -154,7 +165,7 @@ namespace app
 		{
 			if (!m_isAchieved)
 			{
-				m_isAchieved = true;
+				MarkAchieved();
 			}
 		}
 
@@ -179,7 +190,7 @@ namespace app
 			{
 				m_recordValue = value;
 				// 記録が更新された時点で「達成」扱いにする（0以上の記録があるかどうかの判定用）
-				m_isAchieved = true;
+				MarkAchieved();
 			}
 		}
 
@@ -201,7 +212,7 @@ namespace app
 		{
 			if (!m_isAchieved && m_conditionFunc && m_conditionFunc())
 			{
-				m_isAchieved = true;
+				MarkAchieved();
 			}
 		}
 	}

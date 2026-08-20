@@ -35,20 +35,29 @@ namespace app
 	}
 
 
-	void NoiseManager::AddNoise(const Vector3& position, EnNoiseType type)
+	void NoiseManager::AddNoise(const Vector3& position, EnNoiseType type, int penguinId)
 	{
 		NoiseParameter param = GetDefaultParameter(type);
-		AddNoise(position, param.volume, param.falloffRatio, param.range);
+		AddNoise(position, param.volume, param.falloffRatio, param.range, { type, penguinId });
 	}
 
 
-	void NoiseManager::AddNoise(const Vector3& position, float intensity, float attenuationRate, float radius)
+	void NoiseManager::AddNoise(const Vector3& position, float intensity, float attenuationRate, float radius,
+		const NoiseSource& source)
 	{
-		m_noises.push_back({ position, intensity, attenuationRate, radius });
+		m_noises.push_back({ position, intensity, attenuationRate, radius, source });
 	}
 
 
 	float NoiseManager::CalculateTotalNoiseAt(const Vector3& listenerPos, Vector3& outLoudestPosition) const
+	{
+		NoiseSource dummy;
+		return CalculateTotalNoiseAt(listenerPos, outLoudestPosition, dummy);
+	}
+
+
+	float NoiseManager::CalculateTotalNoiseAt(const Vector3& listenerPos, Vector3& outLoudestPosition,
+		NoiseSource& outLoudestSource) const
 	{
 		float totalNoise = 0.0f;
 		float maxHeardIntensity = -1.0f;
@@ -72,10 +81,11 @@ namespace app
 			{
 				totalNoise += heardVolume;
 
-				/** 最も大きく聞こえた音の座標を記録 */
+				/** 最も大きく聞こえた音の座標と、その音を出した主を記録 */
 				if (heardVolume > maxHeardIntensity) {
 					maxHeardIntensity = heardVolume;
 					outLoudestPosition = noise.position;
+					outLoudestSource = noise.source;
 				}
 			}
 		}

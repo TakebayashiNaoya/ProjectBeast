@@ -35,5 +35,24 @@ namespace app
 			Scatter,		// 散開陣（収集特化）
 			Num
 		};
+
+
+		/**
+		 * @brief 陣形の名前を返す
+		 * @param type 陣形の種類
+		 * @return 陣形の名前
+		 * @note プレイログに陣形の切り替えやウルトを残すために使う
+		 */
+		inline const char* FormationTypeName(EnFormationType type)
+		{
+			switch (type)
+			{
+			case EnFormationType::Circle:   return "Circle";
+			case EnFormationType::Triangle: return "Triangle";
+			case EnFormationType::Cluster:  return "Cluster";
+			case EnFormationType::Scatter:  return "Scatter";
+			default:                        return "Unknown";
+			}
+		}
 	}
 }

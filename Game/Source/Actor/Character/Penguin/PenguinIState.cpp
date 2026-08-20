@@ -100,7 +100,8 @@ namespace app
 			{
 				app::NoiseManager::GetInstance().AddNoise(
 					m_owner->GetTransform().m_position,
-					app::EnNoiseType::Sneak
+					app::EnNoiseType::Sneak,
+					child->GetLogId()
 				);
 			}
 
@@ -172,7 +173,8 @@ namespace app
 			{
 				app::NoiseManager::GetInstance().AddNoise(
 					m_owner->GetTransform().m_position,
-					app::EnNoiseType::Dash
+					app::EnNoiseType::Dash,
+					child->GetLogId()
 				);
 			}
 
@@ -252,7 +254,8 @@ namespace app
 			{
 				app::NoiseManager::GetInstance().AddNoise(
 					m_owner->GetTransform().m_position,
-					app::EnNoiseType::Fall
+					app::EnNoiseType::Fall,
+					child->GetLogId()
 				);
 			}
 
@@ -339,7 +342,8 @@ namespace app
 			{
 				app::NoiseManager::GetInstance().AddNoise(
 					m_owner->GetTransform().m_position,
-					app::EnNoiseType::Slide
+					app::EnNoiseType::Slide,
+					child->GetLogId()
 				);
 			}
 
@@ -738,16 +742,8 @@ namespace app
 		{
 			m_owner->PlayAnimation(EnPenguinAnimationID::MoveSwim);
 
-			if (auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase()))
-			{
-				if (ChildPenguinManager::GetInstance()->IsFollower(child))
-				{
-					if (auto* lm = GameLogManager::GetInstance())
-						lm->QueueEvent({ {"ev", "whirlpool_capture"}, {"penguin_id", child->GetLogId()} });
-					if (auto* am = app::achievement::AchievementManager::GetInstance())
-						am->AddWhirlpoolCapture();
-				}
-			}
+			// 飲み込まれた記録は WhirlpoolPowerSytem の捕獲判定側で取る。
+			// ここへ来る時点では既に隊列から外れていて、隊列にいたかどうかを判定できないため
 		}
 
 

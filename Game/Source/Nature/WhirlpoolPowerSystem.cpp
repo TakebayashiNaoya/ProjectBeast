@@ -7,6 +7,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
+#include "Source/Achivement/AchievementManager.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Util/RandomDevice.h"
 #include "Whirlpool.h"
@@ -30,6 +31,13 @@ namespace app
 			{
 				return core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
 			}
+
+			/**
+			 * @brief 同じ子の飲み込みを別の被害として数え直すまでの間隔（秒）
+			 * @details 渦潮の縁では捕獲と救出が数フレーム周期で繰り返されるため、
+			 *          この間隔を空けずに再捕獲されたものは同じ被害の継続として扱う
+			 */
+			constexpr float CAPTURE_RECOUNT_INTERVAL = 3.0f;
 		}
 
 
@@ -147,6 +155,44 @@ namespace app
 					it->radiusOffsetTarget = 0.0f;
 					it->individualOrbitOffset = util::RandomDevice::Random(-orbitOffsetVariation, orbitOffsetVariation);
 					it->individualRotateScale = 1.0f + util::RandomDevice::Random(-rotateScaleVariation, rotateScaleVariation);
+
+					// 飲まれた記録は隊列から外す前に取る。
+					// 外した後だと IsFollower() が必ず偽になり、隊列にいた子の被害を1件も数えられない
+					const bool wasFollower = m_cpManager->IsFollower(it->target);
+
+					// 渦潮の縁では捕獲と救出が数フレーム周期で繰り返されるため、
+					// 直前の捕獲から間隔が空いたものだけを新しい被害として数える。
+					// 残り時間は減っていくので、前回の時刻から現在時刻を引いたものが経過秒数になる
+					const int   logId = it->target->GetLogId();
+					const float now   = TimeManager::GetInstance().GetCurTime();
+					const auto  found = m_lastCaptureTimes.find(logId);
+					const bool  isNewCapture =
+						(found == m_lastCaptureTimes.end()) ||
+						(found->second - now >= CAPTURE_RECOUNT_INTERVAL);
+					m_lastCaptureTimes[logId] = now;
+
+					if (isNewCapture)
+					{
+						if (auto* lm = GameLogManager::GetInstance())
+						{
+							lm->QueueEvent({
+								{ "ev",           "whirlpool_capture" },
+								{ "penguin_id",   it->target->GetLogId() },
+								{ "penguin_type", it->target->GetChildPenguinTypeStr() },
+								{ "was_follower", wasFollower }
+							});
+						}
+
+						// アチーブメントは「隊列にいた子を持っていかれた」回数を数える。
+						// やんちゃが自分から飛び込んだ分はプレイヤーの被害ではないため対象外
+						if (wasFollower)
+						{
+							if (auto* am = app::achievement::AchievementManager::GetInstance())
+							{
+								am->AddWhirlpoolCapture();
+							}
+						}
+					}
 
 					// 渦潮に飲まれた瞬間に隊から抜ける
 					m_cpManager->RemoveFollower(it->target);

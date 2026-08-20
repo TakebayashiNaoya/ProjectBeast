@@ -1460,8 +1460,47 @@ namespace app
 		}
 
 
+		void CaringChildPenguinAI::UpdateInterventionLog()
+		{
+			if (m_interventionTarget == m_loggedInterventionTarget) return;
+
+			auto* lm = GameLogManager::GetInstance();
+			const float now = TimeManager::GetInstance().GetCurTime();
+
+			// 対象が入れ替わるときは、直前の対象の介入をまず閉じる
+			if (m_loggedInterventionTarget != nullptr && lm != nullptr)
+			{
+				// 残り時間は減っていくので、開始時刻から現在時刻を引いたものが経過秒数になる
+				lm->QueueEvent({
+					{ "ev",         "caring_help_end" },
+					{ "penguin_id", m_owner->GetLogId() },
+					{ "target_id",  m_loggedInterventionTarget->GetLogId() },
+					{ "sec",        m_interventionStartTime - now },
+					{ "reached",    m_hasReachedInterventionTarget }
+				});
+			}
+
+			if (m_interventionTarget != nullptr && lm != nullptr)
+			{
+				lm->QueueEvent({
+					{ "ev",          "caring_help_start" },
+					{ "penguin_id",  m_owner->GetLogId() },
+					{ "target_id",   m_interventionTarget->GetLogId() },
+					{ "target_type", m_interventionTarget->GetChildPenguinTypeStr() }
+				});
+			}
+
+			m_interventionStartTime = now;
+			m_hasReachedInterventionTarget = false;
+			m_loggedInterventionTarget = m_interventionTarget;
+		}
+
+
 		void CaringChildPenguinAI::Update()
 		{
+			// 介入対象は以降の処理の複数の経路で差し替わるため、前フレームの結果をここで拾って記録する
+			UpdateInterventionLog();
+
 			if (m_isEnterIglooMode) {
 				UpdateIglooEvent();
 				return;
@@ -1589,6 +1628,7 @@ namespace app
 					{
 						/** 十分近づいたら介入処理を適用してその場で待機する */
 						ApplyIntervention(m_interventionTarget);
+						m_hasReachedInterventionTarget = true;
 						m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 					}
 					else
@@ -1714,6 +1754,7 @@ namespace app
 				{
 					/** 十分近づいたら介入処理を適用してその場で待機する */
 					ApplyIntervention(m_interventionTarget);
+					m_hasReachedInterventionTarget = true;
 					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 				}
 				else

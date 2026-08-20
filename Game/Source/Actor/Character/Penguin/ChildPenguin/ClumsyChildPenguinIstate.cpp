@@ -45,6 +45,10 @@ namespace app
 			m_owner->SetMoveSpeed(0.0f);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Trip);
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
+
+			// 復帰までにかかった秒数と介助の有無を出せるように、転倒の開始を控えておく
+			m_owner->BeginDown(TimeManager::GetInstance().GetCurTime());
+
 			if (auto* lm = GameLogManager::GetInstance())
 				lm->QueueEvent({ {"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "trip"} });
 		}
@@ -61,7 +65,7 @@ namespace app
 				SoundManager::Get().PlaySE(enSoundKind_ChildPenguinCRY, 1.0f, false, false, enSoundPriority_Hight);
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
-				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
+				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY, m_owner->GetOwnerChildPenguin()->GetLogId());
 
 				// エフェクトは頭のボーン座標から発生させる
 				const Vector3 headPos = m_owner->GetOwnerChildPenguin()->GetModelRender().GetBoneWorldPosition(CRY_EFFECT_BONE_NAME);
@@ -127,6 +131,20 @@ namespace app
 				m_owner->SetCryEffectHandle(INVALID_EFFECT_HANDLE);
 			}
 
+			// 転倒してから立ち上がるまでの秒数を、自力か世話焼きの介助かを添えて記録する。
+			// 記録レコードの "t" は整数秒に丸められていて差分を取れないため、秒数はここで計算して持たせる
+			// （残り時間は減っていくので、転倒時刻から現在時刻を引いたものが経過秒数になる）
+			if (auto* lm = GameLogManager::GetInstance())
+			{
+				const float downSec = m_owner->GetDownStartTime() - TimeManager::GetInstance().GetCurTime();
+				lm->QueueEvent({
+					{ "ev",         "clumsy_recover" },
+					{ "penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId() },
+					{ "sec",        downSec },
+					{ "by",         m_owner->GetWasHelpedThisDown() ? "caring" : "self" }
+				});
+			}
+
 			/** 助けられフラグをリセットする */
 			m_owner->SetIsHelped(false);
 
@@ -154,6 +172,10 @@ namespace app
 
 			/** Managerに転倒中であることを登録する */
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
+
+			// 復帰までにかかった秒数と介助の有無を出せるように、転倒の開始を控えておく
+			m_owner->BeginDown(TimeManager::GetInstance().GetCurTime());
+
 			if (auto* lm = GameLogManager::GetInstance())
 				lm->QueueEvent({ {"ev", "clumsy_fall"}, {"penguin_id", m_owner->GetOwnerChildPenguin()->GetLogId()}, {"kind", "slip"} });
 		}
@@ -171,7 +193,7 @@ namespace app
 
 				const Vector3 pos = m_owner->GetOwnerChildPenguin()->GetTransform().m_position;
 
-				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY);
+				NoiseManager::GetInstance().AddNoise(pos, EnNoiseType::ClumsyCRY, m_owner->GetOwnerChildPenguin()->GetLogId());
 
 				// エフェクトは頭のボーン座標から発生させる
 				const Vector3 headPos = m_owner->GetOwnerChildPenguin()->GetModelRender().GetBoneWorldPosition(CRY_EFFECT_BONE_NAME);

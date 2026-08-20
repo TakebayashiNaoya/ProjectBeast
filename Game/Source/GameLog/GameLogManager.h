@@ -15,11 +15,13 @@
  *                       ReplayScene側で引き続き読める
  *
  * 利用側が呼ぶメソッド:
- *   RecordTick()       … 毎フレーム InGameSceneBase から呼ぶ
- *   QueueEvent(json)   … イベント発生時に呼ぶ（次 tick に埋め込まれる）
- *   RecordSpawn(...)   … エンティティ生成時
- *   RecordDespawn(...) … エンティティ消滅時
- *   Flush(stage, ...)  … ゲーム終了時に書き出し
+ *   RecordTick()          … 毎フレーム InGameSceneBase から呼ぶ
+ *   QueueEvent(json)      … イベント発生時に呼ぶ（次 tick に埋め込まれる）
+ *   RecordSpawn(...)      … エンティティ生成時
+ *   RecordDespawn(...)    … エンティティ消滅時
+ *   SetStageConfig(...)   … ロード完了時に一度だけ。ステージの配合などを session.json へ残す
+ *   SetResultDetail(...)  … ゲーム終了時、Flush より前。アチーブメントの結果などを残す
+ *   Flush(stage, ...)     … ゲーム終了時に書き出し
  */
 #pragma once
 #include "Json/json.hpp"
@@ -56,6 +58,8 @@ namespace app
 		 * @param entity   "bear" / "penguin" / "whirlpool"
 		 * @param id       エンティティの連番 ID
 		 * @param extraData タイプなど追加情報（省略可）
+		 * @note extraData の "type" / "t" / "entity" / "id" はレコード共通の項目で上書きされる。
+		 *       ペンギンの種別のような独自の情報は別のキー名で渡すこと
 		 */
 		void RecordSpawn(const std::string& entity, int id,
 			nlohmann::json extraData = nlohmann::json::object());
@@ -68,6 +72,21 @@ namespace app
 		 */
 		void RecordDespawn(const std::string& entity, int id,
 			const std::string& cause = "");
+
+		/**
+		 * @brief ステージの生成設定を記録する
+		 * @param config 子ペンギンの配合・制限時間・敵数などステージ固有のパラメータ
+		 * @details ロード完了時に一度だけ呼ぶ。session.json の "stage_config" へそのまま出力される。
+		 *          どの配合で取ったログなのかをログ自身に残し、配合違いの比較を可能にするために使う
+		 */
+		void SetStageConfig(nlohmann::json config);
+
+		/**
+		 * @brief リザルトの詳細を記録する
+		 * @param detail アチーブメントの達成状況や各種カウンタ
+		 * @details Flush() より前に呼ぶ。session.json の "result" へ統合して出力される
+		 */
+		void SetResultDetail(nlohmann::json detail);
 
 		/**
 		 * @brief ゲーム終了時にファイルへ書き出す
@@ -102,6 +121,12 @@ namespace app
 
 		/** 次の tick に埋め込む予定のイベントリスト */
 		std::vector<nlohmann::json> m_pendingEvents;
+
+		/** ステージの生成設定（session.json の "stage_config" へ出力する） */
+		nlohmann::json m_stageConfig;
+
+		/** リザルトの詳細（session.json の "result" へ統合して出力する） */
+		nlohmann::json m_resultDetail;
 
 		/** フレーム番号 */
 		int m_frameCount = 0;

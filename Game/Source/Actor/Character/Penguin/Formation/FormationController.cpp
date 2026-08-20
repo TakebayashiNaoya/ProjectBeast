@@ -150,8 +150,22 @@ namespace app
 			int ringStart = 0;
 			int ringSize  = 0;
 			const int newLevel = ComputeFormationLevel(effective, FOLLOWERS_PER_LEVEL, ringStart, ringSize);
-			if (newLevel > m_formationLevel && m_onLevelUp){
-				m_onLevelUp(newLevel);
+			if (newLevel > m_formationLevel)
+			{
+				if (m_onLevelUp)
+				{
+					m_onLevelUp(newLevel);
+				}
+
+				// 序盤の空白（初回レベルアップまでの時間）を実測するために記録する
+				if (auto* lm = GameLogManager::GetInstance())
+				{
+					lm->QueueEvent({
+						{ "ev",        "formation_levelup" },
+						{ "level",     newLevel },
+						{ "followers", effective }
+					});
+				}
 			}
 			m_formationLevel   = newLevel;
 			m_ringProgress     = effective - ringStart;
@@ -161,6 +175,10 @@ namespace app
 
 		void FormationController::SwitchFormation(EnFormationType type)
 		{
+			// 実際に切り替わったときだけ記録する（初期化時の同一陣形へのセットは対象外）
+			const bool isChanged = (m_currentFormation != nullptr) && (m_currentType != type);
+			const EnFormationType prevType = m_currentType;
+
 			m_currentType      = type;
 			m_currentFormation = m_formations[static_cast<size_t>(type)].get();
 
@@ -169,8 +187,21 @@ namespace app
 				&m_currentFormation->GetUlt(),
 				m_currentFormation->GetUltVisual(),
 				m_currentFormation->GetUltDuration(),
-				m_currentFormation->GetUltCooldown()
+				m_currentFormation->GetUltCooldown(),
+				FormationTypeName(type)
 			);
+
+			if (isChanged)
+			{
+				if (auto* lm = GameLogManager::GetInstance())
+				{
+					lm->QueueEvent({
+						{ "ev",   "formation_switch" },
+						{ "from", FormationTypeName(prevType) },
+						{ "to",   FormationTypeName(type) }
+					});
+				}
+			}
 		}
 
 

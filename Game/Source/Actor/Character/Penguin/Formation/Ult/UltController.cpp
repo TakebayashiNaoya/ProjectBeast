@@ -35,12 +35,14 @@ namespace app
 		}
 
 
-		void UltController::SetUlt(FormationEffectChain* ult, IUltEffect* visual, float duration, float cooldown)
+		void UltController::SetUlt(FormationEffectChain* ult, IUltEffect* visual, float duration, float cooldown,
+			const char* formationName)
 		{
-			m_ult       = ult;
-			m_ultVisual = visual;
-			m_duration  = duration;
-			m_cooldown  = cooldown;
+			m_ult           = ult;
+			m_ultVisual     = visual;
+			m_duration      = duration;
+			m_cooldown      = cooldown;
+			m_formationName = formationName;
 		}
 
 
@@ -63,6 +65,16 @@ namespace app
 
 			// ウルト発動SEを鳴らす
 			SoundManager::Get().PlaySE(enSoundKind_UltActivate, ULT_ACTIVATE_SE_VOLUME);
+
+			// 感情曲線の「上げ」側を実測するため、発動をプレイログへ残す
+			if (auto* lm = GameLogManager::GetInstance())
+			{
+				lm->QueueEvent({
+					{ "ev",        "ult_activate" },
+					{ "formation", m_formationName },
+					{ "duration",  m_duration }
+				});
+			}
 		}
 
 
@@ -95,6 +107,11 @@ namespace app
 					m_cooldownTimer = m_cooldown;
 					m_ult->Exit(ctx);
 					if (m_ultVisual) m_ultVisual->Exit(ctx);
+
+					if (auto* lm = GameLogManager::GetInstance())
+					{
+						lm->QueueEvent({ {"ev", "ult_end"}, {"formation", m_formationName} });
+					}
 				}
 			}
 

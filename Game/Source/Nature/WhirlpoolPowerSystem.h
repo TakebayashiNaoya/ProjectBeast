@@ -134,6 +134,15 @@ namespace app
 			actor::ChildPenguinManager* m_cpManager;
 			/** 引き寄せの情報のリスト */
 			std::vector<WhirlpoolPowerInfo> m_wpPowerInfos;
+			/**
+			 * @brief 子ペンギンごとの、最後に飲み込まれた時刻（残り秒数）
+			 * @details 渦潮の縁では捕獲と救出が数フレーム周期で繰り返されるため、
+			 *          1回の被害をプレイログとアチーブメントで何十回も数えてしまう。
+			 *          直前の捕獲からの経過時間で数え直しを抑えるために保持する。
+			 *          引き寄せ情報のリストはペンギン数が変わるたびに作り直されるので、
+			 *          リセットされないようここへ分けて持つ（フィーバーの投下中は毎フレーム作り直される）
+			 */
+			std::unordered_map<int, float> m_lastCaptureTimes;
 		};
 	}
 }
