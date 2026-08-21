@@ -317,6 +317,7 @@
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\Decal.cpp" />
     <ClCompile Include="Source\Effect\DecalManager.cpp" />
+    <ClCompile Include="Source\Effect\DecalProfiler.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
     <ClCompile Include="Source\GameLog\GameLogManager.cpp" />
     <ClCompile Include="Source\GameLog\LogCompression.cpp" />
@@ -513,6 +514,7 @@
     <ClInclude Include="Source\Core\Transform.h" />
     <ClInclude Include="Source\Effect\Decal.h" />
     <ClInclude Include="Source\Effect\DecalManager.h" />
+    <ClInclude Include="Source\Effect\DecalProfiler.h" />
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
     <ClInclude Include="Source\GameLog\GameLogManager.h" />

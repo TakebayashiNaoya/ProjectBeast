@@ -670,6 +670,9 @@
     <ClCompile Include="Source\Effect\DecalManager.cpp">
       <Filter>Source\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Effect\DecalProfiler.cpp">
+      <Filter>Source\Effect</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Actor\IK\TwoBoneLegIK.cpp">
       <Filter>Source\Actor\IK</Filter>
     </ClCompile>
@@ -1273,6 +1276,9 @@
       <Filter>Source\Effect</Filter>
     </ClInclude>
     <ClInclude Include="Source\Effect\DecalManager.h">
+      <Filter>Source\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect\DecalProfiler.h">
       <Filter>Source\Effect</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\IK\IKMath.h">
