@@ -6,6 +6,8 @@
 #include "stdafx.h"
 #include "Decal.h"
 
+#include "DecalProfiler.h"
+
 
 namespace app {
 	namespace effect {
@@ -22,6 +24,11 @@ namespace app {
 		{
 			if (!m_isModelInited || m_kind != kind)
 			{
+				// 計測用。ここを通った回数と所要時間が「重い実体」かどうかの判断材料になる
+				const bool   isFirstInit = !m_isModelInited;
+				const DecalKind fromKind = m_kind;
+				const double beginMs = DecalProfiler::Get().IsEnabled() ? DecalProfiler::NowMs() : 0.0;
+
 				nsK2EngineLow::ModelInitData initData;
 				initData.m_tkmFilePath = sharedTkmKey;
 				// 深度バッファを読まない専用シェーダーにする（要新規作成）
@@ -52,6 +59,15 @@ namespace app {
 
 				m_kind = kind;
 				m_isModelInited = true;
+
+				if (DecalProfiler::Get().IsEnabled()) {
+					DecalProfiler::Get().RecordModelInit(
+						DecalProfiler::NowMs() - beginMs, isFirstInit, fromKind, kind);
+				}
+			}
+			else
+			{
+				DecalProfiler::Get().RecordModelReuse();
 			}
 
 			m_modelRender->SetMulColor(color);

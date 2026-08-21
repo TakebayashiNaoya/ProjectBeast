@@ -6,8 +6,11 @@
 #include "stdafx.h"
 
 #include "DecalManager.h"
+#include "DecalProfiler.h"
 #include "Physics/Physics.h"
 #include "Source/Actor/Stage/StageSystem.h"
+
+#include <cstdlib>
 
 
 namespace {
@@ -22,7 +25,26 @@ namespace {
 	const Vector4 COLOR_SNOW_FOOTPRINT(0.55f, 0.70f, 0.90f, 1.0f);
 
 
+	/** @brief 環境変数を整数で読む。未設定なら既定値を返す */
+	int GetEnvInt(const char* name, int defaultValue) {
+		char*  value = nullptr;
+		size_t length = 0;
+		if (_dupenv_s(&value, &length, name) != 0 || value == nullptr) return defaultValue;
+		const int result = std::atoi(value);
+		free(value);
+		return result;
+	}
 
+	// ベンチマークの足跡をばらまく円のパラメータ。
+	// 親ペンギンの初期位置(0,140,0)の周りの氷盤の上に収まる範囲を選んでいる
+	constexpr float BENCH_RADIUS_MIN = 200.0f;
+	constexpr float BENCH_RADIUS_MAX = 900.0f;
+	/** 1点ごとに回す角度。黄金角にして同じ場所を続けて踏まないようにする */
+	constexpr float BENCH_ANGLE_STEP = 2.39996f;
+	// 生存時間は CharacterBase.cpp の FOOTPRINT_LIFE_SECONDS / FADE_OUT_SECONDS に合わせる。
+	// プール内に同時に残る枚数が変わると、スロットの取り合い方まで変わってしまうため
+	constexpr float BENCH_LIFE_SECONDS = 1.0f;
+	constexpr float BENCH_FADE_OUT_SECONDS = 0.5f;
 }
 
 namespace app {
@@ -50,10 +72,15 @@ namespace app {
 			m_rockFootprintTex.InitFromDDSFile(TEX_PATH_ROCK_FOOTPRINT);
 			m_bearFootprintTex.InitFromDDSFile(TEX_PATH_BEAR_FOOTPRINT);
 
-			m_decals.reserve(MAX_DECAL_NUM);
-			for (int i = 0; i < MAX_DECAL_NUM; ++i) {
-				m_decals.emplace_back();
-				m_decals.back().Prepare();
+			// 種類ごとにプールを持つ。ここで作るのは ModelRender の器だけで、
+			// 中身（InitFromLoaded）は最初にそのスロットを使うときまで遅らせる。
+			// 空のままのスロットは一度も作られないので、枚数を増やしても起動は重くならない
+			for (auto& pool : m_decalPools) {
+				pool.reserve(MAX_DECAL_NUM_PER_KIND);
+				for (int i = 0; i < MAX_DECAL_NUM_PER_KIND; ++i) {
+					pool.emplace_back();
+					pool.back().Prepare();
+				}
 			}
 
 
@@ -122,10 +149,20 @@ namespace app {
 
 
 		void DecalManager::SpawnFootprint(const Vector3& position, float yawRadian, DecalKind kind, float size, float lifeSeconds, float fadeOutSeconds, const Vector4& color, bool autoDetectSurface, int priority) {
+			auto& profiler = DecalProfiler::Get();
+			const bool   isProfiling = profiler.IsEnabled();
+			const double spawnBeginMs = isProfiling ? DecalProfiler::NowMs() : 0.0;
+			profiler.RecordSpawnCall();
+
 			EnsureInited();
 
+			const double raycastBeginMs = isProfiling ? DecalProfiler::NowMs() : 0.0;
 			const GroundHitInfo hit = RaycastGround(position);
-			if (!hit.isHit) return;
+			const double raycastMs = isProfiling ? (DecalProfiler::NowMs() - raycastBeginMs) : 0.0;
+			if (!hit.isHit) {
+				profiler.RecordSpawnNoGround();
+				return;
+			}
 
 			DecalKind finalKind = kind; Vector4 finalColor = color;
 			if (autoDetectSurface) {
@@ -140,46 +177,183 @@ namespace app {
 				}
 			}
 
+			// 枠は必ず「その種類のプール」から取る。こうすると Decal::Spawn の
+			// m_kind != kind が二度と成立せず、ModelRender の作り直しが起きない
+			std::vector<Decal>& pool = m_decalPools[static_cast<int>(finalKind)];
+
 			int targetIndex = -1; float minRemaining = FLT_MAX;
 			if (priority == 0) {
 				int childCount = 0;
-				for (const auto& decal : m_decals) { if (decal.IsActive() && decal.GetPriority() == 0) childCount++; }
-				if (childCount >= MAX_CHILD_DECAL_NUM) {
-					for (int i = 0; i < static_cast<int>(m_decals.size()); ++i) {
-						if (m_decals[i].IsActive() && m_decals[i].GetPriority() == 0) {
-							if (m_decals[i].GetRemainingLife() < minRemaining) { minRemaining = m_decals[i].GetRemainingLife(); targetIndex = i; }
+				for (const auto& decal : pool) { if (decal.IsActive() && decal.GetPriority() == 0) childCount++; }
+				if (childCount >= MAX_CHILD_DECAL_NUM_PER_KIND) {
+					for (int i = 0; i < static_cast<int>(pool.size()); ++i) {
+						if (pool[i].IsActive() && pool[i].GetPriority() == 0) {
+							if (pool[i].GetRemainingLife() < minRemaining) { minRemaining = pool[i].GetRemainingLife(); targetIndex = i; }
 						}
 					}
 				}
 			}
 			if (targetIndex < 0) {
-				for (int i = 0; i < static_cast<int>(m_decals.size()); ++i) {
-					if (!m_decals[i].IsActive()) { targetIndex = i; break; }
-					if (m_decals[i].GetPriority() <= priority) {
-						if (m_decals[i].GetRemainingLife() < minRemaining) { minRemaining = m_decals[i].GetRemainingLife(); targetIndex = i; }
+				for (int i = 0; i < static_cast<int>(pool.size()); ++i) {
+					if (!pool[i].IsActive()) { targetIndex = i; break; }
+					if (pool[i].GetPriority() <= priority) {
+						if (pool[i].GetRemainingLife() < minRemaining) { minRemaining = pool[i].GetRemainingLife(); targetIndex = i; }
 					}
 				}
 			}
-			if (targetIndex < 0) return;
+			if (targetIndex < 0) {
+				profiler.RecordSpawnNoSlot();
+				return;
+			}
+			// まだ生きているデカールを潰した場合は記録する。プールの枚数が
+			// 足りているかどうかをあとから数字で確かめられるようにするため
+			if (pool[targetIndex].IsActive()) profiler.RecordEviction();
 
 			const TerrainHeightInfo terrainInfo = BuildTerrainHeightInfo();
 
-			m_decals[targetIndex].Spawn(hit.position, hit.normal, yawRadian, size, finalKind, GetTextureForKind(finalKind), finalColor,
+			pool[targetIndex].Spawn(hit.position, hit.normal, yawRadian, size, finalKind, GetTextureForKind(finalKind), finalColor,
 				lifeSeconds, fadeOutSeconds, priority, SHARED_QUAD_TKM_KEY, terrainInfo);
+
+			if (isProfiling) {
+				profiler.RecordSpawnAccepted(DecalProfiler::NowMs() - spawnBeginMs, raycastMs);
+			}
 		}
 
 
 		void DecalManager::Update() {
+			UpdateBenchmark();
+
 			if (!m_isInited) return;
+
+			auto& profiler = DecalProfiler::Get();
+			const bool   isProfiling = profiler.IsEnabled();
+			const double beginMs = isProfiling ? DecalProfiler::NowMs() : 0.0;
+
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
-			for (auto& decal : m_decals) decal.Update(deltaTime);
+			for (auto& pool : m_decalPools) {
+				for (auto& decal : pool) decal.Update(deltaTime);
+			}
+
+			if (isProfiling) profiler.RecordUpdate(DecalProfiler::NowMs() - beginMs);
 		}
 
 
 		void DecalManager::Render(RenderContext& rc) {
-			if (!m_isInited) return;
-			for (auto& decal : m_decals) decal.Render(rc);
+			auto& profiler = DecalProfiler::Get();
+			const bool   isProfiling = profiler.IsEnabled();
+			const double beginMs = isProfiling ? DecalProfiler::NowMs() : 0.0;
+
+			int drawCalls = 0;
+			int activeDecals = 0;
+			int poolSize = 0;
+			if (m_isInited) {
+				for (auto& pool : m_decalPools) {
+					poolSize += static_cast<int>(pool.size());
+					for (auto& decal : pool) {
+						if (decal.IsActive()) { activeDecals++; drawCalls++; }
+						decal.Render(rc);
+					}
+				}
+			}
+
+			// フレームの最後にデカールを描いているので、ここを1フレームの区切りにする。
+			// 地形のロード前（タイトル画面）も通るため、素の状態のフレーム時間も残る
+			if (isProfiling) {
+				profiler.EndFrame(DecalProfiler::NowMs() - beginMs, drawCalls, activeDecals, poolSize);
+			}
+		}
+
+
+		void DecalManager::UpdateBenchmark() {
+			// 初回だけ環境変数を読む
+			static bool isConfigLoaded = false;
+			if (!isConfigLoaded) {
+				isConfigLoaded = true;
+				m_isBenchEnabled = (GetEnvInt("DECAL_BENCH", 0) != 0);
+				m_benchFramesPerPhase = GetEnvInt("DECAL_BENCH_FRAMES", 600);
+				// 実測（Normal・5400フレーム）の受理済みスポーン数 7.1回/秒 に合わせた既定値。
+				// 負荷を意図的に上げたいときだけ環境変数で増やす
+				m_benchSpawnsPerSecond = static_cast<float>(GetEnvInt("DECAL_BENCH_SPAWNS_PER_SEC", 12));
+				m_isBenchQuitOnFinish = (GetEnvInt("DECAL_BENCH_QUIT", 1) != 0);
+			}
+			if (!m_isBenchEnabled || m_benchPhase == BenchPhase::Finished) return;
+
+			// 地形が出来上がるまでは何もしない（レイキャストが当たらず計測にならない）
+			auto* stageSystem = actor::StageSystem::GetInstance();
+			if (stageSystem == nullptr || stageSystem->GetTerrain() == nullptr) return;
+
+			auto& profiler = DecalProfiler::Get();
+
+			m_benchFrameInPhase++;
+			if (m_benchFrameInPhase > m_benchFramesPerPhase) {
+				m_benchFrameInPhase = 0;
+				switch (m_benchPhase) {
+				case BenchPhase::Warmup:     m_benchPhase = BenchPhase::SingleKind; break;
+				case BenchPhase::SingleKind: m_benchPhase = BenchPhase::MixedKind;  break;
+				case BenchPhase::MixedKind:  m_benchPhase = BenchPhase::AutoDetect; break;
+				case BenchPhase::AutoDetect: m_benchPhase = BenchPhase::Finished;   break;
+				default: break;
+				}
+			}
+
+			switch (m_benchPhase) {
+			case BenchPhase::Warmup:     profiler.SetPhase(0, "warmup");     break;
+			case BenchPhase::SingleKind: profiler.SetPhase(1, "singleKind"); break;
+			case BenchPhase::MixedKind:  profiler.SetPhase(2, "mixedKind");  break;
+			case BenchPhase::AutoDetect: profiler.SetPhase(3, "autoDetect"); break;
+			case BenchPhase::Finished:
+				profiler.SetPhase(4, "finished");
+				profiler.Flush();
+				if (m_isBenchQuitOnFinish) PostQuitMessage(0);
+				return;
+			}
+
+			if (m_benchPhase == BenchPhase::Warmup) return;
+
+			// 種類ごとに1枚ずつテクスチャを使い分けているので、混ぜる区間では
+			// 雪とクマを交互に出す。実際のプレイでも、ペンギン（自動判定）と
+			// シロクマ（BearFootprint固定）が同じプールを取り合っている
+			static const DecalKind MIXED_SEQUENCE[] = {
+				DecalKind::SnowFootprint, DecalKind::BearFootprint,
+				DecalKind::RockFootprint, DecalKind::BearFootprint,
+			};
+
+			// 実時間ベースで本数を決める。フレームレートが変わっても
+			// 「1秒あたり何枚出したか」が揃うようにする
+			m_benchSpawnAccumulator += m_benchSpawnsPerSecond * g_gameTime->GetFrameDeltaTime();
+			const int spawnNum = static_cast<int>(m_benchSpawnAccumulator);
+			m_benchSpawnAccumulator -= static_cast<float>(spawnNum);
+
+			for (int i = 0; i < spawnNum; ++i) {
+				const int   n = m_benchSpawnCounter++;
+				const float angle = BENCH_ANGLE_STEP * n;
+				const float radius = BENCH_RADIUS_MIN
+					+ (BENCH_RADIUS_MAX - BENCH_RADIUS_MIN) * (0.5f + 0.5f * sinf(n * 0.137f));
+				const Vector3 position(radius * cosf(angle), 140.0f, radius * sinf(angle));
+
+				switch (m_benchPhase) {
+				case BenchPhase::SingleKind:
+					SpawnFootprint(position, angle, DecalKind::SnowFootprint,
+						DEFAULT_FOOTPRINT_SIZE, BENCH_LIFE_SECONDS, BENCH_FADE_OUT_SECONDS,
+						COLOR_SNOW_FOOTPRINT, false, DEFAULT_PRIORITY);
+					break;
+
+				case BenchPhase::MixedKind:
+					SpawnFootprint(position, angle, MIXED_SEQUENCE[n % _countof(MIXED_SEQUENCE)],
+						DEFAULT_FOOTPRINT_SIZE, BENCH_LIFE_SECONDS, BENCH_FADE_OUT_SECONDS,
+						DEFAULT_FOOTPRINT_COLOR, false, DEFAULT_PRIORITY);
+					break;
+
+				case BenchPhase::AutoDetect:
+					SpawnFootprint(position, angle, DecalKind::SnowFootprint,
+						DEFAULT_FOOTPRINT_SIZE, BENCH_LIFE_SECONDS, BENCH_FADE_OUT_SECONDS,
+						DEFAULT_FOOTPRINT_COLOR, true, DEFAULT_PRIORITY);
+					break;
+
+				default: break;
+				}
+			}
 		}
 	}
 }

@@ -13,6 +13,9 @@ namespace app {
 	namespace effect {
 		enum class DecalKind { SnowFootprint, GrassFootprint, RockFootprint, BearFootprint };
 
+		/** @brief デカール種別の総数。DecalKind に種類を足したらここも増やすこと */
+		static constexpr int DECAL_KIND_NUM = 4;
+
 		// 地形の凹凸判定に必要な情報をまとめた構造体
 		struct TerrainHeightInfo {
 			nsK2EngineLow::Texture* heightmapTex = nullptr; // 地形のハイトマップ（GPU用、フル解像度）
