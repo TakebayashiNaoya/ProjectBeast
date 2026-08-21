@@ -51,7 +51,7 @@
     "type": 3,
     "color": [1.0, 0.82, 0.63, 1.0],
     "tripChancePerSec": 0.05,
-    "slipChance": 0.5,
+    "slipChance": 0.15,
     "randomRanges": {
       "runSpeed":          [100.0, 130.0],
       "swimSpeed":         [180.0, 220.0],

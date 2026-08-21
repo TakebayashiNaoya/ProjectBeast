@@ -86,7 +86,7 @@ namespace app
 				Quaternion targetRotation = m_transform.m_rotation;
 				targetRotation.SetRotationYFromDirectionXZ(inputDir);
 
-				float slerpFactor = min(MAX_LERP_FACTOR, m_turnSpeed * deltaTime);
+				float slerpFactor = min(MAX_LERP_FACTOR, m_turnSpeed * m_turnSpeedMultiplier * deltaTime);
 				m_transform.m_rotation.Slerp(slerpFactor, m_transform.m_rotation, targetRotation);
 			}
 
@@ -135,6 +135,7 @@ namespace app
 			, m_moveSpeed(0.0f)
 			, m_speedMultiplier(1.0f)
 			, m_externalSpeedMultiplier(1.0f)
+			, m_turnSpeedMultiplier(1.0f)
 			, m_isDash(false)
 			, m_isSwimming(false)
 			, m_prevPositionY(0.0f)

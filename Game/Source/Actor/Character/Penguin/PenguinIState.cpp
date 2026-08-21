@@ -29,6 +29,30 @@ namespace app
 			constexpr float DEFAULT_ANIMATION_SPEED = 1.0f; // アニメーションの再生速度のデフォルト値
 
 			constexpr float SLIDE_END_ANIMATION_SPEED = 2.5f; // スライド終了アニメーションの再生速度
+
+
+			/**
+			 * @brief スライドの傾斜倍率を移動速度と旋回速度へ反映する
+			 * @details スライド系3ステート（SlideStart / Sliding / SlideEnd）が共通で使う。
+			 *          倍率そのものの計算は PenguinStateMachine 側にある。
+			 * @param owner ペンギンのステートマシン
+			 */
+			void ApplySlideSlope(app::actor::PenguinStateMachine* owner)
+			{
+				owner->SetMoveSpeed(owner->CalcSlideSpeedWithSlope());
+				owner->SetTurnSpeedMultiplier(owner->CalcSlideTurnMultiplier());
+			}
+
+			/**
+			 * @brief 旋回速度の倍率を既定へ戻す
+			 * @details スライドを抜けたあとまで曲がりにくいままにしないため、
+			 *          スライド系ステートの Exit() から必ず呼ぶ。
+			 * @param owner ペンギンのステートマシン
+			 */
+			void ClearSlideSlope(app::actor::PenguinStateMachine* owner)
+			{
+				owner->SetTurnSpeedMultiplier(1.0f);
+			}
 		}
 
 
@@ -284,15 +308,17 @@ namespace app
 
 		void PenguinSlideStartState::Enter()
 		{
-			// 滑るステートと同じ速度を設定
-			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
-			m_owner->SetMoveSpeed(moveSpeed);
+			// 滑るステートと同じ速度を設定（傾斜倍率込み）
+			ApplySlideSlope(m_owner);
 			m_owner->PlayAnimation(EnPenguinAnimationID::SlideStart);
 		}
 
 
 		void PenguinSlideStartState::Update()
 		{
+			// 坂の途中で滑り始めることがあるため毎フレーム更新する
+			ApplySlideSlope(m_owner);
+
 			// 移動を可能にする
 			m_owner->Move();
 		}
@@ -301,6 +327,7 @@ namespace app
 		void PenguinSlideStartState::Exit()
 		{
 			//m_owner->ResetVelocity();
+			ClearSlideSlope(m_owner);
 		}
 
 
@@ -316,8 +343,7 @@ namespace app
 
 		void PenguinSlidingState::Enter()
 		{
-			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
-			m_owner->SetMoveSpeed(moveSpeed);
+			ApplySlideSlope(m_owner);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Sliding);
 
 			m_soundHandle = app::INVALID_SE_HANDLE;
@@ -334,6 +360,10 @@ namespace app
 
 		void PenguinSlidingState::Update()
 		{
+			// 下りで加速・上りで減速し、加速中は曲がりにくくする
+			// （カーブと数値の根拠は docs/スライドの傾斜モデル.md）
+			ApplySlideSlope(m_owner);
+
 			m_owner->Move();
 
 			/** 子ペンギンのみスライド音をエネミーに検知させる（親ペンギンは検知対象外） */
@@ -449,6 +479,8 @@ namespace app
 
 		void PenguinSlidingState::Exit()
 		{
+			ClearSlideSlope(m_owner);
+
 			SoundManager::Get().StopSE(m_soundHandle);
 
 			if (m_slideLineEffectHandle != app::INVALID_EFFECT_HANDLE)
@@ -475,9 +507,8 @@ namespace app
 
 		void PenguinSlideEndState::Enter()
 		{
-			// 滑るステートと同じ速度を設定
-			const float moveSpeed = m_owner->GetPenguinStatus()->GetSlideSpeed();
-			m_owner->SetMoveSpeed(moveSpeed);
+			// 滑るステートと同じ速度を設定（傾斜倍率込み）
+			ApplySlideSlope(m_owner);
 			m_owner->PlayAnimation(EnPenguinAnimationID::StandUp);
 			m_owner->SetAnimationSpeed(SLIDE_END_ANIMATION_SPEED);
 		}
@@ -485,6 +516,8 @@ namespace app
 
 		void PenguinSlideEndState::Update()
 		{
+			ApplySlideSlope(m_owner);
+
 			// 移動を可能にする
 			m_owner->Move();
 		}
@@ -492,6 +525,7 @@ namespace app
 
 		void PenguinSlideEndState::Exit()
 		{
+			ClearSlideSlope(m_owner);
 			m_owner->SetAnimationSpeed(DEFAULT_ANIMATION_SPEED);
 		}
 

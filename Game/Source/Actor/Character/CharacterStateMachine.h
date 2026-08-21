@@ -131,6 +131,18 @@ namespace app
 			{
 				m_externalSpeedMultiplier = multiplier;
 			}
+			/**
+			 * @brief 旋回速度の倍率を設定
+			 * @details Move() の Slerp 係数（m_turnSpeed）に乗算される。
+			 *          スライドの傾斜モデルが「加速中は曲がりにくい」を表現するために使う。
+			 *          倍率を戻し忘れると別ステートまで曲がりにくくなるため、
+			 *          使う側は必ずステートの Exit() で 1.0f に戻すこと。
+			 * @param multiplier 倍率（0.0f 未満は 0.0f に丸める。上限クランプなし）
+			 */
+			inline void SetTurnSpeedMultiplier(const float multiplier)
+			{
+				m_turnSpeedMultiplier = (multiplier < 0.0f) ? 0.0f : multiplier;
+			}
 
 
 			/**
@@ -230,6 +242,9 @@ namespace app
 
 			/** 外部要因による移動速度の倍率（陣形速度など：クランプなし、既定 1.0f） */
 			float m_externalSpeedMultiplier;
+
+			/** 旋回速度の倍率（スライドの傾斜モデル用：既定 1.0f） */
+			float m_turnSpeedMultiplier;
 
 			/** ダッシュしているかどうか */
 			bool m_isDash;

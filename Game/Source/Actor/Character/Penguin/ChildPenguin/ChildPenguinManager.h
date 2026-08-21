@@ -470,6 +470,145 @@ namespace app
 
 
 			//============================================//
+			// 親の察知（子ペンギンの視界・音による入隊判定に使う）
+			//============================================//
+
+		public:
+			/**
+			 * @brief 親ペンギンが出している音が届く距離を取得する
+			 * @details 親が何をしているか（待機・歩き・走り・滑り・泳ぎ）で変わる。
+			 *          子ペンギンはこの距離の内側にいれば、向きも遮蔽も関係なく親に気づく。
+			 *          値は NoiseManager が子ペンギンの足音に使っている距離に合わせてある。
+			 *
+			 *          NoiseManager 経由にしていないのは、NoiseManager の音はシロクマも
+			 *          聞いてしまうため。親の足音でシロクマが起きるようになると
+			 *          エネミー側のバランスが変わり、ストリーム B の担当範囲を超える。
+			 * @return 音が届く距離。親が止まっていれば 0
+			 */
+			float GetDaddyNoiseRadius() const
+			{
+				return m_daddyNoiseRadius;
+			}
+
+			/**
+			 * @brief 遮蔽レイキャストを分散させるためのフレーム番号を取得する
+			 * @details 子100体が同じフレームに一斉にレイキャストしないよう、
+			 *          子ごとに割り当てたスロットとこの値で実行フレームをずらす。
+			 * @return Update() のたびに1増えるカウンター
+			 */
+			unsigned int GetPerceptionFrame() const
+			{
+				return m_perceptionFrame;
+			}
+
+			/**
+			 * @brief 遮蔽レイキャストのスロットを1つ払い出す
+			 * @details 子ペンギンのAIコントローラーが生成時に1回だけ呼ぶ。
+			 * @return 0 から始まる通し番号
+			 */
+			unsigned int IssuePerceptionSlot()
+			{
+				return m_nextPerceptionSlot++;
+			}
+
+
+		private:
+			/**
+			 * @brief 親ペンギンの出す音の届く距離を毎フレーム更新する
+			 */
+			void UpdateDaddyNoiseRadius();
+
+			/** 親ペンギンの音が届く距離（毎フレーム更新） */
+			float m_daddyNoiseRadius = 0.0f;
+			/** 遮蔽レイキャストの分散に使うフレームカウンター */
+			unsigned int m_perceptionFrame = 0;
+			/** 次に払い出す遮蔽レイキャストのスロット番号 */
+			unsigned int m_nextPerceptionSlot = 0;
+
+
+
+
+			//============================================//
+			// 逃走：シロクマの脅威と、親による再集合の呼びかけ
+			//============================================//
+
+		public:
+			/**
+			 * @brief 指定座標から一定距離内で、いま獲物を追っているシロクマの座標を返す
+			 * @details 「自分を追っているクマ」ではなく「誰かを追っているクマ」を見る。
+			 *          クマが群れに突っ込んだとき、狙われた1体だけでなく
+			 *          周りの子もまとめて逃げるようにするため
+			 *          （これが無いと「群れごと失う」谷が出ない）。
+			 *
+			 *          脅威リストは毎フレーム1回だけ作り直すので、
+			 *          子ペンギン100体がこれを呼んでもエネミー側を走査し直すことはない。
+			 * @param from   基準座標
+			 * @param radius 探索半径
+			 * @param outPos 最も近い脅威の座標（出力）
+			 * @return 見つかればtrue
+			 */
+			bool FindNearestBearThreat(const Vector3& from, float radius, Vector3& outPos) const;
+
+			/**
+			 * @brief 親が再集合を呼びかける（Yボタン）
+			 * @details パニックで散った子の逃走を打ち切り、親に気づかせる。
+			 *          まだ近くにクマがいる子は戻らない（クマの目の前へ呼び戻さないため）。
+			 */
+			void CallRegroup();
+
+			/**
+			 * @brief 再集合の呼びかけが効いている最中かどうか
+			 * @return 効いている間はtrue
+			 */
+			bool IsRegroupCallActive() const
+			{
+				return m_regroupCallTimer > 0.0f;
+			}
+
+			/**
+			 * @brief 再集合を呼びかけられる状態かどうか（クールダウン中でないか）
+			 * @return 呼びかけられるならtrue
+			 */
+			bool CanCallRegroup() const
+			{
+				return m_regroupCallCooldown <= 0.0f;
+			}
+
+			/**
+			 * @brief 再集合の呼びかけが届く距離を取得する
+			 * @return 届く距離
+			 */
+			float GetRegroupCallRadius() const;
+
+			/**
+			 * @brief 再集合の呼びかけのクールダウンの残り割合を取得する（UI表示用）
+			 * @return 0.0(明けた)〜1.0(入ったばかり)の割合
+			 */
+			float GetRegroupCallCooldownRatio() const;
+
+
+		private:
+			/**
+			 * @brief いま獲物を追っているシロクマの座標を毎フレーム集め直す
+			 */
+			void UpdateBearThreats();
+
+			/**
+			 * @brief 再集合の呼びかけのタイマーを毎フレーム進める
+			 */
+			void UpdateRegroupCall();
+
+			/** いま獲物を追っているシロクマの座標（毎フレーム更新） */
+			std::vector<Vector3> m_bearThreats;
+			/** 再集合の呼びかけが効いている残り時間 */
+			float m_regroupCallTimer = 0.0f;
+			/** 再集合の呼びかけのクールダウン残り時間 */
+			float m_regroupCallCooldown = 0.0f;
+
+
+
+
+			//============================================//
 			// 世話焼き用：問題行動ペンギンの状態管理
 			//============================================//
 

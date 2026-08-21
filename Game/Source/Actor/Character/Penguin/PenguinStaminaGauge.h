@@ -41,8 +41,13 @@ namespace app
 			 * @brief 毎フレーム呼び出す更新処理
 			 * @param isUsing 現在使用中かどうか
 			 * @param deltaTime フレームの経過時間
+			 * @param drainScale 消費速度の倍率（1.0fで既定どおり）
+			 * @details drainScale はスライドの傾斜モデルが使う。
+			 *          下りでは1未満（長く滑れる）、上りでは1超（すぐ切れる）を渡す。
+			 *          回復速度には掛からない（下りで即座に満タンになると
+			 *          実質無限スライドになるため。docs/スライドの傾斜モデル.md 4節）。
 			 */
-			void Update(bool isUsing, float deltaTime);
+			void Update(bool isUsing, float deltaTime, float drainScale = 1.0f);
 
 			/**
 			 * @brief ゲージを即座に全消費する（ジャンプのような単発消費のアクション用）

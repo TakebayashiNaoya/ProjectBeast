@@ -116,6 +116,91 @@ namespace app
 			 */
 			constexpr float FLEE_SIGN_FLIP_CHANCE = 0.5f;
 
+			//============================================//
+			// 散開の距離と復帰の速さ（要調整のつまみ）
+			//
+			// 逃走をシロクマ最優先にすると「群れごと失って集め直す」体験が生まれるが、
+			// やりすぎると理不尽になる（プレイログ計測基盤と実測結果 7-4）。
+			// 散り方はこの2つと ChildPenguinManager の REGROUP_CALL_* で決まる。
+			//============================================//
+
+			/**
+			 * @brief クマが離れてからも逃げ続ける時間（秒）
+			 * @details 0にすると、クマの脇をすり抜けた瞬間に立ち止まって不自然になる。
+			 *          長くするほど遠くまで散る。
+			 */
+			constexpr float FLEE_HOLD_TIME = 1.0f;
+			/**
+			 * @brief 逃げ終わってから隊列へ戻れるようになるまでの時間（秒）
+			 * @details ここが「集め直す時間」の長さ。
+			 *          0にすると散った直後にその場で入隊し直してしまい、谷が出ない。
+			 *          親の再集合の呼びかけ（Yボタン）で打ち切れる。
+			 */
+			constexpr float FLEE_REJOIN_COOLDOWN = 2.0f;
+
+
+			//============================================//
+			// 親の察知（視界と音）
+			//
+			// 各数値の根拠と負荷の見積もりは docs/子ペンギンの察知モデル.md にある。
+			// 触るときは必ずそちらの表も更新すること。
+			//============================================//
+
+			/**
+			 * @brief タイプ別の察知性能テーブル
+			 * @details 添字は EnChildPenguinType の値。
+			 *
+			 *          「まじめ＝よく気づく／やんちゃ＝気づかない」を作るのが目的。
+			 *          まじめは配合でしか差が付けられず実測でも個性が見えていなかったため、
+			 *          ここで差別化する（プレイログ計測基盤と実測結果 7-5）。
+			 *
+			 *          JSON に出していないのは、タイプ別パラメーターの
+			 *          JSON→bin 変換が Tools/ParameterConvert.py にあり、
+			 *          そこはストリーム C の占有ファイルのため。
+			 *          調整が要るようなら C と話をつけてから JSON へ移す。
+			 */
+			constexpr DaddyPerceptionSpec DADDY_PERCEPTION_SPECS[] =
+			{
+				/** まじめ    ：一番よく気づく。この差が「まじめらしさ」になる */
+				{ 420.0f, 120.0f, 0.2f, 1.20f },
+				/** 甘えん坊  ：親を探しているので広い */
+				{ 360.0f, 100.0f, 0.3f, 1.10f },
+				/** やんちゃ  ：よそ見をしていて気づかない */
+				{ 180.0f,  50.0f, 1.2f, 0.60f },
+				/** おっちょこ：どんくさい */
+				{ 240.0f,  70.0f, 0.8f, 0.85f },
+				/** 世話焼き  ：標準（シロクマの視野角 70 の左右版にあたる 90 度） */
+				{ 300.0f,  90.0f, 0.4f, 1.00f },
+			};
+			static_assert(
+				sizeof(DADDY_PERCEPTION_SPECS) / sizeof(DADDY_PERCEPTION_SPECS[0])
+					== static_cast<size_t>(EnChildPenguinType::Num),
+				"DADDY_PERCEPTION_SPECS は EnChildPenguinType と同じ数だけ要素が要る");
+
+			/**
+			 * @brief 察知を忘れるまでの時間（秒）
+			 * @details 知覚できない状態がこれだけ続くと、寄っていくのをやめてその場で待つ。
+			 *          これが無いと、一度でも親を見た子が最後まで親を追い続けて
+			 *          ステージ中の子が全員集まってしまう。
+			 */
+			constexpr float NOTICE_FORGET_TIME = 4.0f;
+
+			/**
+			 * @brief 遮蔽レイキャストを撃つ間隔（フレーム）
+			 * @details 子ごとにスロットをずらしてあるので、
+			 *          1フレームあたりのレイ本数の上限は「子の数 / この値」。
+			 *          子100体なら最大12.5本／フレームで、
+			 *          実際は距離と向きの足切りを通った子だけなのでさらに少ない。
+			 */
+			constexpr unsigned int OCCLUSION_CHECK_INTERVAL = 8;
+
+			/**
+			 * @brief 遮蔽レイキャストの視点の高さ
+			 * @details 足元どうしを結ぶと、なだらかな凸斜面でも地面をかすめて
+			 *          「見えていない」と誤判定する。ペンギンの背丈 70 の目の高さに合わせて浮かせる。
+			 */
+			constexpr float PERCEPTION_EYE_HEIGHT = 42.0f;
+
 
 			/**
 			 * @brief 範囲 [r.min, r.max] から一様乱数を生成する
@@ -186,6 +271,28 @@ namespace app
 			/** 制約補正：stopDistance < walkDistance < runDistance */
 			m_walkDistance = max(m_walkDistance, m_stopDistance + 1.0f);
 			m_runDistance = max(m_runDistance, m_walkDistance + 1.0f);
+
+			/** タイプ別の察知性能と、遮蔽レイキャストを撃つフレームのスロットを確定させる */
+			m_perceptionSpec = &DADDY_PERCEPTION_SPECS[static_cast<int>(type)];
+
+			/**
+			 * リプレイ再生（ReplayScene）は ChildPenguinManager を作らずに
+			 * ChildPenguin を生成するため、ここだけは null を許容する。
+			 * リプレイでは AI の Update() 自体が回らないのでスロットは使われない
+			 */
+			if (auto* manager = ChildPenguinManager::GetInstance())
+			{
+				m_perceptionSlot = manager->IssuePerceptionSlot();
+			}
+		}
+
+
+		void ChildPenguinAIController::Update()
+		{
+			/** タイプによらず先に親の察知を更新する（入隊判定がこの結果を使う） */
+			UpdatePerception();
+
+			UpdateAI();
 		}
 
 
@@ -469,37 +576,293 @@ namespace app
 		}
 
 
+		bool ChildPenguinAIController::IsDaddyWithinJoinRadius() const
+		{
+			return GetDistanceToDaddy() <= ChildPenguinManager::GetInstance()->GetJoinRadius();
+		}
+
+
+		bool ChildPenguinAIController::CanJoinFormation() const
+		{
+			/** 逃げた直後は隊列へ戻さない（散開に「集め直す時間」を持たせるため） */
+			if (m_rejoinCooldown > 0.0f) return false;
+
+			/**
+			 * 入隊条件は「隊列参加距離の内側にいる」かつ「親を察知している」。
+			 *
+			 * 距離は据え置きにしてある。視界の距離まで入隊範囲を広げると
+			 * 遠くの子が勝手に寄ってきて隊列が散らかるため
+			 * （プレイログ計測基盤と実測結果 7-5）。
+			 * 視界と音が効くのは「寄っていくかどうか」の側で、隊列の大きさは変わらない。
+			 *
+			 * 察知は至近距離では無条件に立つので（PerceiveDaddyThisFrame の1番）、
+			 * 従来なら入隊できていた子は必ず入隊できる。
+			 * 変わるのは「気づくまでの時間」だけで、そこにタイプ差が出る
+			 */
+			return IsDaddyWithinJoinRadius() && m_hasNoticedDaddy;
+		}
+
+
+		bool ChildPenguinAIController::TryJoinFormation()
+		{
+			/** すでに隊列にいるなら何もしない */
+			if (m_isFollowing) return true;
+
+			if (!CanJoinFormation()) return false;
+
+			ChildPenguinManager::GetInstance()->AddFollower(m_owner);
+			m_isFollowing = true;
+			return true;
+		}
+
+
+		void ChildPenguinAIController::BuildInputWhenNotFollowing()
+		{
+			auto* manager = ChildPenguinManager::GetInstance();
+
+			/**
+			 * 待機命令中は気づいていても動かない。
+			 * 「待て」と言われた子が勝手に寄ってきては待機命令の意味が無くなる
+			 */
+			const bool isFollowCmd =
+				manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
+
+			if (m_hasNoticedDaddy && isFollowCmd)
+			{
+				/** 親に気づいたので自分から寄っていく */
+				BuildInputToTarget(manager->GetDaddyPosition());
+				return;
+			}
+
+			/** 気づいていなければその場で待つ */
+			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+		}
+
+
+		void ChildPenguinAIController::UpdatePerception()
+		{
+			/** 隊列へ戻れるようになるまでの猶予を進める（AIの経路によらず必ず進める） */
+			if (m_rejoinCooldown > 0.0f)
+			{
+				m_rejoinCooldown -= g_gameTime->GetFrameDeltaTime();
+			}
+
+			/** 隊列にいる間は当然親を察知している（判定そのものを省ける） */
+			if (m_isFollowing)
+			{
+				m_hasNoticedDaddy = true;
+				m_noticeTimer = m_perceptionSpec->noticeTime;
+				m_forgetTimer = 0.0f;
+				return;
+			}
+
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			if (PerceiveDaddyThisFrame())
+			{
+				m_forgetTimer = 0.0f;
+				m_noticeTimer += deltaTime;
+
+				/** 知覚し続けた時間が「気づく速さ」を超えたら察知に変わる */
+				if (m_noticeTimer >= m_perceptionSpec->noticeTime)
+				{
+					m_hasNoticedDaddy = true;
+				}
+				return;
+			}
+
+			/** 見失った：気づきかけはすぐ止まるが、察知済みは少しの間だけ持続する */
+			m_noticeTimer = 0.0f;
+
+			if (!m_hasNoticedDaddy) return;
+
+			m_forgetTimer += deltaTime;
+			if (m_forgetTimer >= NOTICE_FORGET_TIME)
+			{
+				m_hasNoticedDaddy = false;
+				m_forgetTimer = 0.0f;
+			}
+		}
+
+
+		bool ChildPenguinAIController::PerceiveDaddyThisFrame()
+		{
+			auto* manager = ChildPenguinManager::GetInstance();
+			const float distDaddy = GetDistanceToDaddy();
+
+			/**
+			 * 1. 至近距離：隊列参加距離の内側なら向きも遮蔽も問わず気づく。
+			 *    すぐ目の前にいる親を見落とすことは無いし、
+			 *    この保険が無いと「親に背を向けた子が永久に入隊できない」が起きる
+			 */
+			if (distDaddy <= manager->GetJoinRadius()) return true;
+
+			/**
+			 * 2. 再集合の呼びかけ（Yボタン）：親が大声で呼んでいる間は、
+			 *    向きも遮蔽も耳のよさも問わず気づく。
+			 *    散った群れを集め直すための手段なので、ここで性格差は付けない
+			 */
+			if (manager->IsRegroupCallActive()
+				&& distDaddy <= manager->GetRegroupCallRadius())
+			{
+				return true;
+			}
+
+			/** 3. 音：親が立てている音が届いていれば、向きも遮蔽も問わず気づく */
+			const float hearingRadius = manager->GetDaddyNoiseRadius() * m_perceptionSpec->hearingScale;
+			if (distDaddy <= hearingRadius) return true;
+
+			/** 4. 視界：距離 → 向き → 遮蔽 の順に、軽い判定から足切りする */
+			if (distDaddy > m_perceptionSpec->sightDistance) return false;
+
+			/** 向き：自分の正面ベクトルと親への方向の角度を見る */
+			Vector3 forward = Vector3::Front;
+			m_owner->GetTransform().m_rotation.Apply(forward);
+			forward.y = 0.0f;
+			if (forward.LengthSq() <= FLT_EPSILON) return false;
+			forward.Normalize();
+
+			const Vector3 toDaddy = CalculateDirectionToDaddy();
+			if (toDaddy.LengthSq() <= FLT_EPSILON) return false;
+
+			const float cosHalfAngle = cosf(Math::DegToRad(m_perceptionSpec->sightHalfAngleDeg));
+			if (forward.Dot(toDaddy) < cosHalfAngle) return false;
+
+			/** 遮蔽：ここまで通った子だけがレイキャストの対象になる */
+			return !IsDaddyOccluded();
+		}
+
+
+		bool ChildPenguinAIController::IsDaddyOccluded()
+		{
+			auto* manager = ChildPenguinManager::GetInstance();
+
+			/**
+			 * レイキャストは OCCLUSION_CHECK_INTERVAL フレームに1回だけ。
+			 * 子ごとにスロットをずらしてあるので、負荷はフレーム間で平らになる
+			 */
+			const unsigned int frame = manager->GetPerceptionFrame() + m_perceptionSlot;
+			if (frame % OCCLUSION_CHECK_INTERVAL != 0)
+			{
+				return m_isDaddyOccludedCache;
+			}
+
+			Vector3 eyePos = m_owner->GetTransform().m_position;
+			eyePos.y += PERCEPTION_EYE_HEIGHT;
+
+			Vector3 daddyPos = manager->GetDaddyPosition();
+			daddyPos.y += PERCEPTION_EYE_HEIGHT;
+
+			/**
+			 * 地形だけを遮蔽物として扱う。
+			 * フィルタを掛けずに撃つと、間に立っている別の子ペンギンが最近接ヒットになり
+			 * 地形の判定にならない。フィルタはブロードフェーズで効くのでコストも下がる
+			 */
+			nsBeastEngine::nsCollision::RaycastHit hit;
+			m_isDaddyOccludedCache = nsBeastEngine::nsCollision::PhysicsWorld::Get().Raycast(
+				eyePos,
+				daddyPos,
+				hit,
+				nsBeastEngine::nsCollision::ALL_COLLISION_ATTRIBUTE_MASK,
+				[](const btCollisionObject& obj)
+				{
+					return (obj.getUserIndex() & nsBeastEngine::nsCollision::CollisionAttribute::Ground) != 0;
+				});
+
+			return m_isDaddyOccludedCache;
+		}
+
+
 		bool ChildPenguinAIController::CheckAndFlee()
 		{
-			Vector3 chaserPos;
-			if (!EnemyManager::GetInstance()->FindNearestChaserOf(m_owner, chaserPos))
+			auto* manager = ChildPenguinManager::GetInstance();
+			const Vector3 myPos = m_owner->GetTransform().m_position;
+
+			// 「自分を追っているクマ」ではなく「誰かを追っているクマ」を見る。
+			// クマが群れに突っ込んだとき、狙われた1体だけでなく周りの子もまとめて散る。
+			// これが無いと隊列人数に「群れごと失う」谷が出ない
+			Vector3 threatPos;
+			const bool hasThreat = manager->FindNearestBearThreat(myPos, FLEE_DETECTION_DISTANCE, threatPos);
+
+			if (hasThreat)
 			{
-				// 追跡者がいなくなったらタイマーをリセットして次回の逃走に備える
+				// クマが目の前にいる間は、再集合を呼びかけられても戻らない
+				// （クマの口元へ呼び戻すことになるため）
+				m_fleeHoldTimer = FLEE_HOLD_TIME;
+				m_lastThreatPos = threatPos;
+			}
+			else
+			{
+				// クマが離れてもすぐには落ち着かない。この時間だけ逃げ続ける
+				if (m_fleeHoldTimer > 0.0f)
+				{
+					m_fleeHoldTimer -= g_gameTime->GetFrameDeltaTime();
+				}
+
+				// 親の呼びかけが届いていればパニックを打ち切って戻れるようにする
+				if (manager->IsRegroupCallActive()
+					&& GetDistanceToDaddy() <= manager->GetRegroupCallRadius())
+				{
+					m_fleeHoldTimer = 0.0f;
+					m_rejoinCooldown = 0.0f;
+				}
+			}
+
+			if (m_fleeHoldTimer <= 0.0f)
+			{
+				// 逃げ終わった：状態をリセットして次回の逃走に備える
+				if (m_isFleeing)
+				{
+					m_isFleeing = false;
+					if (auto* lm = GameLogManager::GetInstance())
+					{
+						lm->QueueEvent({
+							{"ev", "child_flee_end"},
+							{"penguin_id", m_owner->GetLogId()}
+						});
+					}
+				}
 				m_fleeDirChangeTimer = 0.0f;
 				m_fleeAngleOffset = 0.0f;
 				return false;
 			}
 
-			Vector3 myPos = m_owner->GetTransform().m_position;
-			Vector3 fleeDir = myPos - chaserPos;
+			// ここから逃走行動。
+			//
+			// 以前はここに「親が隊列参加距離以内にいる場合は逃走より隊列を優先する」
+			// という分岐があり、隊列にいる子はクマに追われても逃げなかった。
+			// 新ステージではクマの被害が 4〜5 件から 11 件に増えて
+			// この分岐が頻繁に踏まれるようになり、
+			// 「追われても誰も逃げずそのまま食べられる絵」になっていたため反転した
+			// （プレイログ計測基盤と実測結果 7-1 / ステージ再設計_設計仕様 10節）。
+			const bool wasFollower = m_isFollowing;
+			if (m_isFollowing)
+			{
+				manager->RemoveFollower(m_owner);
+				m_isFollowing = false;
+			}
+
+			// 逃げ終わってもすぐには隊列へ戻さない。ここが「集め直す時間」の長さを決めるつまみ。
+			// 逃げている間ずっと張り直すことで、逃げ終わった瞬間から数え始める
+			// （1回だけ入れると、長く逃げたぶんだけ猶予が食い潰されてしまう）
+			m_rejoinCooldown = FLEE_REJOIN_COOLDOWN;
+
+			if (!m_isFleeing)
+			{
+				m_isFleeing = true;
+				if (auto* lm = GameLogManager::GetInstance())
+				{
+					lm->QueueEvent({
+						{"ev", "child_flee_start"},
+						{"penguin_id", m_owner->GetLogId()},
+						{"penguin_type", m_owner->GetChildPenguinTypeStr()},
+						{"was_follower", wasFollower}
+					});
+				}
+			}
+
+			Vector3 fleeDir = myPos - m_lastThreatPos;
 			fleeDir.y = 0.0f;
-
-			// 追跡中でも距離が遠すぎる場合はまだ逃げない
-			if (fleeDir.LengthSq() > FLEE_DETECTION_DISTANCE * FLEE_DETECTION_DISTANCE)
-			{
-				m_fleeDirChangeTimer = 0.0f;
-				m_fleeAngleOffset = 0.0f;
-				return false;
-			}
-
-			// 親が隊列参加距離以内にいる場合は逃走より隊列を優先する
-			// → false を返すことで呼び出し元の通常AI（隊列追従）処理へ制御を渡す
-			if (GetDistanceToDaddy() <= ChildPenguinManager::GetInstance()->GetJoinRadius())
-			{
-				m_fleeDirChangeTimer = 0.0f;
-				m_fleeAngleOffset = 0.0f;
-				return false;
-			}
 
 			if (fleeDir.LengthSq() > FLT_EPSILON)
 			{
@@ -591,7 +954,7 @@ namespace app
 		{}
 
 
-		void SeriousChildPenguinAI::Update()
+		void SeriousChildPenguinAI::UpdateAI()
 		{
 			if (m_isEnterIglooMode) {
 				UpdateIglooEvent();
@@ -612,9 +975,6 @@ namespace app
 				return;
 			}
 
-			/** 親との距離を取得 */
-			const float distDaddy = GetDistanceToDaddy();
-
 			/** 待機命令のとき */
 			if (manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Wait)
 			{
@@ -629,15 +989,10 @@ namespace app
 				return;
 			}
 
-			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius()) {
-				manager->AddFollower(m_owner);
-				m_isFollowing = true;
-			}
-
-			/** 隊列に参加していない状態ならその場で待機する */
-			if (!m_isFollowing) {
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+			/** 入隊判定（条件は CanJoinFormation() に集約してある） */
+			/** 隊列に参加できていなければ、親に気づいていれば寄っていき、いなければ待つ */
+			if (!TryJoinFormation()) {
+				BuildInputWhenNotFollowing();
 				return;
 			}
 
@@ -683,7 +1038,7 @@ namespace app
 		}
 
 
-		void ClingyChildPenguinAI::Update()
+		void ClingyChildPenguinAI::UpdateAI()
 		{
 			if (m_isEnterIglooMode) {
 				UpdateIglooEvent();
@@ -760,24 +1115,14 @@ namespace app
 				m_isRestrained = false;
 				manager->UnregisterAttempting(m_owner);
 
-				const float distDaddy = GetDistanceToDaddy();
-
-				if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
+				/** 入隊判定（条件は CanJoinFormation() に集約してある） */
+				if (!TryJoinFormation())
 				{
-					manager->AddFollower(m_owner);
-					m_isFollowing = true;
-				}
-
-				if (m_isFollowing)
-				{
-					updateClingyEffect();
-				}
-
-				if (!m_isFollowing)
-				{
-					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					BuildInputWhenNotFollowing();
 					return;
 				}
+
+				updateClingyEffect();
 
 				BuildInput();
 				return;
@@ -803,19 +1148,11 @@ namespace app
 			/** 待機命令中に追従しようとしていることをManagerに登録する */
 			manager->RegisterAttempting(m_owner);
 
-			const float distDaddy = GetDistanceToDaddy();
-
-			/** まだ隊列に参加していない状態で、親との距離が一定以内に入ったら参加する */
-			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
+			/** 入隊判定（条件は CanJoinFormation() に集約してある） */
+			/** 待機命令中なので寄ってはいかず、その場で待つ */
+			if (!TryJoinFormation())
 			{
-				manager->AddFollower(m_owner);
-				m_isFollowing = true;
-			}
-
-			/** 隊列に参加していない状態ならその場で待機する */
-			if (!m_isFollowing)
-			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				BuildInputWhenNotFollowing();
 				return;
 			}
 
@@ -878,7 +1215,7 @@ namespace app
 		}
 
 
-		void NaughtyChildPenguinAI::Update()
+		void NaughtyChildPenguinAI::UpdateAI()
 		{
 			if (m_isEnterIglooMode) {
 				UpdateIglooEvent();
@@ -1142,19 +1479,16 @@ namespace app
 			/** 追従命令のとき */
 			if (isFollowCmd)
 			{
-				/** joinDistance以内に入ったら徘徊を終了して隊列に参加する */
-				if (distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
+				/** 入隊条件を満たしたら徘徊を終了して隊列に参加する */
+				/** （条件は CanJoinFormation() に集約してある） */
+				if (CanJoinFormation())
 				{
 					/** 徘徊登録を解除する */
 					manager->UnregisterRoaming(m_owner);
 
 					StopLivelyEffect();
 
-					if (!m_isFollowing)
-					{
-						manager->AddFollower(m_owner);
-						m_isFollowing = true;
-					}
+					TryJoinFormation();
 				}
 
 				/** 隊列に参加していない状態（＝まだ遠くにいる）なら徘徊を継続する */
@@ -1305,7 +1639,7 @@ namespace app
 		}
 
 
-		void ClumsyChildPenguinAI::Update()
+		void ClumsyChildPenguinAI::UpdateAI()
 		{
 			if (m_isEnterIglooMode) {
 				UpdateIglooEvent();
@@ -1363,17 +1697,10 @@ namespace app
 				return;
 			}
 
-			const float distDaddy = GetDistanceToDaddy();
-
-			if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
+			/** 入隊判定（条件は CanJoinFormation() に集約してある） */
+			if (!TryJoinFormation())
 			{
-				manager->AddFollower(m_owner);
-				m_isFollowing = true;
-			}
-
-			if (!m_isFollowing)
-			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				BuildInputWhenNotFollowing();
 				m_wasSliding = false;
 				return;
 			}
@@ -1496,7 +1823,7 @@ namespace app
 		}
 
 
-		void CaringChildPenguinAI::Update()
+		void CaringChildPenguinAI::UpdateAI()
 		{
 			// 介入対象は以降の処理の複数の経路で差し替わるため、前フレームの結果をここで拾って記録する
 			UpdateInterventionLog();
@@ -1649,17 +1976,10 @@ namespace app
 				}
 
 				/** 介入対象がいなければ通常の追従行動 */
-				const float distDaddy = GetDistanceToDaddy();
-
-				if (!m_isFollowing && distDaddy <= ChildPenguinManager::GetInstance()->GetJoinRadius())
+				/** 入隊判定（条件は CanJoinFormation() に集約してある） */
+				if (!TryJoinFormation())
 				{
-					manager->AddFollower(m_owner);
-					m_isFollowing = true;
-				}
-
-				if (!m_isFollowing)
-				{
-					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					BuildInputWhenNotFollowing();
 					return;
 				}
 
