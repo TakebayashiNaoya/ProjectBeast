@@ -2,75 +2,75 @@
   "whirlpoolPositions": [
     {
       "index": 0,
-      "position": [-1841, 0, -1841]
+      "position": [1001.6, 0.0, 628.1]
     },
     {
       "index": 1,
-      "position": [-1364, 0, -1909]
+      "position": [82.4, 0.0, 1430.1]
     },
     {
       "index": 2,
-      "position": [-955, 0, 317]
+      "position": [-983.3, 0.0, 430.3]
     },
     {
       "index": 3,
-      "position": [-798, 0, 2250]
+      "position": [-642.7, 0.0, -1056.5]
     },
     {
       "index": 4,
-      "position": [-682, 0, -436]
+      "position": [587.8, 0.0, 833.1]
     },
     {
       "index": 5,
-      "position": [-614, 0, -1453]
+      "position": [2243.0, 0.0, -5.5]
     },
     {
       "index": 6,
-      "position": [-556, 0, -5005]
+      "position": [188.6, 0.0, -2349.2]
     },
     {
       "index": 7,
-      "position": [-314, 0, -1383]
+      "position": [1745.0, 0.0, 701.3]
+    },
+    {
+      "index": 8,
+      "position": [-1847.5, 0.0, -1155.4]
     },
     {
       "index": 9,
-      "position": [-254, 0, 2630]
+      "position": [-642.7, 0.0, -2210.1]
     },
     {
       "index": 10,
-      "position": [-63, 0, -1345]
+      "position": [-1049.2, 0.0, -1261.6]
     },
     {
       "index": 11,
-      "position": [102, 0, 556]
+      "position": [-617.1, 0.0, 2517.7]
     },
     {
       "index": 12,
-      "position": [314, 0, 2864]
+      "position": [935.7, 0.0, 2821.7]
     },
     {
       "index": 13,
-      "position": [525, 0, 1728]
+      "position": [60.4, 0.0, 2851.0]
     },
     {
       "index": 14,
-      "position": [648, 0, -784]
+      "position": [646.4, 0.0, -2462.8]
     },
     {
       "index": 15,
-      "position": [1023, 0, 1621]
+      "position": [-2250.4, 0.0, 2594.6]
     },
     {
       "index": 16,
-      "position": [1118, 0, 2575]
+      "position": [2916.9, 0.0, -1631.5]
     },
     {
       "index": 17,
-      "position": [2071, 0, 1723]
-    },
-    {
-      "index": 18,
-      "position": [2409, 0, -1058]
+      "position": [2968.1, 0.0, 1499.6]
     }
   ]
 }
