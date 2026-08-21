@@ -21,6 +21,24 @@ namespace app
 
 
 		/**
+		 * @brief タイプごとの「親の察知」性能
+		 * @details 実際の値は ChildPenguinAIController.cpp の
+		 *          DADDY_PERCEPTION_SPECS テーブルにある。
+		 */
+		struct DaddyPerceptionSpec
+		{
+			/** 視界が届く距離 */
+			float sightDistance;
+			/** 視野角の半角（度）。シロクマの VIEW_ANGLE = 70 と同じ持ち方 */
+			float sightHalfAngleDeg;
+			/** 視界に入り続けてから察知に変わるまでの時間（秒） */
+			float noticeTime;
+			/** 親の音が届く距離への倍率（耳のよさ） */
+			float hearingScale;
+		};
+
+
+		/**
 		 * @brief 子ペンギンのAIコントローラー基底クラス
 		 */
 		class ChildPenguinAIController
@@ -28,8 +46,16 @@ namespace app
 		public:
 			/**
 			 * @brief 更新処理
+			 * @details 全タイプ共通の前処理（親の察知）を行ってから UpdateAI() を呼ぶ。
+			 *          タイプごとの処理は UpdateAI() 側に書くこと。
 			 */
-			virtual void Update() = 0;
+			void Update();
+
+		protected:
+			/**
+			 * @brief タイプごとの更新処理
+			 */
+			virtual void UpdateAI() = 0;
 
 
 		public:
@@ -138,6 +164,79 @@ namespace app
 			bool CheckAndFlee();
 
 
+			//------------------------------------------------------------//
+			// 入隊判定
+			// 以前は同じ距離判定が5タイプのAIに散らばっていた。
+			// 判定を変えるときにここだけ直せば済むよう1箇所へ集約している。
+			//------------------------------------------------------------//
+
+			/**
+			 * @brief 親を察知して隊列へ加われる状態かどうか
+			 * @details 入隊条件はこの関数だけが持つ。各タイプのAIはここを呼ぶこと。
+			 * @return 加われるならtrue
+			 */
+			bool CanJoinFormation() const;
+
+			/**
+			 * @brief 入隊条件を満たしていれば隊列へ加わる
+			 * @details すでに隊列にいる場合は何もせずtrueを返す。
+			 * @return このフレームの終わりに隊列にいるならtrue
+			 */
+			bool TryJoinFormation();
+
+			/**
+			 * @brief 親の隊列参加距離の内側にいるかどうか（入隊済みかは問わない）
+			 * @details 「親のそばにいるか」を距離だけで見たいとき用。
+			 *          CanJoinFormation() と違い、視界や向きの条件は入らない。
+			 * @return 内側にいるならtrue
+			 */
+			bool IsDaddyWithinJoinRadius() const;
+
+			/**
+			 * @brief 隊列に入っていないときの移動入力を組み立てる
+			 * @details 親に気づいていれば自分から寄っていき、気づいていなければその場で待つ。
+			 *          待機命令中は気づいていても動かない（待機の意味を壊さないため）。
+			 */
+			void BuildInputWhenNotFollowing();
+
+
+			//------------------------------------------------------------//
+			// 親の察知（視界と音）
+			//------------------------------------------------------------//
+
+			/**
+			 * @brief 親を察知しているかどうか
+			 * @return 察知していればtrue
+			 */
+			bool HasNoticedDaddy() const { return m_hasNoticedDaddy; }
+
+		private:
+			/**
+			 * @brief 親の察知状態を毎フレーム更新する
+			 * @details Update() の先頭から呼ばれる。
+			 *          距離 → 向き → 遮蔽 の順に重い判定へ進むので、
+			 *          ほとんどの子は最初の距離判定で足切りされる。
+			 */
+			void UpdatePerception();
+
+			/**
+			 * @brief このフレームに親を知覚できているかを判定する
+			 * @details 音・至近距離・視界のいずれかで真になる。
+			 * @return 知覚できていればtrue
+			 */
+			bool PerceiveDaddyThisFrame();
+
+			/**
+			 * @brief 親との間が地形で遮られているかを判定する
+			 * @details レイキャストは OCCLUSION_CHECK_INTERVAL フレームに1回しか撃たず、
+			 *          間のフレームは前回の結果を使い回す。
+			 *          子ごとに実行フレームをずらしてあるので、
+			 *          1フレームあたりのレイ本数は「子の数 / 間隔」が上限になる。
+			 * @return 遮られていればtrue
+			 */
+			bool IsDaddyOccluded();
+
+
 		protected:
 			/** 子ペンギンのポインタ */
 			ChildPenguin* m_owner;
@@ -159,6 +258,25 @@ namespace app
 			Vector3 m_iglooTargetPos = Vector3::Zero;
 			/** エフェクトハンドル */
 			EffectHandle m_hartEffectHandle;
+
+
+		private:
+			//------------------------------------------------------------//
+			// 親の察知（視界と音）の状態
+			//------------------------------------------------------------//
+
+			/** タイプごとの察知性能（生成時に決まる。以降変わらない） */
+			const DaddyPerceptionSpec* m_perceptionSpec = nullptr;
+			/** 親を察知しているかどうか */
+			bool m_hasNoticedDaddy = false;
+			/** 知覚し続けている時間（noticeTime を超えると察知に変わる） */
+			float m_noticeTimer = 0.0f;
+			/** 知覚できなくなってからの時間（NOTICE_FORGET_TIME を超えると察知を忘れる） */
+			float m_forgetTimer = 0.0f;
+			/** 遮蔽レイキャストを撃つフレームをずらすためのスロット番号 */
+			unsigned int m_perceptionSlot = 0;
+			/** 前回の遮蔽レイキャストの結果（間のフレームで使い回す） */
+			bool m_isDaddyOccludedCache = false;
 
 
 		private:
@@ -191,6 +309,24 @@ namespace app
 			 * @details 0のとき直進、±値のとき左右に振れる
 			 */
 			float m_fleeAngleOffset = 0.0f;
+
+			/** 現在逃走中かどうか（プレイログの開始・終了を1回ずつ出すためのエッジ検出用） */
+			bool m_isFleeing = false;
+			/**
+			 * @brief 逃走を続ける残り時間（秒）
+			 * @details クマが近くにいる間は FLEE_HOLD_TIME で上書きされ続ける。
+			 *          クマが離れてから0になるまでの間も逃げ続けるので、
+			 *          「クマの脇をすり抜けた瞬間に立ち止まる」が起きない。
+			 */
+			float m_fleeHoldTimer = 0.0f;
+			/**
+			 * @brief 逃走後、隊列へ戻れるようになるまでの残り時間（秒）
+			 * @details 散った直後にその場で入隊し直すと「集め直す時間」が生まれない。
+			 *          親の再集合の呼びかけ（Yボタン）で0にできる。
+			 */
+			float m_rejoinCooldown = 0.0f;
+			/** 最後に逃げる根拠にしたシロクマの座標（見失った後もこの向きへ逃げ続ける） */
+			Vector3 m_lastThreatPos = Vector3::Zero;
 		};
 
 
@@ -208,7 +344,7 @@ namespace app
 		class SeriousChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 		public:
 			SeriousChildPenguinAI(ChildPenguin* owner);
@@ -228,7 +364,7 @@ namespace app
 		class ClingyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 			/**
 			 * @brief 世話焼きペンギンによる制止フラグを設定する
@@ -272,7 +408,7 @@ namespace app
 		class NaughtyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 			/**
 			 * @brief 世話焼きペンギンによる制止フラグを設定する
@@ -344,7 +480,7 @@ namespace app
 		class ClumsyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 			/**
 			 * @brief 世話焼きペンギンに助けてもらう
@@ -384,7 +520,7 @@ namespace app
 		class CaringChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 		public:
 			CaringChildPenguinAI(ChildPenguin* owner);

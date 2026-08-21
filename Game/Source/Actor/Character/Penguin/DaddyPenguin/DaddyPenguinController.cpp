@@ -153,7 +153,13 @@ namespace app
 			// アクション入力の更新
 			// =========================================================
 			bool isJump = g_pad[0]->IsTrigger(enButtonA);
-			bool isCommandToggle = g_pad[0]->IsTrigger(enButtonY);
+			// Yボタン＝散ってしまった子ペンギンの再集合を呼びかける。
+			// 逃走をシロクマ最優先にした代わりに置いた手段なので、
+			// クールダウン中は空振りさせず、鳴き声もモーションも出さない
+			auto* childPenguinManager = ChildPenguinManager::GetInstance();
+			bool isRegroupCall = g_pad[0]->IsTrigger(enButtonY)
+				&& childPenguinManager != nullptr
+				&& childPenguinManager->CanCallRegroup();
 			bool isSlide = g_pad[0]->IsPress(enButtonX);
 			bool isEnterIgloo = false;
 
@@ -228,7 +234,7 @@ namespace app
 			}
 
 			// 親ペンギン固有の入力
-			m_stateMachine->SetIsCommandToggle(isCommandToggle);
+			m_stateMachine->SetIsCommandToggle(isRegroupCall);
 
 			m_stateMachine->SetIsEnterIgloo(isEnterIgloo);
 		}

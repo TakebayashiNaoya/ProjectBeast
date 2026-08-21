@@ -14,8 +14,8 @@
 #include "Source/Actor/Character/Penguin/Formation/FormationDebugMonitor.h"
 #endif
 #include "Source/Actor/Character/Enemy/Enemy.h"
-#include "Source/Actor/Character/Enemy/Enemy.h"
-#include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Enemy/EnemyController.h"
+#include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
@@ -70,6 +70,50 @@ namespace app
 			/** ゴーストペンギン出現音の音量倍率 */
 			constexpr float SPAWN_GHOST_PENGUIN_SE_VOLUME = 1.0f;
 
+
+			//============================================//
+			// 親の音が届く距離（子ペンギンの察知に使う）
+			//
+			// NoiseManager::GetDefaultParameter() が子ペンギンの足音・スライド音に
+			// 使っている range と同じ数値にしてある。値を変えるときは
+			// docs/子ペンギンの察知モデル.md の表も更新すること。
+			//============================================//
+
+			/** 歩き（NoiseManager の Sneak と同値） */
+			constexpr float DADDY_NOISE_RADIUS_SNEAK = 200.0f;
+			/** 走り（NoiseManager の Dash と同値） */
+			constexpr float DADDY_NOISE_RADIUS_RUN = 400.0f;
+			/** 滑り（NoiseManager の Slide と同値） */
+			constexpr float DADDY_NOISE_RADIUS_SLIDE = 500.0f;
+			/** ジャンプ（着地音。NoiseManager の Fall より控えめにしてある） */
+			constexpr float DADDY_NOISE_RADIUS_JUMP = 300.0f;
+			/** 泳ぎ（水音。歩きより少し広い程度） */
+			constexpr float DADDY_NOISE_RADIUS_SWIM = 250.0f;
+
+
+			//============================================//
+			// 再集合の呼びかけ（Yボタン）
+			//
+			// 逃走をシロクマ最優先にした代わりに、散った群れを集め直す手段として置いた。
+			// 「散開の距離と復帰の速さ」を調整する主なつまみはここと
+			// ChildPenguinAIController.cpp の FLEE_* 定数。
+			//============================================//
+
+			/** 呼びかけの効果が続く時間（秒） */
+			constexpr float REGROUP_CALL_DURATION = 2.0f;
+			/**
+			 * @brief 呼びかけのクールダウン（秒）
+			 * @details 連打できると散開に代償が無くなり、
+			 *          「群れごと失って集め直す」体験が生まれない。
+			 */
+			constexpr float REGROUP_CALL_COOLDOWN = 8.0f;
+			/**
+			 * @brief 呼びかけが届く距離
+			 * @details 親の走りの音（400）より広く、シロクマの索敵距離（600）と同じ。
+			 *          クマに追われて散った子が届く範囲に収まる想定。
+			 */
+			constexpr float REGROUP_CALL_RADIUS = 600.0f;
+
 			/** 青い火の玉オフセット */
 			const Vector3 BLUR_FIRE_BALL_OFFSET = Vector3(0.0f, 30.0f, 0.0f);
 			/** 青い火の玉の初期回転 */
@@ -123,6 +167,12 @@ namespace app
 
 		void ChildPenguinManager::Update()
 		{
+			/** 親の察知・逃走に使う共有データを、子のUpdateより先に1回だけ更新する */
+			m_perceptionFrame++;
+			UpdateDaddyNoiseRadius();
+			UpdateBearThreats();
+			UpdateRegroupCall();
+
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
@@ -773,6 +823,143 @@ namespace app
 		bool ChildPenguinManager::IsAudible(const ChildPenguin* penguin) const
 		{
 			return m_audiblePenguins.count(const_cast<ChildPenguin*>(penguin)) > 0;
+		}
+
+
+		void ChildPenguinManager::UpdateDaddyNoiseRadius()
+		{
+			m_daddyNoiseRadius = 0.0f;
+
+			if (m_daddyPenguin == nullptr) return;
+
+			auto* sm = m_daddyPenguin->GetStateMachine();
+			if (sm == nullptr) return;
+
+			/**
+			 * 親が何をしているかで音の届く距離を決める。
+			 * 数値は NoiseManager::GetDefaultParameter() が子ペンギンの
+			 * 足音・スライド音に使っている range に合わせてある
+			 * （Sneak 200 / Dash 400 / Slide 500）。
+			 * 止まっている間は 0 ＝ 見つけてもらえない。
+			 * これが「親が動いていないと子は寄ってこない」という手触りになり、
+			 * Yボタンの再集合（DaddyPenguinController）が意味を持つ。
+			 */
+			if (sm->IsEqualCurrentState(PenguinSlidingState::ID())
+				|| sm->IsEqualCurrentState(PenguinSlideStartState::ID())
+				|| sm->IsEqualCurrentState(PenguinSlideEndState::ID()))
+			{
+				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_SLIDE;
+			}
+			else if (sm->IsEqualCurrentState(PenguinRunState::ID()))
+			{
+				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_RUN;
+			}
+			else if (sm->IsEqualCurrentState(PenguinJumpState::ID()))
+			{
+				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_JUMP;
+			}
+			else if (sm->IsEqualCurrentState(PenguinSwimmingState::ID()))
+			{
+				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_SWIM;
+			}
+			else if (sm->IsEqualCurrentState(PenguinSneakState::ID()))
+			{
+				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_SNEAK;
+			}
+		}
+
+
+		void ChildPenguinManager::UpdateBearThreats()
+		{
+			m_bearThreats.clear();
+
+			auto* em = EnemyManager::GetInstance();
+			if (em == nullptr) return;
+
+			/**
+			 * GetEnemies() と GetControllers() は同じ m_enemyList から同じ順で作られるので
+			 * 添字が対応する。どちらも要素数はシロクマの数（最大9）なので、
+			 * 毎フレーム1回ずつ作っても負荷にはならない（子ペンギンごとには呼ばない）
+			 */
+			const std::vector<Enemy*> enemies = em->GetEnemies();
+			const std::vector<EnemyController*> controllers = em->GetControllers();
+
+			const size_t count = min(enemies.size(), controllers.size());
+			for (size_t i = 0; i < count; i++)
+			{
+				if (enemies[i] == nullptr || controllers[i] == nullptr) continue;
+
+				/** 誰かを見つけて追っているクマだけを脅威として扱う */
+				if (controllers[i]->GetFoundPenguin() == nullptr) continue;
+
+				m_bearThreats.push_back(enemies[i]->GetTransform().m_position);
+			}
+		}
+
+
+		bool ChildPenguinManager::FindNearestBearThreat(const Vector3& from, float radius, Vector3& outPos) const
+		{
+			const float radiusSq = radius * radius;
+			float nearestSq = FLT_MAX;
+			bool found = false;
+
+			for (const Vector3& threatPos : m_bearThreats)
+			{
+				Vector3 diff = threatPos - from;
+				diff.y = 0.0f;
+				const float distSq = diff.LengthSq();
+
+				if (distSq > radiusSq) continue;
+				if (distSq >= nearestSq) continue;
+
+				nearestSq = distSq;
+				outPos = threatPos;
+				found = true;
+			}
+			return found;
+		}
+
+
+		void ChildPenguinManager::CallRegroup()
+		{
+			/** クールダウン中は呼びかけられない */
+			if (!CanCallRegroup()) return;
+
+			m_regroupCallTimer = REGROUP_CALL_DURATION;
+			m_regroupCallCooldown = REGROUP_CALL_COOLDOWN;
+
+			if (auto* lm = GameLogManager::GetInstance())
+			{
+				lm->QueueEvent({ {"ev", "regroup_call"} });
+			}
+		}
+
+
+		void ChildPenguinManager::UpdateRegroupCall()
+		{
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			if (m_regroupCallTimer > 0.0f)
+			{
+				m_regroupCallTimer -= deltaTime;
+			}
+			if (m_regroupCallCooldown > 0.0f)
+			{
+				m_regroupCallCooldown -= deltaTime;
+			}
+		}
+
+
+		float ChildPenguinManager::GetRegroupCallRadius() const
+		{
+			return REGROUP_CALL_RADIUS;
+		}
+
+
+		float ChildPenguinManager::GetRegroupCallCooldownRatio() const
+		{
+			if (m_regroupCallCooldown <= 0.0f) return 0.0f;
+			return m_regroupCallCooldown / REGROUP_CALL_COOLDOWN;
 		}
 
 
