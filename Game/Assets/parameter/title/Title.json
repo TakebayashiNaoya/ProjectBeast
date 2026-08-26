@@ -1,99 +1,629 @@
-{
-    "canvas":{
-        "elements":[
+﻿{
+    "canvas": {
+        "elements": [
             {
-                "type":"UIIcon",
-                "name":"TitleBackGround",
-                "asset":"Assets/spriteData/Scene/IceBerg.dds",
-                "width":1920,
-                "height":1080,
-                "position":[0,0,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
+                "type": "UIIcon",
+                "name": "TitleBackGround",
+                "asset": "Assets/spriteData/Scene/IceBerg.dds",
+                "width": 1920,
+                "height": 1080,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
             },
             {
-                "type":"UIIcon",
-                "name":"PentaktRogoIcon",
-                "asset":"Assets/spriteData/Scene/PENTAKT.dds",
-                "width":800,
-                "height":500,
-                "position":[0,50,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
+                "type": "UIIcon",
+                "name": "TitleNote0",
+                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
+                "width": 44,
+                "height": 44,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    220
+                ]
             },
             {
-                "type" : "UIIcon",
-                "name" : "Frame",
-                "asset" : "Assets/spriteData/UI/Frame/Frame.dds",
-                "width" : 300,
-                "height" : 130,
-                "position" : [0, 0, 0],
-                "scale" : [1, 1, 1],
-                "rotation" : 0,
-                "color" : [255, 255, 255, 255]
+                "type": "UIIcon",
+                "name": "TitleNote1",
+                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
+                "width": 44,
+                "height": 44,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    220
+                ]
             },
             {
-                "type" : "UIIcon",
-                "name" : "FrameBack",
-                "asset" : "Assets/spriteData/UI/Frame/FrameBackGround.dds",
-                "width":280,
-                "height":101,
-                "position":[0, 0, 0],
-                "scale":[ 1, 1, 1],
-                "rotation":0,
-                "color":[ 255, 255, 255, 120]
-            },
-
-
-            {
-                "type":"UIText",
-                "name":"StartIcon",
-                "text":"スタート",
-                "fontSize":1.2,
-                "fontScaleX":1.0,
-                "fontScaleY":1.0,
-                "rotation":0,
-                "position":[ -500, -310, 0],
-                "color":[ 0, 0, 0, 255],
-                "pivot":[ 0.5, 0.5]
-            },
-            {
-                "type":"UIText",
-                "name":"SoundIcon",
-                "text":"サウンド",
-                "fontSize":1.2,
-                "fontScaleX":1.0,
-                "fontScaleY":1.0,
-                "rotation":0,
-                "position":[ -175, -310, 0],
-                  "color":[ 0, 0, 0, 255],
-                "pivot":[ 0.5, 0.5]
+                "type": "UIIcon",
+                "name": "TitleNote2",
+                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
+                "width": 44,
+                "height": 44,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    220
+                ]
             },
             {
-                "type":"UIText",
-                "name":"RuleIcon",
-                "text":"ヒント",
-                "fontSize":1.2,
-                "fontScaleX":1.0,
-                "fontScaleY":1.0,
-                "rotation":0,
-                "position":[ 175, -310, 0],
-                "color":[ 0, 0, 0, 255],
-                "pivot":[ 0.5, 0.5]
+                "type": "UIIcon",
+                "name": "TitleNote3",
+                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
+                "width": 44,
+                "height": 44,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    220
+                ]
             },
             {
-                "type":"UIText",
-                "name":"EndIcon",
-                "text":"オワリ",
-                "fontSize":1.2,
-                "fontScaleX":1.0,
-                "fontScaleY":1.0,
-                "rotation":0,
-                "position":[ 500, -310, 0],
-                "color":[ 0, 0, 0, 255],
-                "pivot":[ 0.5, 0.5]
+                "type": "UIIcon",
+                "name": "TitleNote4",
+                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
+                "width": 44,
+                "height": 44,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    220
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleNote5",
+                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
+                "width": 44,
+                "height": 44,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    220
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "PentaktRogoIcon",
+                "asset": "Assets/spriteData/Scene/PENTAKT.dds",
+                "width": 800,
+                "height": 500,
+                "position": [
+                    0,
+                    50,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "Frame",
+                "asset": "Assets/spriteData/UI/Frame/Frame.dds",
+                "width": 300,
+                "height": 130,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "FrameBack",
+                "asset": "Assets/spriteData/UI/Frame/FrameBackGround.dds",
+                "width": 280,
+                "height": 101,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    120
+                ]
+            },
+            {
+                "type": "UIText",
+                "name": "StartIcon",
+                "text": "スタート",
+                "fontSize": 1.2,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "rotation": 0,
+                "position": [
+                    -500,
+                    -310,
+                    0
+                ],
+                "color": [
+                    0,
+                    0,
+                    0,
+                    255
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ]
+            },
+            {
+                "type": "UIText",
+                "name": "SoundIcon",
+                "text": "サウンド",
+                "fontSize": 1.2,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "rotation": 0,
+                "position": [
+                    -175,
+                    -310,
+                    0
+                ],
+                "color": [
+                    0,
+                    0,
+                    0,
+                    255
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ]
+            },
+            {
+                "type": "UIText",
+                "name": "RuleIcon",
+                "text": "ヒント",
+                "fontSize": 1.2,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "rotation": 0,
+                "position": [
+                    175,
+                    -310,
+                    0
+                ],
+                "color": [
+                    0,
+                    0,
+                    0,
+                    255
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ]
+            },
+            {
+                "type": "UIText",
+                "name": "EndIcon",
+                "text": "オワリ",
+                "fontSize": 1.2,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "rotation": 0,
+                "position": [
+                    500,
+                    -310,
+                    0
+                ],
+                "color": [
+                    0,
+                    0,
+                    0,
+                    255
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow0",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow1",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow2",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow3",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow4",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow5",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow6",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow7",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow8",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow9",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow10",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "TitleSnow11",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 7,
+                "height": 7,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    140
+                ]
             }
         ]
     }

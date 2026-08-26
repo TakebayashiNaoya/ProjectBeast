@@ -48,7 +48,12 @@ namespace nsK2EngineLow {
 			//マップ、アンマップのオーバーヘッドを軽減するためにはこのインスタンスが生きている間は行わない。
 			{
 				CD3DX12_RANGE readRange(0, 0);        //     intend to read from this resource on the CPU.
-				buffer->Map(0, &readRange, reinterpret_cast<void**>(&m_buffersOnCPU[bufferNo]));
+				if (buffer == nullptr ||
+					FAILED(buffer->Map(0, &readRange, reinterpret_cast<void**>(&m_buffersOnCPU[bufferNo])))) {
+					// Creation/Map fails after a device removal. Write the DRED report instead of crashing later.
+					g_graphicsEngine->ReportDeviceRemoved("RWStructuredBuffer map failed");
+					return;
+				}
 			}
 			if (initData != nullptr) {
 				memcpy(m_buffersOnCPU[bufferNo], initData, m_sizeOfElement * m_numElement);

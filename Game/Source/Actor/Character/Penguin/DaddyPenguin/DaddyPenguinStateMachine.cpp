@@ -24,6 +24,9 @@ namespace app
 			, m_isLose(false)
 			, m_isEnterIgloo(false)
 		{
+			// プレイヤー操作の親ペンギンだけ、急な上り坂でのずり落ちを有効にする
+			SetSlideBackAllowed(true);
+
 			// 共通ステートの追加
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSneakState>(static_cast<PenguinStateMachine*>(this));

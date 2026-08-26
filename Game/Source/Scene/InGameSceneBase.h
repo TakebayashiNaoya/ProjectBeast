@@ -127,10 +127,18 @@ namespace app
 		//------------------------------------------------------------
 		enum class LoadPhase
 		{
-			None, Stage, StageWait, Daddy, Children, Enemy, Camera, Ocean, Done
+			None, Stage, StageWait, DecalPrewarm, Daddy, Children, Enemy, Camera, Ocean, MapIcon, Done
 		};
 		LoadPhase m_loadPhase = LoadPhase::None;
 		int m_childIndex = 0;
+
+		//------------------------------------------------------------
+		// ステージ紹介動画の撮影モード（BEAST_SHOWCASE）
+		//------------------------------------------------------------
+		/** 撮影モードが開始済みか（合図ファイルの書き出しとUI無効化を一度だけ行う） */
+		bool m_isShowcaseStarted = false;
+		/** 撮影モードの経過時間（秒）。一定時間で自動終了する */
+		float m_showcaseTimer = 0.0f;
 
 		//------------------------------------------------------------
 		// ゲームフェーズ

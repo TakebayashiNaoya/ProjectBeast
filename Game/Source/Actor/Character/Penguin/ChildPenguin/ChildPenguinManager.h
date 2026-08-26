@@ -178,10 +178,43 @@ namespace app
 			Vector3 GetDaddyPosition() const;
 
 			/**
+			 * @brief 親へのフローフィールドに沿った移動方向を取得する
+			 * @details 水路や崖を回り込んで親へ向かうための方向。子ペンギンの
+			 *          「親（隊列）へ向かう遠距離移動」で使う。
+			 * @param from   現在地点（ワールド座標）
+			 * @param outDir 次に向かうべき方向（XZ平面、正規化済み）
+			 * @return 取得できたらtrue（フィールド未構築・到達不能ならfalse）
+			 */
+			bool GetDaddyFlowDirection(const Vector3& from, Vector3& outDir) const;
+
+			/**
 			 * @brief 親ペンギンを設定（GameSceneなどで呼び出す）
 			 * @param daddy 親ペンギンのポインタ
 			 */
 			void SetDaddyPenguin(DaddyPenguin* daddy) { m_daddyPenguin = daddy; }
+
+			/**
+			 * @brief 親ペンギンを取得する（未設定ならnullptr）
+			 * @return 親ペンギンのポインタ
+			 */
+			DaddyPenguin* GetDaddyPenguin() const { return m_daddyPenguin; }
+
+			/**
+			 * @brief いま獲物を追っているシロクマがいるかどうか
+			 * @details 「クマに襲われている状況」の判定に使う（Yボタン強調UIなど）。
+			 * @return 追跡中のクマが1体でもいればtrue
+			 */
+			bool HasActiveBearThreat() const { return !m_bearThreats.empty(); }
+
+			/**
+			 * @brief 隊列の子ペンギンを狙っているシロクマがいるかどうか
+			 * @details 「自分が引き連れている群れが襲われている」の判定に使う（Yボタン強調UIなど）。
+			 *          狙われた子は逃走で即座に隊列を抜けるため、隊列中に狙われ始めた子は
+			 *          追跡が続く限り「隊列への脅威」として扱い続ける（UpdateBearThreatsで更新）。
+			 *          隊列に入ったことのないはぐれた子が狙われても反応しない。
+			 * @return 隊列（逃走で抜けた直後の子を含む）を追跡中のクマがいればtrue
+			 */
+			bool HasBearThreatOnFormation() const { return !m_formationChasedPenguins.empty(); }
 
 			/**
 			 * @brief 隊列（フォロー状態）に参加する
@@ -598,8 +631,35 @@ namespace app
 			 */
 			void UpdateRegroupCall();
 
+			/**
+			 * @brief 親へのフローフィールドを必要に応じて作り直す
+			 * @details 一定間隔かつ親が動いたときだけ StageNavGrid::BuildFlowField() を呼ぶ。
+			 */
+			void UpdateDaddyFlowField();
+
+			/**
+			 * @brief 三角陣ウルト「突進」の自動入隊を更新する
+			 * @details 三角陣ウルト発動中、親がスライドで触れた（近接した）非フォロワーの子を
+			 *          自動的に隊列へ加える。速度特化の三角陣に「速さで集める」個性を持たせる。
+			 */
+			void UpdateTriangleUltPickup();
+
 			/** いま獲物を追っているシロクマの座標（毎フレーム更新） */
 			std::vector<Vector3> m_bearThreats;
+			/** いまクマに狙われている子ペンギン（毎フレーム更新。赤点滅の対象） */
+			std::vector<const ChildPenguin*> m_bearTargetedPenguins;
+			/** 隊列中に狙われ始めた子ペンギン（追跡が続く限り保持。Yボタン強調の判定用） */
+			std::vector<const ChildPenguin*> m_formationChasedPenguins;
+
+			/** 散開陣ウルト中の入隊音階コンボ（入隊のたびに増え、ウルト終了でリセット） */
+			int m_scatterJoinCombo = 0;
+
+			/** フローフィールドの再構築タイマー（秒） */
+			float m_flowFieldRebuildTimer = 0.0f;
+			/** 前回フローフィールドを構築したときの親の座標 */
+			Vector3 m_flowFieldGoal = Vector3::Zero;
+			/** フローフィールドが有効かどうか */
+			bool m_isFlowFieldValid = false;
 			/** 再集合の呼びかけが効いている残り時間 */
 			float m_regroupCallTimer = 0.0f;
 			/** 再集合の呼びかけのクールダウン残り時間 */

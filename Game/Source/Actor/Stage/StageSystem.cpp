@@ -250,6 +250,9 @@ namespace app
 
 		bool StageSystem::IsAllLoaded() const
 		{
+			// 地形の分割初期化が終わるまではロード完了扱いにしない
+			if (m_terrain && !m_terrain->IsInited()) return false;
+
 			for (const auto& obj : m_objectMap)
 			{
 				if (!obj.second->IsLoaded()) return false;
@@ -301,8 +304,40 @@ namespace app
 
 		void StageSystem::InitTerrain(const TerrainObject::TerrainConfig& config)
 		{
+			// 生成だけ行い、初期化本体は Update() が InitStep() で時分割実行する
+			// （一括初期化はロード画面のフレームを1.5秒前後止めてしまう）
 			m_terrain = std::make_unique<TerrainObject>();
-			m_terrain->Init(config);
+			m_terrainConfig = config;
+		}
+
+
+		void StageSystem::SnapObjectsToTerrain()
+		{
+			if (m_terrain == nullptr) return;
+
+			/** 沈み込み量。わずかな起伏で縁が浮かないよう数ユニットだけ地面へ沈める */
+			constexpr float SNAP_SINK = 4.0f;
+
+			/** 接地させるオブジェクトのプレフィックス。
+			 *  配置JSONのYはステージ生成スクリプトのフル解像度の高さモデル由来で、
+			 *  実際の地形（subsample済みハイトマップから作る描画メッシュ）とは
+			 *  凹凸部で数ユニットずれる。GetHeightAt() は描画メッシュと同じ
+			 *  補間で高さを返すため、これに合わせれば浮き・めり込みが出ない */
+			const char* snapPrefixes[] = { "igloo_", "bearHome_" };
+
+			for (auto& pair : m_objectMap)
+			{
+				const std::string& key = pair.first;
+				const bool isTarget = std::any_of(
+					std::begin(snapPrefixes), std::end(snapPrefixes),
+					[&key](const char* prefix) { return key.rfind(prefix, 0) == 0; });
+				if (!isTarget) continue;
+
+				Vector3 pos = pair.second->GetTransform().m_position;
+				pos.y = m_terrain->GetHeightAt(pos) - SNAP_SINK;
+				pair.second->SetPosition(pos);
+				pair.second->UpdateWrapper();
+			}
 		}
 
 
@@ -331,6 +366,12 @@ namespace app
 
 		void StageSystem::Update()
 		{
+			// 地形の分割初期化を1フレーム1回分だけ進める（ロード中のみ動く）
+			if (m_terrain && !m_terrain->IsInited())
+			{
+				m_terrain->InitStep(m_terrainConfig);
+			}
+
 			if (m_terrain) { m_terrain->UpdateWrapper(); }
 
 			for (const auto& obj : m_objectMap)

@@ -75,6 +75,24 @@ namespace nsK2EngineLow {
 		//デバイスにアクセスするためのインターフェースを作成。
 		auto dxgiFactory = CreateDXGIFactory();
 
+		// Enable DRED (Device Removed Extended Data) before creating the device,
+		// so that we can find out why the device was removed (GPU hang, page fault, etc.).
+		{
+			ID3D12DeviceRemovedExtendedDataSettings* dredSettings = nullptr;
+			if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)))) {
+				dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+				dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+				dredSettings->Release();
+			}
+			// Breadcrumb contexts record marker/event strings next to each breadcrumb op,
+			// which lets the report name the render pass and model around a GPU hang.
+			ID3D12DeviceRemovedExtendedDataSettings1* dredSettings1 = nullptr;
+			if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings1)))) {
+				dredSettings1->SetBreadcrumbContextEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+				dredSettings1->Release();
+			}
+		}
+
 		//D3Dデバイスの作成。
 		if (!CreateD3DDevice(dxgiFactory)) {
 			//D3Dデバイスの作成に失敗した。
@@ -291,6 +309,8 @@ namespace nsK2EngineLow {
 			//コマンドキューの作成に失敗した。
 			return false;
 		}
+		// Name the queue so DRED breadcrumbs can identify it after a device removal.
+		m_commandQueue->SetName(L"MainCommandQueue");
 
 		return true;
 	}
@@ -308,9 +328,13 @@ namespace nsK2EngineLow {
 			if (!commandList) {
 				return false;
 			}
+			// Name the list so DRED breadcrumbs can identify it after a device removal.
+			wchar_t listName[32];
+			swprintf_s(listName, L"MainCommandList%d", listNo);
+			commandList->SetName(listName);
 			//コマンドリストは開かれている状態で作成されるので、いったん閉じる。
 			commandList->Close();
-			
+
 			listNo++;
 		}
 		return true;
@@ -332,6 +356,12 @@ namespace nsK2EngineLow {
 	}
 	void GraphicsEngine::BeginRender()
 	{
+		// Catch a device removal that happened during the game update phase,
+		// before any draw call touches the broken device.
+		if (m_d3dDevice && FAILED(m_d3dDevice->GetDeviceRemovedReason())) {
+			ReportDeviceRemoved("GraphicsEngine::BeginRender device check");
+		}
+
 		m_frameIndex = m_frameBuffer.GetCurrentBackBufferIndex();
 
 		//カメラを更新する。
@@ -387,6 +417,12 @@ namespace nsK2EngineLow {
 	}
 	void GraphicsEngine::EndRender()
 	{
+		// If the device has been removed, report the reason and stop here
+		// instead of crashing somewhere else with a broken device.
+		if (m_d3dDevice && FAILED(m_d3dDevice->GetDeviceRemovedReason())) {
+			ReportDeviceRemoved("GraphicsEngine::EndRender device check");
+		}
+
 		// レンダリングターゲットへの描き込み完了待ち
 		m_renderContext.WaitUntilFinishDrawingToRenderTarget(m_frameBuffer.GetCurrentRenderTarget());
 		
@@ -417,5 +453,254 @@ namespace nsK2EngineLow {
 		// D3D12オブジェクトの解放リクエストを処理する。
 		ExecuteRequestReleaseD3D12Object();
 
+	}
+
+	namespace {
+		FILE* g_dredLogFile = nullptr;
+		// Print to both the log file and the debugger output window.
+		void DredLog(const char* fmt, ...)
+		{
+			char buf[2048];
+			va_list args;
+			va_start(args, fmt);
+			vsprintf_s(buf, fmt, args);
+			va_end(args);
+			if (g_dredLogFile) {
+				fputs(buf, g_dredLogFile);
+			}
+			OutputDebugStringA(buf);
+		}
+
+		// Readable names for D3D12_AUTO_BREADCRUMB_OP values.
+		const char* GetBreadcrumbOpName(int op)
+		{
+			switch (op) {
+			case 0:  return "SETMARKER";
+			case 1:  return "BEGINEVENT";
+			case 2:  return "ENDEVENT";
+			case 3:  return "DRAWINSTANCED";
+			case 4:  return "DRAWINDEXEDINSTANCED";
+			case 5:  return "EXECUTEINDIRECT";
+			case 6:  return "DISPATCH";
+			case 7:  return "COPYBUFFERREGION";
+			case 8:  return "COPYTEXTUREREGION";
+			case 9:  return "COPYRESOURCE";
+			case 10: return "COPYTILES";
+			case 11: return "RESOLVESUBRESOURCE";
+			case 12: return "CLEARRENDERTARGETVIEW";
+			case 13: return "CLEARUNORDEREDACCESSVIEW";
+			case 14: return "CLEARDEPTHSTENCILVIEW";
+			case 15: return "RESOURCEBARRIER";
+			case 16: return "EXECUTEBUNDLE";
+			case 17: return "PRESENT";
+			case 18: return "RESOLVEQUERYDATA";
+			case 19: return "BEGINSUBMISSION";
+			case 20: return "ENDSUBMISSION";
+			case 26: return "WRITEBUFFERIMMEDIATE";
+			case 39: return "SETPIPELINESTATE1";
+			case 42: return "DISPATCHMESH";
+			case 45: return "BARRIER";
+			case 46: return "BEGIN_COMMAND_LIST";
+			default: return "?";
+			}
+		}
+	}
+
+	void GraphicsEngine::QueryVideoMemoryMB(double& localUsageMB, double& localBudgetMB)
+	{
+		localUsageMB = 0.0;
+		localBudgetMB = 0.0;
+		if (m_d3dDevice == nullptr) {
+			return;
+		}
+		IDXGIFactory4* factory = nullptr;
+		if (SUCCEEDED(CreateDXGIFactory2(0, IID_PPV_ARGS(&factory)))) {
+			IDXGIAdapter3* adapter = nullptr;
+			const LUID luid = m_d3dDevice->GetAdapterLuid();
+			if (SUCCEEDED(factory->EnumAdapterByLuid(luid, IID_PPV_ARGS(&adapter)))) {
+				DXGI_QUERY_VIDEO_MEMORY_INFO local = {};
+				adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &local);
+				localUsageMB = local.CurrentUsage / (1024.0 * 1024.0);
+				localBudgetMB = local.Budget / (1024.0 * 1024.0);
+				adapter->Release();
+			}
+			factory->Release();
+		}
+	}
+
+	// DescriptorHeap.cpp のヒープ数カウンタ（デバイスロストレポートに載せる用）
+	extern int g_numDescriptorHeap;
+	extern int g_numDescriptorHeapLive;
+
+	void GraphicsEngine::ReportDeviceRemoved(const char* site)
+	{
+		// Model loading can run on a worker thread, so two threads may detect the
+		// removal at the same time. Let the first one write the report and abort;
+		// park any other caller here forever.
+		static std::atomic<bool> s_isReporting = false;
+		if (s_isReporting.exchange(true)) {
+			Sleep(INFINITE);
+		}
+
+		const HRESULT reason = m_d3dDevice ? m_d3dDevice->GetDeviceRemovedReason() : E_FAIL;
+
+		// The working directory is Game/, so this lands next to the play logs.
+		char logPath[256];
+		SYSTEMTIME st;
+		GetLocalTime(&st);
+		sprintf_s(logPath, "Logs/device_removed_%04d-%02d-%02d_%02d-%02d-%02d.txt",
+			st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+		fopen_s(&g_dredLogFile, logPath, "w");
+		if (g_dredLogFile == nullptr) {
+			fopen_s(&g_dredLogFile, "device_removed.txt", "w");
+		}
+
+		const char* reasonStr = "unknown";
+		switch (reason) {
+		case DXGI_ERROR_DEVICE_HUNG:            reasonStr = "DXGI_ERROR_DEVICE_HUNG (GPU hang / TDR timeout)"; break;
+		case DXGI_ERROR_DEVICE_REMOVED:         reasonStr = "DXGI_ERROR_DEVICE_REMOVED (adapter removed)"; break;
+		case DXGI_ERROR_DEVICE_RESET:           reasonStr = "DXGI_ERROR_DEVICE_RESET"; break;
+		case DXGI_ERROR_DRIVER_INTERNAL_ERROR:  reasonStr = "DXGI_ERROR_DRIVER_INTERNAL_ERROR (often VRAM exhaustion)"; break;
+		case DXGI_ERROR_INVALID_CALL:           reasonStr = "DXGI_ERROR_INVALID_CALL"; break;
+		case S_OK:                              reasonStr = "S_OK (device is NOT removed)"; break;
+		}
+		DredLog("=== Device Removed Report ===\n");
+		// Which call site triggered the report. When the reason below is S_OK, the
+		// device is fine and the real problem is an allocation failure at this site.
+		DredLog("Report site: %s\n", site ? site : "(unknown)");
+		DredLog("GetDeviceRemovedReason: 0x%08X %s\n", static_cast<unsigned int>(reason), reasonStr);
+		// Cumulative shader-visible descriptor heap creations. Drivers can fail
+		// CreateDescriptorHeap when too many shader-visible heaps are alive.
+		DredLog("DescriptorHeap creations so far: %d (alive now: %d)\n",
+			g_numDescriptorHeap, g_numDescriptorHeapLive);
+
+		// Current video memory usage of the adapter this device runs on.
+		{
+			IDXGIFactory4* factory = nullptr;
+			if (SUCCEEDED(CreateDXGIFactory2(0, IID_PPV_ARGS(&factory)))) {
+				IDXGIAdapter3* adapter = nullptr;
+				const LUID luid = m_d3dDevice->GetAdapterLuid();
+				if (SUCCEEDED(factory->EnumAdapterByLuid(luid, IID_PPV_ARGS(&adapter)))) {
+					DXGI_ADAPTER_DESC desc;
+					adapter->GetDesc(&desc);
+					DredLog("Adapter: %ls\n", desc.Description);
+					DXGI_QUERY_VIDEO_MEMORY_INFO local = {};
+					DXGI_QUERY_VIDEO_MEMORY_INFO nonLocal = {};
+					adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &local);
+					adapter->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_NON_LOCAL, &nonLocal);
+					DredLog("VRAM local    : usage %.1f MB / budget %.1f MB\n",
+						local.CurrentUsage / (1024.0 * 1024.0), local.Budget / (1024.0 * 1024.0));
+					DredLog("VRAM non-local: usage %.1f MB / budget %.1f MB\n",
+						nonLocal.CurrentUsage / (1024.0 * 1024.0), nonLocal.Budget / (1024.0 * 1024.0));
+					adapter->Release();
+				}
+				factory->Release();
+			}
+		}
+
+		// DRED breadcrumbs: which command list stopped at which operation.
+		// Use DRED 1.1 so marker/event strings (render pass and model names) appear inline.
+		ID3D12DeviceRemovedExtendedData1* dred1 = nullptr;
+		if (m_d3dDevice && SUCCEEDED(m_d3dDevice->QueryInterface(IID_PPV_ARGS(&dred1)))) {
+			D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 breadcrumbs = {};
+			if (SUCCEEDED(dred1->GetAutoBreadcrumbsOutput1(&breadcrumbs))) {
+				DredLog("--- Auto breadcrumbs (only command lists that did not finish) ---\n");
+				for (auto* node = breadcrumbs.pHeadAutoBreadcrumbNode; node != nullptr; node = node->pNext) {
+					const UINT32 last = node->pLastBreadcrumbValue ? *node->pLastBreadcrumbValue : 0;
+					if (last == node->BreadcrumbCount) {
+						continue;
+					}
+					// Prefer the ANSI debug name; fall back to the wide name set via SetName().
+					char listName[64] = "(no name)";
+					char queueName[64] = "(no name)";
+					if (node->pCommandListDebugNameA) {
+						sprintf_s(listName, "%s", node->pCommandListDebugNameA);
+					} else if (node->pCommandListDebugNameW) {
+						sprintf_s(listName, "%ls", node->pCommandListDebugNameW);
+					}
+					if (node->pCommandQueueDebugNameA) {
+						sprintf_s(queueName, "%s", node->pCommandQueueDebugNameA);
+					} else if (node->pCommandQueueDebugNameW) {
+						sprintf_s(queueName, "%ls", node->pCommandQueueDebugNameW);
+					}
+					DredLog("CommandList '%s' on queue '%s': stopped at op %u / %u\n",
+						listName, queueName, last, node->BreadcrumbCount);
+					// Dump the whole op history with any marker/event strings so the
+					// render pass and model around the hang can be identified.
+					UINT32 ctxIdx = 0;
+					for (UINT32 i = 0; i < node->BreadcrumbCount; i++) {
+						const int op = static_cast<int>(node->pCommandHistory[i]);
+						const wchar_t* context = nullptr;
+						while (ctxIdx < node->BreadcrumbContextsCount &&
+							node->pBreadcrumbContexts[ctxIdx].BreadcrumbIndex < i) {
+							ctxIdx++;
+						}
+						if (ctxIdx < node->BreadcrumbContextsCount &&
+							node->pBreadcrumbContexts[ctxIdx].BreadcrumbIndex == i) {
+							context = node->pBreadcrumbContexts[ctxIdx].pContextString;
+						}
+						DredLog("  op[%u] = %d %s%s%ls%s%s\n", i, op, GetBreadcrumbOpName(op),
+							context ? "  '" : "", context ? context : L"", context ? "'" : "",
+							(i == last) ? "  <-- last executed" : "");
+					}
+				}
+			}
+			dred1->Release();
+		}
+		// Fallback: DRED 1.0 without contexts.
+		ID3D12DeviceRemovedExtendedData* dred = nullptr;
+		if (dred1 == nullptr && m_d3dDevice && SUCCEEDED(m_d3dDevice->QueryInterface(IID_PPV_ARGS(&dred)))) {
+			D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT breadcrumbs = {};
+			if (SUCCEEDED(dred->GetAutoBreadcrumbsOutput(&breadcrumbs))) {
+				DredLog("--- Auto breadcrumbs (DRED 1.0, no contexts) ---\n");
+				for (auto* node = breadcrumbs.pHeadAutoBreadcrumbNode; node != nullptr; node = node->pNext) {
+					const UINT32 last = node->pLastBreadcrumbValue ? *node->pLastBreadcrumbValue : 0;
+					if (last == node->BreadcrumbCount) {
+						continue;
+					}
+					DredLog("CommandList '%s': stopped at op %u / %u\n",
+						node->pCommandListDebugNameA ? node->pCommandListDebugNameA : "(no name)",
+						last, node->BreadcrumbCount);
+					for (UINT32 i = 0; i < node->BreadcrumbCount; i++) {
+						const int op = static_cast<int>(node->pCommandHistory[i]);
+						DredLog("  op[%u] = %d %s%s\n", i, op, GetBreadcrumbOpName(op),
+							(i == last) ? "  <-- last executed" : "");
+					}
+				}
+			}
+			dred->Release();
+		}
+
+		// Page fault info comes from the base DRED interface; report it in both paths.
+		ID3D12DeviceRemovedExtendedData* dredPf = nullptr;
+		if (m_d3dDevice && SUCCEEDED(m_d3dDevice->QueryInterface(IID_PPV_ARGS(&dredPf)))) {
+			D3D12_DRED_PAGE_FAULT_OUTPUT pageFault = {};
+			if (SUCCEEDED(dredPf->GetPageFaultAllocationOutput(&pageFault))) {
+				DredLog("--- Page fault ---\n");
+				DredLog("PageFaultVA: 0x%llX\n", static_cast<unsigned long long>(pageFault.PageFaultVA));
+				for (auto* n = pageFault.pHeadExistingAllocationNode; n != nullptr; n = n->pNext) {
+					DredLog("existing allocation: '%s' type %d\n",
+						n->ObjectNameA ? n->ObjectNameA : "(no name)", static_cast<int>(n->AllocationType));
+				}
+				for (auto* n = pageFault.pHeadRecentFreedAllocationNode; n != nullptr; n = n->pNext) {
+					DredLog("recently freed allocation: '%s' type %d\n",
+						n->ObjectNameA ? n->ObjectNameA : "(no name)", static_cast<int>(n->AllocationType));
+				}
+			}
+			dredPf->Release();
+		}
+
+		DredLog("=== End of report ===\n");
+		if (g_dredLogFile) {
+			fclose(g_dredLogFile);
+			g_dredLogFile = nullptr;
+		}
+
+		wchar_t msg[512];
+		swprintf_s(msg,
+			L"GPU device removed (device lost) was detected.\nA report was written to:\n%hs",
+			logPath);
+		MessageBox(nullptr, msg, L"GPU Device Removed", MB_OK);
+		std::abort();
 	}
 }

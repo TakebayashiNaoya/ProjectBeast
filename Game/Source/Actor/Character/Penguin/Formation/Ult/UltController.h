@@ -88,7 +88,12 @@ namespace app
 			 * @brief クールダウンを最大値にリセットする
 			 * @details ゲーム開始直後など、ウルトを「何も貯まっていない状態」から開始させたい場合に呼ぶ
 			 */
-			void ResetCooldown() { m_cooldownTimer = m_cooldown; }
+			/**
+			 * @brief クールダウンを張り直す
+			 * @param rate クールダウン時間に掛ける倍率（省略時1.0）。
+			 *             ゲーム開始時に0.5を渡すと、最初のウルトへ半分の待ち時間で到達できる
+			 */
+			void ResetCooldown(const float rate = 1.0f) { m_cooldownTimer = m_cooldown * rate; }
 
 
 		private:

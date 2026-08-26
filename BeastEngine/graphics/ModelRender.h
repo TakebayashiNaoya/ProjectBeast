@@ -358,6 +358,21 @@ namespace nsBeastEngine
 		 * @param outlineWidth	輪郭線の太さ（法線押し出し量）
 		 * @param outlineColor	輪郭線の色（RGBA）
 		 */
+		/**
+		 * @brief トゥーンを使わずに輪郭線だけを有効にする
+		 * @details 本体は通常のディファードで描いたまま、輪郭線だけを
+		 *          フォワードパスで重ね描きする。キャラクターの視認性向上用。
+		 *          Init() の後に呼ぶこと。太さ・色は SetOutlineParam() で調整する
+		 */
+		void EnableOutline();
+
+		/**
+		 * @brief 輪郭線モデルだけを描画する
+		 * @details EnableOutline() したモデルに対して、レンダリングエンジンの
+		 *          フォワードパスから呼ばれる。ユーザーは直接呼ばない
+		 */
+		void OnDrawOutline(RenderContext& rc);
+
 		inline void SetOutlineParam(const float outlineWidth, const Vector4& outlineColor)
 		{
 			m_outlineCb.outlineWidth = outlineWidth;
@@ -526,6 +541,13 @@ namespace nsBeastEngine
 		void InitToonModels(const ModelInitData& baseInitData);
 
 		/**
+		 * @brief アウトラインモデルの初期化
+		 * @details InitToonModels() と EnableOutline() から呼ばれる。
+		 * @param baseInitData m_modelの初期化データをベースに使用する
+		 */
+		void InitOutlineModel(const ModelInitData& baseInitData);
+
+		/**
 		 * @brief シェーダーのエントリーポイントの設定
 		 * @param modelInitData モデルの初期化データ
 		 */
@@ -605,6 +627,12 @@ namespace nsBeastEngine
 		 *          背面法線押し出し方式で輪郭線を描画する。カリングはフロントフェース。
 		 */
 		std::unique_ptr<BeastModel> m_outlineModel;
+
+		/** トゥーンなしで輪郭線だけを描くかどうか（EnableOutline()で有効化） */
+		bool m_isOutlineOnlyEnabled = false;
+
+		/** EnableOutline() の遅延初期化用に控えた最終的なモデル初期化データ */
+		ModelInitData m_savedInitData;
 
 		/** ボーン（自前保有） */
 		Skeleton       m_skeleton;
@@ -696,6 +724,8 @@ namespace nsBeastEngine
 		 * @details WhiteBear など特定モデルのログ絞り込みに使用する
 		 */
 		std::string    m_debugName;
+		/** デバイスロスト調査用。DREDマーカーに刻むモデル名（ワイド文字） */
+		std::wstring   m_debugNameW;
 
 		/** 全モデル共通のトゥーン有効フラグ（staticで全インスタンスに共有） */
 		static bool s_isToonGlobalEnabled;

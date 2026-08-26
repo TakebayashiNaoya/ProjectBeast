@@ -59,6 +59,13 @@ namespace nsK2EngineLow {
 			m_commandList = commandList;
 		}
 		/// <summary>
+		/// Get the raw command list (for diagnostics such as DRED markers).
+		/// </summary>
+		ID3D12GraphicsCommandList4* GetCommandList() const
+		{
+			return m_commandList;
+		}
+		/// <summary>
 		/// ビューポートとシザリング矩形をセットで設定
 		/// </summary>
 		/// <param name="viewport">ビューポート</param>

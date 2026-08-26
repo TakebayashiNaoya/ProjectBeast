@@ -56,12 +56,12 @@ namespace app
 			auto* childPenMan = ChildPenguinManager::GetInstance();
 			childPenMan->CallRegroup();
 
-			auto* effect = &EffectManager::Get();
 			auto* sound = &SoundManager::Get();
 
 			// === 「おいで！」の演出 ===
+			// 視覚演出は FormationRangeVisualizer の波紋（声の届く範囲へ収束するリング）に
+			// 一本化した。旧 DaddyPenguinCommand エフェクトは波紋と重なってうるさいので出さない
 			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
-			effect->PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, EFFECT_SCALE);
 			sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutFollow, false);
 			sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemFollow, false);
 		}

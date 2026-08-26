@@ -17,9 +17,12 @@
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Actor/Stage/TerrainObject.h"
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/FeverTimeManager.h"
 #include "Source/Manager/IglooManager.h"
@@ -120,6 +123,31 @@ namespace app
 			const Quaternion BLUR_FIRE_BALL_ROTATION = Quaternion::Identity;
 			/** 青い火の玉の初期スケール */
 			const Vector3 BLUR_FIRE_BALL_SCALE_UP = Vector3(10.0f, 10.0f, 10.0f);
+
+			/** 三角陣ウルト中、スライドで触れた子を自動入隊させる半径 */
+			constexpr float TRIANGLE_ULT_PICKUP_RADIUS = 80.0f;
+
+			/** ウルトリングの陣形色（EnFormationType の並び順：円陣/三角陣/密集陣/散開陣） */
+			const Vector4 ULT_RING_COLORS[] = {
+				Vector4(0.35f, 1.0f,  0.55f, 1.0f),   // 円陣：緑
+				Vector4(1.0f,  0.9f,  0.3f,  1.0f),   // 三角陣：黄
+				Vector4(0.45f, 0.7f,  1.0f,  1.0f),   // 密集陣：青
+				Vector4(1.0f,  0.6f,  0.25f, 1.0f),   // 散開陣：橙
+			};
+			/** ウルトリングの不透明度（残り時間1.0でMAX、0でMIN。主張しすぎない薄さに） */
+			constexpr float ULT_RING_ALPHA_MIN = 0.08f;
+			constexpr float ULT_RING_ALPHA_MAX = 0.35f;
+
+			/** 散開陣ウルト中の入隊SE（音階コンボ）の設定。
+			 *  1入隊ごとにピッチが PITCH_STEP ずつ上がり、COMBO_MAX で頭打ち */
+			constexpr float SCATTER_JOIN_SE_VOLUME = 0.8f;
+			constexpr float SCATTER_JOIN_PITCH_STEP = 0.08f;
+			constexpr int   SCATTER_JOIN_COMBO_MAX = 12;
+
+			/** 親へのフローフィールドを作り直す最短間隔（秒） */
+			constexpr float FLOW_FIELD_REBUILD_INTERVAL = 0.5f;
+			/** 親がこの距離以上動いていたらフローフィールドを作り直す（動いていなければ再利用） */
+			constexpr float FLOW_FIELD_GOAL_MOVE_MIN = 60.0f;
 		}
 
 
@@ -141,6 +169,17 @@ namespace app
 		ChildPenguinManager::~ChildPenguinManager()
 		{
 			g_renderingEngine->UnregisterCustomRenderer(&m_rangeVisualizer);
+
+			// 生き残っている子ペンギンをすべて解放する。
+			// 解放しないとゲームループの周回ごとにモデルのGPUリソースが溜まり続け、
+			// ディスクリプタヒープの作成に失敗してクラッシュする。
+			// 削除待ち（m_destroyList）の個体も erase 前なので必ずこのリストに残っている。
+			for (auto* cp : m_childPenguinList)
+			{
+				delete cp;
+			}
+			m_childPenguinList.clear();
+			m_destroyList.clear();
 		}
 
 
@@ -172,11 +211,28 @@ namespace app
 			UpdateDaddyNoiseRadius();
 			UpdateBearThreats();
 			UpdateRegroupCall();
+			UpdateDaddyFlowField();
+			UpdateTriangleUltPickup();
+
+			/** 散開陣ウルトの入隊音階コンボは、ウルトが終わったらリセットする */
+			if (!m_formationController.IsUltActive())
+			{
+				m_scatterJoinCombo = 0;
+			}
+
+			/** ウルト発動中は隊列メンバー全員を発光させる（効果の担い手を見せる） */
+			const bool isUltGlowActive = m_formationController.IsUltActive();
 
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
 				cp->UpdateWrapper();
+
+				/** クマに狙われている子は赤く点滅させる（ブルームで光って見える） */
+				const bool isTargeted =
+					std::find(m_bearTargetedPenguins.begin(), m_bearTargetedPenguins.end(), cp)
+						!= m_bearTargetedPenguins.end();
+				cp->UpdateBearTargetHighlight(isTargeted, isUltGlowActive && IsFollower(cp));
 			}
 
 			UpdateGhostPenguins();
@@ -243,15 +299,34 @@ namespace app
 				}
 			}
 
-			/** 陣形範囲ビジュアライザーの更新 */
-			m_rangeVisualizer.SetVisible(true);
-			if (m_daddyPenguin != nullptr)
+			/** 再集合の呼びかけ範囲ビジュアライザーの更新。
+			 *  以前は入隊半径を常時表示していたが、いまはYボタンの呼びかけが
+			 *  効いている間だけ「声の届く範囲」をオレンジの波紋で見せる */
+			m_rangeVisualizer.SetVisible(IsRegroupCallActive());
+			if (m_daddyPenguin != nullptr && IsRegroupCallActive())
 			{
 				const Vector3 center = m_daddyPenguin->GetTransform().m_position;
-				const float joinRadius = m_formationController.GetJoinRadius();
-				/** 次レベルの空きスロットを計算（CalculateNextLevelPositions内でm_outerRadiusが一時変化するため先に読んでおく） */
+				/** 次レベルの空きスロット（スロットマーカーTODO用。現状は未描画） */
 				CalculateNextLevelSlots(center);
-				m_rangeVisualizer.Update(center, joinRadius, m_nextLevelSlots);
+				m_rangeVisualizer.Update(center, GetRegroupCallRadius(), m_nextLevelSlots);
+			}
+
+			/** ウルト発動中は隊列の外周（入隊半径）に陣形色のリングを出す。
+			 *  「今すごい状態」と効果の及ぶ群れの範囲を子供にも分かる形で見せる。
+			 *  残り時間が減るほど薄くなり、切れかけも伝わる */
+			const bool showUltRing =
+				m_formationController.IsUltActive() && m_daddyPenguin != nullptr;
+			m_rangeVisualizer.SetUltRingVisible(showUltRing);
+			if (showUltRing)
+			{
+				const float remaining = m_formationController.GetUltActiveRemainingRate();
+				const float ringAlpha =
+					ULT_RING_ALPHA_MIN + (ULT_RING_ALPHA_MAX - ULT_RING_ALPHA_MIN) * remaining;
+				m_rangeVisualizer.UpdateUltRing(
+					m_daddyPenguin->GetTransform().m_position,
+					m_formationController.GetJoinRadius(),
+					ringAlpha,
+					ULT_RING_COLORS[static_cast<int>(m_formationController.GetCurrentType())]);
 			}
 
 			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */
@@ -551,6 +626,21 @@ namespace app
 				m_followers.push_back(penguin);
 				ScoreManager::GetInstance().AddCollectedCount();
 				BattleManager::GetInstance().NotifyCPReactionChanged(penguin, ui::EnCPReactionType::Happy);
+
+				/** 散開陣ウルト「呼び声」：発動中の入隊は音階が上がるSEで
+				 *  「ごっそり拾う」快感を鳴らす（入隊が続くほどピッチが上がる） */
+				if (m_formationController.IsUltActive()
+					&& m_formationController.GetCurrentType() == EnFormationType::Scatter)
+				{
+					const SEHandle handle = SoundManager::Get().PlaySE(
+						enSoundKind_CPReactionHappy, SCATTER_JOIN_SE_VOLUME);
+					if (auto* se = SoundManager::Get().FindSE(handle))
+					{
+						se->SetFrequencyRatio(
+							1.0f + SCATTER_JOIN_PITCH_STEP * static_cast<float>(m_scatterJoinCombo));
+					}
+					m_scatterJoinCombo = min(m_scatterJoinCombo + 1, SCATTER_JOIN_COMBO_MAX);
+				}
 
 				if (auto* menu = InGameUIManager::GetInstance()->GetRemainingChildMenu())
 				{
@@ -869,12 +959,90 @@ namespace app
 		}
 
 
+		void ChildPenguinManager::UpdateTriangleUltPickup()
+		{
+			/** 三角陣ウルト「突進」：ウルト中のスライドで触れた子を自動入隊させる。
+			 *  速度特化の三角陣に「速さで集める」個性を持たせる（円陣の下位互換解消） */
+			if (m_daddyPenguin == nullptr) return;
+			if (!m_formationController.IsUltActive()) return;
+			if (m_formationController.GetCurrentType() != EnFormationType::Triangle) return;
+
+			/** スライド中（滑走ステート）のみ */
+			auto* daddySm = m_daddyPenguin->GetStateMachine();
+			if (daddySm == nullptr) return;
+			if (!daddySm->IsEqualCurrentState(PenguinSlidingState::ID())) return;
+
+			const Vector3 daddyPos = m_daddyPenguin->GetTransform().m_position;
+			for (auto* cp : m_childPenguinList)
+			{
+				if (cp == nullptr || IsFollower(cp)) continue;
+				if (cp->GetStateMachine()->GetIsInWhirlpool()) continue;
+
+				const auto* status = cp->GetStateMachine()->GetChildPenguinStatus();
+				if (status == nullptr || status->IsDead()) continue;
+
+				Vector3 diff = cp->GetTransform().m_position - daddyPos;
+				diff.y = 0.0f;
+				if (diff.LengthSq() <= TRIANGLE_ULT_PICKUP_RADIUS * TRIANGLE_ULT_PICKUP_RADIUS)
+				{
+					AddFollower(cp);
+				}
+			}
+		}
+
+
+		void ChildPenguinManager::UpdateDaddyFlowField()
+		{
+			m_flowFieldRebuildTimer -= g_gameTime->GetFrameDeltaTime();
+			if (m_flowFieldRebuildTimer > 0.0f) return;
+			m_flowFieldRebuildTimer = FLOW_FIELD_REBUILD_INTERVAL;
+
+			auto* stageSystem = StageSystem::GetInstance();
+			auto* terrain = (stageSystem != nullptr) ? stageSystem->GetTerrain() : nullptr;
+			if (terrain == nullptr || m_daddyPenguin == nullptr)
+			{
+				m_isFlowFieldValid = false;
+				return;
+			}
+
+			const Vector3 goal = m_daddyPenguin->GetTransform().m_position;
+
+			// 親がほとんど動いていなければ前回のフィールドをそのまま使う
+			if (m_isFlowFieldValid)
+			{
+				Vector3 moved = goal - m_flowFieldGoal;
+				moved.y = 0.0f;
+				if (moved.LengthSq() < FLOW_FIELD_GOAL_MOVE_MIN * FLOW_FIELD_GOAL_MOVE_MIN) return;
+			}
+
+			m_isFlowFieldValid = terrain->GetNavGrid().BuildFlowField(goal);
+			m_flowFieldGoal = goal;
+		}
+
+
+		bool ChildPenguinManager::GetDaddyFlowDirection(const Vector3& from, Vector3& outDir) const
+		{
+			if (!m_isFlowFieldValid) return false;
+
+			auto* stageSystem = StageSystem::GetInstance();
+			auto* terrain = (stageSystem != nullptr) ? stageSystem->GetTerrain() : nullptr;
+			if (terrain == nullptr) return false;
+
+			return terrain->GetNavGrid().GetFlowDirection(from, outDir);
+		}
+
+
 		void ChildPenguinManager::UpdateBearThreats()
 		{
 			m_bearThreats.clear();
+			m_bearTargetedPenguins.clear();
 
 			auto* em = EnemyManager::GetInstance();
-			if (em == nullptr) return;
+			if (em == nullptr)
+			{
+				m_formationChasedPenguins.clear();
+				return;
+			}
 
 			/**
 			 * GetEnemies() と GetControllers() は同じ m_enemyList から同じ順で作られるので
@@ -893,7 +1061,30 @@ namespace app
 				if (controllers[i]->GetFoundPenguin() == nullptr) continue;
 
 				m_bearThreats.push_back(enemies[i]->GetTransform().m_position);
+
+				/** 狙われている子は赤点滅の対象として覚えておく */
+				m_bearTargetedPenguins.push_back(controllers[i]->GetFoundPenguin());
 			}
+
+			/**
+			 * 「隊列の子が襲われている」の判定を更新する。
+			 * 狙われた子は逃走で即座に隊列から抜ける（RemoveFollower）ため、
+			 * 「今フォロワーか」だけを見ると判定が一瞬で消えてしまう。
+			 * 隊列中に狙われ始めた子は、同じクマの追跡が続く限り「隊列への脅威」として持ち続ける
+			 */
+			std::vector<const ChildPenguin*> stillChased;
+			for (const auto* penguin : m_bearTargetedPenguins)
+			{
+				const bool wasChasedFromFormation =
+					std::find(m_formationChasedPenguins.begin(), m_formationChasedPenguins.end(), penguin)
+						!= m_formationChasedPenguins.end();
+
+				if (IsFollower(penguin) || wasChasedFromFormation)
+				{
+					stillChased.push_back(penguin);
+				}
+			}
+			m_formationChasedPenguins = std::move(stillChased);
 		}
 
 

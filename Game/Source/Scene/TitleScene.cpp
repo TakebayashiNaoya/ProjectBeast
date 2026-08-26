@@ -19,6 +19,30 @@
 #include "TutorialInGameScene.h"
 
 
+namespace
+{
+	// デバッグ用の自動プレイ（環境変数 BEAST_AUTOPLAY で有効）。
+	// メニューを介さず Easy→Normal→Hard を周回する。値が周回数になる（"2"なら各難易度2周）。
+	// 親ペンギンはボットが操作する（DaddyPenguinController::UpdateAutoplayBot 参照）
+	bool IsAutoplayEnabled()
+	{
+		char buf[8];
+		size_t len = 0;
+		return getenv_s(&len, buf, sizeof(buf), "BEAST_AUTOPLAY") == 0 && len > 0 && buf[0] != '0';
+	}
+
+	// 自動プレイの周回数（BEAST_AUTOPLAY の数値。不正値は1周）
+	int GetAutoplayLoopCount()
+	{
+		char buf[8];
+		size_t len = 0;
+		if (getenv_s(&len, buf, sizeof(buf), "BEAST_AUTOPLAY") != 0 || len == 0) return 1;
+		const int count = atoi(buf);
+		return (count >= 1) ? count : 1;
+	}
+}
+
+
 namespace app
 {
 	TitleScene::TitleScene()
@@ -58,6 +82,45 @@ namespace app
 
 	void TitleScene::Update()
 	{
+		// ステージ紹介動画の撮影（環境変数 BEAST_SHOWCASE=Easy|Normal|Hard）：
+		// メニューを介さず指定ステージへ直行する。終了はインゲーム側が行う
+		if (!m_nextScene)
+		{
+			char stage[16];
+			size_t len = 0;
+			if (getenv_s(&len, stage, sizeof(stage), "BEAST_SHOWCASE") == 0 && len > 0)
+			{
+				if      (strcmp(stage, "Easy")   == 0) m_nextSceneId = EasyInGameScene::ID();
+				else if (strcmp(stage, "Normal") == 0) m_nextSceneId = NormalInGameScene::ID();
+				else                                   m_nextSceneId = HardInGameScene::ID();
+				SoundManager::Get().StopBGM();
+				m_nextScene = true;
+				return;
+			}
+		}
+
+		// 自動プレイ：タイトルに来るたびに Easy→Normal→Hard の順でステージへ入り、
+		// 指定周回数（BEAST_AUTOPLAYの値）を消化したら終了する
+		if (IsAutoplayEnabled() && !m_nextScene)
+		{
+			static int s_autoplayIndex = 0;
+			if (s_autoplayIndex >= 3 * GetAutoplayLoopCount())
+			{
+				PostQuitMessage(0);
+				return;
+			}
+			switch (s_autoplayIndex % 3)
+			{
+			case 0:  m_nextSceneId = EasyInGameScene::ID();   break;
+			case 1:  m_nextSceneId = NormalInGameScene::ID(); break;
+			default: m_nextSceneId = HardInGameScene::ID();   break;
+			}
+			s_autoplayIndex++;
+			SoundManager::Get().StopBGM();
+			m_nextScene = true;
+			return;
+		}
+
 		switch (m_state)
 		{
 		case TitleState::Title:

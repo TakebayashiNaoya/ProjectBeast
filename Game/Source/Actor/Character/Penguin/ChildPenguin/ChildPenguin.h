@@ -90,6 +90,14 @@ namespace app
 			/** @brief 子ペンギンの足跡優先度（最優先で消される） */
 			virtual int GetFootprintPriority() const override { return 0; }
 
+			/**
+			 * @brief 足跡を出さない状態かどうか
+			 * @details 共通条件（ジャンプ・泳ぎ・スライド中）に加えて、
+			 *          親から遠い（＝画面外の）子は出さない。見えない足跡で
+			 *          プールの枠を消費すると、画面内の子の足跡が薄くなるため
+			 */
+			virtual bool ShouldSuppressFootprint() const override;
+
 
 		public:
 			void SetIglooFixedPos(const Vector3& pos) { m_iglooFixedPos = pos; }
@@ -114,6 +122,18 @@ namespace app
 			 */
 			void UpdateAtCountDownTime();
 
+			/**
+			 * @brief 体色ハイライト（点滅・発光）の更新
+			 * @details 優先度の高い順に、①クマに狙われている赤点滅（輝度1超で
+			 *          ブルームが拾って光る）②ウルト発動中の隊列発光（ゆっくりした
+			 *          呼吸のような明滅）③勇敢時間の明滅、を適用する。
+			 *          どれでもなければタイプ別カラーへ戻す。
+			 *          毎フレーム ChildPenguinManager::Update() から呼ばれる。
+			 * @param isTargeted   このフレームにクマに狙われているかどうか
+			 * @param isUltGlowing ウルト発動中の隊列メンバーとして発光させるかどうか
+			 */
+			void UpdateBearTargetHighlight(const bool isTargeted, const bool isUltGlowing);
+
 
 		private:
 			/** ステートマシン */
@@ -130,6 +150,10 @@ namespace app
 			Vector4 m_typeColor = Vector4::One;
 			/** カラー適用済みフラグ（モデルロード完了後に一度だけ適用） */
 			bool m_colorApplied = false;
+			/** クマに狙われている点滅の経過時間（秒） */
+			float m_highlightTimer = 0.0f;
+			/** クマに狙われている点滅中かどうか */
+			bool m_isHighlighted = false;
 
 			bool m_isInsideIgloo = false;
 			Vector3 m_iglooFixedPos;  // 固定座標

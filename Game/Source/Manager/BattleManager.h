@@ -15,6 +15,7 @@ namespace app
 	{
 		class ChildPenguin;
 		class DaddyPenguin;
+		class Enemy;
 	}
 
 
@@ -200,6 +201,50 @@ namespace app
 
 
 		/**
+		 * @brief シロクマ攻撃無効化（密集陣ウルト）の有効/無効を設定する
+		 * @details 密集陣ウルトの BearAttackNullifyEffect が Enter/Exit で切り替える。
+		 *          有効な間、隊列の子への攻撃は EnemyController 側で無効化され、
+		 *          攻撃したクマは弾き飛ばされてスタンする。
+		 * @param enabled 有効にするならtrue
+		 */
+		inline void SetBearAttackNullified(const bool enabled)
+		{
+			m_isBearAttackNullified = enabled;
+		}
+
+		/**
+		 * @brief シロクマ攻撃無効化（密集陣ウルト）が有効かどうか
+		 * @return 有効ならtrue
+		 */
+		inline bool IsBearAttackNullified() const
+		{
+			return m_isBearAttackNullified;
+		}
+
+
+		/**
+		 * @brief シロクマリアクションUI通知functionを設定
+		 * @param func 引数：対象のシロクマ、リアクションのタイプ
+		 */
+		inline void SetOnEnemyReactionChanged(std::function<void(actor::Enemy*, ui::EnCPReactionType)> func)
+		{
+			m_onEnemyReactionChanged = std::move(func);
+		}
+
+		/**
+		 * @brief シロクマのリアクション再生を通知する
+		 * @detail 音に気づいて索敵を始めた瞬間（？）と、ペンギンを見つけて咆哮した瞬間（！）に
+		 *         EnemyController から呼ぶ。typeの確定は呼び出し側の責務。
+		 * @param enemy 対象のシロクマ
+		 * @param type リアクションのタイプ（Question / Exclamation を想定）
+		 */
+		inline void NotifyEnemyReactionChanged(actor::Enemy* enemy, ui::EnCPReactionType type)
+		{
+			if (m_onEnemyReactionChanged) m_onEnemyReactionChanged(enemy, type);
+		}
+
+
+		/**
 		 * @brief 陣形レベルアップUI通知functionを設定
 		 * @param func 引数：新しい陣形レベル
 		 */
@@ -260,8 +305,13 @@ namespace app
 		/** 渦潮UI更新通知 */
 		std::function<void(std::vector<Vector3>)> m_wpWarningChanged;
 
+		/** シロクマ攻撃無効化（密集陣ウルト）が有効かどうか */
+		bool m_isBearAttackNullified = false;
+
 		/** 子ペンギンリアクションUI更新通知 */
 		std::function<void(actor::ChildPenguin*, ui::EnCPReactionType, ui::EnCPReactionPriority)> m_onCPReactionChanged;
+		/** シロクマリアクションUI更新通知 */
+		std::function<void(actor::Enemy*, ui::EnCPReactionType)> m_onEnemyReactionChanged;
 
 		/** 陣形レベルアップUI更新通知 */
 		std::function<void(int)> m_onFormationLevelUp;

@@ -32,28 +32,31 @@ namespace app
 
 			/**
 			 * @brief 下りの効き
-			 * @details 新 Normal に実在する最大傾斜 41.4 度で、親のスライド 180 が
-			 *          泳ぎ 230 に並ぶよう決めた（230/180 = 1.278、0.278/sin(41.4) = 0.42）。
-			 *          泳ぎが最速の移動手段である立場を崩さないための上限でもある。
+			 * @details 親のスライド基準速度を 120（ダッシュ130の少し下）へ落としたのに合わせて
+			 *          係数を上げ、滑り台感を維持している。約3度の下りでダッシュを追い越し、
+			 *          16.8度（Normalの中央値）で 224 ≒ 泳ぎ、30度で 300。
+			 *          「平地は走り、下りが見えたらスライド」の読み合いを作るのが狙い
+			 *          （2026-08-23 試遊フィードバック）。
 			 */
-			constexpr float SLIDE_SLOPE_GAIN_DOWN = 0.42f;
+			constexpr float SLIDE_SLOPE_GAIN_DOWN = 3.0f;
 			/**
 			 * @brief 上りの罰
-			 * @details 下りの倍以上にしてある。傾斜 16.8 度（新 Normal の中央値）の上りで
-			 *          親のスライドが 136 となり走り 130 とほぼ同値、31.7 度で 100 と
-			 *          走りより遅くなる。「スライドを押しっぱなしにするのが常に最適」に
-			 *          ならない角度を 20 度前後へ置くための値。
+			 * @details 同フィードバック「上り坂は一気に減速し、滑り落ちていくぐらい」を受けて
+			 *          0.85 から強化した。sin(θ)=0.286（約16.6度）の上りで速度が0になり、
+			 *          それより急な上りでは倍率が負になって斜面をずり落ちる（親のみ。
+			 *          m_isSlideBackAllowed 参照）。
 			 */
-			constexpr float SLIDE_SLOPE_GAIN_UP = 0.85f;
+			constexpr float SLIDE_SLOPE_GAIN_UP = 3.5f;
 			/**
 			 * @brief 速度倍率の上限
-			 * @details 接地限界 63 度の値（x1.374）のすぐ上に置いてあるので、
-			 *          正常な地形ではクランプされない。ハイトマップ由来の法線が
-			 *          1ピクセルの尖りで極端な値を返したときの事故対策。
+			 * @details 親の基準120に対して上限312。32度を超える下りで頭打ちになる。
+			 *          ハイトマップ由来の法線の尖りで一瞬だけ極端な値が出る事故の対策も兼ねる。
 			 */
-			constexpr float SLIDE_SLOPE_MUL_MAX = 1.40f;
-			/** 速度倍率の下限（速度が0や負にならないことの保証） */
+			constexpr float SLIDE_SLOPE_MUL_MAX = 2.6f;
+			/** 速度倍率の下限（AIの子ペンギン用。前進を保証して上り坂で永久後退しない） */
 			constexpr float SLIDE_SLOPE_MUL_MIN = 0.25f;
+			/** 速度倍率の下限（親ペンギン用。負＝斜面をずり落ちる。-1で基準速度と同速の後退まで） */
+			constexpr float SLIDE_SLOPE_MUL_MIN_PLAYER = -1.0f;
 			/**
 			 * @brief 傾斜倍率の追従時間（秒）
 			 * @details 尾根をまたいだ瞬間に目標速度が下り値と上り値を往復するのを防ぐ。
@@ -107,15 +110,12 @@ namespace app
 
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
-			// スタミナ消費に傾斜倍率が要るので、ゲージより先に傾斜を更新する
+			// 傾斜倍率の更新（スライド速度の算出に毎フレーム必要）
 			UpdateSlideSlope();
 
-			// 下りほど消費が減り、上りほど増える。真下り（s=1）で消費0になる連続関数のため、
-			// 「消費する／しない」の境界で挙動が飛ばない
-			float drainScale = 1.0f - m_slideSlopeSigned;
-			drainScale = max(0.0f, min(SLIDE_STAMINA_DRAIN_SCALE_MAX, drainScale));
-
-			m_slideStaminaGauge.Update(m_isSlide, deltaTime, drainScale);
+			// スライドのスタミナは撤廃した（2026-08-23 試遊フィードバック）。
+			// ゲージは消費させず満タンのまま維持する（CanUseSlide も常にtrue）
+			m_slideStaminaGauge.Update(false, deltaTime);
 			m_jumpStaminaGauge.Update(false, deltaTime);
 		}
 
@@ -160,7 +160,11 @@ namespace app
 			// 符号つき傾斜を速度倍率へ変換する（下りと上りで係数が違う）
 			const float gain = (m_slideSlopeSigned >= 0.0f) ? SLIDE_SLOPE_GAIN_DOWN : SLIDE_SLOPE_GAIN_UP;
 			const float multiplier = 1.0f + gain * m_slideSlopeSigned;
-			m_slideSlopeMultiplier = max(SLIDE_SLOPE_MUL_MIN, min(SLIDE_SLOPE_MUL_MAX, multiplier));
+
+			// 親ペンギンは急な上りで倍率が負になり、斜面をずり落ちる。
+			// AIの子ペンギンは前進の下限を保証する（上り坂で永久に後退しないため）
+			const float mulMin = m_isSlideBackAllowed ? SLIDE_SLOPE_MUL_MIN_PLAYER : SLIDE_SLOPE_MUL_MIN;
+			m_slideSlopeMultiplier = max(mulMin, min(SLIDE_SLOPE_MUL_MAX, multiplier));
 		}
 
 

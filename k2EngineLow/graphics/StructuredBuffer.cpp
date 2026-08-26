@@ -42,7 +42,12 @@ namespace nsK2EngineLow {
 			//マップ、アンマップのオーバーヘッドを軽減するためにはこのインスタンスが生きている間は行わない。
 			{
 				CD3DX12_RANGE readRange(0, 0);        //     intend to read from this resource on the CPU.
-				buffer->Map(0, &readRange, reinterpret_cast<void**>(&m_buffersOnCPU[bufferNo]));
+				if (buffer == nullptr ||
+					FAILED(buffer->Map(0, &readRange, reinterpret_cast<void**>(&m_buffersOnCPU[bufferNo])))) {
+					// Creation/Map fails after a device removal. Write the DRED report instead of crashing later.
+					g_graphicsEngine->ReportDeviceRemoved("StructuredBuffer map failed (Init)");
+					return;
+				}
 			}
 			if (initData != nullptr) {
 				memcpy(m_buffersOnCPU[bufferNo], initData, m_sizeOfElement * m_numElement);
@@ -55,6 +60,11 @@ namespace nsK2EngineLow {
 	void StructuredBuffer::Update(void* data)
 	{
 		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		if (m_buffersOnCPU[backBufferIndex] == nullptr) {
+			// The mapping failed (device removal during Init). Report instead of writing to null.
+			g_graphicsEngine->ReportDeviceRemoved("StructuredBuffer null map (Update)");
+			return;
+		}
 		memcpy(m_buffersOnCPU[backBufferIndex], data, m_numElement * m_sizeOfElement);
 	}
 	ID3D12Resource* StructuredBuffer::GetD3DResoruce()

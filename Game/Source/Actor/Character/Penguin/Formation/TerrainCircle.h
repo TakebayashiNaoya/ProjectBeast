@@ -44,10 +44,42 @@ namespace app
 
 			/**
 			 * @brief 毎フレーム更新
-			 * @param center 円の中心座標（XZ 座標から地表 Y をサンプリングする）
-			 * @param radius 円の半径
+			 * @param center     円の中心座標（XZ 座標から地表 Y をサンプリングする）
+			 * @param radius     円の半径
+			 * @param alphaScale 縁取り・塗りつぶしの不透明度に掛ける係数（波紋のフェード用）
 			 */
-			void Update(const Vector3& center, float radius);
+			void Update(const Vector3& center, float radius, float alphaScale = 1.0f);
+
+			/**
+			 * @brief グラデーション帯（波紋リング）の初期化
+			 * @details 中央が濃く、内外の縁へ向かって透明になる帯を TRIANGLE_LIST で描く。
+			 *          Init() とは独立して使える（両方初期化してもよい）
+			 * @param segments 円周の分割数
+			 * @param color    帯の色（RGBA。アルファは帯中央の濃さ）
+			 */
+			void InitBand(int segments, const Vector4& color);
+
+			/**
+			 * @brief グラデーション帯の色を変更する
+			 * @details 陣形色のウルトリングなど、実行時に色を切り替えたい帯で使う
+			 * @param color 帯の色（RGBA。アルファは帯中央の濃さ）
+			 */
+			void SetBandColor(const Vector4& color) { m_bandColor = color; }
+
+			/**
+			 * @brief グラデーション帯の毎フレーム更新
+			 * @param center     帯の中心座標
+			 * @param radius     帯の中心線の半径
+			 * @param halfWidth  帯の半幅（radius±halfWidth の範囲に描く）
+			 * @param alphaScale 帯全体の不透明度係数（波紋のフェード用）
+			 */
+			void UpdateBand(const Vector3& center, float radius, float halfWidth, float alphaScale);
+
+			/**
+			 * @brief グラデーション帯を描画する（TRIANGLE_LIST）
+			 * @note 呼び出し前に塗りつぶし用 PSO（アルファブレンド有効）がセットされていること
+			 */
+			void RenderBand(RenderContext& rc);
 
 			/**
 			 * @brief 塗りつぶしを描画する（TRIANGLE_LIST）
@@ -101,6 +133,13 @@ namespace app
 			IndexBuffer  m_edgeIndexBuffer;   /** 縁取り用インデックスバッファ */
 			VertexBuffer m_fillVertexBuffer;  /** 塗りつぶし用頂点バッファ */
 			IndexBuffer  m_fillIndexBuffer;   /** 塗りつぶし用インデックスバッファ */
+
+			int     m_bandSegments = 0;                       /** 帯の円周分割数（0なら帯は未初期化） */
+			Vector4 m_bandColor = { 1.0f, 1.0f, 1.0f, 1.0f }; /** 帯の色 */
+			std::vector<Vertex> m_bandVerts;                  /** 帯用頂点バッファ */
+			int m_bandVertexCount = 0;                        /** 帯用頂点バッファの有効頂点数 */
+			VertexBuffer m_bandVertexBuffer;                  /** 帯用頂点バッファ */
+			IndexBuffer  m_bandIndexBuffer;                   /** 帯用インデックスバッファ */
 		};
 	}
 }

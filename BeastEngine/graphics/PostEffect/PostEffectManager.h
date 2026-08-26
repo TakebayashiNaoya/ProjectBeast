@@ -6,6 +6,7 @@
 #pragma once
 #include "Graphics/PostEffect/PostEffectTypes.h"
 #include "Graphics/PostEffect/Bloom.h"
+#include "Graphics/PostEffect/RadialBlur.h"
 #include "Graphics/PostEffect/ToneMap.h"
 
 
@@ -57,10 +58,19 @@ namespace nsBeastEngine
 		 */
 		ToneMap& GetToneMap() { return m_toneMap; }
 
+		/**
+		 * @brief ラジアルブラーを取得する
+		 * @details シロクマの咆哮などの衝撃演出でゲーム側が Start() を呼ぶために使う
+		 * @return ラジアルブラーの参照
+		 */
+		RadialBlur& GetRadialBlur() { return m_radialBlur; }
+
 
 	private:
 		/** ブルームエフェクト */
 		Bloom m_bloom;
+		/** ラジアルブラー */
+		RadialBlur m_radialBlur;
 		/** トーンマップ */
 		ToneMap m_toneMap;
 	};

@@ -31,6 +31,29 @@ namespace app {
 			void Update();
 			void Render(RenderContext& rc);
 
+			/**
+			 * @brief 全スロットのモデルを現在の地形で事前初期化する（分割実行）
+			 * @details モデル初期化は1スロット8ms前後かかるため、プレイ中の初回スポーンに
+			 *          任せるとフレーム落ちの原因になる。インゲームのロード中
+			 *          （地形ロード完了後）に毎フレーム呼んで、ヒッチをロード画面へ吸収する。
+			 *          ステージをまたいだ2回目以降のロードでも、地形世代が進んでいるため
+			 *          全スロットが新しいハイトマップで再初期化される
+			 * @param maxInitCount この呼び出しで初期化する最大枚数
+			 * @return 全スロットの初期化が完了していればtrue
+			 */
+			bool PrewarmPoolsStep(int maxInitCount);
+
+			/**
+			 * @brief ステージ遷移時の後始末
+			 * @details 全デカールを非アクティブ化し、地形の世代番号を進める。
+			 *          このマネージャーはプロセス寿命のシングルトンなので、
+			 *          破棄された前ステージの地形ハイトマップを参照し続けないよう、
+			 *          インゲームシーンの破棄時に必ず呼ぶこと。
+			 *          呼ばないと次ステージのデカール描画で解放済みテクスチャを
+			 *          GPUが読み、デバイスハング（TDR）でクラッシュする
+			 */
+			void OnStageChanged();
+
 
 		private:
 			DecalManager() = default;
@@ -89,10 +112,20 @@ namespace app {
 			 * 偏った瞬間でも足りる。空き待ちで捨てた回数は DecalProfiler の
 			 * spawnNoSlot / evictions で確認できる
 			 */
-			static constexpr int MAX_DECAL_NUM_PER_KIND = 24;
+			/**
+			 * @brief 種類ごとのプール枚数。添字は DecalKind をintにしたもの（雪・草・岩・クマ）。
+			 * @details 子ペンギンの大半は雪面を歩くため、雪に厚く割り振る。
+			 *          合計枚数の上限は見た目ではなく**ディスクリプタヒープの総数**で決まる。
+			 *          デカール1枚がヒープ1個を占有し、フィーバー時はゲーム全体で約3590個
+			 *          （ドライバ上限は実測で生存4021個の時点で作成失敗≒4096）に達するため、
+			 *          デカールに使える枠は100個強しかない（2026-08-26 実測。
+			 *          合計384枚にしたらフィーバーで上限超過しクラッシュした）。
+			 *          これ以上増やすにはヒープを共有するインスタンシング化が必要
+			 */
+			static constexpr int POOL_SIZE_PER_KIND[DECAL_KIND_NUM] = { 64, 8, 8, 24 };
 
-			/** 子ペンギン（優先度0）が種類ごとのプールで使ってよい上限。従来の 40/64 と同じ比率 */
-			static constexpr int MAX_CHILD_DECAL_NUM_PER_KIND = 15;
+			/** 子ペンギン（優先度0）が各プールで使ってよい上限（親・クマ用の枠を残す） */
+			static constexpr int CHILD_DECAL_NUM_PER_KIND[DECAL_KIND_NUM] = { 56, 6, 6, 20 };
 			static constexpr float RAY_START_HEIGHT = 50.0f;
 			static constexpr float RAY_MAX_DISTANCE = 200.0f;
 			static constexpr float PROJECTED_SURFACE_OFFSET = 1.0f;
@@ -105,6 +138,9 @@ namespace app {
 
 			/** 種類ごとのデカールのプール。添字は DecalKind をintにしたもの */
 			std::array<std::vector<Decal>, DECAL_KIND_NUM> m_decalPools;
+
+			/** 地形の世代番号。OnStageChanged() のたびに増え、Decal側の再初期化判定に使う */
+			int m_terrainGeneration = 0;
 
 			nsK2EngineLow::Texture m_snowFootprintTex;
 			nsK2EngineLow::Texture m_grassFootprintTex;

@@ -22,7 +22,9 @@ namespace {
 
 	const Vector4 COLOR_GRASS_FOOTPRINT(0.35f, 0.42f, 0.20f, 1.0f);
 	const Vector4 COLOR_ROCK_FOOTPRINT(0.35f, 0.35f, 0.35f, 1.0f);
-	const Vector4 COLOR_SNOW_FOOTPRINT(0.55f, 0.70f, 0.90f, 1.0f);
+	/** 雪・氷面の足跡色。流氷原の氷はこの色に近い淡色のため、
+	 *  薄くすると足跡が地面に溶けて見えなくなる。濃いめの青で維持する */
+	const Vector4 COLOR_SNOW_FOOTPRINT(0.28f, 0.42f, 0.65f, 1.0f);
 
 
 	/** @brief 環境変数を整数で読む。未設定なら既定値を返す */
@@ -51,6 +53,7 @@ namespace app {
 	namespace effect {
 		TerrainHeightInfo DecalManager::BuildTerrainHeightInfo() const {
 			TerrainHeightInfo info;
+			info.generation = m_terrainGeneration;
 			if (auto* stageSystem = actor::StageSystem::GetInstance()) {
 				if (auto* terrain = stageSystem->GetTerrain()) {
 					info.heightmapTex = &terrain->GetHeightmapTextureGpu();
@@ -61,6 +64,41 @@ namespace app {
 				}
 			}
 			return info;
+		}
+
+
+		bool DecalManager::PrewarmPoolsStep(int maxInitCount) {
+			EnsureInited();
+
+			// 地形がまだ無ければ完了扱いにする（初回スポーン時の遅延初期化に任せる）
+			const TerrainHeightInfo terrainInfo = BuildTerrainHeightInfo();
+			if (terrainInfo.heightmapTex == nullptr) return true;
+
+			// 初期化済みスロットは InitModelIfNeeded が即returnするので、
+			// 毎回先頭から走査しても未初期化の続きから消化される
+			int initCount = 0;
+			for (int kindIndex = 0; kindIndex < DECAL_KIND_NUM; ++kindIndex) {
+				const DecalKind kind = static_cast<DecalKind>(kindIndex);
+				for (auto& decal : m_decalPools[kindIndex]) {
+					if (decal.InitModelIfNeeded(kind, GetTextureForKind(kind), SHARED_QUAD_TKM_KEY, terrainInfo)) {
+						if (++initCount >= maxInitCount) return false;
+					}
+				}
+			}
+			return true;
+		}
+
+
+		void DecalManager::OnStageChanged() {
+			// 前ステージのデカールが破棄済みの地形テクスチャを参照したまま
+			// 描画され続けないよう、全スロットを即座に止める
+			for (auto& pool : m_decalPools) {
+				for (auto& decal : pool) {
+					decal.Deactivate();
+				}
+			}
+			// 世代を進める。次のSpawnで各スロットが新しい地形ハイトマップで再初期化される
+			m_terrainGeneration++;
 		}
 
 
@@ -75,9 +113,11 @@ namespace app {
 			// 種類ごとにプールを持つ。ここで作るのは ModelRender の器だけで、
 			// 中身（InitFromLoaded）は最初にそのスロットを使うときまで遅らせる。
 			// 空のままのスロットは一度も作られないので、枚数を増やしても起動は重くならない
-			for (auto& pool : m_decalPools) {
-				pool.reserve(MAX_DECAL_NUM_PER_KIND);
-				for (int i = 0; i < MAX_DECAL_NUM_PER_KIND; ++i) {
+			for (int kindIndex = 0; kindIndex < DECAL_KIND_NUM; ++kindIndex) {
+				auto& pool = m_decalPools[kindIndex];
+				const int poolSize = POOL_SIZE_PER_KIND[kindIndex];
+				pool.reserve(poolSize);
+				for (int i = 0; i < poolSize; ++i) {
 					pool.emplace_back();
 					pool.back().Prepare();
 				}
@@ -185,7 +225,7 @@ namespace app {
 			if (priority == 0) {
 				int childCount = 0;
 				for (const auto& decal : pool) { if (decal.IsActive() && decal.GetPriority() == 0) childCount++; }
-				if (childCount >= MAX_CHILD_DECAL_NUM_PER_KIND) {
+				if (childCount >= CHILD_DECAL_NUM_PER_KIND[static_cast<int>(finalKind)]) {
 					for (int i = 0; i < static_cast<int>(pool.size()); ++i) {
 						if (pool[i].IsActive() && pool[i].GetPriority() == 0) {
 							if (pool[i].GetRemainingLife() < minRemaining) { minRemaining = pool[i].GetRemainingLife(); targetIndex = i; }

@@ -46,8 +46,13 @@ namespace nsK2EngineLow {
 	}
 	void IndexBuffer::Copy(uint16_t* srcIndecies)
 	{
-		uint32_t* pData;
-		m_indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+		uint32_t* pData = nullptr;
+		auto hr = m_indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+		if (FAILED(hr) || pData == nullptr) {
+			// Map fails after a device removal. Write the DRED report instead of crashing here.
+			g_graphicsEngine->ReportDeviceRemoved("IndexBuffer::Copy(u16) map failed");
+			return;
+		}
 		for (int i = 0; i < m_count; i++) {
 			pData[i] = srcIndecies[i];
 		}
@@ -55,8 +60,13 @@ namespace nsK2EngineLow {
 	}
 	void IndexBuffer::Copy(uint32_t* srcIndecies)
 	{
-		uint32_t* pData;
-		m_indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+		uint32_t* pData = nullptr;
+		auto hr = m_indexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&pData));
+		if (FAILED(hr) || pData == nullptr) {
+			// Map fails after a device removal. Write the DRED report instead of crashing here.
+			g_graphicsEngine->ReportDeviceRemoved("IndexBuffer::Copy(u32) map failed");
+			return;
+		}
 		for (int i = 0; i < m_count; i++) {
 			pData[i] = srcIndecies[i];
 		}

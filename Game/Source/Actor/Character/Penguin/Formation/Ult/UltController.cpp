@@ -7,6 +7,8 @@
 #include "UltController.h"
 #include "IUltEffect.h"
 #include "Source/Actor/Character/Penguin/Formation/Effect/FormationEffectChain.h"
+#include "Source/Camera/CameraController.h"
+#include "Source/Camera/CameraManager.h"
 #include "Source/Sound/SoundManager.h"
 
 
@@ -24,6 +26,25 @@ namespace app
 			constexpr float ULT_ACTIVATE_SE_VOLUME  = 1.0f;
 			/** ウルト発動中（ディスチャージ）SEの音量倍率 */
 			constexpr float ULT_DISCHARGE_SE_VOLUME = 1.0f;
+
+			//============================================//
+			// 発動の瞬間の演出（超必発動の文法）
+			// 一瞬のスローモーション＋画面が中心へ吸い込まれるラジアルブラー
+			//============================================//
+
+			/** スローモーションの時間倍率（うるさすぎない程度の軽いタメ） */
+			constexpr float ULT_SLOW_MOTION_SCALE = 0.4f;
+			/** スローモーションの長さ（実時間・秒） */
+			constexpr float ULT_SLOW_MOTION_DURATION = 0.3f;
+			/** ラジアルブラーの強さ（咆哮の半分程度に抑える） */
+			constexpr float ULT_BLUR_STRENGTH = 0.5f;
+			/** ラジアルブラーの立ち上がり時間（秒） */
+			constexpr float ULT_BLUR_ATTACK_TIME = 0.12f;
+			/** ラジアルブラーの合計時間（秒） */
+			constexpr float ULT_BLUR_DURATION = 0.5f;
+			/** パンチイン（注視点へ一瞬寄る）の割合と長さ（秒） */
+			constexpr float ULT_PUNCH_IN_AMOUNT = 0.07f;
+			constexpr float ULT_PUNCH_IN_DURATION = 0.3f;
 		}
 
 
@@ -65,6 +86,17 @@ namespace app
 
 			// ウルト発動SEを鳴らす
 			SoundManager::Get().PlaySE(enSoundKind_UltActivate, ULT_ACTIVATE_SE_VOLUME);
+
+			// 発動の瞬間を「事件」にする：一瞬のスローモーション＋ラジアルブラー＋パンチイン。
+			// シロクマの脅威で下がった感情曲線を、ウルトの手応えで引き上げる演出
+			g_gameTime->StartSlowMotion(ULT_SLOW_MOTION_SCALE, ULT_SLOW_MOTION_DURATION);
+			nsBeastEngine::g_renderingEngine->GetPostEffectManager()
+				.GetRadialBlur().Start(ULT_BLUR_STRENGTH, ULT_BLUR_ATTACK_TIME, ULT_BLUR_DURATION);
+			if (auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+				camera::GameCamera::ID()))
+			{
+				gameCamera->StartPunchIn(ULT_PUNCH_IN_AMOUNT, ULT_PUNCH_IN_DURATION);
+			}
 
 			// 感情曲線の「上げ」側を実測するため、発動をプレイログへ残す
 			if (auto* lm = GameLogManager::GetInstance())

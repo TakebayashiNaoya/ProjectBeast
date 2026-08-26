@@ -39,14 +39,14 @@ namespace app
 			}
 
 			/**
-			 * @brief スライドのスタミナ状態を設定する（毎フレーム外部から渡される）
-			 * @param ratio 0.0(空)〜1.0(満タン)の割合
+			 * @brief Y（再集合の呼びかけ）のクールダウン状態を設定する（毎フレーム外部から渡される）
+			 * @param ratio 0.0(使用直後)〜1.0(使用可能)の割合
 			 * @param isLocked クールダウン中かどうか
 			 */
-			inline void SetSlideStaminaInfo(float ratio, bool isLocked)
+			inline void SetRegroupCooldownInfo(float ratio, bool isLocked)
 			{
-				m_slideStaminaRatio = ratio;
-				m_isSlideStaminaLocked = isLocked;
+				m_regroupCooldownRatio = ratio;
+				m_isRegroupCooldownLocked = isLocked;
 			}
 
 
@@ -57,11 +57,15 @@ namespace app
 			/** スニーク関連アイコンのカラーをグレー / 通常に切り替える */
 			void UpdateSneakIconColor();
 
-			/** ジャンプ・スライドのスタミナサークルゲージの更新処理（追従イージング＋色演出） */
+			/** ジャンプスタミナ・Yクールダウンのサークルゲージの更新処理（追従イージング＋色演出） */
 			void UpdateStaminaGauge();
 
-			/** 命令標識（表:GO / 裏:WAIT）の更新処理（命令の切り替わり検出＋回転演出） */
-			void UpdateCommandSign();
+			/**
+			 * @brief クマに襲われている間のYボタン強調表示の更新
+			 * @details クマが子を追っていて再集合が使えるときだけ、
+			 *          Yボタンとメガホンアイコンを黄色く脈動させる。
+			 */
+			void UpdateYButtonEmphasis();
 
 			bool IsInputAButton() const;
 			bool IsInputBButton() const;
@@ -84,25 +88,22 @@ namespace app
 			/** 直前フレームでジャンプスタミナがロック中だったか（エッジ検出用） */
 			bool m_wasJumpStaminaLocked = false;
 
-			/** スライドスタミナの割合(0〜1、実値) */
-			float m_slideStaminaRatio = 1.0f;
-			/** スライドスタミナがクールダウン中かどうか */
-			bool m_isSlideStaminaLocked = false;
-			/** スライドスタミナの表示用割合(0〜1、なめらかに追従する値) */
-			float m_slideDisplayRatio = 1.0f;
-			/** 直前フレームでスライドスタミナがロック中だったか（エッジ検出用） */
-			bool m_wasSlideStaminaLocked = false;
+			/** Yクールダウンの回復割合(0〜1、実値。1.0で使用可能) */
+			float m_regroupCooldownRatio = 1.0f;
+			/** Yがクールダウン中かどうか */
+			bool m_isRegroupCooldownLocked = false;
+			/** Yクールダウンの表示用割合(0〜1、なめらかに追従する値) */
+			float m_regroupDisplayRatio = 1.0f;
+			/** 直前フレームでYがクールダウン中だったか（エッジ検出用） */
+			bool m_wasRegroupCooldownLocked = false;
 
-			/** 命令標識の表(GO)のJsonで指定されたスケール（回転演出の基準値） */
-			Vector3 m_goSignBaseScale = Vector3::One;
-			/** 命令標識の裏(WAIT)のJsonで指定されたスケール（回転演出の基準値） */
-			Vector3 m_waitSignBaseScale = Vector3::One;
-			/** 命令標識が回り始めてからの経過時間(秒) */
-			float m_signFlipTimer = 0.0f;
-			/** 命令標識が回転中かどうか */
-			bool m_isSignFlipping = false;
-			/** 直前フレームの命令が待機命令だったか（切り替わりのエッジ検出用） */
-			bool m_wasWaitCommand = false;
+			/** Yボタン強調の脈動用タイマー（常時加算） */
+			float m_yEmphasisTimer = 0.0f;
+			/** Y強調対象アイコンのJSON基準スケール（初回に取得。上書きすると基準0.8のアイコンが常に拡大されるため） */
+			std::array<Vector3, 4> m_yEmphasisBaseScales =
+				{ Vector3::One, Vector3::One, Vector3::One, Vector3::One };
+			/** m_yEmphasisBaseScales を取得済みか（アイコンごと） */
+			std::array<bool, 4> m_isYEmphasisBaseCaptured = {};
 		};
 
 	}

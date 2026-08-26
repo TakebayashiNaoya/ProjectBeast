@@ -18,6 +18,9 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Camera/CameraController.h"
+#include "Source/Camera/CameraManager.h"
+#include "Source/Manager/BattleManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Noise/NoiseManager.h"
 #include "Source/Util/CRC32.h"
@@ -66,6 +69,53 @@ namespace app
 			constexpr float ARRIVE_LAST_KNOWN_POS_DIST = 20.0f;
 			/** 帰巣時に移動を停止する距離の二乗 */
 			constexpr float RETURN_HOME_STOP_DIST_SQ = 200.0f;
+
+			/**
+			 * @brief 索敵（Search）中の旋回速度の倍率
+			 * @details 音に気づいたシロクマが「？」を出しながらゆっくり振り向くための値。
+			 *          視界判定は体の正面（transform）基準なので、振り向きが遅いぶんだけ
+			 *          プレイヤーに逃げる猶予が生まれる（2026-08-23 試遊フィードバック）。
+			 */
+			constexpr float SEARCH_TURN_MULTIPLIER = 0.25f;
+
+			/**
+			 * @brief 咆哮のラジアルブラーが届く「プレイヤーとの距離」
+			 * @details この距離より遠いクマの咆哮では画面演出を出さない。
+			 *          遠くの無関係な咆哮で画面がボケると理不尽なため。
+			 */
+			constexpr float ROAR_BLUR_MAX_DISTANCE = 900.0f;
+			/** 咆哮のラジアルブラーの継続時間（秒） */
+			constexpr float ROAR_BLUR_DURATION = 1.0f;
+			/**
+			 * @brief 咆哮のラジアルブラーの立ち上がり時間（秒）
+			 * @details クマが吠えるまでの溜めに合わせて加速的に強くなり、
+			 *          ここでピークに達した後、残り時間で線形に減衰する。
+			 */
+			constexpr float ROAR_BLUR_ATTACK_TIME = 0.3f;
+			/** 咆哮のラジアルブラーの最小強度（距離境界ぎりぎりでの強さ） */
+			constexpr float ROAR_BLUR_MIN_STRENGTH = 0.3f;
+
+			//============================================//
+			// 密集陣ウルトの攻撃無効化＋反撃
+			//============================================//
+
+			/** 無効化時にクマを弾き飛ばす距離 */
+			constexpr float NULLIFY_KNOCKBACK_DISTANCE = 150.0f;
+			/** 無効化時のヒットストップの時間倍率と長さ（実時間・秒） */
+			constexpr float NULLIFY_HITSTOP_SCALE = 0.4f;
+			constexpr float NULLIFY_HITSTOP_DURATION = 0.15f;
+			/** 無効化時の画面揺れ（振幅・秒）
+			 *  2026-08-25 酔い対策で全シェイクを一段減らした（揺れ自体も滑らかなノイズ方式に変更済み） */
+			constexpr float NULLIFY_SHAKE_STRENGTH = 8.0f;
+			constexpr float NULLIFY_SHAKE_DURATION = 0.25f;
+
+			/** 咆哮の画面揺れ（至近時の最大振幅・秒）。咆哮はラジアルブラーも重なるため特に控えめに */
+			constexpr float ROAR_SHAKE_STRENGTH = 6.0f;
+			constexpr float ROAR_SHAKE_DURATION = 0.4f;
+
+			/** かまくら崩壊の画面揺れ（振幅・秒） */
+			constexpr float IGLOO_BREAK_SHAKE_STRENGTH = 10.0f;
+			constexpr float IGLOO_BREAK_SHAKE_DURATION = 0.4f;
 		}
 
 
@@ -213,8 +263,20 @@ namespace app
 				}
 
 				diff.Normalize();
-				auto moveDirection = m_target->GetEnemyStateMachine()->GetMoveDirection();
-				float cosv = moveDirection.Dot(diff);
+
+				// 視界の向きは移動方向ではなく体の正面（transform）を使う。
+				// 移動方向は入力の瞬間に切り替わるため、音の方向へ「振り向いた瞬間」に
+				// 視界も一瞬で回ってしまい、旋回をゆっくりにした意味が無くなる
+				Vector3 forward = Vector3::Front;
+				m_target->GetTransform().m_rotation.Apply(forward);
+				forward.y = 0.0f;
+				if (forward.LengthSq() <= FLT_EPSILON)
+				{
+					continue;
+				}
+				forward.Normalize();
+
+				float cosv = forward.Dot(diff);
 				float cosAngle = cosf(Math::PI / 180.0f * VIEW_ANGLE);
 				if (cosv < cosAngle)
 				{
@@ -359,6 +421,12 @@ namespace app
 
 			enemy->m_target->GetEnemyStateMachine()->SetSearch(true);
 			enemy->m_searchTimer = 0.0f; // タイマーリセット
+
+			// 音に気づいた合図の「？」を出し、ゆっくり振り向かせる。
+			// 「音で気づく（？）→ 振り向く → 視界に入る（！）→ 追いかける」の段階を見せるため
+			enemy->m_target->GetEnemyStateMachine()->SetTurnSpeedMultiplier(SEARCH_TURN_MULTIPLIER);
+			BattleManager::GetInstance().NotifyEnemyReactionChanged(
+				enemy->m_target, ui::EnCPReactionType::Question);
 		}
 
 
@@ -418,6 +486,8 @@ namespace app
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);
 			enemy->m_target->GetEnemyStateMachine()->SetSearch(false);
+			// 索敵用に落としていた旋回速度を戻す
+			enemy->m_target->GetEnemyStateMachine()->SetTurnSpeedMultiplier(1.0f);
 			enemy->m_searchTimer = 0.0f;
 		}
 
@@ -820,6 +890,13 @@ namespace app
 
 					// 実際に壊す
 					StageSystem::GetInstance()->BreakIgloo(enemy->m_targetIglooKeyAtStart);
+
+					// かまくら崩壊の衝撃を画面揺れで見せる
+					if (auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+						camera::GameCamera::ID()))
+					{
+						gameCamera->StartShake(IGLOO_BREAK_SHAKE_STRENGTH, IGLOO_BREAK_SHAKE_DURATION);
+					}
 					IglooManager::GetInstance().EjectAllPenguins(iglooPos);
 					if (auto* lm = GameLogManager::GetInstance())
 						lm->QueueEvent({ {"ev", "igloo_broken"}, {"key", enemy->m_targetIglooKeyAtStart}, {"bear_id", enemy->m_target->GetLogId()} });
@@ -839,6 +916,53 @@ namespace app
 			// =======================================================
 			if (enemy->m_foundPenguin != nullptr)
 			{
+				// 密集陣ウルト中は、隊列の子への攻撃を無効化してクマへ反撃する。
+				// 「守り切った」だけで終わらせず、弾き飛ばし＋スタン＋短いヒットストップで
+				// プレイヤーに意趣返しの手応えを返す
+				auto* cpManager = actor::ChildPenguinManager::GetInstance();
+				if (BattleManager::GetInstance().IsBearAttackNullified()
+					&& cpManager != nullptr
+					&& cpManager->IsFollower(enemy->m_foundPenguin))
+				{
+					auto* bear = enemy->m_target;
+
+					/** 攻撃した子と反対方向へ弾き飛ばす（キノマティック移動） */
+					Vector3 away = bear->GetTransform().m_position
+						- enemy->m_foundPenguin->GetTransform().m_position;
+					away.y = 0.0f;
+					if (away.LengthSq() > FLT_EPSILON) { away.Normalize(); }
+					else { away = Vector3::Front; }
+
+					Vector3 knockbackPos = bear->GetTransform().m_position
+						+ away * NULLIFY_KNOCKBACK_DISTANCE;
+					bear->GetCharacterController()->SetPosition(knockbackPos);
+					bear->GetCharacterController()->RequestTeleport();
+					bear->GetEnemyStateMachine()->SetPosition(knockbackPos);
+
+					/** スタンさせる（StunStateが時間経過で自動解除する） */
+					bear->GetEnemyStateMachine()->SetStun(true);
+
+					/** 短いヒットストップ＋画面揺れで「弾いた！」を強調する */
+					g_gameTime->StartSlowMotion(NULLIFY_HITSTOP_SCALE, NULLIFY_HITSTOP_DURATION);
+					if (auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+						camera::GameCamera::ID()))
+					{
+						gameCamera->StartShake(NULLIFY_SHAKE_STRENGTH, NULLIFY_SHAKE_DURATION);
+					}
+
+					if (auto* lm = GameLogManager::GetInstance())
+					{
+						lm->QueueEvent({
+							{ "ev",         "bear_attack_nullified" },
+							{ "bear_id",    bear->GetLogId() },
+							{ "penguin_id", enemy->m_foundPenguin->GetLogId() }
+						});
+					}
+
+					enemy->m_foundPenguin = nullptr;
+					return;
+				}
+
 				// 開始時にかまくらの中に「いなかった」場合のみ、即座にやられモーションに入れて足を止める
 				if (!enemy->m_isTargetInsideIglooAtStart)
 				{
@@ -1045,6 +1169,33 @@ namespace app
 		void EnemyController::EnterRoar(EnemyController* enemy)
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetIsRoar(true);
+
+			// ペンギンを見つけた合図の「！」を出す。
+			// 発見はどの経路（索敵・徘徊）でも必ずRoarを通るのでここが唯一の入口
+			BattleManager::GetInstance().NotifyEnemyReactionChanged(
+				enemy->m_target, ui::EnCPReactionType::Exclamation);
+
+			// 咆哮の衝撃演出：プレイヤーの近くでの咆哮ほど強いラジアルブラーをかける
+			Vector3 toDaddy = enemy->m_target->GetTransform().m_position
+				- ChildPenguinManager::GetInstance()->GetDaddyPosition();
+			toDaddy.y = 0.0f;
+			const float distToDaddy = toDaddy.Length();
+			if (distToDaddy <= ROAR_BLUR_MAX_DISTANCE)
+			{
+				// 至近で1.0、境界ぎりぎりで最小強度になるよう距離で線形に落とす
+				const float closeness = 1.0f - (distToDaddy / ROAR_BLUR_MAX_DISTANCE);
+				const float strength =
+					ROAR_BLUR_MIN_STRENGTH + (1.0f - ROAR_BLUR_MIN_STRENGTH) * closeness;
+				nsBeastEngine::g_renderingEngine->GetPostEffectManager()
+					.GetRadialBlur().Start(strength, ROAR_BLUR_ATTACK_TIME, ROAR_BLUR_DURATION);
+
+				// 近い咆哮ほど強い画面揺れも重ねる
+				if (auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+					camera::GameCamera::ID()))
+				{
+					gameCamera->StartShake(ROAR_SHAKE_STRENGTH * closeness, ROAR_SHAKE_DURATION);
+				}
+			}
 		}
 
 

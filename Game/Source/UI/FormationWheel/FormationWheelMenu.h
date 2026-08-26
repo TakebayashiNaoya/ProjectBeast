@@ -40,6 +40,13 @@ namespace app
 			/** ウルト発動可否に応じてLT/RTアイコンの色を切り替える */
 			void UpdateUltIconColor();
 
+			/**
+			 * @brief 陣形切替バナー（画面中央の大きな陣形名＋一言）の更新
+			 * @details 切り替えた瞬間に「さんかくじん！はやい！」のような一言を
+			 *          画面中央に短時間ポップさせ、陣形の意味をその場で学習させる。
+			 */
+			void UpdateFormationBanner();
+
 			/** 陣形レベルと次のレベルアップまでの隊員数ゲージの表示を更新する */
 			void UpdateLevelDisplay();
 
@@ -111,6 +118,9 @@ namespace app
 
 			/** パルス演出用の経過時間(常時加算し続ける) */
 			float m_pulseTimer = 0.0f;
+
+			/** 陣形切替バナーの残り表示時間（秒） */
+			float m_bannerTimer = 0.0f;
 
 #if defined(APP_DEBUG)
 			time_t m_tuningLastWriteTime = 0;    /** チューニングJSONの最終更新日時 */

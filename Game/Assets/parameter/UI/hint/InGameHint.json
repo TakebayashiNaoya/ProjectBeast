@@ -1,0 +1,198 @@
+{
+    "canvas": {
+        "elements": [
+            {
+                "type": "UIIcon",
+                "name": "HintBand",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 700,
+                "height": 96,
+                "position": [
+                    0,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    10,
+                    20,
+                    40,
+                    140
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "HintIconRegroup",
+                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_y.DDS",
+                "width": 64,
+                "height": 64,
+                "position": [
+                    -290,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "HintIconUltL",
+                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_lt.DDS",
+                "width": 56,
+                "height": 56,
+                "position": [
+                    -305,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "HintIconSlash",
+                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/Slash.DDS",
+                "width": 30,
+                "height": 48,
+                "position": [
+                    -262,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "HintIconUlt",
+                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_rt.DDS",
+                "width": 56,
+                "height": 56,
+                "position": [
+                    -220,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "HintIconSneak",
+                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_b.DDS",
+                "width": 64,
+                "height": 64,
+                "position": [
+                    -290,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "HintIconSlide",
+                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_x.DDS",
+                "width": 64,
+                "height": 64,
+                "position": [
+                    -290,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIText",
+                "name": "HintText",
+                "text": "",
+                "fontSize": 0.72,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "position": [
+                    -165,
+                    200,
+                    0
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ]
+            }
+        ]
+    }
+}

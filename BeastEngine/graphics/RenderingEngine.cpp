@@ -199,6 +199,7 @@ namespace nsBeastEngine
 		// 描画オブジェクトのリストをクリア
 		m_deferredModelList.clear();
 		m_forwardModelList.clear();
+		m_outlineModelList.clear();
 		m_renderObjects.clear();
 	}
 
@@ -446,6 +447,18 @@ namespace nsBeastEngine
 			renderObj->OnDraw(rc);
 		}
 
+		// 本体はディファードで描かれたモデルの輪郭線を重ね描きする
+		for (auto& renderObj : m_outlineModelList)
+		{
+			if (m_frustumCullingEnabled &&
+				renderObj->IsCullingEnabled() &&
+				!view.frustum.IsIntersectAABBWorld(renderObj->GetWorldAABBMin(), renderObj->GetWorldAABBMax()))
+			{
+				continue;
+			}
+			renderObj->OnDrawOutline(rc);
+		}
+
 		for (auto* renderer : m_customRenderers)
 		{
 			renderer->Render(rc, view);
@@ -490,6 +503,10 @@ namespace nsBeastEngine
 
 	void RenderingEngine::Render2D(nsK2EngineLow::RenderContext& rc)
 	{
+		// ステージ紹介動画の撮影中はUIを一切合成しない
+		// （メインRTには3D＋ポストエフェクトの結果がそのまま残る）
+		if (!m_is2DRenderEnabled) return;
+
 		BeginGPUEvent("Render2D");
 
 		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);

@@ -301,6 +301,7 @@
     <ClCompile Include="Source\Actor\IK\TwoBoneLegIK.cpp" />
     <ClCompile Include="Source\Actor\Stage\IStage.cpp" />
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
+    <ClCompile Include="Source\Actor\Stage\StageNavGrid.cpp" />
     <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera\CameraCommon.cpp" />
@@ -367,6 +368,7 @@
     <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeStatus.cpp" />
+    <ClCompile Include="Source\UI\Hint\InGameHintMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.cpp" />
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp" />
@@ -497,6 +499,7 @@
     <ClInclude Include="Source\Actor\IK\TwoBoneLegIK.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
+    <ClInclude Include="Source\Actor\Stage\StageNavGrid.h" />
     <ClInclude Include="Source\Actor\Stage\TerrainObject.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera\CameraCommon.h" />
@@ -577,6 +580,7 @@
     <ClInclude Include="Source\UI\Fever\FeverIconMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeStatus.h" />
+    <ClInclude Include="Source\UI\Hint\InGameHintMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.h" />
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h" />

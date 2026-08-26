@@ -16,15 +16,9 @@ namespace app
 			const bool isPositive = stickValue > threshold;
 			const bool isNegative = stickValue < -threshold;
 
-			// ニュートラル域に戻ったら状態をリセットする。
-			if (!isPositive && !isNegative)
-			{
-				m_isNeutral = true;
-				m_repeatTimer = 0.0f;
-				return Direction::None;
-			}
-
-			// トリガー入力は倒しっぱなし状態に関係なく毎回一発判定する。
+			// トリガー入力（十字キー）はスティックの状態に関係なく毎回一発判定する。
+			// ニュートラル判定より先に見ないと、スティックを触っていないとき
+			// （＝十字キーだけで操作しているとき）に下の早期リターンで握り潰される
 			if (triggerPositive)
 			{
 				m_isNeutral = false;
@@ -36,6 +30,14 @@ namespace app
 				m_isNeutral = false;
 				m_repeatTimer = repeatInterval;
 				return Direction::Negative;
+			}
+
+			// ニュートラル域に戻ったら状態をリセットする。
+			if (!isPositive && !isNegative)
+			{
+				m_isNeutral = true;
+				m_repeatTimer = 0.0f;
+				return Direction::None;
 			}
 
 			// ニュートラルから倒した瞬間は即座に反応する。

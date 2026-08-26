@@ -16,6 +16,8 @@ namespace app
 		{
 			Trouble,
 			Happy,
+			Question,		///< 「？」。音に気づいて振り向いている段階（子ペンギン・シロクマ共通）
+			Exclamation,	///< 「！」。視界に入って察知・発見した瞬間（子ペンギン・シロクマ共通）
 			None
 		};
 

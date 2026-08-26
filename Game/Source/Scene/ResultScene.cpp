@@ -18,6 +18,15 @@ namespace
 	constexpr float SCORE_BASE_MULTIPLIER = 100.0f; // 救出数の基本スコア倍率
 	constexpr float SCENE_WAIT_TIME = 3.0f;   // 次シーンへの遷移待機秒数
 	constexpr float SCORE_PER_ACHIEVEMENT = 2000.0f; // アチーブメント達成1件ごとの加算スコア
+
+	// デバッグ用の自動プレイ（環境変数 BEAST_AUTOPLAY で有効）。
+	// Aボタン入力なしでタイトルへ戻る
+	bool IsAutoplayEnabled()
+	{
+		char buf[8];
+		size_t len = 0;
+		return getenv_s(&len, buf, sizeof(buf), "BEAST_AUTOPLAY") == 0 && len > 0 && buf[0] != '0';
+	}
 }
 
 
@@ -74,7 +83,8 @@ namespace app
 
 		if (m_resultMenu && m_resultMenu->IsReadyToNextScene())
 		{
-			if (g_pad[0]->IsTrigger(enButtonA))
+			// 自動プレイ中はAボタン入力なしでタイトルへ戻る
+			if (IsAutoplayEnabled() || g_pad[0]->IsTrigger(enButtonA))
 			{
 				SoundManager::Get().PlaySE(enSoundKind_ButtonEnter, 1.0f);
 				m_nextScene = true;
@@ -120,5 +130,9 @@ namespace app
 
 		float baseScore = static_cast<float>(m_collectedPenguin) * SCORE_BASE_MULTIPLIER;
 		m_totalScore = baseScore + achievementBonus;
+
+		/** ステージ別ハイスコアの更新（新記録ならファイルへ保存される）。
+		 *  ステージ選択画面の「きろく」表示が周回の動機になる */
+		ScoreManager::TryUpdateHighScore(static_cast<int>(m_totalScore));
 	}
 }

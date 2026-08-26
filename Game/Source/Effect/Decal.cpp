@@ -18,11 +18,12 @@ namespace app {
 		}
 
 
-		void Decal::Spawn(const Vector3& pos, const Vector3& normal, float yaw, float size, DecalKind kind,
-			nsK2EngineLow::Texture* texture, const Vector4& color, float lifeSeconds, float fadeOutSeconds,
-			int priority, const char* sharedTkmKey, const TerrainHeightInfo& terrainInfo)
+		bool Decal::InitModelIfNeeded(DecalKind kind, nsK2EngineLow::Texture* texture,
+			const char* sharedTkmKey, const TerrainHeightInfo& terrainInfo)
 		{
-			if (!m_isModelInited || m_kind != kind)
+			// 地形の世代が変わっていたら、種類が同じでも必ず再初期化する。
+			// 前ステージの地形ハイトマップSRVを持ったまま描くとGPUハングするため
+			if (!m_isModelInited || m_kind != kind || m_terrainGeneration != terrainInfo.generation)
 			{
 				// 計測用。ここを通った回数と所要時間が「重い実体」かどうかの判断材料になる
 				const bool   isFirstInit = !m_isModelInited;
@@ -59,13 +60,25 @@ namespace app {
 
 				m_kind = kind;
 				m_isModelInited = true;
+				m_terrainGeneration = terrainInfo.generation;
 
 				if (DecalProfiler::Get().IsEnabled()) {
 					DecalProfiler::Get().RecordModelInit(
 						DecalProfiler::NowMs() - beginMs, isFirstInit, fromKind, kind);
 				}
+				return true;
 			}
-			else
+
+			return false;
+		}
+
+
+		void Decal::Spawn(const Vector3& pos, const Vector3& normal, float yaw, float size, DecalKind kind,
+			nsK2EngineLow::Texture* texture, const Vector4& color, float lifeSeconds, float fadeOutSeconds,
+			int priority, const char* sharedTkmKey, const TerrainHeightInfo& terrainInfo)
+		{
+			// 事前ウォームアップ済みなら、ここでは再利用の計上だけになる
+			if (!InitModelIfNeeded(kind, texture, sharedTkmKey, terrainInfo))
 			{
 				DecalProfiler::Get().RecordModelReuse();
 			}

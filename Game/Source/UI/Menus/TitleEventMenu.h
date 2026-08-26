@@ -49,6 +49,13 @@ namespace app
 			 */
 			void UpdateDrawFlag();
 
+			/**
+			 * @brief タイトルの環境演出（音符・雪・ロゴの弾み）の更新
+			 * @details 静止画のタイトルに命を入れるレイヤー。
+			 *          音符が湧き上がり、雪が降り、ロゴが拍で弾む。
+			 */
+			void UpdateAmbient();
+
 
 		public:
 			/**
@@ -88,6 +95,15 @@ namespace app
 			AxisInputDetector m_axisInputDetector;
 			/** カーソル移動時の制御 */
 			CursorIndexSelector m_cursorSelector;
+
+			/** 環境演出（音符・雪・ロゴ弾み）用の経過時間（秒） */
+			float m_ambientTimer = 0.0f;
+			/** カーソル移動ポップの残り時間（秒） */
+			float m_cursorPopTimer = 0.0f;
+			/** ロゴのJSON上の基準スケール（弾み演出の基準値） */
+			Vector3 m_rogoBaseScale = Vector3::One;
+			/** 基準スケールを取得済みか */
+			bool m_isRogoBaseScaleCaptured = false;
 		};
 	}
 }

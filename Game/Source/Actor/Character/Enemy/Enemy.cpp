@@ -56,6 +56,11 @@ namespace app
 				std::size(ANIMATION_DATA)
 			};
 
+			/** 輪郭線の太さ（スクリーン幅比の法線押し出し量。約1.5px相当） */
+			constexpr float OUTLINE_WIDTH = 0.0018f;
+			/** 輪郭線の色。雪に対して沈む濃い青灰 */
+			const Vector4 OUTLINE_COLOR(0.08f, 0.10f, 0.16f, 1.0f);
+
 		}
 
 
@@ -86,6 +91,10 @@ namespace app
 
 			if (m_modelReady && !m_legIKInited)
 			{
+				/** モデルロード完了後の一度きりの初期化。
+				 *  白い体が雪原に溶け込まないよう、濃い青灰の太めの輪郭線で縁取る */
+				GetModelRender().SetOutlineParam(OUTLINE_WIDTH, OUTLINE_COLOR);
+				GetModelRender().EnableOutline();
 
 				m_legIKInited = InitLegIK();
 			}

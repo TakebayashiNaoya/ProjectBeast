@@ -73,15 +73,15 @@ namespace app
 			const wchar_t* specularMapFilePath
 		)
 		{
-			CreateGridMesh();
-			InitShaders(fxFilePath, vsEntryPoint, psEntryPoint);
+			CreateGridMesh();
+			InitShaders(fxFilePath, vsEntryPoint, psEntryPoint);
 
 			m_albedoMap.InitFromDDSFile(albedoMapFilePath);
 			m_normalMap.InitFromDDSFile(normalMapFilePath);
-			m_specularMap.InitFromDDSFile(specularMapFilePath);
+			m_specularMap.InitFromDDSFile(specularMapFilePath);
 
 			InitRootSignature();
-			InitPipelineState(colorBufferFormat);
+			InitPipelineState(colorBufferFormat);
 
 			m_commonConstantBuffer.Init(sizeof(SCommonConstantBuffer), nullptr);
 
@@ -91,8 +91,8 @@ namespace app
 				m_expandData = expandConstantBuffer;
 			}
 
-			InitDescriptorHeap();
-			InitComputeShader();
+			InitDescriptorHeap();
+			InitComputeShader();
 
 			// チャンクAABBの配列を事前確保する（BuildChunkAABBs()で毎フレーム上書き）
 			const int numChunks = m_chunkDivision * m_chunkDivision;
@@ -682,6 +682,8 @@ namespace app
 					nullptr,
 					IID_PPV_ARGS(&m_csCommandList)
 				);
+				// デバイスロスト時のDREDレポートで識別できるよう名前を付ける
+				m_csCommandList->SetName(L"OceanWaveCSCommandList");
 				m_csCommandList->Close();
 			}
 
@@ -775,7 +777,14 @@ namespace app
 				const UINT64 bufSize = static_cast<UINT64>(sizeof(float) * NUM_VERTS);
 				D3D12_RANGE readRange = { 0, bufSize };
 				void* pData = nullptr;
-				m_readbackBuffer->Map(0, &readRange, &pData);
+				const HRESULT hr = m_readbackBuffer->Map(0, &readRange, &pData);
+				// デバイスロスト後はMapが失敗してnullが返る。巻き添えのアクセス違反で落とさず、
+				// デバイスロストの原因レポートを書き出して止める
+				if (FAILED(hr) || pData == nullptr)
+				{
+					g_graphicsEngine->ReportDeviceRemoved("Ocean readback map failed");
+					return;
+				}
 				memcpy(m_waveHeightCache.data(), pData, bufSize);
 				D3D12_RANGE writeRange = { 0, 0 };
 				m_readbackBuffer->Unmap(0, &writeRange);

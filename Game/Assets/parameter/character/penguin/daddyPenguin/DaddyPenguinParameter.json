@@ -7,7 +7,7 @@
     "runSpeed": 130.0,
     "swimSpeed": 230.0,
     "sneakSpeed": 70.0,
-    "slideSpeed": 180.0,
+    "slideSpeed": 120.0,
     "jumpPower": 300.0,
     "jumpStaminaMax": 100.0,
     "jumpStaminaRecoverSpeed": 50.0,

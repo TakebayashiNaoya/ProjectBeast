@@ -242,6 +242,15 @@ namespace nsK2EngineLow {
 			// ���\�[�X���������Ă��܂��B���̂��߁A�P�t���[���x�����ĊJ������K�v������B
 			m_reqDelayRelease3d12ObjectList.push_back({ res, 1 });
 		}
+		/// <summary>
+		/// Write the device removed reason and DRED breadcrumbs to a log file, then abort.
+		/// Call this when a device removal (device lost) is detected.
+		/// </summary>
+		void ReportDeviceRemoved(const char* site = nullptr);
+		/// <summary>
+		/// Query the current video memory usage and budget (in MB) of the adapter in use.
+		/// </summary>
+		void QueryVideoMemoryMB(double& localUsageMB, double& localBudgetMB);
 #ifdef K2_DEBUG
 		void BeginGPUEvent(const char* eventName)
 		{
@@ -252,12 +261,22 @@ namespace nsK2EngineLow {
 			PIXEndEvent(m_commandList[m_frameIndex]);
 		}
 #else
-		void BeginGPUEvent(const char*)
+		// Release build: emit the event via the raw API (no PIX runtime needed)
+		// so DRED breadcrumb contexts can record the render pass names.
+		void BeginGPUEvent(const char* eventName)
 		{
-
+			wchar_t buf[64];
+			swprintf_s(buf, L"%hs", eventName);
+			m_commandList[m_frameIndex]->BeginEvent(
+				0,	// PIX_EVENT_UNICODE_VERSION
+				buf,
+				static_cast<UINT>((wcslen(buf) + 1) * sizeof(wchar_t))
+			);
 		}
 		void EndGPUEvent()
-		{}
+		{
+			m_commandList[m_frameIndex]->EndEvent();
+		}
 #endif
 	private:
 		/// <summary>

@@ -57,10 +57,32 @@ namespace nsK2EngineLow {
 		{
 			if (m_isFixedFrameDeltaTime) {
 				// 1フレームの経過時間が固定化されている。
-				return m_fixedFrameDeltaTime;
+				return m_fixedFrameDeltaTime * GetTimeScale();
 			}
 
-			return m_frameDeltaTime;
+			return m_frameDeltaTime * GetTimeScale();
+		}
+
+		/// <summary>
+		/// 短いスローモーション（ヒットストップ）を開始する。
+		/// </summary>
+		/// <remark>
+		/// GetFrameDeltaTime()/GetDeltaTime() が返す経過時間を、実時間で
+		/// durationSec 秒のあいだ scale 倍に縮め、その後自動で元に戻す。
+		/// ウルト発動などの「タメ」の演出に使う。
+		/// </remark>
+		void StartSlowMotion(float scale, float durationSec)
+		{
+			m_slowMotionScale = scale;
+			m_slowMotionTimer = durationSec;
+		}
+
+		/// <summary>
+		/// 現在の時間倍率を取得する（スローモーション中でなければ1.0）。
+		/// </summary>
+		float GetTimeScale() const
+		{
+			return (m_slowMotionTimer > 0.0f) ? m_slowMotionScale : 1.0f;
 		}
 
 		/// <summary>
@@ -73,10 +95,10 @@ namespace nsK2EngineLow {
 		const float GetDeltaTime() const
 		{
 			if (m_isFixedFrameDeltaTime) {
-				return m_fixedFrameDeltaTime;
+				return m_fixedFrameDeltaTime * GetTimeScale();
 			}
 
-			return m_rawDeltaTime;
+			return m_rawDeltaTime * GetTimeScale();
 		}
 
 		/// <summary>
@@ -143,7 +165,13 @@ namespace nsK2EngineLow {
 		void EndMeasurement()
 		{
 			m_sw.Stop();
-			PushFrameDeltaTime(static_cast<float>(m_sw.GetElapsed()));
+			const float elapsed = static_cast<float>(m_sw.GetElapsed());
+			// スローモーションの残り時間は「実時間」で進める。
+			// これにより指定した実時間どおりに必ず終了する。
+			if (m_slowMotionTimer > 0.0f) {
+				m_slowMotionTimer -= min(MAX_DELTA_TIME, elapsed);
+			}
+			PushFrameDeltaTime(elapsed);
 			m_sw.Start();
 		}
 	private:
@@ -155,5 +183,7 @@ namespace nsK2EngineLow {
 		float		m_rawDeltaTime = 1.0f / 60.0f;		// 直前フレームの実経過時間（平均化・クランプなし）。
 		bool		m_isFixedFrameDeltaTime = false;		// 1フレームの経過時間を固定化する。
 		float		m_fixedFrameDeltaTime = 1.0f / 60.0f;	// 固定経過時間。
+		float		m_slowMotionScale = 1.0f;	// スローモーション中の時間倍率。
+		float		m_slowMotionTimer = 0.0f;	// スローモーションの残り時間（実時間・秒）。
 	};
 }

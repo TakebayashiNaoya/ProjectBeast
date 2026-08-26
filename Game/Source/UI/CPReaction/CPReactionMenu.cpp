@@ -24,6 +24,8 @@ namespace app
 			, m_speechBubble(nullptr)
 			, m_troubleReaction(nullptr)
 			, m_happyReaction(nullptr)
+			, m_questionReaction(nullptr)
+			, m_exclamationReaction(nullptr)
 			, m_type(EnCPReactionType::None)
 			, m_timer(0.0f)
 			, m_isPlayAnimation(false)
@@ -52,11 +54,15 @@ namespace app
 			m_speechBubble = GetUI<UIIcon>(Hash32("speechBubble"));
 			m_troubleReaction = GetUI<UIIcon>(Hash32("troubleReaction"));
 			m_happyReaction = GetUI<UIIcon>(Hash32("happyReaction"));
+			m_questionReaction = GetUI<UIIcon>(Hash32("questionReaction"));
+			m_exclamationReaction = GetUI<UIIcon>(Hash32("exclamationReaction"));
 
 			// アイコンの描画フラグをリセット
 			m_speechBubble->m_isDraw = false;
 			m_troubleReaction->m_isDraw = false;
 			m_happyReaction->m_isDraw = false;
+			m_questionReaction->m_isDraw = false;
+			m_exclamationReaction->m_isDraw = false;
 		}
 
 
@@ -71,6 +77,9 @@ namespace app
 			m_speechBubble->m_transform.m_localTransform.m_position = basePosition + m_status->GetSpeechBubbleOffset();
 			m_troubleReaction->m_transform.m_localTransform.m_position = basePosition + m_status->GetTroubleReactionOffset();
 			m_happyReaction->m_transform.m_localTransform.m_position = basePosition + m_status->GetHappyReactionOffset();
+			// ？と！は吹き出しに入れず、頭の真上に単独で出す（オフセットなしの基準位置）
+			m_questionReaction->m_transform.m_localTransform.m_position = basePosition;
+			m_exclamationReaction->m_transform.m_localTransform.m_position = basePosition;
 		}
 
 
@@ -84,12 +93,18 @@ namespace app
 				m_speechBubble->m_isDraw = false;
 				m_troubleReaction->m_isDraw = false;
 				m_happyReaction->m_isDraw = false;
+				m_questionReaction->m_isDraw = false;
+				m_exclamationReaction->m_isDraw = false;
 				return;
 			}
 
-			m_speechBubble->m_isDraw = isDraw;
+			// 吹き出しは従来のリアクション（困り/喜び）だけに出す。？/！は頭上に単独表示
+			m_speechBubble->m_isDraw = isDraw
+				&& (m_type == EnCPReactionType::Trouble || m_type == EnCPReactionType::Happy);
 			m_troubleReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Trouble);
 			m_happyReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Happy);
+			m_questionReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Question);
+			m_exclamationReaction->m_isDraw = isDraw && (m_type == EnCPReactionType::Exclamation);
 		}
 
 
@@ -102,6 +117,7 @@ namespace app
 			Vector4 speechBubbleColor = Vector4::Black;
 			enSoundKind kind = enSoundKind::enSoundKind_None;
 
+			// ？と！はSEを鳴らさない（察知のたびに鳴ると音が洪水になる）
 			if (m_type == EnCPReactionType::Trouble)
 			{
 				kind = enSoundKind::enSoundKind_CPReactionTrouble;
@@ -134,16 +150,51 @@ namespace app
 
 			m_speechBubble->m_color = speechBubbleColor;
 
-			soundMng.PlaySE(kind, 0.8f);
+			// ？/！はSEなし（kindがNoneのまま）。Noneを渡すと鳴らさずに戻る
+			if (kind != enSoundKind::enSoundKind_None)
+			{
+				soundMng.PlaySE(kind, 0.8f);
+			}
 
 			SetAnimation();
 			m_timer = 0.0f;
 		}
 
 
+		void CPReactionMenu::PlayUIAnimationWithColor(const EnCPReactionType type, const Vector4& bubbleColor)
+		{
+			m_type = type;
+			m_speechBubble->m_color = bubbleColor;
+
+			SetAnimation();
+			m_timer = 0.0f;
+		}
+
+
+		void CPReactionMenu::ForceFinish()
+		{
+			if (m_type == EnCPReactionType::None) return;
+
+			ResetIcon();
+			m_type = EnCPReactionType::None;
+		}
+
+
 		void CPReactionMenu::DrawFlagUpdate()
 		{
 			if (m_type == EnCPReactionType::None) return;
+
+			// ？/！はアニメーション（揺れ）を持たないため、タイマーだけで自動終了する
+			if (m_type == EnCPReactionType::Question || m_type == EnCPReactionType::Exclamation)
+			{
+				m_timer += g_gameTime->GetFrameDeltaTime();
+				if (m_timer >= m_status->GetSwayTime())
+				{
+					ResetIcon();
+					m_type = EnCPReactionType::None;
+				}
+				return;
+			}
 
 			UpdateAnimation();
 
@@ -168,6 +219,8 @@ namespace app
 			m_speechBubble->m_isDraw = false;
 			m_troubleReaction->m_isDraw = false;
 			m_happyReaction->m_isDraw = false;
+			m_questionReaction->m_isDraw = false;
+			m_exclamationReaction->m_isDraw = false;
 
 			const auto key = animKey::CPREACTION_SWAY_ANIM_KEY;
 
@@ -175,6 +228,10 @@ namespace app
 			m_troubleReaction->RemoveAnimation(key);
 			m_happyReaction->StopAnimation();
 			m_happyReaction->RemoveAnimation(key);
+			m_questionReaction->StopAnimation();
+			m_questionReaction->RemoveAnimation(key);
+			m_exclamationReaction->StopAnimation();
+			m_exclamationReaction->RemoveAnimation(key);
 			m_isPlayAnimation = false;
 			m_timer = 0.0f;
 			m_isDraw = false;
@@ -196,6 +253,7 @@ namespace app
 					if (anim) anim->PlayAnimation();
 				};
 
+			// 揺れの演出は吹き出しのリアクションだけ。？/！は揺らさない
 			attach(m_troubleReaction);
 			attach(m_happyReaction);
 		}
@@ -203,16 +261,17 @@ namespace app
 
 		void CPReactionMenu::UpdateAnimation()
 		{
-			if (m_type == EnCPReactionType::Happy)
-			{
-				m_troubleReaction->StopAnimation();
-			}
-			else if (m_type == EnCPReactionType::Trouble)
-			{
-				m_happyReaction->StopAnimation();
-			}
+			// 表示中のタイプ以外のアイコンのアニメーションを止める
+			if (m_type != EnCPReactionType::Trouble)     { m_troubleReaction->StopAnimation(); }
+			if (m_type != EnCPReactionType::Happy)       { m_happyReaction->StopAnimation(); }
+			if (m_type != EnCPReactionType::Question)    { m_questionReaction->StopAnimation(); }
+			if (m_type != EnCPReactionType::Exclamation) { m_exclamationReaction->StopAnimation(); }
 
-			m_isPlayAnimation = m_troubleReaction->IsPlayAnimation() || m_happyReaction->IsPlayAnimation();
+			m_isPlayAnimation =
+				m_troubleReaction->IsPlayAnimation() ||
+				m_happyReaction->IsPlayAnimation() ||
+				m_questionReaction->IsPlayAnimation() ||
+				m_exclamationReaction->IsPlayAnimation();
 		}
 	}
 }

@@ -104,6 +104,10 @@ namespace nsBeastEngine
 			m_isToonEnabled = true;
 		}
 
+		// デバイスロスト調査：DREDのパンくずへ刻むモデル名を保持する
+		m_debugName = filePath;
+		m_debugNameW.assign(m_debugName.begin(), m_debugName.end());
+
 		// スケルトン初期化
 		InitSkeleton(filePath);
 		m_skeletonRef = &m_skeleton;
@@ -160,6 +164,10 @@ namespace nsBeastEngine
 		{
 			InitToonModels(modelInitData);
 		}
+
+		// EnableOutline() の遅延初期化用に最終的な初期化データを控えておく
+		// （ポインタメンバは本クラスのメンバや外部の永続オブジェクトを指すため保存して安全）
+		m_savedInitData = modelInitData;
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
@@ -226,6 +234,9 @@ namespace nsBeastEngine
 		{
 			InitToonModels(modelInitData);
 		}
+
+		// EnableOutline() の遅延初期化用に最終的な初期化データを控えておく
+		m_savedInitData = modelInitData;
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
@@ -307,7 +318,18 @@ namespace nsBeastEngine
 
 		m_toonModel->Init(toonInitData);
 
+		InitOutlineModel(baseInitData);
+	}
+
+
+	void ModelRender::InitOutlineModel(const ModelInitData& baseInitData)
+	{
 		// ----- アウトラインモデル（outline.fx、前面カリングで背面だけ描画） -----
+		if (m_outlineModel == nullptr)
+		{
+			m_outlineModel = std::make_unique<BeastModel>();
+		}
+
 		ModelInitData outlineInitData = baseInitData;
 
 		outlineInitData.m_fxFilePath = "Assets/shader/outline.fx";
@@ -326,6 +348,27 @@ namespace nsBeastEngine
 		outlineInitData.m_expandConstantBufferSize2 = sizeof(SOutlineCb);
 
 		m_outlineModel->Init(outlineInitData);
+	}
+
+
+	void ModelRender::EnableOutline()
+	{
+		// トゥーン経由で作成済みならフラグだけ立てる
+		if (m_outlineModel == nullptr)
+		{
+			InitOutlineModel(m_savedInitData);
+		}
+		m_isOutlineOnlyEnabled = true;
+	}
+
+
+	void ModelRender::OnDrawOutline(RenderContext& rc)
+	{
+		if (!m_visible) return;
+		if (m_outlineModel == nullptr) return;
+
+		const Frustum& frustum = g_renderingEngine->GetActiveFrustum();
+		m_outlineModel->Draw(rc, frustum, m_maxInstance);
 	}
 
 
@@ -614,6 +657,13 @@ namespace nsBeastEngine
 		{
 			// ディファードレンダリングで描画するなら
 			g_renderingEngine->AddDeferredModelList(this);
+
+			// アウトラインだけ有効なモデルは、本体はディファードのまま
+			// 輪郭線だけフォワードパスで重ね描きする
+			if (m_isOutlineOnlyEnabled)
+			{
+				g_renderingEngine->AddOutlineModelList(this);
+			}
 		}
 	}
 
@@ -622,6 +672,17 @@ namespace nsBeastEngine
 	{
 		/** 描画が有効でない場合は処理しない */
 		if (!m_visible) return;
+
+		// デバイスロスト調査：この直後のドローがハングした場合にDREDレポートで
+		// モデル名を特定できるよう、コマンドリストへマーカーを刻む
+		if (!m_debugNameW.empty())
+		{
+			rc.GetCommandList()->SetMarker(
+				0,	// PIX_EVENT_UNICODE_VERSION
+				m_debugNameW.c_str(),
+				static_cast<UINT>((m_debugNameW.size() + 1) * sizeof(wchar_t))
+			);
+		}
 
 		const Frustum& frustum = g_renderingEngine->GetActiveFrustum();
 

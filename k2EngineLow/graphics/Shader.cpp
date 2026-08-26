@@ -4,6 +4,8 @@
 #include <sstream>
 #include <fstream>
 #include <atlbase.h>
+#include <string>
+#include <vector>
 
 namespace nsK2EngineLow {
 
@@ -11,6 +13,68 @@ namespace nsK2EngineLow {
 		const char* g_vsShaderModelName = "vs_5_0";	//頂点シェーダーのシェーダーモデル名。
 		const char* g_psShaderModelName = "ps_5_0";	//ピクセルシェーダーのシェーダモデル名。
 		const char* g_csShaderModelName = "cs_5_0";	//コンピュートシェーダーのシェーダーモデル名。
+
+		//コンパイル済みシェーダーのディスクキャッシュの置き場所（作業ディレクトリ=Game/基準）。
+		const char* g_shaderCacheDir = "ShaderCache";
+
+		//指定フォルダを再帰的に走査して、含まれるファイルの最終更新時刻の最大値を求める。
+		void ScanDirMaxWriteTime(const char* dir, long long& maxWriteTime)
+		{
+			char pattern[MAX_PATH];
+			sprintf_s(pattern, "%s\\*", dir);
+			WIN32_FIND_DATAA fd;
+			HANDLE handle = FindFirstFileA(pattern, &fd);
+			if (handle == INVALID_HANDLE_VALUE) {
+				return;
+			}
+			do {
+				if (fd.cFileName[0] == '.') {
+					continue;
+				}
+				char path[MAX_PATH];
+				sprintf_s(path, "%s\\%s", dir, fd.cFileName);
+				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					ScanDirMaxWriteTime(path, maxWriteTime);
+				}
+				else {
+					ULARGE_INTEGER t;
+					t.LowPart = fd.ftLastWriteTime.dwLowDateTime;
+					t.HighPart = fd.ftLastWriteTime.dwHighDateTime;
+					if (static_cast<long long>(t.QuadPart) > maxWriteTime) {
+						maxWriteTime = static_cast<long long>(t.QuadPart);
+					}
+				}
+			} while (FindNextFileA(handle, &fd));
+			FindClose(handle);
+		}
+
+		//Assets/shader以下すべての最終更新時刻の最大値（プロセス起動後の初回だけ走査）。
+		//どれか1ファイルでも編集されたら全キャッシュを無効化する。
+		//fx本体のmtimeだけではincludeヘッダーの編集を検知できないため、フォルダ全体で見る。
+		long long GetShaderDirMaxWriteTime()
+		{
+			static long long s_maxWriteTime = -1;
+			if (s_maxWriteTime >= 0) {
+				return s_maxWriteTime;
+			}
+			s_maxWriteTime = 0;
+			ScanDirMaxWriteTime("Assets\\shader", s_maxWriteTime);
+			return s_maxWriteTime;
+		}
+
+		//キャッシュファイルのパスを作る（fxパス・エントリ・モデル・コンパイルフラグで一意にする）。
+		std::string BuildShaderCachePath(const char* filePath, const char* entryFuncName, const char* shaderModel, unsigned int compileFlags)
+		{
+			std::string name = filePath;
+			for (auto& c : name) {
+				if (c == '/' || c == '\\' || c == ':' || c == '.') {
+					c = '_';
+				}
+			}
+			char suffix[128];
+			sprintf_s(suffix, "_%s_%s_%08x.cso", entryFuncName, shaderModel, compileFlags);
+			return std::string(g_shaderCacheDir) + "/" + name + suffix;
+		}
 	}
 	Shader::~Shader()
 	{
@@ -31,6 +95,29 @@ namespace nsK2EngineLow {
 #else
 		UINT compileFlags = 0;
 #endif
+		//ディスクキャッシュにヒットしたら実行時コンパイルを丸ごとスキップする。
+		//コンパイルは1シェーダー数百msかかり、ロード画面が数秒固まる主因だった。
+		//シェーダーを1つでも編集するとフォルダ全体のmtimeが変わりキャッシュは無効になるので、
+		//「.fxを直して再起動だけで反映」の開発フローは今までどおり使える。
+		const long long shaderDirTime = GetShaderDirMaxWriteTime();
+		const std::string cachePath = BuildShaderCachePath(filePath, entryFuncName, shaderModel, compileFlags);
+		{
+			std::ifstream cacheIn(cachePath, std::ios::binary);
+			if (cacheIn) {
+				long long cachedTime = 0;
+				cacheIn.read(reinterpret_cast<char*>(&cachedTime), sizeof(cachedTime));
+				if (cacheIn && cachedTime == shaderDirTime) {
+					std::vector<char> bytes(
+						(std::istreambuf_iterator<char>(cacheIn)), std::istreambuf_iterator<char>());
+					if (!bytes.empty() && SUCCEEDED(D3DCreateBlob(bytes.size(), &m_blob))) {
+						memcpy(m_blob->GetBufferPointer(), bytes.data(), bytes.size());
+						m_isInited = true;
+						return;
+					}
+				}
+			}
+		}
+
 		wchar_t wfxFilePath[256] = { L"" };
 		mbstowcs(wfxFilePath, filePath, 256);
 
@@ -48,6 +135,17 @@ namespace nsK2EngineLow {
 				sprintf_s(errorMessage, "filePath : %ws, %s", wfxFilePath, (char*)errorBlob->GetBufferPointer());
 				MessageBoxA(NULL, errorMessage, "シェーダーコンパイルエラー", MB_OK);
 				return;
+			}
+		}
+
+		//コンパイル結果をキャッシュへ保存する（次回以降の起動・ステージロードを高速化）。
+		if (m_blob) {
+			CreateDirectoryA(g_shaderCacheDir, nullptr);
+			std::ofstream cacheOut(cachePath, std::ios::binary | std::ios::trunc);
+			if (cacheOut) {
+				cacheOut.write(reinterpret_cast<const char*>(&shaderDirTime), sizeof(shaderDirTime));
+				cacheOut.write(static_cast<const char*>(m_blob->GetBufferPointer()),
+					static_cast<std::streamsize>(m_blob->GetBufferSize()));
 			}
 		}
 		m_isInited = true;

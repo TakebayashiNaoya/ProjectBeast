@@ -16,6 +16,7 @@ namespace nsBeastEngine
 		EnToneMapType toneMapType)
 	{
 		m_bloom.Init(mainRenderTarget, bloomType, blurType);
+		m_radialBlur.Init(mainRenderTarget);
 		m_toneMap.Init(mainRenderTarget, toneMapType);
 	}
 
@@ -24,6 +25,9 @@ namespace nsBeastEngine
 	{
 		// HDRのまま輝度抽出を行う必要があるため、ブルームをトーンマップより先に実行する
 		m_bloom.Render(rc, mainRenderTarget);
+
+		// 咆哮などの衝撃演出。非発動中はコストゼロ
+		m_radialBlur.Render(rc, mainRenderTarget);
 
 		// 最後にLDRへ変換する
 		m_toneMap.Render(rc, mainRenderTarget);

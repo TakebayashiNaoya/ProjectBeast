@@ -18,6 +18,7 @@ namespace app
 		class ChildPenguinStateMachine;
 		class ClumsyChildPenguinStateMachine;
 		class NaughtyChildPenguinStateMachine;
+		class StageNavGrid;
 
 
 		/**
@@ -50,6 +51,14 @@ namespace app
 			 *          タイプごとの処理は UpdateAI() 側に書くこと。
 			 */
 			void Update();
+
+		public:
+			/**
+			 * @brief 再集合の呼びかけに応えた「勇敢」時間中かどうか
+			 * @details 勇敢中はシロクマから逃げない。うっすら明滅の演出判定に使う。
+			 * @return 勇敢時間が残っていればtrue
+			 */
+			bool IsBraveFromRegroup() const { return m_braveTimer > 0.0f; }
 
 		protected:
 			/**
@@ -151,6 +160,39 @@ namespace app
 			 */
 			void BuildInputToTarget(const Vector3& targetPos);
 
+			/**
+			 * @brief ナビゲーションを織り込んだ移動方向を求める
+			 * @details 親（隊列）へ向かう遠距離移動はフローフィールドに沿って
+			 *          水路や崖を回り込む。それ以外は目標への直進方向を返す。
+			 * @param targetPos    移動先の座標
+			 * @param distToTarget 目標までの距離（呼び出し側で計算済みの値）
+			 * @return 移動方向（正規化済み）
+			 */
+			Vector3 CalculateMoveDirectionWithNav(const Vector3& targetPos, const float distToTarget);
+
+			/**
+			 * @brief 移動方向にアクティブな渦潮からの反発を織り込む
+			 * @details 渦潮の回避半径内では渦潮から離れる向きの力を加算し、
+			 *          子ペンギンが自分から吸い込み範囲へ入っていくのを防ぐ。
+			 *          意図的に渦潮へ向かうとき（やんちゃのいたずら）は素通しする。
+			 * @param moveDir 元の移動方向（正規化済み）
+			 * @return 反発を織り込んだ移動方向（正規化済み）
+			 */
+			Vector3 ApplyWhirlpoolAvoidance(const Vector3& moveDir) const;
+
+			/**
+			 * @brief 意図的に渦潮へ向かっている最中かどうか
+			 * @details やんちゃAIがいたずらダイブ中にtrueを返し、渦潮回避を無効化する。
+			 * @return 意図的に渦潮へ向かっていればtrue
+			 */
+			virtual bool IsHeadingIntoWhirlpoolOnPurpose() const { return false; }
+
+			/**
+			 * @brief ステージの歩行可否グリッドを取得する
+			 * @return 歩行可否グリッド。地形が無い（未構築の）ステージではnullptr
+			 */
+			StageNavGrid* GetStageNavGrid() const;
+
 
 			/** かまくらイベントの更新処理 */
 			void UpdateIglooEvent();
@@ -220,11 +262,31 @@ namespace app
 			void UpdatePerception();
 
 			/**
-			 * @brief このフレームに親を知覚できているかを判定する
-			 * @details 音・至近距離・視界のいずれかで真になる。
+			 * @brief このフレームに親を「確定的に」知覚できているかを判定する
+			 * @details 至近距離・再集合の呼びかけのどちらか。ここが真なら段階を踏まず即座に察知する。
 			 * @return 知覚できていればtrue
 			 */
-			bool PerceiveDaddyThisFrame();
+			bool PerceiveDaddyStrongThisFrame();
+
+			/**
+			 * @brief このフレームに親の音が聞こえているかを判定する
+			 * @details 音だけでは察知にならず、「？」を出して振り向く段階に入る。
+			 * @return 聞こえていればtrue
+			 */
+			bool PerceiveDaddySoundThisFrame();
+
+			/**
+			 * @brief このフレームに親が視界に入っているかを判定する
+			 * @details 距離 → 向き → 遮蔽 の順に、軽い判定から足切りする。
+			 * @return 見えていればtrue
+			 */
+			bool PerceiveDaddySightThisFrame();
+
+			/**
+			 * @brief 察知の成立処理
+			 * @details 未察知からの遷移なら「！」のリアクションを出す。
+			 */
+			void NoticeDaddy();
 
 			/**
 			 * @brief 親との間が地形で遮られているかを判定する
@@ -269,6 +331,18 @@ namespace app
 			const DaddyPerceptionSpec* m_perceptionSpec = nullptr;
 			/** 親を察知しているかどうか */
 			bool m_hasNoticedDaddy = false;
+			/**
+			 * 親の音だけ聞こえている（まだ見つけてはいない）かどうか。
+			 * この間は「？」を出しながらゆっくり親のほうへ振り向き、
+			 * 視界に入った時点で察知（＝入隊）に変わる
+			 */
+			bool m_hasHeardDaddy = false;
+			/**
+			 * 再集合の呼びかけに応えてからの勇敢時間（秒）。
+			 * 残っている間は「自分が狙われている」か「クマが至近」でない限り逃げない。
+			 * 呼びかけの効果が切れた直後に群れがまた散るのを防ぐ
+			 */
+			float m_braveTimer = 0.0f;
 			/** 知覚し続けている時間（noticeTime を超えると察知に変わる） */
 			float m_noticeTimer = 0.0f;
 			/** 知覚できなくなってからの時間（NOTICE_FORGET_TIME を超えると察知を忘れる） */
@@ -430,11 +504,34 @@ namespace app
 			NaughtyChildPenguinAI(ChildPenguin* owner);
 			~NaughtyChildPenguinAI() override;
 
+			/**
+			 * @brief 意図的に渦潮へ向かっている最中かどうか
+			 * @details いたずらダイブ中は基底の渦潮回避を無効化する。
+			 * @return 渦潮いたずらへ向かっていればtrue
+			 */
+			bool IsHeadingIntoWhirlpoolOnPurpose() const override;
+
 		private:
 			/**
 			 * @brief 次の徘徊目標座標をランダムに選ぶ
 			 */
 			void PickNewRoamTarget();
+
+			/**
+			 * @brief スタック（移動の意思があるのに動けていない）を検出して解消する
+			 * @details 急斜面（接地限界63度超）へ向かって歩き続けると押し戻されて
+			 *          足踏みになるため、一定時間動けていなければ行き先を変える。
+			 *          いたずら（クマ起こし・渦潮）へ向かう途中なら諦めさせる。
+			 */
+			void UpdateStuckWatch();
+
+			/**
+			 * @brief 進めなかった方向の反対側から徘徊目標を選び直す
+			 * @details PickNewRoamTarget() だと同じ斜面方向を引き直す可能性があるため、
+			 *          スタック解消時はこちらを使う。
+			 * @param blockedDir 進めなかった移動方向
+			 */
+			void PickNewRoamTargetAwayFromBlocked(const Vector3& blockedDir);
 
 			/**
 			 * @brief わいわいエフェクトの再生
@@ -457,6 +554,10 @@ namespace app
 			float m_roamTriggerDistance = 0.0f;
 			/** 徘徊先を選ぶ現在地からの半径 */
 			float m_roamRadius = 0.0f;
+			/** スタック検出：動けていない時間（秒） */
+			float m_stuckTimer = 0.0f;
+			/** スタック検出：前回チェック時の座標 */
+			Vector3 m_stuckCheckPos = Vector3::Zero;
 			/** 反省時間 */
 			float m_scoldCooldown = 0.0f;
 			/** 渦潮に飲み込まれたかどうかのフラグ */

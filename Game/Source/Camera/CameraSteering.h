@@ -36,6 +36,19 @@ namespace app
 			app::actor::CharacterBase* m_targetCharacter = nullptr;
 			Vector3 m_toVector = Vector3::Zero;
 
+			/** バネ追従中のカメラ位置（理想位置へ時定数付きで追いつく） */
+			Vector3 m_smoothedPosition = Vector3::Zero;
+			/** バネ追従の初期化済みフラグ（初回とワープ時はスナップする） */
+			bool m_isPositionInitialized = false;
+			/** 前フレームのターゲット座標（速度推定用） */
+			Vector3 m_prevTargetPos = Vector3::Zero;
+			/** 平滑化済みのターゲット速度（ユニット/秒） */
+			float m_smoothedSpeed = 0.0f;
+			/** 平滑化済みの先読みオフセット（移動方向へ注視点をずらす量） */
+			Vector3 m_lookAheadOffset = Vector3::Zero;
+			/** 現在の視野角（ラジアン。速度に応じて基準値〜最大値を行き来する） */
+			float m_currentFov = 0.0f;
+
 
 		public:
 			/**

@@ -76,6 +76,9 @@
     <Filter Include="Source\Actor\Stage">
       <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\Hint">
+      <UniqueIdentifier>{8e1f4a2b-93c7-4d15-b6a8-2f50c1d97e34}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\UI\InGameButton">
       <UniqueIdentifier>{6cf23173-7acb-4026-9850-4f2cb0624d76}</UniqueIdentifier>
     </Filter>
@@ -481,6 +484,9 @@
     <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp">
       <Filter>Source\UI\FormationWheel</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Hint\InGameHintMenu.cpp">
+      <Filter>Source\UI\Hint</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp">
       <Filter>Source\UI\InGameButton</Filter>
     </ClCompile>
@@ -582,6 +588,9 @@
     </ClCompile>
     <ClCompile Include="Source\Vfx\HomingParticleRender.cpp">
       <Filter>Source\Vfx</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Stage\StageNavGrid.cpp">
+      <Filter>Source\Actor\Stage</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp">
       <Filter>Source\Actor\Stage</Filter>
@@ -1044,6 +1053,9 @@
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
       <Filter>Source\UI\WpWarning</Filter>
     </ClInclude>
+    <ClInclude Include="Source\UI\Hint\InGameHintMenu.h">
+      <Filter>Source\UI\Hint</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h">
       <Filter>Source\UI\InGameButton</Filter>
     </ClInclude>
@@ -1157,6 +1169,9 @@
     </ClInclude>
     <ClInclude Include="Source\UI\Menus\StageSelectMenu.h">
       <Filter>Source\UI\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Stage\StageNavGrid.h">
+      <Filter>Source\Actor\Stage</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Stage\TerrainObject.h">
       <Filter>Source\Actor\Stage</Filter>

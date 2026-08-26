@@ -18,15 +18,22 @@ namespace app
 		class ActorStateMachine : public core::StateMachineBase
 		{
 		public:
+			/** アニメーション切り替え時の標準ブレンド時間（秒）。
+			 *  0だと前のポーズから瞬間的に切り替わってカクつくため、
+			 *  全キャラ共通で短いクロスフェードを挟む */
+			static constexpr float ANIMATION_INTERPOLATE_TIME = 0.15f;
+
 			/**
 			 * @brief アニメーションの再生
 			 * @tparam TEnum アニメーションIDの型
 			 * @param animationID アニメーションID
+			 * @param interpolateTime ブレンド時間（秒）。省略時は標準ブレンド
 			 */
 			template<typename TEnum>
-			inline void PlayAnimation(TEnum animationID)
+			inline void PlayAnimation(TEnum animationID, float interpolateTime = ANIMATION_INTERPOLATE_TIME)
 			{
-				m_ownerActor->GetModelRender()->PlayAnimation(static_cast<uint8_t>(animationID));
+				m_ownerActor->GetModelRender()->PlayAnimation(
+					static_cast<uint8_t>(animationID), interpolateTime);
 			}
 			/**
 			 * @brief アニメーションの再生速度の設定

@@ -108,6 +108,8 @@ namespace app
 
 			/** ハイトマップ地形 */
 			std::unique_ptr<TerrainObject> m_terrain;
+			/** 地形生成パラメータ（分割初期化の間 InitStep() へ渡し続けるために保持する） */
+			TerrainObject::TerrainConfig m_terrainConfig;
 
 
 		public:
@@ -147,6 +149,14 @@ namespace app
 
 			/** @brief 地形オブジェクトを取得する（未生成の場合は nullptr） */
 			TerrainObject* GetTerrain() const { return m_terrain.get(); }
+
+			/**
+			 * @brief イグルー・クマの巣を実際の地形の高さへ接地させる
+			 * @details 配置JSONのYは生成スクリプトの高さモデル由来で実地形と数ユニットずれるため、
+			 *          地形とオブジェクトのロード完了後に一度呼んで、描画メッシュと同じ高さ場
+			 *          （TerrainObject::GetHeightAt）へスナップし直す
+			 */
+			void SnapObjectsToTerrain();
 
 
 		public:

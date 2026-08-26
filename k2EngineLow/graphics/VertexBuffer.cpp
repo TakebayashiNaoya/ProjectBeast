@@ -33,8 +33,13 @@ namespace nsK2EngineLow {
 	}
 	void VertexBuffer::Copy(void* srcVertices)
 	{
-		uint8_t* pData;
-		m_vertexBuffer->Map(0, nullptr, (void**)&pData);
+		uint8_t* pData = nullptr;
+		auto hr = m_vertexBuffer->Map(0, nullptr, (void**)&pData);
+		if (FAILED(hr) || pData == nullptr) {
+			// Map fails after a device removal. Write the DRED report instead of crashing here.
+			g_graphicsEngine->ReportDeviceRemoved("VertexBuffer copy failed");
+			return;
+		}
 		memcpy(pData, srcVertices, m_vertexBufferView.SizeInBytes);
 		m_vertexBuffer->Unmap(0, nullptr);
 	}

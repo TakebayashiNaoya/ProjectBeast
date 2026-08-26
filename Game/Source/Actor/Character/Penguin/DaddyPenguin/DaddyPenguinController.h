@@ -65,6 +65,21 @@ namespace app
 			 */
 			void UpdateClingySlow();
 
+			/**
+			 * @brief 自動プレイのボット入力を作る
+			 * @details 環境変数 BEAST_AUTOPLAY が立っているときだけ使う。
+			 *          隊列に入っていない子ペンギンへ向かって移動し、遠距離はスライド、
+			 *          クールダウンが明けるたびにYの再集合を呼ぶ。デバッグ用の疑似プレイヤー。
+			 * @param inputX         スティックX入力（カメラ相対）への出力
+			 * @param inputY         スティックY入力（カメラ相対）への出力
+			 * @param stickLength    スティックの倒し具合への出力
+			 * @param outSlide       スライド入力への出力
+			 * @param outRegroupCall 再集合の呼びかけ入力への出力
+			 */
+			void UpdateAutoplayBot(
+				float& inputX, float& inputY, float& stickLength,
+				bool& outSlide, bool& outRegroupCall);
+
 
 		private:
 			/** 親ペンギンのポインタ */
@@ -74,6 +89,19 @@ namespace app
 
 			int   m_clingyCount     = 0;      /** 隊列にいる甘えん坊の数 */
 			float m_speedMultiplier = 1.0f;   /** 甘えん坊による減速を適用したスピード倍率 */
+
+			/** 自動プレイボットの現在の目標座標 */
+			Vector3 m_botTargetPos = Vector3::Zero;
+			/** 自動プレイボットが目標を選び直すまでのタイマー（秒） */
+			float m_botRepickTimer = 0.0f;
+			/** 自動プレイボットが次に再集合を呼ぶまでのタイマー（秒） */
+			float m_botRegroupTimer = 0.0f;
+			/** 自動プレイボットのスタック検出：動けていない時間（秒） */
+			float m_botStuckTimer = 0.0f;
+			/** 自動プレイボットのスタック検出：前回チェック時の座標 */
+			Vector3 m_botStuckCheckPos = Vector3::Zero;
+			/** 自動プレイボットのスライド禁止残り時間（秒。上り坂スライドのずり落ちループ対策） */
+			float m_botNoSlideTimer = 0.0f;
 
 
 		private:

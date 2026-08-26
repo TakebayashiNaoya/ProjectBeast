@@ -48,6 +48,14 @@ namespace app
 				m_isSlide = isSlide;
 			}
 			/**
+			 * @brief スライド入力中かどうかを取得
+			 * @return スライド入力中かどうか
+			 */
+			inline bool GetIsSlide() const
+			{
+				return m_isSlide;
+			}
+			/**
 			 * @brief 渦潮の中にいるかどうかを設定
 			 * @param isInWhirlpool 渦潮の中にいるかどうか
 			 */
@@ -129,11 +137,13 @@ namespace app
 			}
 			/**
 			 * @brief スライドが使用可能かどうかを取得
-			 * @return スタミナが枯渇しクールダウン中でなければtrue
+			 * @details スライドのスタミナは撤廃した（2026-08-23 試遊フィードバック）。
+			 *          スライドの制限は傾斜モデル（上り坂で滑れない）が担う
+			 * @return 常にtrue
 			 */
 			bool CanUseSlide() const
 			{
-				return m_slideStaminaGauge.CanUse();
+				return true;
 			}
 			/**
 			 * @brief ジャンプのスタミナゲージの割合を取得（UI表示用）
@@ -162,6 +172,26 @@ namespace app
 			float GetSlideSlopeMultiplier() const
 			{
 				return m_slideSlopeMultiplier;
+			}
+			/**
+			 * @brief 進行方向に対する符号つき傾斜（平滑化済み）を取得する
+			 * @details 下りで正、上りで負。値は sin(傾斜角) に一致する。
+			 *          AI側が「上り坂ではスライドを選ばない」判断に使う
+			 * @return 符号つき傾斜（-1.0〜1.0）
+			 */
+			float GetSlideSlopeSigned() const
+			{
+				return m_slideSlopeSigned;
+			}
+			/**
+			 * @brief 上り坂でのずり落ち（負の速度倍率）を許可する
+			 * @details プレイヤー操作の親ペンギンだけ有効にする。
+			 *          AIの子ペンギンで有効にすると上り坂で永久に後退してしまう
+			 * @param isAllowed 許可するかどうか
+			 */
+			void SetSlideBackAllowed(const bool isAllowed)
+			{
+				m_isSlideBackAllowed = isAllowed;
 			}
 			/**
 			 * @brief 傾斜を織り込んだスライド速度を取得する
@@ -339,6 +369,8 @@ namespace app
 			 *          スタミナ消費倍率の算出にも使うため倍率とは別に保持する。
 			 */
 			float m_slideSlopeSigned = 0.0f;
+			/** 上り坂でのずり落ち（負の速度倍率）を許可するか。親ペンギンだけtrue */
+			bool  m_isSlideBackAllowed = false;
 		};
 	}
 }

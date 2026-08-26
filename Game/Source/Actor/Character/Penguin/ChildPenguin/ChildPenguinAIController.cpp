@@ -20,7 +20,9 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Stage/StageNavGrid.h"
 #include "Source/Actor/Stage/StageSystem.h"
+#include "Source/Actor/Stage/TerrainObject.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/IglooManager.h"
@@ -82,13 +84,27 @@ namespace app
 			constexpr float PHASE_UP_MARGIN = 5.0f;
 
 			/**
+			 * @brief Stopフェーズを抜けるためのマージン（遊び）
+			 * @details 強制Stop（距離＋速度の判定）は stopDistance + HYSTERESIS まで許すため、
+			 *          抜けの閾値はそれより外側に置く。PHASE_UP_MARGIN と同じ値だと
+			 *          入りと出が同一距離で接し、親が止まった直後に Stop/Walk が毎フレーム
+			 *          反転して子がその場でばたつく（2026-08-25 実バグ・修正済み）。
+			 *          大きくしすぎると渦潮の吸引などのドリフトへ抵抗し始めるのが遅れて
+			 *          飲まれが増えるため、HYSTERESIS より少し外側に留める
+			 *          （15で試したらHardの飲まれが激増した。2026-08-26 ボット実測）。
+			 */
+			constexpr float STOP_EXIT_MARGIN = 8.0f;
+
+			/**
 			 * @brief 停止判定で共通利用する速度の閾値（速度の二乗で比較）
 			 * @details Walk → Stop 遷移と BuildInputToTarget() 冒頭の強制 Stop 判定の
 			 *          両方でこの定数を参照する。
 			 *          lerpの慣性が残っているうちは Stop に入らず Walk を維持し、
 			 *          停止アニメ中も滑り続ける問題を防ぐ。
+			 *          厳しすぎる（0.1=0.32u/s）と目標付近の微速移動が延々と続いて
+			 *          Stopに入れず足踏みになるため、5u/s（残留滑りは知覚できない量）まで許す
 			 */
-			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 0.1f;
+			constexpr float STOP_VELOCITY_THRESHOLD_SQ = 25.0f;
 
 
 			/**
@@ -200,6 +216,85 @@ namespace app
 			 *          「見えていない」と誤判定する。ペンギンの背丈 70 の目の高さに合わせて浮かせる。
 			 */
 			constexpr float PERCEPTION_EYE_HEIGHT = 42.0f;
+
+			/**
+			 * @brief AIがスライドを諦める上り傾斜（符号つき傾斜 sinθ）
+			 * @details -0.15 は約8.6度の上り。傾斜モデルの強化で上りのスライドは
+			 *          走りより大幅に遅くなったため、これより急な上りでは走りに切り替える。
+			 */
+			constexpr float CHILD_SLIDE_UPHILL_LIMIT = -0.15f;
+
+			/**
+			 * @brief 移動手段を傾斜で選ぶときのしきい値（符号つき傾斜 sinθ。正が下り）
+			 * @details 下り 0.06（約3.4度）を超えたらスライド、
+			 *          上り -0.06 を超えたら歩き、その間は走り。
+			 *          出る側のしきい値（EXIT）を緩くして境界でのばたつきを防ぐ。
+			 */
+			constexpr float CHILD_SLOPE_SLIDE_ENTER = 0.06f;
+			constexpr float CHILD_SLOPE_SLIDE_EXIT  = 0.02f;
+			constexpr float CHILD_SLOPE_WALK_ENTER  = -0.06f;
+			constexpr float CHILD_SLOPE_WALK_EXIT   = -0.02f;
+
+			/**
+			 * @brief 渦潮回避の半径と反発の強さ
+			 * @details 渦潮の吸い込み半径（whirlpoolRadius 200）に余白を足した距離から
+			 *          反発をかけ、自分から吸い込み範囲へ入っていくのを防ぐ。
+			 *          重さ2.0で、回避半径の中ほどでは進行方向より反発が勝つ。
+			 */
+			constexpr float WHIRLPOOL_AVOID_RADIUS = 320.0f;
+			constexpr float WHIRLPOOL_AVOID_WEIGHT = 2.0f;
+
+			/**
+			 * @brief 音に気づいて振り向くときの旋回速度の倍率
+			 * @details 「？」を出しながらゆっくり親のほうへ振り向くための値。
+			 *          既定の旋回速度 8.0 に掛かる。1.0 だと一瞬で振り向いてしまい、
+			 *          「音で気づく → 振り向く → 目で見つける」の段階が見えない
+			 *          （2026-08-23 試遊フィードバック）。
+			 */
+			constexpr float INVESTIGATE_TURN_MULTIPLIER = 0.2f;
+
+			/**
+			 * @brief フローフィールド追従を使い始める目標までの距離
+			 * @details これより近い移動は直進（隊列スロットへの精密な寄せを乱さないため）。
+			 */
+			constexpr float NAV_FLOW_MIN_DISTANCE = 200.0f;
+
+			/**
+			 * @brief 「親へ向かう移動」とみなす目標と親の距離
+			 * @details 隊列スロットは親の周囲に並ぶため、この距離以内の目標への移動は
+			 *          親へのフローフィールドで代用できる。徘徊先などはこれより遠いので直進のまま。
+			 */
+			constexpr float NAV_FLOW_TARGET_NEAR_DADDY = 400.0f;
+
+			/** やんちゃのスタック判定：この距離（XZ）も動けていなければ停滞とみなす */
+			constexpr float NAUGHTY_STUCK_MOVE_THRESHOLD = 10.0f;
+			/** やんちゃのスタック判定：この時間（秒）停滞し続けたら行き先を変える */
+			constexpr float NAUGHTY_STUCK_TIME_LIMIT = 1.5f;
+			/** スタック脱出時に「進めなかった方向の反対」から振るランダム角の半角（ラジアン、約75度） */
+			constexpr float NAUGHTY_STUCK_ESCAPE_HALF_ANGLE = 1.3f;
+
+			/**
+			 * @brief 再集合の呼びかけを無効にする「親とクマの距離」
+			 * @details 親からこの距離以内に狩り中のクマがいる場合、呼びかけで子を
+			 *          親のもとへ向かわせない（クマの口元へ呼び戻すことになるため）。
+			 *          300だと「クマに追われている最中の呼びかけ」がほぼ常に無効になり
+			 *          再集合が機能しなかったため、本当に至近のときだけ無効にする。
+			 */
+			constexpr float REGROUP_DADDY_SAFE_DISTANCE = 150.0f;
+
+			/**
+			 * @brief 呼びかけに応えた子が勇敢でいる時間（秒）
+			 * @details 呼びかけの効果（2秒）が切れた瞬間にクマの300以内の子がまた散ると
+			 *          「集めても集まらない」になるため、応えた子はこの時間だけ
+			 *          「自分が狙われている」か「クマが至近」でない限り逃げない。
+			 */
+			constexpr float REGROUP_BRAVE_TIME = 6.0f;
+
+			/**
+			 * @brief 勇敢な子でも逃げ出す「クマとの距離」
+			 * @details 呼びかけに応えた子も、狩り中のクマがこの距離まで来たら流石に逃げる。
+			 */
+			constexpr float BRAVE_PANIC_DISTANCE = 120.0f;
 
 
 			/**
@@ -358,6 +453,75 @@ namespace app
 		}
 
 
+		StageNavGrid* ChildPenguinAIController::GetStageNavGrid() const
+		{
+			auto* stageSystem = StageSystem::GetInstance();
+			auto* terrain = (stageSystem != nullptr) ? stageSystem->GetTerrain() : nullptr;
+			if (terrain == nullptr || !terrain->GetNavGrid().IsBuilt()) return nullptr;
+			return &terrain->GetNavGrid();
+		}
+
+
+		Vector3 ChildPenguinAIController::CalculateMoveDirectionWithNav(const Vector3& targetPos, const float distToTarget)
+		{
+			/**
+			 * 親（隊列）へ向かう遠距離移動だけ、親へのフローフィールドに沿って
+			 * 水路や崖を回り込む。目標が親の近く（隊列スロット含む）で、
+			 * かつ十分離れているときだけフローを使い、近距離はスロットへの
+			 * 精密な寄せを乱さないよう直進にする
+			 */
+			auto* manager = ChildPenguinManager::GetInstance();
+			if (distToTarget > NAV_FLOW_MIN_DISTANCE)
+			{
+				Vector3 targetToDaddy = targetPos - manager->GetDaddyPosition();
+				targetToDaddy.y = 0.0f;
+				if (targetToDaddy.LengthSq()
+					<= NAV_FLOW_TARGET_NEAR_DADDY * NAV_FLOW_TARGET_NEAR_DADDY)
+				{
+					Vector3 flowDir;
+					if (manager->GetDaddyFlowDirection(m_owner->GetTransform().m_position, flowDir))
+					{
+						return ApplyWhirlpoolAvoidance(flowDir);
+					}
+				}
+			}
+
+			return ApplyWhirlpoolAvoidance(CalculateDirectionToTarget(targetPos));
+		}
+
+
+		Vector3 ChildPenguinAIController::ApplyWhirlpoolAvoidance(const Vector3& moveDir) const
+		{
+			/** やんちゃのいたずらダイブなど、意図的に向かっている間は回避しない */
+			if (IsHeadingIntoWhirlpoolOnPurpose()) return moveDir;
+
+			auto* wpManager = nature::WhirlpoolManager::GetInstance();
+			if (wpManager == nullptr) return moveDir;
+
+			const Vector3 myPos = m_owner->GetTransform().m_position;
+			Vector3 avoid = Vector3::Zero;
+			wpManager->ForEach([&](nature::Whirlpool* wp)
+				{
+					Vector3 diff = myPos - wp->GetTransform().m_position;
+					diff.y = 0.0f;
+					const float dist = diff.Length();
+					if (dist < 1.0f || dist >= WHIRLPOOL_AVOID_RADIUS) return;
+
+					/** 近いほど強い反発（回避半径の縁で0、中心で1） */
+					avoid += diff * (1.0f / dist) * (1.0f - dist / WHIRLPOOL_AVOID_RADIUS);
+				});
+
+			if (avoid.LengthSq() < FLT_EPSILON) return moveDir;
+
+			Vector3 result = moveDir + avoid * WHIRLPOOL_AVOID_WEIGHT;
+			result.y = 0.0f;
+			if (result.LengthSq() < FLT_EPSILON) return moveDir;
+
+			result.Normalize();
+			return result;
+		}
+
+
 		void ChildPenguinAIController::BuildInputToTarget(const Vector3& targetPos)
 		{
 			const float distToTarget = GetDistanceToTarget(targetPos);
@@ -376,43 +540,46 @@ namespace app
 
 
 			/**
-			 * ヒステリシスと「目標到達までステートを維持する」処理を考慮したフェーズ遷移
-			 * 上げる : 設定された距離（m_walkDistance, m_runDistance）を超えたらすぐに上げる
-			 * 下げる : 一度 Run や Slide になったら m_walkDistance まで距離が縮まったら Walk に戻し、
-			 *          Walk から m_stopDistance 以内かつ速度がほぼゼロになったら Stop に落とす。
-			 *          これにより Slide → Walk → Stop の3段階を確実に踏み、
-			 *          lerpの慣性が残ったままオーバーシュートしても Walk に留まって再減速できる。
+			 * フェーズ遷移。
+			 * 遠距離の移動手段は距離ではなく「足元の傾斜」で選ぶ：
+			 *   下り坂 → スライド（傾斜ゲインで加速して速い）
+			 *   上り坂 → 歩き（スライドはずり落ち、確実に登れる歩幅で）
+			 *   平地   → 走り
+			 * 目標付近の減速（Walk→Stop）だけは従来どおり距離と速度で判断する。
+			 * 傾斜は出入りで別しきい値のヒステリシスを持たせ、境界でばたつかないようにする。
 			 */
-			switch (m_movePhase)
+			if (m_movePhase == MovePhase::Stop)
 			{
-			case MovePhase::Stop:
-			{
-				if (distToTarget > m_runDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Slide; }
-				else if (distToTarget > m_walkDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Run; }
-				else if (distToTarget > m_stopDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Walk; }
-				break;
-			}
-
-			case MovePhase::Walk:
-				if (distToTarget > m_runDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Slide; }
-				else if (distToTarget > m_walkDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Run; }
-				else if (distToTarget <= m_stopDistance - HYSTERESIS)
+				if (distToTarget > m_stopDistance + STOP_EXIT_MARGIN)
 				{
-					m_movePhase = MovePhase::Stop;
+					/** まず歩きで動き出し、次フレーム以降は傾斜で選び直す */
+					m_movePhase = MovePhase::Walk;
 				}
-				break;
+			}
+			else if (distToTarget <= m_walkDistance - HYSTERESIS
+				|| (m_movePhase == MovePhase::Walk
+					&& distToTarget <= m_walkDistance + PHASE_UP_MARGIN))
+			{
+				/** 目標付近では傾斜に関係なく Walk へ落として減速する
+				 *  （Stop への遷移はこの上の距離＋速度の判定が行う）。
+				 *  入りは walkDistance-H、出は walkDistance+MARGIN の
+				 *  ヒステリシスにしないと、境界上で Walk/Run が毎フレーム反転して
+				 *  所定位置に着く直前の子がカクカクする */
+				m_movePhase = MovePhase::Walk;
+			}
+			else
+			{
+				const float slope = m_stateMachine->GetSlideSlopeSigned();
+				const bool wantSlide = (m_movePhase == MovePhase::Slide)
+					? (slope > CHILD_SLOPE_SLIDE_EXIT)
+					: (slope > CHILD_SLOPE_SLIDE_ENTER);
+				const bool wantWalk = (m_movePhase == MovePhase::Walk)
+					? (slope < CHILD_SLOPE_WALK_EXIT)
+					: (slope < CHILD_SLOPE_WALK_ENTER);
 
-			case MovePhase::Run:
-				/** さらに離されたら Slide へ上げる */
-				if (distToTarget > m_runDistance + PHASE_UP_MARGIN) { m_movePhase = MovePhase::Slide; }
-				/** m_walkDistance 以内に入ったら Walk へ戻し、そこから Stop へ段階的に落とす */
-				else if (distToTarget <= m_walkDistance - HYSTERESIS) { m_movePhase = MovePhase::Walk; }
-				break;
-
-			case MovePhase::Slide:
-				/** m_walkDistance 以内に入ったら Walk へ戻し、そこから Stop へ段階的に落とす */
-				if (distToTarget <= m_walkDistance - HYSTERESIS) { m_movePhase = MovePhase::Walk; }
-				break;
+				if (wantSlide)     { m_movePhase = MovePhase::Slide; }
+				else if (wantWalk) { m_movePhase = MovePhase::Walk; }
+				else               { m_movePhase = MovePhase::Run; }
 			}
 
 			/**
@@ -422,20 +589,20 @@ namespace app
 			 * moveDirection のスケール（長さ）を変えると本来の速度設定が崩れてしまう。
 			 * 基本速度の調整は SetMoveSpeed()、目標手前での減速やブレーキは SetSpeedMultiplier() 経由で行う。
 			 */
-			const Vector3 moveDirection = CalculateDirectionToTarget(targetPos);
+			const Vector3 moveDirection = CalculateMoveDirectionWithNav(targetPos, distToTarget);
 
 			float speedMultiplier = 1.0f;
 
-			// 停止距離が有効な場合のみ、停止距離の2倍以内で倍率を 1.0 から 0.0 へ徐々に下げる
-			if (m_stopDistance > 0.0f)
+			// 目標までの距離に完全比例で減速する（停止距離の2倍で全速→目標中心で0のバネ）。
+			// 旧実装は「停止距離の内側=全速」だったため、親が止まってスロットが足元に来た子や、
+			// Y再集合の一斉入隊でスロットが数ユニット動いた子が、目標点を全速で
+			// 往復し続けてカクつく（2026-08-26 実バグ）。
+			// 倍率0固定は渦潮吸引に無抵抗になるため不可（同日ボット実測でHard飲まれ激増）。
+			// 距離比例なら静止時はそっと着地し、流されたら距離に応じて踏ん張る
+			if (m_stopDistance > 0.0f && m_movePhase != MovePhase::Stop)
 			{
 				const float brakeRange = m_stopDistance * 2.0f;
-				if (distToTarget > m_stopDistance && distToTarget < brakeRange && m_movePhase != MovePhase::Stop)
-				{
-					// 停止距離の外側にいる間だけ減速補間し、入力と実移動の不一致を防ぐ
-					const float ratio = (distToTarget - m_stopDistance) / (brakeRange - m_stopDistance);
-					speedMultiplier = max(0.0f, min(1.0f, ratio));
-				}
+				speedMultiplier = min(distToTarget / brakeRange, 1.0f);
 			}
 
 			// 計算した倍率をステートマシンに渡し、物理処理(Lerp)の目標速度を落とす
@@ -464,8 +631,19 @@ namespace app
 				break;
 
 			case MovePhase::Slide:
-				/** 滑り：isSneak=false, isDash=true, isSlide=true */
-				m_stateMachine->SetActionInput(moveDirection, false, true, false, true);
+				/**
+				 * 滑り：isSneak=false, isDash=true, isSlide=true。
+				 * ただし上り坂では滑らず走る。傾斜モデルの強化（GAIN_UP 3.5）で
+				 * 上りのスライドは走りより大幅に遅くなるため、AIには選ばせない
+				 */
+				if (m_stateMachine->GetSlideSlopeSigned() < CHILD_SLIDE_UPHILL_LIMIT)
+				{
+					m_stateMachine->SetActionInput(moveDirection, false, true, false, false);
+				}
+				else
+				{
+					m_stateMachine->SetActionInput(moveDirection, false, true, false, true);
+				}
 				break;
 			}
 		}
@@ -588,18 +766,17 @@ namespace app
 			if (m_rejoinCooldown > 0.0f) return false;
 
 			/**
-			 * 入隊条件は「隊列参加距離の内側にいる」かつ「親を察知している」。
+			 * 入隊条件は「親を察知している」のみ（2026-08-23 試遊フィードバック）。
 			 *
-			 * 距離は据え置きにしてある。視界の距離まで入隊範囲を広げると
-			 * 遠くの子が勝手に寄ってきて隊列が散らかるため
-			 * （プレイログ計測基盤と実測結果 7-5）。
-			 * 視界と音が効くのは「寄っていくかどうか」の側で、隊列の大きさは変わらない。
+			 * 以前は「隊列参加距離の内側にいる」も条件で、察知した子が寄ってきて
+			 * 距離内に入った時点で入隊していたが、視界で付いてくるようになったため
+			 * 「見つけた瞬間に♪を出して入隊カウント」へ簡略化した。
+			 * 入隊した子は陣形コントローラーの隊列スロットへ自分で移動してくる。
 			 *
-			 * 察知は至近距離では無条件に立つので（PerceiveDaddyThisFrame の1番）、
-			 * 従来なら入隊できていた子は必ず入隊できる。
-			 * 変わるのは「気づくまでの時間」だけで、そこにタイプ差が出る
+			 * 逃走後の復帰猶予（m_rejoinCooldown）はこの関数の頭で効いているので、
+			 * クマに散らされた子がその場で即復帰することはない
 			 */
-			return IsDaddyWithinJoinRadius() && m_hasNoticedDaddy;
+			return m_hasNoticedDaddy;
 		}
 
 
@@ -630,27 +807,60 @@ namespace app
 			if (m_hasNoticedDaddy && isFollowCmd)
 			{
 				/** 親に気づいたので自分から寄っていく */
+				m_stateMachine->SetTurnSpeedMultiplier(1.0f);
 				BuildInputToTarget(manager->GetDaddyPosition());
 				return;
 			}
 
+			if (m_hasHeardDaddy && isFollowCmd)
+			{
+				/**
+				 * 音だけ聞こえている：その場でゆっくり親のほうへ振り向く。
+				 * 振り向いた結果、親が視界に入れば UpdatePerception() が察知（「！」）へ進める。
+				 * 速度は0にして動かず、旋回だけを遅くする
+				 */
+				const Vector3 toDaddy = CalculateDirectionToDaddy();
+				if (toDaddy.LengthSq() > FLT_EPSILON)
+				{
+					m_stateMachine->SetSpeedMultiplier(0.0f);
+					m_stateMachine->SetTurnSpeedMultiplier(INVESTIGATE_TURN_MULTIPLIER);
+					m_stateMachine->SetActionInput(toDaddy, true, false, false, false);
+					return;
+				}
+			}
+
 			/** 気づいていなければその場で待つ */
+			m_stateMachine->SetTurnSpeedMultiplier(1.0f);
 			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
 		}
 
 
 		void ChildPenguinAIController::UpdatePerception()
 		{
+			/**
+			 * 旋回倍率を毎フレーム既定値へ戻す（AIの経路によらず必ず戻す）。
+			 * 振り向き（？）中だけ BuildInputWhenNotFollowing() がこの後で 0.2 に落とす。
+			 * ここで戻さないと、振り向き中に徘徊などへ移ったタイプが遅い旋回のまま動き続ける
+			 */
+			m_stateMachine->SetTurnSpeedMultiplier(1.0f);
+
 			/** 隊列へ戻れるようになるまでの猶予を進める（AIの経路によらず必ず進める） */
 			if (m_rejoinCooldown > 0.0f)
 			{
 				m_rejoinCooldown -= g_gameTime->GetFrameDeltaTime();
 			}
 
+			/** 呼びかけに応えた子の勇敢タイマーを進める */
+			if (m_braveTimer > 0.0f)
+			{
+				m_braveTimer -= g_gameTime->GetFrameDeltaTime();
+			}
+
 			/** 隊列にいる間は当然親を察知している（判定そのものを省ける） */
 			if (m_isFollowing)
 			{
 				m_hasNoticedDaddy = true;
+				m_hasHeardDaddy = false;
 				m_noticeTimer = m_perceptionSpec->noticeTime;
 				m_forgetTimer = 0.0f;
 				return;
@@ -658,42 +868,89 @@ namespace app
 
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
-			if (PerceiveDaddyThisFrame())
+			/**
+			 * 察知は2段階（2026-08-23 試遊フィードバック）。
+			 *   音が聞こえる  → 「？」を出してゆっくり振り向く（m_hasHeardDaddy）
+			 *   視界に入った  → 「！」を出して察知、自分から寄っていく（m_hasNoticedDaddy）
+			 * 至近距離と再集合の呼びかけだけは段階を踏まず即座に察知する
+			 * （この保険が無いと「親に背を向けた子が永久に入隊できない」が起きる）
+			 */
+			if (PerceiveDaddyStrongThisFrame())
+			{
+				m_forgetTimer = 0.0f;
+				NoticeDaddy();
+				return;
+			}
+
+			if (PerceiveDaddySightThisFrame())
 			{
 				m_forgetTimer = 0.0f;
 				m_noticeTimer += deltaTime;
 
-				/** 知覚し続けた時間が「気づく速さ」を超えたら察知に変わる */
+				/** 視界に入り続けた時間が「気づく速さ」を超えたら察知に変わる */
 				if (m_noticeTimer >= m_perceptionSpec->noticeTime)
 				{
-					m_hasNoticedDaddy = true;
+					NoticeDaddy();
 				}
 				return;
 			}
 
-			/** 見失った：気づきかけはすぐ止まるが、察知済みは少しの間だけ持続する */
 			m_noticeTimer = 0.0f;
 
-			if (!m_hasNoticedDaddy) return;
+			if (PerceiveDaddySoundThisFrame())
+			{
+				m_forgetTimer = 0.0f;
+
+				/** 音だけでは察知にならない。「聞こえた」段階に入って振り向き始める */
+				if (!m_hasNoticedDaddy && !m_hasHeardDaddy)
+				{
+					m_hasHeardDaddy = true;
+					BattleManager::GetInstance().NotifyCPReactionChanged(
+						m_owner, ui::EnCPReactionType::Question);
+				}
+				return;
+			}
+
+			/** 何も知覚できない：察知も「聞こえた」も時間経過で忘れる */
+			if (!m_hasNoticedDaddy && !m_hasHeardDaddy) return;
 
 			m_forgetTimer += deltaTime;
 			if (m_forgetTimer >= NOTICE_FORGET_TIME)
 			{
 				m_hasNoticedDaddy = false;
+				m_hasHeardDaddy = false;
 				m_forgetTimer = 0.0f;
 			}
 		}
 
 
-		bool ChildPenguinAIController::PerceiveDaddyThisFrame()
+		void ChildPenguinAIController::NoticeDaddy()
+		{
+			m_noticeTimer = m_perceptionSpec->noticeTime;
+
+			/**
+			 * 「！」マークは出さない。察知＝入隊なので、入隊の♪吹き出しが
+			 * そのまま「見つけた」の合図になる（2026-08-23 試遊フィードバック）。
+			 * 「？」を出していた場合は見つけた瞬間に消す
+			 */
+			if (m_hasHeardDaddy)
+			{
+				BattleManager::GetInstance().NotifyCPReactionChanged(
+					m_owner, ui::EnCPReactionType::None);
+			}
+			m_hasNoticedDaddy = true;
+			m_hasHeardDaddy = false;
+		}
+
+
+		bool ChildPenguinAIController::PerceiveDaddyStrongThisFrame()
 		{
 			auto* manager = ChildPenguinManager::GetInstance();
 			const float distDaddy = GetDistanceToDaddy();
 
 			/**
 			 * 1. 至近距離：隊列参加距離の内側なら向きも遮蔽も問わず気づく。
-			 *    すぐ目の前にいる親を見落とすことは無いし、
-			 *    この保険が無いと「親に背を向けた子が永久に入隊できない」が起きる
+			 *    すぐ目の前にいる親を見落とすことは無い
 			 */
 			if (distDaddy <= manager->GetJoinRadius()) return true;
 
@@ -708,12 +965,24 @@ namespace app
 				return true;
 			}
 
-			/** 3. 音：親が立てている音が届いていれば、向きも遮蔽も問わず気づく */
-			const float hearingRadius = manager->GetDaddyNoiseRadius() * m_perceptionSpec->hearingScale;
-			if (distDaddy <= hearingRadius) return true;
+			return false;
+		}
 
-			/** 4. 視界：距離 → 向き → 遮蔽 の順に、軽い判定から足切りする */
-			if (distDaddy > m_perceptionSpec->sightDistance) return false;
+
+		bool ChildPenguinAIController::PerceiveDaddySoundThisFrame()
+		{
+			auto* manager = ChildPenguinManager::GetInstance();
+
+			/** 親が立てている音が届いているか（向きも遮蔽も問わない） */
+			const float hearingRadius = manager->GetDaddyNoiseRadius() * m_perceptionSpec->hearingScale;
+			return GetDistanceToDaddy() <= hearingRadius;
+		}
+
+
+		bool ChildPenguinAIController::PerceiveDaddySightThisFrame()
+		{
+			/** 距離 → 向き → 遮蔽 の順に、軽い判定から足切りする */
+			if (GetDistanceToDaddy() > m_perceptionSpec->sightDistance) return false;
 
 			/** 向き：自分の正面ベクトルと親への方向の角度を見る */
 			Vector3 forward = Vector3::Front;
@@ -782,12 +1051,93 @@ namespace app
 			// クマが群れに突っ込んだとき、狙われた1体だけでなく周りの子もまとめて散る。
 			// これが無いと隊列人数に「群れごと失う」谷が出ない
 			Vector3 threatPos;
-			const bool hasThreat = manager->FindNearestBearThreat(myPos, FLEE_DETECTION_DISTANCE, threatPos);
+			bool hasThreat = manager->FindNearestBearThreat(myPos, FLEE_DETECTION_DISTANCE, threatPos);
+
+			// ウルト発動中の隊列の子は逃げない（全陣形共通）。
+			// ウルト中に群れが散ると、せっかくの強化時間が集め直しに消えて
+			// 爽快感よりストレスが勝つ（2026-08-24 試遊フィードバック）。
+			// 密集陣では逃げないことが攻撃無効化＋反撃の前提でもある
+			// （逃走は RemoveFollower で隊列から抜けるため、逃げると無効化の対象外になる）。
+			// 隊列外の子はウルトの恩恵を受けていないので、今までどおり逃げる
+			if (m_isFollowing && manager->IsUltActive())
+			{
+				m_fleeHoldTimer = 0.0f;
+				if (m_isFleeing)
+				{
+					m_isFleeing = false;
+					if (auto* lm = GameLogManager::GetInstance())
+					{
+						lm->QueueEvent({
+							{"ev", "child_flee_end"},
+							{"penguin_id", m_owner->GetLogId()}
+						});
+					}
+				}
+				return false;
+			}
+
+			// 再集合の呼びかけ（Yボタン）中は、クマが近くにいても「クマから逃げる」のをやめて
+			// 親のもとへ逃げ込ませる。以前は「クマの近くの子には呼びかけが効かない」仕様だったが、
+			// クマがうろついている間は再集合がまったく機能しなかった（2026-08-23 試遊フィードバック）。
+			// ただし親自身がクマの至近にいる場合だけは、クマの口元へ呼び戻すことになるので効かせない
+			if (manager->IsRegroupCallActive()
+				&& GetDistanceToDaddy() <= manager->GetRegroupCallRadius())
+			{
+				Vector3 dummyPos;
+				const bool isDaddyInDanger = manager->FindNearestBearThreat(
+					manager->GetDaddyPosition(), REGROUP_DADDY_SAFE_DISTANCE, dummyPos);
+
+				if (!isDaddyInDanger)
+				{
+					// 逃走を打ち切り、察知経路（呼びかけ）で親へ向かわせる。
+					// 復帰の猶予も0にして、親に着いたらすぐ隊列へ入れるようにする。
+					// 呼びかけの効果（2秒）が切れた直後にまた散らないよう、しばらく勇敢にする
+					m_fleeHoldTimer = 0.0f;
+					m_rejoinCooldown = 0.0f;
+					m_braveTimer = REGROUP_BRAVE_TIME;
+					if (m_isFleeing)
+					{
+						m_isFleeing = false;
+						if (auto* lm = GameLogManager::GetInstance())
+						{
+							lm->QueueEvent({
+								{"ev", "child_flee_end"},
+								{"penguin_id", m_owner->GetLogId()}
+							});
+						}
+					}
+					return false;
+				}
+			}
+
+			// 呼びかけに応えた直後の子は勇敢：クマが「他の子」を追っているだけなら逃げない。
+			// これが無いと、呼びかけで集めてもクマが300以内にいる限り2秒後にまた散ってしまう。
+			// 自分が狙われているとき・クマが至近まで来たときは今までどおり逃げる
+			if (hasThreat && m_braveTimer > 0.0f)
+			{
+				Vector3 chaserPos;
+				bool isChasedMyself = false;
+				if (auto* enemyManager = EnemyManager::GetInstance())
+				{
+					isChasedMyself = enemyManager->FindNearestChaserOf(m_owner, chaserPos)
+						&& (chaserPos - myPos).LengthSq()
+							<= FLEE_DETECTION_DISTANCE * FLEE_DETECTION_DISTANCE;
+				}
+
+				Vector3 toThreat = threatPos - myPos;
+				toThreat.y = 0.0f;
+				const bool isThreatVeryClose =
+					toThreat.LengthSq() <= BRAVE_PANIC_DISTANCE * BRAVE_PANIC_DISTANCE;
+
+				if (!isChasedMyself && !isThreatVeryClose)
+				{
+					hasThreat = false;
+				}
+			}
 
 			if (hasThreat)
 			{
-				// クマが目の前にいる間は、再集合を呼びかけられても戻らない
-				// （クマの口元へ呼び戻すことになるため）
+				// クマが目の前にいる間は逃げ続ける
 				m_fleeHoldTimer = FLEE_HOLD_TIME;
 				m_lastThreatPos = threatPos;
 			}
@@ -903,7 +1253,10 @@ namespace app
 				fleeDir.z = newZ;
 			}
 
-			// エネミーから離れる方向へダッシュ
+			// エネミーから離れる方向へダッシュ。
+			// 振り向き（？）中に落としていた速度・旋回の倍率が残らないよう明示的に戻す
+			m_stateMachine->SetSpeedMultiplier(1.0f);
+			m_stateMachine->SetTurnSpeedMultiplier(1.0f);
 			m_stateMachine->SetActionInput(fleeDir, false, true, false, false);
 			return true;
 		}
@@ -1202,6 +1555,13 @@ namespace app
 		}
 
 
+		bool NaughtyChildPenguinAI::IsHeadingIntoWhirlpoolOnPurpose() const
+		{
+			return m_naughtyStateMachine != nullptr
+				&& m_naughtyStateMachine->GetIsGoingToWhirlpool();
+		}
+
+
 		void NaughtyChildPenguinAI::SetRestrained(const bool isRestrained)
 		{
 			// 制止された瞬間(false→true)だけリアクションを要求する
@@ -1224,6 +1584,9 @@ namespace app
 
 			/** シロクマ逃走チェック（かまくら > 逃走 > 通常AI の優先順） */
 			if (CheckAndFlee()) return;
+
+			/** 急斜面などで動けなくなっていたら行き先を変える */
+			UpdateStuckWatch();
 
 			/** 子ペンギンマネージャーのインスタンスを取得 */
 			auto* manager = ChildPenguinManager::GetInstance();
@@ -1332,6 +1695,22 @@ namespace app
 					}
 					else {
 						targetBear = nullptr;   // 渦潮優先
+					}
+				}
+
+				// 崖の向こうなど、歩いて到達できないいたずら先は最初から諦める
+				// （行けない目的地へ向かって壁を押し続けるスタックの予防）
+				if (const StageNavGrid* navGrid = GetStageNavGrid())
+				{
+					const Vector3& myPos = m_owner->GetTransform().m_position;
+					if (targetBear != nullptr
+						&& !navGrid->IsReachable(myPos, targetBear->GetTransform().m_position))
+					{
+						targetBear = nullptr;
+					}
+					if (foundWhirlpool && !navGrid->IsReachable(myPos, whirlpoolPos))
+					{
+						foundWhirlpool = false;
 					}
 				}
 
@@ -1558,20 +1937,119 @@ namespace app
 
 		void NaughtyChildPenguinAI::PickNewRoamTarget()
 		{
-			/** 円内のランダムな座標を選ぶ（拒絶サンプリング） */
+			/**
+			 * 円内のランダムな座標を選ぶ（拒絶サンプリング）。
+			 * ナビグリッドで到達できる目的地だけを採用することで、
+			 * 崖の上や絶壁の向こうを引いてスタックするのを未然に防ぐ
+			 */
 			const Vector3& currentPos = m_owner->GetTransform().m_position;
-			for (int i = 0; i < 10; i++)
+			const StageNavGrid* navGrid = GetStageNavGrid();
+
+			for (int i = 0; i < 16; i++)
 			{
 				const float x = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
 				const float z = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
-				if ((x * x + z * z) <= (m_roamRadius * m_roamRadius))
-				{
-					m_roamTarget = Vector3(currentPos.x + x, currentPos.y, currentPos.z + z);
-					return;
-				}
+				if ((x * x + z * z) > (m_roamRadius * m_roamRadius)) continue;
+
+				const Vector3 candidate(currentPos.x + x, currentPos.y, currentPos.z + z);
+				if (navGrid != nullptr && !navGrid->IsReachable(currentPos, candidate)) continue;
+
+				m_roamTarget = candidate;
+				return;
 			}
 
 			/** 最大試行回数を超えた場合は現在地をそのまま目標にする */
+			m_roamTarget = currentPos;
+		}
+
+
+		void NaughtyChildPenguinAI::UpdateStuckWatch()
+		{
+			const Vector3 currentPos = m_owner->GetTransform().m_position;
+
+			// 「移動する意思があるのに動けていない」時間を測る。
+			// 急斜面（接地限界63度超）へ向かって歩き続けると、押し戻されて足踏みになる
+			const Vector3& moveDir = m_stateMachine->GetMoveDirection();
+			Vector3 moved = currentPos - m_stuckCheckPos;
+			moved.y = 0.0f;
+
+			const bool wantsToMove = moveDir.LengthSq() > FLT_EPSILON;
+			if (!wantsToMove
+				|| moved.LengthSq() >= NAUGHTY_STUCK_MOVE_THRESHOLD * NAUGHTY_STUCK_MOVE_THRESHOLD)
+			{
+				m_stuckTimer = 0.0f;
+				m_stuckCheckPos = currentPos;
+				return;
+			}
+
+			m_stuckTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_stuckTimer < NAUGHTY_STUCK_TIME_LIMIT) return;
+
+			m_stuckTimer = 0.0f;
+			m_stuckCheckPos = currentPos;
+
+			auto* manager = ChildPenguinManager::GetInstance();
+
+			// いたずら（クマ起こし・渦潮）へ向かう途中なら諦める。壁の向こうには行けない
+			if (m_naughtyStateMachine->GetIsGoingToWakeBear()
+				|| m_naughtyStateMachine->GetIsGoingToWhirlpool())
+			{
+				m_naughtyStateMachine->SetIsGoingToWakeBear(false);
+				m_naughtyStateMachine->SetIsAtBear(false);
+				m_naughtyStateMachine->SetIsGoingToWhirlpool(false);
+				m_naughtyStateMachine->SetIsAtWhirlpool(false);
+				m_wasSwallowedByWhirlpool = false;
+				manager->UnregisterAttempting(m_owner);
+				StopLivelyEffect();
+			}
+
+			// 徘徊中なら、進めなかった方向の反対側から行き先を選び直す
+			if (manager->IsRoaming(m_owner))
+			{
+				PickNewRoamTargetAwayFromBlocked(moveDir);
+			}
+		}
+
+
+		void NaughtyChildPenguinAI::PickNewRoamTargetAwayFromBlocked(const Vector3& blockedDir)
+		{
+			const Vector3& currentPos = m_owner->GetTransform().m_position;
+
+			Vector3 back = blockedDir;
+			back.y = 0.0f;
+			if (back.LengthSq() <= FLT_EPSILON)
+			{
+				PickNewRoamTarget();
+				return;
+			}
+			back.Normalize();
+			back *= -1.0f;
+
+			// 反対方向を中心に±75度のランダムな向きへ、半径の40〜100%の距離を選ぶ。
+			// こちらもナビグリッドで到達できる目的地だけを採用する
+			const StageNavGrid* navGrid = GetStageNavGrid();
+			for (int i = 0; i < 8; i++)
+			{
+				const float angle = util::RandomDevice::Random(
+					-NAUGHTY_STUCK_ESCAPE_HALF_ANGLE, NAUGHTY_STUCK_ESCAPE_HALF_ANGLE);
+				const float cosA = cosf(angle);
+				const float sinA = sinf(angle);
+
+				Vector3 dir;
+				dir.x = back.x * cosA - back.z * sinA;
+				dir.y = 0.0f;
+				dir.z = back.x * sinA + back.z * cosA;
+
+				const float dist = util::RandomDevice::Random(m_roamRadius * 0.4f, m_roamRadius);
+				const Vector3 candidate = currentPos + dir * dist;
+
+				if (navGrid != nullptr && !navGrid->IsReachable(currentPos, candidate)) continue;
+
+				m_roamTarget = candidate;
+				return;
+			}
+
+			/** 見つからない場合は現在地を目標にする（到達扱いになり、次フレームで選び直される） */
 			m_roamTarget = currentPos;
 		}
 

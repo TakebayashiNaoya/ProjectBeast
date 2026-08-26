@@ -25,6 +25,7 @@
 #include "Source/UI/DangerArrow/DangerArrowSystem.h"
 #include "Source/UI/Fever/FeverIconMenu.h"
 #include "Source/UI/FormationWheel/FormationWheelMenu.h"
+#include "Source/UI/Hint/InGameHintMenu.h"
 #include "Source/UI/InGameButton/InGameButtonMenu.h"
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
@@ -148,6 +149,8 @@ namespace app
 
 		ui::InitUIPacket(m_speedLinePacket, "Assets/parameter/UI/ult/SpeedLine.json");
 
+		ui::InitUIPacket(m_hintPacket, "Assets/parameter/UI/hint/InGameHint.json");
+
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
 		m_cpReactionSystem->Initialize();
@@ -171,6 +174,12 @@ namespace app
 	void InGameUIManager::InitializeMapIcon()
 	{
 		m_miniMapPacket->GetMenu()->InitializeMapIcon();
+	}
+
+
+	bool InGameUIManager::InitializeMapIconStep(const int maxCount)
+	{
+		return m_miniMapPacket->GetMenu()->InitializeMapIconStep(maxCount);
 	}
 
 
@@ -319,6 +328,16 @@ namespace app
 		);
 
 		//--------------------------------------------//
+		// シロクマリアクションUI通知（？＝索敵開始、！＝発見の咆哮）
+		//--------------------------------------------//
+		bm.SetOnEnemyReactionChanged(
+			[this](actor::Enemy* enemy, ui::EnCPReactionType type)
+			{
+				if (m_cpReactionSystem) m_cpReactionSystem->SetEnemyTarget(enemy, type);
+			}
+		);
+
+		//--------------------------------------------//
 		// 睡眠中クマUI通知
 		// daddyPenguinをキャプチャしてlambda内で探索する
 		//--------------------------------------------//
@@ -457,6 +476,7 @@ namespace app
 		if (m_achievementPacket) m_achievementPacket->Update();
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Update();
 		if (m_speedLinePacket) m_speedLinePacket->Update();
+		if (m_hintPacket) m_hintPacket->Update();
 
 		if (m_achievementPacket)
 		{
@@ -475,7 +495,7 @@ namespace app
 			}
 		}
 
-		// ジャンプ・スライドのスタミナ状態をボタンUIへ通知する（毎フレーム）
+		// ジャンプスタミナとY（再集合の呼びかけ）のクールダウンをボタンUIへ通知する（毎フレーム）
 		if (m_daddyPenguin && m_inGameButtonPacket)
 		{
 			if (auto* menu = m_inGameButtonPacket->GetMenu())
@@ -483,7 +503,13 @@ namespace app
 				if (auto* sm = m_daddyPenguin->GetStateMachine())
 				{
 					menu->SetJumpStaminaInfo(sm->GetJumpStaminaRatio(), !sm->CanUseJump());
-					menu->SetSlideStaminaInfo(sm->GetSlideStaminaRatio(), !sm->CanUseSlide());
+				}
+				if (auto* cpm = actor::ChildPenguinManager::GetInstance())
+				{
+					/** ゲージは「回復していく」見た目に合わせて、残りクールダウンを反転して渡す */
+					menu->SetRegroupCooldownInfo(
+						1.0f - cpm->GetRegroupCallCooldownRatio(),
+						!cpm->CanCallRegroup());
 				}
 			}
 		}
@@ -567,6 +593,7 @@ namespace app
 		if (m_debufPacket) m_debufPacket->Render(rc);
 		if (m_feverIconPacket) m_feverIconPacket->Render(rc);
 		if (m_levelUpIconPacket) m_levelUpIconPacket->Render(rc);
+		if (m_hintPacket) m_hintPacket->Render(rc);
 	}
 
 

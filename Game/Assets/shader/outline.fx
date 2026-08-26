@@ -83,8 +83,13 @@ SPSIn VSMain(SVSIn vsIn)
     float3 worldNormal = normalize(mul((float3x3)mWorld, vsIn.normal));
     float4 clipNormal  = mul(mProj, mul(mView, float4(worldNormal, 0.0f)));
 
-    // クリップ空間のXY方向に押し出す（Wで正規化することで透視変換の影響を除く）
-    clipPos.xy += normalize(clipNormal.xy) * outlineWidth * clipPos.w;
+    // クリップ空間のXY方向に押し出す（Wで正規化することで透視変換の影響を除く）。
+    // ただしスクリーン幅一定のままだと遠距離でモデルが輪郭線に飲み込まれるため、
+    // ワールド単位の上限（OUTLINE_MAX_WORLD_WIDTH）でクランプして、
+    // 遠くでは輪郭が細くなるようにする
+    const float OUTLINE_MAX_WORLD_WIDTH = 6.0f;
+    float widthNdc = min(outlineWidth, OUTLINE_MAX_WORLD_WIDTH * mProj._m00 / max(clipPos.w, 0.001f));
+    clipPos.xy += normalize(clipNormal.xy) * widthNdc * clipPos.w;
 
     psIn.pos = clipPos;
 
@@ -107,8 +112,10 @@ SPSIn VSMainSkin(SVSIn vsIn)
     float3 skinNormal = normalize(mul((float3x3)skinMatrix, vsIn.normal));
     float4 clipNormal = mul(mProj, mul(mView, float4(skinNormal, 0.0f)));
 
-    // クリップ空間のXY方向に押し出す
-    clipPos.xy += normalize(clipNormal.xy) * outlineWidth * clipPos.w;
+    // クリップ空間のXY方向に押し出す（VSMainと同じく遠距離はワールド単位でクランプ）
+    const float OUTLINE_MAX_WORLD_WIDTH = 6.0f;
+    float widthNdc = min(outlineWidth, OUTLINE_MAX_WORLD_WIDTH * mProj._m00 / max(clipPos.w, 0.001f));
+    clipPos.xy += normalize(clipNormal.xy) * widthNdc * clipPos.w;
 
     psIn.pos = clipPos;
 
