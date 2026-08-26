@@ -62,6 +62,13 @@ namespace nsK2EngineLow {
 			return s_maxWriteTime;
 		}
 
+		//キャッシュファイルの先頭に置くヘッダー。
+		struct ShaderCacheHeader
+		{
+			long long shaderDirTime;	//書き出した時点のAssets/shader以下の最終更新時刻の最大値。
+			long long blobSize;			//後続のバイトコードのバイト数。壊れたキャッシュを弾く検証用。
+		};
+
 		//キャッシュファイルのパスを作る（fxパス・エントリ・モデル・コンパイルフラグで一意にする）。
 		std::string BuildShaderCachePath(const char* filePath, const char* entryFuncName, const char* shaderModel, unsigned int compileFlags)
 		{
@@ -104,12 +111,16 @@ namespace nsK2EngineLow {
 		{
 			std::ifstream cacheIn(cachePath, std::ios::binary);
 			if (cacheIn) {
-				long long cachedTime = 0;
-				cacheIn.read(reinterpret_cast<char*>(&cachedTime), sizeof(cachedTime));
-				if (cacheIn && cachedTime == shaderDirTime) {
+				ShaderCacheHeader header = {};
+				cacheIn.read(reinterpret_cast<char*>(&header), sizeof(header));
+				if (cacheIn && header.shaderDirTime == shaderDirTime && header.blobSize > 0) {
 					std::vector<char> bytes(
 						(std::istreambuf_iterator<char>(cacheIn)), std::istreambuf_iterator<char>());
-					if (!bytes.empty() && SUCCEEDED(D3DCreateBlob(bytes.size(), &m_blob))) {
+					//記録しておいたサイズと照合し、書きかけのキャッシュは使わずコンパイルへ回す。
+					//欠けたバイトコードをそのまま渡すとPSOの作成に失敗してabortし、
+					//ShaderCacheを手で消すまで二度と起動できなくなる
+					if (static_cast<long long>(bytes.size()) == header.blobSize
+						&& SUCCEEDED(D3DCreateBlob(bytes.size(), &m_blob))) {
 						memcpy(m_blob->GetBufferPointer(), bytes.data(), bytes.size());
 						m_isInited = true;
 						return;
@@ -139,13 +150,32 @@ namespace nsK2EngineLow {
 		}
 
 		//コンパイル結果をキャッシュへ保存する（次回以降の起動・ステージロードを高速化）。
+		//いったん一時ファイルへ書いてから差し替える。本体へ直接書くと、書き込みの途中で
+		//プロセスが落ちたとき（確保失敗のabort、ウィンドウを閉じる等）に中途半端な
+		//キャッシュが残り、次回以降それを読み続けて起動できなくなる
 		if (m_blob) {
 			CreateDirectoryA(g_shaderCacheDir, nullptr);
-			std::ofstream cacheOut(cachePath, std::ios::binary | std::ios::trunc);
-			if (cacheOut) {
-				cacheOut.write(reinterpret_cast<const char*>(&shaderDirTime), sizeof(shaderDirTime));
-				cacheOut.write(static_cast<const char*>(m_blob->GetBufferPointer()),
-					static_cast<std::streamsize>(m_blob->GetBufferSize()));
+			const std::string tempPath = cachePath + ".tmp";
+			bool isWritten = false;
+			{
+				std::ofstream cacheOut(tempPath, std::ios::binary | std::ios::trunc);
+				if (cacheOut) {
+					ShaderCacheHeader header;
+					header.shaderDirTime = shaderDirTime;
+					header.blobSize = static_cast<long long>(m_blob->GetBufferSize());
+					cacheOut.write(reinterpret_cast<const char*>(&header), sizeof(header));
+					cacheOut.write(static_cast<const char*>(m_blob->GetBufferPointer()),
+						static_cast<std::streamsize>(header.blobSize));
+					cacheOut.flush();
+					//ディスク不足などで書き切れていないものは差し替えない
+					isWritten = cacheOut.good();
+				}
+			}
+			if (isWritten) {
+				MoveFileExA(tempPath.c_str(), cachePath.c_str(), MOVEFILE_REPLACE_EXISTING);
+			}
+			else {
+				DeleteFileA(tempPath.c_str());
 			}
 		}
 		m_isInited = true;
