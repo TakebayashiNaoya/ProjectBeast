@@ -1,7 +1,6 @@
 /**
  * @file FormationRange.fx
  * @brief 陣形の入隊・脱隊範囲を地形追従ラインで描画するシェーダー
- * @author 竹林
  */
 
 cbuffer VSCb : register(b0)

@@ -2,7 +2,6 @@
  * @file UIAnimationFactory.h
  * @brief UIAnimationParameterの定義からUIAnimationを生成するラッパー
  * @detail UIAnimation.h,UIAnimationParameter.h 側はこのファイルを知らないため循環しない
- * author 忽那
  */
 #pragma once
 #include "UIAnimation.h"

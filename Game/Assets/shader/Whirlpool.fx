@@ -1,7 +1,6 @@
 /**
  * @file Whirlpool.fx
  * @brief 渦潮描画シェーダー
- * @author 竹林
  */
 
 // 共通定数バッファ（b0）

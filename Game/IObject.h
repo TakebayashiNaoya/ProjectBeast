@@ -1,7 +1,6 @@
 ﻿/**
  * @file IObject.h
  * @brief ゲームオブジェクトの基底クラス
- * @author 立山
  */
 #pragma once
 
