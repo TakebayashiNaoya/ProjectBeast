@@ -1,7 +1,6 @@
 ﻿/**
  * @file BattleManager.h
  * @brief バトルの管理をするクラス（クラス間の情報受け渡し）
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/CPReaction/CPReactionTypes.h"
@@ -13,10 +12,25 @@ namespace app
 	/** 前方宣言 */
 	namespace actor
 	{
+		class Actor;
 		class ChildPenguin;
 		class DaddyPenguin;
 		class Enemy;
 	}
+
+
+	/**
+	 * @brief 画面演出をともなう衝撃の種類
+	 * @detail 揺れ・ブラー・ヒットストップをどう配分するかは受け取る側（演出）が決める。
+	 *         通知する側（AIやウルト）は「何が起きたか」だけを伝える。
+	 */
+	enum class EnImpactType : uint8_t
+	{
+		BearRoar,		//シロクマの咆哮。
+		IglooBreak,		//かまくらの破壊。
+		BearNullified,	//密集陣ウルトによる攻撃の弾き返し。
+		UltActivate,	//ウルトの発動。
+	};
 
 
 	/**
@@ -201,6 +215,50 @@ namespace app
 
 
 		/**
+		 * @brief 衝撃演出の通知functionを設定
+		 * @param func 引数：衝撃の種類、発生したワールド座標
+		 */
+		inline void SetOnImpact(std::function<void(EnImpactType, const Vector3&)> func)
+		{
+			m_onImpact = std::move(func);
+		}
+
+		/**
+		 * @brief 画面演出をともなう衝撃の発生を通知する
+		 * @detail 揺れの強さやブラーの濃さといった見せ方は受け取る側の責務。
+		 *         呼び出し側は「どこで何が起きたか」だけを伝え、カメラやポストエフェクトを直接触らない。
+		 * @param type 衝撃の種類
+		 * @param worldPosition 衝撃が発生したワールド座標（プレイヤーとの距離で強さを決めるのに使う）
+		 */
+		inline void NotifyImpact(const EnImpactType type, const Vector3& worldPosition)
+		{
+			if (m_onImpact) m_onImpact(type, worldPosition);
+		}
+
+
+		/**
+		 * @brief リアクション対象の破棄通知functionを設定
+		 * @param func 引数：破棄されるアクター
+		 */
+		inline void SetOnReactionTargetDestroyed(std::function<void(actor::Actor*)> func)
+		{
+			m_onReactionTargetDestroyed = std::move(func);
+		}
+
+		/**
+		 * @brief リアクションの対象になりうるアクターの破棄を通知する
+		 * @detail リアクションUIはアニメーションが終わるまで対象のポインタを持ち続けるため、
+		 *         表示中に解放されると座標更新で解放済みメモリを読んでしまう。
+		 *         アクターを解放する側から必ず呼ぶこと。
+		 * @param target 破棄されるアクター
+		 */
+		inline void NotifyReactionTargetDestroyed(actor::Actor* target)
+		{
+			if (m_onReactionTargetDestroyed) m_onReactionTargetDestroyed(target);
+		}
+
+
+		/**
 		 * @brief シロクマ攻撃無効化（密集陣ウルト）の有効/無効を設定する
 		 * @details 密集陣ウルトの BearAttackNullifyEffect が Enter/Exit で切り替える。
 		 *          有効な間、隊列の子への攻撃は EnemyController 側で無効化され、
@@ -312,6 +370,10 @@ namespace app
 		std::function<void(actor::ChildPenguin*, ui::EnCPReactionType, ui::EnCPReactionPriority)> m_onCPReactionChanged;
 		/** シロクマリアクションUI更新通知 */
 		std::function<void(actor::Enemy*, ui::EnCPReactionType)> m_onEnemyReactionChanged;
+		/** リアクション対象の破棄通知（表示中スロットの解放後参照を防ぐ） */
+		std::function<void(actor::Actor*)> m_onReactionTargetDestroyed;
+		/** 衝撃演出の通知（揺れ・ブラー・ヒットストップの配分は受け取る側が決める） */
+		std::function<void(EnImpactType, const Vector3&)> m_onImpact;
 
 		/** 陣形レベルアップUI更新通知 */
 		std::function<void(int)> m_onFormationLevelUp;

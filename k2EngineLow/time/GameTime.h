@@ -86,6 +86,23 @@ namespace nsK2EngineLow {
 		}
 
 		/// <summary>
+		/// スローモーションの影響を受けない1フレームの経過時間を取得(単位・秒)
+		/// </summary>
+		/// <remark>
+		/// UI・ポストエフェクトなど、ヒットストップ中も実時間どおりに進めたい演出向け。
+		/// ワールドの時間で動かしたいものは GetFrameDeltaTime() を使う。
+		/// </remark>
+		/// <returns></returns>
+		const float GetUnscaledFrameDeltaTime() const
+		{
+			if (m_isFixedFrameDeltaTime) {
+				return m_fixedFrameDeltaTime;
+			}
+
+			return m_frameDeltaTime;
+		}
+
+		/// <summary>
 		/// 直前フレームの実経過時間を取得(単位・秒、平均化なし・最大0.1秒でクランプ済み)
 		/// </summary>
 		/// <remark>

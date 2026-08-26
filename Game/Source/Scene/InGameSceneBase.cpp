@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameSceneBase.cpp
  * @brief インゲームシーン基底クラス
- * @author 立山、竹林
  */
 #include "stdafx.h"
 #include "InGameSceneBase.h"
@@ -80,6 +79,45 @@ namespace
 	/** ロードの1フレームがこの時間を超えたらトレースへ記録する（ミリ秒）。
 	 *  ローディングアイコンはフレームが回らないと止まるため、犯人特定に使う */
 	constexpr double LOAD_TICK_LOG_THRESHOLD_MS = 50.0;
+
+	//============================================//
+	// 衝撃演出のつまみ（BattleManager::NotifyImpact の受け口で使う）
+	//
+	// 揺れは 2026-08-25 の酔い対策で全体を一段下げてある。
+	// 揺れ自体も滑らかなノイズ方式（GameCamera::StartShake）に変更済み。
+	//============================================//
+
+	/** 咆哮の画面演出を出す最大距離。
+	 *  遠くの無関係な咆哮で画面がボケると理不尽なため、ここより遠い咆哮は無視する */
+	constexpr float ROAR_EFFECT_MAX_DISTANCE = 900.0f;
+	/** 咆哮のラジアルブラーの長さ・ピークまでの時間・最小強度（秒／秒／0〜1） */
+	constexpr float ROAR_BLUR_DURATION = 1.0f;
+	constexpr float ROAR_BLUR_ATTACK_TIME = 0.3f;
+	constexpr float ROAR_BLUR_MIN_STRENGTH = 0.3f;
+	/** 咆哮の画面揺れ（至近時の最大振幅・秒）。ラジアルブラーも重なるため特に控えめ */
+	constexpr float ROAR_SHAKE_STRENGTH = 6.0f;
+	constexpr float ROAR_SHAKE_DURATION = 0.4f;
+
+	/** かまくら崩壊の画面揺れ（振幅・秒） */
+	constexpr float IGLOO_BREAK_SHAKE_STRENGTH = 10.0f;
+	constexpr float IGLOO_BREAK_SHAKE_DURATION = 0.4f;
+
+	/** 弾き返しのヒットストップ（時間倍率・実時間秒）と画面揺れ（振幅・秒） */
+	constexpr float NULLIFY_HITSTOP_SCALE = 0.4f;
+	constexpr float NULLIFY_HITSTOP_DURATION = 0.15f;
+	constexpr float NULLIFY_SHAKE_STRENGTH = 8.0f;
+	constexpr float NULLIFY_SHAKE_DURATION = 0.25f;
+
+	/** ウルト発動のヒットストップ（時間倍率・実時間秒） */
+	constexpr float ULT_HITSTOP_SCALE = 0.4f;
+	constexpr float ULT_HITSTOP_DURATION = 0.3f;
+	/** ウルト発動のラジアルブラー（強度・ピークまでの時間・長さ）。強さは咆哮の半分程度に抑える */
+	constexpr float ULT_BLUR_STRENGTH = 0.5f;
+	constexpr float ULT_BLUR_ATTACK_TIME = 0.12f;
+	constexpr float ULT_BLUR_DURATION = 0.5f;
+	/** ウルト発動のパンチイン（詰める割合・秒） */
+	constexpr float ULT_PUNCH_IN_AMOUNT = 0.07f;
+	constexpr float ULT_PUNCH_IN_DURATION = 0.3f;
 
 	/**
 	 * @brief BGMのWAVをバックグラウンドで先読みしてOSのファイルキャッシュへ乗せる
@@ -490,6 +528,10 @@ namespace app
 			camera::CameraManager::Get().Register(camera::GameCamera::ID(), gameCamera);
 			camera::CameraManager::Get().SwitchCamera(camera::GameCamera::ID());
 
+			/** 衝撃演出（揺れ・ブラー・ヒットストップ）の受け口を用意する。
+			 *  カメラの生成後でないと登録しても揺らす相手がいない */
+			RegisterImpactObserver();
+
 			/** ステージ紹介動画の撮影モードでは、外周を周回するショーケースカメラに切り替える */
 			if (IsShowcaseEnabled())
 			{
@@ -608,6 +650,70 @@ namespace app
 				}
 			}
 		}
+	}
+
+
+	void InGameSceneBase::RegisterImpactObserver()
+	{
+		BattleManager::GetInstance().SetOnImpact(
+			[](EnImpactType type, const Vector3& worldPosition)
+			{
+				auto& postEffect = nsBeastEngine::g_renderingEngine->GetPostEffectManager();
+				auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+					camera::GameCamera::ID()
+				);
+
+				switch (type)
+				{
+				case EnImpactType::BearRoar:
+				{
+					/** プレイヤーから遠い咆哮ほど弱め、一定距離より遠ければ何も出さない */
+					Vector3 toDaddy = worldPosition
+						- actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
+					toDaddy.y = 0.0f;
+					const float distance = toDaddy.Length();
+					if (distance > ROAR_EFFECT_MAX_DISTANCE) return;
+
+					const float closeness = 1.0f - (distance / ROAR_EFFECT_MAX_DISTANCE);
+					const float blurStrength =
+						ROAR_BLUR_MIN_STRENGTH + (1.0f - ROAR_BLUR_MIN_STRENGTH) * closeness;
+
+					postEffect.GetRadialBlur().Start(
+						blurStrength, ROAR_BLUR_ATTACK_TIME, ROAR_BLUR_DURATION);
+					if (gameCamera)
+					{
+						gameCamera->StartShake(ROAR_SHAKE_STRENGTH * closeness, ROAR_SHAKE_DURATION);
+					}
+					break;
+				}
+
+				case EnImpactType::IglooBreak:
+					if (gameCamera)
+					{
+						gameCamera->StartShake(IGLOO_BREAK_SHAKE_STRENGTH, IGLOO_BREAK_SHAKE_DURATION);
+					}
+					break;
+
+				case EnImpactType::BearNullified:
+					g_gameTime->StartSlowMotion(NULLIFY_HITSTOP_SCALE, NULLIFY_HITSTOP_DURATION);
+					if (gameCamera)
+					{
+						gameCamera->StartShake(NULLIFY_SHAKE_STRENGTH, NULLIFY_SHAKE_DURATION);
+					}
+					break;
+
+				case EnImpactType::UltActivate:
+					g_gameTime->StartSlowMotion(ULT_HITSTOP_SCALE, ULT_HITSTOP_DURATION);
+					postEffect.GetRadialBlur().Start(
+						ULT_BLUR_STRENGTH, ULT_BLUR_ATTACK_TIME, ULT_BLUR_DURATION);
+					if (gameCamera)
+					{
+						gameCamera->StartPunchIn(ULT_PUNCH_IN_AMOUNT, ULT_PUNCH_IN_DURATION);
+					}
+					break;
+				}
+			}
+		);
 	}
 
 

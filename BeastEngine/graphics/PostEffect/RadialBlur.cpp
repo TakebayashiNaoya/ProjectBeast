@@ -1,7 +1,6 @@
 ﻿/**
  * @file RadialBlur.cpp
  * @brief ラジアルブラーポストエフェクトクラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "Graphics/PostEffect/RadialBlur.h"
@@ -28,12 +27,14 @@ namespace nsBeastEngine
 	void RadialBlur::Init(RenderTarget& mainRenderTarget)
 	{
 		// 書き戻し時のフォーマット変換を避けるため、メインRTと同じ設定で作成する
+		// （フォーマットは直接引いてくる。ベタ書きするとメインRT側の変更に追従できない）
+		const DXGI_FORMAT mainFormat = mainRenderTarget.GetColorBufferFormat();
 		m_blurRenderTarget.Create(
 			mainRenderTarget.GetWidth(),
 			mainRenderTarget.GetHeight(),
 			1,
 			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			mainFormat,
 			DXGI_FORMAT_UNKNOWN
 		);
 
@@ -49,7 +50,7 @@ namespace nsBeastEngine
 			initData.m_expandConstantBuffer = &m_cb;
 			initData.m_expandConstantBufferSize = sizeof(m_cb);
 			initData.m_alphaBlendMode = AlphaBlendMode_None;
-			initData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			initData.m_colorBufferFormat[0] = mainFormat;
 
 			m_blurSprite.Init(initData);
 		}
@@ -92,7 +93,9 @@ namespace nsBeastEngine
 	{
 		if (!m_isInitialized || m_duration <= 0.0f) return;
 
-		m_elapsedTime += g_gameTime->GetFrameDeltaTime();
+		// ヒットストップ（ウルト発動・弾き反撃）と重なっても実時間どおりに終わらせる。
+		// スケール後の時間で進めると、咆哮のブラーだけが間延びして見える
+		m_elapsedTime += g_gameTime->GetUnscaledFrameDeltaTime();
 		if (m_elapsedTime >= m_duration)
 		{
 			// 発動終了

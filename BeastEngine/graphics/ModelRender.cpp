@@ -1,7 +1,6 @@
 ﻿/**
  * @file ModelRender.cpp
  * @brief モデルレンダーの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "ModelRender.h"
@@ -166,8 +165,7 @@ namespace nsBeastEngine
 		}
 
 		// EnableOutline() の遅延初期化用に最終的な初期化データを控えておく
-		// （ポインタメンバは本クラスのメンバや外部の永続オブジェクトを指すため保存して安全）
-		m_savedInitData = modelInitData;
+		SaveInitData(modelInitData);
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
@@ -236,7 +234,7 @@ namespace nsBeastEngine
 		}
 
 		// EnableOutline() の遅延初期化用に最終的な初期化データを控えておく
-		m_savedInitData = modelInitData;
+		SaveInitData(modelInitData);
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
@@ -351,11 +349,27 @@ namespace nsBeastEngine
 	}
 
 
+	void ModelRender::SaveInitData(const ModelInitData& modelInitData)
+	{
+		m_savedInitData = modelInitData;
+
+		// tkmキーとfxパスは呼び出し側のスタック上のバッファや一時オブジェクトを
+		// 指していることがある（例: TerrainObject のチャンクキーは char[64] のローカル変数）。
+		// 初期化データを後まで持ち越すこのクラスで文字列を所有し直す
+		m_savedTkmKey = (modelInitData.m_tkmFilePath != nullptr) ? modelInitData.m_tkmFilePath : "";
+		m_savedFxPath = (modelInitData.m_fxFilePath != nullptr) ? modelInitData.m_fxFilePath : "";
+	}
+
+
 	void ModelRender::EnableOutline()
 	{
 		// トゥーン経由で作成済みならフラグだけ立てる
 		if (m_outlineModel == nullptr)
 		{
+			// 所有している文字列を指し直してから使う（保存時のポインタは無効になっている場合がある）
+			m_savedInitData.m_tkmFilePath = m_savedTkmKey.empty() ? nullptr : m_savedTkmKey.c_str();
+			m_savedInitData.m_fxFilePath = m_savedFxPath.empty() ? nullptr : m_savedFxPath.c_str();
+
 			InitOutlineModel(m_savedInitData);
 		}
 		m_isOutlineOnlyEnabled = true;
@@ -674,8 +688,9 @@ namespace nsBeastEngine
 		if (!m_visible) return;
 
 		// デバイスロスト調査：この直後のドローがハングした場合にDREDレポートで
-		// モデル名を特定できるよう、コマンドリストへマーカーを刻む
-		if (!m_debugNameW.empty())
+		// モデル名を特定できるよう、コマンドリストへマーカーを刻む。
+		// 毎ドロー発行されるので、調査時だけ BEAST_GPU_MARKERS で有効にする
+		if (nsK2EngineLow::IsGpuMarkerEnabled() && !m_debugNameW.empty())
 		{
 			rc.GetCommandList()->SetMarker(
 				0,	// PIX_EVENT_UNICODE_VERSION

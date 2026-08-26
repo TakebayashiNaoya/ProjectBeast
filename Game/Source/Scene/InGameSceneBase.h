@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameSceneBase.h
  * @brief インゲームシーン基底クラス
- * @author 立山、竹林
  */
 #pragma once
 #include "IScene.h"
@@ -26,6 +25,44 @@ namespace app
 	}
 
 	class InGameUIManager;
+
+
+	/**
+	 * @brief 難易度ごとに決まっているステージの静的情報
+	 * @details 各インゲームシーンの GetTimeLimit()/GetStageName()/各JSONパスと、
+	 *          ステージ選択画面の情報パネルの両方がここを参照する。
+	 *          両者に同じ数値を書くと、片方だけ直したときに黙ってズレるため一次資料は1つにする。
+	 */
+	struct StageInfo
+	{
+		const char* name;							//ステージ名（ハイスコアの保存キー・ログのステージ名）。
+		float       timeLimit;						//制限時間（秒）。
+		const char* enemyLayoutJsonPath;			//シロクマ配置JSONのパス。
+		const char* whirlpoolPositionsJsonPath;		//渦潮配置JSONのパス。
+	};
+
+
+	/** 難易度3種のステージ情報。ui::EnStageChoices の並び（Easy/Normal/Hard）と一致させること */
+	constexpr StageInfo STAGE_INFO_TABLE[] = {
+		{
+			"Easy", 120.0f,
+			"Assets/parameter/character/enemy/EnemyLayout_Easy.json",
+			"Assets/parameter/stage/whirlpoolPositions_Easy.json"
+		},
+		{
+			"Normal", 150.0f,
+			"Assets/parameter/character/enemy/EnemyLayout_Normal.json",
+			"Assets/parameter/stage/whirlpoolPositions_Normal.json"
+		},
+		{
+			"Hard", 180.0f,
+			"Assets/parameter/character/enemy/EnemyLayout_Hard.json",
+			"Assets/parameter/stage/whirlpoolPositions_Hard.json"
+		},
+	};
+
+	/** ステージ情報の件数（難易度の数） */
+	constexpr int STAGE_INFO_COUNT = static_cast<int>(std::size(STAGE_INFO_TABLE));
 
 
 	/** 子ペンギン生成設定 */
@@ -122,6 +159,14 @@ namespace app
 
 
 	private:
+		/**
+		 * @brief 衝撃演出の受け口を登録する
+		 * @details 咆哮・かまくら破壊・弾き返し・ウルト発動を、画面揺れ・ラジアルブラー・
+		 *          ヒットストップへ振り分ける。通知元（AIやウルト）がカメラや
+		 *          ポストエフェクトを直接触らずに済むよう、見せ方はここへ集約する
+		 */
+		void RegisterImpactObserver();
+
 		//------------------------------------------------------------
 		// ロードフェーズ
 		//------------------------------------------------------------

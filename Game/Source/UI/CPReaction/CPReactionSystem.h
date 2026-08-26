@@ -1,7 +1,6 @@
 /**
  * @file CPReactionSystem.h
  * @brief 子ペンギンのリアクションシステムクラス
- * @author 藤谷
  */
 #pragma once
 #include "CPReactionMenu.h"
@@ -76,6 +75,15 @@ namespace app
 			 * @param type リアクションのタイプ（Question / Exclamation を想定）
 			 */
 			void SetEnemyTarget(actor::Enemy* enemy, const EnCPReactionType type);
+
+			/**
+			 * @brief 破棄されるアクターを参照しているスロットをすべて解放する
+			 * @details スロットはアニメーションが終わるまでターゲットを持ち続けるため、
+			 *          表示中に子ペンギンが解放されると座標更新で解放済みメモリを読んでしまう。
+			 *          破棄側（ChildPenguinManager）から必ず呼ぶこと。
+			 * @param target 破棄されるアクター
+			 */
+			void NotifyTargetDestroyed(actor::Actor* target);
 
 
 		public:

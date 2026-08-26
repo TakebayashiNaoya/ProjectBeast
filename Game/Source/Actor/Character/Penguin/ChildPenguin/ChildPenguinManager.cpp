@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinManager.cpp
  * @brief 子ペンギンのマネージャー
- * @author 立山、竹林
  */
 #include "stdafx.h"
 #include "ChildPenguin.h"
@@ -607,6 +606,9 @@ namespace app
 			{
 				wpMng->NotifyPenguinDestroyed(penguin);
 			}
+
+			/** リアクションUIも表示中はポインタを持ち続けるので同様に無効化する */
+			BattleManager::GetInstance().NotifyReactionTargetDestroyed(penguin);
 
 			/** 即座に m_childPenguinList から erase したり delete したりせず、 */
 			/** 削除予定リストに登録するだけに留める */

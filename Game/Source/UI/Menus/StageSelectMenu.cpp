@@ -1,12 +1,13 @@
 ﻿/**
  * @file StageSelectMenu.cpp
  * @brief ステージ選択画面のメニュークラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "StageSelectMenu.h"
 
 #include "Source/Manager/ScoreManager.h"
+// 制限時間・ステージ名・配置JSONパスの一次資料（STAGE_INFO_TABLE）を共有するため
+#include "Source/Scene/InGameSceneBase.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Animation/UIAnimation.h"
 #include "Source/Util/JsonConverter.h"
@@ -216,31 +217,26 @@ namespace app
 
 		void StageSelectMenu::LoadStageInfoIfNeeded()
 		{
+			static_assert(STAGE_INFO_NUM == STAGE_INFO_COUNT,
+				"情報パネルの枠数と STAGE_INFO_TABLE の件数を揃えること");
+
 			if (m_isStageInfoLoaded) return;
 			m_isStageInfoLoaded = true;
 
 			/** 配置JSONの実データから数を数える。
-			 *  ステージを再生成しても表示が自動で追従する */
-			constexpr const char* ENEMY_PATHS[STAGE_INFO_NUM] = {
-				"Assets/parameter/character/enemy/EnemyLayout_Easy.json",
-				"Assets/parameter/character/enemy/EnemyLayout_Normal.json",
-				"Assets/parameter/character/enemy/EnemyLayout_Hard.json",
-			};
-			constexpr const char* WHIRL_PATHS[STAGE_INFO_NUM] = {
-				"Assets/parameter/stage/whirlpoolPositions_Easy.json",
-				"Assets/parameter/stage/whirlpoolPositions_Normal.json",
-				"Assets/parameter/stage/whirlpoolPositions_Hard.json",
-			};
-
+			 *  パスはインゲームシーンと共有の STAGE_INFO_TABLE から引くので、
+			 *  ステージを再生成・改名しても表示が自動で追従する */
 			for (int i = 0; i < STAGE_INFO_NUM; ++i)
 			{
+				const StageInfo& info = STAGE_INFO_TABLE[i];
+
 				nlohmann::json json;
-				if (util::JsonConverter::IsLoadJsonFile(json, ENEMY_PATHS[i])
+				if (util::JsonConverter::IsLoadJsonFile(json, info.enemyLayoutJsonPath)
 					&& json.contains("enemies"))
 				{
 					m_stageBearCounts[i] = static_cast<int>(json["enemies"].size());
 				}
-				if (util::JsonConverter::IsLoadJsonFile(json, WHIRL_PATHS[i])
+				if (util::JsonConverter::IsLoadJsonFile(json, info.whirlpoolPositionsJsonPath)
 					&& json.contains("whirlpoolPositions"))
 				{
 					m_stageWhirlCounts[i] = static_cast<int>(json["whirlpoolPositions"].size());
@@ -280,15 +276,15 @@ namespace app
 
 			LoadStageInfoIfNeeded();
 
-			/** 制限時間は各シーンヘッダの GetTimeLimit() と同期させること */
-			constexpr int STAGE_TIME_SECONDS[STAGE_INFO_NUM] = { 120, 150, 180 };
-			constexpr const char* STAGE_NAMES[STAGE_INFO_NUM] = { "Easy", "Normal", "Hard" };
-
 			const int index = static_cast<int>(m_selectingStage);
 			if (index < 0 || index >= STAGE_INFO_NUM) return;
 
+			/** 制限時間もステージ名も、インゲームシーンと同じ STAGE_INFO_TABLE から引く */
+			const StageInfo& info = STAGE_INFO_TABLE[index];
+			const int timeSeconds = static_cast<int>(info.timeLimit);
+
 			char buf[48];
-			sprintf_s(buf, "%d:%02d", STAGE_TIME_SECONDS[index] / 60, STAGE_TIME_SECONDS[index] % 60);
+			sprintf_s(buf, "%d:%02d", timeSeconds / 60, timeSeconds % 60);
 			timeText->SetText(buf);
 
 			sprintf_s(buf, "x%d", m_stageBearCounts[index]);
@@ -297,7 +293,7 @@ namespace app
 			sprintf_s(buf, "x%d", m_stageWhirlCounts[index]);
 			whirlText->SetText(buf);
 
-			const int highScore = ScoreManager::GetHighScore(STAGE_NAMES[index]);
+			const int highScore = ScoreManager::GetHighScore(info.name);
 			if (highScore > 0)
 			{
 				sprintf_s(buf, "きろく %d", highScore);

@@ -19,7 +19,10 @@ namespace app
 
 
 		private:
+			/** 演出を乗せたあとの最終的なカメラ状態（描画に使われる） */
 			CameraData m_data;
+			/** SetState() で受け取った素のカメラ状態。演出はここから毎フレーム作り直す */
+			CameraData m_baseData;
 
 			float m_shakeTimer = 0.0f;      /** 画面揺れの残り時間（秒） */
 			float m_shakeDuration = 0.0f;   /** 画面揺れの全体時間（秒） */
@@ -38,6 +41,7 @@ namespace app
 			 */
 			void SetState(const CameraData& data)
 			{
+				m_baseData = data;
 				m_data = data;
 			}
 

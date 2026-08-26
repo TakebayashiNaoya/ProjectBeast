@@ -1,7 +1,6 @@
 ﻿/**
  * @file HardInGameScene.h
  * @brief インゲームシーン（ハードステージ）
- * @author 竹林
  */
 #pragma once
 #include "InGameSceneBase.h"
@@ -18,10 +17,13 @@ namespace app
 	{
 		appScene(HardInGameScene);
 
+		/** STAGE_INFO_TABLE 上の自分の位置（制限時間・ステージ名・配置JSONの一次資料） */
+		static constexpr int STAGE_INFO_INDEX = 2;
+
 	protected:
 		float GetTimeLimit() const override
 		{
-			return 180.0f;
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].timeLimit;
 		}
 
 		Vector3 GetDaddySpawnPos() const override
@@ -41,12 +43,12 @@ namespace app
 
 		const char* GetEnemyJsonPath() const override
 		{
-			return "Assets/parameter/character/enemy/EnemyLayout_Hard.json";
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].enemyLayoutJsonPath;
 		}
 
 		const char* GetWhirlpoolPositionsJsonPath() const override
 		{
-			return "Assets/parameter/stage/whirlpoolPositions_Hard.json";
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].whirlpoolPositionsJsonPath;
 		}
 
 		const char* GetWhirlpoolParameterJsonPath() const override
@@ -76,7 +78,7 @@ namespace app
 
 		const char* GetStageName() const override
 		{
-			return "Hard";
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].name;
 		}
 
 		const char* GetAchievementJsonPath() const override

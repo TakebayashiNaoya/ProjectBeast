@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyController.cpp
  * @brief エネミーのコントローラー
- * @author 立山
  */
 #include "stdafx.h"
 #include <time.h>
@@ -18,8 +17,6 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
 #include "Source/Actor/Stage/StageSystem.h"
-#include "Source/Camera/CameraController.h"
-#include "Source/Camera/CameraManager.h"
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/IglooManager.h"
 #include "Source/Noise/NoiseManager.h"
@@ -78,44 +75,12 @@ namespace app
 			 */
 			constexpr float SEARCH_TURN_MULTIPLIER = 0.25f;
 
-			/**
-			 * @brief 咆哮のラジアルブラーが届く「プレイヤーとの距離」
-			 * @details この距離より遠いクマの咆哮では画面演出を出さない。
-			 *          遠くの無関係な咆哮で画面がボケると理不尽なため。
-			 */
-			constexpr float ROAR_BLUR_MAX_DISTANCE = 900.0f;
-			/** 咆哮のラジアルブラーの継続時間（秒） */
-			constexpr float ROAR_BLUR_DURATION = 1.0f;
-			/**
-			 * @brief 咆哮のラジアルブラーの立ち上がり時間（秒）
-			 * @details クマが吠えるまでの溜めに合わせて加速的に強くなり、
-			 *          ここでピークに達した後、残り時間で線形に減衰する。
-			 */
-			constexpr float ROAR_BLUR_ATTACK_TIME = 0.3f;
-			/** 咆哮のラジアルブラーの最小強度（距離境界ぎりぎりでの強さ） */
-			constexpr float ROAR_BLUR_MIN_STRENGTH = 0.3f;
-
 			//============================================//
 			// 密集陣ウルトの攻撃無効化＋反撃
 			//============================================//
 
 			/** 無効化時にクマを弾き飛ばす距離 */
 			constexpr float NULLIFY_KNOCKBACK_DISTANCE = 150.0f;
-			/** 無効化時のヒットストップの時間倍率と長さ（実時間・秒） */
-			constexpr float NULLIFY_HITSTOP_SCALE = 0.4f;
-			constexpr float NULLIFY_HITSTOP_DURATION = 0.15f;
-			/** 無効化時の画面揺れ（振幅・秒）
-			 *  2026-08-25 酔い対策で全シェイクを一段減らした（揺れ自体も滑らかなノイズ方式に変更済み） */
-			constexpr float NULLIFY_SHAKE_STRENGTH = 8.0f;
-			constexpr float NULLIFY_SHAKE_DURATION = 0.25f;
-
-			/** 咆哮の画面揺れ（至近時の最大振幅・秒）。咆哮はラジアルブラーも重なるため特に控えめに */
-			constexpr float ROAR_SHAKE_STRENGTH = 6.0f;
-			constexpr float ROAR_SHAKE_DURATION = 0.4f;
-
-			/** かまくら崩壊の画面揺れ（振幅・秒） */
-			constexpr float IGLOO_BREAK_SHAKE_STRENGTH = 10.0f;
-			constexpr float IGLOO_BREAK_SHAKE_DURATION = 0.4f;
 		}
 
 
@@ -891,12 +856,8 @@ namespace app
 					// 実際に壊す
 					StageSystem::GetInstance()->BreakIgloo(enemy->m_targetIglooKeyAtStart);
 
-					// かまくら崩壊の衝撃を画面揺れで見せる
-					if (auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
-						camera::GameCamera::ID()))
-					{
-						gameCamera->StartShake(IGLOO_BREAK_SHAKE_STRENGTH, IGLOO_BREAK_SHAKE_DURATION);
-					}
+					// かまくら崩壊の衝撃を演出側へ通知する（見せ方は受け取る側が決める）
+					BattleManager::GetInstance().NotifyImpact(EnImpactType::IglooBreak, iglooPos);
 					IglooManager::GetInstance().EjectAllPenguins(iglooPos);
 					if (auto* lm = GameLogManager::GetInstance())
 						lm->QueueEvent({ {"ev", "igloo_broken"}, {"key", enemy->m_targetIglooKeyAtStart}, {"bear_id", enemy->m_target->GetLogId()} });
@@ -942,13 +903,9 @@ namespace app
 					/** スタンさせる（StunStateが時間経過で自動解除する） */
 					bear->GetEnemyStateMachine()->SetStun(true);
 
-					/** 短いヒットストップ＋画面揺れで「弾いた！」を強調する */
-					g_gameTime->StartSlowMotion(NULLIFY_HITSTOP_SCALE, NULLIFY_HITSTOP_DURATION);
-					if (auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
-						camera::GameCamera::ID()))
-					{
-						gameCamera->StartShake(NULLIFY_SHAKE_STRENGTH, NULLIFY_SHAKE_DURATION);
-					}
+					/** 「弾いた！」の手応えを演出側へ通知する（見せ方は受け取る側が決める） */
+					BattleManager::GetInstance().NotifyImpact(
+						EnImpactType::BearNullified, bear->GetTransform().m_position);
 
 					if (auto* lm = GameLogManager::GetInstance())
 					{
@@ -1175,27 +1132,10 @@ namespace app
 			BattleManager::GetInstance().NotifyEnemyReactionChanged(
 				enemy->m_target, ui::EnCPReactionType::Exclamation);
 
-			// 咆哮の衝撃演出：プレイヤーの近くでの咆哮ほど強いラジアルブラーをかける
-			Vector3 toDaddy = enemy->m_target->GetTransform().m_position
-				- ChildPenguinManager::GetInstance()->GetDaddyPosition();
-			toDaddy.y = 0.0f;
-			const float distToDaddy = toDaddy.Length();
-			if (distToDaddy <= ROAR_BLUR_MAX_DISTANCE)
-			{
-				// 至近で1.0、境界ぎりぎりで最小強度になるよう距離で線形に落とす
-				const float closeness = 1.0f - (distToDaddy / ROAR_BLUR_MAX_DISTANCE);
-				const float strength =
-					ROAR_BLUR_MIN_STRENGTH + (1.0f - ROAR_BLUR_MIN_STRENGTH) * closeness;
-				nsBeastEngine::g_renderingEngine->GetPostEffectManager()
-					.GetRadialBlur().Start(strength, ROAR_BLUR_ATTACK_TIME, ROAR_BLUR_DURATION);
-
-				// 近い咆哮ほど強い画面揺れも重ねる
-				if (auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
-					camera::GameCamera::ID()))
-				{
-					gameCamera->StartShake(ROAR_SHAKE_STRENGTH * closeness, ROAR_SHAKE_DURATION);
-				}
-			}
+			// 咆哮の衝撃を演出側へ通知する。
+			// プレイヤーからの距離で強さを落とすかどうかは受け取る側の判断に任せる
+			BattleManager::GetInstance().NotifyImpact(
+				EnImpactType::BearRoar, enemy->m_target->GetTransform().m_position);
 		}
 
 

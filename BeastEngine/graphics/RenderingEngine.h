@@ -1,7 +1,6 @@
 ﻿/**
  * @file RenderingEngine.h
  * @brief RenderingEngineクラスのヘッダー
- * @author 竹林
  */
 #pragma once
 #include "MyRenderer.h"
@@ -122,18 +121,19 @@ namespace nsBeastEngine
 		 * @brief フォワードモデルリストに描画オブジェクトを追加する
 		 * @param modelRender 追加する描画オブジェクト
 		 */
+		void AddForwardModelList(ModelRender* modelRender)
+		{
+			m_forwardModelList.push_back(modelRender);
+		}
+
 		/**
 		 * @brief 輪郭線だけをフォワードパスで重ね描きするモデルを登録する
 		 * @details 本体はディファードで描かれるモデルの輪郭線用（EnableOutline()）
+		 * @param modelRender 追加する描画オブジェクト
 		 */
 		void AddOutlineModelList(ModelRender* modelRender)
 		{
 			m_outlineModelList.push_back(modelRender);
-		}
-
-		void AddForwardModelList(ModelRender* modelRender)
-		{
-			m_forwardModelList.push_back(modelRender);
 		}
 
 		/**

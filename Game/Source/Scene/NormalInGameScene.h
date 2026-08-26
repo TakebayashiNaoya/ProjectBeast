@@ -1,7 +1,6 @@
 ﻿/**
  * @file NormalInGameScene.h
  * @brief インゲームシーン（ノーマルステージ）
- * @author 立山、竹林
  */
 #pragma once
 #include "InGameSceneBase.h"
@@ -18,10 +17,13 @@ namespace app
 	{
 		appScene(NormalInGameScene);
 
+		/** STAGE_INFO_TABLE 上の自分の位置（制限時間・ステージ名・配置JSONの一次資料） */
+		static constexpr int STAGE_INFO_INDEX = 1;
+
 	protected:
-		float GetTimeLimit() const override 
+		float GetTimeLimit() const override
 		{
-			return 150.0f; 
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].timeLimit;
 		}
 
 		Vector3 GetDaddySpawnPos() const override
@@ -49,12 +51,12 @@ namespace app
 
 		const char* GetEnemyJsonPath() const override
 		{
-			return "Assets/parameter/character/enemy/EnemyLayout_Normal.json";
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].enemyLayoutJsonPath;
 		}
 
 		const char* GetWhirlpoolPositionsJsonPath() const override
 		{
-			return "Assets/parameter/stage/whirlpoolPositions_Normal.json";
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].whirlpoolPositionsJsonPath;
 		}
 
 		const char* GetWhirlpoolParameterJsonPath() const override
@@ -82,7 +84,7 @@ namespace app
 			return "Assets/parameter/nature/oceanParameter_Normal.bin";
 		}
 
-		const char* GetStageName() const override { return "Normal"; }
+		const char* GetStageName() const override { return STAGE_INFO_TABLE[STAGE_INFO_INDEX].name; }
 		const char* GetAchievementJsonPath() const override { return "Assets/parameter/achievement/AchievementList_Normal.json"; }
 
 		const char* GetTerrainJsonPath() const override

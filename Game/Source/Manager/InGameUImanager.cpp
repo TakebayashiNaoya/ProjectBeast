@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameUIManager.cpp
  * @brief インゲームUIの生成・更新・描画・配線を管理するクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "InGameUIManager.h"
@@ -334,6 +333,17 @@ namespace app
 			[this](actor::Enemy* enemy, ui::EnCPReactionType type)
 			{
 				if (m_cpReactionSystem) m_cpReactionSystem->SetEnemyTarget(enemy, type);
+			}
+		);
+
+		//--------------------------------------------//
+		// リアクション対象の破棄通知
+		// 表示中のスロットが解放済みのアクターを指したままにならないようにする
+		//--------------------------------------------//
+		bm.SetOnReactionTargetDestroyed(
+			[this](actor::Actor* target)
+			{
+				if (m_cpReactionSystem) m_cpReactionSystem->NotifyTargetDestroyed(target);
 			}
 		);
 

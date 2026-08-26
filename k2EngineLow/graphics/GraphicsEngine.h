@@ -15,8 +15,29 @@
 #include "font/FontEngine.h"
 #include "FrameBuffer.h"
 #include <pix.h>
+#include <cstdlib>
 
 namespace nsK2EngineLow {
+	/// <summary>
+	/// GPU デバッグマーカー（DRED のパンくずに刻む描画パス名・モデル名）を発行するか。
+	/// </summary>
+	/// <remarks>
+	/// マーカーは毎フレーム・毎ドロー発行されるため常時有効にすると計測の邪魔になる。
+	/// デバイスロスト調査をするときだけ環境変数 BEAST_GPU_MARKERS を立てて使う。
+	/// 判定は初回だけ行い、以降はキャッシュした値を返す。
+	/// </remarks>
+	inline bool IsGpuMarkerEnabled()
+	{
+		static const bool s_isEnabled = []()
+		{
+			char buf[8] = { 0 };
+			size_t len = 0;
+			return getenv_s(&len, buf, sizeof(buf), "BEAST_GPU_MARKERS") == 0
+				&& len > 0 && buf[0] != '0';
+		}();
+		return s_isEnabled;
+	}
+
 	/// <summary>
 	/// �A���t�@�u�����f�B���O���[�h
 	/// </summary>
@@ -263,10 +284,16 @@ namespace nsK2EngineLow {
 #else
 		// Release build: emit the event via the raw API (no PIX runtime needed)
 		// so DRED breadcrumb contexts can record the render pass names.
+		// This costs CPU time on every frame, so it is opt-in via BEAST_GPU_MARKERS.
 		void BeginGPUEvent(const char* eventName)
 		{
+			if (!IsGpuMarkerEnabled()) {
+				return;
+			}
 			wchar_t buf[64];
-			swprintf_s(buf, L"%hs", eventName);
+			// The name is truncated rather than passed whole: swprintf_s would abort
+			// the process through the invalid parameter handler if it did not fit.
+			_snwprintf_s(buf, _TRUNCATE, L"%hs", eventName);
 			m_commandList[m_frameIndex]->BeginEvent(
 				0,	// PIX_EVENT_UNICODE_VERSION
 				buf,
@@ -275,6 +302,11 @@ namespace nsK2EngineLow {
 		}
 		void EndGPUEvent()
 		{
+			// Must mirror BeginGPUEvent exactly, or the command list ends up with
+			// an unmatched EndEvent.
+			if (!IsGpuMarkerEnabled()) {
+				return;
+			}
 			m_commandList[m_frameIndex]->EndEvent();
 		}
 #endif

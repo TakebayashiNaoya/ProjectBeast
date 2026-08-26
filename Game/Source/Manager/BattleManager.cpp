@@ -1,7 +1,6 @@
 ﻿/**
  * @file BattleManager.cpp
  * @brief バトルの管理をするクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "BattleManager.h"
@@ -418,6 +417,9 @@ namespace app
 		m_onMiniMapChanged = nullptr;
 		m_wpWarningChanged = nullptr;
 		m_onCPReactionChanged = nullptr;
+		m_onEnemyReactionChanged = nullptr;
+		m_onReactionTargetDestroyed = nullptr;
+		m_onImpact = nullptr;
 		m_onFormationLevelUp = nullptr;
 	}
 

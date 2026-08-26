@@ -1,7 +1,6 @@
 ﻿/**
  * @file ModelRender.h
  * @brief モデルレンダー
- * @author 竹林尚哉
  */
 #pragma once
 
@@ -358,6 +357,12 @@ namespace nsBeastEngine
 		 * @param outlineWidth	輪郭線の太さ（法線押し出し量）
 		 * @param outlineColor	輪郭線の色（RGBA）
 		 */
+		inline void SetOutlineParam(const float outlineWidth, const Vector4& outlineColor)
+		{
+			m_outlineCb.outlineWidth = outlineWidth;
+			m_outlineCb.outlineColor = outlineColor;
+		}
+
 		/**
 		 * @brief トゥーンを使わずに輪郭線だけを有効にする
 		 * @details 本体は通常のディファードで描いたまま、輪郭線だけを
@@ -372,12 +377,6 @@ namespace nsBeastEngine
 		 *          フォワードパスから呼ばれる。ユーザーは直接呼ばない
 		 */
 		void OnDrawOutline(RenderContext& rc);
-
-		inline void SetOutlineParam(const float outlineWidth, const Vector4& outlineColor)
-		{
-			m_outlineCb.outlineWidth = outlineWidth;
-			m_outlineCb.outlineColor = outlineColor;
-		}
 
 		/**
 		 * @brief 全モデルに対してトゥーンシェーダーを一括で有効/無効にする
@@ -548,6 +547,13 @@ namespace nsBeastEngine
 		void InitOutlineModel(const ModelInitData& baseInitData);
 
 		/**
+		 * @brief EnableOutline() の遅延初期化用に初期化データを控える
+		 * @details 文字列パスは呼び出し側の寿命に依存しないよう本クラスで所有し直す
+		 * @param modelInitData 控える初期化データ
+		 */
+		void SaveInitData(const ModelInitData& modelInitData);
+
+		/**
 		 * @brief シェーダーのエントリーポイントの設定
 		 * @param modelInitData モデルの初期化データ
 		 */
@@ -633,6 +639,10 @@ namespace nsBeastEngine
 
 		/** EnableOutline() の遅延初期化用に控えた最終的なモデル初期化データ */
 		ModelInitData m_savedInitData;
+		/** 上記の初期化データが指すtkmキー（呼び出し側の寿命に依存しないよう自前で持つ） */
+		std::string m_savedTkmKey;
+		/** 上記の初期化データが指すfxファイルパス（同上） */
+		std::string m_savedFxPath;
 
 		/** ボーン（自前保有） */
 		Skeleton       m_skeleton;

@@ -45,8 +45,11 @@ namespace app
 
 		void GameCamera::Update()
 		{
-			/** SetState() で入った今フレームの姿勢に、揺れとパンチインを上乗せする。
-			 *  m_data は毎フレーム SetState() で置き換わるため、オフセットは蓄積しない */
+			/** 素の姿勢（m_baseData）から毎フレーム作り直したうえで、揺れとパンチインを上乗せする。
+			 *  m_data へ直接足し込むと、ポーズ中のように SetState() が呼ばれないフレームで
+			 *  オフセットが積み上がってしまう（CameraManager の更新はシーンのポーズと無関係に回る） */
+			m_data = m_baseData;
+
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
 			// パンチイン：sinカーブで注視点へ寄って戻る

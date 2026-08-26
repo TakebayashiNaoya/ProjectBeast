@@ -1,7 +1,6 @@
 /**
  * @file CPReactionSystem.cpp
  * @brief 子ペンギンのリアクションシステムクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CPReactionSystem.h"
@@ -227,6 +226,33 @@ namespace app
 				m_markTargets.at(i) = nullptr;
 				m_markWorldOffsetsY.at(i) = 0.0f;
 				return;
+			}
+		}
+
+
+		void CPReactionSystem::NotifyTargetDestroyed(actor::Actor* target)
+		{
+			if (!target) return;
+
+			// 吹き出しとマークは別枠なので、同じアクターが両方に載っていることがある。
+			// 片方だけ消すと残った方が解放済みの座標を読み続けるため、両方を走査する
+			for (uint8_t i = 0; i < REACTION_PACKET_NUM; ++i)
+			{
+				if (m_targets.at(i) != target) continue;
+
+				m_reactionPackets.at(i).GetMenu()->ForceFinish();
+				m_targets.at(i) = nullptr;
+				m_targetWorldOffsetsY.at(i) = 0.0f;
+				m_priorities.at(i) = EnCPReactionPriority::Normal;
+			}
+
+			for (uint8_t i = 0; i < MARK_PACKET_NUM; ++i)
+			{
+				if (m_markTargets.at(i) != target) continue;
+
+				m_markPackets.at(i).GetMenu()->ForceFinish();
+				m_markTargets.at(i) = nullptr;
+				m_markWorldOffsetsY.at(i) = 0.0f;
 			}
 		}
 
