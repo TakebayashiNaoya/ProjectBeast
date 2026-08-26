@@ -1,7 +1,6 @@
 ﻿/**
  * @file FormationRangeVisualizer.h
  * @brief 再集合の呼びかけ範囲を地形追従ラインリングで可視化する
- * @author 竹林
  */
 #pragma once
 #include <vector>

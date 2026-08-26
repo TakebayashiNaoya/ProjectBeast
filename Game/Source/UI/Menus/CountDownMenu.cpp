@@ -1,7 +1,6 @@
 ﻿/**
  * @file CountDownMenu.cpp
  * @brief カウントダウンの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "CountDownMenu.h"

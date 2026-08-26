@@ -1,7 +1,6 @@
 ﻿/**
  * @file IglooPromptMenu.cpp
  * @brief かまくら入口でAボタンアイコンを表示するクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "IglooPromptMenu.h"

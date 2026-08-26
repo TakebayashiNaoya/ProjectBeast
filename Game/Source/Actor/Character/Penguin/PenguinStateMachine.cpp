@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinStateMachine.cpp
  * @brief ペンギンのステートマシン
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "PenguinBase.h"

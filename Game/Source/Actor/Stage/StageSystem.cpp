@@ -1,7 +1,6 @@
 ﻿/**
  * @file Actor.cpp
  * @brief ステージ上のオブジェクトを管理するシステム
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "IStage.h"

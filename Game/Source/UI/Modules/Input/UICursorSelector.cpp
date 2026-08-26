@@ -1,7 +1,6 @@
 ﻿/**
  * @file UICursorSelector.cpp
  * @brief UIカーソル選択を行うクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "UICursorSelector.h"

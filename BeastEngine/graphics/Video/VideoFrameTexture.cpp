@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoFrameTexture.cpp
  * @brief CPU→GPU の動的テクスチャ更新クラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "VideoFrameTexture.h"

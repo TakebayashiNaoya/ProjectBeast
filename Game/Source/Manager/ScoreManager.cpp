@@ -1,7 +1,6 @@
 ﻿/**
  * @file ScoreManager.cpp
  * @brief スコアの管理をするクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "ScoreManager.h"

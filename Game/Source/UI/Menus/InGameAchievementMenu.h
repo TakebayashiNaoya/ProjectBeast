@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameAchievementMenu.h
  * @brief インゲーム中にアチーブメントの一覧と達成状況を表示するクラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/Achivement/AchievementManager.h"

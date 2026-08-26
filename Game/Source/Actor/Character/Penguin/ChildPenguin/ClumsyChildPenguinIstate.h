@@ -1,7 +1,6 @@
 ﻿/**
  * @file ClumsyChildPenguinIState.h
  * @brief おっちょこちょいペンギン固有のステートインターフェース
- * @author 竹林
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"

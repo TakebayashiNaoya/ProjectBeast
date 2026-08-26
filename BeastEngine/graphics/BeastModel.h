@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastModel.h
  * @brief トライアングルカリング対応モデルクラス
- * @author 竹林
  */
 #pragma once
 #include "Graphics/BeastMeshParts.h"

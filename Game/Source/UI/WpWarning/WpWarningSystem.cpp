@@ -1,7 +1,6 @@
 ﻿/**
  * @file WpWarningSystem.cpp
  * @brief WpWarningのシステムクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "WpWarningSystem.h"

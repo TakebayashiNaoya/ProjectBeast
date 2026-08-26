@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameButtonGaugeStatus.cpp
  * @brief インゲームボタンのスタミナゲージ専用のステータスクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "InGameButtonGaugeStatus.h"

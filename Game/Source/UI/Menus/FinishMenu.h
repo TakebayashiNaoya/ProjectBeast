@@ -1,7 +1,6 @@
 ﻿/**
  * @file FinishMenu.h
  * @brief FINISH演出の動的処理クラス
- * @author 立山
  */
 #pragma once
 #include "Source/UI/Menu.h"

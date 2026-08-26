@@ -1,7 +1,6 @@
 ﻿/**
  * @file DebufMenu.cpp
  * @brief 甘えん坊ペンギンから親ペンギンにデバフを掛ける演出のメニュー
- * @author 忽那
  */
 #include "stdafx.h"
 #include "DebufMenu.h"

@@ -1,7 +1,6 @@
 /**
  * @file LogCompression.cpp
  * @brief プレイログファイルの圧縮・展開ユーティリティ
- * @author 竹林
  */
 #include "stdafx.h"
 #include "LogCompression.h"

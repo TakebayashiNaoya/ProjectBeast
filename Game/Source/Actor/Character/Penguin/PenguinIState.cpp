@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinIState.cpp
  * @brief ペンギン共通のステートインターフェース
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "graphics/effect/BeastEffectEmitter.h"

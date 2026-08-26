@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguin.h
  * @brief 親ペンギンクラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/PenguinBase.h"

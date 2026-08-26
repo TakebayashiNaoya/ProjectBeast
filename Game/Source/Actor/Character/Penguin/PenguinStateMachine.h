@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinStateMachine.h
  * @brief ペンギンのステートマシン
- * @author 藤谷
  */
 #pragma once
 #include "PenguinEffectStatus.h"

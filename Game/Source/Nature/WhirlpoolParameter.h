@@ -1,7 +1,6 @@
 ﻿/**
  * @file WhirlpoolParameter.h
  * @brief 渦潮のパラメーター
- * @author 竹林
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file WpWarningStatus.cpp
  * @brief WpWarningのステータス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "WpWarningStatus.h"

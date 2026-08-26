@@ -1,7 +1,6 @@
 ﻿/**
  * @file CPReactionAnimStatus.h
  * @brief CPReactionのアニメーションステータス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Model/UIAnimationStatus.h"

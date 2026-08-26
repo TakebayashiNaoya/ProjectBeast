@@ -1,7 +1,6 @@
 ﻿/**
  * @file SoundOptionMenu.h
  * @brief サウンドのオプションの動的処理群
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"

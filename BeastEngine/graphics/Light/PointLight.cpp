@@ -1,7 +1,6 @@
 ﻿/**
  * @file PointLight.cpp
  * @brief ポイントライトの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "PointLight.h"

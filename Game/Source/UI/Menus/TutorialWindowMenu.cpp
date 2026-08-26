@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialWindowMenu.cpp
  * @brief チュートリアルポップアップウィンドウ（ひな型）
- * @author 竹林
  */
 #include "stdafx.h"
 #include "Source/Util/CRC32.h"

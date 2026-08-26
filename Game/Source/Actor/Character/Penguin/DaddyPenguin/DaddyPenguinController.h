@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinController.h
  * @brief 親ペンギンのプレイヤーコントローラー
- * @author 竹林
  */
 #pragma once
 

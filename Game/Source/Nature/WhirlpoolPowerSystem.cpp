@@ -1,7 +1,6 @@
 ﻿/**
  * @file WhirlpoolPowerSystem.cpp
  * @brief 渦潮の引き寄せ、押し出しを管理するクラス
- * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"

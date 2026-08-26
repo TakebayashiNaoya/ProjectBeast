@@ -1,7 +1,6 @@
 /**
  * @file CPReactionMenu.cpp
  * @brief 子ペンギンのリアクションUIクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CPReactionMenu.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file RenderViewContext.h
  * @brief 描画に使用するビューのリソースをまとめた構造体
- * @author 竹林
  */
 #pragma once
 #include "BeastEnginePreCompile.h"

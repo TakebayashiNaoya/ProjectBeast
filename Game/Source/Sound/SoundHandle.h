@@ -1,7 +1,6 @@
 ﻿/**
  * @file SoundHandle.h
  * @brief サウンド再生ハンドルの型定義（軽量ヘッダ）
- * @author 竹林
  */
 #pragma once
 #include <cstdint>

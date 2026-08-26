@@ -1,7 +1,6 @@
 ﻿/**
  * @file TerrainObject.cpp
  * @brief ハイトマップから生成する地形オブジェクト
- * @author 竹林
  */
 #include "stdafx.h"
 #include "DirectXTex/DirectXTex.h"

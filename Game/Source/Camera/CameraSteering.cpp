@@ -1,7 +1,6 @@
 ﻿/**
  * @file CameraSteering.cpp
  * @brief カメラのステアリング処理
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CameraSteering.h"

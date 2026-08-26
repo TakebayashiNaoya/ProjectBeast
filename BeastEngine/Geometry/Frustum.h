@@ -1,7 +1,6 @@
 ﻿/**
  * @file Frustum.h
  * @brief 視錐台（フラスタム）クラス
- * @author 竹林
  */
 #pragma once
 

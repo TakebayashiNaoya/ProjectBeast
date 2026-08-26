@@ -1,7 +1,6 @@
 ﻿/**
  * @file GaussianBlur.h
  * @brief ガウシアンブラー・平均ブラーの独自実装
- * @author 竹林尚哉
  */
 #pragma once
 #include "Graphics/PostEffect/PostEffectTypes.h"

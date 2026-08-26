@@ -1,7 +1,6 @@
 ﻿/**
  * @file RenderingEngine.cpp
  * @brief RenderingEngineクラスの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "RenderingEngine.h"

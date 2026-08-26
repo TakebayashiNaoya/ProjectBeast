@@ -1,7 +1,6 @@
 ﻿/**
  * @file SearchParameter.h
  * @brief シロクマの索敵・追跡に関するパラメータ
- * @author 忽那
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

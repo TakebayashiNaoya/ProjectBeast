@@ -1,7 +1,6 @@
 ﻿/**
  * @file ResultScene.cpp
  * @brief リザルトシーン
- * @author 立山
  */
 #include "stdafx.h"
 #include "ResultScene.h"

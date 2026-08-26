@@ -1,7 +1,6 @@
 ﻿/**
  * @file Decal.cpp
  * @brief でかい足跡などのデカールを描画するクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "Decal.h"

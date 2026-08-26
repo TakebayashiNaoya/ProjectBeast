@@ -1,7 +1,6 @@
 ﻿/**
  * @file RandomDevice.cpp
  * @brief ランダムデバイスの実装
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "RandomDevice.h"

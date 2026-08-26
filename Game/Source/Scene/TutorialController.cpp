@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialController.cpp
  * @brief チュートリアルステージのトリガー・ウィンドウ管理
- * @author 竹林
  */
 #include "stdafx.h"
 #include "SceneManager.h"

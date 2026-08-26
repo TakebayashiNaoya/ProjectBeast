@@ -1,7 +1,6 @@
 ﻿/**
  * @file ClumsyChildPenguinStateMachine.cpp
  * @brief おっちょこちょいペンギンのステートマシン
- * @author 竹林
  */
 #include "stdafx.h"
 #include "ClumsyChildPenguinIState.h"

@@ -1,7 +1,6 @@
 /**
  * @file Types.h
  * @brief エフェクト用の定数など必要な情報を定義するファイル
- * @author 藤谷、竹林
  */
 #pragma once
 #include <string>

@@ -1,7 +1,6 @@
 /**
  * @file FormationEffects.cpp
  * @brief 陣形効果の具体クラス群の実装
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FormationEffects.h"

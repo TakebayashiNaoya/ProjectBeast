@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinIState.h
  * @brief ペンギン共通のステートインターフェース
- * @author 藤谷
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"

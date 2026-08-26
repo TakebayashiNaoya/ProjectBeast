@@ -1,7 +1,6 @@
 ﻿/**
  * @file TerrainCircle.h
  * @brief 地形に追従し、内側を塗りつぶせる円の描画クラス
- * @author 竹林
  */
 #pragma once
 #include <vector>

@@ -1,7 +1,6 @@
 ﻿/**
  * @file Enemy.cpp
  * @brief エネミークラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "Enemy.h"

@@ -1,7 +1,6 @@
 /**
  * @file ReplayScene.h
  * @brief プレイログを再生するリプレイシーン
- * @author 竹林
  */
 #pragma once
 #include "IScene.h"

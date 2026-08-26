@@ -1,7 +1,6 @@
 ﻿/**
  * @file TitleEventMenu.cpp
  * @brief タイトルの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "TitleEventMenu.h"

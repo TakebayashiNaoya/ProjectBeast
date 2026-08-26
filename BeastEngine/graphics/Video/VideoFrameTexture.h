@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoFrameTexture.h
  * @brief CPU→GPU の動的テクスチャ更新クラス
- * @author 竹林
  */
 #pragma once
 #include <cstdint>

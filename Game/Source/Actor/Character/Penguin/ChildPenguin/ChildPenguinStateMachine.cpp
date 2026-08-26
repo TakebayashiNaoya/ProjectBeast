@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinStateMachine.cpp
  * @brief 子ペンギンのステートマシン
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "ChildPenguin.h"

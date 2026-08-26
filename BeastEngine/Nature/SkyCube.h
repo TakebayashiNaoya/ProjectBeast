@@ -1,7 +1,6 @@
 ﻿/**
  * @file SkyCube.h
  * @brief スカイキューブ
- * @author 竹林尚哉
  */
 #pragma once
 #include "Graphics/ModelRender.h"

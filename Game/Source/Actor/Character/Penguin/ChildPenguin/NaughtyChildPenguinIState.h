@@ -1,7 +1,6 @@
 ﻿/**
  * @file NaughtyChildPenguinIState.h
  * @brief ヤンチャペンギン固有のステートインターフェース
- * @author 立山
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"

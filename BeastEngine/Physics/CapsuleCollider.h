@@ -1,7 +1,6 @@
 ﻿/**
  * @file CapsuleCollider.h
  * @brief カプセルコライダー
- * @author 竹林尚哉
  */
 #pragma once
 #include "ICollider.h"

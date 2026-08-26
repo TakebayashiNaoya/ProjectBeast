@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinEffectStatus.h
  * @brief ペンギンのエフェクトステータス
- * @author 立山
  */
 #pragma once
 #include "Source/Actor/ActorStatus.h"

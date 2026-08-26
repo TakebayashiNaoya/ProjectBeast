@@ -1,7 +1,6 @@
 ﻿/**
  * @file SceneLight.h
  * @brief シーンライト
- * @author 竹林尚哉
  */
 #pragma once
 #include "Graphics/Camera/CameraSystem.h"

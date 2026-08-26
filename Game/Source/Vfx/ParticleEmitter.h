@@ -1,7 +1,6 @@
 ﻿/**
  * @file ParticleEmitter.h
  * @brief モジュールを組み合わせてエフェクトを制御する
- * @author 忽那
  */
 #pragma once
 #include "Particle.h"

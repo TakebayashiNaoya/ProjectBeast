@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialController.h
  * @brief チュートリアルステージのトリガー・ウィンドウ管理
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Layout.h"

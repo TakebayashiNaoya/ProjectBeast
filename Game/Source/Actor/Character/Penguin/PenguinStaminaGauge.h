@@ -1,7 +1,6 @@
 /**
  * @file PenguinStaminaGauge.h
  * @brief ジャンプ・スライド共通で使う、スタミナ(オーバーヒート式)ゲージクラス
- * @author 忽那
  */
 #pragma once
 

@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguin.cpp
  * @brief 親ペンギンクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"

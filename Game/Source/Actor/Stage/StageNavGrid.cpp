@@ -1,7 +1,6 @@
 ﻿/**
  * @file StageNavGrid.cpp
  * @brief ハイトマップから作る歩行可否グリッド（簡易ナビゲーション）
- * @author 竹林
  */
 #include "stdafx.h"
 #include "StageNavGrid.h"

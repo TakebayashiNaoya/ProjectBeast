@@ -1,7 +1,6 @@
 /**
  * @file UIMenuConstants.h
  * @brief UIメニュー共通の入力定数
- * @author 竹林
  */
 #pragma once
 

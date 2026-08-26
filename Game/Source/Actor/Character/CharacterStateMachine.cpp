@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterStateMachine.cpp
  * @brief キャラクターのステートマシン
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CharacterStateMachine.h"

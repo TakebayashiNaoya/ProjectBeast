@@ -1,7 +1,6 @@
 ﻿/**
  * @file Decal.h
  * @brief でかい足跡などのデカールを描画するクラス
- * @author 立山
  */
 #pragma once
 #include "Resource/ModelResource.h"

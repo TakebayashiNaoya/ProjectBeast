@@ -1,7 +1,6 @@
 /**
  * @file UltController.h
  * @brief ウルトの発動・タイマー・クールダウンを管理するコントローラー
- * @author 竹林
  */
 #pragma once
 #include "Source/Sound/SoundHandle.h"

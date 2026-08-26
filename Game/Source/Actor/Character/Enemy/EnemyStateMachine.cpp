@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyStateMachine.cpp
  * @brief エネミーのステートマシン
- * @author 立山
  */
 #include "stdafx.h"
 #include "Enemy.h"

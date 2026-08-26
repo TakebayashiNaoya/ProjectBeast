@@ -1,7 +1,6 @@
 ﻿/**
  * @file ParameterManager.h
  * @brief パラメーター管理
- * @author 藤谷
  */
 #pragma once
 #include "Source/Core/AppParameterMacro.h"

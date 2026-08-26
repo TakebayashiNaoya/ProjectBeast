@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIInputController.cpp
  * @brief UI入力制御を行うクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "UIInputController.h"

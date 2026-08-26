@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterBase.cpp
  * @brief キャラクターの基底クラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CharacterBase.h"

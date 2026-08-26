@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinManager.h
  * @brief 子ペンギンのマネージャー
- * @author 立山、竹林
  */
 #pragma once
 #include "ChildPenguinTypes.h"

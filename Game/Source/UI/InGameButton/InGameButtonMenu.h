@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameButtonMenu.h
  * @brief インゲーム中にボタンメニューを表示するクラス
- * @author 立山
  */
 #pragma once
 #include "Source/UI/Menu.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameStartingAnimLogic.h
  * @brief ゲーム開始時のアニメーションロジッククラス
- * @author 藤谷
  */
 #pragma once
 

@@ -1,7 +1,6 @@
 ﻿/**
  * @file HPBarMenu.cpp
  * @brief 親ペンギンのHPバーの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "HPBarMenu.h"

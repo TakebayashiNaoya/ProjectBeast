@@ -1,7 +1,6 @@
 /**
  * @file CPReactionMenu.h
  * @brief 子ペンギンのリアクションUIクラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Menu.h"

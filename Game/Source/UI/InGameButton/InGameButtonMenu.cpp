@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameButtonMenu.cpp
  * @brief インゲーム中にボタンメニューを表示するクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "InGameButtonGaugeAnimStatus.h"

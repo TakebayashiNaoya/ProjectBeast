@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinIState.h
  * @brief 親ペンギンのステートインターフェース
- * @author 藤谷
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file PointLight.h
  * @brief ポイントライト
- * @author 竹林尚哉
  */
 #pragma once
 

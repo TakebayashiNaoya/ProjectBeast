@@ -1,7 +1,6 @@
 ﻿/**
  * @file FormationWheelMenu.h
  * @brief 陣形切り替え(LB/RB)とウルト発動可否(LT/RT)をアイコンで表示するクラス
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Menu.h"

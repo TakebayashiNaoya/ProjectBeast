@@ -1,7 +1,6 @@
 ﻿/**
  * @file Ocean.cpp
  * @brief 海のクラス（OceanMeshを内包）
- * @author 竹林
  */
 #include "stdafx.h"
 #include "Ocean.h"

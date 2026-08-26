@@ -1,7 +1,6 @@
 ﻿/**
  * @file LegIKComponent.h
  * @brief キャラクター1体分の脚IKをまとめて管理するコンポーネント
- * @author 立山
  */
 #pragma once
 #include "TwoBoneLegIK.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file RadialBlur.h
  * @brief ラジアルブラーポストエフェクトクラス
- * @author 竹林
  */
 #pragma once
 #include "Graphics/PostEffect/PostEffectTypes.h"

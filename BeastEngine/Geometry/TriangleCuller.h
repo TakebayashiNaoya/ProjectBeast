@@ -1,7 +1,6 @@
 ﻿/**
  * @file TriangleCuller.h
  * @brief トライアングルカリングクラス
- * @author 竹林
  */
 #pragma once
 #include "Geometry/Frustum.h"

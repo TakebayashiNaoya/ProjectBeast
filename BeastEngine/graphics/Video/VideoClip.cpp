@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoClip.cpp
  * @brief コマ撮り／映像フレームデータ管理クラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "VideoClip.h"

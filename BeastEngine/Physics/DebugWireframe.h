@@ -1,7 +1,6 @@
 ﻿/**
  * @file DebugWireframe.h
  * @brief デバッグワイヤーフレーム
- * @author 竹林尚哉
  */
 #pragma once
 #include "LinearMath/btIDebugDraw.h"

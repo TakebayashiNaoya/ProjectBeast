@@ -1,7 +1,6 @@
 ﻿/**
  * @file SearchStatus.cpp
  * @brief PB追跡・索敵専用ステータスクラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "SearchParameter.h"

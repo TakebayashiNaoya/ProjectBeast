@@ -1,7 +1,6 @@
 /**
  * @file MasterFormationParameter.h
  * @brief 陣形・ウルトのパラメーター管理クラス
- * @author 竹林
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

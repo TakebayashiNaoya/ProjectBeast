@@ -1,7 +1,6 @@
 ﻿/**
  * @file AchievementAnimStatus.cpp
  * @brief アチーブメントアニメーション専用のステータスクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "AchievementAnimStatus.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file TimeManager.h
  * @brief タイムを管理するクラス
- * @author 立山、竹林
  */
 #pragma once
 

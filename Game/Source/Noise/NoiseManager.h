@@ -1,7 +1,6 @@
 ﻿/**
  * @file NoiseManager.h
  * @brief 音（ノイズ）イベントを管理し、エネミーの検知処理を補助するマネージャー
- * @author 竹林
  */
 #pragma once
 

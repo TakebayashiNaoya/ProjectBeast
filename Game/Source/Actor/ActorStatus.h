@@ -1,7 +1,6 @@
 ﻿/**
  * @file ActorStatus.h
  * @brief アクターのステータス基底クラス
- * @author 藤谷
  */
 #pragma once
 

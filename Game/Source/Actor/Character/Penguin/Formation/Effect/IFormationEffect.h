@@ -1,7 +1,6 @@
 ﻿/**
  * @file IFormationEffect.h
  * @brief 陣形効果のインターフェース
- * @author 竹林
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/Formation/Ult/UltContext.h"

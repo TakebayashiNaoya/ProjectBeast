@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinAIController.h
  * @brief 子ペンギンのAIコントローラー
- * @author 藤谷、竹林
  */
 #pragma once
 #include <array>

@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameHintMenu.cpp
  * @brief インゲームの初回操作ヒント（ポップ表示）
- * @author 竹林
  */
 #include "stdafx.h"
 #include "InGameHintMenu.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file JsonLoadingInfomation.h
  * @brief jsonファイルの読み込みに使用する
- * @author 藤谷
  */
 #pragma once
 #include "Json/json.hpp"

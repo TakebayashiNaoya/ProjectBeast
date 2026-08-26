@@ -1,7 +1,6 @@
 ﻿/**
  * @file TimeManager.cpp
  * @brief タイムの管理をするクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "TimeManager.h"

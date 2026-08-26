@@ -1,7 +1,6 @@
 /**
  * @file FormationEffects.h
  * @brief 陣形効果の具体クラス群
- * @author 竹林
  */
 #pragma once
 #include "IFormationEffect.h"

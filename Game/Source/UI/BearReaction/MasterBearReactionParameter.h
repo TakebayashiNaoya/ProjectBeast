@@ -1,7 +1,6 @@
 ﻿/**
  * @file MasterBearReactionParameter.h
  * @brief BearReactionのパラメーター管理クラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

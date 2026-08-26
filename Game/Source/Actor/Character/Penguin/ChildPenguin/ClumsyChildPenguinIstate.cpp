@@ -1,7 +1,6 @@
 ﻿/**
  * @file ClumsyChildPenguinIState.cpp
  * @brief おっちょこちょいペンギン固有のステートインターフェース
- * @author 竹林
  */
 #include "stdafx.h"
 #include "ClumsyChildPenguinIState.h"

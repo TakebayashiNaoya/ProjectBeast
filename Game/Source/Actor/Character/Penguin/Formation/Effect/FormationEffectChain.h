@@ -1,7 +1,6 @@
 ﻿/**
  * @file FormationEffectChain.h
  * @brief 複数の陣形効果をまとめて管理するチェーン
- * @author 竹林
  */
 #pragma once
 #include <memory>

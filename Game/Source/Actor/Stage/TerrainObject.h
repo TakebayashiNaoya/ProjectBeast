@@ -1,7 +1,6 @@
 ﻿/**
  * @file TerrainObject.h
  * @brief ハイトマップから生成する地形オブジェクト
- * @author 竹林
  */
 #pragma once
 #include "Physics/PhysicalBody.h"

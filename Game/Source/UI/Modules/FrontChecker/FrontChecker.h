@@ -1,7 +1,6 @@
 ﻿/**
  * @file FrontChecker.h
  * @brief 前方チェッククラス
- * @author 藤谷
  */
 #pragma once
 

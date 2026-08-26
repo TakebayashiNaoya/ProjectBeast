@@ -1,7 +1,6 @@
 /**
  * @file Formations.h
  * @brief 陣形インターフェースと全具体クラスの定義
- * @author 竹林
  */
 #pragma once
 #include <memory>

@@ -1,7 +1,6 @@
 /**
  * @file GameLogManager.h
  * @brief ゲームプレイログの記録・出力管理クラス
- * @author 竹林
  *
  * @details
  * ゲーム中に発生するイベントと毎フレームティックを JSONL 形式で記録し、

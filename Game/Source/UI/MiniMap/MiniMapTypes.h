@@ -1,7 +1,6 @@
 ﻿/**
  * @file MiniMapTypes.h
  * @brief ミニマップの型定義
- * @author 藤谷
  */
 #pragma once
 

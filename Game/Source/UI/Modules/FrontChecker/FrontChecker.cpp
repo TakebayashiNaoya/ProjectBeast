@@ -1,7 +1,6 @@
 ﻿/**
  * @file FrontChecker.cpp
  * @brief 前方チェッククラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "FrontChecker.h"

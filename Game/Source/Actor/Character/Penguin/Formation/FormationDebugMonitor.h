@@ -1,7 +1,6 @@
 /**
  * @file FormationDebugMonitor.h
  * @brief 陣形の状態をImGuiデバッグウィンドウで監視するクラス
- * @author 竹林
  */
 #pragma once
 

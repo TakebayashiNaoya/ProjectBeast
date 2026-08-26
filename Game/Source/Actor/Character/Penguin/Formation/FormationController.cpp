@@ -1,7 +1,6 @@
 /**
  * @file FormationController.cpp
  * @brief 陣形の切り替えと座標計算を管理するコントローラー
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FormationController.h"

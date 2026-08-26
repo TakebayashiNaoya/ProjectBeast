@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinStatus.cpp
  * @brief 親ペンギンのステータスクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "DaddyPenguinParameter.h"

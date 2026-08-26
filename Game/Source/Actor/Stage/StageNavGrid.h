@@ -1,7 +1,6 @@
 ﻿/**
  * @file StageNavGrid.h
  * @brief ハイトマップから作る歩行可否グリッド（簡易ナビゲーション）
- * @author 竹林
  */
 #pragma once
 #include <vector>

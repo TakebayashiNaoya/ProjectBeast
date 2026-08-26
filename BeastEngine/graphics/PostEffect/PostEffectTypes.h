@@ -1,7 +1,6 @@
 ﻿/**
  * @file PostEffectTypes.h
  * @brief ポストエフェクトの種別を定義するEnum
- * @author 竹林
  */
 #pragma once
 

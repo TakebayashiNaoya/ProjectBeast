@@ -1,7 +1,6 @@
 ﻿/**
  * @file PostEffectManager.h
  * @brief ポストエフェクトマネージャー
- * @author 竹林尚哉
  */
 #pragma once
 #include "Graphics/PostEffect/PostEffectTypes.h"

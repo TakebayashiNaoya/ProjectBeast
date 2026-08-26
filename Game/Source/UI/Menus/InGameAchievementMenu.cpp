@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameAchievementMenu.cpp
  * @brief インゲーム中にアチーブメントの一覧と達成状況を表示するクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "InGameAchievementMenu.h"

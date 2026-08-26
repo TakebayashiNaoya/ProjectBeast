@@ -1,7 +1,6 @@
 /**
  * @file PenguinStaminaGauge.cpp
  * @brief ジャンプ・スライド共通で使う、スタミナ(オーバーヒート式)ゲージクラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "PenguinStaminaGauge.h"

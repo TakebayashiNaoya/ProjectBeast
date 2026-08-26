@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinController.cpp
  * @brief 親ペンギンのプレイヤーコントローラー
- * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"

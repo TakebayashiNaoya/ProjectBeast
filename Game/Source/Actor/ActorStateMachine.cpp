@@ -1,7 +1,6 @@
 ﻿/**
  * @file ActorStateMachine.cpp
  * @brief アクターのステートマシン
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "ActorStateMachine.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file Curve.h
  * @brief 線形補間のCurve処理群
- * @author 忽那, 藤谷
  */
 #pragma once
 

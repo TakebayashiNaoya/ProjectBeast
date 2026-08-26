@@ -1,7 +1,6 @@
 ﻿/**
  * @file Types.h
  * @brief サウンド用の定数やファイルパスなどを定義するクラス
- * @author 立山
  */
 #pragma once
 #include <string>

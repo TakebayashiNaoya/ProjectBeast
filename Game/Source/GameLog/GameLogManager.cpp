@@ -1,7 +1,6 @@
 /**
  * @file GameLogManager.cpp
  * @brief ゲームプレイログの記録・出力管理クラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "GameLogManager.h"

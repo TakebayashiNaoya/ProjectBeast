@@ -1,7 +1,6 @@
 ﻿/**
  * @file StageSelectMenu.h
  * @brief ステージ選択画面のメニュークラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Menu.h"

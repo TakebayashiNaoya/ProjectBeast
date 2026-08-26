@@ -1,7 +1,6 @@
 ﻿/**
  * @file DecalProfiler.cpp
  * @brief デカールの処理負荷を実測するための計測クラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "DecalProfiler.h"

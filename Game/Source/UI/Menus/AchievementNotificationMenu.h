@@ -1,7 +1,6 @@
 ﻿/**
  * @file AchievementNotificationMenu.h
  * @brief アチーブメント通知画面の動的処理クラス
- * @author 立山
  */
 #pragma once
 #include "Source/Achivement/AchievementManager.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file FontRender.h
  * @brief フォントレンダークラス
- * @author 竹林尚哉
  */
 #pragma once
 

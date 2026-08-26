@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinAnimationData.h
  * @brief ペンギンのアニメーションデータ
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/CharacterBase.h"

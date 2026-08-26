@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyManager.h
  * @brief Enemyのマネージャー
- * @author 竹林
  */
 #pragma once
 #include "json/json.hpp"

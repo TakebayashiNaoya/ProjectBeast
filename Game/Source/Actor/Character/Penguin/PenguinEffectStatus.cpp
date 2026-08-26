@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinEffectStatus.cpp
  * @brief ペンギンのエフェクトステータスクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "PenguinEffectParameter.h"

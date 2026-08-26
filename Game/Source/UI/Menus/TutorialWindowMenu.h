@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialWindowMenu.h
  * @brief チュートリアルポップアップウィンドウ（ひな型）
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Animation/UIAnimation.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinParameter.h
  * @brief 子ペンギンのパラメーター管理
- * @author 藤谷
  */
 #pragma once
 #include "ChildPenguinTypes.h"

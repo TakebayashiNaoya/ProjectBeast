@@ -1,7 +1,6 @@
 ﻿/**
  * @file OcclusionDitherManager.cpp
  * @brief ディザリングを管理するクラス
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "OcclusionDitherManager.h"

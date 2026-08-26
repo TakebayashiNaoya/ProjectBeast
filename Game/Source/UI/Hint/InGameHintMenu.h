@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameHintMenu.h
  * @brief インゲームの初回操作ヒント（ポップ表示）
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Menu.h"

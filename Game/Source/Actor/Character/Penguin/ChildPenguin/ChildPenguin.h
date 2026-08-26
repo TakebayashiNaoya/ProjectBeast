@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguin.h
  * @brief 子ペンギンクラス
- * @author 藤谷
  */
 #pragma once
 #include "ChildPenguinTypes.h"

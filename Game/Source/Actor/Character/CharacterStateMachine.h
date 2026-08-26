@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterStateMachine.h
  * @brief キャラクターのステートマシン
- * @author 藤谷
  */
 #pragma once
 #include "CharacterBase.h"

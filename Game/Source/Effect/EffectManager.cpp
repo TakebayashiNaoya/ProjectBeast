@@ -1,7 +1,6 @@
 ﻿/**
  * @file EffectManager.cpp
  * @brief 必要なエフェクトファイルを読み込んだり再生したりなど管理する
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "EffectManager.h"

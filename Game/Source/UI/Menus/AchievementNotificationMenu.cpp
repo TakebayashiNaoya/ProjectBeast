@@ -1,7 +1,6 @@
 ﻿/**
  * @file AchievementNotificationMenu.cpp
  * @brief アチーブメント通知画面の動的処理クラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "AchievementNotificationMenu.h"

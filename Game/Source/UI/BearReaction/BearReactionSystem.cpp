@@ -1,7 +1,6 @@
 ﻿/**
  * @file BearReactionSystem.cpp
  * @brief クマのリアクションシステムクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "BearReactionSystem.h"

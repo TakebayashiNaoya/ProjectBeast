@@ -1,7 +1,6 @@
 /**
  * @file ICustomRenderer.h
  * @brief ゲーム側で自前のメッシュを描画するための基底インターフェース
- * @author 竹林
  */
 #pragma once
 #include "BeastEnginePreCompile.h"

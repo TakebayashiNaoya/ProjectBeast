@@ -1,7 +1,6 @@
 ﻿/**
  * @file MiniMapStatus.h
  * @biref MiniMapStatusクラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Model/UIStatus.h"

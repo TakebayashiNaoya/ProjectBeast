@@ -1,7 +1,6 @@
 ﻿/**
  * @file Frustum.cpp
  * @brief 視錐台（フラスタム）クラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "Geometry/Frustum.h"

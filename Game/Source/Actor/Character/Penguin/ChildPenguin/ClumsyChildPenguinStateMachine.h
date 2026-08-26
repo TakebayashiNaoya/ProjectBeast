@@ -1,7 +1,6 @@
 ﻿/**
  * @file ClumsyChildPenguinStateMachine.h
  * @brief おっちょこちょいペンギンのステートマシン
- * @author 竹林
  */
 #pragma once
 #include "ChildPenguinStateMachine.h"

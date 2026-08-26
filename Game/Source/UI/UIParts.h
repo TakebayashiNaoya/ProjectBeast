@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIParts.h
  * @brief UIのパーツ群
- * @author 忽那
  */
 #pragma once
 #include "Source/Core/HierarchicalTransform.h"

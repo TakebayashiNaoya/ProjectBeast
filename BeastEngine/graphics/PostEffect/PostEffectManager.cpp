@@ -1,7 +1,6 @@
 ﻿/**
  * @file PostEffectManager.cpp
  * @brief ポストエフェクトマネージャーの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "Graphics/PostEffect/PostEffectManager.h"

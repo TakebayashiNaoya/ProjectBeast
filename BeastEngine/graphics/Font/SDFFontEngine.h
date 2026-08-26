@@ -1,7 +1,6 @@
 ﻿/**
  * @file SDFFontEngine.h
  * @brief SDF フォント描画エンジンのクラス定義
- * @author 竹林
  */
 #pragma once
 #include <unordered_map>

@@ -1,7 +1,6 @@
 ﻿/**
  * @file PauseScreenMenu.cpp
  * @brief ポーズ画面の動的クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "PauseScreenMenu.h"

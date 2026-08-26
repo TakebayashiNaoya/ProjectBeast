@@ -1,7 +1,6 @@
 ﻿/**
  * @file Ocean.h
  * @brief 海のクラス（OceanMeshを内包）
- * @author 竹林
  */
 #pragma once
 #include "Nature/INatureObject.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file Enemy.h
  * @brief エネミークラス
- * @author 立山
  */
 #pragma once
 #include "Source/Actor/Character/CharacterBase.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinEffectParameter.h
  * @brief ペンギンのエフェクトパラメーター管理
- * @author 立山
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

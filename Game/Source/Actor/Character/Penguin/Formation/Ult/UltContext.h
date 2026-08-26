@@ -1,7 +1,6 @@
 /**
  * @file UltContext.h
  * @brief ウルト発動・更新時に渡すコンテキスト
- * @author 竹林
  */
 #pragma once
 

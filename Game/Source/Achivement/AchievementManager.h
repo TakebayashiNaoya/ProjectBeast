@@ -1,7 +1,6 @@
 ﻿/**
  * @file AchievementManager.h
  * @brief アチーブメントの管理クラス
- * @author 藤谷
  */
 #pragma once
 #include "AchievementBase.h"

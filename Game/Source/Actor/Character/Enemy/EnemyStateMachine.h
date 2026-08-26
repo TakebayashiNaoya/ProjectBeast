@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyStateMachine.h
  * @brief エネミーのステートマシン
- * @author 立山
  */
 #pragma once
 #include "Source/Actor/Character/CharacterStateMachine.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyIState.h
  * @brief エネミーのステートインターフェース
- * @author 立山
  */
 #pragma once
 #include "Source/Core/StateMachineBase.h"

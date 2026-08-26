@@ -1,7 +1,6 @@
 ﻿/**
  * @file Achievement.cpp
  * @brief アチーブメントに関するクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "AchievementBase.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file SpotLight.h
  * @brief スポットライト
- * @author 竹林尚哉
  */
 #pragma once
 

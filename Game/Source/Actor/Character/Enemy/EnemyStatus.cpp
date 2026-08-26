@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyStatus.cpp
  * @brief エネミーのステータス
- * @author 立山
  */
 #include "stdafx.h"
 #include "EnemyParameter.h"

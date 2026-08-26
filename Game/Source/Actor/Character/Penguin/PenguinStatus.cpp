@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinStatus.cpp
  * @brief ペンギンのステータスクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "PenguinStatus.h"

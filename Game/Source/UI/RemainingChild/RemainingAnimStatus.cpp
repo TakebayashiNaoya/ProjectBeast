@@ -1,7 +1,6 @@
 ﻿/**
  * @file RemaingAnimStatus.cpp
  * @brief 救助数のアニメーションステータスクラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "RemainingAnimStatus.h"

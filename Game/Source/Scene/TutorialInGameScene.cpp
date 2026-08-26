@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialInGameScene.cpp
  * @brief チュートリアルステージ
- * @author 竹林
  */
 #include "stdafx.h"
 #include "Source/Actor/Stage/StageSystem.h"

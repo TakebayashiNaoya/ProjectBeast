@@ -1,7 +1,6 @@
 ﻿/**
  * @file IStage.cpp
  * @brief ステージの基底クラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "IStage.h"

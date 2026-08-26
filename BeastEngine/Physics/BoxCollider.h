@@ -1,7 +1,6 @@
 ﻿/**
  * @file BoxCollider.h
  * @brief ボックスコライダー
- * @author 竹林尚哉
  */
 #pragma once
 #include "ICollider.h"

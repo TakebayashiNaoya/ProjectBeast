@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIAnimation.h
  * @brief UIAnimationの機能群
- * @author 忽那
  */
 #pragma once
 #include "Source/Util/Curve.h"

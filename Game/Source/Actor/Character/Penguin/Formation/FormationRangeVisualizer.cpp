@@ -1,7 +1,6 @@
 ﻿/**
  * @file FormationRangeVisualizer.cpp
  * @brief 陣形の入隊・脱隊半径を地形追従ラインリングで可視化する
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FormationRangeVisualizer.h"

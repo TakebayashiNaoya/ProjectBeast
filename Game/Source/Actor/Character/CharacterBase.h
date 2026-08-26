@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterBase.h
  * @brief キャラクターの基底クラス
- * @author 藤谷
  */
 #pragma once
 #include "Physics/CharacterController.h"

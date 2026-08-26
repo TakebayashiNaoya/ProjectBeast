@@ -1,7 +1,6 @@
 ﻿/**
  * @file WhirlpoolPowerSystem.h
  * @brief 渦潮の引き寄せ、押し出しを管理するクラス
- * @author 藤谷
  */
 #pragma once
 #include "IObject.h"

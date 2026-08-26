@@ -1,7 +1,6 @@
 ﻿/**
  * @file CameraSteering.h
  * @brief カメラ操縦処理群
- * @author 藤谷
  */
 #pragma once
 #include "CameraCommon.h"

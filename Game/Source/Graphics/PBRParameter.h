@@ -1,7 +1,6 @@
 ﻿/**
  * @file PBRParameter.h
  * @brief PBR補正パラメーター管理
- * @author 竹林
  */
 #pragma once
 #include "Graphics/ModelRender.h"

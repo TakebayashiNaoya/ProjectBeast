@@ -1,7 +1,6 @@
 ﻿/**
  * @file DecalManager.cpp
  * @brief デカールを管理するクラス
- * @author 立山
  */
 #include "stdafx.h"
 

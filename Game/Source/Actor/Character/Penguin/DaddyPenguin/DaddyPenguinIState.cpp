@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinIState.cpp
  * @brief 親ペンギンのステートインターフェース
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"

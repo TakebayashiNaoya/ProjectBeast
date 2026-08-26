@@ -1,7 +1,6 @@
 /**
  * @file ReplayScene.cpp
  * @brief プレイログを再生するリプレイシーン
- * @author 竹林
  */
 #include "stdafx.h"
 #include "ReplayScene.h"

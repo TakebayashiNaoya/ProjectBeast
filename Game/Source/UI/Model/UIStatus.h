@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIStatus.h
  * @biref UIStatusの基底クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/Core/IStatus.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file ScoreManager.h
  * @brief スコアの管理をするクラス
- * @author 立山
  */
 #pragma once
 #include <map>

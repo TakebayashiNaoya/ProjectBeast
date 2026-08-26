@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterStatus.h
  * @brief キャラクターのステータス基底クラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/ActorStatus.h"

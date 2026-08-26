@@ -1,7 +1,6 @@
 ﻿/**
  * @file PBWakingUpTimerMenu.h
  * @brief PB起床タイマーの動的処理クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"

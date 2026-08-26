@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyManager.cpp
  * @brief Enemyのマネージャー
- * @author 竹林
  */
 #include "stdafx.h"
 #include "Enemy.h"

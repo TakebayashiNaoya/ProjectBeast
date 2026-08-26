@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinStateMachine.cpp
  * @brief 親ペンギンのステートマシン
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file DecalManager.h
  * @brief デカールを管理するクラス
- * @author 立山
  */
 #pragma once
 #include "Decal.h"

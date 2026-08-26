@@ -1,7 +1,6 @@
 ﻿/**
  * @file SubCameraManager.cpp
  * @brief サブカメラの管理を行うクラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "CameraSystem.h"

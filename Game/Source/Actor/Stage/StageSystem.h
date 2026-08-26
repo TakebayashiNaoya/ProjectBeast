@@ -1,7 +1,6 @@
 ﻿/**
  * @file StageSystem.h
  * @brief ステージ上のオブジェクトを管理するシステム
- * @author 藤谷
  */
 #pragma once
 #include "IStage.h"

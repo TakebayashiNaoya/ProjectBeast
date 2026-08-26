@@ -1,7 +1,6 @@
 ﻿/**
  * @file OcclusionDitherManager.h
  * @brief ディザリングを管理するクラス
- * @author 竹林
  */
 #pragma once
 #include <list>

@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoPlayer.cpp
  * @brief 映像再生制御クラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "VideoPlayer.h"

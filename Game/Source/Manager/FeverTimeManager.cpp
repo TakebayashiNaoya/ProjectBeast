@@ -1,7 +1,6 @@
 ﻿/**
  * @file FeverTimeManager.cpp
  * @brief フィーバータイムを管理するクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FeverTimeManager.h"

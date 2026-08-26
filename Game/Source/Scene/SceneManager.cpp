@@ -1,7 +1,6 @@
 ﻿/**
  * @file SceneManager.cpp
  * @brief シーンの管理をするクラス
- * @author 立山
  */
 #include "stdafx.h"
 

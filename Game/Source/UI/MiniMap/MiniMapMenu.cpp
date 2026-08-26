@@ -1,7 +1,6 @@
 ﻿/**
  * @file MiniMapMenu.cpp
  * @brief ミニマップの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "MiniMapMenu.h"

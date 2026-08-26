@@ -1,7 +1,6 @@
 ﻿/**
  * @file WpWarningMenu.cpp
  * @brief WpWarningのメニュークラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "WpWarningMenu.h"

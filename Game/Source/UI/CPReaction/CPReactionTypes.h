@@ -1,7 +1,6 @@
 /**
  * @file CPReactionTypes.h
  * @brief 子ペンギンのリアクション関連の型定義
- * @author 藤谷
  */
 #pragma once
 

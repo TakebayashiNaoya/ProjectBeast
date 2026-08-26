@@ -1,7 +1,6 @@
 ﻿/**
  * @file DebufMenu.h
  * @brief 甘えん坊ペンギンから親ペンギンにデバフを掛ける演出のメニュー
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"

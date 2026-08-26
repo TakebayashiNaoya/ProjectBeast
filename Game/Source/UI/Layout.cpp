@@ -1,7 +1,6 @@
 ﻿/**
  * @file Layout.cpp
  * @brief UIのレイアウト管理
- * @author 忽那
  */
 #include "stdafx.h"
 #include "Layout.h"

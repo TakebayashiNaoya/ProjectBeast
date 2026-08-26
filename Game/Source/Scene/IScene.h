@@ -1,7 +1,6 @@
 ﻿/**
  * @file IScene.h
  * @brief シーンの基底クラス
- * @author 立山
  */
 #pragma once
 #include "Source/Util/CRC32.h"

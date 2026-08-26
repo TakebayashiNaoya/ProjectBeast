@@ -1,7 +1,6 @@
 ﻿/**
  * @file BearReactionTypes.h
  * @brief クマのリアクションタイプ定義
- * @author 藤谷
  */
 #pragma once
 

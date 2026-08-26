@@ -1,7 +1,6 @@
 ﻿/**
  * @file MasterPBWakingUpTimerParameter.h
  * @biref PB起床タイマー専用のパラメーター管理クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialInGameScene.h
  * @brief チュートリアルステージ
- * @author 竹林
  */
 #pragma once
 #include "InGameSceneBase.h"

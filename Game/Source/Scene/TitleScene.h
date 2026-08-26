@@ -1,7 +1,6 @@
 ﻿/**
  * @file TitleScene.h
  * @brief タイトルシーン
- * @author 立山
  */
 #pragma once
 #include "IScene.h"

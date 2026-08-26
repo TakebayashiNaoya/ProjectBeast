@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastModel.cpp
  * @brief トライアングルカリング対応モデルクラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "Graphics/BeastModel.h"

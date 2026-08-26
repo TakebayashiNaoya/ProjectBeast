@@ -1,7 +1,6 @@
 ﻿/**
  * @file NPCController.cpp
  * @brief NPCのコントローラー
- * @author 立山
  */
 #include "stdafx.h"
 #include "NPCController.h"

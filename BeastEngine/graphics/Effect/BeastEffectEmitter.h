@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastEffectEmitter.h
  * @brief フラスタムカリング対応のエフェクトエミッタークラス
- * @author 竹林
  */
 #pragma once
 #include "graphics/effect/EffectEmitter.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file MiniMapStatus.cpp
  * @brief MiniMapStatusクラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "MiniMapParameter.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file ActorStateMachine.cpp
  * @brief アクターのステートマシンの基底クラス群
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "StateMachineBase.h"

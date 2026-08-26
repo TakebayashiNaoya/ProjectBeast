@@ -1,7 +1,6 @@
 ﻿/**
  * @file SDFFontEngine.cpp
  * @brief SDF フォント描画エンジンの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "SDFFontEngine.h"
