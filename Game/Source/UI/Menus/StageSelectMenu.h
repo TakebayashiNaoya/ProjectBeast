@@ -21,7 +21,6 @@ namespace app
 			Easy,
 			Normal,
 			Hard,
-			Tutorial,
 			Max,
 		};
 
@@ -157,11 +156,10 @@ namespace app
 				float   selectZoomDuration = 0.6f;      /** 選択確定演出の長さ（秒） */
 				float   selectZoomScale = 2.2f;         /** ズームの最終倍率 */
 				float   selectWhiteFadeDuration = 0.35f; /** 白フェードの長さ（秒・演出の末尾に重ねる） */
-				float   tutorialCursorScaleX = 400.0f / 280.0f;
 				float   cursorBlinkDuration = 0.5f;
 				Vector4 cursorBlinkStartColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 				Vector4 cursorBlinkEndColor = Vector4(1.0f, 1.0f, 1.0f, 0.0f);
-				/** ステージごとの背景映像パス（Easy/Normal/Hard/Tutorial 順）*/
+				/** ステージごとの背景映像パス（Easy/Normal/Hard 順）*/
 				std::array<std::string, static_cast<uint8_t>(EnStageChoices::Max)> stageVideoPaths = {};
 			};
 

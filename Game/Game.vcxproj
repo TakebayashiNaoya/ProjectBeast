@@ -350,8 +350,6 @@
     <ClCompile Include="Source\Scene\ResultScene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Scene\TitleScene.cpp" />
-    <ClCompile Include="Source\Scene\TutorialController.cpp" />
-    <ClCompile Include="Source\Scene\TutorialInGameScene.cpp" />
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\Animation\UIAnimation.cpp" />
@@ -388,7 +386,6 @@
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\ScorePopupAnimatorMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp" />
-    <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
@@ -553,8 +550,6 @@
     <ClInclude Include="Source\Scene\ResultScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\Scene\TitleScene.h" />
-    <ClInclude Include="Source\Scene\TutorialController.h" />
-    <ClInclude Include="Source\Scene\TutorialInGameScene.h" />
     <ClInclude Include="Source\Sound\SoundHandle.h" />
     <ClInclude Include="Source\Sound\SoundManager.h" />
     <ClInclude Include="Source\Sound\Types.h" />
@@ -605,7 +600,6 @@
     <ClInclude Include="Source\UI\Menus\StageSelectMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
-    <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h" />

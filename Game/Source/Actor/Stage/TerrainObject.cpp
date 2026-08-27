@@ -10,9 +10,9 @@
 namespace
 {
 	/** ハイトマップ */
-	static const wchar_t* HEIGHTMAP_PATH = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";
+	static const wchar_t* HEIGHTMAP_PATH = L"Assets/modelData/stage/Terrain/NormalStageHeightMap.dds";
 	/** スプラットマップ */
-	static const wchar_t* SPLATMAP_PATH = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";
+	static const wchar_t* SPLATMAP_PATH = L"Assets/modelData/stage/Terrain/NormalStageSplatMap.dds";
 
 	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
 	static const char* TERRAIN_TKM_KEY = "terrain_generated";

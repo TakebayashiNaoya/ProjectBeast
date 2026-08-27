@@ -173,30 +173,6 @@
             },
             {
                 "type": "UIIcon",
-                "name": "TutorialBubble",
-                "asset": "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
-                "width": 400,
-                "height": 100,
-                "position": [
-                    0,
-                    -350,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
                 "name": "FrameBG",
                 "asset": "Assets/spriteData/UI/Frame/FrameBackGround.dds",
                 "width": 293,
@@ -301,30 +277,6 @@
                 "position": [
                     300,
                     -200,
-                    0
-                ],
-                "rotation": 0,
-                "color": [
-                    0,
-                    0,
-                    0,
-                    255
-                ],
-                "pivot": [
-                    0.5,
-                    0.5
-                ]
-            },
-            {
-                "type": "UIText",
-                "name": "TutorialText",
-                "text": "チュートリアル",
-                "fontSize": 1.0,
-                "fontScaleX": 1.0,
-                "fontScaleY": 1.0,
-                "position": [
-                    0,
-                    -350,
                     0
                 ],
                 "rotation": 0,
@@ -731,7 +683,6 @@
         "selectZoomDuration": 0.6,
         "selectZoomScale": 2.2,
         "selectWhiteFadeDuration": 0.35,
-        "tutorialCursorScaleX": 1.4286,
         "cursorBlinkDuration": 0.5,
         "cursorBlinkStartColor": [
             255,
@@ -748,8 +699,7 @@
         "stageVideoPaths": [
             "Assets/Video/EasyStage.mp4",
             "Assets/Video/NormalStage.mp4",
-            "Assets/Video/HardStage.mp4",
-            "Assets/Video/TutorialStage.mp4"
+            "Assets/Video/HardStage.mp4"
         ]
     }
 }

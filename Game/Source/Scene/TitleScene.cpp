@@ -15,7 +15,6 @@
 #include "Source/UI/Menus/StageSelectMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
-#include "TutorialInGameScene.h"
 
 
 namespace
@@ -283,9 +282,6 @@ namespace app
 
 			switch (menu->GetSelectingStage())
 			{
-			case ui::EnStageChoices::Tutorial:
-				m_nextSceneId = TutorialInGameScene::ID();
-				break;
 			case ui::EnStageChoices::Normal:
 				m_nextSceneId = NormalInGameScene::ID();
 				break;

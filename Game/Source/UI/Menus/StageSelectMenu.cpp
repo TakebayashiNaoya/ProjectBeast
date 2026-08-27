@@ -24,7 +24,6 @@ namespace app
 				"Easy",
 				"Normal",
 				"Hard",
-				"Tutorial",
 			};
 
 			const std::array<std::string, static_cast<uint8_t>(EnStageButtonTypes::Max)> BUTTON_NAME =
@@ -261,9 +260,8 @@ namespace app
 				return;
 			}
 
-			/** チュートリアル選択中と選択確定後は出さない */
-			const bool isShow = (m_state == EnStageSelectState::Selecting)
-				&& (m_selectingStage != EnStageChoices::Tutorial);
+			/** 選択確定後は出さない */
+			const bool isShow = (m_state == EnStageSelectState::Selecting);
 			panel->m_isDraw = isShow;
 			timeIcon->m_isDraw = isShow;
 			timeText->m_isDraw = isShow;
@@ -468,12 +466,6 @@ namespace app
 			const bool leftInput = hDir == Direction::Negative;
 			const bool rightInput = hDir == Direction::Positive;
 
-			// 縦方向：Negative=下、Positive=上。倒しっぱなし中はinputIntervalごとにリピートする。
-			const auto vDir = m_verticalInputDetector.Update(
-				stickLYF, g_pad[0]->IsTrigger(enButtonDown), g_pad[0]->IsTrigger(enButtonUp),
-				m_param.inputThreshold, m_param.inputInterval);
-			const bool upInput = vDir == Direction::Positive;
-			const bool downInput = vDir == Direction::Negative;
 
 
 			// カーソル移動の手応え：SEとフレームのポップ（タイトル画面と同じ演出）
@@ -483,45 +475,18 @@ namespace app
 					m_cursorPopTimer = CURSOR_POP_DURATION;
 				};
 
-			if (m_selectingStage == EnStageChoices::Tutorial)
+			// イージー・ノーマル・ハードの横移動
+			const auto current = static_cast<uint8_t>(m_selectingStage);
+			constexpr uint8_t HARD_INDEX = static_cast<uint8_t>(EnStageChoices::Hard);
+			if (leftInput && current > 0)
 			{
-				// チュートリアルから上段への移動：左→イージー、上→ノーマル、右→ハード
-				if (leftInput)
-				{
-					m_selectingStage = EnStageChoices::Easy;
-					PlayCursorSE();
-				}
-				else if (upInput)
-				{
-					m_selectingStage = EnStageChoices::Normal;
-					PlayCursorSE();
-				}
-				else if (rightInput)
-				{
-					m_selectingStage = EnStageChoices::Hard;
-					PlayCursorSE();
-				}
+				m_selectingStage = static_cast<EnStageChoices>(current - 1);
+				PlayCursorSE();
 			}
-			else
+			else if (rightInput && current < HARD_INDEX)
 			{
-				// 上段（イージー・ノーマル・ハード）の横移動と下段への移動
-				const auto current = static_cast<uint8_t>(m_selectingStage);
-				constexpr uint8_t HARD_INDEX = static_cast<uint8_t>(EnStageChoices::Hard);
-				if (leftInput && current > 0)
-				{
-					m_selectingStage = static_cast<EnStageChoices>(current - 1);
-					PlayCursorSE();
-				}
-				else if (rightInput && current < HARD_INDEX)
-				{
-					m_selectingStage = static_cast<EnStageChoices>(current + 1);
-					PlayCursorSE();
-				}
-				else if (downInput)
-				{
-					m_selectingStage = EnStageChoices::Tutorial;
-					PlayCursorSE();
-				}
+				m_selectingStage = static_cast<EnStageChoices>(current + 1);
+				PlayCursorSE();
 			}
 
 			// ステージが変わったら事前ロード済みクリップにポインタを切り替える（I/O なし）
@@ -585,10 +550,7 @@ namespace app
 			const float pop = 1.0f
 				+ CURSOR_POP_SCALE * (std::max)(m_cursorPopTimer, 0.0f) / CURSOR_POP_DURATION;
 
-			// チュートリアルのバブルは横幅が広いのでカーソルを拡大する
-			const Vector3 cursorScale = (m_selectingStage == EnStageChoices::Tutorial)
-				? Vector3(m_param.tutorialCursorScaleX * pop, pop, 1.0f)
-				: Vector3(pop, pop, 1.0f);
+			const Vector3 cursorScale = Vector3(pop, pop, 1.0f);
 			m_cursorFrame->m_transform.m_localTransform.m_scale = cursorScale;
 			m_cursorFrameBG->m_transform.m_localTransform.m_scale = cursorScale;
 		}
@@ -663,7 +625,6 @@ namespace app
 			m_param.selectZoomDuration = JC::ToFloat(p, "selectZoomDuration", m_param.selectZoomDuration);
 			m_param.selectZoomScale = JC::ToFloat(p, "selectZoomScale", m_param.selectZoomScale);
 			m_param.selectWhiteFadeDuration = JC::ToFloat(p, "selectWhiteFadeDuration", m_param.selectWhiteFadeDuration);
-			m_param.tutorialCursorScaleX = JC::ToFloat(p, "tutorialCursorScaleX", m_param.tutorialCursorScaleX);
 			m_param.cursorBlinkDuration = JC::ToFloat(p, "cursorBlinkDuration", m_param.cursorBlinkDuration);
 			m_param.cursorBlinkStartColor = JC::ToVector4(p, "cursorBlinkStartColor", true, m_param.cursorBlinkStartColor);
 			m_param.cursorBlinkEndColor = JC::ToVector4(p, "cursorBlinkEndColor", true, m_param.cursorBlinkEndColor);

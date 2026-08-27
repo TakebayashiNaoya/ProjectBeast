@@ -538,17 +538,8 @@
     <ClCompile Include="Source\Scene\InGameSceneBase.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scene\TutorialController.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\TutorialInGameScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\IStatus.cpp">
       <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp">
-      <Filter>Source\UI\Menus</Filter>
     </ClCompile>
     <ClCompile Include="Source\Vfx\Particle.cpp">
       <Filter>Source\Vfx</Filter>
@@ -1113,17 +1104,8 @@
     <ClInclude Include="Source\Scene\InGameSceneBase.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scene\TutorialController.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Scene\TutorialInGameScene.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Core\IStatus.h">
       <Filter>Source\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h">
-      <Filter>Source\UI\Menus</Filter>
     </ClInclude>
     <ClInclude Include="Source\Vfx\Particle.h">
       <Filter>Source\Vfx</Filter>

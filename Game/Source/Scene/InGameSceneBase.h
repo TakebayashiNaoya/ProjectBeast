@@ -138,7 +138,7 @@ namespace app
 		//------------------------------------------------------------
 		/** ロード完了時の追加処理 */
 		virtual void OnLoadComplete() {}
-		/** Playing フェーズの追加更新（TutorialController などを想定） */
+		/** Playing フェーズの追加更新（各ステージ固有の追加処理を想定） */
 		virtual void OnUpdatePlaying() {}
 		/** Playing フェーズの追加描画（矢印UIなどを想定） */
 		virtual void OnRenderPlaying(RenderContext& /*rc*/) {}

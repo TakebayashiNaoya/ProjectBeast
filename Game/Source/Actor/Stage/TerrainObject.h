@@ -36,8 +36,8 @@ namespace app
 				float minHeight = 0.0f;     ///< この高さ未満の頂点を含むクワッドはポリゴンを生成しない（ワールド単位）
 				int   chunkDivision = 8;      ///< フラスタムカリング用チャンク分割数（縦横共通）
 				nsBeastEngine::PBRParam pbrParam;  ///< PBR補正パラメータ（ModelRender::SetPBRParam に渡す）
-				std::wstring heightmapPath = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";  ///< ハイトマップ DDS パス
-				std::wstring splatmapPath = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";   ///< スプラットマップ DDS パス
+				std::wstring heightmapPath = L"Assets/modelData/stage/Terrain/NormalStageHeightMap.dds";  ///< ハイトマップ DDS パス
+				std::wstring splatmapPath = L"Assets/modelData/stage/Terrain/NormalStageSplatMap.dds";   ///< スプラットマップ DDS パス
 			};
 
 			/**
