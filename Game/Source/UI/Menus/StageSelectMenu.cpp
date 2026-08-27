@@ -304,30 +304,40 @@ namespace app
 		}
 
 
+		void StageSelectMenu::HideMenuParts()
+		{
+			if (m_bgIcon)                m_bgIcon->SetIsDraw(false);
+			if (m_stageSelectText)       m_stageSelectText->SetIsDraw(false);
+			if (m_stageSelectTextBGIcon) m_stageSelectTextBGIcon->SetIsDraw(false);
+			if (m_buttonBGIcon)          m_buttonBGIcon->SetIsDraw(false);
+			if (m_cursorFrame)           m_cursorFrame->SetIsDraw(false);
+			if (m_cursorFrameBG)         m_cursorFrameBG->SetIsDraw(false);
+
+			for (auto& choice : m_choices)
+			{
+				if (choice.m_text)       choice.m_text->SetIsDraw(false);
+				if (choice.m_bubbleIcon) choice.m_bubbleIcon->SetIsDraw(false);
+			}
+			for (auto& button : m_buttons)
+			{
+				if (button.m_button) button.m_button->SetIsDraw(false);
+				if (button.m_text)   button.m_text->SetIsDraw(false);
+			}
+		}
+
+
 		void StageSelectMenu::CaptureZoomBase()
 		{
 			m_zoomTargets.clear();
 
-			// この時点で描画されている全パーツを対象にする（白フラッシュは全画面のまま残すので除外）
+			// ズームさせるのはステージ映像だけにする。
+			// メニュー類（見出し・バブル・カーソル・ボタン）を一緒に拡大すると、
+			// 文字やアイコンが画面外へ散っていくのが目に入って「ステージへ入っていく」感が薄れる。
+			// それらは HideMenuParts() で演出の開始と同時に消す。
+			// 白フラッシュは全画面のまま重ねたいので、ここでは対象にしない
 			std::vector<UIBase*> targets = {
-				m_bgIcon,
 				m_stagePreviewVideo,
-				m_stageSelectText,
-				m_stageSelectTextBGIcon,
-				m_buttonBGIcon,
-				m_cursorFrame,
-				m_cursorFrameBG,
 			};
-			for (auto& choice : m_choices)
-			{
-				targets.push_back(choice.m_text);
-				targets.push_back(choice.m_bubbleIcon);
-			}
-			for (auto& button : m_buttons)
-			{
-				targets.push_back(button.m_button);
-				targets.push_back(button.m_text);
-			}
 
 			// 現在の位置・スケールを基準値として保存する
 			for (auto* ui : targets)
@@ -358,6 +368,9 @@ namespace app
 			{
 				CaptureZoomBase();
 			}
+
+			// UpdateDrawFlag() が毎フレーム全パーツを表示に戻すため、ここで消し直す
+			HideMenuParts();
 
 			m_selectEffectTimer += g_gameTime->GetFrameDeltaTime();
 
