@@ -1,7 +1,6 @@
 ﻿/**
  * @file DebugScene.h
  * @brief デバッグシーン
- * @author 立山
  */
 #pragma once
 #include "IScene.h"

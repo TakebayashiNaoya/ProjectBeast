@@ -1,7 +1,6 @@
 ﻿/**
  * @file EffectManager.h
  * @brief 必要なエフェクトファイルを読み込んだり再生したりなど管理する
- * @author 藤谷、竹林
  */
 #pragma once
 #include "Types.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinBase.cpp
  * @brief ペンギンの基底クラス
- * @author 藤谷
  */
 #include "stdafx.h"
 

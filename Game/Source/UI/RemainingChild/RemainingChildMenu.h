@@ -1,7 +1,6 @@
 ﻿/**
  * @file RemainingChildMenu.h
  * @brief 子ペンギンの残り数表示クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"

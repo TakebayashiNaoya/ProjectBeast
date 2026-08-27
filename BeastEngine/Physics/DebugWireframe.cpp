@@ -1,7 +1,6 @@
 ﻿/**
  * @file DebugWireframe.cpp
  * @brief デバッグワイヤーフレーム
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "DebugWireframe.h"

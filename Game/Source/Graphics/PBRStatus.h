@@ -1,7 +1,6 @@
 ﻿/**
  * @file PBRStatus.h
  * @brief PBR補正パラメーターのステータスクラス
- * @author 竹林
  */
 #pragma once
 #include "PBRParameter.h"

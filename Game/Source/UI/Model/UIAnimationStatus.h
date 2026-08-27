@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIAnimationStatus.h
  * @biref UIAnimationStatusでUIAnimationに必要なステータスの基底クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/Core/IStatus.h"

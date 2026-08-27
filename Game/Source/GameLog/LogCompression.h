@@ -1,7 +1,6 @@
 /**
  * @file LogCompression.h
  * @brief プレイログファイルの圧縮・展開ユーティリティ
- * @author 竹林
  * @details
  * Third Party/miniz（zlib互換のpublic domainライブラリ）を使ってzlib形式で圧縮する。
  * Pythonの zlib モジュール等、zlib形式を扱えるツールであれば読み書きできる

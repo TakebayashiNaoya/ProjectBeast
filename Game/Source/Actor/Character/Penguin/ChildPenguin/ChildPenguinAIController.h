@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinAIController.h
  * @brief 子ペンギンのAIコントローラー
- * @author 藤谷、竹林
  */
 #pragma once
 #include <array>
@@ -18,6 +17,25 @@ namespace app
 		class ChildPenguinStateMachine;
 		class ClumsyChildPenguinStateMachine;
 		class NaughtyChildPenguinStateMachine;
+		class StageNavGrid;
+
+
+		/**
+		 * @brief タイプごとの「親の察知」性能
+		 * @details 実際の値は ChildPenguinAIController.cpp の
+		 *          DADDY_PERCEPTION_SPECS テーブルにある。
+		 */
+		struct DaddyPerceptionSpec
+		{
+			/** 視界が届く距離 */
+			float sightDistance;
+			/** 視野角の半角（度）。シロクマの VIEW_ANGLE = 70 と同じ持ち方 */
+			float sightHalfAngleDeg;
+			/** 視界に入り続けてから察知に変わるまでの時間（秒） */
+			float noticeTime;
+			/** 親の音が届く距離への倍率（耳のよさ） */
+			float hearingScale;
+		};
 
 
 		/**
@@ -28,8 +46,24 @@ namespace app
 		public:
 			/**
 			 * @brief 更新処理
+			 * @details 全タイプ共通の前処理（親の察知）を行ってから UpdateAI() を呼ぶ。
+			 *          タイプごとの処理は UpdateAI() 側に書くこと。
 			 */
-			virtual void Update() = 0;
+			void Update();
+
+		public:
+			/**
+			 * @brief 再集合の呼びかけに応えた「勇敢」時間中かどうか
+			 * @details 勇敢中はシロクマから逃げない。うっすら明滅の演出判定に使う。
+			 * @return 勇敢時間が残っていればtrue
+			 */
+			bool IsBraveFromRegroup() const { return m_braveTimer > 0.0f; }
+
+		protected:
+			/**
+			 * @brief タイプごとの更新処理
+			 */
+			virtual void UpdateAI() = 0;
 
 
 		public:
@@ -125,6 +159,39 @@ namespace app
 			 */
 			void BuildInputToTarget(const Vector3& targetPos);
 
+			/**
+			 * @brief ナビゲーションを織り込んだ移動方向を求める
+			 * @details 親（隊列）へ向かう遠距離移動はフローフィールドに沿って
+			 *          水路や崖を回り込む。それ以外は目標への直進方向を返す。
+			 * @param targetPos    移動先の座標
+			 * @param distToTarget 目標までの距離（呼び出し側で計算済みの値）
+			 * @return 移動方向（正規化済み）
+			 */
+			Vector3 CalculateMoveDirectionWithNav(const Vector3& targetPos, const float distToTarget);
+
+			/**
+			 * @brief 移動方向にアクティブな渦潮からの反発を織り込む
+			 * @details 渦潮の回避半径内では渦潮から離れる向きの力を加算し、
+			 *          子ペンギンが自分から吸い込み範囲へ入っていくのを防ぐ。
+			 *          意図的に渦潮へ向かうとき（やんちゃのいたずら）は素通しする。
+			 * @param moveDir 元の移動方向（正規化済み）
+			 * @return 反発を織り込んだ移動方向（正規化済み）
+			 */
+			Vector3 ApplyWhirlpoolAvoidance(const Vector3& moveDir) const;
+
+			/**
+			 * @brief 意図的に渦潮へ向かっている最中かどうか
+			 * @details やんちゃAIがいたずらダイブ中にtrueを返し、渦潮回避を無効化する。
+			 * @return 意図的に渦潮へ向かっていればtrue
+			 */
+			virtual bool IsHeadingIntoWhirlpoolOnPurpose() const { return false; }
+
+			/**
+			 * @brief ステージの歩行可否グリッドを取得する
+			 * @return 歩行可否グリッド。地形が無い（未構築の）ステージではnullptr
+			 */
+			StageNavGrid* GetStageNavGrid() const;
+
 
 			/** かまくらイベントの更新処理 */
 			void UpdateIglooEvent();
@@ -136,6 +203,99 @@ namespace app
 			 * @return 逃走行動中ならtrue（このフレームの通常AIをスキップする）
 			 */
 			bool CheckAndFlee();
+
+
+			//------------------------------------------------------------//
+			// 入隊判定
+			// 以前は同じ距離判定が5タイプのAIに散らばっていた。
+			// 判定を変えるときにここだけ直せば済むよう1箇所へ集約している。
+			//------------------------------------------------------------//
+
+			/**
+			 * @brief 親を察知して隊列へ加われる状態かどうか
+			 * @details 入隊条件はこの関数だけが持つ。各タイプのAIはここを呼ぶこと。
+			 * @return 加われるならtrue
+			 */
+			bool CanJoinFormation() const;
+
+			/**
+			 * @brief 入隊条件を満たしていれば隊列へ加わる
+			 * @details すでに隊列にいる場合は何もせずtrueを返す。
+			 * @return このフレームの終わりに隊列にいるならtrue
+			 */
+			bool TryJoinFormation();
+
+			/**
+			 * @brief 親の隊列参加距離の内側にいるかどうか（入隊済みかは問わない）
+			 * @details 「親のそばにいるか」を距離だけで見たいとき用。
+			 *          CanJoinFormation() と違い、視界や向きの条件は入らない。
+			 * @return 内側にいるならtrue
+			 */
+			bool IsDaddyWithinJoinRadius() const;
+
+			/**
+			 * @brief 隊列に入っていないときの移動入力を組み立てる
+			 * @details 親に気づいていれば自分から寄っていき、気づいていなければその場で待つ。
+			 *          待機命令中は気づいていても動かない（待機の意味を壊さないため）。
+			 */
+			void BuildInputWhenNotFollowing();
+
+
+			//------------------------------------------------------------//
+			// 親の察知（視界と音）
+			//------------------------------------------------------------//
+
+			/**
+			 * @brief 親を察知しているかどうか
+			 * @return 察知していればtrue
+			 */
+			bool HasNoticedDaddy() const { return m_hasNoticedDaddy; }
+
+		private:
+			/**
+			 * @brief 親の察知状態を毎フレーム更新する
+			 * @details Update() の先頭から呼ばれる。
+			 *          距離 → 向き → 遮蔽 の順に重い判定へ進むので、
+			 *          ほとんどの子は最初の距離判定で足切りされる。
+			 */
+			void UpdatePerception();
+
+			/**
+			 * @brief このフレームに親を「確定的に」知覚できているかを判定する
+			 * @details 至近距離・再集合の呼びかけのどちらか。ここが真なら段階を踏まず即座に察知する。
+			 * @return 知覚できていればtrue
+			 */
+			bool PerceiveDaddyStrongThisFrame();
+
+			/**
+			 * @brief このフレームに親の音が聞こえているかを判定する
+			 * @details 音だけでは察知にならず、「？」を出して振り向く段階に入る。
+			 * @return 聞こえていればtrue
+			 */
+			bool PerceiveDaddySoundThisFrame();
+
+			/**
+			 * @brief このフレームに親が視界に入っているかを判定する
+			 * @details 距離 → 向き → 遮蔽 の順に、軽い判定から足切りする。
+			 * @return 見えていればtrue
+			 */
+			bool PerceiveDaddySightThisFrame();
+
+			/**
+			 * @brief 察知の成立処理
+			 * @details 未察知からの遷移なら「！」のリアクションを出す。
+			 */
+			void NoticeDaddy();
+
+			/**
+			 * @brief 親との間が地形で遮られているかを判定する
+			 * @details レイキャストは OCCLUSION_CHECK_INTERVAL フレームに1回しか撃たず、
+			 *          間のフレームは前回の結果を使い回す。
+			 *          子ごとに実行フレームをずらしてあるので、
+			 *          1フレームあたりのレイ本数は「子の数 / 間隔」が上限になる。
+			 * @return 遮られていればtrue
+			 */
+			bool IsDaddyOccluded();
 
 
 		protected:
@@ -159,6 +319,37 @@ namespace app
 			Vector3 m_iglooTargetPos = Vector3::Zero;
 			/** エフェクトハンドル */
 			EffectHandle m_hartEffectHandle;
+
+
+		private:
+			//------------------------------------------------------------//
+			// 親の察知（視界と音）の状態
+			//------------------------------------------------------------//
+
+			/** タイプごとの察知性能（生成時に決まる。以降変わらない） */
+			const DaddyPerceptionSpec* m_perceptionSpec = nullptr;
+			/** 親を察知しているかどうか */
+			bool m_hasNoticedDaddy = false;
+			/**
+			 * 親の音だけ聞こえている（まだ見つけてはいない）かどうか。
+			 * この間は「？」を出しながらゆっくり親のほうへ振り向き、
+			 * 視界に入った時点で察知（＝入隊）に変わる
+			 */
+			bool m_hasHeardDaddy = false;
+			/**
+			 * 再集合の呼びかけに応えてからの勇敢時間（秒）。
+			 * 残っている間は「自分が狙われている」か「クマが至近」でない限り逃げない。
+			 * 呼びかけの効果が切れた直後に群れがまた散るのを防ぐ
+			 */
+			float m_braveTimer = 0.0f;
+			/** 知覚し続けている時間（noticeTime を超えると察知に変わる） */
+			float m_noticeTimer = 0.0f;
+			/** 知覚できなくなってからの時間（NOTICE_FORGET_TIME を超えると察知を忘れる） */
+			float m_forgetTimer = 0.0f;
+			/** 遮蔽レイキャストを撃つフレームをずらすためのスロット番号 */
+			unsigned int m_perceptionSlot = 0;
+			/** 前回の遮蔽レイキャストの結果（間のフレームで使い回す） */
+			bool m_isDaddyOccludedCache = false;
 
 
 		private:
@@ -191,6 +382,24 @@ namespace app
 			 * @details 0のとき直進、±値のとき左右に振れる
 			 */
 			float m_fleeAngleOffset = 0.0f;
+
+			/** 現在逃走中かどうか（プレイログの開始・終了を1回ずつ出すためのエッジ検出用） */
+			bool m_isFleeing = false;
+			/**
+			 * @brief 逃走を続ける残り時間（秒）
+			 * @details クマが近くにいる間は FLEE_HOLD_TIME で上書きされ続ける。
+			 *          クマが離れてから0になるまでの間も逃げ続けるので、
+			 *          「クマの脇をすり抜けた瞬間に立ち止まる」が起きない。
+			 */
+			float m_fleeHoldTimer = 0.0f;
+			/**
+			 * @brief 逃走後、隊列へ戻れるようになるまでの残り時間（秒）
+			 * @details 散った直後にその場で入隊し直すと「集め直す時間」が生まれない。
+			 *          親の再集合の呼びかけ（Yボタン）で0にできる。
+			 */
+			float m_rejoinCooldown = 0.0f;
+			/** 最後に逃げる根拠にしたシロクマの座標（見失った後もこの向きへ逃げ続ける） */
+			Vector3 m_lastThreatPos = Vector3::Zero;
 		};
 
 
@@ -208,7 +417,7 @@ namespace app
 		class SeriousChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 		public:
 			SeriousChildPenguinAI(ChildPenguin* owner);
@@ -228,7 +437,7 @@ namespace app
 		class ClingyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 			/**
 			 * @brief 世話焼きペンギンによる制止フラグを設定する
@@ -272,7 +481,7 @@ namespace app
 		class NaughtyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 			/**
 			 * @brief 世話焼きペンギンによる制止フラグを設定する
@@ -294,11 +503,34 @@ namespace app
 			NaughtyChildPenguinAI(ChildPenguin* owner);
 			~NaughtyChildPenguinAI() override;
 
+			/**
+			 * @brief 意図的に渦潮へ向かっている最中かどうか
+			 * @details いたずらダイブ中は基底の渦潮回避を無効化する。
+			 * @return 渦潮いたずらへ向かっていればtrue
+			 */
+			bool IsHeadingIntoWhirlpoolOnPurpose() const override;
+
 		private:
 			/**
 			 * @brief 次の徘徊目標座標をランダムに選ぶ
 			 */
 			void PickNewRoamTarget();
+
+			/**
+			 * @brief スタック（移動の意思があるのに動けていない）を検出して解消する
+			 * @details 急斜面（接地限界63度超）へ向かって歩き続けると押し戻されて
+			 *          足踏みになるため、一定時間動けていなければ行き先を変える。
+			 *          いたずら（クマ起こし・渦潮）へ向かう途中なら諦めさせる。
+			 */
+			void UpdateStuckWatch();
+
+			/**
+			 * @brief 進めなかった方向の反対側から徘徊目標を選び直す
+			 * @details PickNewRoamTarget() だと同じ斜面方向を引き直す可能性があるため、
+			 *          スタック解消時はこちらを使う。
+			 * @param blockedDir 進めなかった移動方向
+			 */
+			void PickNewRoamTargetAwayFromBlocked(const Vector3& blockedDir);
 
 			/**
 			 * @brief わいわいエフェクトの再生
@@ -321,6 +553,10 @@ namespace app
 			float m_roamTriggerDistance = 0.0f;
 			/** 徘徊先を選ぶ現在地からの半径 */
 			float m_roamRadius = 0.0f;
+			/** スタック検出：動けていない時間（秒） */
+			float m_stuckTimer = 0.0f;
+			/** スタック検出：前回チェック時の座標 */
+			Vector3 m_stuckCheckPos = Vector3::Zero;
 			/** 反省時間 */
 			float m_scoldCooldown = 0.0f;
 			/** 渦潮に飲み込まれたかどうかのフラグ */
@@ -344,7 +580,7 @@ namespace app
 		class ClumsyChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 			/**
 			 * @brief 世話焼きペンギンに助けてもらう
@@ -384,7 +620,7 @@ namespace app
 		class CaringChildPenguinAI : public ChildPenguinAIController
 		{
 		public:
-			void Update() override;
+			void UpdateAI() override;
 
 		public:
 			CaringChildPenguinAI(ChildPenguin* owner);

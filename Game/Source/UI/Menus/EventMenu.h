@@ -1,7 +1,6 @@
 ﻿/**
  * @file Event.h
  * @brief イベントの動的処理
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"

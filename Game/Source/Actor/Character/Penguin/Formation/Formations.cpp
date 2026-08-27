@@ -1,7 +1,6 @@
 /**
  * @file Formations.cpp
  * @brief 陣形インターフェースと全具体クラスの実装
- * @author 竹林
  */
 #include "stdafx.h"
 #include "Formations.h"

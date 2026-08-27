@@ -1,7 +1,6 @@
 ﻿/**
  * @file HemisphereLight.h
  * @brief 半球ライトの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "HemisphereLight.h"

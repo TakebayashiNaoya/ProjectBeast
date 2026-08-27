@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyStatus.h
  * @brief エネミーのステータス
- * @author 立山
  */
 #pragma once
 #include "Source/Actor/Character/CharacterStatus.h"

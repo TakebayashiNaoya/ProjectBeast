@@ -1,7 +1,6 @@
 ﻿/**
  * @file MyRenderer.h
  * @brief レンダラー関連のヘッダー
- * @author 竹林尚哉
  */
 #pragma once
 

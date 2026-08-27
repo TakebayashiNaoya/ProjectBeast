@@ -1,7 +1,6 @@
 /*
  * @file LinearFillGauge.fx
  * @brief 縦方向の塗り分けゲージシェーダー
- * @author 竹林
  */
 
 

@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialMenu.cpp
  * @brief チュートリアル（ルール説明）画面の動的処理クラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "TutorialMenu.h"

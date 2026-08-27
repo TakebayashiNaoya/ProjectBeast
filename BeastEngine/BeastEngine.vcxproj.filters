@@ -111,6 +111,9 @@
     <ClCompile Include="Graphics\PostEffect\PostEffectManager.cpp">
       <Filter>Graphics\PostEffect</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\PostEffect\RadialBlur.cpp">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClCompile>
     <ClCompile Include="Graphics\PostEffect\ToneMap.cpp">
       <Filter>Graphics\PostEffect</Filter>
     </ClCompile>
@@ -278,6 +281,9 @@
       <Filter>Graphics\PostEffect</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\PostEffect\PostEffectTypes.h">
+      <Filter>Graphics\PostEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\PostEffect\RadialBlur.h">
       <Filter>Graphics\PostEffect</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\PostEffect\ToneMap.h">

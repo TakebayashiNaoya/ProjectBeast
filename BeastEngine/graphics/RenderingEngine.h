@@ -1,7 +1,6 @@
 ﻿/**
  * @file RenderingEngine.h
  * @brief RenderingEngineクラスのヘッダー
- * @author 竹林
  */
 #pragma once
 #include "MyRenderer.h"
@@ -128,6 +127,16 @@ namespace nsBeastEngine
 		}
 
 		/**
+		 * @brief 輪郭線だけをフォワードパスで重ね描きするモデルを登録する
+		 * @details 本体はディファードで描かれるモデルの輪郭線用（EnableOutline()）
+		 * @param modelRender 追加する描画オブジェクト
+		 */
+		void AddOutlineModelList(ModelRender* modelRender)
+		{
+			m_outlineModelList.push_back(modelRender);
+		}
+
+		/**
 		 * @brief 描画オブジェクトをリストに登録する（予約）
 		 * @param renderObject 登録する描画オブジェクト
 		 */
@@ -179,6 +188,14 @@ namespace nsBeastEngine
 				m_customRenderers.erase(it);
 			}
 		}
+
+		/**
+		 * @brief 2D（UI）描画の有効/無効を設定する
+		 * @details ステージ紹介動画の撮影（BEAST_SHOWCASE）などで、
+		 *          UIを一切合成しない素の3D映像が欲しいときに false にする
+		 * @param enabled false で Render2D をまるごとスキップする
+		 */
+		void Set2DRenderEnabled(bool enabled) { m_is2DRenderEnabled = enabled; }
 
 
 		//============================================//
@@ -307,6 +324,8 @@ namespace nsBeastEngine
 		Sprite			m_2DSprite;
 		/** 3D描画結果のスプライト */
 		Sprite			m_mainSprite;
+		/** 2D（UI）描画を行うかどうか（ステージ紹介動画の撮影時だけfalse） */
+		bool			m_is2DRenderEnabled = true;
 
 		/** ポストエフェクトマネージャー */
 		PostEffectManager m_postEffectManager;
@@ -325,6 +344,8 @@ namespace nsBeastEngine
 		std::vector<ModelRender*> m_deferredModelList;
 		/** フォワードモデルリスト */
 		std::vector<ModelRender*> m_forwardModelList;
+		/** 輪郭線だけフォワードで重ね描きするモデルリスト */
+		std::vector<ModelRender*> m_outlineModelList;
 		/** 描画するオブジェクトの予約リスト */
 		std::vector<IRenderer*> m_renderObjects;
 		/** 自然オブジェクトのリスト（Ocean・WhirlpoolManagerなど） */

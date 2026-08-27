@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIInputController.h
  * @brief UI入力制御を行うクラス
- * @author 藤谷
  */
 #pragma once
 

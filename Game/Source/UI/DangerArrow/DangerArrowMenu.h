@@ -1,7 +1,6 @@
 /**
  * @file DangerArrowMenu.h
  * @brief 危険矢印UI（1本分）のMenuクラス
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Menu.h"

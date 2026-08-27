@@ -1,7 +1,6 @@
 ﻿/**
  * @file TwoBoneLegIK.h
  * @brief 2ボーン解析式IK（脚1本分）
- * @author 立山
  */
 #pragma once
 

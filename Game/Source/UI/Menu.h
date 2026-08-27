@@ -1,7 +1,6 @@
 ﻿/**
  * @file Menu.h
  * @brief UIパーツ周りから動的な処理を行う基底クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/UIParts.h"

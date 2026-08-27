@@ -1,7 +1,6 @@
 ﻿/**
  * @file SceneLight.cpp
  * @brief シーンライトの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "SceneLight.h"

@@ -1,7 +1,6 @@
 /**
  * @file FormationController.cpp
  * @brief 陣形の切り替えと座標計算を管理するコントローラー
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FormationController.h"
@@ -23,6 +22,9 @@ namespace app
 			constexpr const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/formation/FormationParameter.bin";
 			/** 陣形切り替え演出（スライド）時間のチューニングファイルパス（ホットリロード対応） */
 			constexpr const char* SWITCH_TUNING_JSON_PATH = "Assets/parameter/character/penguin/formation/FormationSwitchTuning.json";
+
+			/** ゲーム開始時の初回ウルトのクールダウン倍率（0.5=半分の待ち時間で最初のウルトに到達） */
+			constexpr float FIRST_ULT_COOLDOWN_RATE = 0.5f;
 
 			/**
 			 * @brief フォロワー数から陣形レベルと現在進行中のリングの内訳を求める
@@ -101,8 +103,10 @@ namespace app
 
 			SwitchFormation(EnFormationType::Circle);
 
-			// ゲーム開始直後はウルトが貯まっていない状態から始める
-			m_ultController.ResetCooldown();
+			// ゲーム開始直後はウルトが貯まっていない状態から始めるが、
+			// 待ち時間は半分にして最初のウルト体験を早める
+			// （一度も撃たずに終わる子供が多い、という試遊フィードバック対応）
+			m_ultController.ResetCooldown(FIRST_ULT_COOLDOWN_RATE);
 
 			// 陣形切り替え演出時間の初期読み込み
 			{

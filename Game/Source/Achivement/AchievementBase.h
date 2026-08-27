@@ -1,7 +1,6 @@
 ﻿/**
  * @file Achivement.h
  * @brief アチーブメントに関するクラス
- * @author 藤谷
  */
 #pragma once
 #include "Json/json.hpp"

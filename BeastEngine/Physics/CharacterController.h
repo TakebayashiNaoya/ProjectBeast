@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterController.h
  * @brief キャラクターコントローラー
- * @author 竹林尚哉
  */
 #pragma once
 #include "CapsuleCollider.h"

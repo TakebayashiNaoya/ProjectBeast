@@ -1,7 +1,6 @@
 ﻿/**
  * @file EventMenu.cpp
  * @brief イベントの動的メニュー
- * @author 忽那
  */
 #include "stdafx.h"
 #include "EventMenu.h"

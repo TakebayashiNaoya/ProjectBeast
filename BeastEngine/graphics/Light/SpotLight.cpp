@@ -1,7 +1,6 @@
 ﻿/**
  * @file SpotLight.cpp
  * @brief スポットライトの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 

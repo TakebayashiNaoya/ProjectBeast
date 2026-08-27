@@ -1,7 +1,6 @@
 ﻿/**
  * @file BearReactionMenu.h
  * @brief クマのリアクションメニュークラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Menu.h"

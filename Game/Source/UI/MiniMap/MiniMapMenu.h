@@ -1,7 +1,6 @@
 ﻿/**
  * @file MiniMapMenu.h
  * @brief ミニマップの動的処理クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"
@@ -31,9 +30,19 @@ namespace app
 			//======================================//
 		public:
 			/**
-			 * @brief アイコンの数を設定する
+			 * @brief マップアイコンを一括生成する
+			 * @details InitializeMapIconStep() を完了まで回す一括版
 			 */
 			void InitializeMapIcon();
+
+			/**
+			 * @brief マップアイコンを分割生成する
+			 * @details アイコンはフィーバー予約分も含め数百個あり、一括生成は
+			 *          ロード画面のフレームを1秒以上止める。ロード中に毎フレーム呼ぶ。
+			 * @param maxCount この呼び出しで生成する最大個数
+			 * @return 全て生成し終えたらtrue
+			 */
+			bool InitializeMapIconStep(const int maxCount);
 
 			/**
 			 * @brief アイコンの数を設定する
@@ -95,6 +104,10 @@ namespace app
 
 			/** 親ペンギンのアイコン */
 			UIIcon* m_daddy;
+
+			/** 分割生成（InitializeMapIconStep）の進行位置 */
+			uint8_t m_iconInitTypeIndex = 0;    /** 生成中のアイコン種類 */
+			uint8_t m_iconInitIndexInType = 0;  /** 種類内の生成位置 */
 			/** マップのアイコン */
 			UIIcon* m_map;
 			/** マップのフレームアイコン */

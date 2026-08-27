@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoRender.h
  * @brief 映像を IRenderer として 2D パスで描画するクラス
- * @author 竹林
  */
 #pragma once
 #include "VideoClip.h"

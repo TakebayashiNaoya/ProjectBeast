@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoClip.h
  * @brief コマ撮り／映像フレームデータ管理クラス
- * @author 竹林
  */
 #pragma once
 #include <vector>

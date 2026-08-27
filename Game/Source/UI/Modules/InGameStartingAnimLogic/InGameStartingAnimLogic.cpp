@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameStartingAnimLogic.cpp
  * @brief ゲーム開始時のアニメーションロジッククラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "InGameStartingAnimLogic.h"

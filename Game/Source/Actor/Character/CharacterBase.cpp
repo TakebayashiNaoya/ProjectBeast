@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterBase.cpp
  * @brief キャラクターの基底クラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CharacterBase.h"
@@ -18,8 +17,8 @@ namespace app
 		namespace
 		{
 			constexpr float GRAVITY = -9.8f * 150; // 重力の値
-			constexpr float FOOTPRINT_LIFE_SECONDS = 1.0f;     // 足跡の残存時間
-			constexpr float FOOTPRINT_FADE_OUT_SECONDS = 0.5f; // 足跡のフェードアウト時間
+			constexpr float FOOTPRINT_LIFE_SECONDS = 3.5f;     // 足跡の残存時間
+			constexpr float FOOTPRINT_FADE_OUT_SECONDS = 1.0f; // 足跡のフェードアウト時間
 		}
 
 

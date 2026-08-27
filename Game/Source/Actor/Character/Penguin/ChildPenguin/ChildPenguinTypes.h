@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinTypes.h
  * @brief 子ペンギンの型定義
- * @author	竹林
  */
 #pragma once
 #include <cstdint>

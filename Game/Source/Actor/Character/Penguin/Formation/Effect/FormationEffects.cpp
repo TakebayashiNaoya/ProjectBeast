@@ -1,13 +1,14 @@
 /**
  * @file FormationEffects.cpp
  * @brief 陣形効果の具体クラス群の実装
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FormationEffects.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Effect/EffectManager.h"
+#include "Source/Manager/BattleManager.h"
 #include "Source/Nature/Whirlpool.h"
 #include "Source/Nature/WhirlpoolManager.h"
 #include "Source/Nature/WhirlpoolParameter.h"
@@ -17,6 +18,13 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/** 円陣ウルトの呼び戻し時に、呼ばれた子の足元へ出すバーストのスケール */
+			const Vector3 CALL_BURST_EFFECT_SCALE(30.0f, 30.0f, 30.0f);
+		}
+
+
 		void WhirlpoolSpeedBoostEffect::Update(float dt, const UltContext& ctx)
 		{
 			m_isNearWhirlpool = false;
@@ -86,6 +94,14 @@ namespace app
 				if (diff.LengthSq() <= distSq)
 				{
 					ctx.penguinManager->AddFollower(penguin);
+
+					/** 呼び戻された子の足元にバーストを出して「集まってくる」絵を作る。
+					 *  入隊した子はウルト中の隊列発光でも光るため、二段の演出になる */
+					EffectManager::Get().PlayEffect(
+						EnEffectKind::DaddyPenguinCommand,
+						penguin->GetTransform().m_position,
+						Quaternion::Identity,
+						CALL_BURST_EFFECT_SCALE);
 				}
 			}
 		}
@@ -98,14 +114,15 @@ namespace app
 
 		void BearAttackNullifyEffect::Enter(const UltContext& ctx)
 		{
-			// TODO: シロクマ攻撃無効化フラグを有効にする
-			// DaddyPenguin や EnemyManager に無敵フラグのAPIが用意できたら実装する
+			/** 無効化の判定と反撃（ノックバック＋スタン）は EnemyController の
+			 *  攻撃ヒット処理側で行う。ここではフラグを立てるだけ */
+			BattleManager::GetInstance().SetBearAttackNullified(true);
 		}
 
 
 		void BearAttackNullifyEffect::Exit(const UltContext& ctx)
 		{
-			// TODO: シロクマ攻撃無効化フラグを解除する
+			BattleManager::GetInstance().SetBearAttackNullified(false);
 		}
 	}
 }

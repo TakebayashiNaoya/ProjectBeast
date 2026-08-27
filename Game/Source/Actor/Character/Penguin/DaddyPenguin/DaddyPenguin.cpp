@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguin.cpp
  * @brief 親ペンギンクラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"
@@ -26,6 +25,11 @@ namespace app
 				EnModelUpAxis::enModelUpAxisZ,
 				std::size(ANIMATION_DATA)
 			};
+
+			/** 輪郭線の太さ（スクリーン幅比の法線押し出し量。子ペンギンと同じ） */
+			constexpr float OUTLINE_WIDTH = 0.002f;
+			/** 輪郭線の色（子ペンギンと同じ黒） */
+			const Vector4 OUTLINE_COLOR(0.05f, 0.05f, 0.07f, 1.0f);
 		}
 
 
@@ -52,6 +56,14 @@ namespace app
 
 		void DaddyPenguin::Update()
 		{
+			/** モデルロード完了後、一度だけ輪郭線を適用する（子・クマと揃える） */
+			if (m_modelReady && !m_isOutlineApplied)
+			{
+				m_modelRender.SetOutlineParam(OUTLINE_WIDTH, OUTLINE_COLOR);
+				m_modelRender.EnableOutline();
+				m_isOutlineApplied = true;
+			}
+
 			if (m_controller)
 			{
 				m_controller->Update();

@@ -3,7 +3,6 @@
  * @brief ImGuiデバッグウィンドウの一元管理クラス
  * @details 各クラスから描画関数を登録することで、
  *          1つのウィンドウに全員のデバッグUIをまとめて表示する
- * @author 立山
  */
 #pragma once
 #include "imgui.h"

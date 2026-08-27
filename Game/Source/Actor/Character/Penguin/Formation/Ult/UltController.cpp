@@ -1,12 +1,12 @@
 /**
  * @file UltController.cpp
  * @brief ウルトの発動・タイマー・クールダウンを管理するコントローラー
- * @author 竹林
  */
 #include "stdafx.h"
 #include "UltController.h"
 #include "IUltEffect.h"
 #include "Source/Actor/Character/Penguin/Formation/Effect/FormationEffectChain.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Sound/SoundManager.h"
 
 
@@ -24,6 +24,9 @@ namespace app
 			constexpr float ULT_ACTIVATE_SE_VOLUME  = 1.0f;
 			/** ウルト発動中（ディスチャージ）SEの音量倍率 */
 			constexpr float ULT_DISCHARGE_SE_VOLUME = 1.0f;
+
+			// 発動の瞬間の演出（スローモーション・ラジアルブラー・パンチイン）の
+			// つまみは InGameSceneBase の衝撃演出の受け口にある
 		}
 
 
@@ -65,6 +68,13 @@ namespace app
 
 			// ウルト発動SEを鳴らす
 			SoundManager::Get().PlaySE(enSoundKind_UltActivate, ULT_ACTIVATE_SE_VOLUME);
+
+			// 発動の瞬間を「事件」にする演出を通知する。
+			// シロクマの脅威で下がった感情曲線を、ウルトの手応えで引き上げる狙い。
+			// スローモーション・ラジアルブラー・パンチインの配分は受け取る側が決める
+			BattleManager::GetInstance().NotifyImpact(
+				EnImpactType::UltActivate,
+				ctx.penguinManager ? ctx.penguinManager->GetDaddyPosition() : Vector3::Zero);
 
 			// 感情曲線の「上げ」側を実測するため、発動をプレイログへ残す
 			if (auto* lm = GameLogManager::GetInstance())

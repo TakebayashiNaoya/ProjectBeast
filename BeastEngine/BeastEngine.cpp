@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastEngine.cpp
  * @brief BeastEngineクラスの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "BeastEngine.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file MasterCPReactionParameter.h
  * @brief CPReactionのパラメーター管理クラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

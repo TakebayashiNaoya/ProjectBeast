@@ -1,7 +1,6 @@
 ﻿/**
  * @file TriangleCuller.cpp
  * @brief トライアングルカリングクラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "Geometry/TriangleCuller.h"

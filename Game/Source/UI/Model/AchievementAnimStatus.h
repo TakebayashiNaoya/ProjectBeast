@@ -1,7 +1,6 @@
 ﻿/**
  * @file AchievementAnimStatus.h
  * @brief アチーブメントアニメーション専用のステータスクラス
- * @author 立山
  */
 #pragma once
 #include "UIAnimationStatus.h"

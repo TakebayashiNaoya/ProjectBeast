@@ -2,143 +2,75 @@
   "whirlpoolPositions": [
     {
       "index": 0,
-      "position": [-4421, 0, 2463]
+      "position": [-221.2, 0.0, -1164.6]
     },
     {
       "index": 1,
-      "position": [-4110, 0, 1820]
+      "position": [-587.4, 0.0, -1768.1]
     },
     {
       "index": 2,
-      "position": [-4055, 0, 3392]
+      "position": [-1563.0, 0.0, 581.5]
     },
     {
       "index": 3,
-      "position": [-3823, 0, 1145]
+      "position": [-552.2, 0.0, -953.6]
     },
     {
       "index": 4,
-      "position": [-3549, 0, 412]
+      "position": [-329.6, 0.0, -2236.8]
     },
     {
       "index": 5,
-      "position": [-3158, 0, 3518]
+      "position": [-1023.9, 0.0, -2257.3]
     },
     {
       "index": 6,
-      "position": [-3006, 0, 809]
+      "position": [-2594.2, 0.0, -215.3]
     },
     {
       "index": 7,
-      "position": [-2586, 0, 3618]
+      "position": [865.7, 0.0, -2277.8]
     },
     {
       "index": 8,
-      "position": [-2526, 0, 316]
+      "position": [-2189.9, 0.0, 139.2]
     },
     {
       "index": 9,
-      "position": [-2255, 0, -39]
+      "position": [356.0, 0.0, -2333.5]
     },
     {
       "index": 10,
-      "position": [-2188, 0, 3776]
+      "position": [-669.4, 0.0, -2614.7]
+    },
+    {
+      "index": 11,
+      "position": [-3625.5, 0.0, -51.3]
     },
     {
       "index": 12,
-      "position": [-1705, 0, 58]
+      "position": [1797.4, 0.0, 3323.7]
     },
     {
       "index": 13,
-      "position": [-1382, 0, -54]
+      "position": [1797.4, 0.0, -3300.3]
     },
     {
       "index": 14,
-      "position": [-981, 0, 526]
+      "position": [-3016.1, 0.0, 2151.9]
     },
     {
       "index": 15,
-      "position": [-884, 0, 294]
+      "position": [3479.0, 0.0, -1460.4]
     },
     {
       "index": 16,
-      "position": [-828, 0, -1734]
+      "position": [3446.8, 0.0, 1753.4]
     },
     {
       "index": 17,
-      "position": [-291, 0, -1281]
-    },
-    {
-      "index": 18,
-      "position": [-267, 0, -2268]
-    },
-    {
-      "index": 19,
-      "position": [-24, 0, -947]
-    },
-    {
-      "index": 20,
-      "position": [20, 0, 1881]
-    },
-    {
-      "index": 21,
-      "position": [43, 0, 1888]
-    },
-    {
-      "index": 22,
-      "position": [193, 0, 3099]
-    },
-    {
-      "index": 23,
-      "position": [526, 0, -821]
-    },
-    {
-      "index": 24,
-      "position": [695, 0, 1895]
-    },
-    {
-      "index": 25,
-      "position": [801, 0, 3136]
-    },
-    {
-      "index": 26,
-      "position": [862, 0, 837]
-    },
-    {
-      "index": 27,
-      "position": [927, 0, 806]
-    },
-    {
-      "index": 28,
-      "position": [1333, 0, 544]
-    },
-    {
-      "index": 29,
-      "position": [1445, 0, 3557]
-    },
-    {
-      "index": 30,
-      "position": [1594, 0, 253]
-    },
-    {
-      "index": 31,
-      "position": [1989, 0, -106]
-    },
-    {
-      "index": 32,
-      "position": [2019, 0, 2477]
-    },
-    {
-      "index": 33,
-      "position": [2406, 0, -478]
-    },
-    {
-      "index": 34,
-      "position": [2856, 0, -749]
-    },
-    {
-      "index": 35,
-      "position": [3371, 0, -747]
+      "position": [-2412.6, 0.0, 2081.5]
     }
   ]
 }

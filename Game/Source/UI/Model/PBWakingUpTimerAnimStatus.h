@@ -1,7 +1,6 @@
 ﻿/**
  * @file PBWakingUpTimerAnimStatus.h
  * @brief PB起床タイマー専用のステータスクラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Animation/UIAnimationFactory.h"

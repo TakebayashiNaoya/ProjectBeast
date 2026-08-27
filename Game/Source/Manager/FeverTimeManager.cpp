@@ -1,7 +1,6 @@
 ﻿/**
  * @file FeverTimeManager.cpp
  * @brief フィーバータイムを管理するクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FeverTimeManager.h"
@@ -82,6 +81,30 @@ namespace app
 		m_isActive = true;
 		m_hasTriggered = true;
 		m_dropTimer = 0.0f;
+
+		// デバイスロスト調査：フィーバー開始時点のVRAM使用量を記録する。
+		// クラッシュするとプレイログは書き出されないため、ファイルへ直接追記する
+		{
+			double usageMB = 0.0;
+			double budgetMB = 0.0;
+			g_graphicsEngine->QueryVideoMemoryMB(usageMB, budgetMB);
+
+			char buf[256];
+			sprintf_s(buf, "[VRAM] fever start     usage %.1f MB / budget %.1f MB heaps %d\n",
+				usageMB, budgetMB, nsK2EngineLow::g_numDescriptorHeapLive);
+			OutputDebugStringA(buf);
+
+			FILE* fp = nullptr;
+			fopen_s(&fp, "Logs/vram_trace.txt", "a");
+			if (fp)
+			{
+				SYSTEMTIME st;
+				GetLocalTime(&st);
+				fprintf(fp, "%04d-%02d-%02d %02d:%02d:%02d %s",
+					st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, buf);
+				fclose(fp);
+			}
+		}
 
 		/** フィーバー中BGMに切り替える */
 		SoundManager::Get().PlayBGM(enSoundKind_FeverTime);

@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIParts.h
  * @brief UIのパーツ群
- * @author 忽那
  */
 #pragma once
 #include "Source/Core/HierarchicalTransform.h"
@@ -612,6 +611,9 @@ namespace app
 			/** スケールの設定 */
 			void SetScale(const float& scale) { m_scale = { scale, scale }; }
 			void SetScale(const Vector2& scale) { m_scale = scale; }
+
+			/** スケールの取得 */
+			const Vector2& GetScale() const { return m_scale; }
 
 			/** 影の設定 */
 			void SetShadowParam(bool enable, float offset, const Vector4& color)

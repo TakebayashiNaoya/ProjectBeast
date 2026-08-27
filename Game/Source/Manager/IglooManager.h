@@ -1,7 +1,6 @@
 ﻿/**
  * @file IglooManager.h
  * @brief かまくらを管理するクラス
- * @author 立山
  */
 #pragma once
 

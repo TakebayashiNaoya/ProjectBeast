@@ -2,6 +2,17 @@
 
 namespace nsK2EngineLow {
 	/// <summary>
+	/// ディスクリプタヒープの累計作成数（デバッグ計測用）。
+	/// </summary>
+	extern int g_numDescriptorHeap;
+	/// <summary>
+	/// いま生きているシェーダー可視ヒープの数（デバッグ計測用）。
+	/// ドライバの総数上限（実測4500前後）を超えると作成に失敗するため、
+	/// フィーバーなど負荷ピークでの値を監視する。
+	/// </summary>
+	extern int g_numDescriptorHeapLive;
+
+	/// <summary>
 	/// ディスクリプタヒープ。
 	/// </summary>
 	class DescriptorHeap : public Noncopyable {

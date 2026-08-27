@@ -1,7 +1,6 @@
 ﻿/**
  * @file HemisphereLight.h
  * @brief 半球ライト
- * @author 竹林尚哉
  */
 #pragma once
 

@@ -1,7 +1,6 @@
 ﻿/**
  * @file SoundManager.cpp
  * @brief サウンドの管理をするクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "SoundManager.h"
@@ -184,6 +183,12 @@ namespace app
 
 	SEHandle SoundManager::PlaySE(const int kind, const float volumeMagnification, const bool isLoop, const bool is3D, const EnSoundPriority priority)
 	{
+		// Noneは「鳴らさない」の意味。SoundSourceをNoneでInitすると音源が作られず、
+		// 直後のSetVolumeがnullを踏んでクラッシュするため、ここで弾く
+		if (kind == enSoundKind::enSoundKind_None) {
+			return INVALID_SE_HANDLE;
+		}
+
 		if (m_soundHandleCount == INVALID_SE_HANDLE) {
 			K2_ASSERT(false, "サウンドの再生が多いです。\n");
 			return INVALID_SE_HANDLE;

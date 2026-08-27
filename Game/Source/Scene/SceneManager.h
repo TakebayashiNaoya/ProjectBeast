@@ -1,7 +1,6 @@
 ﻿/**
  * @file SceneManager.h
  * @brief シーンの管理をするクラス
- * @author 立山
  */
 #pragma once
 #include"Source/Scene/IScene.h"

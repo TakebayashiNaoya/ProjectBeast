@@ -1,7 +1,6 @@
 ﻿/**
  * @file DangerArrowSystem.cpp
  * @brief 危険矢印UIのシステムクラス実装
- * @author 竹林
  */
 #include "stdafx.h"
 #include "DangerArrowSystem.h"

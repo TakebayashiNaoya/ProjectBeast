@@ -1,7 +1,6 @@
 ﻿/**
  * @file FeverTimeManager.h
  * @brief フィーバータイムを管理するクラス
- * @author 竹林
  */
 #pragma once
 

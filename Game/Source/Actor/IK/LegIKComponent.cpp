@@ -1,7 +1,6 @@
 ﻿/**
  * @file LegIKComponent.cpp
  * @brief キャラクター1体分の脚IKをまとめて管理するコンポーネントの実装
- * @author 立山
  */
 #include "stdafx.h" 
 #include "../../../../k2EngineLow/graphics/Skeleton.h"

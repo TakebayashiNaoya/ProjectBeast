@@ -1,7 +1,6 @@
 ﻿/**
  * @file ParticleValueProvider.h
  * @brief パーティクルパラメーターの値を提供するプロバイダ
- * @author 忽那
  */
 #pragma once
 #include "Source/Util/Curve.h"

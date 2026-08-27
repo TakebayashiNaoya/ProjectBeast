@@ -1,7 +1,6 @@
 /**
  * @file DangerArrowMenu.cpp
  * @brief 危険矢印UI（1本分）のMenuクラス実装
- * @author 竹林
  */
 #include "stdafx.h"
 #include "DangerArrowMenu.h"

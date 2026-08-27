@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinStateMachine.h
  * @brief ペンギンのステートマシン
- * @author 藤谷
  */
 #pragma once
 #include "PenguinEffectStatus.h"
@@ -46,6 +45,14 @@ namespace app
 			inline void SetIsSlide(const bool isSlide)
 			{
 				m_isSlide = isSlide;
+			}
+			/**
+			 * @brief スライド入力中かどうかを取得
+			 * @return スライド入力中かどうか
+			 */
+			inline bool GetIsSlide() const
+			{
+				return m_isSlide;
 			}
 			/**
 			 * @brief 渦潮の中にいるかどうかを設定
@@ -129,11 +136,13 @@ namespace app
 			}
 			/**
 			 * @brief スライドが使用可能かどうかを取得
-			 * @return スタミナが枯渇しクールダウン中でなければtrue
+			 * @details スライドのスタミナは撤廃した（2026-08-23 試遊フィードバック）。
+			 *          スライドの制限は傾斜モデル（上り坂で滑れない）が担う
+			 * @return 常にtrue
 			 */
 			bool CanUseSlide() const
 			{
-				return m_slideStaminaGauge.CanUse();
+				return true;
 			}
 			/**
 			 * @brief ジャンプのスタミナゲージの割合を取得（UI表示用）
@@ -151,6 +160,53 @@ namespace app
 			{
 				return m_slideStaminaGauge.GetRatio();
 			}
+
+			/**
+			 * @brief スライドの傾斜による速度倍率を取得する
+			 * @details 下り坂で1を超え、上り坂で1を下回る。非接地・平地では1.0f。
+			 *          スライド系ステートが SetMoveSpeed() に掛けて使う。
+			 *          カーブと数値の根拠は docs/スライドの傾斜モデル.md を参照。
+			 * @return 速度倍率（SLIDE_SLOPE_MUL_MIN 〜 SLIDE_SLOPE_MUL_MAX）
+			 */
+			float GetSlideSlopeMultiplier() const
+			{
+				return m_slideSlopeMultiplier;
+			}
+			/**
+			 * @brief 進行方向に対する符号つき傾斜（平滑化済み）を取得する
+			 * @details 下りで正、上りで負。値は sin(傾斜角) に一致する。
+			 *          AI側が「上り坂ではスライドを選ばない」判断に使う
+			 * @return 符号つき傾斜（-1.0〜1.0）
+			 */
+			float GetSlideSlopeSigned() const
+			{
+				return m_slideSlopeSigned;
+			}
+			/**
+			 * @brief 上り坂でのずり落ち（負の速度倍率）を許可する
+			 * @details プレイヤー操作の親ペンギンだけ有効にする。
+			 *          AIの子ペンギンで有効にすると上り坂で永久に後退してしまう
+			 * @param isAllowed 許可するかどうか
+			 */
+			void SetSlideBackAllowed(const bool isAllowed)
+			{
+				m_isSlideBackAllowed = isAllowed;
+			}
+			/**
+			 * @brief 傾斜を織り込んだスライド速度を取得する
+			 * @details PenguinStatus の slideSpeed に GetSlideSlopeMultiplier() を掛けたもの。
+			 *          スライド系3ステート（SlideStart / Sliding / SlideEnd）が
+			 *          同じ値を使うためにここへ集約している。
+			 * @return スライドの移動速度
+			 */
+			float CalcSlideSpeedWithSlope() const;
+			/**
+			 * @brief スライド中の旋回速度の倍率を取得する
+			 * @details 加速しているぶんだけ曲がりにくくする（1 / 速度倍率）。
+			 *          上り・平地では 1.0f を返し、操作性を落とさない。
+			 * @return 旋回速度の倍率
+			 */
+			float CalcSlideTurnMultiplier() const;
 
 
 			/** ステートの変更先を取得する */
@@ -171,8 +227,16 @@ namespace app
 			}
 			/**
 			 * @brief ジャンプ・スライドのスタミナゲージを毎フレーム更新する
+			 * @details スライド側の消費速度には傾斜倍率が掛かる（下りほど減らない）。
 			 */
 			void UpdateStaminaGauges();
+			/**
+			 * @brief スライドの傾斜倍率を毎フレーム更新する
+			 * @details 足元の地面法線と移動入力から符号つき傾斜を求めて倍率へ変換し、
+			 *          法線のちらつきで速度が脈打たないよう時定数で追従させる。
+			 *          UpdateStaminaGauges() の先頭から呼ばれるため個別に呼ぶ必要はない。
+			 */
+			void UpdateSlideSlope();
 			/**
 			 * @brief ジャンプ・スライドのスタミナゲージをPenguinStatusの値で初期化する
 			 */
@@ -296,6 +360,16 @@ namespace app
 			PenguinStaminaGauge m_slideStaminaGauge;
 			/** スタミナゲージの初期化が完了したかどうか */
 			bool m_isStaminaGaugeSetup = false;
+			/** スライドの傾斜による速度倍率（平滑化済み。既定 1.0f） */
+			float m_slideSlopeMultiplier = 1.0f;
+			/**
+			 * @brief 進行方向に対する符号つき傾斜（平滑化済み）
+			 * @details 下りで正、上りで負、斜面を横切ると0。値は sinθ 相当で -1〜+1。
+			 *          スタミナ消費倍率の算出にも使うため倍率とは別に保持する。
+			 */
+			float m_slideSlopeSigned = 0.0f;
+			/** 上り坂でのずり落ち（負の速度倍率）を許可するか。親ペンギンだけtrue */
+			bool  m_isSlideBackAllowed = false;
 		};
 	}
 }

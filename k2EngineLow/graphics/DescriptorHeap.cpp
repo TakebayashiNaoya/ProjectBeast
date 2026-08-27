@@ -23,7 +23,13 @@ namespace nsK2EngineLow {
 	}
 	void DescriptorHeap::Release()
 	{
+		if (m_descriptorHeap) {
+			g_numDescriptorHeapLive--;
+		}
 		ReleaseD3D12Object(m_descriptorHeap);
+		// 解放キューに積んだポインタを持ち続けると、二重Releaseで二重に
+		// キューへ積んでしまうためここでクリアする
+		m_descriptorHeap = nullptr;
 	}
 	void DescriptorHeap::CommitSamperHeap()
 	{
@@ -40,6 +46,7 @@ namespace nsK2EngineLow {
 			MessageBox(nullptr, L"DescriptorHeap::Commit ディスクリプタヒープの作成に失敗しました。", L"エラー", MB_OK);
 			std::abort();
 		}
+		g_numDescriptorHeapLive++;
 
 
 		for (int bufferNo = 0; bufferNo < 2; bufferNo++) {
@@ -55,6 +62,10 @@ namespace nsK2EngineLow {
 
 	}
 	int g_numDescriptorHeap = 0;
+	// いま生きているシェーダー可視CBV_SRV_UAVヒープの数。
+	// ドライバにはシェーダー可視ヒープの総数上限があり（実測で4500前後）、
+	// 超えると CreateDescriptorHeap が失敗する。上限監視用
+	int g_numDescriptorHeapLive = 0;
 	void DescriptorHeap::Commit()
 	{
 		Release();
@@ -68,7 +79,12 @@ namespace nsK2EngineLow {
 
 		auto hr = d3dDevice->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_descriptorHeap));
 		g_numDescriptorHeap++;
+		if (SUCCEEDED(hr)) {
+			g_numDescriptorHeapLive++;
+		}
 		if (FAILED(hr)) {
+			// Write the device removed reason and DRED info before aborting.
+			g_graphicsEngine->ReportDeviceRemoved("DescriptorHeap::Commit CreateDescriptorHeap failed");
 			MessageBox(nullptr, L"DescriptorHeap::Commit ディスクリプタヒープの作成に失敗しました。", L"エラー", MB_OK);
 			std::abort();
 		}

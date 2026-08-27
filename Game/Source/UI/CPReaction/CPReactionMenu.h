@@ -1,7 +1,6 @@
 /**
  * @file CPReactionMenu.h
  * @brief 子ペンギンのリアクションUIクラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Menu.h"
@@ -59,6 +58,20 @@ namespace app
 			 */
 			void PlayUIAnimation(const EnCPReactionType type, const actor::EnChildPenguinType cpType);
 
+			/**
+			 * @brief 吹き出し色を直接指定してリアクションを開始する
+			 * @detail 子ペンギン以外（シロクマの「？」「！」）用。SEは鳴らさない。
+			 * @param type リアクションのタイプ
+			 * @param bubbleColor 吹き出しの色
+			 */
+			void PlayUIAnimationWithColor(const EnCPReactionType type, const Vector4& bubbleColor);
+
+			/**
+			 * @brief 表示中のリアクションを即座に終了する
+			 * @detail 「？」を出している子が親を見つけた瞬間に消すために使う
+			 */
+			void ForceFinish();
+
 
 		public:
 			/**
@@ -112,6 +125,10 @@ namespace app
 			UIIcon* m_troubleReaction;
 			/** 喜び */
 			UIIcon* m_happyReaction;
+			/** はてな（音に気づいた） */
+			UIIcon* m_questionReaction;
+			/** びっくり（見つけた） */
+			UIIcon* m_exclamationReaction;
 
 			/** リアクションのタイプ */
 			EnCPReactionType m_type;

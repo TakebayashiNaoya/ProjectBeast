@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastMeshParts.h
  * @brief トライアングルカリング対応メッシュパーツクラス
- * @author 竹林
  */
 #pragma once
 

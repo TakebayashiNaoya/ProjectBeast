@@ -1,7 +1,6 @@
 ﻿/**
  * @file SubCameraManager.h
  * @brief サブカメラの管理を行うクラス
- * @author 竹林
  */
 #pragma once
 #include <functional>

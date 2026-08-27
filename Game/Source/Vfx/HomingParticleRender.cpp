@@ -1,7 +1,6 @@
 ﻿/**
  * @file HomingParticleRender.cpp
  * @brief ターゲット座標へ向かって移動するパーティクルレンダラー
- * @author 忽那
  */
 #include "stdafx.h"
 #include "HomingParticleRender.h"

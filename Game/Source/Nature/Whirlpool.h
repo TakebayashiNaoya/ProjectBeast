@@ -1,7 +1,6 @@
 ﻿/**
  * @file Whirlpool.h
  * @brief 渦潮のクラス
- * @author 藤谷、竹林
  */
 #pragma once
 #include "IObject.h"

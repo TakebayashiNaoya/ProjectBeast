@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinStateMachine.h
  * @brief 親ペンギンのステートマシン
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/PenguinStateMachine.h"
@@ -25,8 +24,13 @@ namespace app
 			// ここに親ペンギン固有のセッター関数を追加していく
 		public:
 			/**
-			 * @brief 命令（トグル）を出すかどうかを設定
+			 * @brief 命令（Yボタン）を出すかどうかを設定
 			 * @param isCommandToggle 命令を出すかどうか
+			 * @note Yボタンの中身は「待機・追従の切り替え」から
+			 *       「散った子ペンギンの再集合を呼びかける」へ変わっている
+			 *       （DaddyPenguinCommandShoutState::Enter()）。
+			 *       ボタンから鳴き声ステートへ繋ぐ配線としては役割が変わっていないため、
+			 *       名前はそのままにしてある。
 			 */
 			inline void SetIsCommandToggle(const bool isCommandToggle)
 			{

@@ -1,7 +1,6 @@
 ﻿/**
  * @file ChildPenguinStateMachine.h
  * @brief 子ペンギンのステートマシン
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/PenguinStateMachine.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file SearchMenu.cpp
  * @brief シロクマがプレイヤーを見つけるか見つけないかの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "SearchMenu.h"

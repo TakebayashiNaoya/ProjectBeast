@@ -1,7 +1,6 @@
 ﻿/**
  * @file JsonLoadingInfomation.cpp
  * @brief jsonファイルの読み込みに使用する
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "JsonConverter.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file ShadowMap.h
  * @brief カスケードシャドウマップクラス
- * @author 竹林尚哉
  */
 #pragma once
 

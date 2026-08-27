@@ -1,7 +1,6 @@
 ﻿/**
  * @file ScorePopupAnimStatus.h
  * @brief スコア加算ポップアップ専用のアニメーションステータスクラス
- * @author 立山
  */
 #pragma once
 #include "UIAnimationStatus.h"

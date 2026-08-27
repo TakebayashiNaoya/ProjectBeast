@@ -1,7 +1,6 @@
 ﻿/**
  * @file ShadowMap.cpp
  * @brief カスケードシャドウマップクラスの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "Graphics/Shadow/ShadowMap.h"

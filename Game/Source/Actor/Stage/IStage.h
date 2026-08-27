@@ -1,7 +1,6 @@
 ﻿/**
  * @file IStage.h
  * @brief ステージの基底クラス
- * @author 藤谷
  */
 #pragma once
 #include "../../../BeastEngine/Physics/PhysicalBody.h"

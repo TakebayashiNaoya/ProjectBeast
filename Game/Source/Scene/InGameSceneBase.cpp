@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameSceneBase.cpp
  * @brief インゲームシーン基底クラス
- * @author 立山、竹林
  */
 #include "stdafx.h"
 #include "InGameSceneBase.h"
@@ -46,6 +45,9 @@
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
 
+#include <thread>
+
+#include "Source/Effect/DecalManager.h"
 #include "Source/Nature/Ocean.h"
 #include "Source/Nature/WhirlpoolManager.h"
 
@@ -59,6 +61,152 @@ namespace
 
 	/** FINISH演出に合わせたBGMフェードアウト時間（秒） */
 	constexpr float FINISH_BGM_FADE_DURATION = 3.0f;
+
+	/** 足跡デカールのロード中ウォームアップで1フレームに初期化する枚数。
+	 *  1枚8ms前後かかるため、ロード画面のアニメが固まらない程度に刻む */
+	constexpr int DECAL_PREWARM_PER_FRAME = 6;
+
+	/** ミニマップアイコンのロード中分割生成で1フレームに作る個数。
+	 *  アイコンはフィーバー予約分も含め数百個あり、一括生成は1秒以上フレームが止まる */
+	constexpr int MAP_ICON_INIT_PER_FRAME = 16;
+
+	/** ロードフェーズ名（LoadPhase の並び順と一致させること。ロード時間トレース用） */
+	constexpr const char* LOAD_PHASE_NAMES[] = {
+		"None", "Stage", "StageWait", "DecalPrewarm", "Daddy",
+		"Children", "Enemy", "Camera", "Ocean", "MapIcon", "Done"
+	};
+
+	/** ロードの1フレームがこの時間を超えたらトレースへ記録する（ミリ秒）。
+	 *  ローディングアイコンはフレームが回らないと止まるため、犯人特定に使う */
+	constexpr double LOAD_TICK_LOG_THRESHOLD_MS = 50.0;
+
+	//============================================//
+	// 衝撃演出のつまみ（BattleManager::NotifyImpact の受け口で使う）
+	//
+	// 揺れは 2026-08-25 の酔い対策で全体を一段下げてある。
+	// 揺れ自体も滑らかなノイズ方式（GameCamera::StartShake）に変更済み。
+	//============================================//
+
+	/** 咆哮の画面演出を出す最大距離。
+	 *  遠くの無関係な咆哮で画面がボケると理不尽なため、ここより遠い咆哮は無視する */
+	constexpr float ROAR_EFFECT_MAX_DISTANCE = 900.0f;
+	/** 咆哮のラジアルブラーの長さ・ピークまでの時間・最小強度（秒／秒／0〜1） */
+	constexpr float ROAR_BLUR_DURATION = 1.0f;
+	constexpr float ROAR_BLUR_ATTACK_TIME = 0.3f;
+	constexpr float ROAR_BLUR_MIN_STRENGTH = 0.3f;
+	/** 咆哮の画面揺れ（至近時の最大振幅・秒）。ラジアルブラーも重なるため特に控えめ */
+	constexpr float ROAR_SHAKE_STRENGTH = 6.0f;
+	constexpr float ROAR_SHAKE_DURATION = 0.4f;
+
+	/** かまくら崩壊の画面揺れ（振幅・秒） */
+	constexpr float IGLOO_BREAK_SHAKE_STRENGTH = 10.0f;
+	constexpr float IGLOO_BREAK_SHAKE_DURATION = 0.4f;
+
+	/** 弾き返しのヒットストップ（時間倍率・実時間秒）と画面揺れ（振幅・秒） */
+	constexpr float NULLIFY_HITSTOP_SCALE = 0.4f;
+	constexpr float NULLIFY_HITSTOP_DURATION = 0.15f;
+	constexpr float NULLIFY_SHAKE_STRENGTH = 8.0f;
+	constexpr float NULLIFY_SHAKE_DURATION = 0.25f;
+
+	/** ウルト発動のヒットストップ（時間倍率・実時間秒） */
+	constexpr float ULT_HITSTOP_SCALE = 0.4f;
+	constexpr float ULT_HITSTOP_DURATION = 0.3f;
+	/** ウルト発動のラジアルブラー（強度・ピークまでの時間・長さ）。強さは咆哮の半分程度に抑える */
+	constexpr float ULT_BLUR_STRENGTH = 0.5f;
+	constexpr float ULT_BLUR_ATTACK_TIME = 0.12f;
+	constexpr float ULT_BLUR_DURATION = 0.5f;
+	/** ウルト発動のパンチイン（詰める割合・秒） */
+	constexpr float ULT_PUNCH_IN_AMOUNT = 0.07f;
+	constexpr float ULT_PUNCH_IN_DURATION = 0.3f;
+
+	/**
+	 * @brief BGMのWAVをバックグラウンドで先読みしてOSのファイルキャッシュへ乗せる
+	 * @details インゲームBGM(16MB)は初回再生の同期ロードでロード画面末尾を約1.3秒止め、
+	 *          フィーバーBGM(30MB)はフィーバー開始をカクつかせる。
+	 *          ロード開始と同時に純粋なファイル読みだけを別スレッドで済ませておけば、
+	 *          本番の同期ロードはキャッシュヒットになり一瞬で終わる。
+	 *          エンジンには一切触れないのでスレッド安全。プロセスにつき1回でよい
+	 */
+	void PrefetchBgmFiles()
+	{
+		static bool s_isPrefetched = false;
+		if (s_isPrefetched) return;
+		s_isPrefetched = true;
+
+		std::thread([] {
+			const char* paths[] = {
+				"Assets/sound/BGM/inGame.wav",
+				"Assets/sound/BGM/FeverTime.wav",
+			};
+			std::vector<char> buffer;
+			for (const char* path : paths)
+			{
+				FILE* fp = nullptr;
+				if (fopen_s(&fp, path, "rb") != 0 || fp == nullptr) continue;
+				fseek(fp, 0, SEEK_END);
+				const long size = ftell(fp);
+				fseek(fp, 0, SEEK_SET);
+				if (size > 0)
+				{
+					buffer.resize(static_cast<size_t>(size));
+					fread(buffer.data(), 1, buffer.size(), fp);
+				}
+				fclose(fp);
+			}
+		}).detach();
+	}
+
+	/** ステージ紹介動画の撮影モード（環境変数 BEAST_SHOWCASE=Easy|Normal|Hard）が有効かどうか。
+	 *  UIを消してショーケースカメラで周回し、一定時間で自動終了する */
+	bool IsShowcaseEnabled()
+	{
+		char buf[16];
+		size_t len = 0;
+		return getenv_s(&len, buf, sizeof(buf), "BEAST_SHOWCASE") == 0 && len > 0;
+	}
+
+	/** 撮影モードの自動終了時間（秒）。ループ検出用に2周分（66秒）撮る余白を含む。
+	 *  環境変数 BEAST_SHOWCASE_TIME（秒）で上書きできる（観察デバッグ用に長くする等） */
+	float GetShowcaseQuitTime()
+	{
+		char buf[16];
+		size_t len = 0;
+		if (getenv_s(&len, buf, sizeof(buf), "BEAST_SHOWCASE_TIME") == 0 && len > 0)
+		{
+			const float t = static_cast<float>(atof(buf));
+			if (t > 0.0f) return t;
+		}
+		return 90.0f;
+	}
+
+	/** 親ペンギンのスポーン時に地面から浮かせる高さ。
+	 *  カウントダウン中は物理が止まるため、ほぼ接地した高さに置く */
+	constexpr float DADDY_SPAWN_GROUND_OFFSET = 2.0f;
+
+	// デバイスロスト調査用の一時計測。VRAM使用量を Logs/vram_trace.txt へ追記する。
+	// ゲームループの周回でVRAMが積み上がっていないかをステージの開始・終了時点で比較する
+	void LogVramUsage(const char* tag)
+	{
+		double usageMB = 0.0;
+		double budgetMB = 0.0;
+		g_graphicsEngine->QueryVideoMemoryMB(usageMB, budgetMB);
+
+		char buf[512];
+		sprintf_s(buf, "[VRAM] %-16s usage %.1f MB / budget %.1f MB heaps %d\n",
+			tag, usageMB, budgetMB, nsK2EngineLow::g_numDescriptorHeapLive);
+		OutputDebugStringA(buf);
+
+		FILE* fp = nullptr;
+		fopen_s(&fp, "Logs/vram_trace.txt", "a");
+		if (fp)
+		{
+			SYSTEMTIME st;
+			GetLocalTime(&st);
+			fprintf(fp, "%04d-%02d-%02d %02d:%02d:%02d %s",
+				st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, buf);
+			fclose(fp);
+		}
+	}
 }
 
 namespace app
@@ -80,6 +228,12 @@ namespace app
 		delete m_daddyPenguin;
 		actor::EnemyManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
+
+		/** デカールの後始末。StageSystem（地形）の破棄より前に行うこと。
+		 *  デカールは地形ハイトマップのSRVを持っているため、地形破棄後に
+		 *  描画されると解放済みテクスチャをGPUが読んでデバイスハングする */
+		effect::DecalManager::Get().OnStageChanged();
+
 		actor::StageSystem::DestroyInstance();
 		nature::WhirlpoolManager::DestroyInstance();
 		actor::IglooManager::DestroyInstance();
@@ -116,11 +270,21 @@ namespace app
 		/** 2周目以降のために GameCamera の登録を解除する。
 		 *  次の LoadPhase::Camera で新しいインスタンスを Register できるようにする。 */
 		camera::CameraManager::Get().Unregister(camera::GameCamera::ID());
+		camera::CameraManager::Get().Unregister(camera::ShowcaseCamera::ID());
+
+		// デバイスロスト調査：シーン破棄後のVRAM使用量を記録する
+		// （D3D12オブジェクトは1フレーム遅延解放なので、実際の解放は次フレーム反映）
+		LogVramUsage("scene end");
 	}
 
 
 	bool InGameSceneBase::Start()
 	{
+		// デバイスロスト調査：ステージ開始時点のVRAM使用量を記録する
+		char vramTag[128];
+		sprintf_s(vramTag, "start %s", GetStageJsonPath());
+		LogVramUsage(vramTag);
+
 		/** マネージャー生成 */
 		app::core::ParameterManager::CreateInstance();
 		BattleManager::CreateInstance();
@@ -129,8 +293,16 @@ namespace app
 		FeverTimeManager::CreateInstance();
 
 		/** ステージ固有の制限時間を設定する */
-		TimeManager::GetInstance().SetMaxTime(GetTimeLimit());
+		/** 撮影・観察モード中は制限時間を実質無効化する
+		 *  （観察が長引いてもFINISHで打ち切られないように） */
+		TimeManager::GetInstance().SetMaxTime(IsShowcaseEnabled() ? 6000.0f : GetTimeLimit());
 		TimeManager::GetInstance().ResetTime();
+
+		/** リザルトでのハイスコア保存先として、プレイ中のステージ名を控えておく */
+		ScoreManager::SetLastPlayedStage(GetStageName());
+
+		/** BGMのWAV先読みを開始する（ロード末尾とフィーバー開始の同期ロード対策） */
+		PrefetchBgmFiles();
 
 		/** フィーバータイムの設定を読み込む */
 		FeverTimeManager::GetInstance()->Start(GetFeverParameterJsonPath());
@@ -163,9 +335,47 @@ namespace app
 
 	void InGameSceneBase::Update()
 	{
+		/** ステージ紹介動画の撮影モード：ロード完了を合図ファイルで知らせ、
+		 *  UIを消して一定時間後に自動終了する（キャプチャスクリプトが合図を待つ） */
+		if (IsShowcaseEnabled() && IsLoaded())
+		{
+			if (!m_isShowcaseStarted)
+			{
+				m_isShowcaseStarted = true;
+				nsBeastEngine::g_renderingEngine->Set2DRenderEnabled(false);
+
+				/** カウントダウンを飛ばしてすぐ世界を動かす。
+				 *  物理停止中の「宙に浮いた絵」を映さないため。
+				 *  通常の遷移（CountDown終了時）と同じ有効化を行う */
+				m_gamePhase = GamePhase::Playing;
+				BattleManager::GetInstance().SetIsActive(true);
+
+				FILE* fp = nullptr;
+				fopen_s(&fp, "Logs/showcase_ready.txt", "w");
+				if (fp)
+				{
+					fprintf(fp, "%s\n", GetStageName());
+					fclose(fp);
+				}
+			}
+
+			m_showcaseTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_showcaseTimer >= GetShowcaseQuitTime())
+			{
+				PostQuitMessage(0);
+				return;
+			}
+		}
+
 		//------------------------------------------------------------
 		// ロードフェーズ
 		//------------------------------------------------------------
+		// ロード中に1フレームを長時間ブロックしたフェーズを記録する
+		// （ローディングアイコンが止まる原因の特定用）
+		const LoadPhase tickPhase = m_loadPhase;
+		LARGE_INTEGER tickBegin;
+		QueryPerformanceCounter(&tickBegin);
+
 		switch (m_loadPhase)
 		{
 		case LoadPhase::Stage:
@@ -187,6 +397,10 @@ namespace app
 			system->Update();
 			if (system->IsAllLoaded())
 			{
+				/** イグルー・クマの巣を実際の地形メッシュの高さへ接地させる
+				 *  （配置JSONのYは生成スクリプトの近似値なので、ここで正確な高さに直す） */
+				system->SnapObjectsToTerrain();
+
 				// イグルーとクマの巣の数をミニマップへ登録
 				const uint8_t iglooCount = system->GetNumbaringObjectCount("igloo");
 				const uint8_t bearHomeCount = system->GetNumbaringObjectCount("bearHome");
@@ -194,6 +408,18 @@ namespace app
 				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Igloo, iglooCount);
 				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::BearNest, bearHomeCount);
 
+				m_loadPhase = LoadPhase::DecalPrewarm;
+			}
+			break;
+		}
+
+		case LoadPhase::DecalPrewarm:
+		{
+			/** 足跡デカールの全スロットを今の地形で事前初期化する。
+			 *  プレイ中の初回スポーンに任せると1枚8ms前後の初期化がヒッチになるため、
+			 *  ロード中に少しずつ済ませる（一括だと約2秒ロード画面が固まる） */
+			if (effect::DecalManager::Get().PrewarmPoolsStep(DECAL_PREWARM_PER_FRAME))
+			{
 				m_loadPhase = LoadPhase::Daddy;
 			}
 			break;
@@ -202,7 +428,17 @@ namespace app
 		case LoadPhase::Daddy:
 		{
 			m_daddyPenguin = new actor::DaddyPenguin();
-			m_daddyPenguin->SetPosition(GetDaddySpawnPos());
+
+			/** スポーン地点を地面へ吸着させる。
+			 *  イグルーと同じく、描画メッシュと同一の高さ場（GetHeightAt）を使う。
+			 *  物理レイキャストはコリジョン登録タイミングに依存して外れることがあり、
+			 *  外れると高いYのままカウントダウン中（物理停止）に宙に浮いて見える */
+			Vector3 daddySpawnPos = GetDaddySpawnPos();
+			if (auto* terrain = actor::StageSystem::GetInstance()->GetTerrain())
+			{
+				daddySpawnPos.y = terrain->GetHeightAt(daddySpawnPos) + DADDY_SPAWN_GROUND_OFFSET;
+			}
+			m_daddyPenguin->SetPosition(daddySpawnPos);
 			m_daddyPenguin->StartWrapper();
 
 			// DaddyPenguinをディザリングのプレイヤーターゲットとして登録する
@@ -291,6 +527,19 @@ namespace app
 			auto gameCamera = std::make_shared<camera::GameCamera>();
 			camera::CameraManager::Get().Register(camera::GameCamera::ID(), gameCamera);
 			camera::CameraManager::Get().SwitchCamera(camera::GameCamera::ID());
+
+			/** 衝撃演出（揺れ・ブラー・ヒットストップ）の受け口を用意する。
+			 *  カメラの生成後でないと登録しても揺らす相手がいない */
+			RegisterImpactObserver();
+
+			/** ステージ紹介動画の撮影モードでは、外周を周回するショーケースカメラに切り替える */
+			if (IsShowcaseEnabled())
+			{
+				auto showcaseCamera = std::make_shared<camera::ShowcaseCamera>();
+				camera::CameraManager::Get().Register(camera::ShowcaseCamera::ID(), showcaseCamera);
+				camera::CameraManager::Get().SwitchCamera(camera::ShowcaseCamera::ID());
+			}
+
 			m_loadPhase = LoadPhase::Ocean;
 			break;
 		}
@@ -314,8 +563,21 @@ namespace app
 				GetWhirlpoolParameterBinaryPath()
 			);
 
-			const uint8_t whirlpoolCount = nature::WhirlpoolManager::GetInstance()->GetWhirlpoolCountMax();
-			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Whirlpool, whirlpoolCount);
+			InGameUIManager::GetInstance()->SetMiniMapIconNum(
+				ui::EnMiniMapIconType::Whirlpool,
+				nature::WhirlpoolManager::GetInstance()->GetWhirlpoolCountMax());
+
+			m_loadPhase = LoadPhase::MapIcon;
+			break;
+		}
+
+		case LoadPhase::MapIcon:
+		{
+			/** ミニマップのアイコン生成を分割実行する（一括だと1.3秒フレームが止まる） */
+			if (!InGameUIManager::GetInstance()->InitializeMapIconStep(MAP_ICON_INIT_PER_FRAME))
+			{
+				break;
+			}
 
 			m_loadPhase = LoadPhase::Done;
 
@@ -326,8 +588,6 @@ namespace app
 				SoundManager::Get().PlayBGM(enSoundKind_InGame, 0.5f);
 			}
 
-			InGameUIManager::GetInstance()->InitializeMapIcon();
-
 			/** どの配合・どのステージ設定で取ったログなのかをログ自身に残す。
 			 *  配合違いのセッションを比較するとき、これが無いとログだけでは区別できない */
 			if (auto* lm = GameLogManager::GetInstance())
@@ -335,6 +595,7 @@ namespace app
 				const PenguinSpawnConfig cfg = GetPenguinConfig();
 				auto* em = actor::EnemyManager::GetInstance();
 				auto* fever = FeverTimeManager::GetInstance();
+				const uint8_t whirlpoolCount = nature::WhirlpoolManager::GetInstance()->GetWhirlpoolCountMax();
 				lm->SetStageConfig({
 					{ "serious",          cfg.serious },
 					{ "clingy",           cfg.clingy },
@@ -353,6 +614,7 @@ namespace app
 			OnLoadComplete();
 			break;
 		}
+
 		case LoadPhase::Done:
 		{
 			/** ポーズ終了後の初回フレームでポーズ入場フラグとサブビューをリセットする
@@ -369,6 +631,89 @@ namespace app
 		default:
 			break;
 		}
+
+		if (tickPhase != LoadPhase::Done && tickPhase != LoadPhase::None)
+		{
+			LARGE_INTEGER tickEnd, tickFreq;
+			QueryPerformanceCounter(&tickEnd);
+			QueryPerformanceFrequency(&tickFreq);
+			const double tickMs =
+				1000.0 * (tickEnd.QuadPart - tickBegin.QuadPart) / tickFreq.QuadPart;
+			if (tickMs > LOAD_TICK_LOG_THRESHOLD_MS)
+			{
+				FILE* fp = nullptr;
+				if (fopen_s(&fp, "Logs/load_trace.txt", "a") == 0 && fp)
+				{
+					fprintf(fp, "%s %s: %.0f ms\n",
+						GetStageName(), LOAD_PHASE_NAMES[static_cast<int>(tickPhase)], tickMs);
+					fclose(fp);
+				}
+			}
+		}
+	}
+
+
+	void InGameSceneBase::RegisterImpactObserver()
+	{
+		BattleManager::GetInstance().SetOnImpact(
+			[](EnImpactType type, const Vector3& worldPosition)
+			{
+				auto& postEffect = nsBeastEngine::g_renderingEngine->GetPostEffectManager();
+				auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+					camera::GameCamera::ID()
+				);
+
+				switch (type)
+				{
+				case EnImpactType::BearRoar:
+				{
+					/** プレイヤーから遠い咆哮ほど弱め、一定距離より遠ければ何も出さない */
+					Vector3 toDaddy = worldPosition
+						- actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
+					toDaddy.y = 0.0f;
+					const float distance = toDaddy.Length();
+					if (distance > ROAR_EFFECT_MAX_DISTANCE) return;
+
+					const float closeness = 1.0f - (distance / ROAR_EFFECT_MAX_DISTANCE);
+					const float blurStrength =
+						ROAR_BLUR_MIN_STRENGTH + (1.0f - ROAR_BLUR_MIN_STRENGTH) * closeness;
+
+					postEffect.GetRadialBlur().Start(
+						blurStrength, ROAR_BLUR_ATTACK_TIME, ROAR_BLUR_DURATION);
+					if (gameCamera)
+					{
+						gameCamera->StartShake(ROAR_SHAKE_STRENGTH * closeness, ROAR_SHAKE_DURATION);
+					}
+					break;
+				}
+
+				case EnImpactType::IglooBreak:
+					if (gameCamera)
+					{
+						gameCamera->StartShake(IGLOO_BREAK_SHAKE_STRENGTH, IGLOO_BREAK_SHAKE_DURATION);
+					}
+					break;
+
+				case EnImpactType::BearNullified:
+					g_gameTime->StartSlowMotion(NULLIFY_HITSTOP_SCALE, NULLIFY_HITSTOP_DURATION);
+					if (gameCamera)
+					{
+						gameCamera->StartShake(NULLIFY_SHAKE_STRENGTH, NULLIFY_SHAKE_DURATION);
+					}
+					break;
+
+				case EnImpactType::UltActivate:
+					g_gameTime->StartSlowMotion(ULT_HITSTOP_SCALE, ULT_HITSTOP_DURATION);
+					postEffect.GetRadialBlur().Start(
+						ULT_BLUR_STRENGTH, ULT_BLUR_ATTACK_TIME, ULT_BLUR_DURATION);
+					if (gameCamera)
+					{
+						gameCamera->StartPunchIn(ULT_PUNCH_IN_AMOUNT, ULT_PUNCH_IN_DURATION);
+					}
+					break;
+				}
+			}
+		);
 	}
 
 
@@ -477,7 +822,12 @@ namespace app
 
 			BattleManager::GetInstance().Update();
 			TimeManager::GetInstance().Update();
-			FeverTimeManager::GetInstance()->Update();
+
+			/** 撮影モード中はフィーバーを発動させない（紹介動画が突然ピンクになるため） */
+			if (!IsShowcaseEnabled())
+			{
+				FeverTimeManager::GetInstance()->Update();
+			}
 
 			app::achievement::AchievementManager::GetInstance()->Update();
 

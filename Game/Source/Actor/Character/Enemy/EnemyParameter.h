@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyParameter.h
  * @brief エネミーのパラメーター管理
- * @author 立山
  */
 #pragma once
 #include "Source/Actor/Character/CharacterParameter.h"

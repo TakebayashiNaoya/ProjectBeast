@@ -1,7 +1,6 @@
 ﻿/**
  * @file CPReactionStatus.h
  * @brief CPReactionのステータス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Model/UIStatus.h"

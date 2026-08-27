@@ -58,7 +58,8 @@ PSInput VSMain(VSInput In)
 /////////////////////////////////////////////////////////
 /*!
  * @brief 輝度抽出ピクセルシェーダー
- * @details luminanceThreshold を超える明るさのピクセルのみを出力する
+ * @details luminanceThreshold を超える明るさのピクセルについて、
+ *          しきい値の超過分だけをブルームに回す
  */
 float4 PSSamplingLuminance(PSInput In) : SV_Target0
 {
@@ -69,6 +70,11 @@ float4 PSSamplingLuminance(PSInput In) : SV_Target0
 
     // しきい値未満のピクセルを破棄する
     clip(t - luminanceThreshold);
+
+    // しきい値をわずかに超えただけのピクセル（半透明の重なりで輝度が
+    // 積み上がった煙など）がフルパワーで光らないよう、色全体ではなく
+    // 超過分だけを通す。輝度1.6の煙は約6%、狙われ点滅の赤(2.5)は40%通る
+    color.xyz *= (t - luminanceThreshold) / max(t, 0.001f);
 
     return color;
 }

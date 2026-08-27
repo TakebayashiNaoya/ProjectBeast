@@ -1,11 +1,11 @@
 ﻿/**
  * @file TerrainObject.h
  * @brief ハイトマップから生成する地形オブジェクト
- * @author 竹林
  */
 #pragma once
 #include "Physics/PhysicalBody.h"
 #include "Source/Actor/Actor.h"
+#include "Source/Actor/Stage/StageNavGrid.h"
 
 
 namespace app
@@ -36,8 +36,8 @@ namespace app
 				float minHeight = 0.0f;     ///< この高さ未満の頂点を含むクワッドはポリゴンを生成しない（ワールド単位）
 				int   chunkDivision = 8;      ///< フラスタムカリング用チャンク分割数（縦横共通）
 				nsBeastEngine::PBRParam pbrParam;  ///< PBR補正パラメータ（ModelRender::SetPBRParam に渡す）
-				std::wstring heightmapPath = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";  ///< ハイトマップ DDS パス
-				std::wstring splatmapPath = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";   ///< スプラットマップ DDS パス
+				std::wstring heightmapPath = L"Assets/modelData/stage/Terrain/NormalStageHeightMap.dds";  ///< ハイトマップ DDS パス
+				std::wstring splatmapPath = L"Assets/modelData/stage/Terrain/NormalStageSplatMap.dds";   ///< スプラットマップ DDS パス
 			};
 
 			/**
@@ -57,10 +57,23 @@ namespace app
 			~TerrainObject();
 
 			/**
-			 * @brief 地形を初期化する
+			 * @brief 地形を初期化する（一括版）
+			 * @details InitStep() を完了まで回す。デバッグのホットリロード用。
 			 * @param config 地形パラメータ（省略時はデフォルト値）
 			 */
 			void Init(const TerrainConfig& config = {});
+
+			/**
+			 * @brief 地形の初期化を分割実行する
+			 * @details ロード画面のフレームを止めないため、テクスチャ1枚・チャンク数個などの
+			 *          小さな単位で1回分だけ進める。ロード中に毎フレーム呼ぶ。
+			 * @param config 地形パラメータ（初回呼び出しのものが使われる）
+			 * @return 初期化が完了していればtrue
+			 */
+			bool InitStep(const TerrainConfig& config);
+
+			/** @brief 初期化が完了しているか */
+			bool IsInited() const { return m_isInited; }
 
 			/** @brief 地表の種類（スプラットマップのR/G/Bに対応。R=雪, G=草, B=岩） */
 			enum class SurfaceType
@@ -87,6 +100,14 @@ namespace app
 
 			/** @brief 足跡デカールが地形の高さをGPU上でサンプリングするためのハイトマップテクスチャを取得する */
 			nsK2EngineLow::Texture& GetHeightmapTextureGpu() { return m_heightmapTextureGpu; }
+
+			/**
+			 * @brief 歩行可否グリッド（簡易ナビゲーション）を取得する
+			 * @details 地形生成時にハイトマップから自動構築される。
+			 *          到達性チェックとフローフィールドに使う。
+			 * @return 歩行可否グリッドの参照
+			 */
+			StageNavGrid& GetNavGrid() { return m_navGrid; }
 
 			// ★追加: デカール側でワールド座標→UV変換をするために必要な値を公開する
 			float GetHalfWidth()   const { return m_terrainCb.halfWidth; }
@@ -130,8 +151,23 @@ namespace app
 			/** HeightmapData からチャンク別 TkmFile を構築し、バンクに登録する */
 			void GenerateMesh();
 
-			/** テクスチャをロードし ModelRender を初期化する */
-			void InitRenderer();
+			/** @brief ModelInitData に地形共通のテクスチャ・定数バッファを設定する */
+			void SetupModelInitData(nsK2EngineLow::ModelInitData& initData, const char* tkmKey);
+
+			/**
+			 * @brief 地形テクスチャを1枚だけ読み込む（分割初期化用）
+			 * @return 全て読み終えたらtrue
+			 */
+			bool InitRendererTextureStep();
+
+			/** @brief 物理コリジョン用モデルと当たり判定を構築する */
+			void InitRendererPhysics();
+
+			/**
+			 * @brief チャンク別ModelRenderを時間予算内で数個ずつ初期化する
+			 * @return 全て終えたらtrue
+			 */
+			bool InitRendererChunkStep();
 
 		private:
 			HeightmapData           m_heightmap;
@@ -155,10 +191,18 @@ namespace app
 
 			nsBeastEngine::nsCollision::PhysicalBody m_physicalBody;  // 当たり判定
 
+			/** 歩行可否グリッド（ハイトマップから自動構築する簡易ナビゲーション） */
+			StageNavGrid m_navGrid;
+
 			TerrainConfig m_config;		// 地形生成パラメータ
 			TerrainCb     m_terrainCb;	// 地形定数バッファ（b1 レジスタ）
 
 			bool m_isInited = false;	// 初期化済みフラグ
+
+			// 分割初期化（InitStep）の進行状態
+			int m_initStep = 0;         // 現在の大ステップ
+			int m_textureInitIndex = 0; // テクスチャ読み込みの進行位置
+			int m_chunkInitIndex = 0;   // チャンク初期化の進行位置
 
 			// シェーダーでサンプリングするためのGPUテクスチャは別途フル解像度で持つ
 			nsK2EngineLow::Texture m_heightmapTextureGpu;

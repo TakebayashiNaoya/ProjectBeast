@@ -1,7 +1,6 @@
 ﻿/**
  * @file RemaingAnimStatus.h
  * @brief 子ペンギンの救助数と総数のアニメーションステータスクラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Animation/UIAnimationFactory.h"

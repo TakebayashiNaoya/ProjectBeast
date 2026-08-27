@@ -1,7 +1,6 @@
 ﻿/**
  * @file TerrainObject.cpp
  * @brief ハイトマップから生成する地形オブジェクト
- * @author 竹林
  */
 #include "stdafx.h"
 #include "DirectXTex/DirectXTex.h"
@@ -11,9 +10,9 @@
 namespace
 {
 	/** ハイトマップ */
-	static const wchar_t* HEIGHTMAP_PATH = L"Assets/modelData/stage/Terrain/TutorialStageHeightMap.dds";
+	static const wchar_t* HEIGHTMAP_PATH = L"Assets/modelData/stage/Terrain/NormalStageHeightMap.dds";
 	/** スプラットマップ */
-	static const wchar_t* SPLATMAP_PATH = L"Assets/modelData/stage/Terrain/TutorialStageSplatMap.dds";
+	static const wchar_t* SPLATMAP_PATH = L"Assets/modelData/stage/Terrain/NormalStageSplatMap.dds";
 
 	/** エンジン内バンクに登録する際のキー（ファイルパスの代わりに使う合成キー） */
 	static const char* TERRAIN_TKM_KEY = "terrain_generated";
@@ -262,14 +261,50 @@ namespace app
 
 		void TerrainObject::Init(const TerrainConfig& config)
 		{
-			if (m_isInited) return;
-			m_config = config;
-			LoadHeightmap();
-			LoadSplatmapCpu();
-			GenerateMesh();
-			InitRenderer();
-			StartWrapper();
-			m_isInited = true;
+			// 一括版（デバッグのホットリロード用）。通常ロードは InitStep() を毎フレーム呼んで時分割する
+			while (!InitStep(config)) {}
+		}
+
+
+		bool TerrainObject::InitStep(const TerrainConfig& config)
+		{
+			if (m_isInited) return true;
+
+			// 各ステップを1フレーム約50ms以下に収める。まとめて実行すると
+			// 1.5秒前後フレームが止まり、ローディングアイコンが凍って見える
+			switch (m_initStep)
+			{
+			case 0:
+				m_config = config;
+				LoadHeightmap();
+				LoadSplatmapCpu();
+				m_initStep++;
+				break;
+
+			case 1:
+				GenerateMesh();
+				m_initStep++;
+				break;
+
+			case 2:
+				if (InitRendererTextureStep()) m_initStep++;
+				break;
+
+			case 3:
+				InitRendererPhysics();
+				m_initStep++;
+				break;
+
+			case 4:
+				if (InitRendererChunkStep()) m_initStep++;
+				break;
+
+			default:
+				StartWrapper();
+				m_isInited = true;
+				break;
+			}
+			return m_isInited;
 		}
 
 
@@ -392,6 +427,9 @@ namespace app
 				}
 			}
 
+			// 歩行可否グリッド（簡易ナビゲーション）を高さキャッシュから構築する
+			m_navGrid.Build(heights, W, H, m_config.totalWidth, m_config.totalDepth, m_config.yOffset);
+
 			// 物理用フルメッシュ（描画には使わず当たり判定のみ）
 			{
 				// チャンク担当範囲の頂点バッファを生成する（全頂点を使う）
@@ -472,49 +510,62 @@ namespace app
 		}
 
 
-		void TerrainObject::InitRenderer()
+		void TerrainObject::SetupModelInitData(nsK2EngineLow::ModelInitData& initData, const char* tkmKey)
 		{
-			// BaseColor
-			m_splatmap.InitFromDDSFile(m_config.splatmapPath.c_str());
-			m_heightmapTextureGpu.InitFromDDSFile(m_config.heightmapPath.c_str());
-			m_terrainTextures[0].InitFromDDSFile(TEX_PATH_SNOW);
-			m_terrainTextures[1].InitFromDDSFile(TEX_PATH_GRASS);
-			m_terrainTextures[2].InitFromDDSFile(TEX_PATH_ROCK);
+			initData.m_tkmFilePath = tkmKey;
+			initData.m_fxFilePath = "Assets/shader/Terrain.fx";
+			initData.m_expandConstantBuffer = &m_terrainCb;
+			initData.m_expandConstantBufferSize = static_cast<int>(sizeof(TerrainCb));
 
-			// PBR テクスチャ（Normal / Roughness）
-			m_snowNormal.InitFromDDSFile(TEX_PATH_SNOW_NORMAL);
-			m_snowRoughness.InitFromDDSFile(TEX_PATH_SNOW_ROUGHNESS);
-			m_grassNormal.InitFromDDSFile(TEX_PATH_GRASS_NORMAL);
-			m_grassRoughness.InitFromDDSFile(TEX_PATH_GRASS_ROUGHNESS);
-			m_rockNormal.InitFromDDSFile(TEX_PATH_ROCK_NORMAL);
-			m_rockRoughness.InitFromDDSFile(TEX_PATH_ROCK_ROUGHNESS);
+			initData.m_expandShaderResoruceView[0] = &m_splatmap;
+			initData.m_expandShaderResoruceView[1] = &m_terrainTextures[0];  // snow
+			initData.m_expandShaderResoruceView[2] = &m_terrainTextures[1];  // grass
+			initData.m_expandShaderResoruceView[3] = &m_terrainTextures[2];  // rock
+			// [4] は t14 に対応するが未使用のため nullptr のまま
+			initData.m_expandShaderResoruceView[5] = &m_snowNormal;
+			initData.m_expandShaderResoruceView[6] = &m_snowRoughness;
+			initData.m_expandShaderResoruceView[7] = &m_grassNormal;
+			initData.m_expandShaderResoruceView[8] = &m_grassRoughness;
+			initData.m_expandShaderResoruceView[9] = &m_rockNormal;
+			initData.m_expandShaderResoruceView[10] = &m_rockRoughness;
+		}
 
-			// ModelInitData の共通パラメータをセットするヘルパー
-			auto buildInitData = [&](const char* tkmKey) -> ModelInitData
-				{
-					ModelInitData initData;
-					initData.m_tkmFilePath = tkmKey;
-					initData.m_fxFilePath = "Assets/shader/Terrain.fx";
-					initData.m_expandConstantBuffer = &m_terrainCb;
-					initData.m_expandConstantBufferSize = static_cast<int>(sizeof(TerrainCb));
 
-					initData.m_expandShaderResoruceView[0] = &m_splatmap;
-					initData.m_expandShaderResoruceView[1] = &m_terrainTextures[0];  // snow
-					initData.m_expandShaderResoruceView[2] = &m_terrainTextures[1];  // grass
-					initData.m_expandShaderResoruceView[3] = &m_terrainTextures[2];  // rock
-					// [4] は t14 に対応するが未使用のため nullptr のまま
-					initData.m_expandShaderResoruceView[5] = &m_snowNormal;
-					initData.m_expandShaderResoruceView[6] = &m_snowRoughness;
-					initData.m_expandShaderResoruceView[7] = &m_grassNormal;
-					initData.m_expandShaderResoruceView[8] = &m_grassRoughness;
-					initData.m_expandShaderResoruceView[9] = &m_rockNormal;
-					initData.m_expandShaderResoruceView[10] = &m_rockRoughness;
-					return initData;
-				};
+		bool TerrainObject::InitRendererTextureStep()
+		{
+			// 1回の呼び出しで1枚だけ読む（1枚約40ms。11枚まとめると0.4秒フレームが止まる）
+			nsK2EngineLow::Texture* textures[] = {
+				&m_splatmap, &m_heightmapTextureGpu,
+				&m_terrainTextures[0], &m_terrainTextures[1], &m_terrainTextures[2],
+				&m_snowNormal, &m_snowRoughness,
+				&m_grassNormal, &m_grassRoughness,
+				&m_rockNormal, &m_rockRoughness,
+			};
+			const wchar_t* paths[] = {
+				m_config.splatmapPath.c_str(), m_config.heightmapPath.c_str(),
+				TEX_PATH_SNOW, TEX_PATH_GRASS, TEX_PATH_ROCK,
+				TEX_PATH_SNOW_NORMAL, TEX_PATH_SNOW_ROUGHNESS,
+				TEX_PATH_GRASS_NORMAL, TEX_PATH_GRASS_ROUGHNESS,
+				TEX_PATH_ROCK_NORMAL, TEX_PATH_ROCK_ROUGHNESS,
+			};
+			static_assert(_countof(textures) == _countof(paths), "テクスチャとパスの数を揃えること");
 
+			if (m_textureInitIndex < _countof(textures))
+			{
+				textures[m_textureInitIndex]->InitFromDDSFile(paths[m_textureInitIndex]);
+				m_textureInitIndex++;
+			}
+			return m_textureInitIndex >= _countof(textures);
+		}
+
+
+		void TerrainObject::InitRendererPhysics()
+		{
 			// 物理コリジョン用 ModelRender（描画には使わない）
+			nsK2EngineLow::ModelInitData initData;
+			SetupModelInitData(initData, TERRAIN_TKM_KEY);
 			m_modelRender.SetGBufferFxFilePath("Assets/shader/Terrain.fx");
-			m_modelRender.InitFromLoaded(buildInitData(TERRAIN_TKM_KEY));
+			m_modelRender.InitFromLoaded(initData);
 			m_modelRender.SetPBRParam(m_config.pbrParam);
 			m_modelRender.SetTRS(Vector3::Zero, Quaternion::Identity, Vector3::One);
 			m_modelRender.Update();
@@ -523,26 +574,48 @@ namespace app
 				m_modelRender.GetModel().GetWorldMatrix(),
 				nsBeastEngine::nsCollision::CollisionAttribute::Ground
 			);
+		}
 
-			// チャンク別 ModelRender（フラスタムカリングで描画）
+
+		bool TerrainObject::InitRendererChunkStep()
+		{
+			// チャンク別 ModelRender（フラスタムカリングで描画）。
+			// 全チャンク一括だと0.6秒前後フレームが止まるため、時間予算内で数個ずつ進める
+			constexpr double CHUNK_INIT_BUDGET_MS = 25.0;
+
 			const int numChunks = static_cast<int>(m_chunkTkmFiles.size());
-			m_chunkRenders.resize(numChunks);
-
-			for (int i = 0; i < numChunks; ++i)
+			if (m_chunkRenders.empty() && numChunks > 0)
 			{
+				m_chunkRenders.resize(numChunks);
+			}
+
+			LARGE_INTEGER freq, begin, now;
+			QueryPerformanceFrequency(&freq);
+			QueryPerformanceCounter(&begin);
+
+			while (m_chunkInitIndex < numChunks)
+			{
+				const int i = m_chunkInitIndex++;
 				if (m_chunkTkmFiles[i] == nullptr) continue;  // minHeight で全クワッドが除外されたチャンク
 
 				char key[64];
 				snprintf(key, sizeof(key), "%s_%d", TERRAIN_CHUNK_KEY_PREFIX, i);
 
+				nsK2EngineLow::ModelInitData initData;
+				SetupModelInitData(initData, key);
 				m_chunkRenders[i] = std::make_unique<nsBeastEngine::ModelRender>();
 				m_chunkRenders[i]->SetGBufferFxFilePath("Assets/shader/Terrain.fx");
-				m_chunkRenders[i]->InitFromLoaded(buildInitData(key));
+				m_chunkRenders[i]->InitFromLoaded(initData);
 				m_chunkRenders[i]->SetPBRParam(m_config.pbrParam);
 				m_chunkRenders[i]->SetTRS(Vector3::Zero, Quaternion::Identity, Vector3::One);
 				m_chunkRenders[i]->Update();
 				nsBeastEngine::OcclusionDitherManager::Get().Register(m_chunkRenders[i].get());
+
+				QueryPerformanceCounter(&now);
+				const double elapsedMs = 1000.0 * (now.QuadPart - begin.QuadPart) / freq.QuadPart;
+				if (elapsedMs > CHUNK_INIT_BUDGET_MS) break;
 			}
+			return m_chunkInitIndex >= numChunks;
 		}
 
 

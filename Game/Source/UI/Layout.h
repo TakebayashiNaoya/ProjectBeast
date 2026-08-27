@@ -1,7 +1,6 @@
 ﻿/**
  * @file Layout.h
  * @brief UIのレイアウト管理
- * @author 忽那
  */
 #pragma once
 #include "Json/json.hpp"

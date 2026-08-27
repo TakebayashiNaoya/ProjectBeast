@@ -1,7 +1,6 @@
 /*
  * @file CircleGauge.fx
  * @brief 円形ゲージシェーダー
- * @author 忽那
  */
 
 

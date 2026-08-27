@@ -1,7 +1,6 @@
 ﻿/**
  * @file CountDownMenu.h
  * @brief カウントダウンの動的処理クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"

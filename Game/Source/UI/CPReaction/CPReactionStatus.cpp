@@ -1,7 +1,6 @@
 ﻿/**
  * @file CPReactionStatus.cpp
  * @brief CPReactionのステータス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CPReactionStatus.h"

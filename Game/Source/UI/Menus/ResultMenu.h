@@ -1,7 +1,6 @@
 ﻿/**
  * @file ResultMenu.h
  * @brief リザルト画面の動的処理クラス
- * @author 立山
  */
 #pragma once
 #include "ScorePopupAnimatorMenu.h"

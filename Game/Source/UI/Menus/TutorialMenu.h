@@ -1,7 +1,6 @@
 ﻿/**
  * @file TutorialMenu.h
  * @brief チュートリアル（ルール説明）画面の動的処理クラス
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Menu.h"

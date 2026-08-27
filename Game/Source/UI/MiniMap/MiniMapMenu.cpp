@@ -1,7 +1,6 @@
 ﻿/**
  * @file MiniMapMenu.cpp
  * @brief ミニマップの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "MiniMapMenu.h"
@@ -137,6 +136,13 @@ namespace app
 
 		void MiniMapMenu::InitializeMapIcon()
 		{
+			// 一括版。通常ロードは Step 版を毎フレーム呼んで時分割する
+			while (!InitializeMapIconStep(INT_MAX)) {}
+		}
+
+
+		bool MiniMapMenu::InitializeMapIconStep(const int maxCount)
+		{
 			// ステータスから初期値を取得
 			auto position = m_miniMapStatus->GetInitPosition();
 			auto scale = m_miniMapStatus->GetInitScale();
@@ -149,55 +155,63 @@ namespace app
 			const std::string path = "Assets/spriteData/UI/Icon/MiniMap/";
 			const std::string ext = ".DDS";
 
-			for (uint8_t i = 0; i < static_cast<uint8_t>(EnMiniMapIconType::Num); ++i)
+			int createdCount = 0;
+			while (m_iconInitTypeIndex < static_cast<uint8_t>(EnMiniMapIconType::Num))
 			{
-				auto& it = m_iconVectors.at(i);
+				auto& it = m_iconVectors.at(m_iconInitTypeIndex);
 
-
-				for (uint8_t j = 0; j < it.num; ++j)
+				// この種類のアイコンを生成し終えたら次の種類へ
+				if (m_iconInitIndexInType >= it.num)
 				{
-					// ステータスから初期値を取得
-					auto& info = m_miniMapStatus->GetIconInitializeInfos().at(i);
-
-					const std::string fullPath = path + info.path + ext;
-					const uint32_t key = Hash32((info.path + std::to_string(j)).c_str());
-
-
-					// UIIconを生成、初期化
-					canvas->CreateUI<UIIcon>(key);
-
-					auto* icon = canvas->FindUI<UIIcon>(key);
-					K2_ASSERT(icon, "登録失敗");
-					icon->m_isDraw = false;
-
-					icon->Initialize(fullPath.c_str(), info.width, info.height, position, scale, rotation, color);
-
-					// アイコンを配列に追加
-					it.icons.push_back(icon);
+					K2_ASSERT(it.icons.size() == it.num, "サイズ不一致");
+					m_iconInitTypeIndex++;
+					m_iconInitIndexInType = 0;
+					continue;
 				}
 
-				K2_ASSERT(it.icons.size() == it.num, "サイズ不一致");
+				// ステータスから初期値を取得
+				auto& info = m_miniMapStatus->GetIconInitializeInfos().at(m_iconInitTypeIndex);
+
+				const uint8_t j = m_iconInitIndexInType++;
+				const std::string fullPath = path + info.path + ext;
+				const uint32_t key = Hash32((info.path + std::to_string(j)).c_str());
+
+				// UIIconを生成、初期化
+				canvas->CreateUI<UIIcon>(key);
+
+				auto* icon = canvas->FindUI<UIIcon>(key);
+				K2_ASSERT(icon, "登録失敗");
+				icon->m_isDraw = false;
+
+				icon->Initialize(fullPath.c_str(), info.width, info.height, position, scale, rotation, color);
+
+				// アイコンを配列に追加
+				it.icons.push_back(icon);
+
+				if (++createdCount >= maxCount) return false;
 			}
 
 			// マップ上のアイコンをすべて生成し終わってから親ペンギンのアイコンを生成する
+			if (m_daddy == nullptr)
+			{
+				const auto& daddyInfo = m_miniMapStatus->GetDaddyInfo();
+				const std::string name = daddyInfo.path;
+				canvas->CreateUI<UIIcon>(Hash32(name.c_str()));
+				m_daddy = canvas->FindUI<UIIcon>(Hash32(name.c_str()));
 
-			const auto& daddyInfo = m_miniMapStatus->GetDaddyInfo();
-			const std::string name = daddyInfo.path;
-			canvas->CreateUI<UIIcon>(Hash32(name.c_str()));
-			m_daddy = canvas->FindUI<UIIcon>(Hash32(name.c_str()));
+				K2_ASSERT(m_daddy, "登録失敗");
 
-			K2_ASSERT(m_daddy, "登録失敗");
+				m_daddy->Initialize(
+					(path + name + ext).c_str(),
+					daddyInfo.width,
+					daddyInfo.height,
+					position, scale, rotation, color
+				);
 
-			m_daddy->Initialize(
-				(path + name + ext).c_str(),
-				daddyInfo.width,
-				daddyInfo.height,
-				position, scale, rotation, color
-			);
-
-
-			m_daddy->m_transform.m_localTransform.m_position = m_miniMapStatus->GetMapCenterPos();
-			m_daddy->m_isDraw = false;
+				m_daddy->m_transform.m_localTransform.m_position = m_miniMapStatus->GetMapCenterPos();
+				m_daddy->m_isDraw = false;
+			}
+			return true;
 		}
 
 

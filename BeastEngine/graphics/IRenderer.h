@@ -1,7 +1,6 @@
 ﻿/**
  * @file IRenderer.h
  * @brief 描画されるオブジェクトが実装するインターフェース
- * @author 竹林尚哉
  */
 #pragma once
 

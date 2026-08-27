@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIAnimatioTypes.h
  * @brief UIAnimationKeyの定義場所
- * @author 忽那
  */
 #pragma once
 #include "Source/Util/CRC32.h"

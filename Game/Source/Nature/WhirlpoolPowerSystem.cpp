@@ -1,7 +1,6 @@
 ﻿/**
  * @file WhirlpoolPowerSystem.cpp
  * @brief 渦潮の引き寄せ、押し出しを管理するクラス
- * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
@@ -9,6 +8,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Achivement/AchievementManager.h"
 #include "Source/Core/ParameterManager.h"
+#include "Source/Nature/Ocean.h"
 #include "Source/Util/RandomDevice.h"
 #include "Whirlpool.h"
 #include "WhirlpoolParameter.h"
@@ -38,6 +38,9 @@ namespace app
 			 *          この間隔を空けずに再捕獲されたものは同じ被害の継続として扱う
 			 */
 			constexpr float CAPTURE_RECOUNT_INTERVAL = 3.0f;
+
+			/** 吸い込み中に海面（波の高さ）からどれだけ沈めて回すか */
+			constexpr float CAPTURED_SUBMERGE_DEPTH = 6.0f;
 		}
 
 
@@ -340,8 +343,22 @@ namespace app
 			pos.x = whirlpoolPos.x + newRadius * cosf(info.angle);
 			pos.z = whirlpoolPos.z + newRadius * sinf(info.angle);
 
-			const Vector3 prevPos = info.target->GetCharacterController()->Execute(pos, deltaTime);
-			info.target->GetStateMachine()->SetPosition(prevPos);
+			// Yは海面（波を含む）に少し沈めた高さへ毎フレーム吸着させる
+			if (const auto* ocean = Ocean::GetInstance())
+			{
+				pos.y = ocean->SampleWaveHeight(pos.x, pos.z) - CAPTURED_SUBMERGE_DEPTH;
+			}
+
+			/**
+			 * 吸い込み中はキノマティックに動かす（かまくらイベントと同じ方式）。
+			 * 以前は CharacterController::Execute() で衝突解決込みで動かしていたが、
+			 * 水路の岸近くの渦潮では「旋回の目標位置 vs 岸コリジョン」が毎フレーム
+			 * 衝突して押し戻され、カクカク震える見た目になっていた。
+			 * 渦潮に捕まっている間は吸い込みが最優先なので、衝突は解決しない
+			 */
+			info.target->GetCharacterController()->SetPosition(pos);
+			info.target->GetCharacterController()->RequestTeleport();
+			info.target->GetStateMachine()->SetPosition(pos);
 		}
 	}
 }

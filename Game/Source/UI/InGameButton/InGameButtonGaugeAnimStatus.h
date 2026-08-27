@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameButtonGaugeAnimStatus.h
  * @brief インゲームボタンのスタミナゲージ専用のアニメーションステータスクラス
- * @author 立山
  */
 #pragma once
 #include "Source/UI/Animation/UIAnimationFactory.h"

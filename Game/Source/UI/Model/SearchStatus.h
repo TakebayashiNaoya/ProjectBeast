@@ -1,7 +1,6 @@
 ﻿/**
  * @file SearchStatus.h
  * @brief SearchStatusクラス
- * @author 忽那
  */
 #pragma once
 #include "UIStatus.h"

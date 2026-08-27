@@ -1,7 +1,6 @@
 ﻿/**
  * @file ResultMenu.cpp
  * @brief リザルトのUI動的処理・アニメーション管理クラス
- * @author 立山
  */
 #include "stdafx.h"
 

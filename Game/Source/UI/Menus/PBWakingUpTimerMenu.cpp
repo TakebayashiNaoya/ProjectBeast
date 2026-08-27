@@ -1,7 +1,6 @@
 ﻿/**
  * @file PBWakingUpTimerMenu.cpp
  * @brief PB起床タイマーの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "PBWakingUpTimerMenu.h"

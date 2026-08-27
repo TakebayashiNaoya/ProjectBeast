@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinStatus.h
  * @brief 親ペンギンのステータス
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/PenguinStatus.h"

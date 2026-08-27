@@ -1,7 +1,6 @@
 ﻿/**
  * @file PBRStatus.cpp
  * @brief PBR補正パラメーターのステータスクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "PBRStatus.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemySleepingMenu.cpp
  * @brief クマの起床ゲージ表示クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "EnemySleepingMenu.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file Actor.h
  * @brief 見た目が存在するオブジェクトの基底クラス
- * @author 藤谷
  */
 #pragma once
 #include "ActorStatus.h"

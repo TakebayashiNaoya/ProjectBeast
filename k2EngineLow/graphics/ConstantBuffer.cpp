@@ -44,7 +44,12 @@ namespace nsK2EngineLow {
 			//マップ、アンマップのオーバーヘッドを軽減するためにはこのインスタンスが生きている間は行わない。
 			{
 				CD3DX12_RANGE readRange(0, 0);        //     intend to read from this resource on the CPU.
-				cb->Map(0, &readRange, reinterpret_cast<void**>(&m_constBufferCPU[bufferNo]));
+				if (cb == nullptr ||
+					FAILED(cb->Map(0, &readRange, reinterpret_cast<void**>(&m_constBufferCPU[bufferNo])))) {
+					// Creation/Map fails after a device removal. Write the DRED report instead of crashing later.
+					g_graphicsEngine->ReportDeviceRemoved("ConstantBuffer::Init map failed");
+					return;
+				}
 			}
 			if (srcData != nullptr) {
 				memcpy(m_constBufferCPU[bufferNo], srcData, m_size);
@@ -71,6 +76,11 @@ namespace nsK2EngineLow {
 	void ConstantBuffer::CopyToVRAM(void* data)
 	{
 		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		if (m_constBufferCPU[backBufferIndex] == nullptr) {
+			// The mapping failed (device removal during Init). Report instead of writing to null.
+			g_graphicsEngine->ReportDeviceRemoved("ConstantBuffer::CopyToVRAM null map");
+			return;
+		}
 		memcpy(m_constBufferCPU[backBufferIndex], data, m_size);
 	}
 	D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGPUVirtualAddress()

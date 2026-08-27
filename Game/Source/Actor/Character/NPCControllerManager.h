@@ -1,7 +1,6 @@
 ﻿/**
  * @file NPCControllerManager.h
  * @brief NPCのコントローラーのマネージャー
- * @author 立山
  */
 #pragma once
 

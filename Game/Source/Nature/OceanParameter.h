@@ -1,7 +1,6 @@
 ﻿/**
  * @file OceanParameter.h
  * @brief 海のパラメーター
- * @author 竹林
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

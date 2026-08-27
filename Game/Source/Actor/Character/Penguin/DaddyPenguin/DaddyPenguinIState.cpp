@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinIState.cpp
  * @brief 親ペンギンのステートインターフェース
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"
@@ -42,34 +41,28 @@ namespace app
 
 		void DaddyPenguinCommandShoutState::Enter()
 		{
-			// 1. マネージャーを介して子ペンギンへの命令を切り替える（トグル）
+			// Yボタンの役割を「待機・追従の切り替え」から
+			// 「パニックで散った子ペンギンの再集合を呼びかける」へ変更した。
+			//
+			// 逃走をシロクマ最優先にしたことで、群れがまるごと散る場面が生まれる。
+			// その散開に対して、プレイヤーが群れを呼び戻せる手段がこれ。
+			// クールダウン中はそもそもこのステートへ入らない
+			// （DaddyPenguinController が CanCallRegroup() で弾いている）。
+			//
+			// 待機命令そのもの（EnPenguinCommand::Wait）は消していない。
+			// ToggleCommand() / SetCommand() は残っているので、
+			// 別のボタンへ割り当て直せば元の切り替えも復活できる。
 			auto* childPenMan = ChildPenguinManager::GetInstance();
-			childPenMan->ToggleCommand();
+			childPenMan->CallRegroup();
 
-			auto* effect = &EffectManager::Get();
 			auto* sound = &SoundManager::Get();
 
-			// 2. 切り替わった後の命令を取得
-			auto currentCommand = childPenMan->GetCommand();
-
-			// 3. 命令に応じて演出（アニメーションやエフェクト）を分岐
-			if (currentCommand == ChildPenguinManager::EnPenguinCommand::Follow)
-			{
-				// === 「おいで！（追従）」の演出 ===
-				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
-				effect->PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, EFFECT_SCALE);
-				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutFollow, false);
-				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemFollow, false);
-			}
-			else if (currentCommand == ChildPenguinManager::EnPenguinCommand::Wait)
-			{
-				// === 「待て！（待機）」の演出 ===
-				// NOTE: 現状は同じ設定を入れていますが、待機用のアニメーションやエフェクト（例: EnPenguinAnimationID::CommandWait など）があればここを変更してください。
-				m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
-				effect->PlayEffect(EnEffectKind::DaddyPenguinCommand, m_owner->GetTransform().m_position, Quaternion::Identity, EFFECT_SCALE);
-				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutWait, false);
-				sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemWait, false);
-			}
+			// === 「おいで！」の演出 ===
+			// 視覚演出は FormationRangeVisualizer の波紋（声の届く範囲へ収束するリング）に
+			// 一本化した。旧 DaddyPenguinCommand エフェクトは波紋と重なってうるさいので出さない
+			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
+			sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutFollow, false);
+			sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemFollow, false);
 		}
 
 

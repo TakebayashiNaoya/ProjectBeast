@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyIState.cpp
  * @brief エネミーのステートインターフェース
- * @author 立山
  */
 #include "stdafx.h"
 #include "Enemy.h"

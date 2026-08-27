@@ -1,7 +1,6 @@
 /**
  * @file PenguinStaminaGauge.cpp
  * @brief ジャンプ・スライド共通で使う、スタミナ(オーバーヒート式)ゲージクラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "PenguinStaminaGauge.h"
@@ -41,12 +40,14 @@ namespace app
 		}
 
 
-		void PenguinStaminaGauge::Update(bool isUsing, float deltaTime)
+		void PenguinStaminaGauge::Update(bool isUsing, float deltaTime, float drainScale)
 		{
 			// 使用中、かつロックされていない場合はゲージを減少させる。
 			if (isUsing && !m_isLocked)
 			{
-				m_currentValue -= m_decreaseSpeed * deltaTime;
+				// 消費倍率が負だとゲージが増えてしまうため0で下限を切る。
+				const float scale = (drainScale < 0.0f) ? 0.0f : drainScale;
+				m_currentValue -= m_decreaseSpeed * scale * deltaTime;
 
 				// 0まで枯渇したら、満タンになるまで使用不可のロック状態にする。
 				if (m_currentValue <= 0.0f)

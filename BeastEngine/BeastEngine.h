@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastEngine.h
  * @brief BeastEngineクラスのヘッダー
- * @author 竹林尚哉
  */
 #pragma once
 #include "imgui.h"

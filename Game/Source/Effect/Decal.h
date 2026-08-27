@@ -1,7 +1,6 @@
 ﻿/**
  * @file Decal.h
  * @brief でかい足跡などのデカールを描画するクラス
- * @author 立山
  */
 #pragma once
 #include "Resource/ModelResource.h"
@@ -13,6 +12,9 @@ namespace app {
 	namespace effect {
 		enum class DecalKind { SnowFootprint, GrassFootprint, RockFootprint, BearFootprint };
 
+		/** @brief デカール種別の総数。DecalKind に種類を足したらここも増やすこと */
+		static constexpr int DECAL_KIND_NUM = 4;
+
 		// 地形の凹凸判定に必要な情報をまとめた構造体
 		struct TerrainHeightInfo {
 			nsK2EngineLow::Texture* heightmapTex = nullptr; // 地形のハイトマップ（GPU用、フル解像度）
@@ -20,6 +22,8 @@ namespace app {
 			float halfDepth = 1.0f;
 			float heightScale = 1.0f;
 			float yOffset = 0.0f;
+			/** 地形の世代番号。ステージが変わるたびに増える（下記参照） */
+			int   generation = 0;
 		};
 
 		class Decal {
@@ -63,6 +67,23 @@ namespace app {
 			/** @brief 現在アクティブかどうかを取得する */
 			bool IsActive() const { return m_isActive; }
 
+			/**
+			 * @brief デカールを即座に非アクティブ化する
+			 * @details ステージ遷移時に呼ぶ。破棄された地形テクスチャを参照したまま
+			 *          描画され続けるのを防ぐ
+			 */
+			void Deactivate() { m_isActive = false; }
+
+			/**
+			 * @brief モデルが未初期化・種類違い・地形世代違いなら初期化する
+			 * @details Spawn() の内部処理だが、ロード中の事前ウォームアップからも呼ぶ。
+			 *          初期化は1回8ms前後かかるため、プレイ中の初回スポーンで行うと
+			 *          フレーム落ちになる。ロード画面のうちに全スロットへ済ませておく
+			 * @return 初期化を実行したらtrue（初期化済みで何もしなかったらfalse）
+			 */
+			bool InitModelIfNeeded(DecalKind kind, nsK2EngineLow::Texture* texture,
+				const char* sharedTkmKey, const TerrainHeightInfo& terrainInfo);
+
 			/** @brief 残り生存時間を取得する */
 			float GetRemainingLife() const { return m_remainingLife; }
 
@@ -93,6 +114,11 @@ namespace app {
 			int   m_priority = 0;
 			bool  m_isActive = false;
 			bool  m_isModelInited = false;
+			/** モデル初期化時に地形ハイトマップをバインドした世代。
+			 *  ステージが変わると地形テクスチャが破棄されるため、世代が違ったら
+			 *  再初期化して新しいハイトマップをバインドし直す。
+			 *  これを怠ると解放済みテクスチャをGPUが読みに行き、デバイスハングする */
+			int   m_terrainGeneration = -1;
 		};
 	}
 }

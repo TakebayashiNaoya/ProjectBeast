@@ -1,7 +1,6 @@
 ﻿/**
  * @file IStatus.h
  * @brief ステータス基底クラス
- * @author 藤谷
  */
 #pragma once
 

@@ -1,7 +1,6 @@
 ﻿/**
  * @file BattleManager.cpp
  * @brief バトルの管理をするクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "BattleManager.h"
@@ -33,8 +32,10 @@ namespace app
 		/** ペンギンのルート座標から注視点までのYオフセット */
 		constexpr float SUB_CAMERA_TARGET_HEIGHT = 0.0f;
 
-		/** スニークが有効になるシロクマへの最大距離 */
-		constexpr float SNEAK_AVAILABLE_DIST = 200.0f;
+		/** スニークが有効になるシロクマへの最大距離。
+		 *  走って近づくとクマは350前後で起きるため、それより十分手前から
+		 *  忍び足を始められる距離にする（スニークヒントの表示距離とも揃える） */
+		constexpr float SNEAK_AVAILABLE_DIST = 600.0f;
 		constexpr float SNEAK_AVAILABLE_DIST_SQ = SNEAK_AVAILABLE_DIST * SNEAK_AVAILABLE_DIST;
 	}
 
@@ -416,6 +417,9 @@ namespace app
 		m_onMiniMapChanged = nullptr;
 		m_wpWarningChanged = nullptr;
 		m_onCPReactionChanged = nullptr;
+		m_onEnemyReactionChanged = nullptr;
+		m_onReactionTargetDestroyed = nullptr;
+		m_onImpact = nullptr;
 		m_onFormationLevelUp = nullptr;
 	}
 

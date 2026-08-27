@@ -1,7 +1,6 @@
 ﻿/**
  * @file NaughtyChildPenguinIState.cpp
  * @brief ヤンチャペンギン固有のステートインターフェース
- * @author 立山
  */
 #include "stdafx.h"
 #include "NaughtyChildPenguinIState.h"

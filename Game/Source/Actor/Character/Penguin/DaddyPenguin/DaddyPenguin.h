@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguin.h
  * @brief 親ペンギンクラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/PenguinBase.h"
@@ -58,6 +57,8 @@ namespace app
 			std::unique_ptr<DaddyPenguinStateMachine> m_stateMachine;
 			/** プレイヤーコントローラー */
 			std::unique_ptr<DaddyPenguinController> m_controller;
+			/** 輪郭線を適用済みか（モデルロード完了後に一度だけ適用する） */
+			bool m_isOutlineApplied = false;
 		};
 	}
 }

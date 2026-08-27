@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterParameter.h
  * @brief キャラクターのパラメーター管理
- * @author 藤谷
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

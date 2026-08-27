@@ -1,7 +1,6 @@
 ﻿/**
  * @file NaughtyChildPenguinStateMachine.cpp
  * @brief ヤンチャペンギンのステートマシン
- * @author 立山
  */
 #include "stdafx.h"
 #include "NaughtyChildPenguinIState.h"

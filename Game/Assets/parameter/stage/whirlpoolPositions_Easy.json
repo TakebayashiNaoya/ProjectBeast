@@ -1,26 +1,72 @@
 {
   "whirlpoolPositions": [
-    { "index": 0,  "position": [ -2000, 0,     0] },
-    { "index": 1,  "position": [ -2000, 0,  -812] },
-    { "index": 2,  "position": [ -1877, 0,  -290] },
-    { "index": 3,  "position": [ -1500, 0,  1500] },
-    { "index": 4,  "position": [ -1500, 0, -1500] },
-    { "index": 5,  "position": [  -817, 0,   228] },
-    { "index": 6,  "position": [  -500, 0,   500] },
-    { "index": 7,  "position": [  -500, 0,  -500] },
-    { "index": 8,  "position": [  -500, 0, -3640] },
-    { "index": 9,  "position": [  -180, 0,   750] },
-    { "index": 10, "position": [  -170, 0, -3640] },
-    { "index": 11, "position": [   -70, 0,  3236] },
-    { "index": 12, "position": [     0, 0,  2000] },
-    { "index": 13, "position": [     0, 0, -2000] },
-    { "index": 14, "position": [    93, 0,   484] },
-    { "index": 15, "position": [   500, 0,   500] },
-    { "index": 16, "position": [   500, 0,  -500] },
-    { "index": 17, "position": [   500, 0,  1300] },
-    { "index": 18, "position": [   684, 0, -2132] },
-    { "index": 19, "position": [  1500, 0,  1500] },
-    { "index": 20, "position": [  1500, 0, -1500] },
-    { "index": 21, "position": [  2000, 0,     0] }
+    {
+      "index": 0,
+      "position": [1762.2, 0.0, 358.9]
+    },
+    {
+      "index": 1,
+      "position": [370.6, 0.0, 1645.0]
+    },
+    {
+      "index": 2,
+      "position": [511.2, 0.0, -1176.3]
+    },
+    {
+      "index": 3,
+      "position": [1501.5, 0.0, -804.2]
+    },
+    {
+      "index": 4,
+      "position": [-1513.2, 0.0, -552.2]
+    },
+    {
+      "index": 5,
+      "position": [1366.7, 0.0, -1671.4]
+    },
+    {
+      "index": 6,
+      "position": [-1135.3, 0.0, -1604.0]
+    },
+    {
+      "index": 7,
+      "position": [-733.9, 0.0, 2421.4]
+    },
+    {
+      "index": 8,
+      "position": [-1612.8, 0.0, 1911.6]
+    },
+    {
+      "index": 9,
+      "position": [1100.1, 0.0, 1794.4]
+    },
+    {
+      "index": 10,
+      "position": [2412.6, 0.0, -411.6]
+    },
+    {
+      "index": 11,
+      "position": [-1366.7, 0.0, -2983.9]
+    },
+    {
+      "index": 12,
+      "position": [2837.4, 0.0, -1196.8]
+    },
+    {
+      "index": 13,
+      "position": [-3127.4, 0.0, -1167.5]
+    },
+    {
+      "index": 14,
+      "position": [-2658.7, 0.0, -1489.7]
+    },
+    {
+      "index": 15,
+      "position": [-2611.8, 0.0, -2037.6]
+    },
+    {
+      "index": 16,
+      "position": [2412.6, 0.0, -2251.5]
+    }
   ]
 }

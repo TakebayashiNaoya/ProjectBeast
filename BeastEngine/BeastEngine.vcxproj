@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -43,6 +43,7 @@
     <ClCompile Include="Graphics\PostEffect\Bloom.cpp" />
     <ClCompile Include="Graphics\PostEffect\GaussianBlur.cpp" />
     <ClCompile Include="Graphics\PostEffect\PostEffectManager.cpp" />
+    <ClCompile Include="Graphics\PostEffect\RadialBlur.cpp" />
     <ClCompile Include="Graphics\PostEffect\ToneMap.cpp" />
     <ClCompile Include="Graphics\Shadow\ShadowMap.cpp" />
     <ClCompile Include="graphics\RenderingEngine.cpp" />
@@ -101,6 +102,7 @@
     <ClInclude Include="Graphics\PostEffect\GaussianBlur.h" />
     <ClInclude Include="Graphics\PostEffect\PostEffectManager.h" />
     <ClInclude Include="Graphics\PostEffect\PostEffectTypes.h" />
+    <ClInclude Include="Graphics\PostEffect\RadialBlur.h" />
     <ClInclude Include="Graphics\PostEffect\ToneMap.h" />
     <ClInclude Include="Graphics\Shadow\ShadowMap.h" />
     <ClInclude Include="graphics\RenderingEngine.h" />

@@ -1,7 +1,6 @@
 ﻿/**
  * @file RandomDevice.h
  * @brief ランダムデバイスの定義
- * @author 藤谷
  */
 #pragma once
 #include <random>

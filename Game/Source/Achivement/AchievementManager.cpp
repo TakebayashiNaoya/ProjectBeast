@@ -1,7 +1,6 @@
 ﻿/**
  * @file AchievementManager.cpp
  * @brief アチーブメントの管理クラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "AchievementManager.h"

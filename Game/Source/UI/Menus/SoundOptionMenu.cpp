@@ -1,7 +1,6 @@
 ﻿/**
  * @file SoundOptionMenu.cpp
  * @brief サウンドのオプションの動的処理群
- * @author 忽那
  */
 #include "stdafx.h"
 #include "SoundOptionMenu.h"

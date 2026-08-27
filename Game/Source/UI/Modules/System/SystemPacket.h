@@ -1,7 +1,6 @@
 ﻿/**
  * @file SystemPacket.h
  * @brief Layoutを複数保持するUIのためのカプセル化クラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Layout.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file Particle.h
  * @brief 個別パーティクルのデータ
- * @author 忽那
  */
 #pragma once
 #include "Source/Util/Curve.h"

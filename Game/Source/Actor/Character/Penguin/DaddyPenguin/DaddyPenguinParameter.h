@@ -1,7 +1,6 @@
 ﻿/**
  * @file DaddyPenguinParameter.h
  * @brief 親ペンギンのパラメーター管理
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/Penguin/PenguinParameter.h"

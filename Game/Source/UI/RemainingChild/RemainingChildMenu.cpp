@@ -1,7 +1,6 @@
 ﻿/**
  * @file RemainingChildMenu.cpp
  * @brief 子ペンギンの残り数表示クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "graphics/Camera/CameraSystem.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file UICursorSelector.h
  * @brief UIカーソル選択を行うクラス
- * @author 藤谷
  */
 #pragma once
 #include "Types.h"

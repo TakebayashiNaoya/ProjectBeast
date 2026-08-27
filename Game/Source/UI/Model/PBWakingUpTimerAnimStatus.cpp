@@ -1,7 +1,6 @@
 ﻿/**
  * @file PBWakingUpTimerAnimStatus.cpp
  * @brief PB起床タイマー専用のステータスクラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "PBWakingUpTimerAnimStatus.h"

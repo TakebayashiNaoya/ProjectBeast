@@ -1,19 +1,23 @@
 ﻿/**
  * @file DaddyPenguinController.cpp
  * @brief 親ペンギンのプレイヤーコントローラー
- * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "DaddyPenguin.h"
 #include "DaddyPenguinController.h"
 #include "DaddyPenguinIState.h"
 #include "DaddyPenguinStateMachine.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
+#include "Source/Nature/Whirlpool.h"
+#include "Source/Nature/WhirlpoolManager.h"
 #include "Source/Manager/BattleManager.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
+#include "Source/Util/RandomDevice.h"
 #include <algorithm> // std::min用
 
 
@@ -21,11 +25,176 @@ namespace app
 {
 	namespace actor
 	{
+		namespace
+		{
+			/**
+			 * @brief 自動プレイのボット操作が有効かどうか
+			 * @details 環境変数 BEAST_AUTOPLAY が "0" 以外の値で設定されているときに有効。
+			 *          デバイスロスト調査で入れた自動周回（TitleScene参照）と同じスイッチ。
+			 */
+			bool IsAutoplayBotEnabled()
+			{
+				char buf[8];
+				size_t len = 0;
+				return getenv_s(&len, buf, sizeof(buf), "BEAST_AUTOPLAY") == 0
+					&& len > 0 && buf[0] != '0';
+			}
+
+			/** ボットが目標を選び直す間隔（秒） */
+			constexpr float BOT_REPICK_INTERVAL = 4.0f;
+			/** ボットが目標に到達したとみなす距離 */
+			constexpr float BOT_ARRIVE_DISTANCE = 150.0f;
+			/** ボットがスライド移動に切り替える目標までの距離 */
+			constexpr float BOT_SLIDE_DISTANCE = 700.0f;
+			/** ボットが再集合を呼ぶ間隔（秒） */
+			constexpr float BOT_REGROUP_INTERVAL = 10.0f;
+			/** 子が誰も残っていないときにボットがうろつく半径 */
+			constexpr float BOT_WANDER_RADIUS = 2000.0f;
+			/** ボットが渦潮を迂回し始める距離と反発の強さ */
+			constexpr float BOT_WHIRLPOOL_AVOID_RADIUS = 350.0f;
+			constexpr float BOT_WHIRLPOOL_AVOID_WEIGHT = 2.0f;
+		}
+
+
 		DaddyPenguinController::DaddyPenguinController(DaddyPenguin* owner)
 			: m_owner(owner)
 			, m_stateMachine(owner->GetStateMachine())
 			, m_iglooPromptMenu(nullptr)
 		{}
+
+
+		void DaddyPenguinController::UpdateAutoplayBot(
+			float& inputX, float& inputY, float& stickLength,
+			bool& outSlide, bool& outRegroupCall)
+		{
+			const float deltaTime = g_gameTime->GetFrameDeltaTime();
+			const Vector3 myPos = m_owner->GetTransform().m_position;
+			auto* manager = ChildPenguinManager::GetInstance();
+
+			// 目標の選び直し：一定間隔、または到達したら
+			m_botRepickTimer -= deltaTime;
+			Vector3 toTarget = m_botTargetPos - myPos;
+			toTarget.y = 0.0f;
+			if (m_botRepickTimer <= 0.0f
+				|| toTarget.LengthSq() < BOT_ARRIVE_DISTANCE * BOT_ARRIVE_DISTANCE)
+			{
+				m_botRepickTimer = BOT_REPICK_INTERVAL;
+
+				// 隊列に入っていない一番近い子ペンギンへ向かう
+				float nearestDistSq = FLT_MAX;
+				bool found = false;
+				if (manager != nullptr)
+				{
+					for (auto* cp : manager->GetChildPenguin())
+					{
+						if (cp == nullptr || manager->IsFollower(cp)) continue;
+
+						/** 渦潮に捕まって旋回中の子は追わない。高速で回る目標を
+						 *  追いかけると渦の中でくるくる空回りしてしまう */
+						if (cp->GetStateMachine()->GetIsInWhirlpool()) continue;
+
+						Vector3 diff = cp->GetTransform().m_position - myPos;
+						diff.y = 0.0f;
+						const float distSq = diff.LengthSq();
+						if (distSq < nearestDistSq)
+						{
+							nearestDistSq = distSq;
+							m_botTargetPos = cp->GetTransform().m_position;
+							found = true;
+						}
+					}
+				}
+
+				// 全員隊列にいる（または子がいない）ならランダムにうろつく
+				if (!found)
+				{
+					const float angle = util::RandomDevice::Random(0.0f, 2.0f * Math::PI);
+					const float radius = util::RandomDevice::Random(BOT_WANDER_RADIUS * 0.3f, BOT_WANDER_RADIUS);
+					m_botTargetPos = Vector3(cosf(angle) * radius, myPos.y, sinf(angle) * radius);
+				}
+
+				toTarget = m_botTargetPos - myPos;
+				toTarget.y = 0.0f;
+			}
+
+			// 目標へのワールド方向をカメラ相対のスティック入力へ変換する
+			const float distToTargetSq = toTarget.LengthSq();
+			if (distToTargetSq > FLT_EPSILON)
+			{
+				toTarget.Normalize();
+
+				// アクティブな渦潮を迂回する。近いほど強い反発を進行方向へ加算する
+				if (auto* wpManager = nature::WhirlpoolManager::GetInstance())
+				{
+					Vector3 avoid = Vector3::Zero;
+					wpManager->ForEach([&](nature::Whirlpool* wp)
+						{
+							Vector3 away = myPos - wp->GetTransform().m_position;
+							away.y = 0.0f;
+							const float dist = away.Length();
+							if (dist < 1.0f || dist >= BOT_WHIRLPOOL_AVOID_RADIUS) return;
+							avoid += away * (1.0f / dist) * (1.0f - dist / BOT_WHIRLPOOL_AVOID_RADIUS);
+						});
+					if (avoid.LengthSq() > FLT_EPSILON)
+					{
+						toTarget += avoid * BOT_WHIRLPOOL_AVOID_WEIGHT;
+						toTarget.y = 0.0f;
+						if (toTarget.LengthSq() > FLT_EPSILON) toTarget.Normalize();
+					}
+				}
+
+				const auto& camData = camera::CameraManager::Get().GetCurrentCameraData();
+				Vector3 camForward = camData.target - camData.position;
+				camForward.y = 0.0f;
+				if (camForward.LengthSq() > FLT_EPSILON)
+				{
+					camForward.Normalize();
+					const Vector3 camRight = { camForward.z, 0.0f, -camForward.x };
+					inputX = toTarget.Dot(camRight);
+					inputY = toTarget.Dot(camForward);
+					stickLength = 1.0f;
+				}
+			}
+
+			// スタック検出：移動する意思があるのに動けていなければ、目標を捨てて
+			// しばらくスライドを禁止する。上り坂でスライドを押しっぱなしにすると
+			// ずり落ちで無限に足踏みする（人間ならXを離す場面）ため
+			Vector3 movedFromCheck = myPos - m_botStuckCheckPos;
+			movedFromCheck.y = 0.0f;
+			if (movedFromCheck.LengthSq() > 30.0f * 30.0f)
+			{
+				m_botStuckTimer = 0.0f;
+				m_botStuckCheckPos = myPos;
+			}
+			else
+			{
+				m_botStuckTimer += deltaTime;
+				if (m_botStuckTimer >= 3.0f)
+				{
+					m_botStuckTimer = 0.0f;
+					m_botStuckCheckPos = myPos;
+					m_botRepickTimer = 0.0f;		// 次フレームで目標を選び直す
+					m_botNoSlideTimer = 5.0f;		// 走りで迂回する
+				}
+			}
+			if (m_botNoSlideTimer > 0.0f)
+			{
+				m_botNoSlideTimer -= deltaTime;
+			}
+
+			// 遠距離はスライドで移動する（傾斜モデルの経路を実プレイ同様に通す）
+			outSlide = (m_botNoSlideTimer <= 0.0f)
+				&& distToTargetSq > BOT_SLIDE_DISTANCE * BOT_SLIDE_DISTANCE;
+
+			// 再集合はクールダウンが明けるたびに呼ぶ
+			m_botRegroupTimer -= deltaTime;
+			outRegroupCall = false;
+			if (m_botRegroupTimer <= 0.0f && manager != nullptr && manager->CanCallRegroup())
+			{
+				outRegroupCall = true;
+				m_botRegroupTimer = BOT_REGROUP_INTERVAL;
+			}
+		}
 
 		void DaddyPenguinController::UpdateClingySlow()
 		{
@@ -96,6 +265,14 @@ namespace app
 				stickLength = min(stickLength, 1.0f);
 			}
 
+			// 自動プレイ（デバッグ）：ボットの入力でスティックを上書きする
+			bool botSlide = false;
+			bool botRegroupCall = false;
+			if (IsAutoplayBotEnabled())
+			{
+				UpdateAutoplayBot(inputX, inputY, stickLength, botSlide, botRegroupCall);
+			}
+
 			/** Bボタンが押されているか（スニークのトグル用） */
 			bool isPressB = g_pad[0]->IsPress(enButtonB);
 
@@ -153,8 +330,14 @@ namespace app
 			// アクション入力の更新
 			// =========================================================
 			bool isJump = g_pad[0]->IsTrigger(enButtonA);
-			bool isCommandToggle = g_pad[0]->IsTrigger(enButtonY);
-			bool isSlide = g_pad[0]->IsPress(enButtonX);
+			// Yボタン＝散ってしまった子ペンギンの再集合を呼びかける。
+			// 逃走をシロクマ最優先にした代わりに置いた手段なので、
+			// クールダウン中は空振りさせず、鳴き声もモーションも出さない
+			auto* childPenguinManager = ChildPenguinManager::GetInstance();
+			bool isRegroupCall = (g_pad[0]->IsTrigger(enButtonY) || botRegroupCall)
+				&& childPenguinManager != nullptr
+				&& childPenguinManager->CanCallRegroup();
+			bool isSlide = g_pad[0]->IsPress(enButtonX) || botSlide;
 			bool isEnterIgloo = false;
 
 			// かまくら近接判定（毎フレーム実行）
@@ -228,7 +411,7 @@ namespace app
 			}
 
 			// 親ペンギン固有の入力
-			m_stateMachine->SetIsCommandToggle(isCommandToggle);
+			m_stateMachine->SetIsCommandToggle(isRegroupCall);
 
 			m_stateMachine->SetIsEnterIgloo(isEnterIgloo);
 		}

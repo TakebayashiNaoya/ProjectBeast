@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastMeshParts.cpp
  * @brief トライアングルカリング対応メッシュパーツクラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "Graphics/BeastMeshParts.h"

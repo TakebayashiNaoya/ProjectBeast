@@ -1,7 +1,6 @@
 ﻿/**
  * @file ParticleEffectRender.h
  * @brief パーティクルエフェクトの描画処理(ホットリロード対応)
- * @author 忽那
  */
 #pragma once
 #include "ParticleEmitter.h"

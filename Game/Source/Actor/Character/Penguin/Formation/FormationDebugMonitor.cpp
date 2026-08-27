@@ -1,7 +1,6 @@
 /**
  * @file FormationDebugMonitor.cpp
  * @brief 陣形の状態をImGuiデバッグウィンドウで監視するクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FormationDebugMonitor.h"

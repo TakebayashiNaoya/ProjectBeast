@@ -1,7 +1,6 @@
 ﻿/**
  * @file ParticleEffectLoader.h
  * @brief JSONからパーティクルエフェクトを構築するローダー
- * @author 忽那
  */
 #pragma once
 #include "ParticleEmitter.h"

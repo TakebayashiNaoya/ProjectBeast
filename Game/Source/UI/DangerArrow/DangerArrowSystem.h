@@ -1,7 +1,6 @@
 ﻿/**
  * @file DangerArrowSystem.h
  * @brief 危険矢印UIのシステムクラス
- * @author 竹林
  */
 #pragma once
 #include "DangerArrowCalc.h"

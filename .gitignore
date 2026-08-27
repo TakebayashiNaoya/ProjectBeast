@@ -446,5 +446,11 @@ ASALocalRun/
 # ゲームプレイログ（実行時生成・リポジトリ管理対象外）
 Logs/
 
+# コンパイル済みシェーダーのディスクキャッシュ（実行時生成）
+ShaderCache/
+
+# セーブデータ（実行時生成・リポジトリ管理対象外）
+Game/SaveData/
+
 # SDF フォントアトラス生成物
 # sdf_atlas.png / sdf_atlas.json は git 管理（Tools/update_font.bat はフォント変更時のみ使用）

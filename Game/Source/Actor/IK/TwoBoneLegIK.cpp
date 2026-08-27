@@ -1,7 +1,6 @@
 ﻿/**
  * @file TwoBoneLegIK.cpp
  * @brief 2ボーン解析式IK（脚1本分）の実装
- * @author 立山
  */
 #include "stdafx.h" 
 #include "../../../../k2EngineLow/graphics/Skeleton.h"

@@ -1,7 +1,6 @@
 /**
  * @file LevelUpIconAnimStatus.h
  * @brief 陣形レベルアップアイコン専用のアニメーションステータスクラス
- * @author 竹林
  */
 #pragma once
 #include "UIAnimationStatus.h"

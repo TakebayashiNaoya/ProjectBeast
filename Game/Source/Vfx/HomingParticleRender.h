@@ -1,7 +1,6 @@
 ﻿/**
  * @file HomingParticleRender.h
  * @brief 3D空間から2DのUI座標へ向かって次元を跨いで移動するパーティクルレンダラー
- * @author 忽那
  */
 #pragma once
 #include "ParticleEffectRender.h"

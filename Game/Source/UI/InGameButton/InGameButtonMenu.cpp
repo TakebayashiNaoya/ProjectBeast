@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameButtonMenu.cpp
  * @brief インゲーム中にボタンメニューを表示するクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "InGameButtonGaugeAnimStatus.h"
@@ -18,14 +17,9 @@ namespace app
 	{
 		namespace
 		{
-			/** 命令標識が回りきるまでの時間(秒) */
-			constexpr float SIGN_FLIP_DURATION = 0.4f;
-			/** 命令標識が回るときの半回転の回数。奇数にすると必ず反対の面を向いて止まる */
-			constexpr int SIGN_FLIP_HALF_TURN_COUNT = 1;
-			/** 命令標識の表(GO)のUI名 */
-			constexpr const char* SIGN_GO_UI_NAME = "OrderSignGoIcon";
-			/** 命令標識の裏(WAIT)のUI名 */
-			constexpr const char* SIGN_WAIT_UI_NAME = "OrderSignWaitIcon";
+			/** Yボタン強調（クマ襲撃中）の脈動の振幅と速さ */
+			constexpr float Y_EMPHASIS_PULSE_AMPLITUDE = 0.18f;
+			constexpr float Y_EMPHASIS_PULSE_SPEED = 6.0f;
 		}
 
 
@@ -51,14 +45,13 @@ namespace app
 						"NotInputJumpIcon", "NotInputSneakIcon", "NotInputSlideIcon", "NotInputOrderIcon",
 						"InputJumpIcon",    "InputSneakIcon",    "InputSlideIcon",    "InputOrderIcon",
 						"NotInputAbuttonIcon", "NotInputBbuttonIcon", "NotInputXbuttonIcon", "NotInputYbuttonIcon",
-						"InputAbuttonIcon",    "InputBbuttonIcon",    "InputXbuttonIcon",    "InputYbuttonIcon",
-						SIGN_GO_UI_NAME,       SIGN_WAIT_UI_NAME
+						"InputAbuttonIcon",    "InputBbuttonIcon",    "InputXbuttonIcon",    "InputYbuttonIcon"
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
 					Vector3(300.0f, 0.0f, 0.0f),
 					1.0f, // duration（既存と同じ値を明示）
 					{},   // テキストUIは使用しない
-					{ "JumpStaminaGaugeA", "JumpStaminaGaugeB", "SlideStaminaGaugeA", "SlideStaminaGaugeB" } // ゲージUIも同じ演出で入場させる
+					{ "JumpStaminaGaugeA", "JumpStaminaGaugeB", "OrderCooldownGaugeA", "OrderCooldownGaugeB" } // ゲージUIも同じ演出で入場させる
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())
@@ -68,8 +61,54 @@ namespace app
 
 			ButtonIconUpdate();
 			UpdateStaminaGauge();
-			UpdateCommandSign();
+			UpdateYButtonEmphasis();
 			MenuBase::Update();
+		}
+
+
+		void InGameButtonMenu::UpdateYButtonEmphasis()
+		{
+			/** クマが自分の隊列の子を追っている ＆ 再集合が使えるときだけ、Yボタン周りを強調する。
+			 *  「散った群れはYで呼び戻せる」を、必要な瞬間にその場で教えるための演出。
+			 *  マップの遠くではぐれた子が襲われても反応しない（自分の群れの危機だけに絞る）。
+			 *  常設のプロンプトはうるさいため、状況限定＋既存アイコンの強調に留める */
+			auto* cpm = actor::ChildPenguinManager::GetInstance();
+			const bool emphasize = cpm != nullptr
+				&& cpm->HasBearThreatOnFormation()
+				&& cpm->CanCallRegroup();
+
+			m_yEmphasisTimer += g_gameTime->GetFrameDeltaTime();
+
+			const float pulse = emphasize
+				? 1.0f + Y_EMPHASIS_PULSE_AMPLITUDE
+					* fabsf(sinf(m_yEmphasisTimer * Y_EMPHASIS_PULSE_SPEED))
+				: 1.0f;
+			const Vector4 color = emphasize
+				? Vector4(1.0f, 1.0f, 0.35f, 1.0f)	// 注意を引く黄色
+				: Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
+			const char* yIconNames[] = {
+				"NotInputOrderIcon",   "InputOrderIcon",
+				"NotInputYbuttonIcon", "InputYbuttonIcon"
+			};
+			for (int i = 0; i < 4; ++i)
+			{
+				auto* ui = GetUI<UIIcon>(Hash32(yIconNames[i]));
+				if (ui == nullptr) continue;
+
+				// JSONの基準スケールを初回に保存し、脈動は「基準×パルス」で掛ける。
+				// (pulse, pulse, 1) の直接上書きだと、基準0.8のメガホンアイコンが
+				// 非強調時も1.0に固定され、他のボタンより常に大きく見えてしまう
+				if (!m_isYEmphasisBaseCaptured[i])
+				{
+					m_yEmphasisBaseScales[i] = ui->m_transform.m_localTransform.m_scale;
+					m_isYEmphasisBaseCaptured[i] = true;
+				}
+				const Vector3& base = m_yEmphasisBaseScales[i];
+				ui->m_transform.m_localTransform.m_scale =
+					Vector3(base.x * pulse, base.y * pulse, base.z);
+				ui->m_color = color;
+			}
 		}
 
 
@@ -149,68 +188,12 @@ namespace app
 				m_jumpDisplayRatio, m_gaugeStatus->GetJumpFollowSpeed(),
 				animKey::JUMP_GAUGE_LOCK_ANIM_KEY, animKey::JUMP_GAUGE_UNLOCK_ANIM_KEY);
 
-			updateGauge("SlideStaminaGaugeA", "SlideStaminaGaugeB",
-				m_slideStaminaRatio, m_isSlideStaminaLocked, m_wasSlideStaminaLocked,
-				m_slideDisplayRatio, m_gaugeStatus->GetSlideFollowSpeed(),
+			// Y（再集合の呼びかけ）のクールダウン。ロック演出はスライド時代の
+			// アニメーション定義（slideGauge*Anim）をそのまま流用している
+			updateGauge("OrderCooldownGaugeA", "OrderCooldownGaugeB",
+				m_regroupCooldownRatio, m_isRegroupCooldownLocked, m_wasRegroupCooldownLocked,
+				m_regroupDisplayRatio, m_gaugeStatus->GetSlideFollowSpeed(),
 				animKey::SLIDE_GAUGE_LOCK_ANIM_KEY, animKey::SLIDE_GAUGE_UNLOCK_ANIM_KEY);
-		}
-
-
-		void InGameButtonMenu::UpdateCommandSign()
-		{
-			auto* goSign = GetUI<UIIcon>(Hash32(SIGN_GO_UI_NAME));
-			auto* waitSign = GetUI<UIIcon>(Hash32(SIGN_WAIT_UI_NAME));
-			if (!goSign || !waitSign) return;
-
-			// 子ペンギンがいないシーンでは命令自体が存在しないので標識も出さない
-			auto* childPenguinManager = actor::ChildPenguinManager::GetInstance();
-			if (childPenguinManager == nullptr)
-			{
-				goSign->m_isDraw = false;
-				waitSign->m_isDraw = false;
-				return;
-			}
-
-			// Yボタンで命令が切り替わった瞬間を捉えて、標識を回し始める
-			const bool isWaitCommand = childPenguinManager->GetCommand() == actor::ChildPenguinManager::EnPenguinCommand::Wait;
-			if (isWaitCommand != m_wasWaitCommand)
-			{
-				m_wasWaitCommand = isWaitCommand;
-				// 回転中にもう一度切り替わったら今の角度から続きを回す
-				// (0に戻すと縮んでいた横幅が一瞬で元に戻ってしまう)
-				m_signFlipTimer = m_isSignFlipping ? SIGN_FLIP_DURATION - m_signFlipTimer : 0.0f;
-				m_isSignFlipping = true;
-			}
-
-			if (m_isSignFlipping)
-			{
-				m_signFlipTimer += g_gameTime->GetFrameDeltaTime();
-				if (m_signFlipTimer >= SIGN_FLIP_DURATION)
-				{
-					m_signFlipTimer = SIGN_FLIP_DURATION;
-					m_isSignFlipping = false;
-				}
-			}
-
-			// 何回半回転したかを求める。0.5回転ごと(板が真横を向いて見えなくなる瞬間)に
-			// 手前の面が入れ替わるので、0.5足した値の偶奇でどちらの面が見えているかを判定する
-			const float turnProgress = (m_signFlipTimer / SIGN_FLIP_DURATION) * SIGN_FLIP_HALF_TURN_COUNT;
-			const bool isShowingNewFace = (static_cast<int>(turnProgress + 0.5f) % 2) != 0;
-			const bool isShowingWait = isShowingNewFace ? isWaitCommand : !isWaitCommand;
-
-			goSign->m_isDraw = !isShowingWait;
-			waitSign->m_isDraw = isShowingWait;
-
-			// 横幅を回転角のコサインで縮めて、板が左右にくるっと回っているように見せる
-			const float widthRate = fabsf(cosf(Math::PI * turnProgress));
-
-			Vector3 goSignScale = m_goSignBaseScale;
-			goSignScale.x *= widthRate;
-			goSign->m_transform.m_localTransform.m_scale = goSignScale;
-
-			Vector3 waitSignScale = m_waitSignBaseScale;
-			waitSignScale.x *= widthRate;
-			waitSign->m_transform.m_localTransform.m_scale = waitSignScale;
 		}
 
 
@@ -241,6 +224,9 @@ namespace app
 
 		void InGameButtonMenu::InitializeLogic()
 		{
+			// Reload後にJSONの基準スケールを取り直す
+			m_isYEmphasisBaseCaptured.fill(false);
+
 			// 初期化対象のアイコン名リスト
 			const char* iconNames[] = {
 				"NotInputJumpIcon", "NotInputSneakIcon", "NotInputSlideIcon", "NotInputOrderIcon",
@@ -257,10 +243,10 @@ namespace app
 				}
 			}
 
-			// スタミナサークルゲージも初期状態では非表示にする
+			// サークルゲージも初期状態では非表示にする
 			const char* gaugeNames[] = {
 				"JumpStaminaGaugeA", "JumpStaminaGaugeB",
-				"SlideStaminaGaugeA", "SlideStaminaGaugeB"
+				"OrderCooldownGaugeA", "OrderCooldownGaugeB"
 			};
 
 			for (const char* name : gaugeNames)
@@ -270,26 +256,6 @@ namespace app
 					ui->m_isDraw = false;
 				}
 			}
-
-			// 命令標識は回転演出の基準になるスケールをJsonから拾っておく
-			if (auto* goSign = GetUI<UIIcon>(Hash32(SIGN_GO_UI_NAME)))
-			{
-				m_goSignBaseScale = goSign->m_transform.m_localTransform.m_scale;
-				goSign->m_isDraw = false;
-			}
-			if (auto* waitSign = GetUI<UIIcon>(Hash32(SIGN_WAIT_UI_NAME)))
-			{
-				m_waitSignBaseScale = waitSign->m_transform.m_localTransform.m_scale;
-				waitSign->m_isDraw = false;
-			}
-
-			// 回転しきった状態から始めて、今の命令の面をそのまま見せる
-			m_signFlipTimer = SIGN_FLIP_DURATION;
-			m_isSignFlipping = false;
-
-			auto* childPenguinManager = actor::ChildPenguinManager::GetInstance();
-			m_wasWaitCommand = childPenguinManager != nullptr
-				&& childPenguinManager->GetCommand() == actor::ChildPenguinManager::EnPenguinCommand::Wait;
 		}
 
 

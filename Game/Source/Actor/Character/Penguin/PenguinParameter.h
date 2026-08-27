@@ -1,7 +1,6 @@
 ﻿/**
  * @file PenguinParameter.h
  * @brief ペンギンのパラメーター管理
- * @author 藤谷
  */
 #pragma once
 #include "Source/Actor/Character/CharacterParameter.h"

@@ -1,7 +1,6 @@
 /**
  * @file ReplayScene.cpp
  * @brief プレイログを再生するリプレイシーン
- * @author 竹林
  */
 #include "stdafx.h"
 #include "ReplayScene.h"
@@ -14,6 +13,7 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
+#include "Source/Actor/ActorStateMachine.h"
 #include "Source/Actor/Character/Enemy/EnemyTypes.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Nature/Ocean.h"
@@ -858,7 +858,8 @@ namespace app
 			auto& parentModel = m_parentActor->GetModelRender();
 			if (!parentModel.IsPlayingAnimation() || p0.state != m_parentLastState)
 			{
-				parentModel.PlayAnimation(PenguinAnimIndexForState(p0.state));
+				parentModel.PlayAnimation(PenguinAnimIndexForState(p0.state),
+					actor::ActorStateMachine::ANIMATION_INTERPOLATE_TIME);
 				m_parentLastState = p0.state;
 			}
 		}
@@ -904,7 +905,8 @@ namespace app
 				auto& bearModel = m_bearActors[slot]->GetModelRender();
 				if (!bearModel.IsPlayingAnimation() || b0.state != m_bearLastState[slot])
 				{
-					bearModel.PlayAnimation(BearAnimIndexForState(b0.state));
+					bearModel.PlayAnimation(BearAnimIndexForState(b0.state),
+						actor::ActorStateMachine::ANIMATION_INTERPOLATE_TIME);
 					m_bearLastState[slot] = b0.state;
 				}
 			}
@@ -967,7 +969,8 @@ namespace app
 				auto& penguinModel = m_penguinActors[slot]->GetModelRender();
 				if (!penguinModel.IsPlayingAnimation() || c0.state != m_penguinLastState[slot])
 				{
-					penguinModel.PlayAnimation(PenguinAnimIndexForState(c0.state));
+					penguinModel.PlayAnimation(PenguinAnimIndexForState(c0.state),
+						actor::ActorStateMachine::ANIMATION_INTERPOLATE_TIME);
 					m_penguinLastState[slot] = c0.state;
 				}
 			}

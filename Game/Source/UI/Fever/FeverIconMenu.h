@@ -1,7 +1,6 @@
 /**
  * @file FeverIconMenu.h
  * @brief フィーバータイム開始時に「FEVER」の文字をジャンプで登場・退場させる演出
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Menu.h"

@@ -1,7 +1,6 @@
 /**
  * @file LevelUpIconMenu.cpp
  * @brief 陣形レベルアップ時に親ペンギンの頭上へ表示するアイコンの演出メニュー
- * @author 竹林
  */
 #include "stdafx.h"
 #include "LevelUpIconMenu.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file INatureObject.h
  * @brief 自然オブジェクトの基底インターフェース
- * @author 竹林
  */
 #pragma once
 #include "BeastEnginePreCompile.h"

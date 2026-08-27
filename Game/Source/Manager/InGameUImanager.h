@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameUIManager.h
  * @brief インゲームUIの生成・更新・描画・配線を管理するクラス
- * @author 竹林
  */
 #pragma once
 #include "Source/UI/Modules/System/SystemPacket.h"
@@ -39,6 +38,7 @@ namespace app
 		class FeverIconMenu;
 		class LevelUpIconMenu;
 		class SpeedLineMenu;
+		class InGameHintMenu;
 
 		class CPReactionSystem;
 		class WpWarningSystem;
@@ -171,6 +171,13 @@ namespace app
 		void InitializeMapIcon();
 
 		/**
+		 * @brief マップアイコンの分割生成を1回分進める（ロード画面のフレームを止めないため）
+		 * @param maxCount この呼び出しで生成する最大個数
+		 * @return 全て生成し終えたらtrue
+		 */
+		bool InitializeMapIconStep(const int maxCount);
+
+		/**
 		 * @brief 実績一覧UIの表示位置にYオフセットを設定する（チュートリアル等、特定ステージのみ使用）
 		 * @detail JSON上の初期座標を基準にオフセットを加算するため、何度呼んでも位置が多重にずれることはない。
 		 * @param offsetY 加算するYオフセット（未設定時は0＝JSON通りの位置）
@@ -233,6 +240,7 @@ namespace app
 		ui::UIPacket<ui::FeverIconMenu> m_feverIconPacket;
 		ui::UIPacket<ui::LevelUpIconMenu> m_levelUpIconPacket;
 		ui::UIPacket<ui::SpeedLineMenu> m_speedLinePacket;
+		ui::UIPacket<ui::InGameHintMenu> m_hintPacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;

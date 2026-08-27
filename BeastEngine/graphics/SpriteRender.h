@@ -1,7 +1,6 @@
 ﻿/**
  * @file SpriteRender.h
  * @brief 2Dスプライト描画クラス
- * @author 竹林尚哉
  */
 #pragma once
 

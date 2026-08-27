@@ -1,7 +1,6 @@
 ﻿/**
  * @file MiniMapParameter.h
  * @brief ミニマップ専用パラメータークラス
- * @author 忽那
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameButtonGaugeStatus.h
  * @brief インゲームボタンのスタミナゲージ専用のステータスクラス
- * @author 立山
  */
 #pragma once
 #include "Source/UI/Model/UIStatus.h"

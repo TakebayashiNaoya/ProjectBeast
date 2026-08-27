@@ -1,7 +1,6 @@
 ﻿/**
  * @file ScorePopupAnimStatus.cpp
  * @brief スコア加算ポップアップ専用のアニメーションステータスクラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "ScorePopupAnimStatus.h"

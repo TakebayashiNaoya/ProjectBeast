@@ -1,7 +1,6 @@
 ﻿/**
  * @file FormationWheelMenu.cpp
  * @brief 陣形切り替え(LB/RB)とウルト発動可否(LT/RT)をアイコンで表示するクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "FormationWheelMenu.h"
@@ -28,6 +27,17 @@ namespace app
 
 			float Lerp(float a, float b, float t) { return a + (b - a) * t; }
 			float Clamp01(float v) { return v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v); }
+
+			/** 陣形切替バナーの表示時間（秒）。
+			 *  主張しすぎない長さにする（位置・文字サイズはFormationWheel.json側） */
+			constexpr float BANNER_DURATION = 1.0f;
+			/** 陣形ごとのバナー文言（EnFormationType の並び順）。効果をひとことだけ */
+			constexpr const char* BANNER_TEXTS[] = {
+				"バランス",
+				"はやい",
+				"まもり",
+				"あつめる",
+			};
 		}
 
 
@@ -64,10 +74,48 @@ namespace app
 #if defined(APP_DEBUG)
 			ReloadTuningIfChanged(dt);
 #endif
+			/** バナーは切り替え開始エッジ（m_wasSwitching）を使うため、
+			 *  m_wasSwitching を更新する UpdateFormationIcons() より先に呼ぶ */
+			UpdateFormationBanner();
 			UpdateFormationIcons();
 			UpdateUltIconColor();
 			UpdateLevelDisplay();
 			MenuBase::Update();
+		}
+
+
+		void FormationWheelMenu::UpdateFormationBanner()
+		{
+			auto* banner = GetUI<UIText>(Hash32("FormationBannerText"));
+			if (banner == nullptr) return;
+
+			auto* cpm = actor::ChildPenguinManager::GetInstance();
+			if (cpm == nullptr)
+			{
+				banner->m_isDraw = false;
+				return;
+			}
+
+			/** 切り替え開始の瞬間にバナーを出し直す（文言は切り替え先の陣形） */
+			const actor::EnFormationType currentType = cpm->GetCurrentFormationType();
+			if (cpm->IsSwitchingFormation() && !m_wasSwitching)
+			{
+				banner->SetText(BANNER_TEXTS[static_cast<int>(currentType)]);
+				m_bannerTimer = BANNER_DURATION;
+			}
+
+			if (m_bannerTimer <= 0.0f)
+			{
+				banner->m_isDraw = false;
+				return;
+			}
+
+			m_bannerTimer -= g_gameTime->GetFrameDeltaTime();
+			banner->m_isDraw = true;
+
+			/** 終わり際はフェードアウトする */
+			const float fadeOut = Clamp01(m_bannerTimer / 0.3f);
+			banner->m_color.w = fadeOut;
 		}
 
 
@@ -79,6 +127,12 @@ namespace app
 				{
 					ui->m_isDraw = true;
 				}
+			}
+
+			/** 陣形切替バナーも初期状態では非表示 */
+			if (auto* banner = GetUI<UIText>(Hash32("FormationBannerText")))
+			{
+				banner->m_isDraw = false;
 			}
 		}
 

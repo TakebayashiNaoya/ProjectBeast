@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameTimerMenu.cpp
  * @brief インゲームタイマーの動的処理クラス
- * @author 忽那
  */
 #include "stdafx.h"
 #include "InGameTimerMenu.h"

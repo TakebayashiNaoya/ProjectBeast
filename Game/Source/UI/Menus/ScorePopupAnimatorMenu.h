@@ -1,7 +1,6 @@
 ﻿/**
  * @file ScorePopupAnimatorMenu.h
  * @brief スコア加算ポップアップのアニメーションを担当するクラス
- * @author 立山
  */
 #pragma once
 #include "Source/UI/Model/ScorePopupAnimStatus.h"

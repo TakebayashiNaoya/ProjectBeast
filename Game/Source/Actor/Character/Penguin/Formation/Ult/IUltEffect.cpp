@@ -1,7 +1,6 @@
 ﻿/**
  * @file IUltEffect.cpp
  * @brief ウルトに付属させる演出（ビジュアルエフェクト）のインターフェース
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "IUltEffect.h"

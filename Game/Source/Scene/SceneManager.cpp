@@ -1,7 +1,6 @@
 ﻿/**
  * @file SceneManager.cpp
  * @brief シーンの管理をするクラス
- * @author 立山
  */
 #include "stdafx.h"
 
@@ -14,7 +13,6 @@
 #include "SceneManager.h"
 #include "Source/Sound/SoundManager.h"
 #include "TitleScene.h"
-#include "TutorialInGameScene.h"
 
 #include "Resource/ResourceManager.h"
 #include "Source/Core/Fade.h"
@@ -34,7 +32,6 @@ namespace app
 		AddSceneMap<app::EasyInGameScene>();
 		AddSceneMap<app::NormalInGameScene>();
 		AddSceneMap<app::HardInGameScene>();
-		AddSceneMap<app::TutorialInGameScene>();
 		AddSceneMap<app::ResultScene>();
 		AddSceneMap<app::ReplayScene>();
 

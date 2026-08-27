@@ -1,7 +1,6 @@
 ﻿/**
  * @file ModelRender.cpp
  * @brief モデルレンダーの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "ModelRender.h"
@@ -104,6 +103,10 @@ namespace nsBeastEngine
 			m_isToonEnabled = true;
 		}
 
+		// デバイスロスト調査：DREDのパンくずへ刻むモデル名を保持する
+		m_debugName = filePath;
+		m_debugNameW.assign(m_debugName.begin(), m_debugName.end());
+
 		// スケルトン初期化
 		InitSkeleton(filePath);
 		m_skeletonRef = &m_skeleton;
@@ -160,6 +163,9 @@ namespace nsBeastEngine
 		{
 			InitToonModels(modelInitData);
 		}
+
+		// EnableOutline() の遅延初期化用に最終的な初期化データを控えておく
+		SaveInitData(modelInitData);
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
@@ -226,6 +232,9 @@ namespace nsBeastEngine
 		{
 			InitToonModels(modelInitData);
 		}
+
+		// EnableOutline() の遅延初期化用に最終的な初期化データを控えておく
+		SaveInitData(modelInitData);
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
@@ -307,7 +316,18 @@ namespace nsBeastEngine
 
 		m_toonModel->Init(toonInitData);
 
+		InitOutlineModel(baseInitData);
+	}
+
+
+	void ModelRender::InitOutlineModel(const ModelInitData& baseInitData)
+	{
 		// ----- アウトラインモデル（outline.fx、前面カリングで背面だけ描画） -----
+		if (m_outlineModel == nullptr)
+		{
+			m_outlineModel = std::make_unique<BeastModel>();
+		}
+
 		ModelInitData outlineInitData = baseInitData;
 
 		outlineInitData.m_fxFilePath = "Assets/shader/outline.fx";
@@ -326,6 +346,43 @@ namespace nsBeastEngine
 		outlineInitData.m_expandConstantBufferSize2 = sizeof(SOutlineCb);
 
 		m_outlineModel->Init(outlineInitData);
+	}
+
+
+	void ModelRender::SaveInitData(const ModelInitData& modelInitData)
+	{
+		m_savedInitData = modelInitData;
+
+		// tkmキーとfxパスは呼び出し側のスタック上のバッファや一時オブジェクトを
+		// 指していることがある（例: TerrainObject のチャンクキーは char[64] のローカル変数）。
+		// 初期化データを後まで持ち越すこのクラスで文字列を所有し直す
+		m_savedTkmKey = (modelInitData.m_tkmFilePath != nullptr) ? modelInitData.m_tkmFilePath : "";
+		m_savedFxPath = (modelInitData.m_fxFilePath != nullptr) ? modelInitData.m_fxFilePath : "";
+	}
+
+
+	void ModelRender::EnableOutline()
+	{
+		// トゥーン経由で作成済みならフラグだけ立てる
+		if (m_outlineModel == nullptr)
+		{
+			// 所有している文字列を指し直してから使う（保存時のポインタは無効になっている場合がある）
+			m_savedInitData.m_tkmFilePath = m_savedTkmKey.empty() ? nullptr : m_savedTkmKey.c_str();
+			m_savedInitData.m_fxFilePath = m_savedFxPath.empty() ? nullptr : m_savedFxPath.c_str();
+
+			InitOutlineModel(m_savedInitData);
+		}
+		m_isOutlineOnlyEnabled = true;
+	}
+
+
+	void ModelRender::OnDrawOutline(RenderContext& rc)
+	{
+		if (!m_visible) return;
+		if (m_outlineModel == nullptr) return;
+
+		const Frustum& frustum = g_renderingEngine->GetActiveFrustum();
+		m_outlineModel->Draw(rc, frustum, m_maxInstance);
 	}
 
 
@@ -614,6 +671,13 @@ namespace nsBeastEngine
 		{
 			// ディファードレンダリングで描画するなら
 			g_renderingEngine->AddDeferredModelList(this);
+
+			// アウトラインだけ有効なモデルは、本体はディファードのまま
+			// 輪郭線だけフォワードパスで重ね描きする
+			if (m_isOutlineOnlyEnabled)
+			{
+				g_renderingEngine->AddOutlineModelList(this);
+			}
 		}
 	}
 
@@ -622,6 +686,18 @@ namespace nsBeastEngine
 	{
 		/** 描画が有効でない場合は処理しない */
 		if (!m_visible) return;
+
+		// デバイスロスト調査：この直後のドローがハングした場合にDREDレポートで
+		// モデル名を特定できるよう、コマンドリストへマーカーを刻む。
+		// 毎ドロー発行されるので、調査時だけ BEAST_GPU_MARKERS で有効にする
+		if (nsK2EngineLow::IsGpuMarkerEnabled() && !m_debugNameW.empty())
+		{
+			rc.GetCommandList()->SetMarker(
+				0,	// PIX_EVENT_UNICODE_VERSION
+				m_debugNameW.c_str(),
+				static_cast<UINT>((m_debugNameW.size() + 1) * sizeof(wchar_t))
+			);
+		}
 
 		const Frustum& frustum = g_renderingEngine->GetActiveFrustum();
 

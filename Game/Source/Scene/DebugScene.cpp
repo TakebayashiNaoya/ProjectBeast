@@ -1,7 +1,6 @@
 ﻿/**
  * @file DebugScene.h
  * @brief デバッグシーン
- * @author 立山
  */
 #include "stdafx.h"
 #include "DebugScene.h"

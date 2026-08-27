@@ -1,7 +1,6 @@
 ﻿/**
  * @file Application.h
  * @brief アプリケーション全体を管理するクラス
- * @author 立山
  */
 #pragma once
 

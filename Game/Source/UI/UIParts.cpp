@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIParts.cpp
  * @brief UIPartsのパーツ群
- * @author 忽那
  */
 #include "stdafx.h"
 #include "UIParts.h"

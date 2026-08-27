@@ -1,7 +1,6 @@
 ﻿/**
  * @file IKMath.h
  * @brief IK計算用の汎用ベクトル演算ヘルパー
- * @author 立山
  */
 #pragma once
 

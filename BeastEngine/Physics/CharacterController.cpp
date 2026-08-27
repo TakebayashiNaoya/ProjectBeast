@@ -1,7 +1,6 @@
 ﻿/**
  * @file CharacterController.cpp
  * @brief キャラクターコントローラーの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "CharacterController.h"

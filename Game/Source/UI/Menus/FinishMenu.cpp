@@ -1,7 +1,6 @@
 ﻿/**
  * @file FinishMenu.cpp
  * @brief FINISH演出の動的処理クラス
- * @author 立山
  */
 #include "stdafx.h"
 #include "FinishMenu.h"

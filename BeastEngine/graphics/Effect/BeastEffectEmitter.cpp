@@ -1,7 +1,6 @@
 ﻿/**
  * @file BeastEffectEmitter.cpp
  * @brief フラスタムカリング対応のエフェクトエミッタークラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "graphics/effect/BeastEffectEmitter.h"

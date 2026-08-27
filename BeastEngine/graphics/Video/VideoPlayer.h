@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoPlayer.h
  * @brief 映像再生制御クラス
- * @author 竹林
  */
 #pragma once
 #include <functional>

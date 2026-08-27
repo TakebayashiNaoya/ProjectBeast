@@ -1,7 +1,6 @@
 /**
  * @file LevelUpIconAnimStatus.cpp
  * @brief 陣形レベルアップアイコン専用のアニメーションステータスクラス
- * @author 竹林
  */
 #include "stdafx.h"
 #include "LevelUpIconAnimStatus.h"

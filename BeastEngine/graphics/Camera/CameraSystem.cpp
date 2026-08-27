@@ -1,7 +1,6 @@
 ﻿/**
  * @file CameraSystem.cpp
  * @brief カメラシステムの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "CameraSystem.h"

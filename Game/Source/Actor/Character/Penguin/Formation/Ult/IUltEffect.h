@@ -1,7 +1,6 @@
 /**
  * @file IUltEffect.h
  * @brief ウルトに付属させる演出（ビジュアルエフェクト）のインターフェース
- * @author 藤谷
  */
 #pragma once
 #include "Source/Effect/Types.h"

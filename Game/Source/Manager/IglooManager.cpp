@@ -1,7 +1,6 @@
 ﻿/**
  * @file IglooManager.cpp
  * @brief かまくらを管理するクラス
- * @author 立山
  */
 #include "stdafx.h"
 

@@ -1,7 +1,6 @@
 ﻿/**
  * @file WhirlpoolManager.cpp
  * @brief 渦潮を管理するクラス
- * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "Source/Core/ParameterManager.h"

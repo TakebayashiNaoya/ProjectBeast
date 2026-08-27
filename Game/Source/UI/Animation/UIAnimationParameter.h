@@ -1,7 +1,6 @@
 ﻿/**
  * @file UIAnimationParameter.h
  * @brief アニメーション情報の外部ファイル管理とホットリロード
- * @author 忽那
  */
 #pragma once
 #include "Json/json.hpp"

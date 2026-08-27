@@ -1,7 +1,6 @@
 ﻿/**
  * @file PauseScreenMenu.h
  * @brief ポーズ画面の動的クラス
- * @author 忽那
  */
 #pragma once
 #include "Source/UI/Menu.h"

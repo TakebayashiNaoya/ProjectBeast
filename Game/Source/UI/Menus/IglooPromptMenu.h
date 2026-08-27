@@ -1,7 +1,6 @@
 ﻿/**
  * @file IglooPromptMenu.h
  * @brief かまくら入口でAボタンアイコンを表示するクラス
- * @author 立山
  */
 #pragma once
 #include "Source/UI/Menu.h"

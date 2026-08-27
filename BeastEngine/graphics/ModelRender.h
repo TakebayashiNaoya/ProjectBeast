@@ -1,7 +1,6 @@
 ﻿/**
  * @file ModelRender.h
  * @brief モデルレンダー
- * @author 竹林尚哉
  */
 #pragma once
 
@@ -365,6 +364,21 @@ namespace nsBeastEngine
 		}
 
 		/**
+		 * @brief トゥーンを使わずに輪郭線だけを有効にする
+		 * @details 本体は通常のディファードで描いたまま、輪郭線だけを
+		 *          フォワードパスで重ね描きする。キャラクターの視認性向上用。
+		 *          Init() の後に呼ぶこと。太さ・色は SetOutlineParam() で調整する
+		 */
+		void EnableOutline();
+
+		/**
+		 * @brief 輪郭線モデルだけを描画する
+		 * @details EnableOutline() したモデルに対して、レンダリングエンジンの
+		 *          フォワードパスから呼ばれる。ユーザーは直接呼ばない
+		 */
+		void OnDrawOutline(RenderContext& rc);
+
+		/**
 		 * @brief 全モデルに対してトゥーンシェーダーを一括で有効/無効にする
 		 * @details RenderingEngineなどから呼ぶことを想定している。
 		 * @param enabled trueで全モデルのトゥーンが有効になる
@@ -526,6 +540,20 @@ namespace nsBeastEngine
 		void InitToonModels(const ModelInitData& baseInitData);
 
 		/**
+		 * @brief アウトラインモデルの初期化
+		 * @details InitToonModels() と EnableOutline() から呼ばれる。
+		 * @param baseInitData m_modelの初期化データをベースに使用する
+		 */
+		void InitOutlineModel(const ModelInitData& baseInitData);
+
+		/**
+		 * @brief EnableOutline() の遅延初期化用に初期化データを控える
+		 * @details 文字列パスは呼び出し側の寿命に依存しないよう本クラスで所有し直す
+		 * @param modelInitData 控える初期化データ
+		 */
+		void SaveInitData(const ModelInitData& modelInitData);
+
+		/**
 		 * @brief シェーダーのエントリーポイントの設定
 		 * @param modelInitData モデルの初期化データ
 		 */
@@ -605,6 +633,16 @@ namespace nsBeastEngine
 		 *          背面法線押し出し方式で輪郭線を描画する。カリングはフロントフェース。
 		 */
 		std::unique_ptr<BeastModel> m_outlineModel;
+
+		/** トゥーンなしで輪郭線だけを描くかどうか（EnableOutline()で有効化） */
+		bool m_isOutlineOnlyEnabled = false;
+
+		/** EnableOutline() の遅延初期化用に控えた最終的なモデル初期化データ */
+		ModelInitData m_savedInitData;
+		/** 上記の初期化データが指すtkmキー（呼び出し側の寿命に依存しないよう自前で持つ） */
+		std::string m_savedTkmKey;
+		/** 上記の初期化データが指すfxファイルパス（同上） */
+		std::string m_savedFxPath;
 
 		/** ボーン（自前保有） */
 		Skeleton       m_skeleton;
@@ -696,6 +734,8 @@ namespace nsBeastEngine
 		 * @details WhiteBear など特定モデルのログ絞り込みに使用する
 		 */
 		std::string    m_debugName;
+		/** デバイスロスト調査用。DREDマーカーに刻むモデル名（ワイド文字） */
+		std::wstring   m_debugNameW;
 
 		/** 全モデル共通のトゥーン有効フラグ（staticで全インスタンスに共有） */
 		static bool s_isToonGlobalEnabled;

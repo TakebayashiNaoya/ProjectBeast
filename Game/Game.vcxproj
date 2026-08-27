@@ -301,6 +301,7 @@
     <ClCompile Include="Source\Actor\IK\TwoBoneLegIK.cpp" />
     <ClCompile Include="Source\Actor\Stage\IStage.cpp" />
     <ClCompile Include="Source\Actor\Stage\StageSystem.cpp" />
+    <ClCompile Include="Source\Actor\Stage\StageNavGrid.cpp" />
     <ClCompile Include="Source\Actor\Stage\TerrainObject.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Camera\CameraCommon.cpp" />
@@ -317,6 +318,7 @@
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Effect\Decal.cpp" />
     <ClCompile Include="Source\Effect\DecalManager.cpp" />
+    <ClCompile Include="Source\Effect\DecalProfiler.cpp" />
     <ClCompile Include="Source\Effect\EffectManager.cpp" />
     <ClCompile Include="Source\GameLog\GameLogManager.cpp" />
     <ClCompile Include="Source\GameLog\LogCompression.cpp" />
@@ -348,8 +350,6 @@
     <ClCompile Include="Source\Scene\ResultScene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Scene\TitleScene.cpp" />
-    <ClCompile Include="Source\Scene\TutorialController.cpp" />
-    <ClCompile Include="Source\Scene\TutorialInGameScene.cpp" />
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
     <ClCompile Include="Source\UI\Animation\UIAnimation.cpp" />
@@ -366,6 +366,7 @@
     <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonGaugeStatus.cpp" />
+    <ClCompile Include="Source\UI\Hint\InGameHintMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp" />
     <ClCompile Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.cpp" />
     <ClCompile Include="Source\UI\InGameTimer\InGameTimerMenu.cpp" />
@@ -385,7 +386,6 @@
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\ScorePopupAnimatorMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp" />
-    <ClCompile Include="Source\UI\Menus\TutorialWindowMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
@@ -496,6 +496,7 @@
     <ClInclude Include="Source\Actor\IK\TwoBoneLegIK.h" />
     <ClInclude Include="Source\Actor\Stage\IStage.h" />
     <ClInclude Include="Source\Actor\Stage\StageSystem.h" />
+    <ClInclude Include="Source\Actor\Stage\StageNavGrid.h" />
     <ClInclude Include="Source\Actor\Stage\TerrainObject.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\Camera\CameraCommon.h" />
@@ -513,6 +514,7 @@
     <ClInclude Include="Source\Core\Transform.h" />
     <ClInclude Include="Source\Effect\Decal.h" />
     <ClInclude Include="Source\Effect\DecalManager.h" />
+    <ClInclude Include="Source\Effect\DecalProfiler.h" />
     <ClInclude Include="Source\Effect\EffectManager.h" />
     <ClInclude Include="Source\Effect\Types.h" />
     <ClInclude Include="Source\GameLog\GameLogManager.h" />
@@ -548,8 +550,6 @@
     <ClInclude Include="Source\Scene\ResultScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
     <ClInclude Include="Source\Scene\TitleScene.h" />
-    <ClInclude Include="Source\Scene\TutorialController.h" />
-    <ClInclude Include="Source\Scene\TutorialInGameScene.h" />
     <ClInclude Include="Source\Sound\SoundHandle.h" />
     <ClInclude Include="Source\Sound\SoundManager.h" />
     <ClInclude Include="Source\Sound\Types.h" />
@@ -575,6 +575,7 @@
     <ClInclude Include="Source\UI\Fever\FeverIconMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeAnimStatus.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonGaugeStatus.h" />
+    <ClInclude Include="Source\UI\Hint\InGameHintMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h" />
     <ClInclude Include="Source\UI\InGameButton\MasterInGameButtonGaugeParameter.h" />
     <ClInclude Include="Source\UI\InGameTimer\InGameTimerMenu.h" />
@@ -599,7 +600,6 @@
     <ClInclude Include="Source\UI\Menus\StageSelectMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
-    <ClInclude Include="Source\UI\Menus\TutorialWindowMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h" />

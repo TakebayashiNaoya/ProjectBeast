@@ -1,7 +1,6 @@
 ﻿/**
  * @file FontRender.cpp
  * @brief フォントレンダーの実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "FontRender.h"

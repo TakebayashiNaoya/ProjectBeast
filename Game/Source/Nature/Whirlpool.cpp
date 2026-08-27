@@ -1,7 +1,6 @@
 ﻿/**
  * @file Whirlpool.cpp
  * @brief 渦潮クラス
- * @author 藤谷、竹林
  */
 #include "stdafx.h"
 #include "Geometry/Frustum.h"

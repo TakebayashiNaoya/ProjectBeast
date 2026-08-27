@@ -1,7 +1,6 @@
 ﻿/**
  * @file BearReactionMenu.cpp
  * @brief クマのリアクションメニュークラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "BearReactionMenu.h"

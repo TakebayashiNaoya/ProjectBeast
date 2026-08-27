@@ -1,11 +1,13 @@
 ﻿/**
  * @file StageSelectMenu.cpp
  * @brief ステージ選択画面のメニュークラス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "StageSelectMenu.h"
 
+#include "Source/Manager/ScoreManager.h"
+// 制限時間・ステージ名・配置JSONパスの一次資料（STAGE_INFO_TABLE）を共有するため
+#include "Source/Scene/InGameSceneBase.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Animation/UIAnimation.h"
 #include "Source/Util/JsonConverter.h"
@@ -22,7 +24,6 @@ namespace app
 				"Easy",
 				"Normal",
 				"Hard",
-				"Tutorial",
 			};
 
 			const std::array<std::string, static_cast<uint8_t>(EnStageButtonTypes::Max)> BUTTON_NAME =
@@ -34,6 +35,10 @@ namespace app
 
 			/** 選択中のアニメーションのキー */
 			constexpr uint32_t SELECTING_CURSOR_ANIMATION_KEY = Hash32("SelectingBlinking");
+
+			/** カーソル移動ポップの長さ（秒）と大きさ（タイトル画面と同じ手応えに揃える） */
+			constexpr float CURSOR_POP_DURATION = 0.15f;
+			constexpr float CURSOR_POP_SCALE = 0.2f;
 
 			constexpr const char* STAGE_SELECT_JSON_PATH = "Assets/parameter/UI/stageSelect/StageSelect.json";
 			constexpr const char* MENU_PARAM_KEY = "menuParam";
@@ -76,6 +81,7 @@ namespace app
 			, m_cursorFrame(nullptr)
 			, m_cursorFrameBG(nullptr)
 			, m_stagePreviewVideo(nullptr)
+			, m_selectFlashIcon(nullptr)
 			, m_prevSelectingStage(EnStageChoices::Max)
 			, m_selectInputInterval(0.0f)
 			, m_isSelected(false)
@@ -99,7 +105,13 @@ namespace app
 			m_cursorFrame = nullptr;
 			m_cursorFrameBG = nullptr;
 			m_stagePreviewVideo = nullptr;
+			m_selectFlashIcon = nullptr;
 			m_prevSelectingStage = EnStageChoices::Max;
+
+			// 選択確定演出の状態もリセットする
+			m_zoomTargets.clear();
+			m_isZoomBaseCaptured = false;
+			m_selectEffectTimer = 0.0f;
 
 			// Reload後に古い状態が残らないようリセットする。
 			m_verticalInputDetector.Reset();
@@ -146,6 +158,7 @@ namespace app
 				m_cursorFrame,
 				m_cursorFrameBG,
 				m_buttonBGIcon,
+				m_selectFlashIcon,
 			};
 
 			for (auto& choice : m_choices)
@@ -191,9 +204,208 @@ namespace app
 			// 描画フラグを更新
 			UpdateDrawFlag();
 			UpdateIcons();
+			UpdateStageInfo();
+
+			// 選択確定演出（位置・スケールを上書きするので各Updateの後に行う）
+			UpdateSelectEffect();
 
 			// Canvasの更新
 			MenuBase::Update();
+		}
+
+
+		void StageSelectMenu::LoadStageInfoIfNeeded()
+		{
+			static_assert(STAGE_INFO_NUM == STAGE_INFO_COUNT,
+				"情報パネルの枠数と STAGE_INFO_TABLE の件数を揃えること");
+
+			if (m_isStageInfoLoaded) return;
+			m_isStageInfoLoaded = true;
+
+			/** 配置JSONの実データから数を数える。
+			 *  パスはインゲームシーンと共有の STAGE_INFO_TABLE から引くので、
+			 *  ステージを再生成・改名しても表示が自動で追従する */
+			for (int i = 0; i < STAGE_INFO_NUM; ++i)
+			{
+				const StageInfo& info = STAGE_INFO_TABLE[i];
+
+				nlohmann::json json;
+				if (util::JsonConverter::IsLoadJsonFile(json, info.enemyLayoutJsonPath)
+					&& json.contains("enemies"))
+				{
+					m_stageBearCounts[i] = static_cast<int>(json["enemies"].size());
+				}
+				if (util::JsonConverter::IsLoadJsonFile(json, info.whirlpoolPositionsJsonPath)
+					&& json.contains("whirlpoolPositions"))
+				{
+					m_stageWhirlCounts[i] = static_cast<int>(json["whirlpoolPositions"].size());
+				}
+			}
+		}
+
+
+		void StageSelectMenu::UpdateStageInfo()
+		{
+			auto* panel = GetUI<UIIcon>(Hash32("StageInfoPanel"));
+			auto* timeIcon = GetUI<UIIcon>(Hash32("StageInfoTimeIcon"));
+			auto* timeText = GetUI<UIText>(Hash32("StageInfoTimeText"));
+			auto* bearIcon = GetUI<UIIcon>(Hash32("StageInfoBearIcon"));
+			auto* bearText = GetUI<UIText>(Hash32("StageInfoBearText"));
+			auto* whirlIcon = GetUI<UIIcon>(Hash32("StageInfoWhirlIcon"));
+			auto* whirlText = GetUI<UIText>(Hash32("StageInfoWhirlText"));
+			auto* recordText = GetUI<UIText>(Hash32("StageInfoRecordText"));
+			if (!panel || !timeIcon || !timeText || !bearIcon || !bearText
+				|| !whirlIcon || !whirlText || !recordText)
+			{
+				return;
+			}
+
+			/** 選択確定後は出さない */
+			const bool isShow = (m_state == EnStageSelectState::Selecting);
+			panel->m_isDraw = isShow;
+			timeIcon->m_isDraw = isShow;
+			timeText->m_isDraw = isShow;
+			bearIcon->m_isDraw = isShow;
+			bearText->m_isDraw = isShow;
+			whirlIcon->m_isDraw = isShow;
+			whirlText->m_isDraw = isShow;
+			recordText->m_isDraw = isShow;
+			if (!isShow) return;
+
+			LoadStageInfoIfNeeded();
+
+			const int index = static_cast<int>(m_selectingStage);
+			if (index < 0 || index >= STAGE_INFO_NUM) return;
+
+			/** 制限時間もステージ名も、インゲームシーンと同じ STAGE_INFO_TABLE から引く */
+			const StageInfo& info = STAGE_INFO_TABLE[index];
+			const int timeSeconds = static_cast<int>(info.timeLimit);
+
+			char buf[48];
+			sprintf_s(buf, "%d:%02d", timeSeconds / 60, timeSeconds % 60);
+			timeText->SetText(buf);
+
+			sprintf_s(buf, "x%d", m_stageBearCounts[index]);
+			bearText->SetText(buf);
+
+			sprintf_s(buf, "x%d", m_stageWhirlCounts[index]);
+			whirlText->SetText(buf);
+
+			const int highScore = ScoreManager::GetHighScore(info.name);
+			if (highScore > 0)
+			{
+				sprintf_s(buf, "きろく %d", highScore);
+				recordText->SetText(buf);
+			}
+			else
+			{
+				recordText->SetText("きろく ---");
+			}
+		}
+
+
+		void StageSelectMenu::HideMenuParts()
+		{
+			if (m_bgIcon)                m_bgIcon->SetIsDraw(false);
+			if (m_stageSelectText)       m_stageSelectText->SetIsDraw(false);
+			if (m_stageSelectTextBGIcon) m_stageSelectTextBGIcon->SetIsDraw(false);
+			if (m_buttonBGIcon)          m_buttonBGIcon->SetIsDraw(false);
+			if (m_cursorFrame)           m_cursorFrame->SetIsDraw(false);
+			if (m_cursorFrameBG)         m_cursorFrameBG->SetIsDraw(false);
+
+			for (auto& choice : m_choices)
+			{
+				if (choice.m_text)       choice.m_text->SetIsDraw(false);
+				if (choice.m_bubbleIcon) choice.m_bubbleIcon->SetIsDraw(false);
+			}
+			for (auto& button : m_buttons)
+			{
+				if (button.m_button) button.m_button->SetIsDraw(false);
+				if (button.m_text)   button.m_text->SetIsDraw(false);
+			}
+		}
+
+
+		void StageSelectMenu::CaptureZoomBase()
+		{
+			m_zoomTargets.clear();
+
+			// ズームさせるのはステージ映像だけにする。
+			// メニュー類（見出し・バブル・カーソル・ボタン）を一緒に拡大すると、
+			// 文字やアイコンが画面外へ散っていくのが目に入って「ステージへ入っていく」感が薄れる。
+			// それらは HideMenuParts() で演出の開始と同時に消す。
+			// 白フラッシュは全画面のまま重ねたいので、ここでは対象にしない
+			std::vector<UIBase*> targets = {
+				m_stagePreviewVideo,
+			};
+
+			// 現在の位置・スケールを基準値として保存する
+			for (auto* ui : targets)
+			{
+				if (ui == nullptr) continue;
+
+				ZoomTarget target;
+				target.m_ui = ui;
+				target.m_basePosition = ui->m_transform.m_localTransform.m_position;
+				target.m_baseScale = ui->m_transform.m_localTransform.m_scale;
+				if (auto* text = dynamic_cast<UIText*>(ui))
+				{
+					target.m_baseFontScale = text->GetScale();
+				}
+				m_zoomTargets.push_back(target);
+			}
+
+			m_isZoomBaseCaptured = true;
+		}
+
+
+		void StageSelectMenu::UpdateSelectEffect()
+		{
+			if (m_state != EnStageSelectState::Selected) return;
+
+			// 演出の開始フレームで基準値を保存する
+			if (!m_isZoomBaseCaptured)
+			{
+				CaptureZoomBase();
+			}
+
+			// UpdateDrawFlag() が毎フレーム全パーツを表示に戻すため、ここで消し直す
+			HideMenuParts();
+
+			m_selectEffectTimer += g_gameTime->GetFrameDeltaTime();
+
+			// 画面中央へ加速しながら吸い込まれるズーム（座標系が中央原点なので位置×倍率で放射拡大になる）
+			const float u = (std::min)(m_selectEffectTimer / m_param.selectZoomDuration, 1.0f);
+			const float zoom = 1.0f + (m_param.selectZoomScale - 1.0f) * u * u;
+			for (auto& target : m_zoomTargets)
+			{
+				auto& transform = target.m_ui->m_transform.m_localTransform;
+				transform.m_position = Vector3(
+					target.m_basePosition.x * zoom, target.m_basePosition.y * zoom, target.m_basePosition.z);
+
+				// テキストのスケールはフォントスケールで、それ以外はトランスフォームで掛ける
+				if (auto* text = dynamic_cast<UIText*>(target.m_ui))
+				{
+					text->SetScale(Vector2(target.m_baseFontScale.x * zoom, target.m_baseFontScale.y * zoom));
+				}
+				else
+				{
+					transform.m_scale = Vector3(
+						target.m_baseScale.x * zoom, target.m_baseScale.y * zoom, target.m_baseScale.z);
+				}
+			}
+
+			// ズームの後半で徐々に真っ白へ（このあと既存のシーンフェードで暗転しロードへつながる）
+			if (m_selectFlashIcon)
+			{
+				const float fadeStart = (std::max)(m_param.selectZoomDuration - m_param.selectWhiteFadeDuration, 0.0f);
+				const float fade = (m_param.selectWhiteFadeDuration > 0.0f)
+					? (m_selectEffectTimer - fadeStart) / m_param.selectWhiteFadeDuration
+					: 1.0f;
+				const float alpha = (std::max)(0.0f, (std::min)(fade, 1.0f));
+				m_selectFlashIcon->SetIsDraw(alpha > 0.0f);
+				m_selectFlashIcon->m_color.w = alpha;
+			}
 		}
 
 
@@ -205,6 +417,32 @@ namespace app
 
 			m_cursorFrameBG->StopAnimation();
 
+			// 選択確定演出を巻き戻す（ズームした位置・スケールを元に戻す）
+			if (m_isZoomBaseCaptured)
+			{
+				for (auto& target : m_zoomTargets)
+				{
+					target.m_ui->m_transform.m_localTransform.m_position = target.m_basePosition;
+					if (auto* text = dynamic_cast<UIText*>(target.m_ui))
+					{
+						text->SetScale(target.m_baseFontScale);
+					}
+					else
+					{
+						target.m_ui->m_transform.m_localTransform.m_scale = target.m_baseScale;
+					}
+				}
+				m_zoomTargets.clear();
+				m_isZoomBaseCaptured = false;
+			}
+			m_selectEffectTimer = 0.0f;
+			if (m_selectFlashIcon)
+			{
+				m_selectFlashIcon->SetIsDraw(false);
+				m_selectFlashIcon->m_color.w = 0.0f;
+			}
+
+			m_cursorPopTimer = 0.0f;
 			m_isSelected = false;
 		}
 
@@ -241,58 +479,27 @@ namespace app
 			const bool leftInput = hDir == Direction::Negative;
 			const bool rightInput = hDir == Direction::Positive;
 
-			// 縦方向：Negative=下、Positive=上。倒しっぱなし中はinputIntervalごとにリピートする。
-			const auto vDir = m_verticalInputDetector.Update(
-				stickLYF, g_pad[0]->IsTrigger(enButtonDown), g_pad[0]->IsTrigger(enButtonUp),
-				m_param.inputThreshold, m_param.inputInterval);
-			const bool upInput = vDir == Direction::Positive;
-			const bool downInput = vDir == Direction::Negative;
 
 
+			// カーソル移動の手応え：SEとフレームのポップ（タイトル画面と同じ演出）
 			auto PlayCursorSE = [&]()
 				{
 					SoundManager::Get().PlaySE(static_cast<int>(enSoundKind::enSoundKind_CursorMove));
+					m_cursorPopTimer = CURSOR_POP_DURATION;
 				};
 
-			if (m_selectingStage == EnStageChoices::Tutorial)
+			// イージー・ノーマル・ハードの横移動
+			const auto current = static_cast<uint8_t>(m_selectingStage);
+			constexpr uint8_t HARD_INDEX = static_cast<uint8_t>(EnStageChoices::Hard);
+			if (leftInput && current > 0)
 			{
-				// チュートリアルから上段への移動：左→イージー、上→ノーマル、右→ハード
-				if (leftInput)
-				{
-					m_selectingStage = EnStageChoices::Easy;
-					PlayCursorSE();
-				}
-				else if (upInput)
-				{
-					m_selectingStage = EnStageChoices::Normal;
-					PlayCursorSE();
-				}
-				else if (rightInput)
-				{
-					m_selectingStage = EnStageChoices::Hard;
-					PlayCursorSE();
-				}
+				m_selectingStage = static_cast<EnStageChoices>(current - 1);
+				PlayCursorSE();
 			}
-			else
+			else if (rightInput && current < HARD_INDEX)
 			{
-				// 上段（イージー・ノーマル・ハード）の横移動と下段への移動
-				const auto current = static_cast<uint8_t>(m_selectingStage);
-				constexpr uint8_t HARD_INDEX = static_cast<uint8_t>(EnStageChoices::Hard);
-				if (leftInput && current > 0)
-				{
-					m_selectingStage = static_cast<EnStageChoices>(current - 1);
-					PlayCursorSE();
-				}
-				else if (rightInput && current < HARD_INDEX)
-				{
-					m_selectingStage = static_cast<EnStageChoices>(current + 1);
-					PlayCursorSE();
-				}
-				else if (downInput)
-				{
-					m_selectingStage = EnStageChoices::Tutorial;
-					PlayCursorSE();
-				}
+				m_selectingStage = static_cast<EnStageChoices>(current + 1);
+				PlayCursorSE();
 			}
 
 			// ステージが変わったら事前ロード済みクリップにポインタを切り替える（I/O なし）
@@ -348,10 +555,15 @@ namespace app
 			m_cursorFrame->m_transform.m_localTransform.m_position = position;
 			m_cursorFrameBG->m_transform.m_localTransform.m_position = position;
 
-			// チュートリアルのバブルは横幅が広いのでカーソルを拡大する
-			const Vector3 cursorScale = (m_selectingStage == EnStageChoices::Tutorial)
-				? Vector3(m_param.tutorialCursorScaleX, 1.0f, 1.0f)
-				: Vector3::One;
+			// カーソル移動のポップ（フレームが一瞬大きくなって戻る）
+			if (m_cursorPopTimer > 0.0f)
+			{
+				m_cursorPopTimer -= g_gameTime->GetFrameDeltaTime();
+			}
+			const float pop = 1.0f
+				+ CURSOR_POP_SCALE * (std::max)(m_cursorPopTimer, 0.0f) / CURSOR_POP_DURATION;
+
+			const Vector3 cursorScale = Vector3(pop, pop, 1.0f);
 			m_cursorFrame->m_transform.m_localTransform.m_scale = cursorScale;
 			m_cursorFrameBG->m_transform.m_localTransform.m_scale = cursorScale;
 		}
@@ -391,6 +603,8 @@ namespace app
 			if (!m_cursorFrameBG) m_cursorFrameBG = GetUI<UIIcon>(Hash32("FrameBG"));
 
 			if (!m_stagePreviewVideo) m_stagePreviewVideo = GetUI<UIVideo>(Hash32("StagePreviewVideo"));
+
+			if (!m_selectFlashIcon) m_selectFlashIcon = GetUI<UIIcon>(Hash32("SelectFlashWhite"));
 		}
 
 
@@ -421,7 +635,9 @@ namespace app
 
 			m_param.inputInterval = JC::ToFloat(p, "inputInterval", m_param.inputInterval);
 			m_param.inputThreshold = JC::ToFloat(p, "inputThreshold", m_param.inputThreshold);
-			m_param.tutorialCursorScaleX = JC::ToFloat(p, "tutorialCursorScaleX", m_param.tutorialCursorScaleX);
+			m_param.selectZoomDuration = JC::ToFloat(p, "selectZoomDuration", m_param.selectZoomDuration);
+			m_param.selectZoomScale = JC::ToFloat(p, "selectZoomScale", m_param.selectZoomScale);
+			m_param.selectWhiteFadeDuration = JC::ToFloat(p, "selectWhiteFadeDuration", m_param.selectWhiteFadeDuration);
 			m_param.cursorBlinkDuration = JC::ToFloat(p, "cursorBlinkDuration", m_param.cursorBlinkDuration);
 			m_param.cursorBlinkStartColor = JC::ToVector4(p, "cursorBlinkStartColor", true, m_param.cursorBlinkStartColor);
 			m_param.cursorBlinkEndColor = JC::ToVector4(p, "cursorBlinkEndColor", true, m_param.cursorBlinkEndColor);

@@ -1,7 +1,6 @@
 ﻿/**
  * @file MasterInGameButtonGaugeParameter.h
  * @brief インゲームボタンのスタミナゲージ専用のパラメーター管理クラス
- * @author 立山
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"

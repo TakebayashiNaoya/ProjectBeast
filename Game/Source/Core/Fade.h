@@ -1,7 +1,6 @@
 ﻿/**
  * @file Fade.h
  * @brief ロード画面を表示するクラス
- * @author 立山
  */
 #pragma once
 

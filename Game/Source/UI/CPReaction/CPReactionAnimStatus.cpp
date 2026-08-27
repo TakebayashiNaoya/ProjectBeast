@@ -1,7 +1,6 @@
 ﻿/**
  * @file CPReactionAnimStatus.cpp
  * @brief CPReactionのアニメーションステータス
- * @author 藤谷
  */
 #include "stdafx.h"
 #include "CPReactionAnimStatus.h"

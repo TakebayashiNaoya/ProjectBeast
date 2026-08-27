@@ -1,7 +1,6 @@
 ﻿/**
  * @file EnemyController.h
  * @brief エネミーのコントローラー
- * @author 立山、竹林
  */
 #pragma once
 

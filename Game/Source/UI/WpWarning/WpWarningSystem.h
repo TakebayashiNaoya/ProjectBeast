@@ -1,7 +1,6 @@
 ﻿/**
  * @file WpWarningSystem.h
  * @brief WpWarningのシステムクラス
- * @author 藤谷
  */
 #pragma once
 #include "Source/UI/Modules/FrontChecker/FrontChecker.h"

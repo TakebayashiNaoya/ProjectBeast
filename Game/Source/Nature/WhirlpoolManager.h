@@ -1,7 +1,6 @@
 ﻿/**
  * @file WhirlpoolManager.h
  * @brief 渦潮を管理するクラス
- * @author 藤谷、竹林
  */
 #pragma once
 #include "Nature/INatureObject.h"

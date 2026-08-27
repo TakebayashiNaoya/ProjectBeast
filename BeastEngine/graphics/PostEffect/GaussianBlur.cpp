@@ -1,7 +1,6 @@
 ﻿/**
  * @file GaussianBlur.cpp
  * @brief ガウシアンブラー・平均ブラーの独自実装
- * @author 竹林尚哉
  */
 #include "BeastEnginePreCompile.h"
 #include "Graphics/PostEffect/GaussianBlur.h"

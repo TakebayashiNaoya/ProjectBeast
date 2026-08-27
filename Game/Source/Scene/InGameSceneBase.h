@@ -1,7 +1,6 @@
 ﻿/**
  * @file InGameSceneBase.h
  * @brief インゲームシーン基底クラス
- * @author 立山、竹林
  */
 #pragma once
 #include "IScene.h"
@@ -26,6 +25,44 @@ namespace app
 	}
 
 	class InGameUIManager;
+
+
+	/**
+	 * @brief 難易度ごとに決まっているステージの静的情報
+	 * @details 各インゲームシーンの GetTimeLimit()/GetStageName()/各JSONパスと、
+	 *          ステージ選択画面の情報パネルの両方がここを参照する。
+	 *          両者に同じ数値を書くと、片方だけ直したときに黙ってズレるため一次資料は1つにする。
+	 */
+	struct StageInfo
+	{
+		const char* name;							//ステージ名（ハイスコアの保存キー・ログのステージ名）。
+		float       timeLimit;						//制限時間（秒）。
+		const char* enemyLayoutJsonPath;			//シロクマ配置JSONのパス。
+		const char* whirlpoolPositionsJsonPath;		//渦潮配置JSONのパス。
+	};
+
+
+	/** 難易度3種のステージ情報。ui::EnStageChoices の並び（Easy/Normal/Hard）と一致させること */
+	constexpr StageInfo STAGE_INFO_TABLE[] = {
+		{
+			"Easy", 120.0f,
+			"Assets/parameter/character/enemy/EnemyLayout_Easy.json",
+			"Assets/parameter/stage/whirlpoolPositions_Easy.json"
+		},
+		{
+			"Normal", 150.0f,
+			"Assets/parameter/character/enemy/EnemyLayout_Normal.json",
+			"Assets/parameter/stage/whirlpoolPositions_Normal.json"
+		},
+		{
+			"Hard", 180.0f,
+			"Assets/parameter/character/enemy/EnemyLayout_Hard.json",
+			"Assets/parameter/stage/whirlpoolPositions_Hard.json"
+		},
+	};
+
+	/** ステージ情報の件数（難易度の数） */
+	constexpr int STAGE_INFO_COUNT = static_cast<int>(std::size(STAGE_INFO_TABLE));
 
 
 	/** 子ペンギン生成設定 */
@@ -101,7 +138,7 @@ namespace app
 		//------------------------------------------------------------
 		/** ロード完了時の追加処理 */
 		virtual void OnLoadComplete() {}
-		/** Playing フェーズの追加更新（TutorialController などを想定） */
+		/** Playing フェーズの追加更新（各ステージ固有の追加処理を想定） */
 		virtual void OnUpdatePlaying() {}
 		/** Playing フェーズの追加描画（矢印UIなどを想定） */
 		virtual void OnRenderPlaying(RenderContext& /*rc*/) {}
@@ -122,15 +159,31 @@ namespace app
 
 
 	private:
+		/**
+		 * @brief 衝撃演出の受け口を登録する
+		 * @details 咆哮・かまくら破壊・弾き返し・ウルト発動を、画面揺れ・ラジアルブラー・
+		 *          ヒットストップへ振り分ける。通知元（AIやウルト）がカメラや
+		 *          ポストエフェクトを直接触らずに済むよう、見せ方はここへ集約する
+		 */
+		void RegisterImpactObserver();
+
 		//------------------------------------------------------------
 		// ロードフェーズ
 		//------------------------------------------------------------
 		enum class LoadPhase
 		{
-			None, Stage, StageWait, Daddy, Children, Enemy, Camera, Ocean, Done
+			None, Stage, StageWait, DecalPrewarm, Daddy, Children, Enemy, Camera, Ocean, MapIcon, Done
 		};
 		LoadPhase m_loadPhase = LoadPhase::None;
 		int m_childIndex = 0;
+
+		//------------------------------------------------------------
+		// ステージ紹介動画の撮影モード（BEAST_SHOWCASE）
+		//------------------------------------------------------------
+		/** 撮影モードが開始済みか（合図ファイルの書き出しとUI無効化を一度だけ行う） */
+		bool m_isShowcaseStarted = false;
+		/** 撮影モードの経過時間（秒）。一定時間で自動終了する */
+		float m_showcaseTimer = 0.0f;
 
 		//------------------------------------------------------------
 		// ゲームフェーズ

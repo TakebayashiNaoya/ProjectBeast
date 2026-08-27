@@ -1,7 +1,6 @@
 ﻿/**
  * @file VideoRender.cpp
  * @brief 映像を IRenderer として 2D パスで描画するクラスの実装
- * @author 竹林
  */
 #include "BeastEnginePreCompile.h"
 #include "VideoRender.h"
