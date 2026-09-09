@@ -349,6 +349,7 @@
     <ClCompile Include="Source\Scene\ReplayScene.cpp" />
     <ClCompile Include="Source\Scene\ResultScene.cpp" />
     <ClCompile Include="Source\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Scene\PVScene.cpp" />
     <ClCompile Include="Source\Scene\TitleScene.cpp" />
     <ClCompile Include="Source\Sound\SoundManager.cpp" />
     <ClCompile Include="Source\system\system.cpp" />
@@ -549,6 +550,7 @@
     <ClInclude Include="Source\Scene\ReplayScene.h" />
     <ClInclude Include="Source\Scene\ResultScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
+    <ClInclude Include="Source\Scene\PVScene.h" />
     <ClInclude Include="Source\Scene\TitleScene.h" />
     <ClInclude Include="Source\Sound\SoundHandle.h" />
     <ClInclude Include="Source\Sound\SoundManager.h" />
