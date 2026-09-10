@@ -1,0 +1,33 @@
+﻿{
+    "canvas": {
+        "elements": [
+            {
+                "type": "UIVideo",
+                "name": "PVVideo",
+                "clipPath": "Assets/Video/PV.mp4",
+                "width": 1600,
+                "height": 900,
+                "fps": 23.976,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "loop": false,
+                "autoPlay": false
+            }
+        ]
+    }
+}

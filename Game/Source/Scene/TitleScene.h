@@ -44,6 +44,11 @@ namespace app
 		void SoundOptionUpdate();
 		/** @brief チュートリアル画面の更新 */
 		void TutorialUpdate();
+		/**
+		 * @brief タイトル放置時間を更新し、一定時間放置されていたらPVシーンを要求する
+		 * @return PVシーンへの遷移を要求したらtrue
+		 */
+		bool UpdateAttractTimer();
 
 
 	private:
@@ -60,6 +65,13 @@ namespace app
 	private:
 		bool     m_nextScene = false;
 		uint32_t m_nextSceneId = 0;
+		/** 次のシーンへ移るまでのフェード時間（秒） */
+		float    m_nextSceneWaitTime = 3.0f;
+
+
+	private:
+		/** 操作されないまま経過した時間（秒） */
+		float m_attractTimer = 0.0f;
 
 
 	private:

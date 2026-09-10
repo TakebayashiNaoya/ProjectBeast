@@ -9,6 +9,7 @@
 #include "EasyInGameScene.h"
 #include "HardInGameScene.h"
 #include "NormalInGameScene.h"
+#include "PVScene.h"
 #include "ReplayScene.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
@@ -37,6 +38,36 @@ namespace
 		if (getenv_s(&len, buf, sizeof(buf), "BEAST_AUTOPLAY") != 0 || len == 0) return 1;
 		const int count = atoi(buf);
 		return (count >= 1) ? count : 1;
+	}
+
+
+	/** タイトルを放置してPVへ移るまでの時間（秒） */
+	constexpr float ATTRACT_IDLE_TIME = 30.0f;
+	/** PVへ切り替えるときのフェード時間（秒） */
+	constexpr float ATTRACT_FADE_TIME = 1.0f;
+	/** スティックを操作とみなす閾値 */
+	constexpr float STICK_INPUT_THRESHOLD = 0.2f;
+
+	// 放置時間の上書き（環境変数 BEAST_ATTRACT_TIME）。PVの確認で30秒待たずに済ませるためのもの
+	float GetAttractIdleTime()
+	{
+		char buf[16];
+		size_t len = 0;
+		if (getenv_s(&len, buf, sizeof(buf), "BEAST_ATTRACT_TIME") != 0 || len == 0) return ATTRACT_IDLE_TIME;
+
+		const float time = static_cast<float>(atof(buf));
+		return (time > 0.0f) ? time : ATTRACT_IDLE_TIME;
+	}
+
+	// 放置判定に使う入力。ボタンだけだとスティックを倒し続けているときに放置扱いになるので両方見る
+	bool HasAnyInput()
+	{
+		if (g_pad[0]->IsPressAnyKey()) return true;
+
+		return fabsf(g_pad[0]->GetLStickXF()) > STICK_INPUT_THRESHOLD
+			|| fabsf(g_pad[0]->GetLStickYF()) > STICK_INPUT_THRESHOLD
+			|| fabsf(g_pad[0]->GetRStickXF()) > STICK_INPUT_THRESHOLD
+			|| fabsf(g_pad[0]->GetRStickYF()) > STICK_INPUT_THRESHOLD;
 	}
 }
 
@@ -119,6 +150,9 @@ namespace app
 			return;
 		}
 
+		// タイトルを一定時間放置したらPVを流す
+		if (UpdateAttractTimer()) return;
+
 		switch (m_state)
 		{
 		case TitleState::Title:
@@ -186,7 +220,7 @@ namespace app
 	{
 		if (m_nextScene) {
 			id = m_nextSceneId;
-			waitTime = 3.0f;
+			waitTime = m_nextSceneWaitTime;
 			return true;
 		}
 
@@ -335,5 +369,27 @@ namespace app
 			m_tutorialPacket->GetMenu()->SetClosed(false);
 			m_state = TitleState::Title;
 		}
+	}
+
+
+	bool TitleScene::UpdateAttractTimer()
+	{
+		// 遷移待ちのときや、タイトル以外の画面を開いている間は数えない
+		if (m_nextScene || m_state != TitleState::Title || HasAnyInput())
+		{
+			m_attractTimer = 0.0f;
+			return false;
+		}
+
+		m_attractTimer += g_gameTime->GetFrameDeltaTime();
+		if (m_attractTimer < GetAttractIdleTime()) return false;
+
+		// PVシーンへ。暗転に合わせてタイトルのBGMも消していく
+		m_attractTimer = 0.0f;
+		m_nextSceneId = PVScene::ID();
+		m_nextSceneWaitTime = ATTRACT_FADE_TIME;
+		m_nextScene = true;
+		SoundManager::Get().FadeOutBGM(ATTRACT_FADE_TIME);
+		return true;
 	}
 }
