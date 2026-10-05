@@ -539,20 +539,33 @@ namespace nsBeastEngine
 		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);
 		rc.SetRenderTargetAndViewport(m_2DRenderTarget);
 		rc.ClearRenderTargetView(m_2DRenderTarget);
-		m_mainSprite.Draw(rc);
-		for (auto& renderObj : m_renderObjects)
 		{
-			renderObj->OnRender2D(rc);
+			BEAST_PROFILE_SCOPE(u8"メインスプライト描画");
+			m_mainSprite.Draw(rc);
+		}
+		{
+			// 内訳は各IRenderer実装（FontRender/SpriteRender/GaugeRender等）側の計測ポイントに出る
+			BEAST_PROFILE_SCOPE(u8"UIオブジェクト描画 (各IRenderer)");
+			for (auto& renderObj : m_renderObjects)
+			{
+				renderObj->OnRender2D(rc);
+			}
 		}
 
 		// 小窓（サブカメラ）の描画
-		SubCameraManager::Get().RenderToScreen(rc);
+		{
+			BEAST_PROFILE_SCOPE(u8"小窓描画 (SubCameraManager)");
+			SubCameraManager::Get().RenderToScreen(rc);
+		}
 
 		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);
 
 		rc.WaitUntilToPossibleSetRenderTarget(m_mainView.renderTarget);
 		rc.SetRenderTargetAndViewport(m_mainView.renderTarget);
-		m_2DSprite.Draw(rc);
+		{
+			BEAST_PROFILE_SCOPE(u8"2D合成描画 (メインRTへ)");
+			m_2DSprite.Draw(rc);
+		}
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainView.renderTarget);
 
 		EndGPUEvent();
