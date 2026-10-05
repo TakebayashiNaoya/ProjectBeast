@@ -10,6 +10,35 @@ namespace nsBeastEngine
 {
 	namespace nsCollision
 	{
+		namespace
+		{
+			/**
+			 * 床スイープ結果を連続で使い回してよい最大フレーム数
+			 * 今キャラなど乗り物が足元に乗る・離れるときに、最長でこのフレーム数だけ反映が遅れる
+			 */
+			constexpr uint32_t GROUND_CACHE_MAX_REUSE = 10;
+
+			/**
+			 * 床スイープ結果を使い回してよいスイープ元からのXZの許容量
+			 * 微小で速度が0に収束しきらない座標のがたつきに追従する場合でも、使い回しできるようにする
+			 */
+			constexpr float GROUND_CACHE_XZ_TOLERANCE = 0.05f;
+
+			/**
+			 * 床スイープの区間を上下に広げる量
+			 * 泳ぎ中は波で高さが毎フレーム上下するため、少し広めに調べておくことで
+			 * 区間が調べ済みの範囲に収まり続け、使い回しやすくする
+			 */
+			constexpr float GROUND_CACHE_SWEEP_MARGIN = 30.0f;
+
+			/**
+			 * 各スイープのタイミングをインスタンスごとにばらすための連番
+			 * 全員が同じフレームに毎スイープすると、そのフレームだけ重くなるため
+			 */
+			uint32_t s_groundCacheStagger = 0;
+		}
+
+
 		/** 地面判定 */
 		struct SweepResultGround : public btCollisionWorld::ConvexResultCallback {
 			bool isHit = false;
@@ -166,7 +195,9 @@ namespace nsBeastEngine
 			, m_isOnGround(true)
 			, m_isRequestTeleport(false)
 			, m_isGroundInfoValid(false)
-		{}
+		{
+			m_groundSweepCache.reuseCount = s_groundCacheStagger++ % GROUND_CACHE_MAX_REUSE;
+		}
 
 
 		CharacterController::~CharacterController()
@@ -349,22 +380,36 @@ namespace nsBeastEngine
 
 					Vector3 xzMove(m_position.x - m_prevPosition.x, 0.0f, m_position.z - m_prevPosition.z);
 					float moveDist = xzMove.Length();
+
+					// TODO: スイープ距離の短縮（未実装の改善案）
+					// 床スイープは、stepOffset（移動量×2.5 + 半径×2） + checkDist（接地中は5）の長さ
+					// 縦に伸ばしているが長いほど地形メッシュの三角形に多く触れて重くなりがち。
+					// 段差の上限（maxSlopeRise）を移動量ではなく固定の上限値で抑える。
+					// 接地中は stickDist を短くするなどで距離を詰められる余地がある。
+					// 坂の登り・段差・上り下での吸着の挙動が変わるので、調整は実機で確認すること。
 					float maxSlopeRise = moveDist * 2.5f;
 					float stepOffset = maxSlopeRise + m_radius * 2.0f;
 
 					float totalSweepDist = stepOffset + checkDist;
 
-					float checkY = m_position.y + m_height * 0.5f + m_radius;
-					Vector3 start(m_position.x, checkY + stepOffset, m_position.z);
-					Vector3 end(m_position.x, start.y - totalSweepDist, m_position.z);
+					// カプセル中心を基準とする区間
+					const float checkY = m_position.y + m_height * 0.5f + m_radius;
+					const float sweepTop = checkY + stepOffset;
+					const float sweepBottom = sweepTop - totalSweepDist;
 
-					SweepResultGround callback;
-					callback.me = m_rigidBody.GetBody();
-
-					{
-						BEAST_PROFILE_SCOPE(u8"床スイープ");
-						PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+					// 床スイープ
+					// 停止中（群れの大半）は同じXZで同じ区間を毎フレーム調べることになるため、
+					// 調べ済みの区間に収まる間は前回の結果を使い回す
+					if (CanReuseGroundSweep(sweepTop, sweepBottom)) {
+						BEAST_PROFILE_SCOPE(u8"床スイープ省略");
+						m_groundSweepCache.reuseCount++;
 					}
+					else {
+						SweepGround(sweepTop, sweepBottom);
+					}
+					const GroundSweepCache& ground = m_groundSweepCache;
+					// 広げて調べた分のうち、今回の区間よりも下で当たったものは、当たらなかったものと扱う
+					const bool isHit = ground.isHit && ground.hitCenterY >= sweepBottom;
 
 					// カプセルのスイープは「そこに立てるか」の判定には正しいが、斜面では
 					// カプセルが側面で接地するため、接地Yは真下の地面より radius*(1/cosθ-1)
@@ -407,12 +452,12 @@ namespace nsBeastEngine
 						}
 					}
 
-					if (callback.isHit) {
+					if (isHit) {
 						// ぶつかった地点のY座標を計算
-						float hitCenterY = start.y - totalSweepDist * callback.closestFraction;
+						float hitCenterY = ground.hitCenterY;
 						float newY = hitCenterY - (m_height * 0.5f + m_radius);
 
-						if (callback.isGround) {
+						if (ground.isGround) {
 							if (newY >= m_seaLevel) {
 								// 立てる床の場合：着地
 								m_position.y = newY;
@@ -430,12 +475,12 @@ namespace nsBeastEngine
 								}
 							}
 						}
-						else if (callback.isSteepSlope) {
+						else if (ground.isSteepSlope) {
 							// 急斜面の場合：接地判定にせず、法線の外側に滑り落とす
 							m_isOnGround = false;
 
 							// 坂のXZ方向の法線ベクトルを計算
-							Vector3 normalXZ(callback.hitNormal.x, 0.0f, callback.hitNormal.z);
+							Vector3 normalXZ(ground.hitNormal.x, 0.0f, ground.hitNormal.z);
 							if (normalXZ.LengthSq() > FLT_EPSILON) {
 								normalXZ.Normalize();
 							}
@@ -471,7 +516,7 @@ namespace nsBeastEngine
 							// 制限をかけた速度でXZ方向の押し出し量（滑り落ちる量）を計算
 							if (normalXZ.LengthSq() > FLT_EPSILON) {
 								float slideAmount = fabsf(m_verticalVelocity * deltaTime);
-								float slopeFactor = 1.0f - callback.hitNormal.y;
+								float slopeFactor = 1.0f - ground.hitNormal.y;
 
 								// 落下速度に応じて斜面を滑り落ちるようにXZ方向に押し出す
 								m_position.x += normalXZ.x * slideAmount * slopeFactor;
@@ -507,6 +552,82 @@ namespace nsBeastEngine
 			trans.setOrigin(btVector3(m_position.x, m_position.y + m_height * 0.5f + m_radius, m_position.z));
 
 			return m_position;
+		}
+
+
+		bool CharacterController::CanReuseGroundSweep(const float sweepTop, const float sweepBottom) const
+		{
+			const GroundSweepCache& cache = m_groundSweepCache;
+			if (!cache.isValid) return false;
+
+			// 今キャラなどの変化を見落とさないため、一定回数ごとに必ず毎スイープする。
+			if (cache.reuseCount >= GROUND_CACHE_MAX_REUSE) return false;
+
+			// 縦方向のスイープ結果はXZごとに決まるので、XZが変わったら使えない
+			const float dx = m_position.x - cache.x;
+			const float dz = m_position.z - cache.z;
+			if (dx * dx + dz * dz > GROUND_CACHE_XZ_TOLERANCE * GROUND_CACHE_XZ_TOLERANCE) return false;
+
+			// 前回より上は調べていない（何かあるかもしれない）
+			if (sweepTop > cache.top) return false;
+
+			if (cache.isHit) {
+				// 前回の区間では当たった面より上に何も無いことが分かっているので、
+				// 開始が当たった面より下なら最初に当たる面は同じ
+				return sweepTop >= cache.hitCenterY;
+			}
+
+			// 当たらなかった場合は、前回調べた区間に今回の区間が収まっていれば当たらない
+			return sweepBottom >= cache.bottom;
+		}
+
+
+		void CharacterController::SweepGround(const float sweepTop, const float sweepBottom)
+		{
+			BEAST_PROFILE_SCOPE(u8"床スイープ");
+
+			// 区間を上下に広げてスイープし、広げた区間をキャッシュする
+			float top = sweepTop + GROUND_CACHE_SWEEP_MARGIN;
+			const float bottom = sweepBottom - GROUND_CACHE_SWEEP_MARGIN;
+
+			SweepResultGround widenedCallback;
+			widenedCallback.me = m_rigidBody.GetBody();
+			PhysicsWorld::Get().ConvexSweepTest(
+				m_collider,
+				Vector3(m_position.x, top, m_position.z),
+				Vector3(m_position.x, bottom, m_position.z),
+				widenedCallback);
+			const SweepResultGround* callback = &widenedCallback;
+			float hitCenterY = top - (top - bottom) * callback->closestFraction;
+
+			// 広げた上側で当たった場合、本来の開始位置よりも上の面を拾っている。
+			// 本来のスイープではこの面は対象外なので、広げずに調べ直す（頭上に物がある場合だけ起きる）
+			SweepResultGround exactCallback;
+			if (widenedCallback.isHit && hitCenterY > sweepTop) {
+				top = sweepTop;
+				exactCallback.me = m_rigidBody.GetBody();
+				PhysicsWorld::Get().ConvexSweepTest(
+					m_collider,
+					Vector3(m_position.x, top, m_position.z),
+					Vector3(m_position.x, bottom, m_position.z),
+					exactCallback);
+				callback = &exactCallback;
+				hitCenterY = top - (top - bottom) * callback->closestFraction;
+			}
+
+			GroundSweepCache& cache = m_groundSweepCache;
+			// 前回だけはコンストラクタでばらした回数を残し、毎スイープのタイミングを分散させる
+			cache.reuseCount = cache.isValid ? 0 : cache.reuseCount;
+			cache.isValid = true;
+			cache.x = m_position.x;
+			cache.z = m_position.z;
+			cache.top = top;
+			cache.bottom = bottom;
+			cache.isHit = callback->isHit;
+			cache.isGround = callback->isGround;
+			cache.isSteepSlope = callback->isSteepSlope;
+			cache.hitCenterY = hitCenterY;
+			cache.hitNormal = callback->hitNormal;
 		}
 
 
