@@ -254,7 +254,11 @@ namespace nsBeastEngine
 						callback.me = m_rigidBody.GetBody();
 						callback.startPos = posTmp;
 
-						PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+						{
+							// 壁に沿って戻ろうとするたびに毎スイープかかるため回数が反復回数になる
+							BEAST_PROFILE_SCOPE(u8"壁スイープ");
+							PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+						}
 
 						if (callback.isHit) {
 							// 1. 壁のXZ平面上の法線を取得
@@ -318,6 +322,7 @@ namespace nsBeastEngine
 					callback.startPos.y = checkY;
 
 					if ((start - end).LengthSq() >= 0.01f) {
+						BEAST_PROFILE_SCOPE(u8"天井スイープ");
 						PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
 					}
 					if (callback.isHit) {
@@ -356,7 +361,10 @@ namespace nsBeastEngine
 					SweepResultGround callback;
 					callback.me = m_rigidBody.GetBody();
 
-					PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+					{
+						BEAST_PROFILE_SCOPE(u8"床スイープ");
+						PhysicsWorld::Get().ConvexSweepTest(m_collider, start, end, callback);
+					}
 
 					// カプセルのスイープは「そこに立てるか」の判定には正しいが、斜面では
 					// カプセルが側面で接地するため、接地Yは真下の地面より radius*(1/cosθ-1)
@@ -372,6 +380,7 @@ namespace nsBeastEngine
 						const Vector3 rayStart(m_position.x, m_position.y + stepOffset, m_position.z);
 						const Vector3 rayEnd(m_position.x, m_position.y - rayDownReach, m_position.z);
 
+						BEAST_PROFILE_SCOPE(u8"足元レイ");
 						const btCollisionObject* me = m_rigidBody.GetBody();
 						RaycastHit rayHit;
 						const bool isRayHit = PhysicsWorld::Get().Raycast(

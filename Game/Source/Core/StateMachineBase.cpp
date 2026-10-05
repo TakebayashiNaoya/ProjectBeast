@@ -21,10 +21,16 @@ namespace app
 		void StateMachineBase::Update()
 		{
 			// ステートを変更する
-			ChangeState();
+			{
+				BEAST_PROFILE_SCOPE(u8"ステート遷移判定");
+				ChangeState();
+			}
 
 			// 現在のステートを更新する
-			if (m_currentState) m_currentState->Update();
+			if (m_currentState) {
+				BEAST_PROFILE_SCOPE(u8"ステート更新");
+				m_currentState->Update();
+			}
 		}
 
 

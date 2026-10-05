@@ -217,28 +217,62 @@ namespace app
 
 	void Application::Update()
 	{
-		camera::CameraManager::Get().Update(6);
-		core::ParameterManager::Get()->Update();
-		SceneManager::GetInstance()->Update();
-		SoundManager::Get().Update();
-		// 1フレーム前のフラスタムを使用してエフェクトのカリングを行う
-		// ModelRenderの既存カリングと同じ挙動であり、許容される仕様
-		EffectManager::Get().Update(g_renderingEngine->GetFrustum());
-		core::Fade::Get().Update();
+		BEAST_PROFILE_SCOPE(u8"アプリ更新 (Application::Update)");
 
-		app::effect::DecalManager::Get().Update();
+		{
+			BEAST_PROFILE_SCOPE(u8"カメラマネージャー更新");
+			camera::CameraManager::Get().Update(6);
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"パラメーター更新");
+			core::ParameterManager::Get()->Update();
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"シーン更新");
+			SceneManager::GetInstance()->Update();
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"サウンド更新");
+			SoundManager::Get().Update();
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"エフェクトマネージャー更新");
+			// 1フレーム前のフラスタムを使用してエフェクトのカリングを行う
+			// ModelRenderの既存カリングと同じ挙動であり、許容される仕様
+			EffectManager::Get().Update(g_renderingEngine->GetFrustum());
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"フェード更新");
+			core::Fade::Get().Update();
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"デカール更新");
+			app::effect::DecalManager::Get().Update();
+		}
 	}
 
 
 	void Application::Render(RenderContext& rc)
 	{
+		BEAST_PROFILE_SCOPE(u8"アプリ描画 (Application::Render)");
+
 #if defined(_DEBUG) || defined(K2_DEBUG)
-		DebugWindow::Get().Render();
+		{
+			BEAST_PROFILE_SCOPE(u8"デバッグウィンドウ");
+			DebugWindow::Get().Render();
+		}
 #endif
-		SceneManager::GetInstance()->Render(rc);
-
-		app::effect::DecalManager::Get().Render(rc);
-
-		core::Fade::Get().Render(rc);
+		{
+			BEAST_PROFILE_SCOPE(u8"シーン描画");
+			SceneManager::GetInstance()->Render(rc);
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"デカール描画");
+			app::effect::DecalManager::Get().Render(rc);
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"フェード描画");
+			core::Fade::Get().Render(rc);
+		}
 	}
 }

@@ -384,9 +384,14 @@ namespace app
 		void ChildPenguinAIController::Update()
 		{
 			/** タイプによらず先に親の察知を更新する（入隊判定がこの結果を使う） */
-			UpdatePerception();
-
-			UpdateAI();
+			{
+				BEAST_PROFILE_SCOPE(u8"親の察知 (UpdatePerception)");
+				UpdatePerception();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"AI判断 (UpdateAI)");
+				UpdateAI();
+			}
 		}
 
 

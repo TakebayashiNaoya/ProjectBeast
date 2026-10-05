@@ -49,6 +49,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここからゲームループ。
 	while (DispatchWindowMessage())
 	{
+		// プロファイラーのフレーム区切り（前フレームの計測結果が確定する）
+		BEAST_PROFILE_FRAME();
+
 		application->Update();
 
 		auto* engine = nsBeastEngine::BeastEngine::GetInstance();

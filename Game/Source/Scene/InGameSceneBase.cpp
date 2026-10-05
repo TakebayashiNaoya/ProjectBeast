@@ -720,26 +720,39 @@ namespace app
 	void InGameSceneBase::UpdateGamePhase()
 	{
 		/** カメラは常に更新 */
-		auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
-			camera::GameCamera::ID()
-		);
-		if (gameCamera)
 		{
-			camera::CameraData data = gameCamera->GetCameraData();
-			m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
-			gameCamera->SetState(data);
+			BEAST_PROFILE_SCOPE(u8"カメラステアリング");
+			auto gameCamera = camera::CameraManager::Get().GetController<camera::GameCamera>(
+				camera::GameCamera::ID()
+			);
+			if (gameCamera)
+			{
+				camera::CameraData data = gameCamera->GetCameraData();
+				m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
+				gameCamera->SetState(data);
+			}
 		}
 
 		/** ディザリングマネージャーは毎フレーム更新して、カメラとプレイヤーの位置を反映させる */
-		OcclusionDitherManager::Get().SetPlayerTarget(&m_daddyPenguin->GetModelRender());
-		OcclusionDitherManager::Get().Update();
+		{
+			BEAST_PROFILE_SCOPE(u8"遮蔽ディザ更新");
+			OcclusionDitherManager::Get().SetPlayerTarget(&m_daddyPenguin->GetModelRender());
+			OcclusionDitherManager::Get().Update();
+		}
 
 		/** ステージは常に更新 */
-		actor::StageSystem::GetInstance()->Update();
+		{
+			BEAST_PROFILE_SCOPE(u8"ステージ更新");
+			actor::StageSystem::GetInstance()->Update();
+		}
 		if (nature::Ocean::GetInstance()) {
+			BEAST_PROFILE_SCOPE(u8"海更新");
 			nature::Ocean::GetInstance()->Update();
 		}
-		nature::WhirlpoolManager::GetInstance()->Update();
+		{
+			BEAST_PROFILE_SCOPE(u8"渦潮更新");
+			nature::WhirlpoolManager::GetInstance()->Update();
+		}
 
 		switch (m_gamePhase)
 		{
@@ -752,9 +765,12 @@ namespace app
 			BattleManager::GetInstance().SetIsActive(false);
 
 			/** AI・入力は動かさないが、描画用の行列更新だけ行う */
-			if (m_daddyPenguin) m_daddyPenguin->UpdateModelOnly();
-			actor::ChildPenguinManager::GetInstance()->UpdateModelOnly();
-			actor::EnemyManager::GetInstance()->UpdateModelOnly();
+			{
+				BEAST_PROFILE_SCOPE(u8"モデル行動更新 (カウントダウン)");
+				if (m_daddyPenguin) m_daddyPenguin->UpdateModelOnly();
+				actor::ChildPenguinManager::GetInstance()->UpdateModelOnly();
+				actor::EnemyManager::GetInstance()->UpdateModelOnly();
+			}
 
 			/** カウントダウン UI 更新 */
 			auto* uiMngr = InGameUIManager::GetInstance();
@@ -812,33 +828,54 @@ namespace app
 			}
 
 			/** プレイヤー・子ペンギン・シロクマ の更新 */
-			if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
-			actor::ChildPenguinManager::GetInstance()->Update();
-			actor::EnemyManager::GetInstance()->Update();
+			{
+				BEAST_PROFILE_SCOPE(u8"親ペンギン更新");
+				if (m_daddyPenguin) m_daddyPenguin->UpdateWrapper();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"子ペンギン更新");
+				actor::ChildPenguinManager::GetInstance()->Update();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"シロクマ更新");
+				actor::EnemyManager::GetInstance()->Update();
+			}
 
 			/** インゲームUI 更新 */
 			auto* uiMngr = InGameUIManager::GetInstance();
-			uiMngr->UpdatePlaying();
-
-			BattleManager::GetInstance().Update();
-			TimeManager::GetInstance().Update();
-
-			/** 撮影モード中はフィーバーを発動させない（紹介動画が突然ピンクになるため） */
-			if (!IsShowcaseEnabled())
 			{
-				FeverTimeManager::GetInstance()->Update();
+				BEAST_PROFILE_SCOPE(u8"インゲーム UI更新");
+				uiMngr->UpdatePlaying();
 			}
 
-			app::achievement::AchievementManager::GetInstance()->Update();
+			{
+				BEAST_PROFILE_SCOPE(u8"バトル・時間・フィーバー・実績");
+				BattleManager::GetInstance().Update();
+				TimeManager::GetInstance().Update();
+
+				/** 撮影モード中はフィーバーを発動させない（紹介動画が突然ピンクになるため） */
+				if (!IsShowcaseEnabled())
+				{
+					FeverTimeManager::GetInstance()->Update();
+				}
+
+				app::achievement::AchievementManager::GetInstance()->Update();
+			}
 
 			/** ログ毎フレームティック */
 			if (auto* lm = GameLogManager::GetInstance())
+			{
+				BEAST_PROFILE_SCOPE(u8"ゲームログ記録");
 				lm->RecordTick(m_daddyPenguin);
+			}
 
 			/** ノイズリストをクリア */
 			NoiseManager::GetInstance().ClearNoises();
 
-			OnUpdatePlaying();
+			{
+				BEAST_PROFILE_SCOPE(u8"ステージ固有更新 (OnUpdatePlaying)");
+				OnUpdatePlaying();
+			}
 
 			/** 終了判定 */
 			if (BattleManager::GetInstance().GetBattleState() == BattleManager::EnBattleState::Finished)

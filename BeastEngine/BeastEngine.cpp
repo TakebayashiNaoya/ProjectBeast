@@ -112,45 +112,73 @@ namespace nsBeastEngine
 
 	void BeastEngine::BeginExecute()
 	{
+		BEAST_PROFILE_SCOPE(u8"エンジン前半 (BeginExecute)");
+
 		// フレーム開始
-		g_engine->BeginFrame();
+		{
+			// コマンドリストのリセットに加え、レンダーターゲットが使えるまでのGPU待ちを含む
+			BEAST_PROFILE_SCOPE(u8"フレーム開始 (BeginFrame)");
+			g_engine->BeginFrame();
+		}
 
 		// IMGUIの更新
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
+		{
+			BEAST_PROFILE_SCOPE(u8"ImGui NewFrame");
+			ImGui_ImplDX12_NewFrame();
+			ImGui_ImplWin32_NewFrame();
 
-		// バックバッファ（スワップチェイン）はFRAME_BUFFER_W/Hで固定作成されたまま、
-		// ウィンドウの最大化・リサイズに合わせて動的に作り直されることはない。
-		// ImGui_ImplWin32_NewFrame()は実際のクライアント領域をDisplaySizeに設定するが、
-		// それをそのまま使うとImGuiが実際のバックバッファより大きい（あるいは小さい）
-		// キャンバスがあるものとしてレイアウト・描画してしまい、見た目が崩れる。
-		// 常にバックバッファと同じFRAME_BUFFER_W/Hに固定することで、ImGuiは常にバックバッファに
-		// ぴったり収まるよう描画される。DXGIのPresentがバックバッファ全体をクライアント領域へ
-		// 引き伸ばすため、結果的にゲーム本編と同じ比率でImGuiも一緒に拡大縮小表示される
-		// （クリック判定側の変換はGame/Source/system/system.cppのWM_MOUSEMOVE処理で対応する）
-		ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(FRAME_BUFFER_W), static_cast<float>(FRAME_BUFFER_H));
+			// バックバッファ（スワップチェイン）はFRAME_BUFFER_W/Hで固定作成されたまま、
+			// ウィンドウの最大化・リサイズに合わせて動的に作り直されることはない。
+			// ImGui_ImplWin32_NewFrame()は実際のクライアント領域をDisplaySizeに設定するが、
+			// それをそのまま使うとImGuiが実際のバックバッファより大きい（あるいは小さい）
+			// キャンバスがあるものとしてレイアウト・描画してしまい、見た目が崩れる。
+			// 常にバックバッファと同じFRAME_BUFFER_W/Hに固定することで、ImGuiは常にバックバッファに
+			// ぴったり収まるよう描画される。DXGIのPresentがバックバッファ全体をクライアント領域へ
+			// 引き伸ばすため、結果的にゲーム本編と同じ比率でImGuiも一緒に拡大縮小表示される
+			// （クリック判定側の変換はGame/Source/system/system.cppのWM_MOUSEMOVE処理で対応する）
+			ImGui::GetIO().DisplaySize = ImVec2(static_cast<float>(FRAME_BUFFER_W), static_cast<float>(FRAME_BUFFER_H));
 
-		ImGui::NewFrame();
+			ImGui::NewFrame();
+		}
 
 		// k2EngineLowの更新処理（パッド・サウンドのみ。ポーズ中も継続する）
-		g_engine->ExecuteUpdate();
+		{
+			BEAST_PROFILE_SCOPE(u8"サウンド等更新");
+			g_engine->ExecuteUpdate();
+		}
 
 		// GameObjectManager・EffectEngineの更新。
 		// ポーズ中はエフェクトや自動更新オブジェクトの見た目を凍結したいため、
 		// EffectEngineへ渡すdeltaTimeを0にして再生位置を止める（Stopとは違い状態は保持する）。
-		GameObjectManager::GetInstance()->ExecuteUpdate();
-		const float effectDeltaTime = m_isPause ? 0.0f : g_gameTime->GetFrameDeltaTime();
-		EffectEngine::GetInstance()->Update(effectDeltaTime);
+		{
+			// 物理ワールドの更新もこの中で行われる
+			BEAST_PROFILE_SCOPE(u8"GameObject更新 (物理含む)");
+			GameObjectManager::GetInstance()->ExecuteUpdate();
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"エフェクト更新 (Effekseer)");
+			const float effectDeltaTime = m_isPause ? 0.0f : g_gameTime->GetFrameDeltaTime();
+			EffectEngine::GetInstance()->Update(effectDeltaTime);
+		}
 
 		// カメラの更新
-		SubCameraManager::Get().Update();
-		CameraSystem::Get().Update();
+		{
+			BEAST_PROFILE_SCOPE(u8"カメラ更新");
+			SubCameraManager::Get().Update();
+			CameraSystem::Get().Update();
+		}
 
 		// レンダリングエンジンの更新
-		m_renderingEngine.Update();
+		{
+			BEAST_PROFILE_SCOPE(u8"レンダリングエンジン更新");
+			m_renderingEngine.Update();
+		}
 
 		// k2EngineLowの描画処理
-		g_engine->ExecuteRender();
+		{
+			BEAST_PROFILE_SCOPE(u8"GameObject描画");
+			g_engine->ExecuteRender();
+		}
 
 #ifdef DEBUG
 		nsBeastEngine::nsCollision::PhysicsWorld::Get().DebubDrawWorld(g_graphicsEngine->GetRenderContext());
@@ -160,24 +188,41 @@ namespace nsBeastEngine
 
 	void BeastEngine::EndExecute()
 	{
+		BEAST_PROFILE_SCOPE(u8"エンジン後半 (EndExecute)");
+
 		// 描画処理
-		m_renderingEngine.Execute(g_graphicsEngine->GetRenderContext());
+		{
+			BEAST_PROFILE_SCOPE(u8"描画 (RenderingEngine::Execute)");
+			m_renderingEngine.Execute(g_graphicsEngine->GetRenderContext());
+		}
 
 		// ========== ImGui 描画 ==========
-		ImGui::Render();
+		{
+			BEAST_PROFILE_SCOPE(u8"ImGui描画");
 
-		// SRVヒープをセット
-		auto* cmdList = g_graphicsEngine->GetCommandList();
-		ID3D12DescriptorHeap* heaps[] = { m_imguiSrvHeap.Get() };
-		cmdList->SetDescriptorHeaps(1, heaps);
+			// プロファイラーの結果表示（ImGui::Render()よりも前に積む必要がある）
+			BEAST_PROFILE_DRAW_IMGUI();
 
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
+			ImGui::Render();
+
+			// SRVヒープをセット
+			auto* cmdList = g_graphicsEngine->GetCommandList();
+			ID3D12DescriptorHeap* heaps[] = { m_imguiSrvHeap.Get() };
+			cmdList->SetDescriptorHeaps(1, heaps);
+
+			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
+		}
 
 		// 当たり判定描画
 		g_engine->DebubDrawWorld();
 
 		// フレーム終了
-		g_engine->EndFrame();
+		{
+			// コマンド実行・Present・GPU完了待ち・FPS制限の待機を含む。
+			// ここが大きい場合はCPUではなくGPU側が純粋同期で待たされている
+			BEAST_PROFILE_SCOPE(u8"フレーム終了 (Present / GPU待ち)");
+			g_engine->EndFrame();
+		}
 	}
 
 

@@ -178,6 +178,7 @@ namespace app
 			if (ImGui::BeginMenu(u8"デバッグ"))
 			{
 				ImGui::MenuItem(u8"ウィンドウを表示", nullptr, &m_visible);
+				ImGui::MenuItem(u8"プロファイラーを表示", nullptr, nsBeastEngine::Profiler::Get().GetVisibleFlag());
 				ImGui::EndMenu();
 			}
 		}
