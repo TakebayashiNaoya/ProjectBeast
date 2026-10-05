@@ -155,6 +155,23 @@ namespace nsBeastEngine
 
 
 		private:
+			/**
+			 * @brief 前回の床スイープ結果が今回も使えるか
+			 * @param sweepTop    今回のスイープ開始高さ（カプセル中心）
+			 * @param sweepBottom 今回のスイープ終了高さ（カプセル中心）
+			 * @return 同じXZで、今回の区間の結果が前回調べた区間から確定できるなら true
+			 */
+			bool CanReuseGroundSweep(const float sweepTop, const float sweepBottom) const;
+
+			/**
+			 * @brief 床スイープを実行して結果をキャッシュに保存する
+			 * @param sweepTop    スイープ開始高さ（カプセル中心）
+			 * @param sweepBottom スイープ終了高さ（カプセル中心）
+			 */
+			void SweepGround(const float sweepTop, const float sweepBottom);
+
+
+		private:
 			/** キャラクター用なのでカプセルとしておく */
 			CapsuleCollider	m_collider;
 			/** 物理空間の処理に必要 */
@@ -190,6 +207,31 @@ namespace nsBeastEngine
 			bool m_isRequestTeleport;
 			/** 足元の地面情報が有効か */
 			bool m_isGroundInfoValid;
+
+			/**
+			 * @brief 床スイープ結果のキャッシュ
+			 * @details 縦方向のスイープの結果は、静的な地形に対してはXZだけで決まる
+			 *          （その真上で最初に当たる面は高さに依らない）。
+			 *          ここで、どのXZでどの高さ区間を調べたか・何に当たったかを覚えておく。
+			 *          同じXZで区間が調べ済みの範囲に収まる間はスイープを省略する。
+			 *          床・海面・急斜面の判定は毎フレームこの結果から再計算し直すので、
+			 *          波で海面が上下しても泳ぎ中でも挙動は変わらない。
+			 */
+			struct GroundSweepCache
+			{
+				bool isValid = false;         /**< キャッシュが有効か */
+				float x = 0.0f;               /**< スイープしたX座標 */
+				float z = 0.0f;               /**< スイープしたZ座標 */
+				float top = 0.0f;             /**< 調べた区間の上端（カプセル中心の高さ） */
+				float bottom = 0.0f;          /**< 調べた区間の下端（カプセル中心の高さ） */
+				bool isHit = false;           /**< 区間内で床・急斜面に当たった */
+				bool isGround = false;        /**< 立てる床か */
+				bool isSteepSlope = false;    /**< 滑り落ちる急斜面か */
+				float hitCenterY = 0.0f;      /**< 当たった瞬間のカプセル中心の高さ */
+				Vector3 hitNormal;            /**< 当たった面の法線 */
+				uint32_t reuseCount = 0;      /**< 連続で使い回した回数（一定数で強制的に毎スイープ） */
+			};
+			GroundSweepCache m_groundSweepCache;
 		};
 	}
 }

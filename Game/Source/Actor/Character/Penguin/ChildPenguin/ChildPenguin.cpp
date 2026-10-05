@@ -160,18 +160,27 @@ namespace app
 			/** AIコントローラーがあれば更新 */
 			if (m_aiController)
 			{
+				BEAST_PROFILE_SCOPE(u8"AIコントローラー");
 				m_aiController->Update();
 			}
 
 			/** ステートマシン更新 */
-			m_stateMachine->Update();
+			{
+				BEAST_PROFILE_SCOPE(u8"ステートマシン");
+				m_stateMachine->Update();
+			}
 
-			PenguinBase::Update();
+			{
+				BEAST_PROFILE_SCOPE(u8"キャラクター展開更新");
+				PenguinBase::Update();
+			}
 
 			/** 泳ぎ中はモデルの描画位置のみY座標をオフセットする */
 			/** 物理・ステート判定には影響を与えない */
 			if (m_stateMachine->IsSwimming() && m_modelReady)
 			{
+				// 展開更新で一度モデルを更新した後にずれでもう一度更新している
+				BEAST_PROFILE_SCOPE(u8"泳ぎ用モデル位置更新");
 				Vector3 renderPos = m_transform.m_position;
 				renderPos.y += SWIM_Y_OFFSET;
 				m_modelRender.SetTRS(renderPos, m_transform.m_rotation, m_transform.m_scale);
@@ -181,7 +190,10 @@ namespace app
 
 			/** スライド中は地形の法線に沿ってモデルを傾ける */
 			/** 物理・ステート判定には影響を与えない */
-			UpdateSlideTilt();
+			{
+				BEAST_PROFILE_SCOPE(u8"スライド傾き");
+				UpdateSlideTilt();
+			}
 		}
 
 

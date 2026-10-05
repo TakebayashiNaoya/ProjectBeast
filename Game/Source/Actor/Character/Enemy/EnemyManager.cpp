@@ -88,8 +88,14 @@ namespace app
 		{
 			for (auto& data : m_enemyList)
 			{
-				if (data.enemy) data.enemy->UpdateWrapper();
-				if (data.controller) data.controller->Update();
+				if (data.enemy) {
+					BEAST_PROFILE_SCOPE(u8"シロクマ本体");
+					data.enemy->UpdateWrapper();
+				}
+				if (data.controller) {
+					BEAST_PROFILE_SCOPE(u8"シロクマAI");
+					data.controller->Update();
+				}
 			}
 		}
 

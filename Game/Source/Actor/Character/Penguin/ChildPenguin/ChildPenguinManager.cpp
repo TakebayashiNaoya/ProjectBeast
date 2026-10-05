@@ -207,11 +207,26 @@ namespace app
 		{
 			/** 親の察知・逃走に使う共有データを、子のUpdateより先に1回だけ更新する */
 			m_perceptionFrame++;
-			UpdateDaddyNoiseRadius();
-			UpdateBearThreats();
-			UpdateRegroupCall();
-			UpdateDaddyFlowField();
-			UpdateTriangleUltPickup();
+			{
+				BEAST_PROFILE_SCOPE(u8"親の騒音取得");
+				UpdateDaddyNoiseRadius();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"クマの脅威");
+				UpdateBearThreats();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"再集合の呼びかけ");
+				UpdateRegroupCall();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"フローフィールド");
+				UpdateDaddyFlowField();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"三角ウルト拾得");
+				UpdateTriangleUltPickup();
+			}
 
 			/** 散開陣ウルトの入隊音階コンボは、ウルトが終わったらリセットする */
 			if (!m_formationController.IsUltActive())
@@ -225,6 +240,7 @@ namespace app
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {
 				if (!cp) continue;
+				BEAST_PROFILE_SCOPE(u8"子ペンギン個別更新");
 				cp->UpdateWrapper();
 
 				/** クマに狙われている子は赤く点滅させる（ブルームで光って見える） */
@@ -234,11 +250,15 @@ namespace app
 				cp->UpdateBearTargetHighlight(isTargeted, isUltGlowActive && IsFollower(cp));
 			}
 
-			UpdateGhostPenguins();
+			{
+				BEAST_PROFILE_SCOPE(u8"ゴーストペンギン");
+				UpdateGhostPenguins();
+			}
 
 			/** ウルト更新 */
 			if (m_daddyPenguin != nullptr)
 			{
+				BEAST_PROFILE_SCOPE(u8"ウルト更新");
 				UltContext ctx{ this, m_daddyPenguin };
 				m_formationController.UpdateUlt(g_gameTime->GetDeltaTime(), ctx);
 			}
@@ -281,6 +301,7 @@ namespace app
 			{
 				if (!m_followers.empty())
 				{
+					BEAST_PROFILE_SCOPE(u8"隊形計算・割り当て");
 					/** 親の位置をベースに最大100個のポジションを計算 */
 					CalculateFormationPositions();
 

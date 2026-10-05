@@ -25,6 +25,7 @@
     <ClCompile Include="BeastEnginePreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Diagnostics\Profiler.cpp" />
     <ClCompile Include="Geometry\Frustum.cpp" />
     <ClCompile Include="Geometry\TriangleCuller.cpp" />
     <ClCompile Include="Graphics\BeastMeshParts.cpp" />
@@ -78,6 +79,7 @@
     <ClCompile Include="Resource\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Diagnostics\Profiler.h" />
     <ClInclude Include="BeastEngine.h" />
     <ClInclude Include="BeastEnginePreCompile.h" />
     <ClInclude Include="Geometry\Frustum.h" />

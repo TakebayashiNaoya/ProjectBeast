@@ -120,10 +120,16 @@ namespace nsBeastEngine
 
 		// シャドウマップへの描画
 		// ※ディファードライティングで参照するため、GBuffer描画より前に行う
-		RenderShadowMap(rc);
+		{
+			BEAST_PROFILE_SCOPE(u8"シャドウマップ");
+			RenderShadowMap(rc);
+		}
 
 		// メインカメラの描画パスを実行する
-		ExecuteViewPass(rc, m_mainView);
+		{
+			BEAST_PROFILE_SCOPE(u8"メインビュー描画");
+			ExecuteViewPass(rc, m_mainView);
+		}
 
 		// エフェクトの描画先としてmainRTを設定する
 		// ※GBufferの深度を引き継ぐため、DSVはgBuffer[enGBuffer_Albedo]を使用する
@@ -135,7 +141,10 @@ namespace nsBeastEngine
 
 		// エフェクトを描画
 		// ※ポストエフェクトより前に描くことで、ブルームとトーンマップの対象に含める
-		EffectEngine::GetInstance()->Draw();
+		{
+			BEAST_PROFILE_SCOPE(u8"エフェクト描画 (Effekseer)");
+			EffectEngine::GetInstance()->Draw();
+		}
 
 		// エフェクト描画後もメインRTがレンダリングターゲット状態のままなので、
 		// 以降のパスでテクスチャとして読めるように状態を戻す
@@ -143,14 +152,21 @@ namespace nsBeastEngine
 
 		// ポストエフェクトの描画処理（ブルーム → トーンマップ）
 		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
-		PostEffect(rc);
+		{
+			BEAST_PROFILE_SCOPE(u8"ポストエフェクト");
+			PostEffect(rc);
+		}
 
 		// 2D描画処理（小窓スプライトの描画も含む）
-		Render2D(rc);
+		{
+			BEAST_PROFILE_SCOPE(u8"2D描画");
+			Render2D(rc);
+		}
 
 		// サブカメラの描画パスを実行する（メイン描画パス完了後）
 		if (CameraSystem::Get().HasSubCamera())
 		{
+			BEAST_PROFILE_SCOPE(u8"サブビュー描画");
 			auto* subCamera = CameraSystem::Get().GetSubCamera();
 			m_subView.camera = subCamera;
 			Matrix subViewProjMatrix;
@@ -208,10 +224,22 @@ namespace nsBeastEngine
 		CameraSystem::Get().SetActiveCamera(view.camera);
 		m_activeFrustum = &view.frustum;
 
-		RenderToGBuffer(rc, view);
-		DeferredLighting(rc, view);
-		ForwardRendering(rc, view);
-		RenderNatureObjects(rc, view);
+		{
+			BEAST_PROFILE_SCOPE(u8"GBuffer描画");
+			RenderToGBuffer(rc, view);
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"ディファードライティング");
+			DeferredLighting(rc, view);
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"フォワード描画");
+			ForwardRendering(rc, view);
+		}
+		{
+			BEAST_PROFILE_SCOPE(u8"自然物描画 (海・空など)");
+			RenderNatureObjects(rc, view);
+		}
 	}
 
 

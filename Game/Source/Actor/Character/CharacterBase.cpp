@@ -67,18 +67,28 @@ namespace app
 		void CharacterBase::Update()
 		{
 			// モデルの非同期ロードの更新
-			ModelLoadUpdate();
+			{
+				BEAST_PROFILE_SCOPE(u8"モデルロード確認");
+				ModelLoadUpdate();
+			}
 
 			m_transform.m_position = m_characterStateMachine->GetTransform().m_position;
 			m_transform.m_rotation = m_characterStateMachine->GetTransform().m_rotation;
 			m_transform.m_scale = m_characterStateMachine->GetTransform().m_scale;
 
 			// モデルの行列を更新
-			m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
-			m_modelRender.Update();
+			{
+				// アニメーション進行とボーン行列の計算を含む
+				BEAST_PROFILE_SCOPE(u8"モデル更新 (アニメ・ボーン)");
+				m_modelRender.SetTRS(m_transform.m_position, m_transform.m_rotation, m_transform.m_scale);
+				m_modelRender.Update();
+			}
 
 			// 足跡の更新（Penguin/Enemy共通。違いは仮想関数側で吸収する）
-			UpdateFootprints();
+			{
+				BEAST_PROFILE_SCOPE(u8"足跡更新");
+				UpdateFootprints();
+			}
 		}
 
 

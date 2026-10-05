@@ -6,6 +6,7 @@
 
 #include "k2EngineLowPreCompile.h"
 using namespace nsK2EngineLow;
+#include "Diagnostics/Profiler.h"
 //#include "collision/CollisionObject.h"
 #include "Graphics/IRenderer.h"
 #include "Graphics/RenderingEngine.h"
