@@ -37,14 +37,27 @@ namespace app
 		}
 
 
+		StageInfoPanel::StageInfoPanel()
+			: m_timeText(nullptr)
+			, m_bearText(nullptr)
+			, m_whirlText(nullptr)
+			, m_recordText(nullptr)
+			, m_bearCounts()
+			, m_whirlCounts()
+			, m_isCountsLoaded(false)
+		{}
+
+
 		void StageInfoPanel::Initialize(MenuBase& menu)
 		{
 			m_parts.clear();
+			m_baseAlphas.clear();
 			for (const uint32_t key : PART_KEYS)
 			{
 				auto* part = menu.GetUI<UIBase>(key);
 				K2_ASSERT(part, "情報パネルのパーツを取得できていません。");
 				m_parts.push_back(part);
+				m_baseAlphas.push_back(part->m_color.w);
 			}
 
 			m_timeText = menu.GetUI<UIText>(TIME_TEXT_KEY);
@@ -94,6 +107,15 @@ namespace app
 			for (auto* part : m_parts)
 			{
 				part->SetIsDraw(isDraw);
+			}
+		}
+
+
+		void StageInfoPanel::SetAlpha(const float rate)
+		{
+			for (size_t i = 0; i < m_parts.size(); ++i)
+			{
+				m_parts[i]->m_color.w = m_baseAlphas[i] * rate;
 			}
 		}
 

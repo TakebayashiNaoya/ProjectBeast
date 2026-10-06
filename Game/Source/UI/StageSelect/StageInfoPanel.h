@@ -20,6 +20,8 @@ namespace app
 		class StageInfoPanel
 		{
 		public:
+			StageInfoPanel();
+
 			/**
 			 * @brief UIパーツを取得する
 			 * @param menu パーツを持っているメニュー
@@ -38,6 +40,13 @@ namespace app
 			 */
 			void SetDraw(const bool isDraw);
 
+			/**
+			 * @brief パネル全体の濃さを設定する
+			 * @param rate 濃さの倍率（1.0で通常、0.0で透明）
+			 * @details 各パーツの元のαに掛けるので、もともと半透明の背景も薄くなる方向にだけ動く
+			 */
+			void SetAlpha(const float rate);
+
 
 		private:
 			/** @brief クマ数・渦潮数を配置JSONから読み込む（初回のみ） */
@@ -50,21 +59,23 @@ namespace app
 
 			/** パネルを構成する全パーツ（表示/非表示をまとめて切り替える対象） */
 			std::vector<UIBase*> m_parts;
+			/** m_parts と同じ並びの、各パーツの元のα（SetAlpha の基準） */
+			std::vector<float> m_baseAlphas;
 			/** 制限時間のテキスト */
-			UIText* m_timeText = nullptr;
+			UIText* m_timeText;
 			/** クマ数のテキスト */
-			UIText* m_bearText = nullptr;
+			UIText* m_bearText;
 			/** 渦潮数のテキスト */
-			UIText* m_whirlText = nullptr;
+			UIText* m_whirlText;
 			/** ハイスコアのテキスト */
-			UIText* m_recordText = nullptr;
+			UIText* m_recordText;
 
 			/** 配置JSONから読んだクマの頭数 */
-			std::array<int, STAGE_NUM> m_bearCounts = {};
+			std::array<int, STAGE_NUM> m_bearCounts;
 			/** 配置JSONから読んだ渦潮の数 */
-			std::array<int, STAGE_NUM> m_whirlCounts = {};
+			std::array<int, STAGE_NUM> m_whirlCounts;
 			/** クマ数・渦潮数を読み込み済みか */
-			bool m_isCountsLoaded = false;
+			bool m_isCountsLoaded;
 		};
 	}
 }
