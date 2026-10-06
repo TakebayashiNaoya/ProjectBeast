@@ -5,6 +5,7 @@
 #pragma once
 #include "Particle.h"
 #include "ParticleValueProvider.h"
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,8 @@ namespace app
 		Spawn,					// 生成
 		InitLifeTime,			// 寿命初期化
 		InitPosition,			// 初期座標
+		InitPositionOutsideRect,// 初期座標(矩形をくり抜いた範囲)
+		InitPositionLine,		// 初期座標(線分上に等間隔)
 		InitVelocity,			// 初期速度
 		InitScale,				// 初期スケール
 		InitRotation,			// 初期回転
@@ -274,6 +277,189 @@ namespace app
 		void OnParticleSpawn(Particle& p) override
 		{
 			p.position = m_position.ResolveInitial();
+		}
+	};
+
+
+
+
+	/***********************************************/
+
+
+	/**
+	 * @brief 初期座標(外側の矩形から内側の矩形をくり抜いた範囲のランダムな位置)
+	 * @details 座標はエミッターからの相対。内側の矩形に入った位置と、許可していない象限の位置と、
+	 *          SetBlockedCheckerで使えないと判定された位置は使わない。
+	 *          置ける位置が見つからなかったパーティクルは寿命0にして出さない。
+	 */
+	class InitPositionOutsideRectModule : public ParticleModule
+	{
+	public:
+		/**
+		 * @brief 象限(エミッターを原点としたデカルト座標)のビットフラグ
+		 */
+		enum EnQuadrant : uint8_t
+		{
+			Quadrant1 = 1 << 0,	// (+,+) 右上
+			Quadrant2 = 1 << 1,	// (-,+) 左上
+			Quadrant3 = 1 << 2,	// (-,-) 左下
+			Quadrant4 = 1 << 3,	// (+,-) 右下
+			QuadrantAll = Quadrant1 | Quadrant2 | Quadrant3 | Quadrant4,
+		};
+
+
+	private:
+		/** 位置を選び直す最大回数 */
+		static constexpr int MAX_TRY_COUNT = 32;
+
+		/** 外側の矩形(この範囲の中から選ぶ) */
+		Vector2 m_outerMin;
+		Vector2 m_outerMax;
+		/** くり抜く内側の矩形の半分の大きさ(エミッター中心) */
+		Vector2 m_innerHalfSize;
+		/** 出してよい象限(EnQuadrantの組み合わせ) */
+		uint8_t m_allowedQuadrants;
+		/** 使えない位置かを判定する関数(他のパーティクルとの重なり判定など。未設定なら判定しない) */
+		std::function<bool(const Vector2&)> m_isBlocked;
+
+
+	public:
+		InitPositionOutsideRectModule()
+			: ParticleModule(EnParticleModuleType::InitPositionOutsideRect)
+			, m_outerMin(0.0f, 0.0f)
+			, m_outerMax(0.0f, 0.0f)
+			, m_innerHalfSize(0.0f, 0.0f)
+			, m_allowedQuadrants(QuadrantAll)
+		{}
+
+		/**
+		 * @brief 出してよい象限を設定
+		 * @param quadrants EnQuadrantの組み合わせ(例: Quadrant2 | Quadrant4)
+		 */
+		void SetAllowedQuadrants(const uint8_t quadrants) { m_allowedQuadrants = quadrants; }
+
+		/**
+		 * @brief 使えない位置かを判定する関数を設定
+		 * @param isBlocked エミッターからの相対座標を受け取り、使えないならtrueを返す関数
+		 */
+		void SetBlockedChecker(std::function<bool(const Vector2&)> isBlocked) { m_isBlocked = std::move(isBlocked); }
+
+		/**
+		 * @brief 範囲を設定
+		 * @param outerMin 外側の矩形の最小座標
+		 * @param outerMax 外側の矩形の最大座標
+		 * @param innerHalfSize くり抜く内側の矩形の半分の大きさ
+		 */
+		void SetArea(const Vector2& outerMin, const Vector2& outerMax, const Vector2& innerHalfSize)
+		{
+			m_outerMin = outerMin;
+			m_outerMax = outerMax;
+			m_innerHalfSize = innerHalfSize;
+		}
+
+		/**
+		 * @brief パーティクル生成時に座標を初期化
+		 * @param p 生成されたパーティクル
+		 */
+		void OnParticleSpawn(Particle& p) override
+		{
+			if (m_outerMin.x < m_outerMax.x && m_outerMin.y < m_outerMax.y)
+			{
+				for (int i = 0; i < MAX_TRY_COUNT; ++i)
+				{
+					const float x = util::RandomDevice::Random(m_outerMin.x, m_outerMax.x);
+					const float y = util::RandomDevice::Random(m_outerMin.y, m_outerMax.y);
+					const bool isInside = fabsf(x) < m_innerHalfSize.x && fabsf(y) < m_innerHalfSize.y;
+					if (!isInside && IsAllowedQuadrant(x, y) && !(m_isBlocked && m_isBlocked(Vector2(x, y))))
+					{
+						p.position = Vector3(x, y, 0.0f);
+						return;
+					}
+				}
+			}
+
+			// 置ける位置が無い場合は出さない
+			p.lifeTime = 0.0f;
+		}
+
+
+	private:
+		/**
+		 * @brief 位置が出してよい象限にあるか
+		 * @param x エミッターからの相対X
+		 * @param y エミッターからの相対Y
+		 * @return 出してよい象限ならtrue
+		 */
+		bool IsAllowedQuadrant(const float x, const float y) const
+		{
+			uint8_t quadrant;
+			if (x >= 0.0f) quadrant = (y >= 0.0f) ? Quadrant1 : Quadrant4;
+			else           quadrant = (y >= 0.0f) ? Quadrant2 : Quadrant3;
+			return (m_allowedQuadrants & quadrant) != 0;
+		}
+	};
+
+
+
+
+	/***********************************************/
+
+
+	/**
+	 * @brief 初期座標(始点から終点までの線分上に等間隔で並べる)
+	 * @details 座標はエミッターからの相対。生成するたびに次の位置へ進み、最後まで行ったら始点に戻る。
+	 *          寿命が一定なら、消えた位置に次のパーティクルが入るので並びが崩れない。
+	 */
+	class InitPositionLineModule : public ParticleModule
+	{
+	private:
+		/** 始点と終点 */
+		Vector2 m_start;
+		Vector2 m_end;
+		/** 並べる数 */
+		int m_count;
+		/** 次に使う位置の番号 */
+		int m_nextIndex;
+
+
+	public:
+		InitPositionLineModule()
+			: ParticleModule(EnParticleModuleType::InitPositionLine)
+			, m_start(0.0f, 0.0f)
+			, m_end(0.0f, 0.0f)
+			, m_count(1)
+			, m_nextIndex(0)
+		{}
+
+		/**
+		 * @brief 並べる線分と数を設定
+		 * @param start 始点
+		 * @param end 終点
+		 * @param count 並べる数
+		 */
+		void SetLine(const Vector2& start, const Vector2& end, const int count)
+		{
+			m_start = start;
+			m_end = end;
+			m_count = (std::max)(count, 1);
+			if (m_nextIndex >= m_count) m_nextIndex = 0;
+		}
+
+		/**
+		 * @brief パーティクル生成時に座標を初期化
+		 * @param p 生成されたパーティクル
+		 */
+		void OnParticleSpawn(Particle& p) override
+		{
+			const float t = (m_count > 1)
+				? static_cast<float>(m_nextIndex) / static_cast<float>(m_count - 1)
+				: 0.5f;
+			p.position = Vector3(
+				m_start.x + (m_end.x - m_start.x) * t,
+				m_start.y + (m_end.y - m_start.y) * t,
+				0.0f
+			);
+			m_nextIndex = (m_nextIndex + 1) % m_count;
 		}
 	};
 

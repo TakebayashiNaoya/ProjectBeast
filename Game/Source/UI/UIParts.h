@@ -434,6 +434,17 @@ namespace app
 				, const Quaternion& rotation
 				, const Vector4& color
 			);
+
+			/**
+			 * @brief 初期化時の画像サイズ（スケール適用前）を取得
+			 * @return 横幅(x)と縦幅(y)
+			 */
+			const Vector2& GetSize() const { return m_size; }
+
+
+		private:
+			/** 初期化時の画像サイズ（スケール適用前） */
+			Vector2 m_size = Vector2(0.0f, 0.0f);
 		};
 
 
@@ -615,6 +626,9 @@ namespace app
 			/** スケールの取得 */
 			const Vector2& GetScale() const { return m_scale; }
 
+			/** 設定されているテキストの文字数を取得（改行も1文字として数える） */
+			size_t GetTextLength() const { return m_textLength; }
+
 			/** 影の設定 */
 			void SetShadowParam(bool enable, float offset, const Vector4& color)
 			{
@@ -637,6 +651,8 @@ namespace app
 		private:
 			nsBeastEngine::FontRender m_fontRender;
 			Vector2 m_scale;
+			/** 設定されているテキストの文字数 */
+			size_t m_textLength = 0;
 		};
 
 

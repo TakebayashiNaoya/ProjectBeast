@@ -92,6 +92,8 @@ namespace app
 			{
 			case EnParticleModuleType::InitLifeTime:
 			case EnParticleModuleType::InitPosition:
+			case EnParticleModuleType::InitPositionOutsideRect:
+			case EnParticleModuleType::InitPositionLine:
 			case EnParticleModuleType::InitVelocity:
 			case EnParticleModuleType::InitScale:
 			case EnParticleModuleType::InitRotation:
@@ -119,6 +121,22 @@ namespace app
 
 			m_ownedModules.push_back(std::move(mod));
 			return ptr;
+		}
+
+		/**
+		 * @brief 登録済みのモジュールを検索
+		 * @tparam T モジュールの型
+		 * @return 最初に見つかったモジュールのポインタ（無ければnullptr）
+		 */
+		template <typename T>
+		T* FindModule()
+		{
+			for (size_t i = 0; i < m_ownedModules.size(); ++i) {
+				if (T* mod = dynamic_cast<T*>(m_ownedModules[i].get())) {
+					return mod;
+				}
+			}
+			return nullptr;
 		}
 
 		// ----- 制御 -----
