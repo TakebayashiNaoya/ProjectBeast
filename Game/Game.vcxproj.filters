@@ -580,6 +580,9 @@
     <ClCompile Include="..\Third Party\miniz\miniz_tinfl.c">
       <Filter>Third Party\miniz</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\StageSelect\StageInfoPanel.cpp">
+      <Filter>Source\UI\StageSelect</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\StageSelect\StageSelectMenu.cpp">
       <Filter>Source\UI\StageSelect</Filter>
     </ClCompile>
@@ -1157,6 +1160,9 @@
     </ClInclude>
     <ClInclude Include="..\Third Party\miniz\miniz_zip.h">
       <Filter>Third Party\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\StageSelect\StageInfoPanel.h">
+      <Filter>Source\UI\StageSelect</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\StageSelect\StageSelectMenu.h">
       <Filter>Source\UI\StageSelect</Filter>

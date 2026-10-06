@@ -5,7 +5,7 @@
 #pragma once
 #include "Source/UI/Menu.h"
 
-#include "Source/UI/Modules/Input/UICursorSelector.h"
+#include "Source/UI/StageSelect/StageInfoPanel.h"
 #include "Source/UI/Modules/Input/UIInputController.h"
 
 
@@ -21,19 +21,6 @@ namespace app
 			Easy,
 			Normal,
 			Hard,
-			Max,
-		};
-
-
-		/**
-		 * @brief ボタンの種類
-		 * @detail もどる、決定、選択
-		 */
-		enum class EnStageButtonTypes : uint8_t
-		{
-			Back,
-			Decide,
-			Select,
 			Max,
 		};
 
@@ -55,7 +42,7 @@ namespace app
 
 
 		public:
-			/** @brief ステージが選択されたかどうかを取得する */
+			/** @brief ステージが選択されたかどうかを設定する */
 			inline void SetIsSelected(const bool isSelected) { m_isSelected = isSelected; }
 
 
@@ -84,9 +71,12 @@ namespace app
 
 		private:
 			/**
-			 * @brief 描画フラグを更新する
+			 * @brief 選択中だけ見せるパーツの表示/非表示を反映する
+			 * @param isShow 表示するかどうか
+			 * @details 状態が変わった時にだけ呼ぶ（毎フレーム呼ばない）。
+			 *          表示するパーツは m_selectingParts と情報パネル。映像と白フラッシュは含まない。
 			 */
-			void UpdateDrawFlag();
+			void ApplyVisibility(const bool isShow);
 			/**
 			 * @brief 位置を更新する
 			 */
@@ -105,18 +95,6 @@ namespace app
 			void LoadMenuParam();
 
 			/**
-			 * @brief 選択中ステージの情報パネル（制限時間・クマ数・渦潮数・記録）を更新する
-			 * @details クマ数と渦潮数は配置JSONから読むので、ステージを再生成しても
-			 *          表示が自動で追従する。チュートリアル選択中は非表示。
-			 */
-			void UpdateStageInfo();
-
-			/**
-			 * @brief ステージ情報（クマ数・渦潮数）を配置JSONから読み込む（初回のみ）
-			 */
-			void LoadStageInfoIfNeeded();
-
-			/**
 			 * @brief 選択確定後の演出（画面中央へズームイン＋白フェード）を更新する
 			 * @details メニュー類は演出の開始と同時に隠し、ステージ映像だけをズームさせる。
 			 *          座標系が画面中央原点なので、位置とスケールに同じ倍率を掛けるだけで
@@ -130,12 +108,6 @@ namespace app
 			 */
 			void CaptureZoomBase();
 
-			/**
-			 * @brief 選択確定演出の間、メニュー類（見出し・バブル・カーソル・ボタン）を隠す
-			 * @details UpdateDrawFlag() が毎フレーム全パーツを表示へ戻すため、演出中は毎フレーム呼ぶ
-			 */
-			void HideMenuParts();
-
 
 		private:
 			/** ステージ選択状態 */
@@ -145,14 +117,11 @@ namespace app
 				Selected,
 			};
 
-			/** ステージ情報（Easy/Normal/Hardの3ステージ分） */
-			static constexpr int STAGE_INFO_NUM = 3;
-			/** 配置JSONから読んだクマの頭数 */
-			int m_stageBearCounts[STAGE_INFO_NUM] = { 0, 0, 0 };
-			/** 配置JSONから読んだ渦潮の数 */
-			int m_stageWhirlCounts[STAGE_INFO_NUM] = { 0, 0, 0 };
-			/** ステージ情報を読み込み済みか */
-			bool m_isStageInfoLoaded = false;
+			/**
+			 * @brief ステージ選択状態を切り替える
+			 * @details 状態によって見せるパーツが変わるので、次のUpdateで表示を反映させる
+			 */
+			void SetState(const EnStageSelectState state);
 
 
 			/** JSONから読み込むメニューパラメーター */
@@ -171,39 +140,6 @@ namespace app
 			};
 
 
-			/** ステージ選択肢のデータ構造体 */
-			struct StageChoicesData
-			{
-				/** テキスト */
-				UIText* m_text;
-				/** バブルアイコン */
-				UIIcon* m_bubbleIcon;
-
-
-				StageChoicesData();
-				~StageChoicesData() = default;
-			};
-
-
-
-
-			/*****************************************************/
-
-
-			/** ステージ選択のデータ構造体 */
-			struct StageButtonData
-			{
-				/** ボタンアイコン */
-				UIIcon* m_button;
-				/** テキスト */
-				UIText* m_text;
-
-
-				StageButtonData();
-				~StageButtonData() = default;
-			};
-
-
 			/** 選択確定演出のズーム対象と基準値 */
 			struct ZoomTarget
 			{
@@ -216,40 +152,36 @@ namespace app
 
 		private:
 			/** ステージ選択状態 */
-			EnStageSelectState m_state;
+			EnStageSelectState m_state = EnStageSelectState::Selecting;
 			/** 選択中のステージ選択肢 */
-			EnStageChoices m_selectingStage;
+			EnStageChoices m_selectingStage = EnStageChoices::Easy;
 
 
-			/** 背景アイコン */
-			UIIcon* m_bgIcon;
-			/** "ステージセレクト"のテキスト */
-			UIText* m_stageSelectText;
-			/** "ステージセレクト"の背景アイコン */
-			UIIcon* m_stageSelectTextBGIcon;
+			/**
+			 * 選択中だけ見せるパーツ（背景・見出し・選択肢・ボタン・カーソルなど）
+			 * 選択が確定すると、まとめて隠れる。
+			 */
+			std::vector<UIBase*> m_selectingParts;
+			/** 表示/非表示の反映が必要か（初期化直後と状態が変わった時に立てる） */
+			bool m_isVisibilityDirty = true;
 
-			/** ステージ選択肢 */
-			std::array<StageChoicesData, static_cast<uint8_t>(EnStageChoices::Max)> m_choices;
-
-			/** ステージ選択画面のボタン */
-			std::array<StageButtonData, static_cast<uint8_t>(EnStageButtonTypes::Max)> m_buttons;
-			/** ボタンの背景アイコン */
-			UIIcon* m_buttonBGIcon;
-
+			/** ステージ選択肢のバブル（カーソルの位置合わせの基準） */
+			std::array<UIIcon*, static_cast<uint8_t>(EnStageChoices::Max)> m_bubbleIcons = {};
 			/** 選択カーソルのフレーム */
-			UIIcon* m_cursorFrame;
+			UIIcon* m_cursorFrame = nullptr;
 			/** 選択カーソルのフレームの背景 */
-			UIIcon* m_cursorFrameBG;
+			UIIcon* m_cursorFrameBG = nullptr;
+
+			/** 選択中ステージの情報パネル */
+			StageInfoPanel m_infoPanel;
 
 			/** ステージ背景映像 */
-			UIVideo* m_stagePreviewVideo;
+			UIVideo* m_stagePreviewVideo = nullptr;
 			/** 選択確定演出の白フラッシュアイコン */
-			UIIcon* m_selectFlashIcon;
-			/** 直前のステージ選択（映像切り替え検出用）*/
-			EnStageChoices m_prevSelectingStage;
+			UIIcon* m_selectFlashIcon = nullptr;
+			/** 直前のステージ選択（映像・情報パネルの切り替え検出用）*/
+			EnStageChoices m_prevSelectingStage = EnStageChoices::Max;
 
-			/** 選択入力のインターバル */
-			float m_selectInputInterval;
 			/** カーソル移動ポップの残り時間（秒） */
 			float m_cursorPopTimer = 0.0f;
 			/** 選択確定演出の経過時間（秒） */
@@ -259,14 +191,13 @@ namespace app
 			/** ズーム基準値を保存済みか */
 			bool m_isZoomBaseCaptured = false;
 			/** 選択されたかどうか */
-			bool m_isSelected;
+			bool m_isSelected = false;
 			/** JSONから読み込んだメニューパラメーター */
 			StageSelectParam m_param;
 
 
-			AxisInputDetector m_verticalInputDetector;
+			/** 左右入力の判定 */
 			AxisInputDetector m_horizontalInputDetector;
-			CursorIndexSelector m_cursorSelector;
 		};
 	}
 }

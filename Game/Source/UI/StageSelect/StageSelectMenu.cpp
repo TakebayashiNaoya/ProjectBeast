@@ -5,9 +5,6 @@
 #include "stdafx.h"
 #include "StageSelectMenu.h"
 
-#include "Source/Manager/ScoreManager.h"
-// 制限時間・ステージ名・配置JSONパスの一次資料（STAGE_INFO_TABLE）を共有するため
-#include "Source/Scene/InGameSceneBase.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Animation/UIAnimation.h"
 #include "Source/Util/JsonConverter.h"
@@ -19,18 +16,37 @@ namespace app
 	{
 		namespace
 		{
-			const std::array<std::string, static_cast<uint8_t>(EnStageChoices::Max)> CHOICES_NAME =
+			/** ステージ選択肢のバブル（Easy/Normal/Hard順）。カーソルの位置合わせに使う */
+			constexpr uint32_t BUBBLE_KEYS[] =
 			{
-				"Easy",
-				"Normal",
-				"Hard",
+				Hash32("EasyBubble"),
+				Hash32("NormalBubble"),
+				Hash32("HardBubble"),
 			};
+			static_assert(std::size(BUBBLE_KEYS) == static_cast<size_t>(EnStageChoices::Max),
+				"バブルの数と EnStageChoices の件数を揃えること");
 
-			const std::array<std::string, static_cast<uint8_t>(EnStageButtonTypes::Max)> BUTTON_NAME =
+			/**
+			 * 選択中だけ見せるパーツのうち、表示/非表示にしか使わないもの。
+			 * ロジックでも触るパーツ（バブル・カーソル）は GetUIParts で個別に取得して、同じグループへ入れる。
+			 * 情報パネルは StageInfoPanel が自分で持つ。
+			 * 選択中だけ見せるパーツを足すときは、ここに追記する。
+			 */
+			constexpr uint32_t SELECTING_ONLY_PART_KEYS[] =
 			{
-				"Back",
-				"Decide",
-				"Select",
+				Hash32("BG"),
+				Hash32("StageSelectBG"),
+				Hash32("StageSelectText"),
+				Hash32("EasyText"),
+				Hash32("NormalText"),
+				Hash32("HardText"),
+				Hash32("ButtonBG"),
+				Hash32("SelectButton"),
+				Hash32("SelectText"),
+				Hash32("DecideButton"),
+				Hash32("DecideText"),
+				Hash32("BackButton"),
+				Hash32("BackText"),
 			};
 
 			/** 選択中のアニメーションのキー */
@@ -48,46 +64,9 @@ namespace app
 
 
 		/************************************************************************************/
-		StageSelectMenu::StageChoicesData::StageChoicesData()
-			: m_text(nullptr)
-			, m_bubbleIcon(nullptr)
-		{}
-
-
-
-
-		/************************************************************************************/
-
-		StageSelectMenu::StageButtonData::StageButtonData()
-			: m_button(nullptr)
-			, m_text(nullptr)
-		{}
-
-
-
-
-		/************************************************************************************/
 
 
 		StageSelectMenu::StageSelectMenu()
-			: m_state(EnStageSelectState::Selecting)
-			, m_selectingStage(EnStageChoices::Easy)
-			, m_bgIcon(nullptr)
-			, m_stageSelectText(nullptr)
-			, m_stageSelectTextBGIcon(nullptr)
-			, m_choices()
-			, m_buttons()
-			, m_buttonBGIcon(nullptr)
-			, m_cursorFrame(nullptr)
-			, m_cursorFrameBG(nullptr)
-			, m_stagePreviewVideo(nullptr)
-			, m_selectFlashIcon(nullptr)
-			, m_prevSelectingStage(EnStageChoices::Max)
-			, m_selectInputInterval(0.0f)
-			, m_isSelected(false)
-			, m_verticalInputDetector()
-			, m_horizontalInputDetector()
-			, m_cursorSelector(static_cast<int>(EnStageChoices::Max))
 		{}
 
 
@@ -98,10 +77,8 @@ namespace app
 		void StageSelectMenu::InitializeLogic()
 		{
 			// Reload後に古いポインタが残らないようリセット
-			m_bgIcon = nullptr;
-			m_stageSelectText = nullptr;
-			m_stageSelectTextBGIcon = nullptr;
-			m_buttonBGIcon = nullptr;
+			m_selectingParts.clear();
+			m_bubbleIcons.fill(nullptr);
 			m_cursorFrame = nullptr;
 			m_cursorFrameBG = nullptr;
 			m_stagePreviewVideo = nullptr;
@@ -114,26 +91,7 @@ namespace app
 			m_selectEffectTimer = 0.0f;
 
 			// Reload後に古い状態が残らないようリセットする。
-			m_verticalInputDetector.Reset();
 			m_horizontalInputDetector.Reset();
-			m_cursorSelector.Reset();
-
-			// このメニューは「倒しっぱなし連続移動」の仕様のため入力判定自体には使わないが、
-			// Reload後に古い状態が残らないようリセットだけしておく。
-			m_verticalInputDetector.Reset();
-			m_horizontalInputDetector.Reset();
-			m_cursorSelector.Reset();
-
-			for (auto& choice : m_choices)
-			{
-				choice.m_text = nullptr;
-				choice.m_bubbleIcon = nullptr;
-			}
-			for (auto& button : m_buttons)
-			{
-				button.m_button = nullptr;
-				button.m_text = nullptr;
-			}
 
 			// JSONパラメーターを読み込む
 			LoadMenuParam();
@@ -151,35 +109,11 @@ namespace app
 				}
 			}
 
-			std::vector<UIBase*> icons = {
-				m_bgIcon,
-				m_stageSelectText,
-				m_stageSelectTextBGIcon,
-				m_cursorFrame,
-				m_cursorFrameBG,
-				m_buttonBGIcon,
-				m_selectFlashIcon,
-			};
-
-			for (auto& choice : m_choices)
-			{
-				icons.push_back(choice.m_text);
-				icons.push_back(choice.m_bubbleIcon);
-			}
-
-			for (auto& button : m_buttons)
-			{
-				icons.push_back(button.m_button);
-				icons.push_back(button.m_text);
-			}
-
-			for (const auto& icon : icons)
-			{
-				K2_ASSERT(icon, "アイコンを取得できていません。");
-
-				icon->m_isDraw = false;
-			}
-
+			// この画面に入った最初のフレームは、このメニューのUpdateより先にRenderされることがある。
+			// 更新前のレイアウトが映らないよう、最初のUpdateまでは隠しておく（表示はそこで反映する）
+			ApplyVisibility(false);
+			m_selectFlashIcon->SetIsDraw(false);
+			m_isVisibilityDirty = true;
 		}
 
 
@@ -201,10 +135,13 @@ namespace app
 			}
 
 
-			// 描画フラグを更新
-			UpdateDrawFlag();
+			// 状態が変わった時にだけ、表示/非表示を反映する
+			if (m_isVisibilityDirty)
+			{
+				m_isVisibilityDirty = false;
+				ApplyVisibility(m_state == EnStageSelectState::Selecting);
+			}
 			UpdateIcons();
-			UpdateStageInfo();
 
 			// 選択確定演出（位置・スケールを上書きするので各Updateの後に行う）
 			UpdateSelectEffect();
@@ -214,115 +151,20 @@ namespace app
 		}
 
 
-		void StageSelectMenu::LoadStageInfoIfNeeded()
+		void StageSelectMenu::SetState(const EnStageSelectState state)
 		{
-			static_assert(STAGE_INFO_NUM == STAGE_INFO_COUNT,
-				"情報パネルの枠数と STAGE_INFO_TABLE の件数を揃えること");
-
-			if (m_isStageInfoLoaded) return;
-			m_isStageInfoLoaded = true;
-
-			/** 配置JSONの実データから数を数える。
-			 *  パスはインゲームシーンと共有の STAGE_INFO_TABLE から引くので、
-			 *  ステージを再生成・改名しても表示が自動で追従する */
-			for (int i = 0; i < STAGE_INFO_NUM; ++i)
-			{
-				const StageInfo& info = STAGE_INFO_TABLE[i];
-
-				nlohmann::json json;
-				if (util::JsonConverter::IsLoadJsonFile(json, info.enemyLayoutJsonPath)
-					&& json.contains("enemies"))
-				{
-					m_stageBearCounts[i] = static_cast<int>(json["enemies"].size());
-				}
-				if (util::JsonConverter::IsLoadJsonFile(json, info.whirlpoolPositionsJsonPath)
-					&& json.contains("whirlpoolPositions"))
-				{
-					m_stageWhirlCounts[i] = static_cast<int>(json["whirlpoolPositions"].size());
-				}
-			}
+			m_state = state;
+			m_isVisibilityDirty = true;
 		}
 
 
-		void StageSelectMenu::UpdateStageInfo()
+		void StageSelectMenu::ApplyVisibility(const bool isShow)
 		{
-			auto* panel = GetUI<UIIcon>(Hash32("StageInfoPanel"));
-			auto* timeIcon = GetUI<UIIcon>(Hash32("StageInfoTimeIcon"));
-			auto* timeText = GetUI<UIText>(Hash32("StageInfoTimeText"));
-			auto* bearIcon = GetUI<UIIcon>(Hash32("StageInfoBearIcon"));
-			auto* bearText = GetUI<UIText>(Hash32("StageInfoBearText"));
-			auto* whirlIcon = GetUI<UIIcon>(Hash32("StageInfoWhirlIcon"));
-			auto* whirlText = GetUI<UIText>(Hash32("StageInfoWhirlText"));
-			auto* recordText = GetUI<UIText>(Hash32("StageInfoRecordText"));
-			if (!panel || !timeIcon || !timeText || !bearIcon || !bearText
-				|| !whirlIcon || !whirlText || !recordText)
+			for (auto* ui : m_selectingParts)
 			{
-				return;
+				ui->SetIsDraw(isShow);
 			}
-
-			/** 選択確定後は出さない */
-			const bool isShow = (m_state == EnStageSelectState::Selecting);
-			panel->m_isDraw = isShow;
-			timeIcon->m_isDraw = isShow;
-			timeText->m_isDraw = isShow;
-			bearIcon->m_isDraw = isShow;
-			bearText->m_isDraw = isShow;
-			whirlIcon->m_isDraw = isShow;
-			whirlText->m_isDraw = isShow;
-			recordText->m_isDraw = isShow;
-			if (!isShow) return;
-
-			LoadStageInfoIfNeeded();
-
-			const int index = static_cast<int>(m_selectingStage);
-			if (index < 0 || index >= STAGE_INFO_NUM) return;
-
-			/** 制限時間もステージ名も、インゲームシーンと同じ STAGE_INFO_TABLE から引く */
-			const StageInfo& info = STAGE_INFO_TABLE[index];
-			const int timeSeconds = static_cast<int>(info.timeLimit);
-
-			char buf[48];
-			sprintf_s(buf, "%d:%02d", timeSeconds / 60, timeSeconds % 60);
-			timeText->SetText(buf);
-
-			sprintf_s(buf, "x%d", m_stageBearCounts[index]);
-			bearText->SetText(buf);
-
-			sprintf_s(buf, "x%d", m_stageWhirlCounts[index]);
-			whirlText->SetText(buf);
-
-			const int highScore = ScoreManager::GetHighScore(info.name);
-			if (highScore > 0)
-			{
-				sprintf_s(buf, "きろく %d", highScore);
-				recordText->SetText(buf);
-			}
-			else
-			{
-				recordText->SetText("きろく ---");
-			}
-		}
-
-
-		void StageSelectMenu::HideMenuParts()
-		{
-			if (m_bgIcon)                m_bgIcon->SetIsDraw(false);
-			if (m_stageSelectText)       m_stageSelectText->SetIsDraw(false);
-			if (m_stageSelectTextBGIcon) m_stageSelectTextBGIcon->SetIsDraw(false);
-			if (m_buttonBGIcon)          m_buttonBGIcon->SetIsDraw(false);
-			if (m_cursorFrame)           m_cursorFrame->SetIsDraw(false);
-			if (m_cursorFrameBG)         m_cursorFrameBG->SetIsDraw(false);
-
-			for (auto& choice : m_choices)
-			{
-				if (choice.m_text)       choice.m_text->SetIsDraw(false);
-				if (choice.m_bubbleIcon) choice.m_bubbleIcon->SetIsDraw(false);
-			}
-			for (auto& button : m_buttons)
-			{
-				if (button.m_button) button.m_button->SetIsDraw(false);
-				if (button.m_text)   button.m_text->SetIsDraw(false);
-			}
+			m_infoPanel.SetDraw(isShow);
 		}
 
 
@@ -333,7 +175,7 @@ namespace app
 			// ズームさせるのはステージ映像だけにする。
 			// メニュー類（見出し・バブル・カーソル・ボタン）を一緒に拡大すると、
 			// 文字やアイコンが画面外へ散っていくのが目に入って「ステージへ入っていく」感が薄れる。
-			// それらは HideMenuParts() で演出の開始と同時に消す。
+			// それらは選択確定で ApplyVisibility() が演出の開始と同時に消す。
 			// 白フラッシュは全画面のまま重ねたいので、ここでは対象にしない
 			std::vector<UIBase*> targets = {
 				m_stagePreviewVideo,
@@ -368,9 +210,6 @@ namespace app
 			{
 				CaptureZoomBase();
 			}
-
-			// UpdateDrawFlag() が毎フレーム全パーツを表示に戻すため、ここで消し直す
-			HideMenuParts();
 
 			m_selectEffectTimer += g_gameTime->GetFrameDeltaTime();
 
@@ -411,7 +250,7 @@ namespace app
 
 		void StageSelectMenu::Reset()
 		{
-			m_state = EnStageSelectState::Selecting;
+			SetState(EnStageSelectState::Selecting);
 			m_selectingStage = EnStageChoices::Easy;
 			m_prevSelectingStage = EnStageChoices::Max;
 
@@ -452,7 +291,7 @@ namespace app
 			// 選択済みになると状態を変更して抜ける
 			if (m_isSelected)
 			{
-				m_state = EnStageSelectState::Selected;
+				SetState(EnStageSelectState::Selected);
 				return;
 			}
 
@@ -470,7 +309,6 @@ namespace app
 
 
 			const float stickLXF = g_pad[0]->GetLStickXF();
-			const float stickLYF = g_pad[0]->GetLStickYF();
 
 			// 横方向：Negative=左、Positive=右。倒しっぱなし中はinputIntervalごとにリピートする。
 			const auto hDir = m_horizontalInputDetector.Update(
@@ -502,14 +340,17 @@ namespace app
 				PlayCursorSE();
 			}
 
-			// ステージが変わったら事前ロード済みクリップにポインタを切り替える（I/O なし）
+			// ステージが変わったら、映像と情報パネルを切り替える。
+			// 映像は事前ロード済みクリップにポインタを切り替える（I/O なし）
 			if (m_selectingStage != m_prevSelectingStage)
 			{
 				m_prevSelectingStage = m_selectingStage;
+				const int stageIndex = static_cast<int>(m_selectingStage);
 				if (m_stagePreviewVideo)
 				{
-					m_stagePreviewVideo->SwitchToPreloadedClip(static_cast<int>(m_selectingStage));
+					m_stagePreviewVideo->SwitchToPreloadedClip(stageIndex);
 				}
+				m_infoPanel.SetStage(stageIndex);
 			}
 		}
 
@@ -523,35 +364,11 @@ namespace app
 		}
 
 
-		void StageSelectMenu::UpdateDrawFlag()
-		{
-			if (m_bgIcon)              m_bgIcon->SetIsDraw(true);
-			if (m_stageSelectText)     m_stageSelectText->SetIsDraw(true);
-			if (m_stageSelectTextBGIcon) m_stageSelectTextBGIcon->SetIsDraw(true);
-
-			for (auto& it : m_choices)
-			{
-				if (it.m_text)       it.m_text->SetIsDraw(true);
-				if (it.m_bubbleIcon) it.m_bubbleIcon->SetIsDraw(true);
-			}
-
-			for (auto& it : m_buttons)
-			{
-				if (it.m_button) it.m_button->SetIsDraw(true);
-				if (it.m_text)   it.m_text->SetIsDraw(true);
-			}
-
-			if (m_buttonBGIcon)  m_buttonBGIcon->SetIsDraw(true);
-			if (m_cursorFrame)   m_cursorFrame->SetIsDraw(true);
-			if (m_cursorFrameBG) m_cursorFrameBG->SetIsDraw(true);
-		}
-
-
 		void StageSelectMenu::UpdateIcons()
 		{
 			// カーソルの位置を選択中のバブルに合わせる
-			const auto& selected = m_choices.at(static_cast<uint8_t>(m_selectingStage));
-			const Vector3 position = selected.m_bubbleIcon->m_transform.m_localTransform.m_position;
+			const auto* selected = m_bubbleIcons.at(static_cast<uint8_t>(m_selectingStage));
+			const Vector3 position = selected->m_transform.m_localTransform.m_position;
 			m_cursorFrame->m_transform.m_localTransform.m_position = position;
 			m_cursorFrameBG->m_transform.m_localTransform.m_position = position;
 
@@ -571,40 +388,39 @@ namespace app
 
 		void StageSelectMenu::GetUIParts()
 		{
-			// すでに取得している場合は取得しない
+			// 選択中だけ見せるグループへ登録する（取得できていなければアサート）
+			auto AddSelectingPart = [&](UIBase* ui)
+				{
+					K2_ASSERT(ui, "UIパーツを取得できていません。");
+					m_selectingParts.push_back(ui);
+				};
 
-			if (!m_bgIcon) m_bgIcon = GetUI<UIIcon>(Hash32("BG"));
-			if (!m_stageSelectText) m_stageSelectText = GetUI<UIText>(Hash32("StageSelectText"));
-			if (!m_stageSelectTextBGIcon) m_stageSelectTextBGIcon = GetUI<UIIcon>(Hash32("StageSelectBG"));
+			// 表示/非表示にしか使わないパーツ
+			for (const uint32_t key : SELECTING_ONLY_PART_KEYS)
+			{
+				AddSelectingPart(GetUI<UIBase>(key));
+			}
 
-
+			// ロジックでも触るパーツは型付きで持ち、同じグループへも入れる
 			for (uint8_t i = 0; i < static_cast<uint8_t>(EnStageChoices::Max); ++i)
 			{
-				auto& it = m_choices.at(i);
-				const auto textKey = CHOICES_NAME.at(i) + "Text";
-				const auto bubbleKey = CHOICES_NAME.at(i) + "Bubble";
-				if (!it.m_text) it.m_text = GetUI<UIText>(Hash32(textKey.c_str()));
-				if (!it.m_bubbleIcon) it.m_bubbleIcon = GetUI<UIIcon>(Hash32(bubbleKey.c_str()));
+				m_bubbleIcons.at(i) = GetUI<UIIcon>(BUBBLE_KEYS[i]);
+				AddSelectingPart(m_bubbleIcons.at(i));
 			}
 
+			m_cursorFrame = GetUI<UIIcon>(Hash32("Frame"));
+			AddSelectingPart(m_cursorFrame);
+			m_cursorFrameBG = GetUI<UIIcon>(Hash32("FrameBG"));
+			AddSelectingPart(m_cursorFrameBG);
 
-			for (uint8_t i = 0; i < static_cast<uint8_t>(EnStageButtonTypes::Max); ++i)
-			{
-				auto& it = m_buttons.at(i);
-				const auto buttonKey = BUTTON_NAME.at(i) + "Button";
-				const auto textKey = BUTTON_NAME.at(i) + "Text";
-				if (!it.m_button) it.m_button = GetUI<UIIcon>(Hash32(buttonKey.c_str()));
-				if (!it.m_text) it.m_text = GetUI<UIText>(Hash32(textKey.c_str()));
-			}
+			// 情報パネルは自分でパーツを持つ
+			m_infoPanel.Initialize(*this);
 
-			if (!m_buttonBGIcon) m_buttonBGIcon = GetUI<UIIcon>(Hash32("ButtonBG"));
+			// 映像と白フラッシュは、選択確定演出が個別に制御するのでグループに入れない
+			m_stagePreviewVideo = GetUI<UIVideo>(Hash32("StagePreviewVideo"));
 
-			if (!m_cursorFrame) m_cursorFrame = GetUI<UIIcon>(Hash32("Frame"));
-			if (!m_cursorFrameBG) m_cursorFrameBG = GetUI<UIIcon>(Hash32("FrameBG"));
-
-			if (!m_stagePreviewVideo) m_stagePreviewVideo = GetUI<UIVideo>(Hash32("StagePreviewVideo"));
-
-			if (!m_selectFlashIcon) m_selectFlashIcon = GetUI<UIIcon>(Hash32("SelectFlashWhite"));
+			m_selectFlashIcon = GetUI<UIIcon>(Hash32("SelectFlashWhite"));
+			K2_ASSERT(m_selectFlashIcon, "アイコンを取得できていません。");
 		}
 
 

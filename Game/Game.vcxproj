@@ -409,6 +409,7 @@
     <ClCompile Include="Source\UI\Modules\Input\UIInputController.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingAnimStatus.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp" />
+    <ClCompile Include="Source\UI\StageSelect\StageInfoPanel.cpp" />
     <ClCompile Include="Source\UI\StageSelect\StageSelectMenu.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
     <ClCompile Include="Source\UI\Ult\SpeedLineMenu.cpp" />
@@ -623,6 +624,7 @@
     <ClInclude Include="Source\UI\Modules\System\SystemPacket.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingChildMenu.h" />
+    <ClInclude Include="Source\UI\StageSelect\StageInfoPanel.h" />
     <ClInclude Include="Source\UI\StageSelect\StageSelectMenu.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\UI\Ult\SpeedLineMenu.h" />
