@@ -13,7 +13,7 @@
 #include "ReplayScene.h"
 #include "Source/Sound/SoundManager.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
-#include "Source/UI/Menus/StageSelectMenu.h"
+#include "Source/UI/StageSelect/StageSelectMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/Menus/TutorialMenu.h"
 
