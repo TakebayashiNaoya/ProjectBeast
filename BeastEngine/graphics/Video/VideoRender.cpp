@@ -88,7 +88,7 @@ namespace nsBeastEngine
 	}
 
 
-	void VideoRender::Draw(RenderContext& /*rc*/)
+	void VideoRender::Draw(RenderContext& rc)
 	{
 		if (!m_isInitialized) return;
 
@@ -102,15 +102,21 @@ namespace nsBeastEngine
 	{
 		if (!m_isInitialized || !m_activeClip) return;
 
+		BEAST_PROFILE_SCOPE(u8"動画描画 (VideoRender)");
+
 		// フレームが変化した時だけ GPU テクスチャを更新する
 		const int frameIdx = m_player.GetCurrentFrameIndex();
 		if (frameIdx != m_lastFrameIdx)
 		{
+			BEAST_PROFILE_SCOPE(u8"動画フレームアップロード (UploadFrame)");
 			const uint8_t* pixels = m_activeClip->GetFramePixels(frameIdx);
 			if (pixels) m_frameTex.UploadFrame(pixels);
 			m_lastFrameIdx = frameIdx;
 		}
 
-		m_sprite.Draw(rc);
+		{
+			BEAST_PROFILE_SCOPE(u8"動画スプライト描画");
+			m_sprite.Draw(rc);
+		}
 	}
 }

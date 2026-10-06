@@ -149,6 +149,7 @@ namespace nsBeastEngine
 		 */
 		void OnRender2D(RenderContext& rc)override
 		{
+			BEAST_PROFILE_SCOPE(u8"テキスト描画 (FontRender)");
 			auto& sdfFont = GetSDFFontEngine();
 			sdfFont.SetShadowParam(m_isDrawShadow, m_shadowOffset, m_shadowColor);
 			sdfFont.SetTextAlign(m_textAlign);

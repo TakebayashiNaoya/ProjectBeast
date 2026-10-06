@@ -135,6 +135,7 @@ namespace nsBeastEngine
 		 */
 		void OnRender2D(RenderContext& rc)override
 		{
+			BEAST_PROFILE_SCOPE(u8"スプライト描画 (SpriteRender)");
 			m_sprite.Draw(rc);
 		}
 
@@ -417,6 +418,7 @@ namespace nsBeastEngine
 		 */
 		void OnRender2D(RenderContext& rc)override
 		{
+			BEAST_PROFILE_SCOPE(u8"ゲージ描画 (GaugeRender)");
 			m_sprite.Draw(rc);
 		}
 
@@ -599,6 +601,7 @@ namespace nsBeastEngine
 		 */
 		void OnRender2D(RenderContext& rc)override
 		{
+			BEAST_PROFILE_SCOPE(u8"ゲージ描画 (LinearFillGaugeRender)");
 			m_sprite.Draw(rc);
 		}
 

@@ -7,6 +7,10 @@ namespace nsK2EngineLow {
 	Camera* g_camera2D = nullptr;				//2Dカメラ。
 	Camera* g_camera3D = nullptr;				//3Dカメラ。
 
+	/** GraphicsMemory::GarbageCollect() を呼ぶ間隔（フレーム数） */
+	constexpr int GFX_MEMORY_GC_INTERVAL_FRAMES = 300;
+
+
 	GraphicsEngine::~GraphicsEngine()
 	{
 		WaitDraw();
@@ -445,7 +449,15 @@ namespace nsK2EngineLow {
 		m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 		// コマンドリストをGPUに流した印。
 		m_isExecuteCommandList = true;
-		m_directXTKGfxMemroy->GarbageCollect();
+		// GarbageCollect()は未使用ページを解放するだけの処理だが、
+		// 毎フレーム呼ぶとCommit()で返却されたばかりのページも即座に解放されてしまい、
+		// 次フレームでSpriteBatch等がGraphicsMemoryから確保するたびにCreateCommittedResourceで
+		// 作り直しになる（プールが使い回しとして機能しない）。頻度を落として様子を見る。
+		static int s_gfxMemoryGCCounter = 0;
+		if (++s_gfxMemoryGCCounter >= GFX_MEMORY_GC_INTERVAL_FRAMES) {
+			s_gfxMemoryGCCounter = 0;
+			m_directXTKGfxMemroy->GarbageCollect();
+		}
 
 		// バックバッファを入れ替える。
 		m_frameBuffer.SwapBackBuffer();
