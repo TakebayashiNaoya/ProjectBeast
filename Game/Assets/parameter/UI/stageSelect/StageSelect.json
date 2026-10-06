@@ -55,11 +55,11 @@
                 "type": "UIIcon",
                 "name": "StageSelectBG",
                 "asset": "Assets/spriteData/UI/Icon/BGIcon.dds",
-                "width": 550,
-                "height": 70,
+                "width": 640,
+                "height": 240,
                 "position": [
-                    -500,
-                    400,
+                    -480,
+                    440,
                     0
                 ],
                 "scale": [
@@ -77,165 +77,21 @@
             },
             {
                 "type": "UIText",
-                "name": "StageSelectText",
-                "text": "ステージセレクト",
-                "fontSize": 1.0,
-                "fontScaleX": 1.0,
-                "fontScaleY": 1.0,
-                "position": [
-                    -500,
-                    400,
-                    0
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ],
-                "pivot": [
-                    0.5,
-                    0.5
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "EasyBubble",
-                "asset": "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
-                "width": 280,
-                "height": 100,
-                "position": [
-                    -300,
-                    -275,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "NormalBubble",
-                "asset": "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
-                "width": 280,
-                "height": 100,
-                "position": [
-                    0,
-                    -275,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "HardBubble",
-                "asset": "Assets/spriteData/UI/StageSelect/ChoiceBubble.dds",
-                "width": 280,
-                "height": 100,
-                "position": [
-                    300,
-                    -275,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "FrameBG",
-                "asset": "Assets/spriteData/UI/Frame/FrameBackGround.dds",
-                "width": 293,
-                "height": 113,
-                "position": [
-                    -300,
-                    -275,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "Frame",
-                "asset": "Assets/spriteData/UI/Frame/Frame.dds",
-                "width": 296,
-                "height": 116,
-                "position": [
-                    -300,
-                    -275,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIText",
-                "name": "EasyText",
+                "name": "StageNameText",
                 "text": "イージー",
-                "fontSize": 1.0,
+                "fontSize": 1.3,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    -300,
-                    -275,
+                    -480,
+                    385,
                     0
                 ],
                 "rotation": 0,
                 "color": [
-                    0,
-                    0,
-                    0,
+                    255,
+                    255,
+                    255,
                     255
                 ],
                 "pivot": [
@@ -244,51 +100,51 @@
                 ]
             },
             {
-                "type": "UIText",
-                "name": "NormalText",
-                "text": "ノーマル",
-                "fontSize": 1.0,
-                "fontScaleX": 1.0,
-                "fontScaleY": 1.0,
+                "type": "UIIcon",
+                "name": "LeftArrow",
+                "asset": "Assets/spriteData/UI/StageSelect/ArrowTriangle.DDS",
+                "width": 72,
+                "height": 96,
                 "position": [
+                    -752,
                     0,
-                    -275,
                     0
                 ],
-                "rotation": 0,
-                "color": [
-                    0,
-                    0,
-                    0,
-                    255
+                "scale": [
+                    1,
+                    1,
+                    1
                 ],
-                "pivot": [
-                    0.5,
-                    0.5
+                "rotation": 180,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
                 ]
             },
             {
-                "type": "UIText",
-                "name": "HardText",
-                "text": "ハード",
-                "fontSize": 1.0,
-                "fontScaleX": 1.0,
-                "fontScaleY": 1.0,
+                "type": "UIIcon",
+                "name": "RightArrow",
+                "asset": "Assets/spriteData/UI/StageSelect/ArrowTriangle.DDS",
+                "width": 72,
+                "height": 96,
                 "position": [
-                    300,
-                    -275,
+                    752,
+                    0,
                     0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
                 ],
                 "rotation": 0,
                 "color": [
-                    0,
-                    0,
-                    0,
+                    255,
+                    255,
+                    255,
                     255
-                ],
-                "pivot": [
-                    0.5,
-                    0.5
                 ]
             },
             {
@@ -683,23 +539,22 @@
         "selectZoomDuration": 0.6,
         "selectZoomScale": 2.2,
         "selectWhiteFadeDuration": 0.35,
-        "cursorBlinkDuration": 0.5,
-        "cursorBlinkStartColor": [
-            255,
-            255,
-            255,
-            255
-        ],
-        "cursorBlinkEndColor": [
-            255,
-            255,
-            255,
-            0
+        "stageNames": [
+            "イージー",
+            "ノーマル",
+            "ハード"
         ],
         "stageVideoPaths": [
             "Assets/Video/EasyStage.mp4",
             "Assets/Video/NormalStage.mp4",
             "Assets/Video/HardStage.mp4"
-        ]
+        ],
+        "arrowDisabledAlpha": 0.3,
+        "switchOutDuration": 0.12,
+        "switchInDuration": 0.25,
+        "switchZoomScale": 0.05,
+        "stageNamePopScale": 1.35,
+        "stageNameExpandDuration": 0.08,
+        "stageNameShrinkDuration": 0.18
     }
 }

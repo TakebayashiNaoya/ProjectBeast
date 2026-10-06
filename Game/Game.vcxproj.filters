@@ -91,6 +91,9 @@
     <Filter Include="Source\UI\RemainingChild">
       <UniqueIdentifier>{761969bc-a80d-46bd-b94a-fd6e027c74ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI\StageSelect">
+      <UniqueIdentifier>{b5a183ba-712c-4d2c-9fbc-957f670f8c0a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\UI\MiniMap">
       <UniqueIdentifier>{4948fc8c-fd5e-4b23-b2dd-3fcfeaa6d56b}</UniqueIdentifier>
     </Filter>
@@ -577,8 +580,11 @@
     <ClCompile Include="..\Third Party\miniz\miniz_tinfl.c">
       <Filter>Third Party\miniz</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp">
-      <Filter>Source\UI\Menus</Filter>
+    <ClCompile Include="Source\UI\StageSelect\StageInfoPanel.cpp">
+      <Filter>Source\UI\StageSelect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\StageSelect\StageSelectMenu.cpp">
+      <Filter>Source\UI\StageSelect</Filter>
     </ClCompile>
     <ClCompile Include="Source\Vfx\HomingParticleRender.cpp">
       <Filter>Source\Vfx</Filter>
@@ -1155,8 +1161,11 @@
     <ClInclude Include="..\Third Party\miniz\miniz_zip.h">
       <Filter>Third Party\miniz</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Menus\StageSelectMenu.h">
-      <Filter>Source\UI\Menus</Filter>
+    <ClInclude Include="Source\UI\StageSelect\StageInfoPanel.h">
+      <Filter>Source\UI\StageSelect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI\StageSelect\StageSelectMenu.h">
+      <Filter>Source\UI\StageSelect</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Stage\StageNavGrid.h">
       <Filter>Source\Actor\Stage</Filter>

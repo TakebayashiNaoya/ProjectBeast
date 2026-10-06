@@ -386,7 +386,6 @@
     <ClCompile Include="Source\UI\Menus\PauseScreenMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\PBWakingUpTimerMenu.cpp" />
     <ClCompile Include="Source\UI\Menus\ScorePopupAnimatorMenu.cpp" />
-    <ClCompile Include="Source\UI\Menus\StageSelectMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp" />
     <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp" />
     <ClCompile Include="Source\UI\Menus\ResultMenu.cpp" />
@@ -410,6 +409,8 @@
     <ClCompile Include="Source\UI\Modules\Input\UIInputController.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingAnimStatus.cpp" />
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp" />
+    <ClCompile Include="Source\UI\StageSelect\StageInfoPanel.cpp" />
+    <ClCompile Include="Source\UI\StageSelect\StageSelectMenu.cpp" />
     <ClCompile Include="Source\UI\UIParts.cpp" />
     <ClCompile Include="Source\UI\Ult\SpeedLineMenu.cpp" />
     <ClCompile Include="Source\UI\WpWarning\MasterWpWarningParameter.cpp" />
@@ -599,7 +600,6 @@
     <ClInclude Include="Source\UI\Menus\ScorePopupAnimatorMenu.h" />
     <ClInclude Include="Source\UI\Menus\SearchMenu.h" />
     <ClInclude Include="Source\UI\Menus\SoundOptionMenu.h" />
-    <ClInclude Include="Source\UI\Menus\StageSelectMenu.h" />
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h" />
     <ClInclude Include="Source\UI\Menus\TutorialMenu.h" />
     <ClInclude Include="Source\UI\MiniMap\MiniMapMenu.h" />
@@ -624,6 +624,8 @@
     <ClInclude Include="Source\UI\Modules\System\SystemPacket.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h" />
     <ClInclude Include="Source\UI\RemainingChild\RemainingChildMenu.h" />
+    <ClInclude Include="Source\UI\StageSelect\StageInfoPanel.h" />
+    <ClInclude Include="Source\UI\StageSelect\StageSelectMenu.h" />
     <ClInclude Include="Source\UI\UIParts.h" />
     <ClInclude Include="Source\UI\Ult\SpeedLineMenu.h" />
     <ClInclude Include="Source\UI\WpWarning\MasterWpWarningParameter.h" />
