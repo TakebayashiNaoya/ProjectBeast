@@ -27,162 +27,18 @@
             },
             {
                 "type": "UIIcon",
-                "name": "TitleNote0",
-                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
-                "width": 44,
-                "height": 44,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    220
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "TitleNote1",
-                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
-                "width": 44,
-                "height": 44,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    220
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "TitleNote2",
-                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
-                "width": 44,
-                "height": 44,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    220
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "TitleNote3",
-                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
-                "width": 44,
-                "height": 44,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    220
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "TitleNote4",
-                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
-                "width": 44,
-                "height": 44,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    220
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "TitleNote5",
-                "asset": "Assets/spriteData/UI/Icon/Reaction/CPReaction/HappyReaction.dds",
-                "width": 44,
-                "height": 44,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    220
-                ]
-            },
-            {
-                "type": "UIIcon",
                 "name": "PentaktRogoIcon",
                 "asset": "Assets/spriteData/Scene/PENTAKT.dds",
-                "width": 800,
-                "height": 500,
+                "width": 460,
+                "height": 350,
                 "position": [
-                    0,
-                    50,
+                    370,
+                    190,
                     0
                 ],
                 "scale": [
-                    1,
-                    1,
+                    1.35,
+                    1.35,
                     1
                 ],
                 "rotation": 0,
@@ -191,67 +47,19 @@
                     255,
                     255,
                     255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "Frame",
-                "asset": "Assets/spriteData/UI/Frame/Frame.dds",
-                "width": 300,
-                "height": 130,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "FrameBack",
-                "asset": "Assets/spriteData/UI/Frame/FrameBackGround.dds",
-                "width": 280,
-                "height": 101,
-                "position": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    120
                 ]
             },
             {
                 "type": "UIText",
                 "name": "StartIcon",
                 "text": "スタート",
-                "fontSize": 1.2,
+                "fontSize": 0.7,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "rotation": 0,
                 "position": [
                     -500,
-                    -310,
+                    180,
                     0
                 ],
                 "color": [
@@ -269,13 +77,13 @@
                 "type": "UIText",
                 "name": "SoundIcon",
                 "text": "サウンド",
-                "fontSize": 1.2,
+                "fontSize": 0.7,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "rotation": 0,
                 "position": [
-                    -175,
-                    -310,
+                    -500,
+                    60,
                     0
                 ],
                 "color": [
@@ -293,13 +101,13 @@
                 "type": "UIText",
                 "name": "RuleIcon",
                 "text": "ヒント",
-                "fontSize": 1.2,
+                "fontSize": 0.7,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "rotation": 0,
                 "position": [
-                    175,
-                    -310,
+                    -500,
+                    -60,
                     0
                 ],
                 "color": [
@@ -317,13 +125,13 @@
                 "type": "UIText",
                 "name": "EndIcon",
                 "text": "オワリ",
-                "fontSize": 1.2,
+                "fontSize": 0.7,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "rotation": 0,
                 "position": [
-                    500,
-                    -310,
+                    -500,
+                    -180,
                     0
                 ],
                 "color": [
@@ -335,6 +143,54 @@
                 "pivot": [
                     0.5,
                     0.5
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "SelectNoteIcon",
+                "asset": "Assets/effect/vfx/MusicalNoteTexture/musicalNoteTexture.dds",
+                "width": 44,
+                "height": 44,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "SelectUnderlineIcon",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 100,
+                "height": 4,
+                "position": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    0,
+                    0,
+                    0,
+                    255
                 ]
             },
             {

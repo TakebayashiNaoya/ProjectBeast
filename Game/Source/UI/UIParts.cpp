@@ -68,6 +68,7 @@ namespace app
 			m_transform.m_localTransform.m_scale = scale;
 			m_transform.m_localTransform.m_rotation = rotation;
 			m_color = color;
+			m_size = Vector2(width, height);
 
 			m_spriteRender.Init(assetName, width, height);
 			m_spriteRender.SetPosition(position);
@@ -478,6 +479,7 @@ namespace app
 		{
 			if (text.empty()) {
 				m_fontRender.SetText(L"");
+				m_textLength = 0;
 				return;
 			}
 
@@ -487,6 +489,7 @@ namespace app
 			MultiByteToWideChar(CP_UTF8, 0, &text[0], (int)text.size(), &wstrTo[0], size_needed);
 
 			m_fontRender.SetText(wstrTo.c_str());
+			m_textLength = wstrTo.size();
 		}
 
 
