@@ -8,7 +8,6 @@
 #include "EasyInGameScene.h"
 #include "HardInGameScene.h"
 #include "NormalInGameScene.h"
-#include "PVScene.h"
 #include "ReplayScene.h"
 #include "ResultScene.h"
 #include "SceneManager.h"
@@ -35,7 +34,6 @@ namespace app
 		AddSceneMap<app::HardInGameScene>();
 		AddSceneMap<app::ResultScene>();
 		AddSceneMap<app::ReplayScene>();
-		AddSceneMap<app::PVScene>();
 
 		// 初期シーン生成
 		CreateScene(app::TitleScene::ID());
