@@ -10,6 +10,45 @@
 
 namespace nsBeastEngine
 {
+
+	namespace
+	{
+		/**
+		 * @brief R32G32_FLOAT の2Dテクスチャを表すDDSファイルの中身をメモリ上に作る
+		 * @details Texture::InitFromMemory() でGPUへ転送するため（DX10拡張ヘッダーを使う）
+		 * @param pixels 1画素あたり float 2つ（R, G）を並べた配列
+		 */
+		std::vector<char> BuildR32G32FloatDds(const float* pixels, const int width, const int height)
+		{
+			const uint32_t pitch = static_cast<uint32_t>(width) * sizeof(float) * 2;
+			const size_t dataSize = static_cast<size_t>(pitch) * static_cast<size_t>(height);
+			// "DDS " + DDS_HEADER(124) + DDS_HEADER_DXT10(20) + 画素
+			std::vector<char> dds(4 + 124 + 20 + dataSize, 0);
+			uint32_t* header = reinterpret_cast<uint32_t*>(dds.data());
+			header[0] = 0x20534444;					// "DDS "
+			header[1] = 124;						// dwSize
+			header[2] = 0x1 | 0x2 | 0x4 | 0x8 | 0x1000;	// CAPS | HEIGHT | WIDTH | PITCH | PIXELFORMAT
+			header[3] = static_cast<uint32_t>(height);
+			header[4] = static_cast<uint32_t>(width);
+			header[5] = pitch;						// dwPitchOrLinearSize
+			header[6] = 0;							// dwDepth
+			header[7] = 1;							// dwMipMapCount
+			// ピクセルフォーマット（header[19]〜）
+			header[19] = 32;						// ddspf.dwSize
+			header[20] = 0x4;						// DDPF_FOURCC
+			header[21] = 0x30315844;				// "DX10"
+			header[27] = 0x1000;					// dwCaps = DDSCAPS_TEXTURE
+			// DX10拡張ヘッダー（header[32]〜）
+			header[32] = 16;						// DXGI_FORMAT_R32G32_FLOAT
+			header[33] = 3;							// D3D10_RESOURCE_DIMENSION_TEXTURE2D
+			header[34] = 0;							// miscFlag
+			header[35] = 1;							// arraySize
+			header[36] = 0;							// miscFlags2
+			memcpy(dds.data() + 4 + 124 + 20, pixels, dataSize);
+			return dds;
+		}
+	}
+
 	namespace
 	{
 		/** サブカメラのRenderTarget幅 */
@@ -46,6 +85,13 @@ namespace nsBeastEngine
 		// ディファードライティング用スプライトが初期化時にシャドウマップの
 		// テクスチャを参照するため、必ずInitDeferredLightingSpriteより先に行うこと
 		m_shadowMap.Init();
+
+		// 地形のベイク影は、地形を読み込むまで1x1のダミーにしておく（Light側で無効にしている）
+		{
+			const float noShadow[2] = { -1.0e6f, -1.0e6f };
+			const std::vector<char> dds = BuildR32G32FloatDds(noShadow, 1, 1);
+			m_terrainShadowTexture.InitFromMemory(dds.data(), static_cast<unsigned int>(dds.size()));
+		}
 
 		// メインビューの初期化
 		m_mainView.width = g_graphicsEngine->GetFrameBufferWidth();
@@ -121,13 +167,13 @@ namespace nsBeastEngine
 		// シャドウマップへの描画
 		// ※ディファードライティングで参照するため、GBuffer描画より前に行う
 		{
-			BEAST_PROFILE_SCOPE(u8"シャドウマップ");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"シャドウマップ");
 			RenderShadowMap(rc);
 		}
 
 		// メインカメラの描画パスを実行する
 		{
-			BEAST_PROFILE_SCOPE(u8"メインビュー描画");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"メインビュー描画");
 			ExecuteViewPass(rc, m_mainView);
 		}
 
@@ -142,7 +188,7 @@ namespace nsBeastEngine
 		// エフェクトを描画
 		// ※ポストエフェクトより前に描くことで、ブルームとトーンマップの対象に含める
 		{
-			BEAST_PROFILE_SCOPE(u8"エフェクト描画 (Effekseer)");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"エフェクト描画 (Effekseer)");
 			EffectEngine::GetInstance()->Draw();
 		}
 
@@ -153,20 +199,20 @@ namespace nsBeastEngine
 		// ポストエフェクトの描画処理（ブルーム → トーンマップ）
 		// ※3D描画完了後・UI描画前に実行することでUIへの影響を防ぐ
 		{
-			BEAST_PROFILE_SCOPE(u8"ポストエフェクト");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"ポストエフェクト");
 			PostEffect(rc);
 		}
 
 		// 2D描画処理（小窓スプライトの描画も含む）
 		{
-			BEAST_PROFILE_SCOPE(u8"2D描画");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"2D描画");
 			Render2D(rc);
 		}
 
 		// サブカメラの描画パスを実行する（メイン描画パス完了後）
 		if (CameraSystem::Get().HasSubCamera())
 		{
-			BEAST_PROFILE_SCOPE(u8"サブビュー描画");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"サブビュー描画");
 			auto* subCamera = CameraSystem::Get().GetSubCamera();
 			m_subView.camera = subCamera;
 			Matrix subViewProjMatrix;
@@ -180,15 +226,16 @@ namespace nsBeastEngine
 			// サブビューパスではもう一方のフレームバッファインデックスを使用する。
 			// 同フレーム内でメインビューとサブビューが同じ定数バッファスロットに書き込むと
 			// サブビューがメインビューのマトリクスを上書きしてしまうため、別スロットを使う。
-			const UINT mainFrameIdx = g_graphicsEngine->GetBackBufferIndex();
-			g_graphicsEngine->SetFrameIndex(1 - mainFrameIdx);
+			g_graphicsEngine->SetResourceViewSlot(1);
 
 			// DeferredLightingのワールド座標復元・影判定をサブカメラ基準に一時的に切り替える
 			// ※切り替えないとメインカメラの行列のままサブビューを描いてしまい、
 			//   小窓のスペキュラ・リムライト・影がジオメトリと無関係な位置で判定される
 			m_sceneLight.SetViewCamera(*subCamera);
 
+			m_isRenderingSubView = true;
 			ExecuteViewPass(rc, m_subView);
+			m_isRenderingSubView = false;
 
 			// サブビューにもメインビューと同じトーンマップを適用し、小窓の色味を合わせる
 			// ※メインビューはPostEffect()内でブルームと合わせて処理するが、
@@ -200,7 +247,7 @@ namespace nsBeastEngine
 			//   メインカメラ基準の値を参照するコードが残っていても壊れないようにする
 			m_sceneLight.SetViewCamera(mainCamera);
 
-			g_graphicsEngine->SetFrameIndex(mainFrameIdx);
+			g_graphicsEngine->SetResourceViewSlot(0);
 		}
 
 		// メインレンダリングターゲットの内容をフレームバッファにコピー
@@ -225,19 +272,19 @@ namespace nsBeastEngine
 		m_activeFrustum = &view.frustum;
 
 		{
-			BEAST_PROFILE_SCOPE(u8"GBuffer描画");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"GBuffer描画");
 			RenderToGBuffer(rc, view);
 		}
 		{
-			BEAST_PROFILE_SCOPE(u8"ディファードライティング");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"ディファードライティング");
 			DeferredLighting(rc, view);
 		}
 		{
-			BEAST_PROFILE_SCOPE(u8"フォワード描画");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"フォワード描画");
 			ForwardRendering(rc, view);
 		}
 		{
-			BEAST_PROFILE_SCOPE(u8"自然物描画 (海・空など)");
+			BEAST_PROFILE_GPU_SCOPE(rc, u8"自然物描画 (海・空など)");
 			RenderNatureObjects(rc, view);
 		}
 	}
@@ -292,17 +339,52 @@ namespace nsBeastEngine
 		spriteInitData.m_textures[enDeferredLightingSrv_Specular] = &view.gBuffer[enGBuffer_Specular].GetRenderTargetTexture();
 		// カスケードシャドウマップは連続したスロットへ順に割り当てる
 		static_assert(
-			enDeferredLightingSrv_ShadowMap0 + NUM_SHADOW_CASCADES == enDeferredLightingSrv_Num,
+			enDeferredLightingSrv_ShadowMap0 + NUM_SHADOW_CASCADES == enDeferredLightingSrv_TerrainShadow,
 			"シャドウマップのSRVスロット数がカスケード数と食い違っています");
 		for (int i = 0; i < NUM_SHADOW_CASCADES; i++)
 		{
 			spriteInitData.m_textures[enDeferredLightingSrv_ShadowMap0 + i] =
 				&m_shadowMap.GetShadowMapTexture(i);
 		}
+		spriteInitData.m_textures[enDeferredLightingSrv_TerrainShadow] = &m_terrainShadowTexture;
 		spriteInitData.m_fxFilePath = "Assets/shader/DeferredLighting.fx";
 		spriteInitData.m_expandConstantBuffer = m_sceneLight.GetLight();
 		spriteInitData.m_expandConstantBufferSize = sizeof(Light);
 		view.deferredLightingSprite.Init(spriteInitData);
+	}
+
+
+	void RenderingEngine::SetTerrainShadowMap(
+		const std::vector<float>& shadowHeights,
+		const int width,
+		const int height,
+		const Vector4& uvScaleOffset,
+		const float softness,
+		const float bias)
+	{
+		if (width <= 0 || height <= 0 || shadowHeights.size() != static_cast<size_t>(width) * static_cast<size_t>(height) * 2)
+		{
+			ClearTerrainShadowMap();
+			return;
+		}
+
+		const std::vector<char> dds = BuildR32G32FloatDds(shadowHeights.data(), width, height);
+		m_terrainShadowTexture.InitFromMemory(dds.data(), static_cast<unsigned int>(dds.size()));
+
+		// テクスチャのリソースを作り直したので、参照しているディスクリプタも作り直す
+		m_mainView.deferredLightingSprite.RecommitDescriptorHeap();
+		m_subView.deferredLightingSprite.RecommitDescriptorHeap();
+
+		Light* light = m_sceneLight.GetLight();
+		light->m_terrainShadowUVScaleOffset = uvScaleOffset;
+		light->m_terrainShadowParam = Vector4((std::max)(softness, 0.001f), bias, 1.0f, 0.0f);
+	}
+
+
+	void RenderingEngine::ClearTerrainShadowMap()
+	{
+		// テクスチャはそのまま残し、使わないようにするだけ（ディスクリプタを作り直さずに済む）
+		m_sceneLight.GetLight()->m_terrainShadowParam.z = 0.0f;
 	}
 
 

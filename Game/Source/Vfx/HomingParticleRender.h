@@ -37,6 +37,12 @@ namespace app
 
         /** ホーミングパーティクルのリスト */
         std::vector<std::unique_ptr<HomingParticleInfo>> m_homingParticles;
+        /**
+         * 使っていないパーティクルエフェクトレンダー（使い回し用）
+         * @details 生成（JSON読み込み・スプライト初期化）は重いので、初期化時に最大数ぶん作っておき、
+         *          飛ばすときに取り出して、飛び終わったら戻す。
+         */
+        std::vector<std::unique_ptr<ParticleEffectRender>> m_freeEffectRenders;
         /**  2DのUIの座標 */
         Vector3 m_goalPosition;
         /** パーティクルの数 */

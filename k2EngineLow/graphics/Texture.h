@@ -97,5 +97,6 @@ namespace nsK2EngineLow {
 		ID3D12Resource* m_texture = nullptr;	//テクスチャ。
 		D3D12_RESOURCE_DESC m_textureDesc;	//テクスチャ情報
 		bool m_isCubemap = false;				//キューブマップ？
+		bool m_isInMemoryLedger = false;		//【計測用】VRAMの台帳に記録したか（自分で読み込んだテクスチャだけ記録する）
 	};
 }

@@ -194,7 +194,7 @@ namespace app
 
 			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
 			IndexBuffer    m_indexBuffer;					/** 元インデックスバッファ（カリングなし描画用） */
-			IndexBuffer* m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
+			IndexBuffer* m_visibleIndexBuffers[NUM_GPU_RESOURCE_SLOTS] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
 			int            m_indexCount = 0;			/** 元インデックスの総数 */
 
 			/** 元インデックス配列（BuildChunkAABBs・カリング描画用CPUキャッシュ） */
@@ -248,6 +248,12 @@ namespace app
 			Microsoft::WRL::ComPtr<ID3D12CommandAllocator> m_csCommandAllocator;
 			/** CS専用コマンドリスト（グラフィクスrcと独立して実行するために使用） */
 			Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> m_csCommandList;
+			/**
+			 * CS専用の計算キュー
+			 * @details 描画と同じキューで実行して完了を待つと、先に積まれている前フレームの描画の完了まで待ってしまい、
+			 *          CPUとGPUが並行に動けない。計算専用のキューなら、待つのは波の計算だけになる
+			 */
+			Microsoft::WRL::ComPtr<ID3D12CommandQueue> m_csCommandQueue;
 		};
 
 

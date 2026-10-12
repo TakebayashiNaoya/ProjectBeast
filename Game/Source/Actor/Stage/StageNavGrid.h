@@ -74,6 +74,26 @@ namespace app
 			 * @return 構築できたらtrue（目標が場外・グリッド未構築ならfalse）
 			 */
 			bool BuildFlowField(const Vector3& goalPos);
+			/**
+			 * @brief フローフィールドの作り直しを開始する（数フレームに分けて計算する用）
+			 * @details 以降 StepFlowFieldBuild() を毎フレーム呼んで計算を進める。
+			 *          計算が終わるまでは、前回作ったフローフィールドをそのまま使う。
+			 *          作り直しの途中で呼んだ場合は、途中までの計算を捨てて最初からやり直す。
+			 * @param goalPos 目標地点（ワールド座標）
+			 * @return 開始できたらtrue（目標が場外・グリッド未構築ならfalse。このときフローフィールドは無効になる）
+			 */
+			bool BeginFlowFieldBuild(const Vector3& goalPos);
+			/**
+			 * @brief フローフィールドの作り直しを指定ノード数だけ進める
+			 * @param maxPopCount このフレームで処理する最大ノード数
+			 * @return このフレームで計算が終わり、新しいフローフィールドに切り替わったらtrue
+			 */
+			bool StepFlowFieldBuild(const int maxPopCount);
+			/**
+			 * @brief フローフィールドを作り直している途中か
+			 * @return 途中ならtrue
+			 */
+			bool IsFlowFieldBuilding() const { return m_isFlowFieldBuilding; }
 
 			/**
 			 * @brief フローフィールドに沿った移動方向を取得する
@@ -150,6 +170,21 @@ namespace app
 			std::vector<int> m_flowNext;
 			/** フローフィールドが構築済みかどうか */
 			bool m_isFlowFieldBuilt = false;
+
+			/** ダイクストラ探索のノード（コストの小さい順に取り出す） */
+			struct SFlowNode
+			{
+				float cost;		/** 目標からのコスト */
+				int   index;	/** セル番号         */
+			};
+			/** 作り直し中のフローフィールド（完成したら m_flowNext と入れ替える） */
+			std::vector<int> m_buildFlowNext;
+			/** 作り直し中の各セルの目標からのコスト */
+			std::vector<float> m_buildCosts;
+			/** 作り直し中の探索候補（ヒープ。毎回の確保を避けるため使い回す） */
+			std::vector<SFlowNode> m_buildOpenList;
+			/** フローフィールドを作り直している途中かどうか */
+			bool m_isFlowFieldBuilding = false;
 		};
 	}
 }

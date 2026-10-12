@@ -275,6 +275,10 @@ namespace app
 		// デバイスロスト調査：シーン破棄後のVRAM使用量を記録する
 		// （D3D12オブジェクトは1フレーム遅延解放なので、実際の解放は次フレーム反映）
 		LogVramUsage("scene end");
+
+		// ここまでの RAM・VRAM の最大使用量を Logs/memory_peak.txt に残す（動作環境の必要メモリを調べる用）
+		// ※デストラクタ内なので派生クラスのステージ名は取れない
+		nsBeastEngine::MemoryPeakTracker::Get().WriteReport("scene end");
 	}
 
 
@@ -327,6 +331,11 @@ namespace app
 
 		/** ロードフェーズ開始 */
 		m_loadPhase = LoadPhase::Stage;
+		{
+			LARGE_INTEGER now;
+			QueryPerformanceCounter(&now);
+			m_loadBeginQpc = now.QuadPart;
+		}
 		m_childIndex = 0;
 
 		return true;
@@ -581,6 +590,20 @@ namespace app
 
 			m_loadPhase = LoadPhase::Done;
 
+			/** ロード全体にかかった時間をログに残す */
+			{
+				LARGE_INTEGER now, frequency;
+				QueryPerformanceCounter(&now);
+				QueryPerformanceFrequency(&frequency);
+				FILE* fp = nullptr;
+				if (fopen_s(&fp, "Logs/load_trace.txt", "a") == 0 && fp)
+				{
+					fprintf(fp, "%s TotalLoad: %.0f ms\n", GetStageName(),
+						1000.0 * static_cast<double>(now.QuadPart - m_loadBeginQpc) / static_cast<double>(frequency.QuadPart));
+					fclose(fp);
+				}
+			}
+
 			/** ロード完了 → カウントダウン開始 */
 			if (InGameUIManager::GetInstance()->GetCountDownMenu())
 			{
@@ -719,6 +742,23 @@ namespace app
 
 	void InGameSceneBase::UpdateGamePhase()
 	{
+#if defined(BEAST_ENABLE_PROFILER)
+		/** 【計測用】F9 でフィーバーをすぐ始める（フィーバー中の負荷を見やすくするため。プロファイラー有効時のみ） */
+		{
+			static bool s_wasDebugFeverKeyDown = false;
+			const bool isDebugFeverKeyDown = (GetAsyncKeyState(VK_F9) & 0x8000) != 0;
+			if (isDebugFeverKeyDown && !s_wasDebugFeverKeyDown)
+			{
+				if (auto* fever = FeverTimeManager::GetInstance())
+				{
+					// 公開されている入口を使う（中身は TryStartFever と同じ。プレイログの理由は "all_caught" になる）
+					fever->TryStartFeverOnAllCaught();
+				}
+			}
+			s_wasDebugFeverKeyDown = isDebugFeverKeyDown;
+		}
+#endif
+
 		/** カメラは常に更新 */
 		{
 			BEAST_PROFILE_SCOPE(u8"カメラステアリング");

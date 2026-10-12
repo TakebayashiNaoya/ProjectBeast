@@ -77,7 +77,15 @@ namespace nsK2EngineLow {
 #endif 
 		m_graphicsEngine->EndRender();
 #ifdef USE_FPS_LIMITTER
-		m_fpsLimitter.Wait();
+		{
+			// 【計測用】FPS上限の待ち時間を記録する
+			LARGE_INTEGER frequency, t0, t1;
+			QueryPerformanceFrequency(&frequency);
+			QueryPerformanceCounter(&t0);
+			m_fpsLimitter.Wait();
+			QueryPerformanceCounter(&t1);
+			m_lastFpsLimitWaitMs = static_cast<double>(t1.QuadPart - t0.QuadPart) * 1000.0 / static_cast<double>(frequency.QuadPart);
+		}
 #endif
 		m_gameTime.EndMeasurement();
 

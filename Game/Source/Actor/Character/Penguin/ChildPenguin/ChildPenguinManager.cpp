@@ -55,6 +55,12 @@ namespace app
 			constexpr float GHOST_TOTAL_TIME = 7.0f;
 			/** ゴーストペンギンのモデルパス */
 			constexpr const char* GHOST_MODEL_PATH = "Assets/modelData/penguin/childPenguin/GhostChildPenguin.tkm";
+			/**
+			 * ステージ開始時に作っておくゴーストペンギンの数
+			 * @details 子ペンギンが倒されるたびにゴーストのモデルを作ると、そのフレームだけ約10ms重くなる。
+			 *          前もって作っておき、使い終わったものは使い回す（足りなくなったら追加で作る）
+			 */
+			constexpr int GHOST_PREWARM_COUNT = 8;
 			/** 一オフセットY */
 			constexpr float GHOST_POSITION_OFFSET_Y = 0.2f;
 			// 浮上アニメーション持続時間。
@@ -147,6 +153,12 @@ namespace app
 			constexpr float FLOW_FIELD_REBUILD_INTERVAL = 0.5f;
 			/** 親がこの距離以上動いていたらフローフィールドを作り直す（動いていなければ再利用） */
 			constexpr float FLOW_FIELD_GOAL_MOVE_MIN = 60.0f;
+			/**
+			 * フローフィールドの作り直しで1フレームに処理する最大ノード数
+			 * @details 全セル（約150x150）を1フレームで計算すると一瞬だけ重くなるため、数フレームに分ける。
+			 *          計算が終わるまでは前回のフローフィールドを使う。
+			 */
+			constexpr int FLOW_FIELD_BUILD_NODES_PER_FRAME = 3000;
 		}
 
 
@@ -186,6 +198,13 @@ namespace app
 		{
 			m_rangeVisualizer.Init();
 			g_renderingEngine->RegisterCustomRenderer(&m_rangeVisualizer);
+
+			/** ゴーストペンギンを前もって作っておく（倒された瞬間にモデルを作ると重いため） */
+			while (static_cast<int>(m_ghostPenguins.size()) < GHOST_PREWARM_COUNT)
+			{
+				m_ghostPenguins.push_back(CreateGhostPenguin());
+			}
+			m_ghostPenguinNum = static_cast<uint8_t>(m_ghostPenguins.size());
 
 			// 陣形レベルアップ時にBattleManager経由でUIへ通知する
 			m_formationController.SetOnLevelUp(
@@ -1017,11 +1036,23 @@ namespace app
 		void ChildPenguinManager::UpdateDaddyFlowField()
 		{
 			m_flowFieldRebuildTimer -= g_gameTime->GetFrameDeltaTime();
-			if (m_flowFieldRebuildTimer > 0.0f) return;
-			m_flowFieldRebuildTimer = FLOW_FIELD_REBUILD_INTERVAL;
 
 			auto* stageSystem = StageSystem::GetInstance();
 			auto* terrain = (stageSystem != nullptr) ? stageSystem->GetTerrain() : nullptr;
+
+			// 作り直しの途中なら続きを進める（終わるまでは前回のフローフィールドを使う）
+			if (terrain != nullptr && terrain->GetNavGrid().IsFlowFieldBuilding())
+			{
+				if (terrain->GetNavGrid().StepFlowFieldBuild(FLOW_FIELD_BUILD_NODES_PER_FRAME))
+				{
+					m_isFlowFieldValid = true;
+				}
+				return;
+			}
+
+			if (m_flowFieldRebuildTimer > 0.0f) return;
+			m_flowFieldRebuildTimer = FLOW_FIELD_REBUILD_INTERVAL;
+
 			if (terrain == nullptr || m_daddyPenguin == nullptr)
 			{
 				m_isFlowFieldValid = false;
@@ -1038,8 +1069,19 @@ namespace app
 				if (moved.LengthSq() < FLOW_FIELD_GOAL_MOVE_MIN * FLOW_FIELD_GOAL_MOVE_MIN) return;
 			}
 
-			m_isFlowFieldValid = terrain->GetNavGrid().BuildFlowField(goal);
+			StageNavGrid& navGrid = terrain->GetNavGrid();
+			if (!navGrid.BeginFlowFieldBuild(goal))
+			{
+				m_isFlowFieldValid = false;
+				return;
+			}
 			m_flowFieldGoal = goal;
+
+			// 最初の分はこのフレームで進める（小さいステージならここで終わる）
+			if (navGrid.StepFlowFieldBuild(FLOW_FIELD_BUILD_NODES_PER_FRAME))
+			{
+				m_isFlowFieldValid = true;
+			}
 		}
 
 
@@ -1333,14 +1375,48 @@ namespace app
 		{}
 
 
+		std::unique_ptr<ChildPenguinManager::GhostPenguinInfo> ChildPenguinManager::CreateGhostPenguin()
+		{
+			auto info = std::make_unique<GhostPenguinInfo>();
+			info->modelRender.Init(GHOST_MODEL_PATH);
+			// 使われるまでは非表示（使い終わったものと同じ扱いにして、RegisterGhostPenguin() で使い回せるようにする）
+			info->isHidden = true;
+			info->modelRender.SetAlpha(0.0f);
+			return info;
+		}
+
+
 		void ChildPenguinManager::RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target)
 		{
 			const Vector3 dethPos = penguin->GetTransform().m_position;
 			const Quaternion dethRot = penguin->GetTransform().m_rotation;
 			const Vector3 dethScale = penguin->GetTransform().m_scale + GHOST_SCALE_UP;
 
-			auto info = std::make_unique<GhostPenguinInfo>();
-			info->modelRender.Init(GHOST_MODEL_PATH);
+			// 使い終わったゴースト（非表示になり、デバフも終わったもの）があれば使い回す。
+			// 無ければ新しく作る（モデルの作成は重いので、なるべく使い回す）
+			GhostPenguinInfo* info = nullptr;
+			for (auto& ghost : m_ghostPenguins)
+			{
+				if (ghost->isHidden && !ghost->isDebuffActive)
+				{
+					info = ghost.get();
+					break;
+				}
+			}
+			if (info == nullptr)
+			{
+				m_ghostPenguins.push_back(CreateGhostPenguin());
+				info = m_ghostPenguins.back().get();
+			}
+
+			// 前回の状態を初期化する
+			info->target = nullptr;
+			info->timer = 0.0f;
+			info->isHidden = false;
+			info->isFadingOut = false;
+			info->isDebuffActive = false;
+			info->position = Vector3::Zero;
+			info->handle = INVALID_EFFECT_HANDLE;
 
 			// 浮上アニメーションの初期化と再生。
 			info->floatCurve.Initialize(0.0f, GHOST_POSITION_OFFSET_Y, GHOST_SURFACING_ANIM_DURATION, util::EasingType::Linear, util::LoopMode::Once);
@@ -1378,8 +1454,6 @@ namespace app
 			// 構造体のメンバにターゲットを設定。
 			info->target = target;
 
-			// ゴーストペンギンをリストに追加。
-			m_ghostPenguins.push_back(std::move(info));
 			// リストをキャッシュして同じ型に変換。
 			m_ghostPenguinNum = static_cast<uint8_t>(m_ghostPenguins.size());
 		}

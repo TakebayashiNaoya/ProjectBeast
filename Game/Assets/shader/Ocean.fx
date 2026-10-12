@@ -56,6 +56,8 @@ struct Light
     float4x4       shadowLVP0;        // m_shadowLVP[0]（64バイト）
     float4x4       shadowLVP1;        // m_shadowLVP[1]（64バイト）
     float4x4       shadowLVP2;        // m_shadowLVP[2]（64バイト）
+    float4         terrainShadowUVScaleOffset; // m_terrainShadowUVScaleOffset（16バイト）
+    float4         terrainShadowParam;         // m_terrainShadowParam（16バイト）
 };
 
 ////////////////////////////////////////////////
@@ -102,6 +104,8 @@ Texture2D<float4> g_specularMap : register(t2);
 Texture2D<float4> g_shadowMap0  : register(t3);
 Texture2D<float4> g_shadowMap1  : register(t4);
 Texture2D<float4> g_shadowMap2  : register(t5);
+// 地形のベイク影（影の高さマップ）。地形はカスケードに描いていないため、海に落ちる地形の影はこちらで求める
+Texture2D<float2> g_terrainShadowMap : register(t6);
 sampler           g_sampler     : register(s0);
 
 // 影の判定は Shadow.h の CalcShadowRate() を使う（ディファードライティングと共通）
@@ -207,6 +211,9 @@ float4 PSMain(SPSIn psIn) : SV_Target0
         light.shadowLVP0, light.shadowLVP1, light.shadowLVP2,
         g_shadowMap0, g_shadowMap1, g_shadowMap2,
         g_sampler);
+    // 地形の影はカスケードに描いておらず、ベイクした影の高さマップから求める
+    shadowRate = min(shadowRate, CalcTerrainBakedShadowRate(
+        psIn.worldPos, g_terrainShadowMap, g_sampler, light.terrainShadowUVScaleOffset, light.terrainShadowParam));
 
 
     // 直接光と環境光それぞれに、調整値で加減した影を掛ける

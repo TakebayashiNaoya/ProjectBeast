@@ -54,6 +54,10 @@ namespace nsK2EngineLow {
 		/// フレームの終了時に呼ばれる処理。
 		/// </summary>
 		void EndFrame();
+		/// <summary>
+		/// 【計測用】直前のEndFrame()でFPS上限の待ちにかかった時間（ミリ秒）。
+		/// </summary>
+		double GetLastFpsLimitWaitMs() const { return m_lastFpsLimitWaitMs; }
 
 		/// <summary>
 		/// ゲームエンジンの初期化。
@@ -220,6 +224,7 @@ namespace nsK2EngineLow {
 		GamePad m_pad[GamePad::CONNECT_PAD_MAX];		// ゲームパッド。
 		GameTime m_gameTime;
 		FPSLimitter m_fpsLimitter;						// FPSに制限をかける処理。
+		double m_lastFpsLimitWaitMs = 0.0;				// 【計測用】直前のFPS上限の待ち時間（ミリ秒）
 		FrameRateInfo m_frameRateInfo = { enFrameRateMode_Variable , 60};
 	};
 

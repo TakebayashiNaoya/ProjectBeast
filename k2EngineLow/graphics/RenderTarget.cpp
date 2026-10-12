@@ -9,6 +9,9 @@ namespace nsK2EngineLow {
 	}
 	void RenderTarget::Release()
 	{
+		// 【計測用】VRAMの台帳から消す
+		GetGpuMemoryLedger().Remove(m_renderTargetTextureDx12);
+		GetGpuMemoryLedger().Remove(m_depthStencilTexture);
 		ReleaseD3D12Object(m_renderTargetTextureDx12);
 		ReleaseD3D12Object(m_depthStencilTexture);
 		ReleaseD3D12Object(m_rtvHeap);
@@ -138,6 +141,13 @@ namespace nsK2EngineLow {
 			return false;
 		}
 		m_renderTargetTexture.InitFromD3DResource(m_renderTargetTextureDx12);
+		// 【計測用】VRAMの台帳に記録する（名前は「幅x高さ フォーマット番号」）
+		{
+			const D3D12_RESOURCE_DESC rtDesc = m_renderTargetTextureDx12->GetDesc();
+			char rtName[64];
+			sprintf_s(rtName, "%llux%u fmt%d", static_cast<unsigned long long>(rtDesc.Width), rtDesc.Height, static_cast<int>(rtDesc.Format));
+			GetGpuMemoryLedger().Add(m_renderTargetTextureDx12, "RenderTarget", rtName);
+		}
 		return true;
 	}
 	bool RenderTarget::CreateDepthStencilTexture(
@@ -177,6 +187,13 @@ namespace nsK2EngineLow {
 		if (FAILED(hr)) {
 			//深度ステンシルバッファの作成に失敗。
 			return false;
+		}
+		// 【計測用】VRAMの台帳に記録する
+		{
+			const D3D12_RESOURCE_DESC dsDesc = m_depthStencilTexture->GetDesc();
+			char dsName[64];
+			sprintf_s(dsName, "%llux%u fmt%d", static_cast<unsigned long long>(dsDesc.Width), dsDesc.Height, static_cast<int>(dsDesc.Format));
+			GetGpuMemoryLedger().Add(m_depthStencilTexture, "DepthStencil", dsName);
 		}
 		return true;
 	}

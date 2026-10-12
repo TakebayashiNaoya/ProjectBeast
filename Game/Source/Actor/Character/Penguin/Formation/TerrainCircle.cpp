@@ -21,7 +21,7 @@ namespace app
 			/** LINE_LIST: 1 セグメント = 始点 + 終点 = 2 頂点 */
 			const int edgeVerts = segments * 2;
 			m_edgeVerts.resize(edgeVerts);
-			m_edgeVertexBuffer.Init(sizeof(Vertex) * edgeVerts, sizeof(Vertex));
+			for (auto& vb : m_edgeVertexBuffers) vb.Init(sizeof(Vertex) * edgeVerts, sizeof(Vertex));	// 描画のたびに書き換えるので面ごとに持つ
 			m_edgeIndexBuffer.Init(sizeof(uint16_t) * edgeVerts, sizeof(uint16_t));
 
 			std::vector<uint16_t> edgeIdx(edgeVerts);
@@ -36,7 +36,7 @@ namespace app
 				/** TRIANGLE_LIST: 1 セグメント = 中心 + 始点 + 終点 = 3 頂点 */
 				const int fillVerts = segments * 3;
 				m_fillVerts.resize(fillVerts);
-				m_fillVertexBuffer.Init(sizeof(Vertex) * fillVerts, sizeof(Vertex));
+				for (auto& vb : m_fillVertexBuffers) vb.Init(sizeof(Vertex) * fillVerts, sizeof(Vertex));
 				m_fillIndexBuffer.Init(sizeof(uint16_t) * fillVerts, sizeof(uint16_t));
 
 				std::vector<uint16_t> fillIdx(fillVerts);
@@ -106,7 +106,7 @@ namespace app
 			/** TRIANGLE_LIST: 1セグメント = (外側⇔中央) 2枚 + (中央⇔内側) 2枚 = 12頂点 */
 			const int bandVerts = segments * 12;
 			m_bandVerts.resize(bandVerts);
-			m_bandVertexBuffer.Init(sizeof(Vertex) * bandVerts, sizeof(Vertex));
+			for (auto& vb : m_bandVertexBuffers) vb.Init(sizeof(Vertex) * bandVerts, sizeof(Vertex));
 			m_bandIndexBuffer.Init(sizeof(uint16_t) * bandVerts, sizeof(uint16_t));
 
 			std::vector<uint16_t> idx(bandVerts);
@@ -173,9 +173,11 @@ namespace app
 		void TerrainCircle::RenderBand(RenderContext& rc)
 		{
 			if (m_bandVertexCount == 0) return;
-			m_bandVertexBuffer.Copy(m_bandVerts.data());
+			// 今の面に書いてから使う（GPUが前のフレーム・別のビューで使っている面を書き換えないため）
+			auto& bandVertexBuffer = m_bandVertexBuffers[g_graphicsEngine->GetResourceSlot()];
+			bandVertexBuffer.Copy(m_bandVerts.data());
 			rc.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			rc.SetVertexBuffer(m_bandVertexBuffer);
+			rc.SetVertexBuffer(bandVertexBuffer);
 			rc.SetIndexBuffer(m_bandIndexBuffer);
 			rc.DrawIndexed(static_cast<UINT>(m_bandVertexCount));
 		}
@@ -184,9 +186,10 @@ namespace app
 		void TerrainCircle::RenderFill(RenderContext& rc)
 		{
 			if (m_fillVertexCount == 0 || !m_hasFill) return;
-			m_fillVertexBuffer.Copy(m_fillVerts.data());
+			auto& fillVertexBuffer = m_fillVertexBuffers[g_graphicsEngine->GetResourceSlot()];
+			fillVertexBuffer.Copy(m_fillVerts.data());
 			rc.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			rc.SetVertexBuffer(m_fillVertexBuffer);
+			rc.SetVertexBuffer(fillVertexBuffer);
 			rc.SetIndexBuffer(m_fillIndexBuffer);
 			rc.DrawIndexed(static_cast<UINT>(m_fillVertexCount));
 		}
@@ -195,9 +198,10 @@ namespace app
 		void TerrainCircle::RenderEdge(RenderContext& rc)
 		{
 			if (m_edgeVertexCount == 0) return;
-			m_edgeVertexBuffer.Copy(m_edgeVerts.data());
+			auto& edgeVertexBuffer = m_edgeVertexBuffers[g_graphicsEngine->GetResourceSlot()];
+			edgeVertexBuffer.Copy(m_edgeVerts.data());
 			rc.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-			rc.SetVertexBuffer(m_edgeVertexBuffer);
+			rc.SetVertexBuffer(edgeVertexBuffer);
 			rc.SetIndexBuffer(m_edgeIndexBuffer);
 			rc.DrawIndexed(static_cast<UINT>(m_edgeVertexCount));
 		}

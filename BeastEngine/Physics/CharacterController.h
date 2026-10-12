@@ -164,6 +164,13 @@ namespace nsBeastEngine
 			bool CanReuseGroundSweep(const float sweepTop, const float sweepBottom) const;
 
 			/**
+			 * @brief 前回の床スイープで当たったカプセル中心の高さを、今のXZ向けに補正して返す
+			 * @details 前回の位置から少し動いた場合は、当たった床の傾き（法線）に沿って高さを補正する。
+			 *          平らな面の上なら、スイープし直した結果と一致する
+			 */
+			float GetCachedGroundHitCenterY() const;
+
+			/**
 			 * @brief 床スイープを実行して結果をキャッシュに保存する
 			 * @param sweepTop    スイープ開始高さ（カプセル中心）
 			 * @param sweepBottom スイープ終了高さ（カプセル中心）

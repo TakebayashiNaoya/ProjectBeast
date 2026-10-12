@@ -433,6 +433,10 @@ namespace nsBeastEngine
 		// （下のstatic_assertで食い違いを検出する）。
 		// m_directionLight.m_LVP は使わない（カスケード化以前の名残）。
 		Matrix				m_shadowLVP[3];
+		// 地形のベイク影（TerrainObject がロード時に計算する「影の高さマップ」）。
+		// RenderingEngine::SetTerrainShadowMap() で設定する
+		Vector4				m_terrainShadowUVScaleOffset;	// ワールドXZ→マップのUV（x=X倍率, y=Xオフセット, z=Z倍率, w=Zオフセット）
+		Vector4				m_terrainShadowParam;			// x=境界をぼかす高さの幅, y=バイアス, z=有効なら1, w=未使用
 
 
 		/**
@@ -450,6 +454,8 @@ namespace nsBeastEngine
 			, m_shadowAmbientRate(1.0f)
 			, padding3(0.0f)
 			, padding4(0.0f)
+			, m_terrainShadowUVScaleOffset(0.0f, 0.0f, 0.0f, 0.0f)
+			, m_terrainShadowParam(1.0f, 0.0f, 0.0f, 0.0f)
 		{
 			for (auto& lvp : m_shadowLVP)
 			{

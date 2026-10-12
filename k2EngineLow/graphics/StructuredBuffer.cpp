@@ -59,18 +59,22 @@ namespace nsK2EngineLow {
 	}
 	void StructuredBuffer::Update(void* data)
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
-		if (m_buffersOnCPU[backBufferIndex] == nullptr) {
-			// The mapping failed (device removal during Init). Report instead of writing to null.
-			g_graphicsEngine->ReportDeviceRemoved("StructuredBuffer null map (Update)");
-			return;
+		// 今の面に書く。メインビュー（とUpdate中）に書いた内容は、同じフレームのサブビュー用の面にも写す
+		// （ボーン行列など Update で1フレームに1回だけ書くものを、サブビューでも使えるようにするため）
+		const UINT firstSlot = g_graphicsEngine->GetResourceSlot();
+		const UINT lastSlot = g_graphicsEngine->IsMainViewResourceSlot() ? firstSlot + 1 : firstSlot;
+		for (UINT slot = firstSlot; slot <= lastSlot; slot++) {
+			if (m_buffersOnCPU[slot] == nullptr) {
+				// The mapping failed (device removal during Init). Report instead of writing to null.
+				g_graphicsEngine->ReportDeviceRemoved("StructuredBuffer null map (Update)");
+				return;
+			}
+			memcpy(m_buffersOnCPU[slot], data, m_numElement * m_sizeOfElement);
 		}
-		memcpy(m_buffersOnCPU[backBufferIndex], data, m_numElement * m_sizeOfElement);
 	}
 	ID3D12Resource* StructuredBuffer::GetD3DResoruce()
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
-		return m_buffersOnGPU[backBufferIndex];
+		return m_buffersOnGPU[g_graphicsEngine->GetResourceSlot()];
 	}
 	void StructuredBuffer::RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 	{

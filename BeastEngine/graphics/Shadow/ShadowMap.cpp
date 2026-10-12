@@ -44,6 +44,14 @@ namespace nsBeastEngine
 		/** ライトの近クリップ面 */
 		constexpr float SHADOW_NEAR = 1.0f;
 
+		/**
+		 * 遠いカスケード（1番以降）で、影の描画を省く小さいモデルの大きさ（そのカスケードのテクセル数）
+		 * @details 遠いカスケードは1テクセルが大きく、小さいモデル（子ペンギンなど）の影は数テクセルにしかならない。
+		 *          描くモデル数がそのままGPU時間になるため、これより小さいものは描かない。
+		 *          近いカスケード（0番）は全て描く。
+		 */
+		constexpr float MIN_FAR_CASCADE_CASTER_TEXELS = 4.0f;
+
 		/** シャドウマップシェーダーのファイルパス */
 		constexpr const char* SHADOW_MAP_FX_PATH = "Assets/shader/shadowMap.fx";
 
@@ -283,21 +291,38 @@ namespace nsBeastEngine
 		// カメラから見えないキャスターでも画面内へ影を落とすことがあるため。
 		// カメラの視錐台ではなく、このカスケードが覆う範囲でカリングする。
 		// カメラから見えないキャスターでも画面内へ影を落とすことがあるため。
+		// 遠いカスケードでは、テクセル数個ぶんにしかならない小さいモデルを省く
+		const float minCasterSize = (cascadeIndex == 0)
+			? 0.0f
+			: MIN_FAR_CASCADE_CASTER_TEXELS * m_texelWorldSizes[cascadeIndex];
+
+		const auto renderCaster = [&](ModelRender* model)
+			{
+				// 影を落とさない設定のモデルは描かない（OnRenderShadowMap内でも弾かれるが、AABBの判定を省くため先に除く）
+				if (!model->IsCastShadow())
+				{
+					return;
+				}
+				const Vector3& aabbMin = model->GetWorldAABBMin();
+				const Vector3& aabbMax = model->GetWorldAABBMax();
+				if (!IsCasterVisibleInCascade(cascadeIndex, aabbMin, aabbMax))
+				{
+					return;
+				}
+				const float casterSize = max(max(aabbMax.x - aabbMin.x, aabbMax.y - aabbMin.y), aabbMax.z - aabbMin.z);
+				if (casterSize < minCasterSize)
+				{
+					return;
+				}
+				model->OnRenderShadowMap(rc, cascadeIndex, Matrix::Identity, lvp);
+			};
 		for (auto* model : deferredModels)
 		{
-			if (!IsCasterVisibleInCascade(cascadeIndex, model->GetWorldAABBMin(), model->GetWorldAABBMax()))
-			{
-				continue;
-			}
-			model->OnRenderShadowMap(rc, cascadeIndex, Matrix::Identity, lvp);
+			renderCaster(model);
 		}
 		for (auto* model : forwardModels)
 		{
-			if (!IsCasterVisibleInCascade(cascadeIndex, model->GetWorldAABBMin(), model->GetWorldAABBMax()))
-			{
-				continue;
-			}
-			model->OnRenderShadowMap(rc, cascadeIndex, Matrix::Identity, lvp);
+			renderCaster(model);
 		}
 
 		rc.WaitUntilFinishDrawingToRenderTarget(renderTarget);

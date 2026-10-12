@@ -3,27 +3,27 @@
 namespace nsK2EngineLow {
 	inline ID3D12DescriptorHeap* DescriptorHeap::Get()const
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = g_graphicsEngine->GetResourceSlot();
 		return m_descriptorHeap;
 	}
 	inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetConstantBufferGpuDescritorStartHandle() const
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = g_graphicsEngine->GetResourceSlot();
 		return m_cbGpuDescriptorStart[backBufferIndex];
 	}
 	inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetShaderResourceGpuDescritorStartHandle() const
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = g_graphicsEngine->GetResourceSlot();
 		return m_srGpuDescriptorStart[backBufferIndex];
 	}
 	inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetUavResourceGpuDescritorStartHandle() const
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = g_graphicsEngine->GetResourceSlot();
 		return m_uavGpuDescriptorStart[backBufferIndex];
 	}
 	inline D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetSamplerResourceGpuDescritorStartHandle() const
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
+		auto backBufferIndex = g_graphicsEngine->GetResourceSlot();
 		return m_samplerGpuDescriptorStart[backBufferIndex];
 	}
 }

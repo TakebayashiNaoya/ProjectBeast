@@ -348,6 +348,9 @@
     <ClInclude Include="graphics\FrameBuffer.h" />
     <ClInclude Include="graphics\GaussianBlur.h" />
     <ClInclude Include="graphics\GPUBuffer.h" />
+    <ClInclude Include="graphics\GpuMemoryLedger.h" />
+    <ClInclude Include="graphics\GpuObjectCache.h" />
+    <ClInclude Include="graphics\GpuResourceSlot.h" />
     <ClInclude Include="graphics\GraphicsEngine.h" />
     <ClInclude Include="graphics\IndexBuffer.h" />
     <ClInclude Include="graphics\IShaderResource.h" />

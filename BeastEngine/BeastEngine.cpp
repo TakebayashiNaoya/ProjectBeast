@@ -25,6 +25,9 @@ namespace nsBeastEngine
 
 	BeastEngine::~BeastEngine()
 	{
+		// 終了時点までの RAM・VRAM の最大使用量を Logs/memory_peak.txt に残す（GPUを解放する前に）
+		MemoryPeakTracker::Get().WriteReport("app exit");
+
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
@@ -120,6 +123,43 @@ namespace nsBeastEngine
 			BEAST_PROFILE_SCOPE(u8"フレーム開始 (BeginFrame)");
 			g_engine->BeginFrame();
 		}
+		// GPU計測のフレーム開始（前フレームのGPU時間の表示もここで行う）
+		BEAST_PROFILE_GPU_BEGIN_FRAME(g_graphicsEngine->GetRenderContext());
+
+#if defined(BEAST_ENABLE_PROFILER)
+		// 【計測用】F10 で垂直同期を切り替える（GPU開始までの遅れが垂直同期の待ちかを確かめる用）
+		{
+			static bool s_wasVsyncKeyDown = false;
+			const bool isVsyncKeyDown = (GetAsyncKeyState(VK_F10) & 0x8000) != 0;
+			if (isVsyncKeyDown && !s_wasVsyncKeyDown)
+			{
+				g_graphicsEngine->SetVsyncEnabled(!g_graphicsEngine->IsVsyncEnabled());
+			}
+			s_wasVsyncKeyDown = isVsyncKeyDown;
+			BEAST_PROFILE_COUNT(g_graphicsEngine->IsVsyncEnabled()
+				? u8"[計測] 垂直同期: オン (F10で切替)" : u8"[計測] 垂直同期: オフ (F10で切替)", 1);
+
+			// 【計測用】F11 で CPU と GPU の直列／並行を切り替える
+			static bool s_wasSerializeKeyDown = false;
+			const bool isSerializeKeyDown = (GetAsyncKeyState(VK_F11) & 0x8000) != 0;
+			if (isSerializeKeyDown && !s_wasSerializeKeyDown)
+			{
+				g_graphicsEngine->SetSerializeCpuGpu(!g_graphicsEngine->IsSerializeCpuGpu());
+			}
+			s_wasSerializeKeyDown = isSerializeKeyDown;
+			BEAST_PROFILE_COUNT(g_graphicsEngine->IsSerializeCpuGpu()
+				? u8"[計測] CPUとGPU: 直列 (F11で切替)" : u8"[計測] CPUとGPU: 並行 (F11で切替)", 1);
+
+			// 【計測用】F8 で今のVRAMの内訳を Logs/vram_breakdown.txt に書き出す
+			static bool s_wasVramKeyDown = false;
+			const bool isVramKeyDown = (GetAsyncKeyState(VK_F8) & 0x8000) != 0;
+			if (isVramKeyDown && !s_wasVramKeyDown)
+			{
+				MemoryPeakTracker::Get().WriteVramBreakdown("F8");
+			}
+			s_wasVramKeyDown = isVramKeyDown;
+		}
+#endif
 
 		// IMGUIの更新
 		{
@@ -198,7 +238,7 @@ namespace nsBeastEngine
 
 		// ========== ImGui 描画 ==========
 		{
-			BEAST_PROFILE_SCOPE(u8"ImGui描画");
+			BEAST_PROFILE_GPU_SCOPE(g_graphicsEngine->GetRenderContext(), u8"ImGui描画");
 
 			// プロファイラーの結果表示（ImGui::Render()よりも前に積む必要がある）
 			BEAST_PROFILE_DRAW_IMGUI();
@@ -216,12 +256,22 @@ namespace nsBeastEngine
 		// 当たり判定描画
 		g_engine->DebubDrawWorld();
 
+		// GPU計測のフレーム終了（コマンドリストを閉じる前に積む）
+		BEAST_PROFILE_GPU_END_FRAME(g_graphicsEngine->GetRenderContext());
+
+		// RAM・VRAM の最大使用量を記録する（動作環境の必要メモリを調べる用。常に動く）
+		MemoryPeakTracker::Get().Update();
+
 		// フレーム終了
 		{
 			// コマンド実行・Present・GPU完了待ち・FPS制限の待機を含む。
 			// ここが大きい場合はCPUではなくGPU側が純粋同期で待たされている
 			BEAST_PROFILE_SCOPE(u8"フレーム終了 (Present / GPU待ち)");
 			g_engine->EndFrame();
+			// 内訳（k2EngineLow側で測った時間）
+			BEAST_PROFILE_ADD_TIME(u8"Present (垂直同期の待ちを含む)", g_graphicsEngine->GetLastPresentMs());
+			BEAST_PROFILE_ADD_TIME(u8"GPU描画完了待ち (WaitDraw)", g_graphicsEngine->GetLastWaitDrawMs());
+			BEAST_PROFILE_ADD_TIME(u8"FPS上限の待ち (60FPS)", g_engine->GetLastFpsLimitWaitMs());
 		}
 	}
 

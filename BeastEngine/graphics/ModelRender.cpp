@@ -169,7 +169,10 @@ namespace nsBeastEngine
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
-		InitShadowModel(modelInitData);
+		if (m_isCreateShadowModels)
+		{
+			InitShadowModel(modelInitData);
+		}
 
 		// スケルトンを持つか記録する
 		m_hasSkeleton = m_skeletonRef->IsInited();
@@ -238,7 +241,10 @@ namespace nsBeastEngine
 
 		// シャドウマップ描画用モデルを初期化する
 		// トゥーン・フォワードのモデルも影は落とすため、分岐せず常に作る
-		InitShadowModel(modelInitData);
+		if (m_isCreateShadowModels)
+		{
+			InitShadowModel(modelInitData);
+		}
 
 		// アニメーション初期化
 		if (m_animationClips != nullptr && numAnimationClips > 0 && m_skeletonRef != nullptr)
@@ -376,10 +382,25 @@ namespace nsBeastEngine
 	}
 
 
+	bool ModelRender::IsFartherThanFromActiveCamera(const float maxDistance) const
+	{
+		if (maxDistance <= 0.0f) return false;
+		const nsK2EngineLow::Camera* camera = CameraSystem::Get().GetActiveCamera();
+		if (camera == nullptr) return false;
+		const Vector3 center = (m_worldAABBMin + m_worldAABBMax) * 0.5f;
+		const Vector3 toModel = center - camera->GetPosition();
+		return toModel.LengthSq() > maxDistance * maxDistance;
+	}
+
+
 	void ModelRender::OnDrawOutline(RenderContext& rc)
 	{
-		if (!m_visible) return;
+		if (!m_visible || m_isShadowOnly) return;
 		if (m_outlineModel == nullptr) return;
+		// 小窓（サブビュー）では輪郭線を描かない（小さく表示されるので目立たない割に、戦闘中のキャラが集まって重い）
+		if (g_renderingEngine->IsRenderingSubView()) return;
+		// 遠くでは輪郭線を描かない
+		if (IsFartherThanFromActiveCamera(m_outlineMaxDistance)) return;
 
 		const Frustum& frustum = g_renderingEngine->GetActiveFrustum();
 		m_outlineModel->Draw(rc, frustum, m_maxInstance);
@@ -431,6 +452,8 @@ namespace nsBeastEngine
 	{
 		// 非表示・影を落とさない設定・未初期化のいずれかなら描かない
 		if (!m_visible || !m_isCastShadow || !m_isShadowModelInited) return;
+		// このカスケードには影を描かない設定なら描かない
+		if ((m_shadowCascadeMask & (1u << cascadeIndex)) == 0) return;
 
 		// カメラではなくライトの行列で描画する
 		// カスケード専用のモデルを使うことで、行列が他のカスケードに上書きされない
@@ -684,8 +707,10 @@ namespace nsBeastEngine
 
 	void ModelRender::OnDraw(RenderContext& rc)
 	{
-		/** 描画が有効でない場合は処理しない */
-		if (!m_visible) return;
+		/** 描画が有効でない場合・影だけを描く設定の場合は処理しない */
+		if (!m_visible || m_isShadowOnly) return;
+		/** 小窓では遠くのモデルを描かない */
+		if (g_renderingEngine->IsRenderingSubView() && IsFartherThanFromActiveCamera(m_subViewMaxDrawDistance)) return;
 
 		// デバイスロスト調査：この直後のドローがハングした場合にDREDレポートで
 		// モデル名を特定できるよう、コマンドリストへマーカーを刻む。
@@ -705,7 +730,8 @@ namespace nsBeastEngine
 		{
 			// トゥーン有効: GBufferへの書き込みをスキップし、フォワードパスで描画する
 			// アウトラインを先に描画して、トゥーンモデルで上書きする
-			if (m_outlineModel != nullptr)
+			// 小窓（サブビュー）では輪郭線を描かない（小さく表示されるので目立たない割に、戦闘中のキャラが集まって重い）
+			if (m_outlineModel != nullptr && !g_renderingEngine->IsRenderingSubView())
 			{
 				m_outlineModel->Draw(rc, frustum, m_maxInstance);
 			}

@@ -102,6 +102,33 @@ namespace nsBeastEngine
 		 */
 		ShadowMap& GetShadowMap() { return m_shadowMap; }
 
+		/** @brief 小窓（サブビュー）を描いている最中か */
+		bool IsRenderingSubView() const { return m_isRenderingSubView; }
+
+		/**
+		 * @brief 地形のベイク影（影の高さマップ）を設定する
+		 * @details ワールドXZごとに「この高さより下は地形の影」という高さと、地面の高さを持つマップ。
+		 *          ディファードライティングと海が、カスケードシャドウと合わせて使う。
+		 *          GPUが描画を終えている（ロード中など）ときに呼ぶこと。
+		 * @param shadowHeights  1点につき（影の高さ, 地面の高さ）の2つ（ワールドY）。width * height 点、行（Z）ごとに並べる
+		 * @param width          マップの横の数
+		 * @param height         マップの縦の数
+		 * @param uvScaleOffset  ワールドXZ→UV（x=X倍率, y=Xオフセット, z=Z倍率, w=Zオフセット）
+		 * @param softness       影の境界をぼかす高さの幅（ワールド単位）
+		 * @param bias           影の判定を甘くする高さ（自分自身の影で縞が出るのを防ぐ）
+		 */
+		void SetTerrainShadowMap(
+			const std::vector<float>& shadowHeights,
+			const int width,
+			const int height,
+			const Vector4& uvScaleOffset,
+			const float softness,
+			const float bias);
+		/** @brief 地形のベイク影を無効にする（地形を破棄したときに呼ぶ） */
+		void ClearTerrainShadowMap();
+		/** @brief 地形のベイク影のテクスチャ（海など、自前で描画するものが登録する用） */
+		Texture& GetTerrainShadowTexture() { return m_terrainShadowTexture; }
+
 
 		//============================================//
 		// 登録・解除用の関数
@@ -331,6 +358,10 @@ namespace nsBeastEngine
 		PostEffectManager m_postEffectManager;
 		/** シャドウマップ */
 		ShadowMap m_shadowMap;
+		/** 小窓（サブビュー）を描いている最中か */
+		bool m_isRenderingSubView = false;
+		/** 地形のベイク影（影の高さマップ）。地形が無いときは1x1のダミー */
+		Texture m_terrainShadowTexture;
 		/**
 		 * @brief サブビュー（小窓）専用のトーンマップ
 		 * @details サブビューはPostEffectManagerとは別の解像度のRenderTargetを使うため、

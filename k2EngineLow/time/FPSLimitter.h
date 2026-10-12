@@ -11,9 +11,17 @@ namespace nsK2EngineLow {
 		/// <summary>
 		/// 1フレームの開始時に呼び出してください。
 		/// </summary>
+		/// <remarks>
+		/// 計測の開始は最初の1回だけ。以降は Wait() の終わりから次の Wait() までを1フレームとして計る。
+		/// （BeginFrame() はゲームループの途中（アプリの更新の後）で呼ばれるため、ここで毎フレーム計り直すと
+		///   アプリの更新時間が1フレームの時間に含まれず、上限より遅いフレームレートになってしまう）
+		/// </remarks>
 		void BeginFrame()
 		{
-			m_sw.Start();
+			if (!m_isStarted) {
+				m_sw.Start();
+				m_isStarted = true;
+			}
 		}
 		/// <summary>
 		/// 指定されたFPSを超えて動作している場合、ウェイトをかける。
@@ -28,6 +36,8 @@ namespace nsK2EngineLow {
 				m_sw.Stop();
 				restTime = frameDeltaTimeMin - (int)m_sw.GetElapsedMillisecond();
 			} while (restTime > 1.0f);
+			// 待ち終わった時点から次のフレームの計測を始める
+			m_sw.Start();
 		}
 		/// <summary>
 		/// 現在設定されている最大FPSを取得。
@@ -48,5 +58,6 @@ namespace nsK2EngineLow {
 	private:
 		Stopwatch m_sw;
 		int m_maxFPS = 60;
+		bool m_isStarted = false;	// 計測を開始済みか
 	};
 }

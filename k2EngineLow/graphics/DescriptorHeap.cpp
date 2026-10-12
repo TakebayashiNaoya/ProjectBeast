@@ -36,7 +36,7 @@ namespace nsK2EngineLow {
 		const auto& d3dDevice = g_graphicsEngine->GetD3DDevice();
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 
-		srvHeapDesc.NumDescriptors = m_numSamplerDesc * 2;
+		srvHeapDesc.NumDescriptors = m_numSamplerDesc * NUM_GPU_RESOURCE_SLOTS;
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
@@ -49,7 +49,7 @@ namespace nsK2EngineLow {
 		g_numDescriptorHeapLive++;
 
 
-		for (int bufferNo = 0; bufferNo < 2; bufferNo++) {
+		for (int bufferNo = 0; bufferNo < NUM_GPU_RESOURCE_SLOTS; bufferNo++) {
 			auto cpuHandle = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			auto gpuHandle = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 			for (int i = 0; i < m_numSamplerDesc; i++) {
@@ -72,7 +72,7 @@ namespace nsK2EngineLow {
 		const auto& d3dDevice = g_graphicsEngine->GetD3DDevice();
 		D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 
-		srvHeapDesc.NumDescriptors = (m_numShaderResource + m_numConstantBuffer + m_numUavResource) * 2;
+		srvHeapDesc.NumDescriptors = (m_numShaderResource + m_numConstantBuffer + m_numUavResource) * NUM_GPU_RESOURCE_SLOTS;
 		srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
@@ -92,7 +92,7 @@ namespace nsK2EngineLow {
 		//定数バッファやシェーダーリソースのディスクリプタをヒープに書き込んでいく。
 		auto cpuHandle = m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		auto gpuHandle = m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-		for (int bufferNo = 0; bufferNo < 2; bufferNo++) {
+		for (int bufferNo = 0; bufferNo < NUM_GPU_RESOURCE_SLOTS; bufferNo++) {
 			//定数バッファを登録していく。
 			for (int i = 0; i < m_numConstantBuffer; i++) {
 				//@todo bug

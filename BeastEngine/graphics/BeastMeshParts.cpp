@@ -257,8 +257,8 @@ namespace nsBeastEngine
 				mesh->m_visibleIndices[ibNo].reserve(tkIb.indices.size());
 
 				// トライアングルカリング用の可視インデックスバッファをダブルバッファで作成する
-				// buf=0 がメインビュー用、buf=1 がサブビュー用（SetFrameIndex による切り替えと対応）
-				for (int buf = 0; buf < 2; buf++)
+				// GraphicsEngine::GetResourceSlot() の面ごとに作る（フレーム×ビュー。メインとサブ、前後のフレームで別のバッファ）
+				for (int buf = 0; buf < NUM_GPU_RESOURCE_SLOTS; buf++)
 				{
 					auto visIb = new IndexBuffer;
 					visIb->Init(static_cast<int>(tkIb.indices.size()) * 2, 2);
@@ -297,7 +297,7 @@ namespace nsBeastEngine
 				mesh->m_visibleIndices[ibNo].reserve(tkIb.indices.size());
 
 				// トライアングルカリング用の可視インデックスバッファをダブルバッファで作成する
-				for (int buf = 0; buf < 2; buf++)
+				for (int buf = 0; buf < NUM_GPU_RESOURCE_SLOTS; buf++)
 				{
 					auto visIb = new IndexBuffer;
 					visIb->Init(static_cast<int>(tkIb.indices.size()) * 4, 4);
@@ -423,9 +423,8 @@ namespace nsBeastEngine
 						continue;
 					}
 
-					// メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で別スロットに書き込む。
-					// 定数バッファと同様に SetFrameIndex による切り替えと連動している。
-					const int frameIdx = g_graphicsEngine->GetBackBufferIndex();
+					// GraphicsEngine::GetResourceSlot() の面に書き込む（フレーム×ビューごとに別のバッファ。定数バッファと同じ）
+					const int frameIdx = static_cast<int>(g_graphicsEngine->GetResourceSlot());
 					auto* visIb = mesh->m_visibleIndexBuffers[matNo][frameIdx];
 					visIb->Copy(visibleIndices.data());
 					rc.SetIndexBuffer(*visIb);

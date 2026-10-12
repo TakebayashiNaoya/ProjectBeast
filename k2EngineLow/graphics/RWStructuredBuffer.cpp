@@ -107,8 +107,7 @@ namespace nsK2EngineLow {
 	}
 	ID3D12Resource* RWStructuredBuffer::GetD3DResoruce()
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
-		return m_buffersOnGPU[backBufferIndex];
+		return m_buffersOnGPU[g_graphicsEngine->GetResourceSlot()];
 	}
 	/// <summary>
 	/// CPUからアクセス可能なリソースを取得する。
@@ -116,8 +115,7 @@ namespace nsK2EngineLow {
 	/// <returns></returns>
 	void* RWStructuredBuffer::GetResourceOnCPU()
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
-		return m_buffersOnCPU[backBufferIndex];
+		return m_buffersOnCPU[g_graphicsEngine->GetResourceSlot()];
 	}
 	void RWStructuredBuffer::RegistUnorderAccessView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)
 	{

@@ -235,12 +235,14 @@ namespace app
 			constexpr float CHILD_SLOPE_WALK_EXIT   = -0.02f;
 
 			/**
-			 * @brief 渦潮回避の半径と反発の強さ
-			 * @details 渦潮の吸い込み半径（whirlpoolRadius 200）に余白を足した距離から
-			 *          反発をかけ、自分から吸い込み範囲へ入っていくのを防ぐ。
+			 * @brief 渦潮回避の余白と反発の強さ
+			 * @details 渦潮ごとの吸い込み半径（whirlpoolRadius）に余白を足した距離から反発をかける。
+			 *          以前は回避半径を 320 で固定していたため、渦潮の小さいイージー（半径120）では
+			 *          吸い込み範囲のずっと外からよけてしまい、渦潮にのみこまれなくなっていた。
+			 *          余白はハード（半径315.8 → 回避320）で調整した値に合わせ、ハードの挙動は変えない。
 			 *          重さ2.0で、回避半径の中ほどでは進行方向より反発が勝つ。
 			 */
-			constexpr float WHIRLPOOL_AVOID_RADIUS = 320.0f;
+			constexpr float WHIRLPOOL_AVOID_MARGIN = 4.2f;
 			constexpr float WHIRLPOOL_AVOID_WEIGHT = 2.0f;
 
 			/**
@@ -509,10 +511,11 @@ namespace app
 					Vector3 diff = myPos - wp->GetTransform().m_position;
 					diff.y = 0.0f;
 					const float dist = diff.Length();
-					if (dist < 1.0f || dist >= WHIRLPOOL_AVOID_RADIUS) return;
+					const float avoidRadius = wp->GetMaxRadius() + WHIRLPOOL_AVOID_MARGIN;
+					if (dist < 1.0f || dist >= avoidRadius) return;
 
 					/** 近いほど強い反発（回避半径の縁で0、中心で1） */
-					avoid += diff * (1.0f / dist) * (1.0f - dist / WHIRLPOOL_AVOID_RADIUS);
+					avoid += diff * (1.0f / dist) * (1.0f - dist / avoidRadius);
 				});
 
 			if (avoid.LengthSq() < FLT_EPSILON) return moveDir;

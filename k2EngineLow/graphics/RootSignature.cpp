@@ -16,6 +16,7 @@ namespace nsK2EngineLow {
 	void RootSignature::Release()
 	{
 		ReleaseD3D12Object(m_rootSignature);
+		m_rootSignature = nullptr;
 	}
 	bool RootSignature::Init(
 		D3D12_STATIC_SAMPLER_DESC* samplerDescArray,
@@ -55,7 +56,9 @@ namespace nsK2EngineLow {
 		Microsoft::WRL::ComPtr<ID3DBlob> signature;
 		Microsoft::WRL::ComPtr<ID3DBlob> error;
 		D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
-		auto hr = d3dDevice->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature));
+		// 同じ内容のルートシグネチャは共有する（GpuObjectCache.h）
+		HRESULT hr = S_OK;
+		m_rootSignature = GetGpuObjectCache().GetRootSignature(d3dDevice, signature->GetBufferPointer(), signature->GetBufferSize(), hr);
 		if (FAILED(hr)) {
 			//ルートシグネチャの作成に失敗した。
 			return false;
@@ -102,8 +105,10 @@ namespace nsK2EngineLow {
 			D3D_BLOB_ROOT_SIGNATURE, 0, &sig);
 		//ルートシグネチャの生成
 		auto d3dDevice = g_graphicsEngine->GetD3DDevice();
-		hr = d3dDevice->CreateRootSignature(0, sig->GetBufferPointer(), sig->GetBufferSize(),
-			IID_PPV_ARGS(&m_rootSignature));
+		Release();
+		// 同じ内容のルートシグネチャは共有する（GpuObjectCache.h）
+		m_rootSignature = GetGpuObjectCache().GetRootSignature(d3dDevice, sig->GetBufferPointer(), sig->GetBufferSize(), hr);
+		sig->Release();
 		return hr == S_OK;
 	}
 }

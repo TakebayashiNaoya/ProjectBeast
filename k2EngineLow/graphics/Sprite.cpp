@@ -19,11 +19,32 @@ namespace nsK2EngineLow {
         //スプライトで使用するテクスチャを準備する。
         if (initData.m_ddsFilePath[0] != nullptr) {
             //ddsファイルのパスが指定されてるのなら、ddsファイルからテクスチャを作成する。
+            //同じ画像を使うスプライトはテクスチャを共有する（テクスチャバンクに登録して使い回す）。
+            //以前はスプライトごとに読み込んでいたため、同じアイコンが何十枚もVRAMに載り、
+            //ゲーム中に作るたびにファイルの読み込みとGPUへの転送待ちが発生していた。
             int texNo = 0;
             while (initData.m_ddsFilePath[texNo] && texNo < MAX_TEXTURE) {
+                // 大文字小文字だけ違うパスも同じ画像として扱う
+                std::string bankKey = initData.m_ddsFilePath[texNo];
+                std::transform(bankKey.begin(), bankKey.end(), bankKey.begin(),
+                    [](const char c) { return static_cast<char>(tolower(static_cast<unsigned char>(c))); });
+
                 wchar_t wddsFilePath[1024];
                 mbstowcs(wddsFilePath, initData.m_ddsFilePath[texNo], 1023);
-                m_textures[texNo].InitFromDDSFile(wddsFilePath);
+                if (g_engine == nullptr) {
+                    // エンジンの初期化前はバンクが使えないので、従来どおり自分で持つ
+                    m_textures[texNo].InitFromDDSFile(wddsFilePath);
+                    m_textureExternal[texNo] = &m_textures[texNo];
+                }
+                else {
+                    Texture* texture = g_engine->GetTextureFromBank(bankKey.c_str());
+                    if (texture == nullptr) {
+                        texture = new Texture();
+                        texture->InitFromDDSFile(wddsFilePath);
+                        g_engine->RegistTextureToBank(bankKey.c_str(), texture);
+                    }
+                    m_textureExternal[texNo] = texture;
+                }
                 texNo++;
             }
             m_numTexture = texNo;

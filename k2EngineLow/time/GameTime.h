@@ -190,12 +190,22 @@ namespace nsK2EngineLow {
 			}
 			PushFrameDeltaTime(elapsed);
 			m_sw.Start();
+			m_frameCount++;
+		}
+		/// <summary>
+		/// 何フレーム目か（EndMeasurement() のたびに1増える）。
+		/// 「1フレームに〇〇まで」のような処理の振り分けで、フレームが変わったことを知る用。
+		/// </summary>
+		unsigned long long GetFrameCount() const
+		{
+			return m_frameCount;
 		}
 	private:
 		friend class K2EngineLow;
 		static constexpr float MAX_DELTA_TIME = 1.0f / 10.0f;	// 1フレームの経過時間として扱う上限値（生値・移動平均共通）。
 		Stopwatch m_sw;
 		std::list<float> m_frameDeltaTimeQue;
+		unsigned long long m_frameCount = 0;	// 何フレーム目か
 		float		m_frameDeltaTime = 1.0f / 60.0f;	// 1フレームの経過時間（移動平均・クランプ済み）。
 		float		m_rawDeltaTime = 1.0f / 60.0f;		// 直前フレームの実経過時間（平均化・クランプなし）。
 		bool		m_isFixedFrameDeltaTime = false;		// 1フレームの経過時間を固定化する。

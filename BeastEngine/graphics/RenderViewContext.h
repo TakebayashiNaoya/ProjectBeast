@@ -35,6 +35,7 @@ namespace nsBeastEngine
 		enDeferredLightingSrv_ShadowMap0,    /** シャドウマップ 近景  (t3) */
 		enDeferredLightingSrv_ShadowMap1,    /** シャドウマップ 中景  (t4) */
 		enDeferredLightingSrv_ShadowMap2,    /** シャドウマップ 遠景  (t5) */
+		enDeferredLightingSrv_TerrainShadow, /** 地形のベイク影（影の高さマップ） (t6) */
 		enDeferredLightingSrv_Num,           /** スロットの数			   */
 	};
 

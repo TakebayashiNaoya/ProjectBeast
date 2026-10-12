@@ -168,6 +168,12 @@ namespace app
 			 * @return 全て終えたらtrue
 			 */
 			bool InitRendererChunkStep();
+			/**
+			 * @brief 地形の影の高さマップをベイクして描画側に渡す
+			 * @details ライトの向きと地形は変わらないので、地形の影はロード時に一度だけ求める。
+			 *          地形自体はカスケードシャドウに描かない（GPU負荷の削減）
+			 */
+			void BakeTerrainShadow();
 
 		private:
 			HeightmapData           m_heightmap;
@@ -175,9 +181,19 @@ namespace app
 			// 物理コリジョン用フルメッシュ（描画には使わない）
 			nsK2EngineLow::TkmFile* m_tkmFile = nullptr;
 
-			// チャンク描画用（フラスタムカリング対象）
-			std::vector<nsK2EngineLow::TkmFile*>                       m_chunkTkmFiles;
-			std::vector<std::unique_ptr<nsBeastEngine::ModelRender>>   m_chunkRenders;
+			/** チャンクのLOD（頂点を間引いた段階）の数。[0]がフル解像度 */
+			static constexpr int NUM_CHUNK_LODS = 3;
+			/** チャンク1つぶんの描画データ（LODごと） */
+			struct ChunkRenderData
+			{
+				/** LODごとのメッシュ（ポリゴンが無いチャンクは nullptr） */
+				std::array<nsK2EngineLow::TkmFile*, NUM_CHUNK_LODS> tkmFiles = {};
+				/** LODごとの描画モデル */
+				std::array<std::unique_ptr<nsBeastEngine::ModelRender>, NUM_CHUNK_LODS> renders;
+			};
+
+			// チャンク描画用（フラスタムカリング対象。カメラからの距離でLODを切り替える）
+			std::vector<ChunkRenderData>                               m_chunks;
 			std::vector<nsK2EngineLow::AABB>                           m_chunkAABBs;
 
 			nsK2EngineLow::Texture m_splatmap;
@@ -203,6 +219,13 @@ namespace app
 			int m_initStep = 0;         // 現在の大ステップ
 			int m_textureInitIndex = 0; // テクスチャ読み込みの進行位置
 			int m_chunkInitIndex = 0;   // チャンク初期化の進行位置
+
+			/** メッシュ生成時の頂点の高さ（影のベイクに使い、使い終わったら捨てる） */
+			std::vector<float> m_meshHeights;
+			/** 地形の影をベイクしたか（したら地形はカスケードシャドウに描かない） */
+			bool m_isShadowBaked = false;
+			/** 初期化を始めた時刻（ロード時間のログ用） */
+			int64_t m_initBeginQpc = 0;
 
 			// シェーダーでサンプリングするためのGPUテクスチャは別途フル解像度で持つ
 			nsK2EngineLow::Texture m_heightmapTextureGpu;
