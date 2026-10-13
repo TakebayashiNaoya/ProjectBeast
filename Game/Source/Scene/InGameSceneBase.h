@@ -175,6 +175,8 @@ namespace app
 			None, Stage, StageWait, DecalPrewarm, Daddy, Children, Enemy, Camera, Ocean, MapIcon, Done
 		};
 		LoadPhase m_loadPhase = LoadPhase::None;
+		/** ロードを始めた時刻（ロード時間のログ用） */
+		int64_t m_loadBeginQpc = 0;
 		int m_childIndex = 0;
 
 		//------------------------------------------------------------

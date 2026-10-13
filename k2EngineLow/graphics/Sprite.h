@@ -56,6 +56,15 @@ namespace nsK2EngineLow {
 		/// <param name="initData">初期化データ</param>
 		void Init(const SpriteInitData& initData);
 		/// <summary>
+		/// ディスクリプタヒープを作り直す。
+		/// 初期化時に渡したテクスチャの中身（リソース）を作り直したときに呼ぶ。
+		/// GPUが古いヒープを使い終わっている（描画完了を待った後）ことが前提。
+		/// </summary>
+		void RecommitDescriptorHeap()
+		{
+			m_descriptorHeap.Commit();
+		}
+		/// <summary>
 		/// 乗算カラーを設定。
 		/// </summary>
 		/// <param name="mulColor">乗算カラー。</param>
@@ -105,7 +114,7 @@ namespace nsK2EngineLow {
 		/// <returns></returns>
 		int GetTextureWidth(int texNo) const
 		{
-			return m_textures[texNo].GetWidth();
+			return (m_textureExternal[texNo] != nullptr) ? m_textureExternal[texNo]->GetWidth() : m_textures[texNo].GetWidth();
 		}
 		/// <summary>
 		/// テクスチャの幅を取得。
@@ -114,7 +123,7 @@ namespace nsK2EngineLow {
 		/// <returns></returns>
 		int GetTextureHeight(int texNo) const
 		{
-			return m_textures[texNo].GetHeight();
+			return (m_textureExternal[texNo] != nullptr) ? m_textureExternal[texNo]->GetHeight() : m_textures[texNo].GetHeight();
 		}
 	private:
 		/// <summary>

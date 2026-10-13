@@ -99,7 +99,6 @@ namespace app
 		enSoundKind_Title,
 		enSoundKind_Result,
 		enSoundKind_FeverTime,
-		enSoundKind_PV,
 
 		// =========================================================================
 		// Voice (ボイス)
@@ -213,8 +212,6 @@ namespace app
 		SoundInformation("Assets/sound/BGM/title.wav"),
 		SoundInformation("Assets/sound/BGM/result.wav"),
 		SoundInformation("Assets/sound/BGM/FeverTime.wav"),
-		// PVの音声（映像側は音を持たないので、BGMとして別に鳴らす）
-		SoundInformation("Assets/sound/BGM/PV.wav"),
 
 		// -------------------------------------------------------------------------
 		// Voice (ボイス)

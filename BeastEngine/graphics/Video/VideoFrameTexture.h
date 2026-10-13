@@ -51,7 +51,9 @@ namespace nsBeastEngine
 	private:
 		// GPU の遅延解放（ReleaseD3D12Object）のため ComPtr を使わず生ポインタで管理する
 		ID3D12Resource* m_gpuTexture = nullptr;   /** GPU 用テクスチャリソース（DEFAULT ヒープ） */
-		ID3D12Resource* m_uploadBuffer = nullptr; /** CPU→GPU 転送用バッファ（UPLOAD ヒープ） */
+		ID3D12Resource* m_uploadBuffer = nullptr; /** CPU→GPU 転送用バッファ（UPLOAD ヒープ）。初回の同期アップロード用 */
+		/** 毎フレームの転送用バッファ（フレームごと。GPUが前のフレームでコピー中のものを書き換えないため） */
+		ID3D12Resource* m_frameUploadBuffers[2] = {};
 		nsK2EngineLow::Texture m_k2Texture;						/** k2EngineLow 側から参照するテクスチャラッパー */
 		D3D12_PLACED_SUBRESOURCE_FOOTPRINT m_footprint = {};	/** GetCopyableFootprints で取得したレイアウト情報 */
 		int  m_width = 0;				/** テクスチャ幅（ピクセル） */

@@ -36,14 +36,19 @@ namespace app
 			//------------------------------------------------------------
 			// GPUがコマンドキューを使い終わるまで待つ
 			//------------------------------------------------------------
-			m_fenceValue++;
-			ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
-			commandQueue->Signal(m_fence.Get(), m_fenceValue);
-
-			if (m_fence->GetCompletedValue() < m_fenceValue)
+			// 描画キューと計算キューの両方で使い終わるまで待つ
+			ID3D12CommandQueue* queues[] = { g_graphicsEngine->GetCommandQueue(), m_csCommandQueue.Get() };
+			for (ID3D12CommandQueue* commandQueue : queues)
 			{
-				m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent);
-				WaitForSingleObject(m_fenceEvent, INFINITE);
+				if (commandQueue == nullptr) continue;
+				m_fenceValue++;
+				commandQueue->Signal(m_fence.Get(), m_fenceValue);
+
+				if (m_fence->GetCompletedValue() < m_fenceValue)
+				{
+					m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent);
+					WaitForSingleObject(m_fenceEvent, INFINITE);
+				}
 			}
 
 			//------------------------------------------------------------
@@ -255,8 +260,8 @@ namespace app
 				return;
 			}
 
-			// メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で別スロットに書き込む
-			const int frameIdx = g_graphicsEngine->GetBackBufferIndex();
+			// GraphicsEngine::GetResourceSlot() の面に書き込む（フレーム×ビューごとに別のバッファ。定数バッファと同じ）
+			const int frameIdx = static_cast<int>(g_graphicsEngine->GetResourceSlot());
 			auto* visIb = m_visibleIndexBuffers[frameIdx];
 			visIb->Copy(m_visibleIndexArray.data());
 			rc.SetIndexBuffer(*visIb);
@@ -360,9 +365,8 @@ namespace app
 			);
 			m_indexBuffer.Copy(m_srcIndexArray.data());
 
-			// 可視インデックスバッファをダブルバッファで作成する
-			// [0]=メインビュー用、[1]=サブビュー用（SetFrameIndexによる切り替えと対応）
-			for (int buf = 0; buf < 2; buf++)
+			// 可視インデックスバッファを GraphicsEngine::GetResourceSlot() の面ごとに作成する（フレーム×ビュー）
+			for (int buf = 0; buf < NUM_GPU_RESOURCE_SLOTS; buf++)
 			{
 				m_visibleIndexBuffers[buf] = new IndexBuffer;
 				m_visibleIndexBuffers[buf]->Init(
@@ -428,7 +432,7 @@ namespace app
 				samplerDescArray,
 				2,	// サンプラー数
 				2,	// CBV数（b0, b1）
-				3 + nsBeastEngine::NUM_SHADOW_CASCADES,	// SRV数（t0〜t2 + カスケードシャドウマップ）
+				4 + nsBeastEngine::NUM_SHADOW_CASCADES,	// SRV数（t0〜t2 + カスケードシャドウマップ + 地形のベイク影）
 				1	// UAV=0だと内部でシリアライズ失敗するので最低1にする
 			);
 		}
@@ -481,7 +485,7 @@ namespace app
 		void OceanMesh::InitDescriptorHeap()
 		{
 			m_descriptorHeap.ResizeConstantBuffer(2);
-			m_descriptorHeap.ResizeShaderResource(3 + nsBeastEngine::NUM_SHADOW_CASCADES);
+			m_descriptorHeap.ResizeShaderResource(4 + nsBeastEngine::NUM_SHADOW_CASCADES);
 			m_descriptorHeap.ResizeUnorderAccessResource(1);
 
 			m_descriptorHeap.RegistConstantBuffer(0, m_commonConstantBuffer);
@@ -502,6 +506,10 @@ namespace app
 				m_descriptorHeap.RegistShaderResource(
 					3 + i, g_renderingEngine->GetShadowMap().GetShadowMapTexture(i));
 			}
+			// 地形のベイク影（Ocean.fx の g_terrainShadowMap (t6)）。
+			// 地形の方が先に読み込まれ、ベイク済みのテクスチャが入っている
+			m_descriptorHeap.RegistShaderResource(
+				3 + nsBeastEngine::NUM_SHADOW_CASCADES, g_renderingEngine->GetTerrainShadowTexture());
 
 			m_descriptorHeap.Commit();
 		}
@@ -670,13 +678,20 @@ namespace app
 			// CS専用コマンドアロケータ・コマンドリストを生成する
 			//------------------------------------------------------------
 			{
+				// 描画とは別の計算専用キューで実行する（m_csCommandQueue のコメント参照）
+				D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+				queueDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+				queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+				device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_csCommandQueue));
+				m_csCommandQueue->SetName(L"OceanWaveCSCommandQueue");
+
 				device->CreateCommandAllocator(
-					D3D12_COMMAND_LIST_TYPE_DIRECT,
+					D3D12_COMMAND_LIST_TYPE_COMPUTE,
 					IID_PPV_ARGS(&m_csCommandAllocator)
 				);
 				device->CreateCommandList(
 					0,
-					D3D12_COMMAND_LIST_TYPE_DIRECT,
+					D3D12_COMMAND_LIST_TYPE_COMPUTE,
 					m_csCommandAllocator.Get(),
 					nullptr,
 					IID_PPV_ARGS(&m_csCommandList)
@@ -702,7 +717,8 @@ namespace app
 			// 定数バッファをCPU側で更新する（永続Mapなのでコピーするだけ）
 			memcpy(m_csCbMapped, &waveCb, sizeof(SWaveConstantBuffer));
 
-			ID3D12CommandQueue* commandQueue = g_graphicsEngine->GetCommandQueue();
+			// 計算専用のキューで実行して、波の計算だけを待つ
+			ID3D12CommandQueue* commandQueue = m_csCommandQueue.Get();
 
 			//------------------------------------------------------------
 			// コマンドの記録

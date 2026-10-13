@@ -21,6 +21,14 @@ namespace nsBeastEngine
 			nsK2EngineLow::ReleaseD3D12Object(m_uploadBuffer);
 			m_uploadBuffer = nullptr;
 		}
+		for (auto*& frameUploadBuffer : m_frameUploadBuffers)
+		{
+			if (frameUploadBuffer)
+			{
+				nsK2EngineLow::ReleaseD3D12Object(frameUploadBuffer);
+				frameUploadBuffer = nullptr;
+			}
+		}
 		// m_k2Texture のデストラクタも ReleaseD3D12Object を呼ぶ（参照カウント -1）
 	}
 
@@ -81,6 +89,23 @@ namespace nsBeastEngine
 		{
 			K2_LOG("VideoFrameTexture::Init: アップロードバッファの作成に失敗しました (hr=0x%08X)\n", hr);
 			return;
+		}
+		// 毎フレームの転送用（フレームごと）
+		for (auto*& frameUploadBuffer : m_frameUploadBuffers)
+		{
+			hr = device->CreateCommittedResource(
+				&uploadHeapProp,
+				D3D12_HEAP_FLAG_NONE,
+				&bufDesc,
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				IID_PPV_ARGS(&frameUploadBuffer)
+			);
+			if (FAILED(hr))
+			{
+				K2_LOG("VideoFrameTexture::Init: アップロードバッファの作成に失敗しました (hr=0x%08X)\n", hr);
+				return;
+			}
 		}
 
 		// ----- 4. 初回同期アップロード（透明黒）+ PIXEL_SHADER_RESOURCE へ遷移 -----
@@ -164,11 +189,14 @@ namespace nsBeastEngine
 		if (!m_isInitialized || !rgbaPixels) return;
 
 		auto* cmdList = g_graphicsEngine->GetCommandList();
+		// GPUが前のフレームでコピーしている転送用バッファを書き換えないよう、フレームごとのものを使う
+		ID3D12Resource* uploadBuffer = m_frameUploadBuffers[g_graphicsEngine->GetBackBufferIndex()];
+		if (uploadBuffer == nullptr) return;
 
 		// ----- アップロードバッファに CPU データを書き込む -----
 		uint8_t* mapped = nullptr;
 		D3D12_RANGE readRange = { 0, 0 };
-		m_uploadBuffer->Map(0, &readRange, reinterpret_cast<void**>(&mapped));
+		uploadBuffer->Map(0, &readRange, reinterpret_cast<void**>(&mapped));
 
 		const int srcRowPitch = m_width * 4;
 		const int dstRowPitch = static_cast<int>(m_footprint.Footprint.RowPitch);
@@ -181,7 +209,7 @@ namespace nsBeastEngine
 			);
 		}
 
-		m_uploadBuffer->Unmap(0, nullptr);
+		uploadBuffer->Unmap(0, nullptr);
 
 		// ----- PIXEL_SHADER_RESOURCE → COPY_DEST -----
 		auto toCopyDest = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -198,7 +226,7 @@ namespace nsBeastEngine
 		dst.SubresourceIndex = 0;
 
 		D3D12_TEXTURE_COPY_LOCATION src = {};
-		src.pResource = m_uploadBuffer;
+		src.pResource = uploadBuffer;
 		src.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 		src.PlacedFootprint = m_footprint;
 

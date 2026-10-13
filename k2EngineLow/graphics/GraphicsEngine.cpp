@@ -367,6 +367,8 @@ namespace nsK2EngineLow {
 		}
 
 		m_frameIndex = m_frameBuffer.GetCurrentBackBufferIndex();
+		// フレームの始めはメインビュー用の面
+		SetResourceViewSlot(0);
 
 		//カメラを更新する。
 		m_camera2D.Update();
@@ -430,15 +432,26 @@ namespace nsK2EngineLow {
 		// レンダリングターゲットへの描き込み完了待ち
 		m_renderContext.WaitUntilFinishDrawingToRenderTarget(m_frameBuffer.GetCurrentRenderTarget());
 		
+		m_lastPresentMs = 0.0;
+		m_lastWaitDrawMs = 0.0;
 		if (m_isExecuteCommandList)
 		{
+			// 【計測用】Present（垂直同期の待ちを含む）と描画完了待ちの時間をそれぞれ記録する
+			LARGE_INTEGER frequency, t0, t1, t2;
+			QueryPerformanceFrequency(&frequency);
+			QueryPerformanceCounter(&t0);
 #ifdef USE_FPS_LIMITTER
-			m_frameBuffer.Present(1);
+			m_frameBuffer.Present(m_isVsyncEnabled ? 1 : 0);
 #else
 			m_frameBuffer.Present(0);
 #endif
+			QueryPerformanceCounter(&t1);
 			// 描画完了待ち。
 			WaitDraw();
+			QueryPerformanceCounter(&t2);
+			const double msPerTick = 1000.0 / static_cast<double>(frequency.QuadPart);
+			m_lastPresentMs = static_cast<double>(t1.QuadPart - t0.QuadPart) * msPerTick;
+			m_lastWaitDrawMs = static_cast<double>(t2.QuadPart - t1.QuadPart) * msPerTick;
 		}
 
 		m_directXTKGfxMemroy->Commit(m_commandQueue);
@@ -446,9 +459,31 @@ namespace nsK2EngineLow {
 		m_renderContext.Close();
 		//このフレームに作成した描画コマンドを実行する。
 		ID3D12CommandList* ppCommandLists[] = { m_commandList[m_frameIndex] };
+		{
+			// 【計測用】実行に渡した時刻
+			LARGE_INTEGER now;
+			QueryPerformanceCounter(&now);
+			m_lastExecuteQpc = now.QuadPart;
+		}
 		m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
 		// コマンドリストをGPUに流した印。
 		m_isExecuteCommandList = true;
+
+		// 直列にする設定のときだけ、このフレームの描画がGPUで終わるまで待つ。
+		// 既定は並行（GPUが前のフレームを描いている間にCPUが次のフレームを処理する）。
+		// 並行にできるよう、CPUが毎フレーム書くバッファは GraphicsEngine::GetResourceSlot() の面
+		// （フレーム×ビュー）ごとに分けてあり、海の波の計算は別のキューで実行している。
+		if (m_isSerializeCpuGpu)
+		{
+			LARGE_INTEGER frequency, t0, t1;
+			QueryPerformanceFrequency(&frequency);
+			QueryPerformanceCounter(&t0);
+			WaitDraw();
+			QueryPerformanceCounter(&t1);
+			m_lastWaitEndQpc = t1.QuadPart;
+			// 【計測用】Present後の待ちと合わせて「GPU描画完了待ち」とする
+			m_lastWaitDrawMs += static_cast<double>(t1.QuadPart - t0.QuadPart) * 1000.0 / static_cast<double>(frequency.QuadPart);
+		}
 		// GarbageCollect()は未使用ページを解放するだけの処理だが、
 		// 毎フレーム呼ぶとCommit()で返却されたばかりのページも即座に解放されてしまい、
 		// 次フレームでSpriteBatch等がGraphicsMemoryから確保するたびにCreateCommittedResourceで

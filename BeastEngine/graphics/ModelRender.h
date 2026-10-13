@@ -498,6 +498,53 @@ namespace nsBeastEngine
 		 */
 		bool IsCastShadow() const { return m_isCastShadow; }
 
+		/**
+		 * @brief 遠いカスケード（1番以降）にも影を落とすかを設定
+		 * @details ポリゴンの多いモデルは、影を描くたびにGPU時間がかかる。
+		 *          false にすると近いカスケード（0番）にだけ影を描き、遠くでは影を省く。
+		 * @param isCastShadow 遠いカスケードにも影を落とすかどうか
+		 */
+		void SetCastShadowInFarCascades(const bool isCastShadow)
+		{
+			m_shadowCascadeMask = isCastShadow ? ALL_SHADOW_CASCADES_MASK : 1u;
+		}
+
+		/**
+		 * @brief 影を描くカスケードを設定
+		 * @param mask ビット i が立っているカスケード i にだけ影を描く（既定は全カスケード）
+		 */
+		void SetShadowCascadeMask(const uint32_t mask) { m_shadowCascadeMask = mask; }
+
+		/**
+		 * @brief 影だけを描き、メインビュー・サブビューには描かないかを設定
+		 * @details 地形のLODで「遠いカスケードの影だけ粗いメッシュで描く」用
+		 * @param isShadowOnly true で影だけを描く
+		 */
+		void SetShadowOnly(const bool isShadowOnly) { m_isShadowOnly = isShadowOnly; }
+
+		/**
+		 * @brief 輪郭線を描く最大距離を設定
+		 * @details 描画中のカメラからこれより遠ければ輪郭線を描かない（0で制限なし）
+		 */
+		void SetOutlineMaxDistance(const float distance) { m_outlineMaxDistance = distance; }
+
+		/**
+		 * @brief 小窓（サブビュー）に描く最大距離を設定
+		 * @details 小窓のカメラからこれより遠ければ小窓には描かない（0で制限なし）。メインビュー・影には影響しない
+		 */
+		void SetSubViewMaxDrawDistance(const float distance) { m_subViewMaxDrawDistance = distance; }
+
+		/**
+		 * @brief 初期化時に影用モデル（カスケードごと）を作るかを設定
+		 * @details 影を描かないと決まっているモデルは、作らないことでディスクリプタヒープの数を減らせる
+		 *          （モデル1つにつきカスケード数ぶん作るため、数の多いモデルでは上限に近づく）。
+		 *          Init() / InitFromLoaded() より前に呼ぶこと。false にしたモデルは影を描かない
+		 */
+		void SetCreateShadowModels(const bool isCreate) { m_isCreateShadowModels = isCreate; }
+
+		/** 全カスケードに影を描くマスク */
+		static constexpr uint32_t ALL_SHADOW_CASCADES_MASK = (1u << NUM_SHADOW_CASCADES) - 1u;
+
 
 	private:
 		/**
@@ -607,6 +654,22 @@ namespace nsBeastEngine
 		bool           m_isShadowModelInited = false;
 		/** 影を落とすかどうか */
 		bool           m_isCastShadow = true;
+		/** 影を描くカスケード（ビット i がカスケード i） */
+		uint32_t       m_shadowCascadeMask = ALL_SHADOW_CASCADES_MASK;
+		/** 影だけを描き、メインビュー・サブビューには描かないか */
+		bool           m_isShadowOnly = false;
+		/** 初期化時に影用モデルを作るか */
+		bool           m_isCreateShadowModels = true;
+		/** 輪郭線を描く最大距離（0で制限なし） */
+		float          m_outlineMaxDistance = 0.0f;
+		/** 小窓（サブビュー）に描く最大距離（0で制限なし） */
+		float          m_subViewMaxDrawDistance = 0.0f;
+
+		/**
+		 * @brief 描画中のカメラからの距離が、指定した最大距離を超えているか
+		 * @param maxDistance 最大距離（0以下なら制限なしとして false）
+		 */
+		bool IsFartherThanFromActiveCamera(const float maxDistance) const;
 
 		/**
 		 * @brief GBuffer描画用モデル（BeastModel、前方宣言のためunique_ptrで保持）

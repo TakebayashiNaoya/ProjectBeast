@@ -12,7 +12,16 @@ namespace nsK2EngineLow {
 	}
 	void Texture::Release()
 	{
+		// 【計測用】VRAMの台帳から消す
+		if (m_isInMemoryLedger) {
+			GetGpuMemoryLedger().Remove(m_texture);
+			m_isInMemoryLedger = false;
+		}
 		ReleaseD3D12Object(m_texture);
+		// 解放キューに積んだポインタを持ち続けると、続けて Release() が呼ばれたとき
+		// （InitFromMemory() → LoadTextureFromMemory() など）に同じものを二重にキューへ積み、
+		// 二重解放でクラッシュする。DescriptorHeap::Release() と同じくここでクリアする
+		m_texture = nullptr;
 	}
 	void Texture::InitFromDDSFile(const wchar_t* filePath)
 	{
@@ -62,6 +71,9 @@ namespace nsK2EngineLow {
 
 		m_texture = texture;
 		m_textureDesc = m_texture->GetDesc();
+		// 【計測用】VRAMの台帳に記録する
+		GetGpuMemoryLedger().Add(m_texture, "Texture", "(memory)");
+		m_isInMemoryLedger = true;
 	}
 	void Texture::LoadTextureFromDDSFile(const wchar_t* filePath)
 	{
@@ -90,6 +102,9 @@ namespace nsK2EngineLow {
 
 		m_texture = texture;
 		m_textureDesc = m_texture->GetDesc();
+		// 【計測用】VRAMの台帳に記録する
+		GetGpuMemoryLedger().Add(m_texture, "Texture", ToLedgerName(filePath));
+		m_isInMemoryLedger = true;
 	}
 
 	void Texture::RegistShaderResourceView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle, int bufferNo)

@@ -117,4 +117,44 @@ float CalcShadowRate(
     return 1.0f;
 }
 
+/*!
+ * @brief 地形のベイク影で、光が当たっている割合を求める
+ * @details 地形はロード時に「影の高さマップ」をベイクしており（TerrainObject）、カスケードには描いていない。
+ *          マップには「この高さより下は地形の影」というワールドYが入っている。
+ * @param worldPos       ワールド座標
+ * @param shadowHeights  影の高さマップ（x=影の高さ, y=地面の高さ）
+ * @param smp            サンプラー（線形補間）
+ * @param uvScaleOffset  ワールドXZ→UV（x=X倍率, y=Xオフセット, z=Z倍率, w=Zオフセット）
+ * @param param          x=境界をぼかす高さの幅, y=バイアス, z=有効なら1
+ * @return 光が当たっている割合（0.0=完全な影 1.0=影なし）
+ */
+float CalcTerrainBakedShadowRate(
+    float3 worldPos,
+    Texture2D<float2> shadowHeights,
+    sampler smp,
+    float4 uvScaleOffset,
+    float4 param)
+{
+    if (param.z < 0.5f)
+    {
+        return 1.0f;
+    }
+
+    float2 uv = float2(
+        worldPos.x * uvScaleOffset.x + uvScaleOffset.y,
+        worldPos.z * uvScaleOffset.z + uvScaleOffset.w);
+    if (uv.x < 0.0f || uv.x > 1.0f || uv.y < 0.0f || uv.y > 1.0f)
+    {
+        return 1.0f;
+    }
+
+    float2 heights = shadowHeights.SampleLevel(smp, uv, 0);
+    // 影を受ける点の高さは、本来の地面より下にはしない。
+    // 遠くの地形はLODで頂点を間引いており、崖などでは粗いメッシュの面が本来の地面より低い所を通る。
+    // そのまま比べると、本来の地面より低い点だけ影になって縞模様が出る
+    float receiverY = max(worldPos.y, heights.y);
+    // 影の高さより上なら光が当たる。境界は param.x の幅でぼかす
+    return saturate((receiverY + param.y - heights.x) / param.x + 0.5f);
+}
+
 #endif // _SHADOW_H_

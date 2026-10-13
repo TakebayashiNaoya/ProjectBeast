@@ -25,6 +25,15 @@ namespace nsBeastEngine
 			constexpr float GROUND_CACHE_XZ_TOLERANCE = 0.05f;
 
 			/**
+			 * 立てる床の上を動いている間、床スイープ結果を使い回してよい移動量（カプセル半径に対する割合）
+			 * @details 床スイープの重さは足元の範囲に入る地形の三角形の数（≒半径の2乗）で決まり、
+			 *          シロクマ（半径40）は子ペンギン（半径10）の十数倍重い。
+			 *          前回スイープした位置からこの距離以内なら、当たった床の傾きで高さを補正して使い回す。
+			 *          （前回スイープした位置から測るので、合計でこれだけ動いたら必ずスイープし直す）
+			 */
+			constexpr float GROUND_CACHE_MOVE_RADIUS_RATIO = 0.25f;
+
+			/**
 			 * 床スイープの区間を上下に広げる量
 			 * 泳ぎ中は波で高さが毎フレーム上下するため、少し広めに調べておくことで
 			 * 区間が調べ済みの範囲に収まり続け、使い回しやすくする
@@ -409,7 +418,9 @@ namespace nsBeastEngine
 					}
 					const GroundSweepCache& ground = m_groundSweepCache;
 					// 広げて調べた分のうち、今回の区間よりも下で当たったものは、当たらなかったものと扱う
-					const bool isHit = ground.isHit && ground.hitCenterY >= sweepBottom;
+					// 使い回した場合は、前回の位置から動いた分を床の傾きで補正した高さを使う
+					const float groundHitCenterY = GetCachedGroundHitCenterY();
+					const bool isHit = ground.isHit && groundHitCenterY >= sweepBottom;
 
 					// カプセルのスイープは「そこに立てるか」の判定には正しいが、斜面では
 					// カプセルが側面で接地するため、接地Yは真下の地面より radius*(1/cosθ-1)
@@ -454,7 +465,7 @@ namespace nsBeastEngine
 
 					if (isHit) {
 						// ぶつかった地点のY座標を計算
-						float hitCenterY = ground.hitCenterY;
+						float hitCenterY = groundHitCenterY;
 						float newY = hitCenterY - (m_height * 0.5f + m_radius);
 
 						if (ground.isGround) {
@@ -566,7 +577,19 @@ namespace nsBeastEngine
 			// 縦方向のスイープ結果はXZごとに決まるので、XZが変わったら使えない
 			const float dx = m_position.x - cache.x;
 			const float dz = m_position.z - cache.z;
-			if (dx * dx + dz * dz > GROUND_CACHE_XZ_TOLERANCE * GROUND_CACHE_XZ_TOLERANCE) return false;
+			const float moveDistSq = dx * dx + dz * dz;
+			if (moveDistSq > GROUND_CACHE_XZ_TOLERANCE * GROUND_CACHE_XZ_TOLERANCE) {
+				// 動いている場合は、立てる床の上を少し動いただけなら、床の傾きで高さを補正して使い回す。
+				// （急斜面・空中は挙動が大きく変わるので毎回スイープする）
+				if (!cache.isHit || !cache.isGround) return false;
+				const float moveTolerance = m_radius * GROUND_CACHE_MOVE_RADIUS_RATIO;
+				if (moveDistSq > moveTolerance * moveTolerance) return false;
+				// 補正した床の高さが、今回のスイープ区間の中にあること。
+				// 区間より下だと「床に当たらなかった（空中）」扱いになり、接地判定が一瞬だけ外れて
+				// 状態（追跡など）が途切れてしまうので、その場合はスイープし直す
+				const float predictedHitCenterY = GetCachedGroundHitCenterY();
+				return sweepTop >= predictedHitCenterY && predictedHitCenterY >= sweepBottom;
+			}
 
 			// 前回より上は調べていない（何かあるかもしれない）
 			if (sweepTop > cache.top) return false;
@@ -579,6 +602,18 @@ namespace nsBeastEngine
 
 			// 当たらなかった場合は、前回調べた区間に今回の区間が収まっていれば当たらない
 			return sweepBottom >= cache.bottom;
+		}
+
+
+		float CharacterController::GetCachedGroundHitCenterY() const
+		{
+			const GroundSweepCache& cache = m_groundSweepCache;
+			if (!cache.isHit || cache.hitNormal.y <= FLT_EPSILON) return cache.hitCenterY;
+
+			// 床の平面 n・p = 一定 の上で、XZを (dx, dz) 動かしたときの高さの変化
+			const float dx = m_position.x - cache.x;
+			const float dz = m_position.z - cache.z;
+			return cache.hitCenterY - (cache.hitNormal.x * dx + cache.hitNormal.z * dz) / cache.hitNormal.y;
 		}
 
 

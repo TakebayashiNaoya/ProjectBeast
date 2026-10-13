@@ -70,22 +70,25 @@ namespace nsK2EngineLow {
 	}
 	void ConstantBuffer::RegistConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE descriptorHandle)
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
-		RegistConstantBufferView(descriptorHandle, backBufferIndex);
+		RegistConstantBufferView(descriptorHandle, static_cast<int>(g_graphicsEngine->GetResourceSlot()));
 	}
 	void ConstantBuffer::CopyToVRAM(void* data)
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
-		if (m_constBufferCPU[backBufferIndex] == nullptr) {
-			// The mapping failed (device removal during Init). Report instead of writing to null.
-			g_graphicsEngine->ReportDeviceRemoved("ConstantBuffer::CopyToVRAM null map");
-			return;
+		// 今の面に書く。メインビュー（とUpdate中）に書いた内容は、同じフレームのサブビュー用の面にも写す
+		// （Update で1フレームに1回だけ書くものを、サブビューでも使えるようにするため）
+		const UINT firstSlot = g_graphicsEngine->GetResourceSlot();
+		const UINT lastSlot = g_graphicsEngine->IsMainViewResourceSlot() ? firstSlot + 1 : firstSlot;
+		for (UINT slot = firstSlot; slot <= lastSlot; slot++) {
+			if (m_constBufferCPU[slot] == nullptr) {
+				// The mapping failed (device removal during Init). Report instead of writing to null.
+				g_graphicsEngine->ReportDeviceRemoved("ConstantBuffer::CopyToVRAM null map");
+				return;
+			}
+			memcpy(m_constBufferCPU[slot], data, m_size);
 		}
-		memcpy(m_constBufferCPU[backBufferIndex], data, m_size);
 	}
 	D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetGPUVirtualAddress()
 	{
-		auto backBufferIndex = g_graphicsEngine->GetBackBufferIndex();
-		return m_constantBuffer[backBufferIndex]->GetGPUVirtualAddress();
+		return m_constantBuffer[g_graphicsEngine->GetResourceSlot()]->GetGPUVirtualAddress();
 	}
 }

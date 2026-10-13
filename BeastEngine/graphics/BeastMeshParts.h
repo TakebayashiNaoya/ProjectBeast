@@ -33,7 +33,7 @@ namespace nsBeastEngine
 		// トライアングルカリング書き込み先のインデックスバッファ（ダブルバッファ）
 		// 定数バッファと同様に、メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で
 		// 別スロットに書き込むことで同フレーム内の上書き競合を防ぐ
-		std::vector<std::array<IndexBuffer*, 2>> m_visibleIndexBuffers;
+		std::vector<std::array<IndexBuffer*, NUM_GPU_RESOURCE_SLOTS>> m_visibleIndexBuffers;
 	};
 
 

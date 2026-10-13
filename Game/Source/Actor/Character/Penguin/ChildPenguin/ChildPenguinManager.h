@@ -632,7 +632,8 @@ namespace app
 
 			/**
 			 * @brief 親へのフローフィールドを必要に応じて作り直す
-			 * @details 一定間隔かつ親が動いたときだけ StageNavGrid::BuildFlowField() を呼ぶ。
+			 * @details 一定間隔かつ親が動いたときだけ作り直す。作り直しは StageNavGrid::BeginFlowFieldBuild() で始め、
+			 *          StepFlowFieldBuild() で数フレームに分けて進める（終わるまでは前回のフィールドを使う）。
 			 */
 			void UpdateDaddyFlowField();
 
@@ -803,6 +804,12 @@ namespace app
 				GhostPenguinInfo();
 			};
 
+
+			/**
+			 * @brief 非表示のゴーストペンギンを1体作る（モデルの初期化を含む）
+			 * @details モデルの初期化は重い（約10ms）ため、使い終わったゴーストは RegisterGhostPenguin() で使い回す
+			 */
+			std::unique_ptr<GhostPenguinInfo> CreateGhostPenguin();
 
 		public:
 			using GhostPenguins = std::vector<std::unique_ptr<GhostPenguinInfo>>;

@@ -282,6 +282,15 @@
     <ClInclude Include="graphics\GPUBuffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\GpuMemoryLedger.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\GpuObjectCache.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\GpuResourceSlot.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
     <ClInclude Include="graphics\GraphicsEngine.h">
       <Filter>graphics</Filter>
     </ClInclude>

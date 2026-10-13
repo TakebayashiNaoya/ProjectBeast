@@ -254,11 +254,11 @@ namespace app
 			/** 頂点データ（CPU側キャッシュ・毎フレーム更新） */
 			std::vector<WhirlpoolVertex> m_vertices;
 
-			Texture        m_albedoMap;					/** アルベドマップ */
+			Texture*       m_albedoMap = nullptr;		/** アルベドマップ（全ての渦潮で共有。テクスチャバンクが持つ） */
 
-			VertexBuffer   m_vertexBuffer;				/** 頂点バッファ */
+			VertexBuffer   m_vertexBuffers[NUM_GPU_RESOURCE_SLOTS];	/** 頂点バッファ（毎フレーム書き換えるので GraphicsEngine::GetResourceSlot() の面ごと） */
 			IndexBuffer    m_indexBuffer;					/** 元インデックスバッファ（カリングなし描画用） */
-			IndexBuffer* m_visibleIndexBuffers[2] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
+			IndexBuffer* m_visibleIndexBuffers[NUM_GPU_RESOURCE_SLOTS] = {};	/** 可視インデックスバッファ（ダブルバッファ: [0]=メインビュー, [1]=サブビュー） */
 			int            m_indexCount = 0;			/** インデックス数 */
 
 			/** 元インデックス配列（CPUキャッシュ・カリング判定用） */

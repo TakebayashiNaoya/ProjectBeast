@@ -45,6 +45,21 @@ namespace app
 	{
 		// リストのメモリ確保だけを行う。
 		m_homingParticles.reserve(m_particleCount);
+
+		// パーティクルエフェクトレンダーの生成は重い（JSON読み込み・スプライト初期化）ため、
+		// 入隊のたびに作るとその瞬間だけ処理が重くなる。最大数ぶんをここで作っておき使い回す。
+		m_freeEffectRenders.reserve(m_maxParticles);
+		for (int i = 0; i < m_maxParticles; ++i)
+		{
+			auto effectRender = std::make_unique<ParticleEffectRender>();
+			effectRender->Init(
+				JSON_PATH,
+				TEXTURE_PATH,
+				WIDTH,
+				HEIGHT
+			);
+			m_freeEffectRenders.push_back(std::move(effectRender));
+		}
 	}
 
 
@@ -52,22 +67,17 @@ namespace app
 	{
 		K2_ASSERT(!m_goalPosition.IsEqual(Vector3::Zero), "目標座標未設定");
 
-		// すでにホーミングパーティクルが最大数存在している場合は、これ以上追加しない。
-		if (m_homingParticles.size() >= m_maxParticles) return;
+		// すでにホーミングパーティクルが最大数存在している（空きが無い）場合は、これ以上追加しない。
+		if (m_homingParticles.size() >= m_maxParticles || m_freeEffectRenders.empty()) return;
 
 		auto info = std::make_unique<HomingParticleInfo>();
 
 		info->targetActor = target;
 
-		// 生成と初期化。
-		info->effectRender = std::make_unique<ParticleEffectRender>();
-
-		info->effectRender->Init(
-			JSON_PATH,
-			TEXTURE_PATH,
-			WIDTH,
-			HEIGHT
-		);
+		// 空いているレンダーを取り出し、生成直後と同じ状態（停止・パーティクル無し）に戻して使う。
+		info->effectRender = std::move(m_freeEffectRenders.back());
+		m_freeEffectRenders.pop_back();
+		info->effectRender->Reset();
 
 		// 画面上の座標を取得
 		Vector2 screenPosition = Vector2::Zero;
@@ -131,6 +141,8 @@ namespace app
 
 			if (!info->curve.IsPlaying())
 			{
+				// 飛び終わったレンダーは使い回すために戻す。
+				m_freeEffectRenders.push_back(std::move(info->effectRender));
 				// eraseは削除した次の要素のイテレーターを返すので、安全にループできる。
 				it = m_homingParticles.erase(it);
 			}

@@ -274,9 +274,9 @@ namespace nsK2EngineLow {
 		std::vector < IUnorderAccessResrouce*> m_uavResoruces;	//UAVリソース。
 		std::vector < ConstantBuffer*> m_constantBuffers;		//定数バッファ。
 		D3D12_SAMPLER_DESC m_samplerDescs[MAX_SAMPLER_STATE];						//サンプラステート。
-		D3D12_GPU_DESCRIPTOR_HANDLE m_cbGpuDescriptorStart[2];						//定数バッファのディスクリプタヒープの開始ハンドル。
-		D3D12_GPU_DESCRIPTOR_HANDLE m_srGpuDescriptorStart[2];						//シェーダーリソースのディスクリプタヒープの開始ハンドル。
-		D3D12_GPU_DESCRIPTOR_HANDLE m_uavGpuDescriptorStart[2];						//UAVリソースのディスクリプタヒープの開始ハンドル。
-		D3D12_GPU_DESCRIPTOR_HANDLE m_samplerGpuDescriptorStart[2];					//Samplerのでスクリプタヒープの開始ハンドル。
+		D3D12_GPU_DESCRIPTOR_HANDLE m_cbGpuDescriptorStart[NUM_GPU_RESOURCE_SLOTS];						//定数バッファのディスクリプタヒープの開始ハンドル。
+		D3D12_GPU_DESCRIPTOR_HANDLE m_srGpuDescriptorStart[NUM_GPU_RESOURCE_SLOTS];						//シェーダーリソースのディスクリプタヒープの開始ハンドル。
+		D3D12_GPU_DESCRIPTOR_HANDLE m_uavGpuDescriptorStart[NUM_GPU_RESOURCE_SLOTS];						//UAVリソースのディスクリプタヒープの開始ハンドル。
+		D3D12_GPU_DESCRIPTOR_HANDLE m_samplerGpuDescriptorStart[NUM_GPU_RESOURCE_SLOTS];					//Samplerのでスクリプタヒープの開始ハンドル。
 	};
 }

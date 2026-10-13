@@ -112,6 +112,9 @@ cbuffer LightCB : register(b1)
     float4x4 shadowLVP0;         // offset: 224
     float4x4 shadowLVP1;         // offset: 288
     float4x4 shadowLVP2;         // offset: 352
+    // 地形のベイク影（C++側 Light::m_terrainShadowUVScaleOffset / m_terrainShadowParam）
+    float4   terrainShadowUVScaleOffset; // offset: 416
+    float4   terrainShadowParam;         // offset: 432
 };
 
 
@@ -131,6 +134,8 @@ Texture2D<float4> g_metaricSmoothTexture : register(t2);	// メタリックス�
 Texture2D<float4> g_shadowMap0           : register(t3);
 Texture2D<float4> g_shadowMap1           : register(t4);
 Texture2D<float4> g_shadowMap2           : register(t5);
+// 地形のベイク影（影の高さマップ）
+Texture2D<float2> g_terrainShadowMap     : register(t6);
 
 // レジスタ番号は C++ 側の EnDeferredLightingSrv（RenderViewContext.h）と一致させること。
 // RenderingEngine::InitDeferredLightingSprite() がその順番でテクスチャを設定している。
@@ -333,6 +338,9 @@ float3 CalcDirectionLight(
         shadowLVP0, shadowLVP1, shadowLVP2,
         g_shadowMap0, g_shadowMap1, g_shadowMap2,
         g_sampler);
+    // 地形の影はカスケードに描いておらず、ベイクした影の高さマップから求める
+    shadowRate = min(shadowRate, CalcTerrainBakedShadowRate(
+        worldPos, g_terrainShadowMap, g_sampler, terrainShadowUVScaleOffset, terrainShadowParam));
 
     // 直接光に影を適用する
     lig *= lerp(shadowDirectRate, 1.0f, shadowRate);

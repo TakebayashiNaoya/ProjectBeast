@@ -24,6 +24,8 @@ namespace app
 			const char* WHIRLPOOL_SHADER_PATH = "Assets/shader/Whirlpool.fx";
 			/** アルベドマップのパス */
 			const wchar_t* WHIRLPOOL_ALBEDO_PATH = L"Assets/modelData/stage/Whirlpool/whirlpool.DDS";
+			/** アルベドマップをテクスチャバンクに登録するときのキー */
+			const char* WHIRLPOOL_ALBEDO_BANK_KEY = "assets/modeldata/stage/whirlpool/whirlpool.dds";
 
 			/** 渦潮の最小スケール */
 			const Vector3 MIN_SCALE = Vector3(0.0f, 1.0f, 0.0f);
@@ -55,7 +57,15 @@ namespace app
 			InitShaders();
 
 			// テクスチャをロードする
-			m_albedoMap.InitFromDDSFile(WHIRLPOOL_ALBEDO_PATH);
+			// 渦潮は2秒ごとに作り直されるので、テクスチャは全ての渦潮で共有する
+			// （作るたびにファイルから読み込むと、読み込みとGPUへの転送待ちで1回10ms近くかかっていた）
+			m_albedoMap = g_engine->GetTextureFromBank(WHIRLPOOL_ALBEDO_BANK_KEY);
+			if (m_albedoMap == nullptr)
+			{
+				m_albedoMap = new Texture();
+				m_albedoMap->InitFromDDSFile(WHIRLPOOL_ALBEDO_PATH);
+				g_engine->RegistTextureToBank(WHIRLPOOL_ALBEDO_BANK_KEY, m_albedoMap);
+			}
 
 			// ルートシグネチャを構築する
 			InitRootSignature();
@@ -188,8 +198,8 @@ namespace app
 				return;
 			}
 
-			// メインビュー（frameIdx=0）とサブビュー（frameIdx=1）で別スロットに書き込む
-			const int frameIdx = g_graphicsEngine->GetBackBufferIndex();
+			// GraphicsEngine::GetResourceSlot() の面に書き込む（フレーム×ビューごとに別のバッファ。定数バッファと同じ）
+			const int frameIdx = static_cast<int>(g_graphicsEngine->GetResourceSlot());
 			auto* visIb = m_visibleIndexBuffers[frameIdx];
 			visIb->Copy(m_visibleIndexArray.data());
 			rc.SetIndexBuffer(*visIb);
@@ -341,12 +351,15 @@ namespace app
 				}
 			}
 
-			// 頂点バッファを初期化する
-			m_vertexBuffer.Init(
-				static_cast<int>(sizeof(WhirlpoolVertex) * m_vertices.size()),
-				sizeof(WhirlpoolVertex)
-			);
-			m_vertexBuffer.Copy(m_vertices.data());
+			// 頂点バッファを初期化する（毎フレーム書き換えるので面ごとに持つ）
+			for (auto& vertexBuffer : m_vertexBuffers)
+			{
+				vertexBuffer.Init(
+					static_cast<int>(sizeof(WhirlpoolVertex) * m_vertices.size()),
+					sizeof(WhirlpoolVertex)
+				);
+				vertexBuffer.Copy(m_vertices.data());
+			}
 
 			// インデックスを生成する
 			m_srcIndexArray.reserve(numSegments * 3 + (numRings - 1) * numSegments * 6);
@@ -392,9 +405,8 @@ namespace app
 			);
 			m_indexBuffer.Copy(m_srcIndexArray.data());
 
-			// 可視インデックスバッファをダブルバッファで作成する
-			// [0]=メインビュー用、[1]=サブビュー用（SetFrameIndexによる切り替えと対応）
-			for (int buf = 0; buf < 2; buf++)
+			// 可視インデックスバッファを GraphicsEngine::GetResourceSlot() の面ごとに作成する（フレーム×ビュー）
+			for (int buf = 0; buf < NUM_GPU_RESOURCE_SLOTS; buf++)
 			{
 				m_visibleIndexBuffers[buf] = new IndexBuffer;
 				m_visibleIndexBuffers[buf]->Init(
@@ -445,7 +457,11 @@ namespace app
 			rc.SetPipelineState(m_pipelineState);
 			rc.SetDescriptorHeap(m_descriptorHeap);
 			rc.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			rc.SetVertexBuffer(m_vertexBuffer);
+			// 頂点の高さは UpdateVertexHeights() で毎フレーム変わるので、今の面に書いてから使う
+			// （GPUが前のフレームで使っている面を書き換えないため）
+			auto& vertexBuffer = m_vertexBuffers[g_graphicsEngine->GetResourceSlot()];
+			vertexBuffer.Copy(m_vertices.data());
+			rc.SetVertexBuffer(vertexBuffer);
 		}
 
 
@@ -561,7 +577,7 @@ namespace app
 		{
 			m_descriptorHeap.RegistConstantBuffer(0, m_commonConstantBuffer);
 			m_descriptorHeap.RegistConstantBuffer(1, m_whirlpoolConstantBuffer);
-			m_descriptorHeap.RegistShaderResource(0, m_albedoMap);
+			m_descriptorHeap.RegistShaderResource(0, *m_albedoMap);
 
 			// キャラクターや地形の影を渦潮に映すためのカスケードシャドウマップ
 			// 渦潮自身は影を落とさない（キャスターには登録していない）
@@ -591,7 +607,7 @@ namespace app
 				v.pos.y = ocean->SampleWaveHeight(worldX, worldZ) + WHIRLPOOL_Y_OFFSET;
 			}
 
-			m_vertexBuffer.Copy(m_vertices.data());
+			// 頂点バッファへの書き込みは描画時に今の面へ行う（SetupDrawCommands）
 		}
 
 

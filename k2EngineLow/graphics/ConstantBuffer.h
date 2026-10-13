@@ -71,8 +71,8 @@ namespace nsK2EngineLow {
 		/// </summary>
 		void Release();
 	private:
-		ID3D12Resource* m_constantBuffer[2] = { nullptr };//定数バッファ。
-		void* m_constBufferCPU[2] = { nullptr };		//CPU側からアクセスできるする定数バッファのアドレス。
+		ID3D12Resource* m_constantBuffer[NUM_GPU_RESOURCE_SLOTS] = { nullptr };//定数バッファ。
+		void* m_constBufferCPU[NUM_GPU_RESOURCE_SLOTS] = { nullptr };		//CPU側からアクセスできるする定数バッファのアドレス。
 		int m_size = 0;									//定数バッファのサイズ。
 		int m_allocSize = 0;
 		bool m_isValid = false;							//利用可能？

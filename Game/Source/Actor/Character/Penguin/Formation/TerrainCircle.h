@@ -128,16 +128,16 @@ namespace app
 			int m_edgeVertexCount = 0;		  /** 縁取り用頂点バッファの有効頂点数 */
 			int m_fillVertexCount = 0;		  /** 塗りつぶし用頂点バッファの有効頂点数 */
 
-			VertexBuffer m_edgeVertexBuffer;  /** 縁取り用頂点バッファ */
+			VertexBuffer m_edgeVertexBuffers[NUM_GPU_RESOURCE_SLOTS];  /** 縁取り用頂点バッファ */
 			IndexBuffer  m_edgeIndexBuffer;   /** 縁取り用インデックスバッファ */
-			VertexBuffer m_fillVertexBuffer;  /** 塗りつぶし用頂点バッファ */
+			VertexBuffer m_fillVertexBuffers[NUM_GPU_RESOURCE_SLOTS];  /** 塗りつぶし用頂点バッファ */
 			IndexBuffer  m_fillIndexBuffer;   /** 塗りつぶし用インデックスバッファ */
 
 			int     m_bandSegments = 0;                       /** 帯の円周分割数（0なら帯は未初期化） */
 			Vector4 m_bandColor = { 1.0f, 1.0f, 1.0f, 1.0f }; /** 帯の色 */
 			std::vector<Vertex> m_bandVerts;                  /** 帯用頂点バッファ */
 			int m_bandVertexCount = 0;                        /** 帯用頂点バッファの有効頂点数 */
-			VertexBuffer m_bandVertexBuffer;                  /** 帯用頂点バッファ */
+			VertexBuffer m_bandVertexBuffers[NUM_GPU_RESOURCE_SLOTS];                  /** 帯用頂点バッファ */
 			IndexBuffer  m_bandIndexBuffer;                   /** 帯用インデックスバッファ */
 		};
 	}

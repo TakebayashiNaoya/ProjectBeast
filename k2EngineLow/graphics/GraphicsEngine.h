@@ -83,6 +83,41 @@ namespace nsK2EngineLow {
 		/// </remarks>
 		void EndRender();
 		/// <summary>
+		/// 【計測用】直前のEndRender()でPresentにかかった時間（ミリ秒）。垂直同期の待ちを含む。
+		/// </summary>
+		double GetLastPresentMs() const { return m_lastPresentMs; }
+		/// <summary>
+		/// 【計測用】直前のEndRender()でGPUの描画完了待ち（WaitDraw）にかかった時間（ミリ秒）。
+		/// </summary>
+		double GetLastWaitDrawMs() const { return m_lastWaitDrawMs; }
+		/// <summary>
+		/// 【計測用】直前のEndRender()でコマンドリストを実行に渡した時刻（QueryPerformanceCounter）。
+		/// </summary>
+		int64_t GetLastExecuteQpc() const { return m_lastExecuteQpc; }
+		/// <summary>
+		/// 【計測用】直前のEndRender()で描画完了待ちが終わった時刻（QueryPerformanceCounter）。
+		/// </summary>
+		int64_t GetLastWaitEndQpc() const { return m_lastWaitEndQpc; }
+		/// <summary>
+		/// 【計測用】垂直同期を使うかを設定する（USE_FPS_LIMITTER が有効なときの Present の待ち方）。
+		/// GPU開始までの遅れが垂直同期の待ちかを確かめる用。既定は使う。
+		/// </summary>
+		void SetVsyncEnabled(const bool isEnabled) { m_isVsyncEnabled = isEnabled; }
+		/// <summary>
+		/// 【計測用】垂直同期を使っているか。
+		/// </summary>
+		bool IsVsyncEnabled() const { return m_isVsyncEnabled; }
+		/// <summary>
+		/// CPUとGPUを直列にするか（実行に渡したフレームの描画完了をその場で待つ）。
+		/// false（既定）なら、GPUが前のフレームを描いている間にCPUが次のフレームを処理する。
+		/// 並行で表示が崩れたときの切り分け・比較用。
+		/// </summary>
+		void SetSerializeCpuGpu(const bool isSerialize) { m_isSerializeCpuGpu = isSerialize; }
+		/// <summary>
+		/// CPUとGPUを直列にしているか。
+		/// </summary>
+		bool IsSerializeCpuGpu() const { return m_isSerializeCpuGpu; }
+		/// <summary>
 		/// D3D�f�o�C�X���擾�B
 		/// </summary>
 		/// <returns></returns>
@@ -99,12 +134,29 @@ namespace nsK2EngineLow {
 			return m_frameIndex;
 		}
 		/// <summary>
-		/// フレームインデックスを一時的に変更する。
-		/// 同一フレーム内で複数の定数バッファ書き込みが競合しないようにするために使用する。
+		/// CPUが毎フレーム書き込むGPUリソース（定数バッファなど）のどの面を使うかを取得する。
+		/// フレーム番号 × NUM_GPU_RESOURCE_VIEWS + ビュー番号（0=メインビュー, 1=サブビュー）。
 		/// </summary>
-		void SetFrameIndex(UINT index)
+		UINT GetResourceSlot() const
 		{
-			m_frameIndex = index;
+			return m_resourceSlot;
+		}
+		/// <summary>
+		/// 今の面がメインビュー用か（Update中もメインビュー用の面になっている）。
+		/// </summary>
+		bool IsMainViewResourceSlot() const
+		{
+			return (m_resourceSlot % NUM_GPU_RESOURCE_VIEWS) == 0;
+		}
+		/// <summary>
+		/// 書き込む面をビューに合わせて切り替える（0=メインビュー, 1=サブビュー）。
+		/// 同じフレーム内でメインビューとサブビューが同じ定数バッファに書くと、
+		/// 後から書いた方で上書きされるため、ビューごとに別の面を使う。
+		/// コマンドリスト（GetBackBufferIndex()）は切り替わらない。
+		/// </summary>
+		void SetResourceViewSlot(const int viewIndex)
+		{
+			m_resourceSlot = m_frameIndex * NUM_GPU_RESOURCE_VIEWS + static_cast<UINT>(viewIndex);
 		}
 		/// <summary>
 		/// �R�}���h�L���[���擾�B
@@ -362,6 +414,30 @@ namespace nsK2EngineLow {
 		/// </summary>
 		void WaitDraw();
 		/// <summary>
+		/// 【計測用】直前のEndRender()でPresentにかかった時間（ミリ秒）
+		/// </summary>
+		double m_lastPresentMs = 0.0;
+		/// <summary>
+		/// 【計測用】直前のEndRender()でGPUの描画完了待ちにかかった時間（ミリ秒）
+		/// </summary>
+		double m_lastWaitDrawMs = 0.0;
+		/// <summary>
+		/// 【計測用】直前のEndRender()でコマンドリストを実行に渡した時刻
+		/// </summary>
+		int64_t m_lastExecuteQpc = 0;
+		/// <summary>
+		/// 【計測用】直前のEndRender()で描画完了待ちが終わった時刻
+		/// </summary>
+		int64_t m_lastWaitEndQpc = 0;
+		/// <summary>
+		/// 【計測用】垂直同期を使うか
+		/// </summary>
+		bool m_isVsyncEnabled = true;
+		/// <summary>
+		/// CPUとGPUを直列にするか（既定は並行）
+		/// </summary>
+		bool m_isSerializeCpuGpu = false;
+		/// <summary>
 		/// ID3D12Object�̉�����N�G�X�g����������B
 		/// </summary>
 		void ExecuteRequestReleaseD3D12Object();
@@ -393,6 +469,7 @@ namespace nsK2EngineLow {
 
 		// GPU�Ƃ̓����Ŏg�p����ϐ��B
 		UINT m_frameIndex = 0;
+		UINT m_resourceSlot = 0;	// CPUが書き込むGPUリソースの面（GetResourceSlot() 参照）
 		HANDLE m_fenceEvent = nullptr;
 		ID3D12Fence* m_fence = nullptr;
 		UINT64 m_fenceValue = 0;

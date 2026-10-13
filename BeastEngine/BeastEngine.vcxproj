@@ -292,6 +292,20 @@
       <AdditionalDependencies>k2EngineLow.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
+  <!--
+    計測用ビルド: msbuild に /p:BeastProfiler=true を付けると CPU プロファイラーを有効にする（Release の処理負荷を見る用）。
+    通常のビルドと混ざらないよう、中間ファイル・出力先を「構成名+Profiler」に分ける。
+  -->
+  <PropertyGroup Condition="'$(BeastProfiler)'=='true'">
+    <OutDir>..\exlib\$(Platform)\$(Configuration)Profiler\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)Profiler\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(BeastProfiler)'=='true'">
+    <ClCompile>
+      <PreprocessorDefinitions>BEAST_ENABLE_PROFILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

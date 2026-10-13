@@ -116,6 +116,7 @@ namespace app
 			m_cellHeights.assign(m_cellNum, 0.0f);
 			m_flowNext.assign(m_cellNum, -1);
 			m_isFlowFieldBuilt = false;
+			m_isFlowFieldBuilding = false;
 
 			for (int i = 0; i < m_cellNum; ++i)
 			{
@@ -323,31 +324,62 @@ namespace app
 
 		bool StageNavGrid::BuildFlowField(const Vector3& goalPos)
 		{
-			m_isFlowFieldBuilt = false;
-			if (!IsBuilt()) return false;
+			if (!BeginFlowFieldBuild(goalPos)) return false;
 
-			const int goalIndex = FindNearbyPassableCell(CellIndexFromWorld(goalPos));
-			if (goalIndex < 0) return false;
+			// 1フレームで最後まで計算する
+			StepFlowFieldBuild(INT_MAX);
+			return true;
+		}
 
-			// 目標から全セルへのダイクストラ。m_flowNext[セル] = 目標へ一歩近づくセル
-			struct SNode { float cost; int index; };
-			struct SNodeGreater
+
+		bool StageNavGrid::BeginFlowFieldBuild(const Vector3& goalPos)
+		{
+			m_isFlowFieldBuilding = false;
+
+			const int goalIndex = IsBuilt() ? FindNearbyPassableCell(CellIndexFromWorld(goalPos)) : -1;
+			if (goalIndex < 0)
 			{
-				bool operator()(const SNode& a, const SNode& b) const { return a.cost > b.cost; }
-			};
+				m_isFlowFieldBuilt = false;
+				return false;
+			}
 
-			std::vector<float> costs(m_cellNum, FLT_MAX);
-			std::fill(m_flowNext.begin(), m_flowNext.end(), -1);
-			std::priority_queue<SNode, std::vector<SNode>, SNodeGreater> openList;
+			// 目標から全セルへのダイクストラ。m_buildFlowNext[セル] = 目標へ一歩近づくセル
+			// 計算途中の状態はメンバーに持ち、StepFlowFieldBuild() で数フレームに分けて進める
+			m_buildCosts.assign(m_cellNum, FLT_MAX);
+			m_buildFlowNext.assign(m_cellNum, -1);
+			m_buildOpenList.clear();
+			m_buildOpenList.reserve(m_cellNum);
 
-			costs[goalIndex] = 0.0f;
-			m_flowNext[goalIndex] = goalIndex;
-			openList.push({ 0.0f, goalIndex });
+			m_buildCosts[goalIndex] = 0.0f;
+			m_buildFlowNext[goalIndex] = goalIndex;
+			m_buildOpenList.push_back({ 0.0f, goalIndex });
 
+			m_isFlowFieldBuilding = true;
+			return true;
+		}
+
+
+		bool StageNavGrid::StepFlowFieldBuild(const int maxPopCount)
+		{
+			if (!m_isFlowFieldBuilding) return false;
+
+			// コストの小さい順に取り出すヒープ（std::push_heap は最大ヒープなので比較を逆にする）
+			const auto costGreater = [](const SFlowNode& a, const SFlowNode& b) { return a.cost > b.cost; };
+
+			std::vector<float>& costs = m_buildCosts;
+			std::vector<int>& flowNext = m_buildFlowNext;
+			std::vector<SFlowNode>& openList = m_buildOpenList;
+
+			int popCount = 0;
 			while (!openList.empty())
 			{
-				const SNode node = openList.top();
-				openList.pop();
+				// 1フレームで処理する数に達したら、続きは次のフレームで行う
+				if (popCount >= maxPopCount) return false;
+				++popCount;
+
+				std::pop_heap(openList.begin(), openList.end(), costGreater);
+				const SFlowNode node = openList.back();
+				openList.pop_back();
 
 				if (node.cost > costs[node.index]) continue;
 
@@ -381,12 +413,16 @@ namespace app
 					if (newCost >= costs[neighborIndex]) continue;
 
 					costs[neighborIndex] = newCost;
-					m_flowNext[neighborIndex] = node.index;
-					openList.push({ newCost, neighborIndex });
+					flowNext[neighborIndex] = node.index;
+					openList.push_back({ newCost, neighborIndex });
+					std::push_heap(openList.begin(), openList.end(), costGreater);
 				}
 			}
 
+			// 計算が終わったので、新しいフローフィールドに切り替える
+			m_flowNext.swap(m_buildFlowNext);
 			m_isFlowFieldBuilt = true;
+			m_isFlowFieldBuilding = false;
 			return true;
 		}
 

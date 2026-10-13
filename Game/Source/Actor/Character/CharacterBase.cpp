@@ -140,6 +140,25 @@ namespace app
 			{
 				if (!m_assetsLoader.IsReady()) return;
 
+				// 1フレームにモデルの初期化に使う時間には上限を設ける。
+				// フィーバーで子ペンギンが何匹も同じフレームに読み込み終わると、初期化が重なってそのフレームだけ重くなるため。
+				// 上限を超えた分は次のフレームに回す（準備ができるまでは描画されないだけ）。1フレームに1体は必ず進める
+				constexpr double MODEL_INIT_BUDGET_MS_PER_FRAME = 4.0;
+				static unsigned long long s_budgetFrame = ~0ull;
+				static double s_usedBudgetMs = 0.0;
+				const unsigned long long frame = g_gameTime->GetFrameCount();
+				if (frame != s_budgetFrame)
+				{
+					s_budgetFrame = frame;
+					s_usedBudgetMs = 0.0;
+				}
+				else if (s_usedBudgetMs >= MODEL_INIT_BUDGET_MS_PER_FRAME)
+				{
+					return;
+				}
+				LARGE_INTEGER initBegin, initEnd, frequency;
+				QueryPerformanceCounter(&initBegin);
+
 				nsK2EngineLow::ModelInitData initData;
 				m_assetsLoader.Finalize(initData, &m_skeleton, m_animationClips.get());
 				m_modelRender.Init(initData.m_tkmFilePath, m_animationClips.get(), m_clipNum, true, m_upAxis);
@@ -152,6 +171,10 @@ namespace app
 				m_modelReady = true;
 
 				m_characterStateMachine->ReEnterCurrentState();
+
+				QueryPerformanceCounter(&initEnd);
+				QueryPerformanceFrequency(&frequency);
+				s_usedBudgetMs += 1000.0 * static_cast<double>(initEnd.QuadPart - initBegin.QuadPart) / static_cast<double>(frequency.QuadPart);
 				return;
 			}
 		}
