@@ -20,6 +20,20 @@ namespace nsBeastEngine
 
 
 	/**
+	 * @brief 影のデバッグ表示モード
+	 * @details 値は DeferredLighting.fx の SHADOW_DEBUG_VIEW_* と一致させること。
+	 */
+	enum class EnShadowDebugView : int
+	{
+		None = 0,		// 通常の描画
+		Cascade,		// 判定に使ったカスケードの色分け（赤=0 緑=1 青=2 白=範囲外）
+		ShadowRate,		// 光が当たっている割合（白=当たる 黒=影）
+		GeomNdotL,		// 面と光の向きの内積（白=正対 黒=すれすれ 赤=裏向き）
+		Num
+	};
+
+
+	/**
 	 * @brief カスケードシャドウマップ
 	 * @details ディレクションライトから見た深度を書き込み、
 	 *          ディファードライティングや海・渦潮で参照させるためのクラス。
@@ -132,6 +146,45 @@ namespace nsBeastEngine
 		 * @return 影を出す距離
 		 */
 		float GetShadowDistance() const { return m_shadowDistance; }
+
+		/**
+		 * @brief 深度バイアスのうち、面の傾きに依らない分を設定
+		 * @details そのカスケードのテクセル数で指定する。上げると平らな面のアクネが消えるが、影が根元から浮く。
+		 * @param texels テクセル数
+		 */
+		void SetConstBiasTexels(const float texels) { m_constBiasTexels = texels; }
+
+		/**
+		 * @brief 深度バイアスのうち、面の傾きに依らない分を取得
+		 * @return テクセル数
+		 */
+		float GetConstBiasTexels() const { return m_constBiasTexels; }
+
+		/**
+		 * @brief 深度バイアスのうち、面の傾きに比例する分の倍率を設定
+		 * @details 光がすれすれに当たる面の縞模様・まだらが出るなら上げる。
+		 * @param scale 倍率
+		 */
+		void SetSlopeBiasScale(const float scale) { m_slopeBiasScale = scale; }
+
+		/**
+		 * @brief 深度バイアスのうち、面の傾きに比例する分の倍率を取得
+		 * @return 倍率
+		 */
+		float GetSlopeBiasScale() const { return m_slopeBiasScale; }
+
+		/**
+		 * @brief 影のデバッグ表示モードを設定
+		 * @details DeferredLighting.fx が画面の色を差し替える。値の意味は EnShadowDebugView を参照。
+		 * @param mode 表示モード
+		 */
+		void SetDebugView(const EnShadowDebugView mode) { m_debugView = mode; }
+
+		/**
+		 * @brief 影のデバッグ表示モードを取得
+		 * @return 表示モード
+		 */
+		EnShadowDebugView GetDebugView() const { return m_debugView; }
 
 		/**
 		 * @brief 指定したカスケードの1テクセルあたりのワールド空間の大きさを取得
@@ -266,6 +319,12 @@ namespace nsBeastEngine
 		float m_ambientRate = 0.5f;
 		/** 影を出す距離 */
 		float m_shadowDistance = 12000.0f;
+		/** 深度バイアスのうち、面の傾きに依らない分（テクセル数） */
+		float m_constBiasTexels = 1.5f;
+		/** 深度バイアスのうち、面の傾きに比例する分の倍率 */
+		float m_slopeBiasScale = 2.0f;
+		/** 影のデバッグ表示モード */
+		EnShadowDebugView m_debugView = EnShadowDebugView::None;
 	};
 
 } // namespace nsBeastEngine

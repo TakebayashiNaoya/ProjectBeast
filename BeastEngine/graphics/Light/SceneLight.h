@@ -417,7 +417,8 @@ namespace nsBeastEngine
 		Vector3				m_ambientLightColor;			// 環境光の色
 		float				padding1;						// パディング（16バイトアラインメントのため）
 		Vector3				m_rimLightColor;				// リムライトの色
-		float				padding2;						// パディング（16バイトアラインメントのため）
+		// 元はパディングだった位置を使う（挿入するとシェーダー側のオフセットがずれるため）
+		int					m_shadowDebugView;				// 影のデバッグ表示モード（EnShadowDebugView）。DeferredLighting.fx のみ参照
 		Matrix				m_mViewProjInv;					// カメラのビュープロジェクション行列の逆行列
 
 		// ここから下は影の見え方を調整するパラメータ。
@@ -426,8 +427,9 @@ namespace nsBeastEngine
 		// （DeferredLighting.fx / Ocean.fx / toon.fx）のオフセットが全てずれる。
 		float				m_shadowDirectLightRate;		// 影の中で直接光を何割残すか（0=完全に遮る）
 		float				m_shadowAmbientRate;			// 影の中で環境光を何割残すか（1=そのまま）
-		float				padding3;						// パディング（16バイトアラインメントのため）
-		float				padding4;						// パディング（16バイトアラインメントのため）
+		// 深度バイアス（Shadow.h CalcShadowRateWithSlope の biasParam）。元はパディングだった位置を使う
+		float				m_shadowConstBiasTexels;		// 面の傾きに依らない分（そのカスケードのテクセル数）
+		float				m_shadowSlopeBiasScale;			// 面の傾き（光との角度のtan）に比例する分の倍率
 		// カスケードシャドウマップのライトビュープロジェクション行列。
 		// 要素数は ShadowMap.h の NUM_SHADOW_CASCADES と一致させること
 		// （下のstatic_assertで食い違いを検出する）。
@@ -448,12 +450,12 @@ namespace nsBeastEngine
 			, m_ambientLightColor(Vector3::Zero)
 			, padding1(0.0f)
 			, m_rimLightColor(Vector3::Zero)
-			, padding2(0.0f)
+			, m_shadowDebugView(0)
 			, m_mViewProjInv(Matrix::Identity)
 			, m_shadowDirectLightRate(0.0f)
 			, m_shadowAmbientRate(1.0f)
-			, padding3(0.0f)
-			, padding4(0.0f)
+			, m_shadowConstBiasTexels(1.5f)
+			, m_shadowSlopeBiasScale(2.0f)
 			, m_terrainShadowUVScaleOffset(0.0f, 0.0f, 0.0f, 0.0f)
 			, m_terrainShadowParam(1.0f, 0.0f, 0.0f, 0.0f)
 		{
@@ -519,6 +521,12 @@ namespace nsBeastEngine
 	static_assert(
 		sizeof(Light::m_shadowLVP) / sizeof(Light::m_shadowLVP[0]) == NUM_SHADOW_CASCADES,
 		"m_shadowLVPの要素数がNUM_SHADOW_CASCADESと食い違っています");
+
+	// 影の調整値はシェーダー（DeferredLighting.fx の LightCB）とオフセットで対応している。
+	// 元のパディングの位置から動いていないことを確かめる
+	static_assert(offsetof(Light, m_shadowDebugView) == 140, "LightCB の shadowDebugView とオフセットが食い違っています");
+	static_assert(offsetof(Light, m_shadowConstBiasTexels) == 216, "LightCB の shadowConstBiasTexels とオフセットが食い違っています");
+	static_assert(offsetof(Light, m_shadowSlopeBiasScale) == 220, "LightCB の shadowSlopeBiasScale とオフセットが食い違っています");
 
 
 

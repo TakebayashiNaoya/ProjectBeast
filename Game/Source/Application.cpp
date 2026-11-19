@@ -83,6 +83,39 @@ namespace app
 				shadowMap.SetDirectLightRate(directRate);
 			}
 			ImGui::TextDisabled(u8"0で直接光を完全に遮る。上げると影が薄くなる");
+
+			ImGui::Separator();
+
+			// 深度バイアス（影の誤判定を防ぐための余裕）。カスケードのテクセル長に比例する
+			float constBias = shadowMap.GetConstBiasTexels();
+			if (ImGui::SliderFloat(u8"バイアス（一律）", &constBias, 0.0f, 4.0f, "%.2f texel"))
+			{
+				shadowMap.SetConstBiasTexels(constBias);
+			}
+			ImGui::TextDisabled(u8"平らな面の縞模様が出るなら上げる。上げすぎると影が根元から浮く");
+
+			float slopeBias = shadowMap.GetSlopeBiasScale();
+			if (ImGui::SliderFloat(u8"バイアス（傾き）", &slopeBias, 0.0f, 4.0f, "%.2f"))
+			{
+				shadowMap.SetSlopeBiasScale(slopeBias);
+			}
+			ImGui::TextDisabled(u8"光がすれすれに当たる面のまだら・ちらつきが出るなら上げる");
+
+			// デバッグ表示（画面全体の色を差し替える）
+			const char* debugViewNames[] =
+			{
+				u8"通常",
+				u8"カスケード（赤=0 緑=1 青=2 白=範囲外）",
+				u8"光の割合（白=当たる 黒=影）",
+				u8"面と光の向き（白=正対 黒=すれすれ 赤=裏）",
+			};
+			static_assert(ARRAYSIZE(debugViewNames) == static_cast<int>(nsBeastEngine::EnShadowDebugView::Num),
+				"debugViewNames と EnShadowDebugView の数が食い違っています");
+			int debugView = static_cast<int>(shadowMap.GetDebugView());
+			if (ImGui::Combo(u8"デバッグ表示", &debugView, debugViewNames, ARRAYSIZE(debugViewNames)))
+			{
+				shadowMap.SetDebugView(static_cast<nsBeastEngine::EnShadowDebugView>(debugView));
+			}
 		}
 
 

@@ -465,6 +465,8 @@ namespace nsBeastEngine
 			// 古いシャドウマップの中身に関係なく確実に「影なし」にできる。
 			m_sceneLight.GetLight()->m_shadowDirectLightRate = 1.0f;
 			m_sceneLight.GetLight()->m_shadowAmbientRate = 1.0f;
+			// 有効時に選んだデバッグ表示が残ると、影なしの画面に古い判定が出てしまう
+			m_sceneLight.GetLight()->m_shadowDebugView = 0;
 			return;
 		}
 
@@ -479,6 +481,9 @@ namespace nsBeastEngine
 		// デバッグUIから実行中に変更されるため毎フレーム転送する
 		m_sceneLight.GetLight()->m_shadowDirectLightRate = m_shadowMap.GetDirectLightRate();
 		m_sceneLight.GetLight()->m_shadowAmbientRate = m_shadowMap.GetAmbientRate();
+		m_sceneLight.GetLight()->m_shadowConstBiasTexels = m_shadowMap.GetConstBiasTexels();
+		m_sceneLight.GetLight()->m_shadowSlopeBiasScale = m_shadowMap.GetSlopeBiasScale();
+		m_sceneLight.GetLight()->m_shadowDebugView = static_cast<int>(m_shadowMap.GetDebugView());
 	}
 
 

@@ -102,12 +102,12 @@ cbuffer LightCB : register(b1)
     float3   ambientLightColor;  // offset: 112
     float    pad3;               // offset: 124
     float3   rimLightColor;      // offset: 128
-    float    pad4;               // offset: 140
+    int      shadowDebugView;    // offset: 140  影のデバッグ表示モード（SHADOW_DEBUG_VIEW_*）
     float4x4 mViewProjInv;       // offset: 144
     float    shadowDirectRate;   // offset: 208  影の中で直接光を何割残すか
     float    shadowAmbientRate;  // offset: 212  影の中で環境光を何割残すか
-    float    pad5;               // offset: 216
-    float    pad6;               // offset: 220
+    float    shadowConstBiasTexels; // offset: 216  深度バイアスの一律分（テクセル数）
+    float    shadowSlopeBiasScale;  // offset: 220  深度バイアスの傾き分の倍率
     // カスケードシャドウマップのライトビュープロジェクション行列
     float4x4 shadowLVP0;         // offset: 224
     float4x4 shadowLVP1;         // offset: 288
@@ -147,8 +147,14 @@ sampler g_sampler : register(s0);
 // シャドウ
 ///////////////////////////////////////
 
-// 影の判定は Shadow.h の CalcShadowRate() を使う（海・渦潮と共通）
+// 影の判定は Shadow.h を使う（海・渦潮と共通）
 #include "Shadow.h"
+
+// 影のデバッグ表示モード。C++側 EnShadowDebugView（ShadowMap.h）と一致させること
+#define SHADOW_DEBUG_VIEW_NONE        0  // 通常の描画
+#define SHADOW_DEBUG_VIEW_CASCADE     1  // 判定に使ったカスケード（赤=0 緑=1 青=2 白=範囲外）
+#define SHADOW_DEBUG_VIEW_SHADOW_RATE 2  // 光が当たっている割合（白=当たる 黒=影）
+#define SHADOW_DEBUG_VIEW_GEOM_NDOTL  3  // 面と光の向きの内積（白=正対 黒=すれすれ 赤=裏向き）
 
 
 ///////////////////////////////////////
@@ -295,6 +301,7 @@ float3 CalcRimLight(float3 normal, float3 toEye)
  * @param smooth         滑らかさ
  * @param dirLightScale  ディレクションライト強度倍率
  * @param ambientScale   環境光強度倍率
+ * @param shadowRate     光が当たっている割合（0=完全な影 1=影なし）
  */
 float3 CalcDirectionLight(
     float3 normal,
@@ -303,7 +310,8 @@ float3 CalcDirectionLight(
     float  metallic,
     float  smooth,
     float  dirLightScale,
-    float  ambientScale)
+    float  ambientScale,
+    float  shadowRate)
 {
     float3 toLight = -dirLightDirection;
     float3 toEye   = normalize(cameraPosition - worldPos);
@@ -331,16 +339,6 @@ float3 CalcDirectionLight(
     // 滑らかさを使って拡散反射光と鏡面反射光を合成する
     // 滑らかさが高ければ拡散反射は弱くなる
     float3 lig = diffuse * (1.0f - smooth) + spec;
-
-    // 影の割合を求める（0=完全な影 1=影なし）
-    float shadowRate = CalcShadowRate(
-        worldPos,
-        shadowLVP0, shadowLVP1, shadowLVP2,
-        g_shadowMap0, g_shadowMap1, g_shadowMap2,
-        g_sampler);
-    // 地形の影はカスケードに描いておらず、ベイクした影の高さマップから求める
-    shadowRate = min(shadowRate, CalcTerrainBakedShadowRate(
-        worldPos, g_terrainShadowMap, g_sampler, terrainShadowUVScaleOffset, terrainShadowParam));
 
     // 直接光に影を適用する
     lig *= lerp(shadowDirectRate, 1.0f, shadowRate);
@@ -380,8 +378,11 @@ float4 PSMain(PSInput In) : SV_Target0
     float4 albedo = g_albedoTexture.Sample(g_sampler, In.uv);
 
     // G-Bufferから法線をサンプリング
-    float3 normalRaw = g_normalTexture.Sample(g_sampler, In.uv).xyz;
+    float4 normalSample = g_normalTexture.Sample(g_sampler, In.uv);
+    float3 normalRaw = normalSample.xyz;
     float3 normal    = (normalRaw * 2.0f) - 1.0f;
+    // w成分はポリゴンの面と光の向きの内積（0〜1に詰めてある。RenderToGBuffer.fx / Terrain.fx が書く）
+    float  geomNdotL = normalSample.w * 2.0f - 1.0f;
 
     // GBufferに何も書き込まれていないピクセル（法線が未書き込み）はライティングをスキップする
     // 未書き込み時は normalRaw = (0,0,0) となるため、生の法線値の長さで判定する
@@ -400,11 +401,43 @@ float4 PSMain(PSInput In) : SV_Target0
     // ワールド座標を復元
     float3 worldPos = CalcWorldPosFromUVZ(In.uv, albedo.w, mViewProjInv);
 
+    // 影の割合を求める（0=完全な影 1=影なし）
+    int shadowCascade = -1;
+    float shadowRate = CalcShadowRateWithSlope(
+        worldPos,
+        shadowLVP0, shadowLVP1, shadowLVP2,
+        g_shadowMap0, g_shadowMap1, g_shadowMap2,
+        g_sampler,
+        geomNdotL,
+        float2(shadowConstBiasTexels, shadowSlopeBiasScale),
+        shadowCascade);
+    // 地形の影はカスケードに描いておらず、ベイクした影の高さマップから求める
+    shadowRate = min(shadowRate, CalcTerrainBakedShadowRate(
+        worldPos, g_terrainShadowMap, g_sampler, terrainShadowUVScaleOffset, terrainShadowParam));
 
-
+    // 影のデバッグ表示（ImGuiのシャドウ設定から切り替える）
+    if (shadowDebugView == SHADOW_DEBUG_VIEW_CASCADE)
+    {
+        float3 cascadeColor = float3(1.0f, 1.0f, 1.0f);
+        if (shadowCascade == 0)      { cascadeColor = float3(1.0f, 0.0f, 0.0f); }
+        else if (shadowCascade == 1) { cascadeColor = float3(0.0f, 1.0f, 0.0f); }
+        else if (shadowCascade == 2) { cascadeColor = float3(0.0f, 0.0f, 1.0f); }
+        // 影の濃淡も見えるよう、光の割合で少し暗くする
+        return float4(cascadeColor * lerp(0.3f, 1.0f, shadowRate), 1.0f);
+    }
+    if (shadowDebugView == SHADOW_DEBUG_VIEW_SHADOW_RATE)
+    {
+        return float4(shadowRate.xxx, 1.0f);
+    }
+    if (shadowDebugView == SHADOW_DEBUG_VIEW_GEOM_NDOTL)
+    {
+        return (geomNdotL < 0.0f)
+            ? float4(1.0f, 0.0f, 0.0f, 1.0f)
+            : float4(geomNdotL.xxx, 1.0f);
+    }
 
     // PBRベースのディレクションライトを計算する（補正値込み）
-    float3 lig = CalcDirectionLight(normal, worldPos, albedo.rgb, metallic, smooth, dirLightScale, ambientScale);
+    float3 lig = CalcDirectionLight(normal, worldPos, albedo.rgb, metallic, smooth, dirLightScale, ambientScale, shadowRate);
 
     // 最終カラー
     float4 finalColor = albedo;
