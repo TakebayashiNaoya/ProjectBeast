@@ -170,14 +170,68 @@ static const int g_bayerPattern[4][4] =
 // -----------------------------------------------------------------------
 
 /**
- * ノーマルマップをタンジェント空間からワールド空間に変換する（RenderToGBuffer.fx と同じ処理）
+ * ノーマルマップの凹凸の強さ（細かい縮尺）
+ * 1.0 でテクスチャのまま。上げると傾きが強調され、陰影がはっきりする。
  */
-float3 SampleNormal(Texture2D normalTex, float2 uv, float3x3 tbn)
+static const float TERRAIN_NORMAL_STRENGTH = 1.0f;
+
+/**
+ * 粗い縮尺のノーマルマップの UV 倍率
+ * 色テクスチャと同じ縮尺（uvTile）では、テクスチャ1枚が約150ユニットに貼られ、
+ * 凹凸がカメラから数百ユニット先でミップマップに平均されて消える（1画素に十数テクセル入る）。
+ * 同じノーマルマップを大きく引き伸ばしてもう一度重ね、遠くでも見える大きさの凹凸を足す。
+ * 小さくするほど凹凸が大きくなる。色テクスチャの縮尺は変えない。
+ */
+static const float TERRAIN_MACRO_NORMAL_UV_SCALE = 0.25f;
+
+/**
+ * 粗い縮尺のノーマルマップの凹凸の強さ
+ */
+static const float TERRAIN_MACRO_NORMAL_STRENGTH = 1.0f;
+
+/**
+ * リニアの値を sRGB の値へ戻す（sRGB 形式のテクスチャをサンプルしたときに掛かった変換の逆）
+ * ハードウェアが使う式と同じものにしないと、平らな面の法線 (0.5, 0.5, 1.0) が元に戻らず傾く。
+ */
+float3 LinearToSRGB(float3 linearColor)
+{
+    float3 low  = linearColor * 12.92f;
+    float3 high = 1.055f * pow(max(linearColor, 0.0f), 1.0f / 2.4f) - 0.055f;
+    return lerp(high, low, step(linearColor, 0.0031308f));
+}
+
+/**
+ * ノーマルマップを1回サンプルし、タンジェント空間の法線（-1〜1）にする
+ * @param isSRGBTexture テクスチャが sRGB 形式（DXGI_FORMAT_*_SRGB）なら true
+ *        snow_Normal / grass_Normal は sRGB 形式で保存されており、サンプルすると
+ *        ハードウェアがリニアへ変換してしまうので元へ戻す。rock_Normal は通常の RGBA8 なので戻さない。
+ *        全テクスチャで一律に戻すと岩の法線が壊れる。形式は DDS のヘッダーで確認すること。
+ * @param strength 凹凸の強さ（xy に掛ける）
+ */
+float3 SampleTangentNormal(Texture2D normalTex, float2 uv, uniform bool isSRGBTexture, float strength)
 {
     float3 normalMap = normalTex.Sample(g_sampler, uv).xyz;
-    //normalMap = pow(normalMap, 1.0f / 2.2f);   // sRGB → linear（RenderToGBuffer.fx と同じ）
+    if (isSRGBTexture)
+    {
+        normalMap = LinearToSRGB(normalMap);
+    }
     normalMap = (normalMap - 0.5f) * 2.0f;
-    return normalize(mul(normalMap, tbn));
+    normalMap.xy *= strength;
+    return normalMap;
+}
+
+/**
+ * ノーマルマップを細かい縮尺と粗い縮尺で重ね、ワールド空間の法線にする
+ * 重ね方は Whiteout ブレンド（傾きを足し合わせ、z を掛け合わせる）。
+ * 単純な平均だと両方の凹凸が半分ずつに薄まってしまう。
+ */
+float3 SampleNormal(Texture2D normalTex, float2 uv, float3x3 tbn, uniform bool isSRGBTexture)
+{
+    float3 detail = SampleTangentNormal(normalTex, uv, isSRGBTexture, TERRAIN_NORMAL_STRENGTH);
+    float3 macro  = SampleTangentNormal(normalTex, uv * TERRAIN_MACRO_NORMAL_UV_SCALE, isSRGBTexture, TERRAIN_MACRO_NORMAL_STRENGTH);
+    float3 blended = float3(detail.xy + macro.xy, detail.z * macro.z);
+
+    return normalize(mul(blended, tbn));
 }
 
 /**
@@ -294,9 +348,9 @@ SPSOut PSMain(SPSIn psIn)
     albedo.a = 1.0f;
 
     // ------ Normal ブレンド ------
-    float3 snowNorm  = SampleNormal(g_snowNormal,  psIn.uv, tbn);
-    float3 grassNorm = SampleNormal(g_grassNormal, psIn.uv, tbn);
-    float3 rockNorm  = SampleNormal(g_rockNormal,  psIn.uv, tbn);
+    float3 snowNorm  = SampleNormal(g_snowNormal,  psIn.uv, tbn, true);
+    float3 grassNorm = SampleNormal(g_grassNormal, psIn.uv, tbn, true);
+    float3 rockNorm  = SampleNormal(g_rockNormal,  psIn.uv, tbn, false);
 
     float3 finalNormal = normalize(
         snowNorm  * weights.r +
