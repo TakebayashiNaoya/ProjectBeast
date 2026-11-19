@@ -23,6 +23,24 @@ namespace app
 		/** シャドウのデバッグ表示のセクション名 */
 		constexpr const char* SHADOW_DEBUG_LABEL = u8"シャドウ";
 
+		/** 撮影用のデバッグ表示のセクション名 */
+		constexpr const char* CAPTURE_DEBUG_LABEL = u8"撮影";
+
+
+		/**
+		 * @brief 撮影用のデバッグUIを描画する
+		 * @details UIを隠したスクリーンショットを撮るときに使う。
+		 */
+		void DrawCaptureDebug()
+		{
+			// UI（2D描画）を丸ごと隠す。ImGui自体は別経路で描かれるので消えない
+			bool isDrawUI = g_renderingEngine->Is2DRenderEnabled();
+			if (ImGui::Checkbox(u8"UIを表示する", &isDrawUI))
+			{
+				g_renderingEngine->Set2DRenderEnabled(isDrawUI);
+			}
+		}
+
 
 		/**
 		 * @brief シャドウのデバッグUIを描画する
@@ -226,6 +244,7 @@ namespace app
 #if defined(_DEBUG) || defined(K2_DEBUG)
 		DebugWindow::Get().Register(TONE_MAP_DEBUG_LABEL, DrawToneMapDebug);
 		DebugWindow::Get().Register(SHADOW_DEBUG_LABEL, DrawShadowDebug);
+		DebugWindow::Get().Register(CAPTURE_DEBUG_LABEL, DrawCaptureDebug);
 #endif
 	}
 
@@ -233,6 +252,7 @@ namespace app
 	Application::~Application()
 	{
 #if defined(_DEBUG) || defined(K2_DEBUG)
+		DebugWindow::Get().Unregister(CAPTURE_DEBUG_LABEL);
 		DebugWindow::Get().Unregister(SHADOW_DEBUG_LABEL);
 		DebugWindow::Get().Unregister(TONE_MAP_DEBUG_LABEL);
 #endif
