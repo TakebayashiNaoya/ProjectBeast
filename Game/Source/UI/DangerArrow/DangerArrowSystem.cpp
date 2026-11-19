@@ -10,6 +10,8 @@
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Orca/OrcaController.h"
+#include "Source/Actor/Character/Orca/OrcaManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Graphics/Camera/SubCameraManager.h"
 
@@ -21,6 +23,10 @@ namespace app
 		void DangerArrowSystem::Initialize()
 		{
 			for (auto& packet : m_packets)
+			{
+				packet.Initialize("Assets/parameter/UI/dangerArrow/DangerArrow.json");
+			}
+			for (auto& packet : m_orcaPackets)
 			{
 				packet.Initialize("Assets/parameter/UI/dangerArrow/DangerArrow.json");
 			}
@@ -71,6 +77,29 @@ namespace app
 
 				m_packets[i].Update();
 			}
+
+			// シャチの矢印（クマとは別枠。強調はしない）
+			CalcOrcaArrowInfos();
+			for (int i = 0; i < MAX_ORCA_ARROWS; i++)
+			{
+				auto* menu = m_orcaPackets[i].GetMenu();
+				if (!menu) continue;
+
+				if (i < static_cast<int>(m_orcaArrowInfos.size()))
+				{
+					const auto& info = m_orcaArrowInfos[i];
+					menu->SetArrowScreenPos(info.screenPos);
+					menu->SetArrowAngleRad(info.angleRad);
+					menu->SetVisible(info.visible);
+				}
+				else
+				{
+					menu->SetVisible(false);
+				}
+				menu->SetPulsing(false);
+
+				m_orcaPackets[i].Update();
+			}
 		}
 
 
@@ -79,6 +108,56 @@ namespace app
 			for (auto& packet : m_packets)
 			{
 				packet.Render(rc);
+			}
+			for (auto& packet : m_orcaPackets)
+			{
+				packet.Render(rc);
+			}
+		}
+
+
+		void DangerArrowSystem::CalcOrcaArrowInfos()
+		{
+			m_orcaArrowInfos.clear();
+
+			auto* orcaManager = actor::OrcaManager::GetInstance();
+			if (orcaManager == nullptr) return;
+
+			auto& mainCamera = CameraSystem::Get().GetMainCamera();
+			const Vector3 camPos = mainCamera.GetPosition();
+			const Vector3 camFwd = mainCamera.GetForward();
+			const Frustum& frustum = g_renderingEngine->GetFrustum();
+
+			for (const auto* controller : orcaManager->GetControllers())
+			{
+				if (static_cast<int>(m_orcaArrowInfos.size()) >= MAX_ORCA_ARROWS) break;
+				if (controller == nullptr) continue;
+
+				// 追跡中で、追っている子がいるときだけ矢印を出す（クマの CalcArrowInfos と同じ考え方）
+				const auto* target = controller->GetFoundPenguin();
+				if (target == nullptr || controller->GetState() != actor::OrcaController::EnState::Chase) continue;
+
+				const Vector3 targetPos = target->GetTransform().m_position;
+
+				// 以下、矢印の位置の出し方はクマの CalcArrowInfos と同じ
+				ArrowInfo info;
+				mainCamera.CalcScreenPositionFromWorldPosition(info.screenPos, targetPos);
+				const Vector3 toTarget = targetPos - camPos;
+				if (toTarget.Dot(camFwd) < 0.0f)
+				{
+					info.screenPos.x = -info.screenPos.x;
+					info.screenPos.y = -info.screenPos.y;
+				}
+				const float distSq = toTarget.LengthSq();
+				if (frustum.IsPointInside(targetPos))
+				{
+					info = CalcOverheadArrow(info.screenPos, distSq);
+				}
+				else
+				{
+					info = CalcEdgeArrow(info.screenPos, distSq);
+				}
+				m_orcaArrowInfos.push_back(info);
 			}
 		}
 

@@ -78,7 +78,7 @@ namespace app
 			auto* cpMng = ChildPenguinManager::GetInstance();
 
 			// ゴーストペンギンを登録して表示する。
-			cpMng->RegisterGhostPenguin(m_ownerChildPenguin, m_attackerEnemy);
+			cpMng->RegisterGhostPenguin(m_ownerChildPenguin, m_attackerEnemy, m_onGhostHidden);
 
 			// ChildPenguinManagerからの削除とdeleteを行う。
 			cpMng->RemoveAndDestroy(m_ownerChildPenguin);

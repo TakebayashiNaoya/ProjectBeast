@@ -69,6 +69,12 @@ namespace app
 		private:
 			/** 矢印の最大本数（EnemyManagerのエネミー数上限に合わせる） */
 			static constexpr int MAX_ARROWS = 3;
+			/**
+			 * シャチ用の矢印の本数
+			 * @details クマの3本とは別枠にする。クマ3頭が同時に追っていてもシャチの矢印が消えず、
+			 *          小窓（サブビュー）と強調の判定はクマの矢印だけで行うので、クマの見え方は変わらない
+			 */
+			static constexpr int MAX_ORCA_ARROWS = 1;
 			/** これ以下の距離（ワールド単位）かつフラスタム内ならサブビューを非表示 */
 			static constexpr float SUB_VIEW_HIDE_DIST = 1000.0f;
 			/** サブビューの表示スケール（1.0 = 480x270px 原寸） */
@@ -105,6 +111,12 @@ namespace app
 			 */
 			ArrowInfo CalcOverheadArrow(const Vector2& screenPos, float distSq) const;
 
+			/**
+			 * @brief シャチに追われている子の矢印情報を計算して m_orcaArrowInfos に格納する
+			 * @details 追っている子は OrcaController が毎フレーム有効か確かめているので、キャッシュは持たない
+			 */
+			void CalcOrcaArrowInfos();
+
 
 		private:
 			/** エネミースロット（ターゲットキャッシュ） */
@@ -115,6 +127,11 @@ namespace app
 
 			/** 矢印メニューのパケット */
 			std::array<SystemPacket<DangerArrowMenu>, MAX_ARROWS> m_packets;
+
+			/** シャチ用の矢印情報（最大 MAX_ORCA_ARROWS 本） */
+			std::vector<ArrowInfo> m_orcaArrowInfos;
+			/** シャチ用の矢印メニューのパケット */
+			std::array<SystemPacket<DangerArrowMenu>, MAX_ORCA_ARROWS> m_orcaPackets;
 		};
 	}
 }

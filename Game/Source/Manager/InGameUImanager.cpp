@@ -11,6 +11,9 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Orca/Orca.h"
+#include "Source/Actor/Character/Orca/OrcaManager.h"
+#include "Source/Actor/Character/Orca/OrcaStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
@@ -311,6 +314,27 @@ namespace app
 						type
 					);
 				}
+
+				// シャチは追跡中の舌だけを出す（帰巣・睡眠が無いのでデバフ・ベッドは無い）。
+				// 枠はクマの後ろ。体は水面下にあるので、真上の水面の点を基準にする
+				if (auto* orcaManager = actor::OrcaManager::GetInstance())
+				{
+					const auto orcas = orcaManager->GetOrcas();
+					for (size_t j = 0; j < orcas.size(); ++j)
+					{
+						const auto* orca = orcas.at(j);
+						if (orca == nullptr) continue;
+						const auto type = orca->GetOrcaStateMachine()->IsChasing()
+							? ui::EnBearReactionType::Tongue
+							: ui::EnBearReactionType::None;
+						m_bearReactionSystem->SetReaction(
+							static_cast<uint8_t>(enemies.size() + j),
+							orca->GetSurfacePosition(),
+							daddyPenguin->GetTransform(),
+							type
+						);
+					}
+				}
 			}
 		);
 
@@ -333,6 +357,16 @@ namespace app
 			[this](actor::Enemy* enemy, ui::EnCPReactionType type)
 			{
 				if (m_cpReactionSystem) m_cpReactionSystem->SetEnemyTarget(enemy, type);
+			}
+		);
+
+		//--------------------------------------------//
+		// シャチリアクションUI通知（？＝索敵開始、！＝発見）
+		//--------------------------------------------//
+		bm.SetOnOrcaReactionChanged(
+			[this](actor::Orca* orca, ui::EnCPReactionType type)
+			{
+				if (m_cpReactionSystem) m_cpReactionSystem->SetOrcaTarget(orca, type);
 			}
 		);
 

@@ -33,6 +33,7 @@ namespace app
 			Bear,
 			Whirlpool,
 			Igloo,
+			Orca,
 			Num
 		};
 

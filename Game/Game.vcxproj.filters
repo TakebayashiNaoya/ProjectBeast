@@ -64,6 +64,9 @@
     <Filter Include="Source\Actor\Character\Enemy">
       <UniqueIdentifier>{43478fe8-bc95-4006-80d2-755fcfe20067}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Actor\Character\Orca">
+      <UniqueIdentifier>{0ac23871-412b-45e6-bcfd-710d42fd9069}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source\Actor\Character\penguin">
       <UniqueIdentifier>{96a86590-7162-4a66-aa1f-738d6c97706b}</UniqueIdentifier>
     </Filter>
@@ -258,6 +261,27 @@
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyStatus.cpp">
       <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Orca\Orca.cpp">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Orca\OrcaController.cpp">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Orca\OrcaIState.cpp">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Orca\OrcaManager.cpp">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Orca\OrcaSeaGrid.cpp">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Orca\OrcaStateMachine.cpp">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Actor\Character\Orca\OrcaStatus.cpp">
+      <Filter>Source\Actor\Character\Orca</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Enemy\EnemyParameter.cpp">
       <Filter>Source\Actor\Character\Enemy</Filter>
@@ -812,6 +836,33 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyStatus.h">
       <Filter>Source\Actor\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\Orca.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaController.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaIState.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaManager.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaSeaGrid.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaStateMachine.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaStatus.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaParameter.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Orca\OrcaTypes.h">
+      <Filter>Source\Actor\Character\Orca</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Enemy\EnemyParameter.h">
       <Filter>Source\Actor\Character\Enemy</Filter>

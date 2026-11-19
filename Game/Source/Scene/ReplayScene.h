@@ -30,6 +30,7 @@ namespace app
 	{
 		class DaddyPenguin;
 		class Enemy;
+		class Orca;
 		class ChildPenguin;
 	}
 
@@ -140,6 +141,9 @@ namespace app
 		 */
 		size_t AcquireBearSlot(int id);
 
+		/** @brief シャチ版の AcquireBearSlot */
+		size_t AcquireOrcaSlot(int id);
+
 		/**
 		 * @brief 記録された "id" に対応する子ペンギンの表示スロットを探す。無ければ新規に確保する
 		 * @param id      対応付けたい記録上のid
@@ -216,6 +220,13 @@ namespace app
 		std::vector<std::string> m_bearLastState;
 		/** 記録上のid → m_bearSlotIds上のインデックスの逆引き（AcquireBearSlotをO(1)にするため） */
 		std::unordered_map<int, size_t> m_bearSlotIndexById;
+
+		/** シャチのゴーストActorプール（シロクマと同じ持ち方。旧ログには "orcas" が無いので0体のまま） */
+		std::vector<std::unique_ptr<actor::Orca>> m_orcaActors;
+		std::vector<int> m_orcaSlotIds;
+		std::vector<bool> m_orcaSlotActive;
+		std::vector<std::string> m_orcaLastState;
+		std::unordered_map<int, size_t> m_orcaSlotIndexById;
 
 		/** 子ペンギンのゴーストActorプール（idごとに1体、使い捨てで増える） */
 		std::vector<std::unique_ptr<actor::ChildPenguin>> m_penguinActors;
