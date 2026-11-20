@@ -197,6 +197,16 @@ namespace app
 		}
 
 
+		bool OrcaManager::IsAllModelReady() const
+		{
+			for (const auto& data : m_orcaList)
+			{
+				if (data.orca && !data.orca->IsModelReady()) return false;
+			}
+			return true;
+		}
+
+
 		void OrcaManager::Render(RenderContext& rc)
 		{
 			for (auto& data : m_orcaList)

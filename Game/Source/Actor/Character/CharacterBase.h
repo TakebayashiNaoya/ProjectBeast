@@ -73,6 +73,11 @@ namespace app
 			 * @detail カウントダウン中など、描画は必要だが動かしたくない場合に使用
 			 */
 			virtual void UpdateModelOnly();
+			/**
+			 * @brief モデルの初期化が終わり、描画できる状態か
+			 * @details ロード画面を明ける前に全キャラ分そろったかを確かめるのに使う
+			 */
+			bool IsModelReady() const { return m_modelReady; }
 
 
 		public:

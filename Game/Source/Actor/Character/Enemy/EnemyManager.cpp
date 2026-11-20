@@ -112,6 +112,16 @@ namespace app
 		}
 
 
+		bool EnemyManager::IsAllModelReady() const
+		{
+			for (const auto& data : m_enemyList)
+			{
+				if (data.enemy && !data.enemy->IsModelReady()) return false;
+			}
+			return true;
+		}
+
+
 		void EnemyManager::Render(RenderContext& rc)
 		{
 			for (auto& data : m_enemyList)

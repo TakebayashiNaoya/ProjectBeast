@@ -29,6 +29,8 @@ namespace app
 		public:
 			void Update();
 			void UpdateModelOnly();
+			/** @brief 全員のモデルが描画できる状態になったか */
+			bool IsAllModelReady() const;
 			void Render(RenderContext& rc);
 
 			/**

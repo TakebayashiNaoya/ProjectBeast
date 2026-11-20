@@ -39,6 +39,8 @@ namespace app
 			 * @brief モデルの行列更新のみ行う（AI・ステートマシンは動かさない）
 			 */
 			void UpdateModelOnly();
+			/** @brief 全員のモデルが描画できる状態になったか */
+			bool IsAllModelReady() const;
 
 
 
