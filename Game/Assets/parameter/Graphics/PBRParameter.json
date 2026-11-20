@@ -12,10 +12,10 @@
   },
   {
     "name": "wall",
-    "dirLightScale": 0.0,
+    "dirLightScale": 1.0,
     "ambientScale": 2.0,
-    "metallicOffset": 0.0,
-    "smoothOffset": 0.0
+    "metallicOffset": 1.0,
+    "smoothOffset": 1.0
   },
   {
     "name": "igloo",
@@ -28,7 +28,7 @@
     "name": "ground",
     "dirLightScale": 1.0,
     "ambientScale": 1.0,
-    "metallicOffset": -1.0,
-    "smoothOffset": -1.0
+    "metallicOffset": 0.0,
+    "smoothOffset": 0.0
   }
 ]
