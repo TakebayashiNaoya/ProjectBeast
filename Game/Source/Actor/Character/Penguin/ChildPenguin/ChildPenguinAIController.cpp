@@ -16,6 +16,7 @@
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Orca/OrcaManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
@@ -1129,6 +1130,16 @@ namespace app
 					isChasedMyself = enemyManager->FindNearestChaserOf(m_owner, chaserPos)
 						&& (chaserPos - myPos).LengthSq()
 							<= FLEE_DETECTION_DISTANCE * FLEE_DETECTION_DISTANCE;
+				}
+				// シャチに追われている場合も「自分が狙われている」とみなす
+				if (!isChasedMyself)
+				{
+					if (auto* orcaManager = OrcaManager::GetInstance())
+					{
+						isChasedMyself = orcaManager->FindNearestChaserOf(m_owner, chaserPos)
+							&& (chaserPos - myPos).LengthSq()
+								<= FLEE_DETECTION_DISTANCE * FLEE_DETECTION_DISTANCE;
+					}
 				}
 
 				Vector3 toThreat = threatPos - myPos;

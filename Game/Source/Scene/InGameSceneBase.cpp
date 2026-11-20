@@ -14,6 +14,7 @@
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Orca/OrcaManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
@@ -227,6 +228,7 @@ namespace app
 		/** アクター */
 		delete m_daddyPenguin;
 		actor::EnemyManager::DestroyInstance();
+		actor::OrcaManager::DestroyInstance();
 		actor::ChildPenguinManager::DestroyInstance();
 
 		/** デカールの後始末。StageSystem（地形）の破棄より前に行うこと。
@@ -323,6 +325,7 @@ namespace app
 		actor::StageSystem::CreateInstance();
 		actor::ChildPenguinManager::CreateInstance();
 		actor::EnemyManager::CreateInstance();
+		actor::OrcaManager::CreateInstance();
 		actor::IglooManager::CreateInstance();
 
 		/** UIManager生成（Layoutの生成はDaddyPenguin生成後のInitializeで行う） */
@@ -516,11 +519,25 @@ namespace app
 				InGameUIManager::GetInstance()->AddSearchLayout(enemy);
 			}
 
+			/** シャチ（地形が読み込み済みなので、ここで泳げる場所の地図も作る）。頭上アイコンの枠を数えるためクマの直後に読む */
+			if (const char* orcaPath = GetOrcaJsonPath())
+			{
+				nlohmann::json orcaJson;
+				if (util::JsonConverter::IsLoadJsonFile(orcaJson, orcaPath))
+				{
+					actor::OrcaManager::GetInstance()->LoadOrcas(orcaJson);
+				}
+			}
+
+			/** 頭上アイコン（舌など）の枠はクマ＋シャチの数。クマが先頭、シャチはその後ろの番号を使う */
 			InGameUIManager::GetInstance()->InitializeReactionSystem(
 				actor::EnemyManager::GetInstance()->GetEnemies().size()
+				+ actor::OrcaManager::GetInstance()->GetOrcas().size()
 			);
 
 			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Bear, enemies.size());
+			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Orca,
+				static_cast<uint8_t>(actor::OrcaManager::GetInstance()->GetOrcas().size()));
 
 			m_loadPhase = LoadPhase::Camera;
 			break;
@@ -810,6 +827,7 @@ namespace app
 				if (m_daddyPenguin) m_daddyPenguin->UpdateModelOnly();
 				actor::ChildPenguinManager::GetInstance()->UpdateModelOnly();
 				actor::EnemyManager::GetInstance()->UpdateModelOnly();
+				actor::OrcaManager::GetInstance()->UpdateModelOnly();
 			}
 
 			/** カウントダウン UI 更新 */
@@ -879,6 +897,10 @@ namespace app
 			{
 				BEAST_PROFILE_SCOPE(u8"シロクマ更新");
 				actor::EnemyManager::GetInstance()->Update();
+			}
+			{
+				BEAST_PROFILE_SCOPE(u8"シャチ更新");
+				actor::OrcaManager::GetInstance()->Update();
 			}
 
 			/** インゲームUI 更新 */
@@ -1171,6 +1193,7 @@ namespace app
 		if (m_daddyPenguin) m_daddyPenguin->RenderWrapper(rc);
 		actor::ChildPenguinManager::GetInstance()->Render(rc);
 		actor::EnemyManager::GetInstance()->Render(rc);
+		actor::OrcaManager::GetInstance()->Render(rc);
 
 		/** ポーズ中の描画 */
 		if (SceneManager::GetInstance()->IsPause())

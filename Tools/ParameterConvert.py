@@ -173,6 +173,23 @@ def pack_enemy_parameter(data):
     )
 
 
+def pack_orca_parameter(data):
+    # シャチのパラメーター。並びは Game/Source/Actor/Character/Orca/OrcaParameter.h の MasterOrcaParameter と同じ
+    # 全項目 float、30項目 = 120 bytes（項目数は偶数にする。構造体末尾の詰め物でずれないようにするため）
+    keys = [
+        "runSpeed", "swimSpeed", "radius", "height",
+        "modelScale", "turnSpeedDeg", "acceleration", "searchTurnMultiplier",
+        "viewAngleDeg", "viewDistance", "noiseThreshold", "attackDistance",
+        "mouthOffset", "attackImpactTime", "roarDuration", "lostChaseDistance",
+        "maxEat", "maxStamina", "staminaDrainRate", "idleTimeMax",
+        "patrolArriveDistance", "searchGiveUpTime",
+        "swimDepth", "attackDepth",
+        "stunDuration", "nullifyKnockbackDistance", "attackPitchDeg", "attackHoldTime",
+        "attackRiseTime", "attackSinkTime",
+    ]
+    return struct.pack("<30f", *[float(data.get(key, 0.0)) for key in keys])
+
+
 def pack_ocean_parameter(data):
     # 全フィールドが float のみ
     # "<8f" = float(4) × 8 = 32 bytes
@@ -259,6 +276,7 @@ RULE_BOOK = {
     "ChildPenguinParameter":     pack_child_penguin_parameter,
     "ChildPenguinTypeParameter": pack_child_penguin_type_parameter,
     "EnemyParameter":           pack_enemy_parameter,
+    "OrcaParameter":            pack_orca_parameter,
     "oceanParameter":           pack_ocean_parameter,
     "PBRParameter":             pack_pbr_parameter,
     "whirlpoolParameter":       pack_whirlpool_parameter,

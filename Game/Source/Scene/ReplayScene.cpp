@@ -11,6 +11,8 @@
 #include "Source/Nature/Whirlpool.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Orca/Orca.h"
+#include "Source/Actor/Character/Orca/OrcaTypes.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinAnimationData.h"
 #include "Source/Actor/ActorStateMachine.h"
@@ -319,6 +321,17 @@ namespace app
 			// "Idle" / "Jump"（専用アニメ無し）/ 未知の値
 			return static_cast<int>(AnimID::Idle);
 		}
+
+		/**
+		 * @brief シャチ（OrcaController::GetStateName()）の記録stateから対応するアニメーションクリップ番号を返す
+		 * @details 噛みつき（"Attack"）だけ口を開けるアニメ、ほかは泳ぐアニメ。潜る深さは記録の pos.y に入っている
+		 */
+		int OrcaAnimIndexForState(const std::string& state)
+		{
+			using AnimID = actor::EnOrcaAnimationType;
+			if (state == "Attack") return static_cast<int>(AnimID::Mouth);
+			return static_cast<int>(AnimID::Swim);
+		}
 	}
 
 
@@ -434,6 +447,11 @@ namespace app
 		for (size_t i = 0; i < m_bearActors.size(); i++)
 		{
 			if (m_bearSlotActive[i]) m_bearActors[i]->RenderWrapper(rc);
+		}
+
+		for (size_t i = 0; i < m_orcaActors.size(); i++)
+		{
+			if (m_orcaSlotActive[i]) m_orcaActors[i]->RenderWrapper(rc);
 		}
 
 		for (size_t i = 0; i < m_penguinActors.size(); i++)
@@ -606,6 +624,7 @@ namespace app
 		m_playbackTime = 0.0f;
 		m_currentTickIndex = 0;
 		std::fill(m_bearSlotActive.begin(), m_bearSlotActive.end(), false);
+		std::fill(m_orcaSlotActive.begin(), m_orcaSlotActive.end(), false);
 		std::fill(m_penguinSlotActive.begin(), m_penguinSlotActive.end(), false);
 		std::fill(m_whirlpoolSlotActive.begin(), m_whirlpoolSlotActive.end(), false);
 
@@ -768,6 +787,7 @@ namespace app
 				m_ticks.clear();
 				m_isPlaying = false;
 				std::fill(m_bearSlotActive.begin(), m_bearSlotActive.end(), false);
+				std::fill(m_orcaSlotActive.begin(), m_orcaSlotActive.end(), false);
 				std::fill(m_penguinSlotActive.begin(), m_penguinSlotActive.end(), false);
 				std::fill(m_whirlpoolSlotActive.begin(), m_whirlpoolSlotActive.end(), false);
 			}
@@ -908,6 +928,49 @@ namespace app
 					bearModel.PlayAnimation(BearAnimIndexForState(b0.state),
 						actor::ActorStateMachine::ANIMATION_INTERPOLATE_TIME);
 					m_bearLastState[slot] = b0.state;
+				}
+			}
+		}
+
+		// ------ シャチ ------
+		// 記録の形はシロクマと同じ [id, pos, rot_y, state]（sleep_timer は無い）なので ParseBear で読む。
+		// 旧ログには "orcas" が無いので、このブロックは何もしない
+		std::fill(m_orcaSlotActive.begin(), m_orcaSlotActive.end(), false);
+		if (tick0.contains("orcas"))
+		{
+			const auto& orcas0 = tick0["orcas"];
+			const auto& orcas1 = tick1.contains("orcas") ? tick1["orcas"] : orcas0;
+
+			std::unordered_map<int, const nlohmann::json*> orcas1ById;
+			orcas1ById.reserve(orcas1.size());
+			for (const auto& cand : orcas1)
+			{
+				orcas1ById.emplace(GetEntityId(cand, -2), &cand);
+			}
+
+			for (const auto& o0json : orcas0)
+			{
+				const BearFields o0 = ParseBear(o0json);
+				const auto it1 = orcas1ById.find(o0.id);
+				const BearFields o1 = (it1 != orcas1ById.end()) ? ParseBear(*it1->second) : o0;
+
+				const size_t slot = AcquireOrcaSlot(o0.id);
+				m_orcaSlotActive[slot] = true;
+
+				Vector3 pos;
+				pos.Lerp(alpha, o0.pos, o1.pos);
+				Quaternion rot;
+				rot.SetRotationDegY(o0.rotY + (o1.rotY - o0.rotY) * alpha);
+				m_orcaActors[slot]->SetPosition(pos);
+				m_orcaActors[slot]->SetRotation(rot);
+				m_orcaActors[slot]->UpdateModelOnly();
+
+				auto& orcaModel = m_orcaActors[slot]->GetModelRender();
+				if (!orcaModel.IsPlayingAnimation() || o0.state != m_orcaLastState[slot])
+				{
+					orcaModel.PlayAnimation(OrcaAnimIndexForState(o0.state),
+						actor::ActorStateMachine::ANIMATION_INTERPOLATE_TIME);
+					m_orcaLastState[slot] = o0.state;
 				}
 			}
 		}
@@ -1264,6 +1327,28 @@ namespace app
 
 		const size_t slot = m_bearSlotIds.size() - 1;
 		m_bearSlotIndexById.emplace(id, slot);
+		return slot;
+	}
+
+
+	size_t ReplayScene::AcquireOrcaSlot(int id)
+	{
+		if (const auto it = m_orcaSlotIndexById.find(id); it != m_orcaSlotIndexById.end())
+		{
+			return it->second;
+		}
+
+		// 地図（OrcaSeaGrid）は渡さない。リプレイでは記録された位置をそのまま置くだけなので要らない。
+		// 大きさ・深さは Start（InitializePose）で決まり、UpdateModelOnly は位置と向きだけを反映する
+		auto orca = std::make_unique<actor::Orca>();
+		orca->StartWrapper();
+		m_orcaActors.push_back(std::move(orca));
+		m_orcaSlotIds.push_back(id);
+		m_orcaSlotActive.push_back(false);
+		m_orcaLastState.push_back("");
+
+		const size_t slot = m_orcaSlotIds.size() - 1;
+		m_orcaSlotIndexById.emplace(id, slot);
 		return slot;
 	}
 
