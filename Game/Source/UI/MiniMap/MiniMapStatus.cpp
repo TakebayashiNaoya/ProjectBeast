@@ -40,6 +40,7 @@ namespace app
 				{ "bearName",     "bearWidth",       "bearHeight"       },
 				{ "whirlpoolName","whirlpoolWidth",  "whirlpoolHeight"  },
 				{ "iglooName",    "iglooWidth",      "iglooHeight"      },
+				{ "orcaName",     "orcaWidth",       "orcaHeight"       },
 			} };
 
 

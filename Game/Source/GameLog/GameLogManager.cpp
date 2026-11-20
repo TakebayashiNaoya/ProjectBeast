@@ -8,6 +8,9 @@
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Orca/Orca.h"
+#include "Source/Actor/Character/Orca/OrcaManager.h"
+#include "Source/Actor/Character/Orca/OrcaStateMachine.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
@@ -266,6 +269,32 @@ namespace app
 			}
 		}
 		snap["bears"] = std::move(bearsArr);
+
+		// ------ シャチ ------
+		// 配列レイアウト: [id, pos, rot_y, state]
+		// 潜っている深さは pos.y に入る。睡眠が無いので sleep_timer は持たない。
+		// "bears" とは別のキーにする（旧リプレイがシャチをクマとして描かないように。旧ログは "orcas" が無いだけで読める）
+		if (auto* om = actor::OrcaManager::GetInstance())
+		{
+			const auto orcas = om->GetOrcas();
+			if (!orcas.empty())
+			{
+				nlohmann::json orcasArr = nlohmann::json::array();
+				for (const auto* orca : orcas)
+				{
+					if (!orca) continue;
+					const auto* sm = orca->GetOrcaStateMachine();
+					const auto& tf = orca->GetTransform();
+					orcasArr.push_back(nlohmann::json::array({
+						orca->GetLogId(),
+						V3toJson(tf.m_position),
+						GetYawDeg(tf.m_rotation),
+						sm ? sm->GetStateNameForLog() : "Unknown"
+					}));
+				}
+				snap["orcas"] = std::move(orcasArr);
+			}
+		}
 
 		// ------ 子ペンギン ------
 		// 配列レイアウト: [id, type, pos, rot_y, state, in_formation, is_alive]

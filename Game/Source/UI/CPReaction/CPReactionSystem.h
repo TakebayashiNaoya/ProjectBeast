@@ -17,6 +17,7 @@ namespace app
 		class ChildPenguin;
 		class DaddyPenguin;
 		class Enemy;
+		class Orca;
 	}
 
 
@@ -75,6 +76,14 @@ namespace app
 			 * @param type リアクションのタイプ（Question / Exclamation を想定）
 			 */
 			void SetEnemyTarget(actor::Enemy* enemy, const EnCPReactionType type);
+
+			/**
+			 * @brief リアクションの対象となるシャチを設定
+			 * @detail 見た目はシロクマと同じ頭上マーク。シャチの原点は水面下にあるので、そのぶん高く持ち上げる
+			 * @param orca 対象のシャチ
+			 * @param type リアクションのタイプ（Question / Exclamation を想定）
+			 */
+			void SetOrcaTarget(actor::Orca* orca, const EnCPReactionType type);
 
 			/**
 			 * @brief 破棄されるアクターを参照しているスロットをすべて解放する

@@ -16,6 +16,9 @@
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Orca/Orca.h"
+#include "Source/Actor/Character/Orca/OrcaController.h"
+#include "Source/Actor/Character/Orca/OrcaManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
@@ -1132,6 +1135,25 @@ namespace app
 			}
 
 			/**
+			 * シャチも、子を追っている間はクマと同じ脅威として扱う（陸・海を問わず近くの子が逃げる）。
+			 * 位置は口先（体は長いので、子に迫っている先端から逃げさせる）
+			 */
+			if (auto* orcaManager = OrcaManager::GetInstance())
+			{
+				const auto orcas = orcaManager->GetOrcas();
+				const auto orcaControllers = orcaManager->GetControllers();
+				const size_t orcaCount = min(orcas.size(), orcaControllers.size());
+				for (size_t i = 0; i < orcaCount; i++)
+				{
+					if (orcas[i] == nullptr || orcaControllers[i] == nullptr) continue;
+					if (orcaControllers[i]->GetFoundPenguin() == nullptr) continue;
+
+					m_bearThreats.push_back(orcas[i]->GetMouthPosition());
+					m_bearTargetedPenguins.push_back(orcaControllers[i]->GetFoundPenguin());
+				}
+			}
+
+			/**
 			 * 「隊列の子が襲われている」の判定を更新する。
 			 * 狙われた子は逃走で即座に隊列から抜ける（RemoveFollower）ため、
 			 * 「今フォロワーか」だけを見ると判定が一瞬で消えてしまう。
@@ -1386,7 +1408,7 @@ namespace app
 		}
 
 
-		void ChildPenguinManager::RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target)
+		void ChildPenguinManager::RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target, std::function<void()> onGhostHidden)
 		{
 			const Vector3 dethPos = penguin->GetTransform().m_position;
 			const Quaternion dethRot = penguin->GetTransform().m_rotation;
@@ -1411,6 +1433,7 @@ namespace app
 
 			// 前回の状態を初期化する
 			info->target = nullptr;
+			info->onGhostHidden = nullptr;
 			info->timer = 0.0f;
 			info->isHidden = false;
 			info->isFadingOut = false;
@@ -1453,6 +1476,7 @@ namespace app
 
 			// 構造体のメンバにターゲットを設定。
 			info->target = target;
+			info->onGhostHidden = std::move(onGhostHidden);
 
 			// リストをキャッシュして同じ型に変換。
 			m_ghostPenguinNum = static_cast<uint8_t>(m_ghostPenguins.size());
@@ -1532,6 +1556,14 @@ namespace app
 							// タイマーをリセット。
 							info->timer = 0.0f;
 						}
+					}
+
+					// シャチなど、クマ以外の攻撃者へのデバフは登録時に渡された処理で届ける（一度だけ）
+					if (info->onGhostHidden)
+					{
+						std::function<void()> onGhostHidden = std::move(info->onGhostHidden);
+						info->onGhostHidden = nullptr;
+						onGhostHidden();
 					}
 				}
 

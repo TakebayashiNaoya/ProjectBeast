@@ -54,6 +54,11 @@ namespace app
 			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].enemyLayoutJsonPath;
 		}
 
+		const char* GetOrcaJsonPath() const override
+		{
+			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].orcaLayoutJsonPath;
+		}
+
 		const char* GetWhirlpoolPositionsJsonPath() const override
 		{
 			return STAGE_INFO_TABLE[STAGE_INFO_INDEX].whirlpoolPositionsJsonPath;

@@ -8,6 +8,7 @@
 #include "CPReactionStatus.h"
 
 #include "Source/Actor/Character/Enemy/Enemy.h"
+#include "Source/Actor/Character/Orca/Orca.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 
@@ -21,6 +22,11 @@ namespace app
 		{
 			/** シロクマの？/！アイコンの基準位置へ足すワールドYオフセット（背丈ぶん持ち上げる） */
 			constexpr float ENEMY_MARK_WORLD_OFFSET_Y = 150.0f;
+			/**
+			 * シャチの頭上マークの高さ（シャチの原点から）
+			 * @details 原点は水面の約50下（背びれだけ出る深さ）。背びれの先は水面の約30上なので、その少し上（水面の約60上）に出す
+			 */
+			constexpr float ORCA_MARK_WORLD_OFFSET_Y = 110.0f;
 
 			/** シロクマの吹き出しの色（子ペンギンのタイプ色と混ざらないグレー） */
 			const Vector4 ENEMY_BUBBLE_COLOR(0.35f, 0.35f, 0.35f, 1.0f);
@@ -171,6 +177,14 @@ namespace app
 			if (!enemy) return;
 
 			SetMarkTarget(enemy, type, ENEMY_MARK_WORLD_OFFSET_Y);
+		}
+
+
+		void CPReactionSystem::SetOrcaTarget(actor::Orca* orca, const EnCPReactionType type)
+		{
+			if (!orca) return;
+
+			SetMarkTarget(orca, type, ORCA_MARK_WORLD_OFFSET_Y);
 		}
 
 

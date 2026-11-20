@@ -39,6 +39,7 @@ namespace app
 		float       timeLimit;						//制限時間（秒）。
 		const char* enemyLayoutJsonPath;			//シロクマ配置JSONのパス。
 		const char* whirlpoolPositionsJsonPath;		//渦潮配置JSONのパス。
+		const char* orcaLayoutJsonPath;				//シャチ配置JSONのパス。
 	};
 
 
@@ -47,17 +48,20 @@ namespace app
 		{
 			"Easy", 120.0f,
 			"Assets/parameter/character/enemy/EnemyLayout_Easy.json",
-			"Assets/parameter/stage/whirlpoolPositions_Easy.json"
+			"Assets/parameter/stage/whirlpoolPositions_Easy.json",
+			"Assets/parameter/character/orca/OrcaLayout_Easy.json"
 		},
 		{
 			"Normal", 150.0f,
 			"Assets/parameter/character/enemy/EnemyLayout_Normal.json",
-			"Assets/parameter/stage/whirlpoolPositions_Normal.json"
+			"Assets/parameter/stage/whirlpoolPositions_Normal.json",
+			"Assets/parameter/character/orca/OrcaLayout_Normal.json"
 		},
 		{
 			"Hard", 180.0f,
 			"Assets/parameter/character/enemy/EnemyLayout_Hard.json",
-			"Assets/parameter/stage/whirlpoolPositions_Hard.json"
+			"Assets/parameter/stage/whirlpoolPositions_Hard.json",
+			"Assets/parameter/character/orca/OrcaLayout_Hard.json"
 		},
 	};
 
@@ -132,6 +136,8 @@ namespace app
 		virtual const char* GetAchievementJsonPath() const = 0;
 		/** ハイトマップ地形のJSONパス（不要なステージはnullptrを返す） */
 		virtual const char* GetTerrainJsonPath() const { return nullptr; }
+		/** シャチの配置JSONパス（シャチを出さないステージはnullptrを返す） */
+		virtual const char* GetOrcaJsonPath() const { return nullptr; }
 
 		//------------------------------------------------------------
 		// フック（必要なステージだけオーバーライドする）

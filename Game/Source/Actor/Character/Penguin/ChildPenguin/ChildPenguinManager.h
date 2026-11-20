@@ -793,6 +793,8 @@ namespace app
 				util::FloatCurve alphaCurve;
 
 				Enemy* target;
+				/** 幽霊が消えた瞬間に一度だけ呼ぶ（シャチのデバフに使う。クマは target を使う） */
+				std::function<void()> onGhostHidden;
 				float timer;
 				bool isHidden;
 				bool isFadingOut;
@@ -825,8 +827,9 @@ namespace app
 			 * @brief ゴーストペンギンを登録する
 			 * @param penguin 登録するペンギンのポインタ
 			 * @param target ゴーストペンギンのデバフ対象となるシロクマ
+			 * @param onGhostHidden 幽霊が消えた瞬間に一度だけ呼ぶ処理（シャチのデバフ用。クマは渡さない）
 			 */
-			void RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target);
+			void RegisterGhostPenguin(ChildPenguin* penguin, Enemy* target, std::function<void()> onGhostHidden = nullptr);
 
 			/**
 			 * @brief ゴーストペンギンを更新する

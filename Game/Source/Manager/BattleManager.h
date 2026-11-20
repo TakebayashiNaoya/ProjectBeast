@@ -16,6 +16,7 @@ namespace app
 		class ChildPenguin;
 		class DaddyPenguin;
 		class Enemy;
+		class Orca;
 	}
 
 
@@ -301,6 +302,26 @@ namespace app
 			if (m_onEnemyReactionChanged) m_onEnemyReactionChanged(enemy, type);
 		}
 
+		/**
+		 * @brief シャチリアクションUI通知functionを設定
+		 * @param func 引数：対象のシャチ、リアクションのタイプ
+		 */
+		inline void SetOnOrcaReactionChanged(std::function<void(actor::Orca*, ui::EnCPReactionType)> func)
+		{
+			m_onOrcaReactionChanged = std::move(func);
+		}
+
+		/**
+		 * @brief シャチのリアクション再生を通知する
+		 * @detail シロクマと同じく、音に気づいた瞬間（？）と子を見つけた瞬間（！）に OrcaController から呼ぶ
+		 * @param orca 対象のシャチ
+		 * @param type リアクションのタイプ（Question / Exclamation を想定）
+		 */
+		inline void NotifyOrcaReactionChanged(actor::Orca* orca, ui::EnCPReactionType type)
+		{
+			if (m_onOrcaReactionChanged) m_onOrcaReactionChanged(orca, type);
+		}
+
 
 		/**
 		 * @brief 陣形レベルアップUI通知functionを設定
@@ -370,6 +391,8 @@ namespace app
 		std::function<void(actor::ChildPenguin*, ui::EnCPReactionType, ui::EnCPReactionPriority)> m_onCPReactionChanged;
 		/** シロクマリアクションUI更新通知 */
 		std::function<void(actor::Enemy*, ui::EnCPReactionType)> m_onEnemyReactionChanged;
+		/** シャチリアクションUI更新通知 */
+		std::function<void(actor::Orca*, ui::EnCPReactionType)> m_onOrcaReactionChanged;
 		/** リアクション対象の破棄通知（表示中スロットの解放後参照を防ぐ） */
 		std::function<void(actor::Actor*)> m_onReactionTargetDestroyed;
 		/** 衝撃演出の通知（揺れ・ブラー・ヒットストップの配分は受け取る側が決める） */

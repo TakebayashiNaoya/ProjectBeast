@@ -75,6 +75,13 @@ namespace app
 			void SetAttackerEnemy(Enemy* enemy) { m_attackerEnemy = enemy; }
 
 			/**
+			 * @brief 幽霊が消えた瞬間に呼ぶ処理を設定
+			 * @details シャチのように Enemy でない攻撃者が、幽霊デバフで帰巣するために使う
+			 * @param func 呼ぶ処理（不要なら nullptr）
+			 */
+			void SetOnGhostHidden(std::function<void()> func) { m_onGhostHidden = std::move(func); }
+
+			/**
 			 * @brief 攻撃者を取得
 			 * @return 攻撃者
 			 */
@@ -99,6 +106,8 @@ namespace app
 			bool m_isFinishAfterDeath;
 			/** 攻撃者 */
 			Enemy* m_attackerEnemy;
+			/** 幽霊が消えた瞬間に呼ぶ処理（シャチ用） */
+			std::function<void()> m_onGhostHidden;
 		};
 	}
 }

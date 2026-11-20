@@ -10,6 +10,8 @@
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
+#include "Source/Actor/Character/Orca/Orca.h"
+#include "Source/Actor/Character/Orca/OrcaManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
@@ -169,6 +171,16 @@ namespace app
 			{
 				K2_ASSERT(enemy, "エネミーがnullptr");
 				positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Bear)).push_back(enemy->GetTransform().m_position);
+			}
+
+			// シャチの座標を取得する（体は水面下にあるので、真上の水面の点を使う）
+			if (auto* orcaManager = actor::OrcaManager::GetInstance())
+			{
+				for (const auto* orca : orcaManager->GetOrcas())
+				{
+					if (orca == nullptr) continue;
+					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Orca)).push_back(orca->GetSurfacePosition());
+				}
 			}
 
 
@@ -418,6 +430,7 @@ namespace app
 		m_wpWarningChanged = nullptr;
 		m_onCPReactionChanged = nullptr;
 		m_onEnemyReactionChanged = nullptr;
+		m_onOrcaReactionChanged = nullptr;
 		m_onReactionTargetDestroyed = nullptr;
 		m_onImpact = nullptr;
 		m_onFormationLevelUp = nullptr;
