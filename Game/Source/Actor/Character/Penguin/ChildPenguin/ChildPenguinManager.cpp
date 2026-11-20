@@ -412,6 +412,15 @@ namespace app
 		}
 
 
+		bool ChildPenguinManager::IsAllModelReady() const
+		{
+			for (const auto& cp : m_childPenguinList) {
+				if (cp && !cp->IsModelReady()) return false;
+			}
+			return true;
+		}
+
+
 		Vector3 ChildPenguinManager::GetDaddyPosition() const
 		{
 			if (m_daddyPenguin != nullptr)
