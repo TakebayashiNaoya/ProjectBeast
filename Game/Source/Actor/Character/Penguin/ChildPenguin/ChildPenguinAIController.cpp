@@ -268,12 +268,12 @@ namespace app
 			 */
 			constexpr float NAV_FLOW_TARGET_NEAR_DADDY = 400.0f;
 
-			/** やんちゃのスタック判定：この距離（XZ）も動けていなければ停滞とみなす */
-			constexpr float NAUGHTY_STUCK_MOVE_THRESHOLD = 10.0f;
-			/** やんちゃのスタック判定：この時間（秒）停滞し続けたら行き先を変える */
-			constexpr float NAUGHTY_STUCK_TIME_LIMIT = 1.5f;
+			/** スタック判定：この距離（XZ）も動けていなければ停滞とみなす */
+			constexpr float ROAM_STUCK_MOVE_THRESHOLD = 10.0f;
+			/** スタック判定：この時間（秒）停滞し続けたら行き先を変える */
+			constexpr float ROAM_STUCK_TIME_LIMIT = 1.5f;
 			/** スタック脱出時に「進めなかった方向の反対」から振るランダム角の半角（ラジアン、約75度） */
-			constexpr float NAUGHTY_STUCK_ESCAPE_HALF_ANGLE = 1.3f;
+			constexpr float ROAM_STUCK_ESCAPE_HALF_ANGLE = 1.3f;
 
 			/**
 			 * @brief 再集合の呼びかけを無効にする「親とクマの距離」
@@ -369,6 +369,10 @@ namespace app
 			m_walkDistance = max(m_walkDistance, m_stopDistance + 1.0f);
 			m_runDistance = max(m_runDistance, m_walkDistance + 1.0f);
 
+			/** 徘徊の個体値を決定する（全タイプ共通） */
+			m_roamTriggerDistance = RollRange(td.roamTriggerDistance);
+			m_roamRadius = RollRange(td.roamRadius);
+
 			/** タイプ別の察知性能と、遮蔽レイキャストを撃つフレームのスロットを確定させる */
 			m_perceptionSpec = &DADDY_PERCEPTION_SPECS[static_cast<int>(type)];
 
@@ -393,7 +397,22 @@ namespace app
 			}
 			{
 				BEAST_PROFILE_SCOPE(u8"AI判断 (UpdateAI)");
+
+				/** スタック検出は徘徊・いたずらの両方が使うので、AIの経路によらず毎フレーム1回だけ測る */
+				m_isStuckThisFrame = DetectStuck();
+				m_didRoamThisFrame = false;
+
 				UpdateAI();
+
+				/**
+				 * このフレームに TryRoam() を通らなかったら徘徊は終わり。
+				 * 逃走・かまくら・渦潮・制止・入隊など、徘徊をやめる経路はタイプごとに多いので、
+				 * 終了箇所を列挙せずここで一括して確定させる（解除漏れを構造的に防ぐ）
+				 */
+				if (m_isRoaming && !m_didRoamThisFrame)
+				{
+					StopRoam();
+				}
 			}
 		}
 
@@ -806,13 +825,17 @@ namespace app
 			auto* manager = ChildPenguinManager::GetInstance();
 
 			/**
-			 * 待機命令中は気づいていても動かない。
+			 * 待機命令中は気づいていても親へは寄らない。
 			 * 「待て」と言われた子が勝手に寄ってきては待機命令の意味が無くなる
+			 * （親が離れたときの徘徊は末尾の TryRoam() が判定する）
 			 */
 			const bool isFollowCmd =
 				manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
-			if (m_hasNoticedDaddy && isFollowCmd)
+			/** やんちゃは親に寄らず・振り向かず、徘徊を続ける */
+			const bool reactsToDaddy = isFollowCmd && !PrefersRoamOverDaddy();
+
+			if (m_hasNoticedDaddy && reactsToDaddy)
 			{
 				/** 親に気づいたので自分から寄っていく */
 				m_stateMachine->SetTurnSpeedMultiplier(1.0f);
@@ -820,7 +843,7 @@ namespace app
 				return;
 			}
 
-			if (m_hasHeardDaddy && isFollowCmd)
+			if (m_hasHeardDaddy && reactsToDaddy)
 			{
 				/**
 				 * 音だけ聞こえている：その場でゆっくり親のほうへ振り向く。
@@ -837,9 +860,175 @@ namespace app
 				}
 			}
 
-			/** 気づいていなければその場で待つ */
+			/** 気づいていなければ徘徊する（条件を満たさなければその場で待つ） */
 			m_stateMachine->SetTurnSpeedMultiplier(1.0f);
+			if (TryRoam()) return;
+
 			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+		}
+
+
+		bool ChildPenguinAIController::TryRoam()
+		{
+			/** 半径0は徘徊しない（パラメーター未設定の安全弁。タイプごとに徘徊を切る用途にも使える） */
+			if (m_roamRadius <= 0.0f) return false;
+
+			if (!m_isRoaming)
+			{
+				/**
+				 * 開始条件。ここに来た時点で隊列外なので、
+				 * 追従命令中は無条件、待機命令中は親が一定距離以上離れたときだけ徘徊する。
+				 * 一度始めたら、徘徊が途切れるまで距離は見ない（親が戻ってきても止まらない）
+				 */
+				const bool isFollowCmd = ChildPenguinManager::GetInstance()->GetCommand()
+					== ChildPenguinManager::EnPenguinCommand::Follow;
+				if (!isFollowCmd && GetDistanceToDaddy() < m_roamTriggerDistance) return false;
+
+				StartRoam();
+			}
+
+			m_didRoamThisFrame = true;
+
+			/** 動けなくなっていたら進めなかった方向の反対側へ、目標に着いたら次の目標へ */
+			if (m_isStuckThisFrame)
+			{
+				PickNewRoamTargetAwayFromBlocked(m_stuckBlockedDir);
+			}
+			else if (GetDistanceToTarget(m_roamTarget) <= m_stopDistance)
+			{
+				PickNewRoamTarget();
+			}
+
+			/**
+			 * 徘徊中は常に走る。
+			 * 振り向き（速度0）や目標手前のブレーキ倍率が残っていると走れないので1.0へ戻し、
+			 * 隊列外なので陣形の速度倍率も乗せない
+			 */
+			const float distToTarget = GetDistanceToTarget(m_roamTarget);
+			m_stateMachine->SetSpeedMultiplier(1.0f);
+			m_stateMachine->SetExternalSpeedMultiplier(1.0f);
+			m_stateMachine->SetActionInput(
+				CalculateMoveDirectionWithNav(m_roamTarget, distToTarget), false, true, false, false);
+
+			OnRoamUpdated();
+			return true;
+		}
+
+
+		void ChildPenguinAIController::StartRoam()
+		{
+			m_isRoaming = true;
+			m_stuckTimer = 0.0f;
+			m_stuckCheckPos = m_owner->GetTransform().m_position;
+			PickNewRoamTarget();
+			OnRoamStarted();
+		}
+
+
+		void ChildPenguinAIController::StopRoam()
+		{
+			m_isRoaming = false;
+			OnRoamStopped();
+		}
+
+
+		bool ChildPenguinAIController::DetectStuck()
+		{
+			const Vector3 currentPos = m_owner->GetTransform().m_position;
+
+			// 「移動する意思があるのに動けていない」時間を測る。
+			// 急斜面（接地限界63度超）へ向かって歩き続けると、押し戻されて足踏みになる
+			const Vector3& moveDir = m_stateMachine->GetMoveDirection();
+			Vector3 moved = currentPos - m_stuckCheckPos;
+			moved.y = 0.0f;
+
+			const bool wantsToMove = moveDir.LengthSq() > FLT_EPSILON;
+			if (!wantsToMove
+				|| moved.LengthSq() >= ROAM_STUCK_MOVE_THRESHOLD * ROAM_STUCK_MOVE_THRESHOLD)
+			{
+				m_stuckTimer = 0.0f;
+				m_stuckCheckPos = currentPos;
+				return false;
+			}
+
+			m_stuckTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_stuckTimer < ROAM_STUCK_TIME_LIMIT) return false;
+
+			m_stuckTimer = 0.0f;
+			m_stuckCheckPos = currentPos;
+			m_stuckBlockedDir = moveDir;
+			return true;
+		}
+
+
+		void ChildPenguinAIController::PickNewRoamTarget()
+		{
+			/**
+			 * 円内のランダムな座標を選ぶ（拒絶サンプリング）。
+			 * ナビグリッドで到達できる目的地だけを採用することで、
+			 * 崖の上や絶壁の向こうを引いてスタックするのを未然に防ぐ
+			 */
+			const Vector3& currentPos = m_owner->GetTransform().m_position;
+			const StageNavGrid* navGrid = GetStageNavGrid();
+
+			for (int i = 0; i < 16; i++)
+			{
+				const float x = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
+				const float z = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
+				if ((x * x + z * z) > (m_roamRadius * m_roamRadius)) continue;
+
+				const Vector3 candidate(currentPos.x + x, currentPos.y, currentPos.z + z);
+				if (navGrid != nullptr && !navGrid->IsReachable(currentPos, candidate)) continue;
+
+				m_roamTarget = candidate;
+				return;
+			}
+
+			/** 最大試行回数を超えた場合は現在地をそのまま目標にする */
+			m_roamTarget = currentPos;
+		}
+
+
+		void ChildPenguinAIController::PickNewRoamTargetAwayFromBlocked(const Vector3& blockedDir)
+		{
+			const Vector3& currentPos = m_owner->GetTransform().m_position;
+
+			Vector3 back = blockedDir;
+			back.y = 0.0f;
+			if (back.LengthSq() <= FLT_EPSILON)
+			{
+				PickNewRoamTarget();
+				return;
+			}
+			back.Normalize();
+			back *= -1.0f;
+
+			// 反対方向を中心に±75度のランダムな向きへ、半径の40〜100%の距離を選ぶ。
+			// こちらもナビグリッドで到達できる目的地だけを採用する
+			const StageNavGrid* navGrid = GetStageNavGrid();
+			for (int i = 0; i < 8; i++)
+			{
+				const float angle = util::RandomDevice::Random(
+					-ROAM_STUCK_ESCAPE_HALF_ANGLE, ROAM_STUCK_ESCAPE_HALF_ANGLE);
+				const float cosA = cosf(angle);
+				const float sinA = sinf(angle);
+
+				Vector3 dir;
+				dir.x = back.x * cosA - back.z * sinA;
+				dir.y = 0.0f;
+				dir.z = back.x * sinA + back.z * cosA;
+
+				const float dist = util::RandomDevice::Random(m_roamRadius * 0.4f, m_roamRadius);
+				const Vector3 candidate = currentPos + dir * dist;
+
+				if (navGrid != nullptr && !navGrid->IsReachable(currentPos, candidate)) continue;
+
+				m_roamTarget = candidate;
+				return;
+			}
+
+			/** 見つからない場合は現在地を目標にする（到達扱いになり、次フレームで選び直される） */
+			m_roamTarget = currentPos;
 		}
 
 
@@ -1355,8 +1544,8 @@ namespace app
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
-				/** その場で待機 */
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				/** その場で待機（親が離れたら徘徊） */
+				BuildInputWhenNotFollowing();
 				return;
 			}
 
@@ -1560,11 +1749,7 @@ namespace app
 		NaughtyChildPenguinAI::NaughtyChildPenguinAI(ChildPenguin* owner)
 			: ChildPenguinAIController(owner, EnChildPenguinType::Naughty)
 			, m_naughtyStateMachine(static_cast<NaughtyChildPenguinStateMachine*>(owner->GetStateMachine()))
-		{
-			const auto& td = GetTypeData(EnChildPenguinType::Naughty);
-			m_roamTriggerDistance = RollRange(td.roamTriggerDistance);
-			m_roamRadius = RollRange(td.roamRadius);
-		}
+		{}
 
 
 		NaughtyChildPenguinAI::~NaughtyChildPenguinAI()
@@ -1610,9 +1795,6 @@ namespace app
 			auto* manager = ChildPenguinManager::GetInstance();
 			const bool isFollowCmd = manager->GetCommand() == ChildPenguinManager::EnPenguinCommand::Follow;
 
-			/** 親との距離を取得 */
-			const float distDaddy = GetDistanceToDaddy();
-
 			/** 意図せず渦潮に飲まれている間は隊を抜けて入力をゼロにする
 			 *  （意図的な場合は後続の GetIsGoingToWhirlpool() ブロックで処理） */
 			if (m_owner->GetStateMachine()->GetIsInWhirlpool() && !m_naughtyStateMachine->GetIsGoingToWhirlpool())
@@ -1647,10 +1829,6 @@ namespace app
 				{
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
-				}
-				if (manager->IsRoaming(m_owner))
-				{
-					manager->UnregisterRoaming(m_owner);
 				}
 
 				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
@@ -1745,15 +1923,11 @@ namespace app
 					// 優先度Highのため、この後のRemoveFollower()が発行するTrouble(Normal)には上書きされない
 					BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Happy, ui::EnCPReactionPriority::High);
 
-					// シロクマに向かうため、隊列や徘徊からは離脱する
+					// シロクマに向かうため、隊列からは離脱する（徘徊は Update() 末尾で自動的に終わる）
 					if (m_isFollowing)
 					{
 						manager->RemoveFollower(m_owner);
 						m_isFollowing = false;
-					}
-					if (manager->IsRoaming(m_owner))
-					{
-						manager->UnregisterRoaming(m_owner);
 					}
 
 					manager->RegisterAttempting(m_owner);
@@ -1771,7 +1945,6 @@ namespace app
 					BattleManager::GetInstance().NotifyCPReactionChanged(m_owner, ui::EnCPReactionType::Happy, ui::EnCPReactionPriority::High);
 
 					if (m_isFollowing) { manager->RemoveFollower(m_owner); m_isFollowing = false; }
-					if (manager->IsRoaming(m_owner)) { manager->UnregisterRoaming(m_owner); }
 					manager->RegisterAttempting(m_owner);
 				}
 			}
@@ -1876,38 +2049,11 @@ namespace app
 			/** 追従命令のとき */
 			if (isFollowCmd)
 			{
-				/** 入隊条件を満たしたら徘徊を終了して隊列に参加する */
-				/** （条件は CanJoinFormation() に集約してある） */
-				if (CanJoinFormation())
+				/** 入隊判定（条件は CanJoinFormation() に集約してある） */
+				/** 隊列に参加できていなければ徘徊する（徘徊は基底の BuildInputWhenNotFollowing() が行う） */
+				if (!TryJoinFormation())
 				{
-					/** 徘徊登録を解除する */
-					manager->UnregisterRoaming(m_owner);
-
-					StopLivelyEffect();
-
-					TryJoinFormation();
-				}
-
-				/** 隊列に参加していない状態（＝まだ遠くにいる）なら徘徊を継続する */
-				if (!m_isFollowing)
-				{
-					/** 徘徊中でなければ新しい目標を選ぶ */
-					if (!manager->IsRoaming(m_owner))
-					{
-						manager->RegisterRoaming(m_owner);
-						PickNewRoamTarget();
-					}
-
-					const float distToRoamTarget = GetDistanceToTarget(m_roamTarget);
-
-					/** 目標地点に到達したら次の目標を選ぶ */
-					if (distToRoamTarget <= m_stopDistance)
-					{
-						PickNewRoamTarget();
-					}
-
-					BuildInputToTarget(m_roamTarget);
-					PlayLivelyEffect();
+					BuildInputWhenNotFollowing();
 					return;
 				}
 
@@ -1925,88 +2071,41 @@ namespace app
 				m_isFollowing = false;
 			}
 
-			/** 親が一定距離以上離れたら徘徊を開始する */
-			if (!manager->IsRoaming(m_owner) && distDaddy >= m_roamTriggerDistance)
-			{
-				manager->RegisterRoaming(m_owner);
-				PickNewRoamTarget();
-			}
-
-			/** 徘徊中 */
-			if (manager->IsRoaming(m_owner))
-			{
-				const float distToRoamTarget = GetDistanceToTarget(m_roamTarget);
-
-				/** 目標地点に到達したら次の目標を選ぶ */
-				if (distToRoamTarget <= m_stopDistance)
-				{
-					PickNewRoamTarget();
-				}
-
-				BuildInputToTarget(m_roamTarget);
-				PlayLivelyEffect();
-				return;
-			}
-
-			/** 待機命令中かつ親が近い場合はその場で待機する */
-			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+			/** 親が一定距離以上離れたら徘徊、近ければその場で待機する */
+			BuildInputWhenNotFollowing();
 		}
 
 
-		void NaughtyChildPenguinAI::PickNewRoamTarget()
+		void NaughtyChildPenguinAI::OnRoamStarted()
 		{
-			/**
-			 * 円内のランダムな座標を選ぶ（拒絶サンプリング）。
-			 * ナビグリッドで到達できる目的地だけを採用することで、
-			 * 崖の上や絶壁の向こうを引いてスタックするのを未然に防ぐ
-			 */
-			const Vector3& currentPos = m_owner->GetTransform().m_position;
-			const StageNavGrid* navGrid = GetStageNavGrid();
+			/** 徘徊中のやんちゃは世話焼きの制止対象になる */
+			ChildPenguinManager::GetInstance()->RegisterRoaming(m_owner);
+		}
 
-			for (int i = 0; i < 16; i++)
+
+		void NaughtyChildPenguinAI::OnRoamStopped()
+		{
+			ChildPenguinManager::GetInstance()->UnregisterRoaming(m_owner);
+
+			/** いたずらへ移った場合はエフェクトを出し続ける（いたずら側が止める） */
+			if (!m_naughtyStateMachine->GetIsGoingToWakeBear()
+				&& !m_naughtyStateMachine->GetIsGoingToWhirlpool())
 			{
-				const float x = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
-				const float z = util::RandomDevice::Random(-m_roamRadius, m_roamRadius);
-				if ((x * x + z * z) > (m_roamRadius * m_roamRadius)) continue;
-
-				const Vector3 candidate(currentPos.x + x, currentPos.y, currentPos.z + z);
-				if (navGrid != nullptr && !navGrid->IsReachable(currentPos, candidate)) continue;
-
-				m_roamTarget = candidate;
-				return;
+				StopLivelyEffect();
 			}
+		}
 
-			/** 最大試行回数を超えた場合は現在地をそのまま目標にする */
-			m_roamTarget = currentPos;
+
+		void NaughtyChildPenguinAI::OnRoamUpdated()
+		{
+			PlayLivelyEffect();
 		}
 
 
 		void NaughtyChildPenguinAI::UpdateStuckWatch()
 		{
-			const Vector3 currentPos = m_owner->GetTransform().m_position;
-
-			// 「移動する意思があるのに動けていない」時間を測る。
-			// 急斜面（接地限界63度超）へ向かって歩き続けると、押し戻されて足踏みになる
-			const Vector3& moveDir = m_stateMachine->GetMoveDirection();
-			Vector3 moved = currentPos - m_stuckCheckPos;
-			moved.y = 0.0f;
-
-			const bool wantsToMove = moveDir.LengthSq() > FLT_EPSILON;
-			if (!wantsToMove
-				|| moved.LengthSq() >= NAUGHTY_STUCK_MOVE_THRESHOLD * NAUGHTY_STUCK_MOVE_THRESHOLD)
-			{
-				m_stuckTimer = 0.0f;
-				m_stuckCheckPos = currentPos;
-				return;
-			}
-
-			m_stuckTimer += g_gameTime->GetFrameDeltaTime();
-			if (m_stuckTimer < NAUGHTY_STUCK_TIME_LIMIT) return;
-
-			m_stuckTimer = 0.0f;
-			m_stuckCheckPos = currentPos;
-
-			auto* manager = ChildPenguinManager::GetInstance();
+			/** スタックの検出は基底の Update() が行う。徘徊先の選び直しも基底の TryRoam() が行う */
+			if (!IsStuckThisFrame()) return;
 
 			// いたずら（クマ起こし・渦潮）へ向かう途中なら諦める。壁の向こうには行けない
 			if (m_naughtyStateMachine->GetIsGoingToWakeBear()
@@ -2017,58 +2116,9 @@ namespace app
 				m_naughtyStateMachine->SetIsGoingToWhirlpool(false);
 				m_naughtyStateMachine->SetIsAtWhirlpool(false);
 				m_wasSwallowedByWhirlpool = false;
-				manager->UnregisterAttempting(m_owner);
+				ChildPenguinManager::GetInstance()->UnregisterAttempting(m_owner);
 				StopLivelyEffect();
 			}
-
-			// 徘徊中なら、進めなかった方向の反対側から行き先を選び直す
-			if (manager->IsRoaming(m_owner))
-			{
-				PickNewRoamTargetAwayFromBlocked(moveDir);
-			}
-		}
-
-
-		void NaughtyChildPenguinAI::PickNewRoamTargetAwayFromBlocked(const Vector3& blockedDir)
-		{
-			const Vector3& currentPos = m_owner->GetTransform().m_position;
-
-			Vector3 back = blockedDir;
-			back.y = 0.0f;
-			if (back.LengthSq() <= FLT_EPSILON)
-			{
-				PickNewRoamTarget();
-				return;
-			}
-			back.Normalize();
-			back *= -1.0f;
-
-			// 反対方向を中心に±75度のランダムな向きへ、半径の40〜100%の距離を選ぶ。
-			// こちらもナビグリッドで到達できる目的地だけを採用する
-			const StageNavGrid* navGrid = GetStageNavGrid();
-			for (int i = 0; i < 8; i++)
-			{
-				const float angle = util::RandomDevice::Random(
-					-NAUGHTY_STUCK_ESCAPE_HALF_ANGLE, NAUGHTY_STUCK_ESCAPE_HALF_ANGLE);
-				const float cosA = cosf(angle);
-				const float sinA = sinf(angle);
-
-				Vector3 dir;
-				dir.x = back.x * cosA - back.z * sinA;
-				dir.y = 0.0f;
-				dir.z = back.x * sinA + back.z * cosA;
-
-				const float dist = util::RandomDevice::Random(m_roamRadius * 0.4f, m_roamRadius);
-				const Vector3 candidate = currentPos + dir * dist;
-
-				if (navGrid != nullptr && !navGrid->IsReachable(currentPos, candidate)) continue;
-
-				m_roamTarget = candidate;
-				return;
-			}
-
-			/** 見つからない場合は現在地を目標にする（到達扱いになり、次フレームで選び直される） */
-			m_roamTarget = currentPos;
 		}
 
 
@@ -2188,7 +2238,8 @@ namespace app
 					manager->RemoveFollower(m_owner);
 					m_isFollowing = false;
 				}
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				/** その場で待機（親が離れたら徘徊） */
+				BuildInputWhenNotFollowing();
 				m_wasSliding = false;
 				return;
 			}
@@ -2590,8 +2641,8 @@ namespace app
 				return;
 			}
 
-			/** 介入対象がいなければその場で待機する */
-			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+			/** 介入対象がいなければその場で待機する（親が離れたら徘徊） */
+			BuildInputWhenNotFollowing();
 		}
 
 

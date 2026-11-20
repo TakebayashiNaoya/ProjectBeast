@@ -235,10 +235,81 @@ namespace app
 
 			/**
 			 * @brief 隊列に入っていないときの移動入力を組み立てる
-			 * @details 親に気づいていれば自分から寄っていき、気づいていなければその場で待つ。
-			 *          待機命令中は気づいていても動かない（待機の意味を壊さないため）。
+			 * @details 親に気づいていれば自分から寄っていき、音だけ聞こえていれば振り向く。
+			 *          どちらでもなければ徘徊する（徘徊条件を満たさなければその場で待つ）。
+			 *          待機命令中は気づいていても親へは寄らない（待機の意味を壊さないため）。
+			 *          徘徊の入口はこの関数だけ。タイプ固有の行動はこれより前で return すること。
 			 */
 			void BuildInputWhenNotFollowing();
+
+
+			//------------------------------------------------------------//
+			// 徘徊（全タイプ共通）
+			//------------------------------------------------------------//
+
+			/**
+			 * @brief 徘徊中かどうか
+			 * @return 徘徊中ならtrue
+			 */
+			bool IsRoaming() const { return m_isRoaming; }
+
+			/**
+			 * @brief このフレームにスタック（進む意思があるのに動けていない）を検出したか
+			 * @details 検出は Update() が UpdateAI() の前に毎フレーム1回だけ行う。
+			 * @return 検出したフレームだけtrue
+			 */
+			bool IsStuckThisFrame() const { return m_isStuckThisFrame; }
+
+			/**
+			 * @brief 親への接近・振り向きより徘徊を優先するか
+			 * @return 優先するならtrue（やんちゃのみ）
+			 */
+			virtual bool PrefersRoamOverDaddy() const { return false; }
+
+			/** @brief 徘徊を始めたときに呼ばれる */
+			virtual void OnRoamStarted() {}
+			/** @brief 徘徊をやめたときに呼ばれる（Update() の末尾から） */
+			virtual void OnRoamStopped() {}
+			/** @brief 徘徊中、毎フレーム呼ばれる */
+			virtual void OnRoamUpdated() {}
+
+		private:
+			/**
+			 * @brief 徘徊の開始判定と、徘徊中の走り入力の組み立て
+			 * @details 追従命令中は無条件、待機命令中は親が m_roamTriggerDistance 以上離れたら開始する。
+			 *          BuildInputWhenNotFollowing() からだけ呼ぶ。
+			 * @return このフレームに徘徊したならtrue
+			 */
+			bool TryRoam();
+
+			/** @brief 徘徊を開始する */
+			void StartRoam();
+
+			/** @brief 徘徊を終了する */
+			void StopRoam();
+
+			/**
+			 * @brief スタックを検出する
+			 * @details 急斜面（接地限界63度超）へ向かって進み続けると押し戻されて足踏みになるため、
+			 *          一定時間動けていなければtrueを返し、進めなかった方向を記録する。
+			 * @return 検出したらtrue
+			 */
+			bool DetectStuck();
+
+			/**
+			 * @brief 次の徘徊目標座標をランダムに選ぶ
+			 */
+			void PickNewRoamTarget();
+
+			/**
+			 * @brief 進めなかった方向の反対側から徘徊目標を選び直す
+			 * @details PickNewRoamTarget() だと同じ斜面方向を引き直す可能性があるため、
+			 *          スタック解消時はこちらを使う。
+			 * @param blockedDir 進めなかった移動方向
+			 */
+			void PickNewRoamTargetAwayFromBlocked(const Vector3& blockedDir);
+
+		protected:
 
 
 			//------------------------------------------------------------//
@@ -352,6 +423,30 @@ namespace app
 			bool m_isDaddyOccludedCache = false;
 
 
+			//------------------------------------------------------------//
+			// 徘徊の状態
+			//------------------------------------------------------------//
+
+			/** 徘徊中かどうか */
+			bool m_isRoaming = false;
+			/** このフレームに TryRoam() を通ったか（通らなければ Update() 末尾で徘徊を終える） */
+			bool m_didRoamThisFrame = false;
+			/** このフレームにスタックを検出したか */
+			bool m_isStuckThisFrame = false;
+			/** スタックを検出したときに進もうとしていた方向 */
+			Vector3 m_stuckBlockedDir = Vector3::Zero;
+			/** 徘徊先の目標座標 */
+			Vector3 m_roamTarget = Vector3::Zero;
+			/** 待機命令中に徘徊を開始する親との距離 */
+			float m_roamTriggerDistance = 0.0f;
+			/** 徘徊先を選ぶ現在地からの半径 */
+			float m_roamRadius = 0.0f;
+			/** スタック検出：動けていない時間（秒） */
+			float m_stuckTimer = 0.0f;
+			/** スタック検出：前回チェック時の座標 */
+			Vector3 m_stuckCheckPos = Vector3::Zero;
+
+
 		private:
 			/**
 			 * @brief 移動手段の内部フェーズ
@@ -412,7 +507,7 @@ namespace app
 
 		 /**
 		  * @brief まじめタイプの子ペンギンAI
-		  * @details 追従命令→ついてくる、待機命令→その場待機
+		  * @details 追従命令→ついてくる、待機命令→その場待機（親が離れたら徘徊）
 		  */
 		class SeriousChildPenguinAI : public ChildPenguinAIController
 		{
@@ -476,7 +571,8 @@ namespace app
 
 		/**
 		 * @brief やんちゃタイプの子ペンギンAI
-		 * @details 追従命令→ついてくる、待機命令かつ親が一定距離以上離れたら→徘徊する
+		 * @details 追従命令→ついてくる、待機命令→その場待機（親が離れたら徘徊）。
+		 *          徘徊中は親に寄らず・振り向かない
 		 */
 		class NaughtyChildPenguinAI : public ChildPenguinAIController
 		{
@@ -510,27 +606,23 @@ namespace app
 			 */
 			bool IsHeadingIntoWhirlpoolOnPurpose() const override;
 
+		protected:
+			/** やんちゃは親に寄らず・振り向かず徘徊を続ける */
+			bool PrefersRoamOverDaddy() const override { return true; }
+			/** 徘徊中のやんちゃを世話焼きの制止対象として登録する */
+			void OnRoamStarted() override;
+			/** 制止対象の登録を解除し、わいわいエフェクトを止める */
+			void OnRoamStopped() override;
+			/** 徘徊中はわいわいエフェクトを出す */
+			void OnRoamUpdated() override;
+
 		private:
 			/**
-			 * @brief 次の徘徊目標座標をランダムに選ぶ
-			 */
-			void PickNewRoamTarget();
-
-			/**
-			 * @brief スタック（移動の意思があるのに動けていない）を検出して解消する
-			 * @details 急斜面（接地限界63度超）へ向かって歩き続けると押し戻されて
-			 *          足踏みになるため、一定時間動けていなければ行き先を変える。
-			 *          いたずら（クマ起こし・渦潮）へ向かう途中なら諦めさせる。
+			 * @brief スタック時に、向かっていたいたずらを諦めさせる
+			 * @details 検出は基底の Update()、徘徊先の選び直しは基底の TryRoam() が行う。
+			 *          ここはいたずら（クマ起こし・渦潮）へ向かう途中だった場合の中止だけを受け持つ。
 			 */
 			void UpdateStuckWatch();
-
-			/**
-			 * @brief 進めなかった方向の反対側から徘徊目標を選び直す
-			 * @details PickNewRoamTarget() だと同じ斜面方向を引き直す可能性があるため、
-			 *          スタック解消時はこちらを使う。
-			 * @param blockedDir 進めなかった移動方向
-			 */
-			void PickNewRoamTargetAwayFromBlocked(const Vector3& blockedDir);
 
 			/**
 			 * @brief わいわいエフェクトの再生
@@ -547,16 +639,6 @@ namespace app
 			NaughtyChildPenguinStateMachine* m_naughtyStateMachine = nullptr;
 			/** 世話焼きペンギンに制止されているかどうか */
 			bool m_isRestrained = false;
-			/** 徘徊先の目標座標 */
-			Vector3 m_roamTarget = Vector3::Zero;
-			/** 待機命令中に徘徊を開始する親との距離 */
-			float m_roamTriggerDistance = 0.0f;
-			/** 徘徊先を選ぶ現在地からの半径 */
-			float m_roamRadius = 0.0f;
-			/** スタック検出：動けていない時間（秒） */
-			float m_stuckTimer = 0.0f;
-			/** スタック検出：前回チェック時の座標 */
-			Vector3 m_stuckCheckPos = Vector3::Zero;
 			/** 反省時間 */
 			float m_scoldCooldown = 0.0f;
 			/** 渦潮に飲み込まれたかどうかのフラグ */
