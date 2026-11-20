@@ -11,7 +11,9 @@
       "jumpPower":         [250.0, 290.0],
       "stopDistance":      [14.0,  18.0],
       "walkDistance":      [38.0,  45.0],
-      "runDistance":       [75.0,  90.0]
+      "runDistance":       [75.0,  90.0],
+      "roamTriggerDistance":  [150.0, 200.0],
+      "roamRadius":           [100.0, 150.0]
     }
   },
   {
@@ -26,7 +28,9 @@
       "jumpPower":         [250.0, 290.0],
       "stopDistance":      [12.0,  16.0],
       "walkDistance":      [32.0,  38.0],
-      "runDistance":       [55.0,  65.0]
+      "runDistance":       [55.0,  65.0],
+      "roamTriggerDistance":  [150.0, 200.0],
+      "roamRadius":           [100.0, 150.0]
     }
   },
   {
@@ -60,7 +64,9 @@
       "jumpPower":         [250.0, 290.0],
       "stopDistance":      [10.0,  22.0],
       "walkDistance":      [34.0,  52.0],
-      "runDistance":       [65.0,  100.0]
+      "runDistance":       [65.0,  100.0],
+      "roamTriggerDistance":  [150.0, 200.0],
+      "roamRadius":           [100.0, 150.0]
     }
   },
   {
@@ -76,7 +82,9 @@
       "jumpPower":         [250.0, 290.0],
       "stopDistance":      [14.0,  18.0],
       "walkDistance":      [38.0,  45.0],
-      "runDistance":       [75.0,  90.0]
+      "runDistance":       [75.0,  90.0],
+      "roamTriggerDistance":  [150.0, 200.0],
+      "roamRadius":           [100.0, 150.0]
     }
   }
 ]

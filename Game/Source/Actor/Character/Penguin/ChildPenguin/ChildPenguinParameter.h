@@ -75,12 +75,12 @@ namespace app
 			Range walkDistance;
 			Range runDistance;
 			/**
-			 * @brief やんちゃペンギン固有：徘徊を開始する親との距離
+			 * @brief 全タイプ共通：徘徊を開始する親との距離
 			 * @details 待機命令中に親がこの距離以上離れたら徘徊を開始する
 			 */
 			Range roamTriggerDistance;
 			/**
-			 * @brief やんちゃペンギン固有：徘徊先を選ぶ半径
+			 * @brief 全タイプ共通：徘徊先を選ぶ半径
 			 * @details 現在地からこの半径内のランダムな座標を徘徊先として選ぶ
 			 */
 			Range roamRadius;
