@@ -21,6 +21,16 @@ namespace app
 		 */
 		class DaddyPenguinStateMachine : public PenguinStateMachine
 		{
+		public:
+			/**
+			 * @brief スライド中に空中にいても滑走を続ける猶予（秒）
+			 * @details 小さな段差で滑走が途切れないようにするための猶予。
+			 *          これを超えて空中にいたら、SlideEnd を経由せず直接ジャンプ（落下）ステートへ移る。
+			 *          DaddyPenguinController の自動スライド判定も同じ値を使う。
+			 */
+			static constexpr float SLIDE_AIR_GRACE_TIME = 0.3f;
+
+
 			// ここに親ペンギン固有のセッター関数を追加していく
 		public:
 			/**
@@ -186,6 +196,8 @@ namespace app
 			bool m_isIglooEventFinished;
 			/** かまくら内にいるかどうか */
 			bool m_isInsideIgloo;
+			/** 空中にいる時間（秒。接地で0に戻る。スライド中の落下判定に使う） */
+			float m_slideAirTimer = 0.0f;
 		};
 	}
 }

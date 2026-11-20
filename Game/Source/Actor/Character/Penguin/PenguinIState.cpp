@@ -34,23 +34,26 @@ namespace app
 			 * @brief スライドの傾斜倍率を移動速度と旋回速度へ反映する
 			 * @details スライド系3ステート（SlideStart / Sliding / SlideEnd）が共通で使う。
 			 *          倍率そのものの計算は PenguinStateMachine 側にある。
+			 *          スライド中だけの加速度倍率もここで掛ける。
 			 * @param owner ペンギンのステートマシン
 			 */
 			void ApplySlideSlope(app::actor::PenguinStateMachine* owner)
 			{
 				owner->SetMoveSpeed(owner->CalcSlideSpeedWithSlope());
 				owner->SetTurnSpeedMultiplier(owner->CalcSlideTurnMultiplier());
+				owner->SetAccelerationMultiplier(owner->GetSlideAccelerationMultiplier());
 			}
 
 			/**
-			 * @brief 旋回速度の倍率を既定へ戻す
-			 * @details スライドを抜けたあとまで曲がりにくいままにしないため、
+			 * @brief 旋回速度・加速度の倍率を既定へ戻す
+			 * @details スライドを抜けたあとまで曲がりにくい・加速が速いままにしないため、
 			 *          スライド系ステートの Exit() から必ず呼ぶ。
 			 * @param owner ペンギンのステートマシン
 			 */
 			void ClearSlideSlope(app::actor::PenguinStateMachine* owner)
 			{
 				owner->SetTurnSpeedMultiplier(1.0f);
+				owner->SetAccelerationMultiplier(1.0f);
 			}
 		}
 

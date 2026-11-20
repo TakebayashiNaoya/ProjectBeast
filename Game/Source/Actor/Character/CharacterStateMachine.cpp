@@ -31,7 +31,7 @@ namespace app
 				Vector3 targetVelocity = m_moveDirection * (m_moveSpeed * m_speedMultiplier * m_externalSpeedMultiplier);
 
 				// ★修正：1.0f の代わりに MAX_LERP_FACTOR を使う
-				float lerpFactor = min(MAX_LERP_FACTOR, m_acceleration * deltaTime);
+				float lerpFactor = min(MAX_LERP_FACTOR, m_acceleration * m_accelerationMultiplier * deltaTime);
 
 				m_currentVelocity.Lerp(lerpFactor, m_currentVelocity, targetVelocity);
 			}
@@ -144,6 +144,7 @@ namespace app
 			, m_prevPositionY(0.0f)
 			, m_currentVelocity(Vector3::Zero)
 			, m_acceleration(10.0f)
+			, m_accelerationMultiplier(1.0f)
 			, m_friction(5.0f)
 			, m_turnSpeed(8.0f)
 		{}

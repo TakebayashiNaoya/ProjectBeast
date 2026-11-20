@@ -207,6 +207,24 @@ namespace app
 			 * @return 旋回速度の倍率
 			 */
 			float CalcSlideTurnMultiplier() const;
+			/**
+			 * @brief スライド中だけ掛ける加速度の倍率を設定する
+			 * @details スライド系ステートが SetAccelerationMultiplier() に渡す。
+			 *          親ペンギンだけ 1.0f より大きくして滑り出しを速くする（子は既定のまま）。
+			 * @param multiplier 倍率（既定 1.0f）
+			 */
+			void SetSlideAccelerationMultiplier(const float multiplier)
+			{
+				m_slideAccelerationMultiplier = multiplier;
+			}
+			/**
+			 * @brief スライド中だけ掛ける加速度の倍率を取得する
+			 * @return 倍率（既定 1.0f）
+			 */
+			float GetSlideAccelerationMultiplier() const
+			{
+				return m_slideAccelerationMultiplier;
+			}
 
 
 			/** ステートの変更先を取得する */
@@ -370,6 +388,8 @@ namespace app
 			float m_slideSlopeSigned = 0.0f;
 			/** 上り坂でのずり落ち（負の速度倍率）を許可するか。親ペンギンだけtrue */
 			bool  m_isSlideBackAllowed = false;
+			/** スライド中だけ掛ける加速度の倍率（既定 1.0f。親ペンギンだけ大きくする） */
+			float m_slideAccelerationMultiplier = 1.0f;
 		};
 	}
 }

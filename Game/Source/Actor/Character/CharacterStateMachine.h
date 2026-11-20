@@ -142,6 +142,18 @@ namespace app
 			{
 				m_turnSpeedMultiplier = (multiplier < 0.0f) ? 0.0f : multiplier;
 			}
+			/**
+			 * @brief 加速度の倍率を設定
+			 * @details Move() の Lerp 係数（m_acceleration）に乗算される。
+			 *          スライド中だけ目標速度への到達を早めるために使う。
+			 *          倍率を戻し忘れると別ステートまで加速が速くなるため、
+			 *          使う側は必ずステートの Exit() で 1.0f に戻すこと。
+			 * @param multiplier 倍率（0.0f 未満は 0.0f に丸める。上限クランプなし）
+			 */
+			inline void SetAccelerationMultiplier(const float multiplier)
+			{
+				m_accelerationMultiplier = (multiplier < 0.0f) ? 0.0f : multiplier;
+			}
 
 
 			/**
@@ -259,6 +271,8 @@ namespace app
 
 			/** 加速度（目標速度への到達の早さ） */
 			float m_acceleration;
+			/** 加速度の倍率（スライド中の加速用：既定 1.0f） */
+			float m_accelerationMultiplier;
 			/** 摩擦係数（入力がないときの減速の早さ） */
 			float m_friction;
 			/** 旋回速度（Slerpによる回転の滑らかさ） */

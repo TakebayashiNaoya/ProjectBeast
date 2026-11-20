@@ -26,6 +26,9 @@ namespace app
 			// プレイヤー操作の親ペンギンだけ、急な上り坂でのずり落ちを有効にする
 			SetSlideBackAllowed(true);
 
+			// 親ペンギンだけ、スライド中の加速度を上げて滑り出しを速くする
+			SetSlideAccelerationMultiplier(3.0f);
+
 			// 共通ステートの追加
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSneakState>(static_cast<PenguinStateMachine*>(this));
@@ -77,6 +80,16 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
+			// 空中にいる時間を更新する（Update() の遷移判定から毎フレーム呼ばれる）
+			if (IsOnGround())
+			{
+				m_slideAirTimer = 0.0f;
+			}
+			else
+			{
+				m_slideAirTimer += g_gameTime->GetFrameDeltaTime();
+			}
+
 			core::IState* nextState = nullptr;
 
 			// 1. システム・環境系の判定（ダメージ、死亡、水泳など）
@@ -160,7 +173,16 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::CheckActionState()
 		{
-			/** 1. スライド開始ステートのアニメーションが終わっていて、かつスライド状態が続いているならスライドステートへ */
+			/** 0. スライド系ステート中に空中にいる時間が猶予を超えたら（崖から落ちたなど）、
+					SlideEnd を経由せず直接ジャンプ（落下）ステートへ */
+			if (IsEqualCurrentState(PenguinSlideStartState::ID())
+				|| IsEqualCurrentState(PenguinSlidingState::ID())
+				|| IsEqualCurrentState(PenguinSlideEndState::ID()))
+			{
+				if (m_slideAirTimer > SLIDE_AIR_GRACE_TIME) return FindState(PenguinJumpState::ID());
+			}
+
+			/** 1.スライド開始ステートのアニメーションが終わっていて、かつスライド状態が続いているならスライドステートへ */
 			if (IsEqualCurrentState(PenguinSlideStartState::ID())) {
 				if (CanChangeSlidingState()) return FindState(PenguinSlidingState::ID());
 			}
