@@ -224,6 +224,12 @@ namespace nsBeastEngine
 		 */
 		void Set2DRenderEnabled(bool enabled) { m_is2DRenderEnabled = enabled; }
 
+		/**
+		 * @brief 2D（UI）描画が有効かどうかを取得する
+		 * @return 有効なら true
+		 */
+		bool Is2DRenderEnabled() const { return m_is2DRenderEnabled; }
+
 
 		//============================================//
 		// Init内で呼ばれる初期化処理

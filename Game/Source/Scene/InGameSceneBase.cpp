@@ -74,7 +74,7 @@ namespace
 	/** ロードフェーズ名（LoadPhase の並び順と一致させること。ロード時間トレース用） */
 	constexpr const char* LOAD_PHASE_NAMES[] = {
 		"None", "Stage", "StageWait", "DecalPrewarm", "Daddy",
-		"Children", "Enemy", "Camera", "Ocean", "MapIcon", "Done"
+		"Children", "Enemy", "Camera", "Ocean", "MapIcon", "ModelFinalize", "Done"
 	};
 
 	/** ロードの1フレームがこの時間を超えたらトレースへ記録する（ミリ秒）。
@@ -601,6 +601,30 @@ namespace app
 		{
 			/** ミニマップのアイコン生成を分割実行する（一括だと1.3秒フレームが止まる） */
 			if (!InGameUIManager::GetInstance()->InitializeMapIconStep(MAP_ICON_INIT_PER_FRAME))
+			{
+				break;
+			}
+
+			m_loadPhase = LoadPhase::ModelFinalize;
+			break;
+		}
+
+		case LoadPhase::ModelFinalize:
+		{
+			/** キャラクターのモデル初期化（非同期ロード完了後の Init）をロード画面の裏で済ませる。
+			 *  初期化は1フレーム4msまでに制限されているため、ここを飛ばしてカウントダウンに任せると
+			 *  ロード明けに子ペンギンなどが数体ずつ現れていく様子が映ってしまう */
+			if (m_daddyPenguin) m_daddyPenguin->UpdateModelOnly();
+			actor::ChildPenguinManager::GetInstance()->UpdateModelOnly();
+			actor::EnemyManager::GetInstance()->UpdateModelOnly();
+			actor::OrcaManager::GetInstance()->UpdateModelOnly();
+
+			const bool isAllModelReady =
+				(!m_daddyPenguin || m_daddyPenguin->IsModelReady()) &&
+				actor::ChildPenguinManager::GetInstance()->IsAllModelReady() &&
+				actor::EnemyManager::GetInstance()->IsAllModelReady() &&
+				actor::OrcaManager::GetInstance()->IsAllModelReady();
+			if (!isAllModelReady)
 			{
 				break;
 			}
