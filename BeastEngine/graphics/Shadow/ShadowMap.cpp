@@ -68,6 +68,30 @@ namespace nsBeastEngine
 		 *          環境光で埋まってしまい、トーンマップ後にはほぼ差が見えなくなる。
 		 */
 		constexpr float INITIAL_AMBIENT_RATE = 0.5f;
+
+		/**
+		 * @brief 深度バイアスのうち、面の傾きに依らない分の初期値（そのカスケードのテクセル数）
+		 * @details 定数バッファ経由で Shadow.h の CalcShadowRateWithSlope() に渡る。
+		 *          テクセル単位にしているのは、遠いカスケードほどテクセルが粗く、必要なバイアスも大きくなるため。
+		 */
+		constexpr float INITIAL_CONST_BIAS_TEXELS = 1.5f;
+
+		/**
+		 * @brief 深度バイアスのうち、面の傾き（光との角度のtan）に比例する分の倍率の初期値
+		 * @details 定数バッファ経由で Shadow.h の CalcShadowRateWithSlope() に渡る。
+		 *          光がすれすれに当たる面は、1テクセルの中で深度が大きく変わる。
+		 *          PCFで隣のテクセルを引くと自分自身を影と誤判定する（シャドウアクネ）ので、傾きに応じて深くする。
+		 */
+		constexpr float INITIAL_SLOPE_BIAS_SCALE = 2.0f;
+
+		/**
+		 * @brief 覆う範囲を求めるときに使う視野角の下限（度）
+		 * @details CameraSteering.cpp の FOV_MAX_DEG 以上にすること。
+		 *          スライド中は速度に応じて視野角が変わるため、そのまま使うと範囲（=テクセルの大きさ）が毎フレーム変わる。
+		 *          テクセルの大きさが変わると丸めの升目もずれ、影の輪郭がちらつく。
+		 *          下限で固定し、通常プレイでは範囲が変わらないようにする。
+		 */
+		constexpr float MIN_FRUSTUM_VIEW_ANGLE_DEG = 65.0f;
 	}
 
 
@@ -76,6 +100,8 @@ namespace nsBeastEngine
 		m_directLightRate = INITIAL_DIRECT_LIGHT_RATE;
 		m_ambientRate = INITIAL_AMBIENT_RATE;
 		m_shadowDistance = INITIAL_SHADOW_DISTANCE;
+		m_constBiasTexels = INITIAL_CONST_BIAS_TEXELS;
+		m_slopeBiasScale = INITIAL_SLOPE_BIAS_SCALE;
 
 		// 何も描かれていない場所は「最も遠い」とみなしたいのでクリア値を1.0にする
 		// 0.0でクリアすると範囲外が影だらけになる
@@ -139,7 +165,10 @@ namespace nsBeastEngine
 		up.Cross(forward, right);
 		up.Normalize();
 
-		const float tanHalfFov = tanf(camera.GetViewAngle() * 0.5f);
+		// 視野角が変わっても範囲が変わらないよう、下限で固定する（MIN_FRUSTUM_VIEW_ANGLE_DEG 参照）
+		const float minViewAngle = MIN_FRUSTUM_VIEW_ANGLE_DEG * Math::PI / 180.0f;
+		const float viewAngle = max(camera.GetViewAngle(), minViewAngle);
+		const float tanHalfFov = tanf(viewAngle * 0.5f);
 		const float aspect = camera.GetAspect();
 
 		// 区間の手前と奥、それぞれの面の4隅で計8点を求める

@@ -41,6 +41,7 @@ struct SPSIn
     float3 biNormal : BINORMAL;      // ワールド空間に変換済みの従ベクトル
     float2 uv       : TEXCOORD0;     // UV座標（そのまま引き継ぐ）
     float3 worldPos : TEXCOORD1;     // ワールド座標（ライティング計算・ディザリング判定用）
+    nointerpolation float isSkinned : TEXCOORD2; // スキンありメッシュなら1（影の判定に使う面の向きの選び方を変える）
 };
 
 // ピクセルシェーダーからの出力（GBufferに書き込まれる）
@@ -63,6 +64,13 @@ Texture2D<float4> g_metallicSmoothMap : register(t2);    // メタリックス�
 StructuredBuffer<float4x4> g_boneMatrix       : register(t3);    // ボーン行列（スキニング用）
 StructuredBuffer<float4x4> g_worldMatrixArray : register(t10);   // インスタンス用ワールド行列
 sampler g_sampler : register(s0);  // サンプラー（テクスチャをどう読むかの設定）
+
+// シーンライト（b1）。C++側 Light（SceneLight.h）の先頭だけを使う
+// 影の判定に使う「面と光の向きの内積」を求めるため、ライトの向きだけ読む
+cbuffer GBufferLightCb : register(b1)
+{
+    float3 gbufferLightDirection;  // ディレクションライトの向き（光が進む方向。Light::m_directionLight.m_direction）
+};
 
 // PBR補正パラメータ定数バッファ（b2）
 // C++側 PBRParam（ModelRender.h）と一致させること
@@ -162,6 +170,7 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
     psIn.biNormal = normalize(mul(m3x3, vsIn.biNormal));
 
     psIn.uv = vsIn.uv;
+    psIn.isSkinned = hasSkin ? 1.0f : 0.0f;
 
     // 法線や接ベクトル、従ベクトルがNaNになっていたら0ベクトルにする。
     if (any(isnan(psIn.tangent)))
@@ -304,16 +313,31 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
     psOut.metaricSmoothMap.b = ambientScale;
     psOut.metaricSmoothMap.a = saturate(metaricSmooth.a + smoothOffset);
 
-    // シャドウレシーバーかどうかを判定するフラグをw成分に格納する。
-    // 法線マップのｗは使わないので、ここに格納する。
-    if (isShadowReciever == true)
+    // 法線のw成分に「面の向きと、光源へ向かう方向の内積」を -1〜1 → 0〜1 で格納する。
+    // DeferredLighting.fx が影の判定（傾きに応じたバイアスと、すれすれ・裏向きの面の影）に使う。
+    // （isShadowReciever は以前このw成分に入れていたフラグ。現在は使わない）
+    //
+    // 面の向きの取り方をモデルの種類で変える。
+    // ・スキンなし（壁・建物などの背景）: ポリゴンそのものの向き。
+    //   ローダーが法線を角で丸めており（壁の上端で約45度）、頂点法線ではシャドウマップに写る実際の面の傾きと合わない。
+    //   光とほぼ平行な大きな面は、実際の傾きで影へ寄せないと三角形単位のまだら・ちらつきが出る。
+    // ・スキンあり（キャラクター）: 補間した頂点法線。
+    //   ポリゴンの向きを使うと、曲面の明暗の境界がポリゴン1枚ごとの段になって目立つ。
+    //   キャラクターは小さく近景のカスケードで細かく写るので、滑らかな向きで判定しても誤判定は出にくい。
+    float3 faceNormal = normalize(psIn.normal);
+    if (psIn.isSkinned < 0.5f)
     {
-        psOut.normal.w = 1.0f;
+        float3 geomNormal = cross(ddx(psIn.worldPos), ddy(psIn.worldPos));
+        float geomNormalLenSq = dot(geomNormal, geomNormal);
+        if (geomNormalLenSq > 0.0f)
+        {
+            geomNormal *= rsqrt(geomNormalLenSq);
+            // 外積の向きは画面の座標系で決まるので、頂点法線と同じ側（面の表）へそろえる
+            faceNormal = (dot(geomNormal, psIn.normal) < 0.0f) ? -geomNormal : geomNormal;
+        }
     }
-    else
-    {
-        psOut.normal.w = 0.0f;
-    }
+    float faceNdotL = dot(faceNormal, -gbufferLightDirection);
+    psOut.normal.w = faceNdotL * 0.5f + 0.5f;
 
     return psOut;
 }
