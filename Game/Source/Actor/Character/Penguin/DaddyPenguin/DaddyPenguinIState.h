@@ -58,6 +58,13 @@ namespace app
 			void Update() override final;
 			void Exit() override final;
 
+			/**
+			 * @brief 子ペンギンへ再集合を呼びかけ、鳴き声を鳴らす（モーションは含まない）
+			 * @details このステートの Enter と、泳いでいてこのステートへ入れないとき
+			 *          （DaddyPenguinController）の両方から使う。
+			 */
+			static void CallRegroupWithVoice();
+
 
 		public:
 			DaddyPenguinCommandShoutState(DaddyPenguinStateMachine* owner);

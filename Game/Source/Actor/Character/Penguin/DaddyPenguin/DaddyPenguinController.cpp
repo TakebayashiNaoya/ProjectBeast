@@ -427,6 +427,14 @@ namespace app
 			// 共通のアクション入力（ジャンプは使わない）
 			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, false, isSlide, isSlideCoast);
 
+			// 泳いでいる間は泳ぎステートが呼びかけステートより優先されて入れないので、
+			// 泳ぎを続けたまま呼びかけと鳴き声だけ行う（呼びかけのモーションは陸上のみ）
+			if (isRegroupCall && m_stateMachine->IsSwimming())
+			{
+				DaddyPenguinCommandShoutState::CallRegroupWithVoice();
+				isRegroupCall = false;
+			}
+
 			// 親ペンギン固有の入力
 			m_stateMachine->SetIsCommandToggle(isRegroupCall);
 
