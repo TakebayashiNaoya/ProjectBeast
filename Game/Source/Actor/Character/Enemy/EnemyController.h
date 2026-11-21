@@ -86,7 +86,6 @@ namespace app
 				enEnemyState_Search,
 				enEnemyState_Wandering,
 				enEnemyState_Chase,
-				enEnemyState_Jump,
 				enEnemyState_Swim,
 				enEnemyState_Attack,
 				enEnemyState_ReturnHome,
@@ -166,12 +165,6 @@ namespace app
 			static void UpdateChase(EnemyController* enemy);
 			static void ExitChase(EnemyController* enemy);
 			static int CheckChase(EnemyController* enemy);
-
-			/** ジャンプ */
-			static void EnterJump(EnemyController* enemy);
-			static void UpdateJump(EnemyController* enemy);
-			static void ExitJump(EnemyController* enemy);
-			static int CheckJump(EnemyController* enemy);
 
 			/** 泳ぐ */
 			static void EnterSwim(EnemyController* enemy);

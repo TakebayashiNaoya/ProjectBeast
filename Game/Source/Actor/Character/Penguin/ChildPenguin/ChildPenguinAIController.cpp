@@ -366,9 +366,8 @@ namespace app
 			const float swimSpeed = RollRange(td.swimSpeed);
 			const float sneakSpeed = RollRange(td.sneakSpeed);
 			const float slideSpeed = RollRange(td.slideSpeed);
-			const float jumpPower = RollRange(td.jumpPower);
 			owner->GetStatus<ChildPenguinStatus>()->SetIndividualValues(
-				runSpeed, swimSpeed, sneakSpeed, slideSpeed, jumpPower);
+				runSpeed, swimSpeed, sneakSpeed, slideSpeed);
 
 			/** 距離系個体値を決定する */
 			m_stopDistance = RollRange(td.stopDistance);
@@ -693,24 +692,24 @@ namespace app
 			case MovePhase::Stop:
 				/** 停止 */
 				// 目標座標の近くで自然に止まるため、向きの調整は不要
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				break;
 
 			case MovePhase::Walk:
 				/** 歩き：isSneak=true, isDash=false, isSlide=false */
-				m_stateMachine->SetActionInput(moveDirection, true, false, false, false);
+				m_stateMachine->SetActionInput(moveDirection, true, false, false);
 				break;
 
 			case MovePhase::Run:
 				/** 走り：isSneak=false, isDash=true, isSlide=false */
-				m_stateMachine->SetActionInput(moveDirection, false, true, false, false);
+				m_stateMachine->SetActionInput(moveDirection, false, true, false);
 				break;
 
 			case MovePhase::Slide:
 				/**
 				 * 滑り：isSneak=false, isDash=true, isSlide=true。
 				 */
-				m_stateMachine->SetActionInput(moveDirection, false, true, false, true, isSlideCoast);
+				m_stateMachine->SetActionInput(moveDirection, false, true, true, isSlideCoast);
 				break;
 			}
 		}
@@ -728,7 +727,7 @@ namespace app
 				// これがないと見た目だけ屋根の上に押し出されてしまいます
 				m_stateMachine->SetPosition(m_iglooTargetPos);
 
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				return;
 			}
 
@@ -743,7 +742,7 @@ namespace app
 			// 青い円に十分近づいたらワープ発動
 			if (dirToTarget.Length() < ENTER_DISTANCE)
 			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 
 				// 子ペンギンの現在位置を基準に最も近いイグルーの中心座標を取得
 				Vector3 iglooPos = StageSystem::GetInstance()->GetNearestIglooPosition(myPos);
@@ -798,7 +797,7 @@ namespace app
 				{
 					dirToTarget.Normalize();
 				}
-				m_stateMachine->SetActionInput(dirToTarget, true, false, false, false);
+				m_stateMachine->SetActionInput(dirToTarget, true, false, false);
 			}
 		}
 
@@ -895,7 +894,7 @@ namespace app
 				{
 					m_stateMachine->SetSpeedMultiplier(0.0f);
 					m_stateMachine->SetTurnSpeedMultiplier(INVESTIGATE_TURN_MULTIPLIER);
-					m_stateMachine->SetActionInput(toDaddy, true, false, false, false);
+					m_stateMachine->SetActionInput(toDaddy, true, false, false);
 					return;
 				}
 			}
@@ -904,7 +903,7 @@ namespace app
 			m_stateMachine->SetTurnSpeedMultiplier(1.0f);
 			if (TryRoam()) return;
 
-			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 		}
 
 
@@ -948,7 +947,7 @@ namespace app
 			m_stateMachine->SetSpeedMultiplier(1.0f);
 			m_stateMachine->SetExternalSpeedMultiplier(1.0f);
 			m_stateMachine->SetActionInput(
-				CalculateMoveDirectionWithNav(m_roamTarget, distToTarget), false, true, false, false);
+				CalculateMoveDirectionWithNav(m_roamTarget, distToTarget), false, true, false);
 
 			OnRoamUpdated();
 			return true;
@@ -1504,7 +1503,7 @@ namespace app
 			// 振り向き（？）中に落としていた速度・旋回の倍率が残らないよう明示的に戻す
 			m_stateMachine->SetSpeedMultiplier(1.0f);
 			m_stateMachine->SetTurnSpeedMultiplier(1.0f);
-			m_stateMachine->SetActionInput(fleeDir, false, true, false, false);
+			m_stateMachine->SetActionInput(fleeDir, false, true, false);
 			return true;
 		}
 
@@ -1536,8 +1535,8 @@ namespace app
 			m_stateMachine->SetPosition(spawnPos);
 
 			// 4. 強制的に空中に放り出された判定にするため、入力をゼロにする
-			// （これによって自動的にジャンプ・落下ステート等へ遷移します）
-			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+			// （これによって自動的に落下ステート等へ遷移します）
+			m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 		}
 
 
@@ -1571,7 +1570,7 @@ namespace app
 			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
 			{
 				if (m_isFollowing) { m_isFollowing = false; }
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				return;
 			}
 
@@ -1656,7 +1655,7 @@ namespace app
 			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
 			{
 				if (m_isFollowing) { m_isFollowing = false; }
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				return;
 			}
 
@@ -1741,7 +1740,7 @@ namespace app
 					m_isFollowing = false;
 				}
 				stopEffect();
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				return;
 			}
 
@@ -1840,7 +1839,7 @@ namespace app
 			if (m_owner->GetStateMachine()->GetIsInWhirlpool() && !m_naughtyStateMachine->GetIsGoingToWhirlpool())
 			{
 				if (m_isFollowing) { m_isFollowing = false; }
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				return;
 			}
 
@@ -1871,7 +1870,7 @@ namespace app
 					m_isFollowing = false;
 				}
 
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				return;
 			}
 
@@ -2003,7 +2002,7 @@ namespace app
 					// 巻き込まれたフラグを立てて、入力はゼロにしてシステムに身を任せる
 					m_wasSwallowedByWhirlpool = true;
 					if (m_isFollowing) { m_isFollowing = false; }
-					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 					PlayLivelyEffect();
 					return;
 				}
@@ -2037,7 +2036,7 @@ namespace app
 					else
 					{
 						Vector3 dir = CalculateDirectionToTarget(targetPos);
-						m_stateMachine->SetActionInput(dir, false, true, false, false); // ダッシュで向かう
+						m_stateMachine->SetActionInput(dir, false, true, false); // ダッシュで向かう
 					}
 
 					PlayLivelyEffect();
@@ -2057,7 +2056,7 @@ namespace app
 					m_naughtyStateMachine->SetIsGoingToWakeBear(false);
 					m_naughtyStateMachine->SetIsAtBear(false);
 					manager->UnregisterAttempting(m_owner);
-					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 
 					StopLivelyEffect();
 					return;
@@ -2070,14 +2069,14 @@ namespace app
 				if (distToBear <= REACH_BEAR_DISTANCE)
 				{
 					m_naughtyStateMachine->SetIsAtBear(true);
-					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				}
 				else
 				{
 					// 到達していなければシロクマに向かって移動
 					Vector3 dir = CalculateDirectionToTarget(bearPos);
 
-					m_stateMachine->SetActionInput(dir, true, false, false, false);
+					m_stateMachine->SetActionInput(dir, true, false, false);
 				}
 
 				// エフェクトを再生する。
@@ -2253,7 +2252,7 @@ namespace app
 			if (isDowningNow)
 			{
 				/** 転倒・スリップ中は移動入力をゼロにして固有ステートの評価を妨げないようにする */
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				m_wasSliding = false;
 				return;
 			}
@@ -2265,7 +2264,7 @@ namespace app
 			if (m_owner->GetStateMachine()->GetIsInWhirlpool())
 			{
 				if (m_isFollowing) { m_isFollowing = false; }
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				m_wasSliding = false;
 				return;
 			}
@@ -2437,7 +2436,7 @@ namespace app
 				}
 				if (m_isFollowing) { m_isFollowing = false; }
 				// 自分の入力もゼロにしてシステムに身を任せる
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				return;
 			}
 
@@ -2543,7 +2542,7 @@ namespace app
 						/** 十分近づいたら介入処理を適用してその場で待機する */
 						ApplyIntervention(m_interventionTarget);
 						m_hasReachedInterventionTarget = true;
-						m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+						m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 					}
 					else
 					{
@@ -2552,7 +2551,7 @@ namespace app
 						{
 							Vector3 dir = CalculateDirectionToTarget(m_interventionTarget->GetTransform().m_position);
 
-							m_stateMachine->SetActionInput(dir, false, true, false, true);
+							m_stateMachine->SetActionInput(dir, false, true, true);
 						}
 						else
 						{
@@ -2662,7 +2661,7 @@ namespace app
 					/** 十分近づいたら介入処理を適用してその場で待機する */
 					ApplyIntervention(m_interventionTarget);
 					m_hasReachedInterventionTarget = true;
-					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
+					m_stateMachine->SetActionInput(Vector3::Zero, false, false, false);
 				}
 				else
 				{
@@ -2671,7 +2670,7 @@ namespace app
 					{
 						Vector3 dir = CalculateDirectionToTarget(m_interventionTarget->GetTransform().m_position);
 
-						m_stateMachine->SetActionInput(dir, false, true, false, true);
+						m_stateMachine->SetActionInput(dir, false, true, true);
 					}
 					else
 					{

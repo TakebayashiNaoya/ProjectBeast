@@ -24,11 +24,11 @@ namespace app
 
 		InGameButtonMenu::InGameButtonMenu()
 		{
-			// スタミナゲージ専用のステータスを生成。
+			// 再集合ゲージ専用のステータスを生成。
 			m_gaugeStatus = std::make_unique<InGameButtonGaugeStatus>();
 			m_gaugeStatus->SetUp();
 
-			// スタミナゲージ専用のアニメーションステータスを生成。
+			// 再集合ゲージ専用のアニメーションステータスを生成。
 			m_gaugeAnimStatus = std::make_unique<InGameButtonGaugeAnimStatus>();
 			m_gaugeAnimStatus->SetUp();
 		}
@@ -57,7 +57,7 @@ namespace app
 			}
 
 			ButtonIconUpdate();
-			UpdateStaminaGauge();
+			UpdateRegroupGauge();
 			UpdateYButtonEmphasis();
 			MenuBase::Update();
 		}
@@ -109,7 +109,7 @@ namespace app
 		}
 
 
-		void InGameButtonMenu::UpdateStaminaGauge()
+		void InGameButtonMenu::UpdateRegroupGauge()
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 
@@ -123,7 +123,7 @@ namespace app
 					auto* gaugeB = GetUI<UICircleGauge>(Hash32(gaugeBName));
 					if (!gaugeA || !gaugeB) return;
 
-					// ゲームからのスタミナ残量(0.0〜1.0)を安全にクランプ
+					// ゲームからの残量(0.0〜1.0)を安全にクランプ
 					float targetRatio = util::clamp(rawTargetRatio, 0.0f, 1.0f);
 
 					displayRatio = targetRatio;
@@ -134,7 +134,7 @@ namespace app
 					// 外枠(GaugeB)は常に100%表示
 					gaugeB->SetProgress(1.0f);
 
-					// スタミナ残量に応じた色の変更 (緑 → 黄色 → 赤)
+					// 残量に応じた色の変更 (緑 → 黄色 → 赤)
 					Vector4 gaugeColor;
 					if (displayRatio > 0.5f) {
 						gaugeColor = Vector4(0.0f, 1.0f, 0.0f, 1.0f); // 緑
@@ -180,12 +180,11 @@ namespace app
 					}
 				};
 
-			// Y（再集合の呼びかけ）のクールダウン。ロック演出はスライド時代の
-			// アニメーション定義（slideGauge*Anim）をそのまま流用している
+			// Y（再集合の呼びかけ）のクールダウン
 			updateGauge("OrderCooldownGaugeA", "OrderCooldownGaugeB",
 				m_regroupCooldownRatio, m_isRegroupCooldownLocked, m_wasRegroupCooldownLocked,
-				m_regroupDisplayRatio, m_gaugeStatus->GetSlideFollowSpeed(),
-				animKey::SLIDE_GAUGE_LOCK_ANIM_KEY, animKey::SLIDE_GAUGE_UNLOCK_ANIM_KEY);
+				m_regroupDisplayRatio, m_gaugeStatus->GetRegroupFollowSpeed(),
+				animKey::REGROUP_GAUGE_LOCK_ANIM_KEY, animKey::REGROUP_GAUGE_UNLOCK_ANIM_KEY);
 		}
 
 

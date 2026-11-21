@@ -69,7 +69,6 @@ namespace app
 			Range swimSpeed;
 			Range sneakSpeed;
 			Range slideSpeed;
-			Range jumpPower;
 			/** 距離系の個体差範囲 */
 			Range stopDistance;
 			Range walkDistance;

@@ -30,7 +30,7 @@ namespace app {
 
 		void NaughtyWakeBearState::Enter()
 		{
-			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
+			m_owner->SetActionInput(Vector3::Zero, false, false, false);
 			m_owner->SetMoveSpeed(0.0f);
 
 			// TODO: シロクマを起こすアニメID に差し替える
@@ -69,7 +69,7 @@ namespace app {
 
 		void NaughtyDiveWhirlpoolState::Enter()
 		{
-			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
+			m_owner->SetActionInput(Vector3::Zero, false, false, false);
 			m_owner->SetMoveSpeed(0.0f);
 
 			m_owner->PlayAnimation(EnPenguinAnimationID::LaunchBegin);

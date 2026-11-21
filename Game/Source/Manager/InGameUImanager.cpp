@@ -242,7 +242,7 @@ namespace app
 
 		auto* daddyPenguin = bm.GetDaddyPenguin();
 
-		// スタミナゲージUI通知用にキャッシュしておく
+		// 再集合ゲージUI通知用にキャッシュしておく
 		m_daddyPenguin = daddyPenguin;
 
 		// UIがnullptrでないかをチェックするラムダ

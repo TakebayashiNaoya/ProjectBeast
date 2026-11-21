@@ -1,6 +1,6 @@
 ﻿/**
  * @file InGameButtonGaugeAnimStatus.h
- * @brief インゲームボタンのスタミナゲージ専用のアニメーションステータスクラス
+ * @brief インゲームボタンの再集合ゲージ専用のアニメーションステータスクラス
  */
 #pragma once
 #include "Source/UI/Animation/UIAnimationFactory.h"
@@ -12,7 +12,7 @@ namespace app
 	namespace ui
 	{
 		/**
-		 * @brief インゲームボタンのスタミナゲージ専用のアニメーションステータスクラス
+		 * @brief インゲームボタンの再集合ゲージ専用のアニメーションステータスクラス
 		 * @note UIAnimationStatusを継承しているため、UIアニメーションを制御するためのステータスを持つことが可能
 		 */
 		class InGameButtonGaugeAnimStatus : public UIAnimationStatus
@@ -34,10 +34,8 @@ namespace app
 			virtual ~InGameButtonGaugeAnimStatus() override;
 
 			/** 構造体のゲッター群 */
-			AnimData GetJumpLockAnimData() const { return m_jumpLockAnimData; }
-			AnimData GetJumpUnlockAnimData() const { return m_jumpUnlockAnimData; }
-			AnimData GetSlideLockAnimData() const { return m_slideLockAnimData; }
-			AnimData GetSlideUnlockAnimData() const { return m_slideUnlockAnimData; }
+			AnimData GetRegroupLockAnimData() const { return m_regroupLockAnimData; }
+			AnimData GetRegroupUnlockAnimData() const { return m_regroupUnlockAnimData; }
 
 			void SetUp() override;
 			void Update() override;
@@ -45,10 +43,8 @@ namespace app
 
 		private:
 			/** これらにJSONの情報を入れていく */
-			AnimData m_jumpLockAnimData;
-			AnimData m_jumpUnlockAnimData;
-			AnimData m_slideLockAnimData;
-			AnimData m_slideUnlockAnimData;
+			AnimData m_regroupLockAnimData;
+			AnimData m_regroupUnlockAnimData;
 		};
 	}
 }

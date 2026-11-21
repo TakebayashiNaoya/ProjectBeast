@@ -40,7 +40,7 @@ namespace app
 
 		void ClumsyTripState::Enter()
 		{
-			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
+			m_owner->SetActionInput(Vector3::Zero, false, false, false);
 			m_owner->SetMoveSpeed(0.0f);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Trip);
 			ChildPenguinManager::GetInstance()->RegisterDowning(m_owner->GetOwnerChildPenguin());
@@ -166,7 +166,7 @@ namespace app
 		{
 			/** 移動入力をゼロにしてこけるアニメーションを再生する */
 			/** 速度のリセットはしない（スライドの慣性を残して少し滑らせる） */
-			m_owner->SetActionInput(Vector3::Zero, false, false, false, false);
+			m_owner->SetActionInput(Vector3::Zero, false, false, false);
 			m_owner->PlayAnimation(EnPenguinAnimationID::Trip);
 
 			/** Managerに転倒中であることを登録する */

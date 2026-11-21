@@ -313,28 +313,6 @@ namespace app
 		/***************************************/
 
 
-		void EnemyJumpState::Enter()
-		{}
-
-
-		void EnemyJumpState::Update()
-		{}
-
-
-		void EnemyJumpState::Exit()
-		{}
-
-
-		EnemyJumpState::EnemyJumpState(EnemyStateMachine* owner)
-			: EnemyIState(owner)
-		{}
-
-
-
-
-		/***************************************/
-
-
 		void EnemySwimState::Enter()
 		{
 			const float moveSpeed = m_owner->GetOwnerStatus()->GetSwimSpeed();

@@ -67,7 +67,6 @@ namespace app {
 			{
 				enAIState_Idle,
 				enAIState_Move,
-				enAIState_Jump,
 				enAIState_Swim,
 
 				enAIState_Num,
@@ -141,15 +140,6 @@ namespace app {
 			static void UpdateMove(NPCController* npc);
 			static void ExitMove(NPCController* npc);
 			static int CheckMove(NPCController* npc);
-
-
-			/**
-			 * ジャンプ
-			 */
-			static void EnterJump(NPCController* npc);
-			static void UpdateJump(NPCController* npc);
-			static void ExitJump(NPCController* npc);
-			static int CheckJump(NPCController* npc);
 
 
 			/**
