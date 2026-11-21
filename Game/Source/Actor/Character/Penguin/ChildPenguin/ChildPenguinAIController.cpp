@@ -226,6 +226,20 @@ namespace app
 			 */
 			constexpr float CHILD_SLIDE_OVERSHOOT_LIMIT = 250.0f;
 
+			/** 離されたときの追いつき補正（runDistance 超過分に比例、RAMP で最大） */
+			constexpr float CHILD_CATCHUP_SPEED_MAX = 1.8f;
+			constexpr float CHILD_CATCHUP_RAMP_DISTANCE = 200.0f;
+
+			constexpr float CalcCatchUpMultiplier(const float distToTarget, const float runDistance)
+			{
+				const float over = distToTarget - runDistance;
+				if (over <= 0.0f) return 1.0f;
+				const float t = (over >= CHILD_CATCHUP_RAMP_DISTANCE) ? 1.0f : over / CHILD_CATCHUP_RAMP_DISTANCE;
+				return 1.0f + (CHILD_CATCHUP_SPEED_MAX - 1.0f) * t;
+			}
+			static_assert(CalcCatchUpMultiplier(50.0f, 80.0f) == 1.0f, "");
+			static_assert(CalcCatchUpMultiplier(1000.0f, 80.0f) == CHILD_CATCHUP_SPEED_MAX, "");
+
 			/**
 			 * @brief 移動手段を傾斜で選ぶときの歩きのしきい値（符号つき傾斜 sinθ。正が下り）
 			 * @details 上り -0.06 を超えたら歩き、それ以外は走り。
@@ -574,7 +588,9 @@ namespace app
 
 			// 陣形のパッシブ/ウルト速度倍率を反映する（1.0f超もありうるためクランプなしの別枠に渡す）。
 			// 滑走の判定を陣形倍率込みの速度で行うため、判定より先に設定する
-			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
+			m_stateMachine->SetExternalSpeedMultiplier(
+				ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier()
+				* CalcCatchUpMultiplier(distToTarget, m_runDistance));
 
 			/**
 			 * 滑走の判定（親と共用の slideRule::Decide()。しきい値は PenguinSlideRule.h）。
