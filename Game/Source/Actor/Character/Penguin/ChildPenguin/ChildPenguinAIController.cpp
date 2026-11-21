@@ -594,7 +594,7 @@ namespace app
 
 			/**
 			 * 滑走の判定（親と共用の slideRule::Decide()。しきい値は PenguinSlideRule.h）。
-			 * 子は滑走中に後ろへ切り返せない（なかなか止まれない）：
+			 * おっちょこちょいは滑走中に後ろへ切り返せない（なかなか止まれない）：
 			 *   目標が進行方向の後ろに来たら、進行方向を保ったまま勢いだけで滑る（Coast）。
 			 *   このとき傾斜は0として判定し、坂に運ばれて目標から逃げていかないようにする。
 			 *   後ろの目標まで CHILD_SLIDE_OVERSHOOT_LIMIT を超えたら立って戻る。
@@ -609,7 +609,8 @@ namespace app
 
 			float slope = m_stateMachine->GetSlideSlopeSigned();
 			bool isTargetBehind = false;
-			if (isSliding && isTraveling)
+			const bool isClumsy = (m_owner->GetChildPenguinType() == EnChildPenguinType::Clumsy);
+			if (isClumsy && isSliding && isTraveling)
 			{
 				const Vector3 toTarget = CalculateDirectionToTarget(targetPos);
 				if (toTarget.LengthSq() > FLT_EPSILON && toTarget.Dot(travelDir) < 0.0f)

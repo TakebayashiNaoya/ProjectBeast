@@ -21,8 +21,8 @@ namespace app
 			, m_type(type)
 			, m_attackerEnemy(nullptr)
 		{
-			/** 子は親（120）より惰性の減速を緩くして「なかなか止まれない」を表現する（u/s²） */
-			SetSlideCoastDeceleration(80.0f);
+			/** 惰性の減速（u/s²）。おっちょこちょいだけ親（120）より止まりにくい */
+			SetSlideCoastDeceleration(type == EnChildPenguinType::Clumsy ? 80.0f : 120.0f);
 
 			/** 共通ステートの追加 */
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
