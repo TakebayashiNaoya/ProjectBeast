@@ -52,15 +52,20 @@ namespace app
 			// 待機命令そのもの（EnPenguinCommand::Wait）は消していない。
 			// ToggleCommand() / SetCommand() は残っているので、
 			// 別のボタンへ割り当て直せば元の切り替えも復活できる。
-			auto* childPenMan = ChildPenguinManager::GetInstance();
-			childPenMan->CallRegroup();
-
-			auto* sound = &SoundManager::Get();
+			CallRegroupWithVoice();
 
 			// === 「おいで！」の演出 ===
 			// 視覚演出は FormationRangeVisualizer の波紋（声の届く範囲へ収束するリング）に
 			// 一本化した。旧 DaddyPenguinCommand エフェクトは波紋と重なってうるさいので出さない
 			m_owner->PlayAnimation(EnPenguinAnimationID::CommandShout);
+		}
+
+
+		void DaddyPenguinCommandShoutState::CallRegroupWithVoice()
+		{
+			ChildPenguinManager::GetInstance()->CallRegroup();
+
+			auto* sound = &SoundManager::Get();
 			sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinShoutFollow, false);
 			sound->PlaySE(enSoundKind::enSoundKind_DaddyPenguinSystemFollow, false);
 		}
