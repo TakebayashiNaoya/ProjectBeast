@@ -154,6 +154,19 @@ namespace app
 			{
 				m_accelerationMultiplier = (multiplier < 0.0f) ? 0.0f : multiplier;
 			}
+			/**
+			 * @brief 惰性の減速度を設定
+			 * @details 0 より大きいと、Move() は速度の「入力方向の成分」をこの減速度（u/s²）でしか落とさない
+			 *          （加速・切り返し・横成分・無入力時の摩擦は従来どおり）。
+			 *          スライドの「勢いで滑り続ける」を表現するために使う。
+			 *          戻し忘れると別ステートまで止まりにくくなるため、
+			 *          使う側は必ずステートの Exit() で 0.0f に戻すこと。
+			 * @param deceleration 減速度（u/s²。0.0f 以下で無効＝従来の計算）
+			 */
+			inline void SetCoastDeceleration(const float deceleration)
+			{
+				m_coastDeceleration = (deceleration < 0.0f) ? 0.0f : deceleration;
+			}
 
 
 			/**
@@ -273,6 +286,8 @@ namespace app
 			float m_acceleration;
 			/** 加速度の倍率（スライド中の加速用：既定 1.0f） */
 			float m_accelerationMultiplier;
+			/** 惰性の減速度（u/s²。スライドの惰性用：既定 0.0f = 無効） */
+			float m_coastDeceleration;
 			/** 摩擦係数（入力がないときの減速の早さ） */
 			float m_friction;
 			/** 旋回速度（Slerpによる回転の滑らかさ） */

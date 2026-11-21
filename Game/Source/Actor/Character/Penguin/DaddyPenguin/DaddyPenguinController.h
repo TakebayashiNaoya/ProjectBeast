@@ -88,8 +88,6 @@ namespace app
 			int   m_clingyCount     = 0;      /** 隊列にいる甘えん坊の数 */
 			float m_speedMultiplier = 1.0f;   /** 甘えん坊による減速を適用したスピード倍率 */
 
-			/** 自動スライド：継続条件を外れてからの時間（秒） */
-			float m_autoSlideExitTimer = 0.0f;
 			/** 自動スライド：空中にいる時間（秒） */
 			float m_autoSlideAirTimer = 0.0f;
 

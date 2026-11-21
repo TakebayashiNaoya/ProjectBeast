@@ -26,9 +26,11 @@ namespace
 
 	/** 速度の平滑化の時定数（秒）。FOV・先読み・低アングルの入力になる */
 	constexpr float SPEED_SMOOTH_TIME = 0.25f;
-	/** 速度演出が始まる速度と最大になる速度（ユニット/秒）。歩き90〜スライド最大300が目安 */
+	/** 速度演出が始まる速度と最大になる速度（ユニット/秒）。
+	 *  歩き90〜スライド上限520が目安。親の slideSpeed を 200 へ上げた（3.4度で236、10度で304）ので、
+	 *  高速域でも演出が段階的に効くよう最大を 400 に置く */
 	constexpr float SPEED_EFFECT_MIN = 110.0f;
-	constexpr float SPEED_EFFECT_MAX = 270.0f;
+	constexpr float SPEED_EFFECT_MAX = 400.0f;
 
 	/** 視野角（度）。基準値から、最高速時は最大値まで広がる（疾走感）。
 	 *  FOVの変化は酔いのトリガーになるため、振れ幅は小さく・変化はゆっくりにする

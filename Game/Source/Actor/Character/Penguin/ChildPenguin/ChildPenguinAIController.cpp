@@ -20,6 +20,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Character/Penguin/PenguinSlideRule.h"
 #include "Source/Actor/Stage/StageNavGrid.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Actor/Stage/TerrainObject.h"
@@ -218,20 +219,19 @@ namespace app
 			constexpr float PERCEPTION_EYE_HEIGHT = 42.0f;
 
 			/**
-			 * @brief AIがスライドを諦める上り傾斜（符号つき傾斜 sinθ）
-			 * @details -0.15 は約8.6度の上り。傾斜モデルの強化で上りのスライドは
-			 *          走りより大幅に遅くなったため、これより急な上りでは走りに切り替える。
+			 * @brief 滑走中に目標を追い越してよい距離の上限
+			 * @details 子は滑走中に後ろへ切り返せない（なかなか止まれない）。
+			 *          目標が進行方向の後ろにあり、ここより離れたら立って戻る。
+			 *          無制限にすると渦潮・水辺へ流れる事故が増える。
 			 */
-			constexpr float CHILD_SLIDE_UPHILL_LIMIT = -0.15f;
+			constexpr float CHILD_SLIDE_OVERSHOOT_LIMIT = 250.0f;
 
 			/**
-			 * @brief 移動手段を傾斜で選ぶときのしきい値（符号つき傾斜 sinθ。正が下り）
-			 * @details 下り 0.06（約3.4度）を超えたらスライド、
-			 *          上り -0.06 を超えたら歩き、その間は走り。
+			 * @brief 移動手段を傾斜で選ぶときの歩きのしきい値（符号つき傾斜 sinθ。正が下り）
+			 * @details 上り -0.06 を超えたら歩き、それ以外は走り。
 			 *          出る側のしきい値（EXIT）を緩くして境界でのばたつきを防ぐ。
+			 *          スライドのしきい値は親と共用で PenguinSlideRule.h にある。
 			 */
-			constexpr float CHILD_SLOPE_SLIDE_ENTER = 0.06f;
-			constexpr float CHILD_SLOPE_SLIDE_EXIT  = 0.02f;
 			constexpr float CHILD_SLOPE_WALK_ENTER  = -0.06f;
 			constexpr float CHILD_SLOPE_WALK_EXIT   = -0.02f;
 
@@ -467,13 +467,8 @@ namespace app
 
 		void ChildPenguinAIController::BuildInput()
 		{
-			// SlideEnd アニメーション中は入力をゼロにして自然に滑り止まるのを待つ
-			if (m_stateMachine->IsEqualCurrentState(PenguinSlideEndState::ID()))
-			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
-				return;
-			}
-
+			// SlideEnd 中も入力を通す（入力が来たら SlideEnd を抜けて走り出す。
+			// 再スライドは slideRule::Decide() の開始条件が守る）
 			const Vector3 targetPos = m_owner->GetFormationTargetPosition();
 			BuildInputToTarget(targetPos);
 		}
@@ -567,56 +562,120 @@ namespace app
 
 
 			/**
-			 * フェーズ遷移。
-			 * 遠距離の移動手段は距離ではなく「足元の傾斜」で選ぶ：
-			 *   下り坂 → スライド（傾斜ゲインで加速して速い）
-			 *   上り坂 → 歩き（スライドはずり落ち、確実に登れる歩幅で）
-			 *   平地   → 走り
-			 * 目標付近の減速（Walk→Stop）だけは従来どおり距離と速度で判断する。
-			 * 傾斜は出入りで別しきい値のヒステリシスを持たせ、境界でばたつかないようにする。
-			 */
-			if (m_movePhase == MovePhase::Stop)
-			{
-				if (distToTarget > m_stopDistance + STOP_EXIT_MARGIN)
-				{
-					/** まず歩きで動き出し、次フレーム以降は傾斜で選び直す */
-					m_movePhase = MovePhase::Walk;
-				}
-			}
-			else if (distToTarget <= m_walkDistance - HYSTERESIS
-				|| (m_movePhase == MovePhase::Walk
-					&& distToTarget <= m_walkDistance + PHASE_UP_MARGIN))
-			{
-				/** 目標付近では傾斜に関係なく Walk へ落として減速する
-				 *  （Stop への遷移はこの上の距離＋速度の判定が行う）。
-				 *  入りは walkDistance-H、出は walkDistance+MARGIN の
-				 *  ヒステリシスにしないと、境界上で Walk/Run が毎フレーム反転して
-				 *  所定位置に着く直前の子がカクカクする */
-				m_movePhase = MovePhase::Walk;
-			}
-			else
-			{
-				const float slope = m_stateMachine->GetSlideSlopeSigned();
-				const bool wantSlide = (m_movePhase == MovePhase::Slide)
-					? (slope > CHILD_SLOPE_SLIDE_EXIT)
-					: (slope > CHILD_SLOPE_SLIDE_ENTER);
-				const bool wantWalk = (m_movePhase == MovePhase::Walk)
-					? (slope < CHILD_SLOPE_WALK_EXIT)
-					: (slope < CHILD_SLOPE_WALK_ENTER);
-
-				if (wantSlide)     { m_movePhase = MovePhase::Slide; }
-				else if (wantWalk) { m_movePhase = MovePhase::Walk; }
-				else               { m_movePhase = MovePhase::Run; }
-			}
-
-			/**
 			 * 移動方向（常に正規化済みベクトルを渡す）
 			 *
 			 * Move() は moveDirection * (moveSpeed * speedMultiplier) で目標速度を計算するため、
 			 * moveDirection のスケール（長さ）を変えると本来の速度設定が崩れてしまう。
 			 * 基本速度の調整は SetMoveSpeed()、目標手前での減速やブレーキは SetSpeedMultiplier() 経由で行う。
+			 * 滑走の判定に使うため、フェーズ遷移より先に求める。
 			 */
-			const Vector3 moveDirection = CalculateMoveDirectionWithNav(targetPos, distToTarget);
+			const Vector3 targetMoveDirection = CalculateMoveDirectionWithNav(targetPos, distToTarget);
+			Vector3 moveDirection = targetMoveDirection;
+
+			// 陣形のパッシブ/ウルト速度倍率を反映する（1.0f超もありうるためクランプなしの別枠に渡す）。
+			// 滑走の判定を陣形倍率込みの速度で行うため、判定より先に設定する
+			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
+
+			/**
+			 * 滑走の判定（親と共用の slideRule::Decide()。しきい値は PenguinSlideRule.h）。
+			 * 子は滑走中に後ろへ切り返せない（なかなか止まれない）：
+			 *   目標が進行方向の後ろに来たら、進行方向を保ったまま勢いだけで滑る（Coast）。
+			 *   このとき傾斜は0として判定し、坂に運ばれて目標から逃げていかないようにする。
+			 *   後ろの目標まで CHILD_SLIDE_OVERSHOOT_LIMIT を超えたら立って戻る。
+			 */
+			const bool isSliding = m_stateMachine->IsEqualCurrentState(PenguinSlideStartState::ID())
+				|| m_stateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
+
+			Vector3 travelDir = m_stateMachine->GetCurrentVelocity();
+			travelDir.y = 0.0f;
+			const bool isTraveling = travelDir.LengthSq() > STOP_VELOCITY_THRESHOLD_SQ;
+			if (isTraveling) travelDir.Normalize();
+
+			float slope = m_stateMachine->GetSlideSlopeSigned();
+			bool isTargetBehind = false;
+			if (isSliding && isTraveling)
+			{
+				const Vector3 toTarget = CalculateDirectionToTarget(targetPos);
+				if (toTarget.LengthSq() > FLT_EPSILON && toTarget.Dot(travelDir) < 0.0f)
+				{
+					isTargetBehind = true;
+					moveDirection = ApplyWhirlpoolAvoidance(travelDir);
+					slope = 0.0f;
+				}
+			}
+
+			// 新たに滑り始めてよいか。スライドは遠距離の移動手段なので、目標付近（下の距離判定で
+			// Stop / Walk に落ちる範囲）では始めない。接地していないときと、
+			// まだ入力と逆向きに進んでいるとき（切り返した直後は傾斜が前の向きのまま残っている）も始めない
+			const bool isNearTarget = (m_movePhase == MovePhase::Stop)
+				|| distToTarget <= m_walkDistance - HYSTERESIS
+				|| (m_movePhase == MovePhase::Walk && distToTarget <= m_walkDistance + PHASE_UP_MARGIN);
+			const bool isMovingAgainstInput = isTraveling && travelDir.Dot(moveDirection) < 0.0f;
+			const bool canStart = !isNearTarget
+				&& !isMovingAgainstInput
+				&& m_owner->GetCharacterController()->IsOnGround();
+
+			// 子の立ち速度は常に runSpeed（スライドの代わりは走り）
+			const PenguinStateMachine::SlideSpeeds slideSpeeds = m_stateMachine->CalcSlideSpeeds(moveDirection, true);
+			slideRule::EnDecision slideDecision = slideRule::Decide(
+				isSliding, moveDirection.LengthSq() > FLT_EPSILON, canStart,
+				slope, slideSpeeds.slope, slideSpeeds.standing, slideSpeeds.current);
+
+			// 追い越し上限：後ろの目標から離れすぎたら立って戻る
+			if (isTargetBehind && distToTarget > CHILD_SLIDE_OVERSHOOT_LIMIT)
+			{
+				slideDecision = slideRule::EnDecision::Stand;
+			}
+
+			/**
+			 * フェーズ遷移。
+			 * 滑るなら距離による Stop / Walk 落としより優先する（子はなかなか止まれない）。
+			 * 滑らないときの遠距離の移動手段は「足元の傾斜」で選ぶ：
+			 *   上り坂 → 歩き（確実に登れる歩幅で）
+			 *   それ以外 → 走り
+			 * 目標付近の減速（Walk→Stop）は従来どおり距離と速度で判断する。
+			 * 傾斜は出入りで別しきい値のヒステリシスを持たせ、境界でばたつかないようにする。
+			 */
+			bool isSlideCoast = false;
+			if (slideDecision != slideRule::EnDecision::Stand)
+			{
+				m_movePhase = MovePhase::Slide;
+				isSlideCoast = (slideDecision == slideRule::EnDecision::Coast);
+			}
+			else
+			{
+				// 立つときは保っていた進行方向を捨て、目標へ向かう
+				moveDirection = targetMoveDirection;
+
+				if (m_movePhase == MovePhase::Stop)
+				{
+					if (distToTarget > m_stopDistance + STOP_EXIT_MARGIN)
+					{
+						/** まず歩きで動き出し、次フレーム以降は傾斜で選び直す */
+						m_movePhase = MovePhase::Walk;
+					}
+				}
+				else if (distToTarget <= m_walkDistance - HYSTERESIS
+					|| (m_movePhase == MovePhase::Walk
+						&& distToTarget <= m_walkDistance + PHASE_UP_MARGIN))
+				{
+					/** 目標付近では傾斜に関係なく Walk へ落として減速する
+					 *  （Stop への遷移はこの上の距離＋速度の判定が行う）。
+					 *  入りは walkDistance-H、出は walkDistance+MARGIN の
+					 *  ヒステリシスにしないと、境界上で Walk/Run が毎フレーム反転して
+					 *  所定位置に着く直前の子がカクカクする */
+					m_movePhase = MovePhase::Walk;
+				}
+				else
+				{
+					const float walkSlope = m_stateMachine->GetSlideSlopeSigned();
+					const bool wantWalk = (m_movePhase == MovePhase::Walk)
+						? (walkSlope < CHILD_SLOPE_WALK_EXIT)
+						: (walkSlope < CHILD_SLOPE_WALK_ENTER);
+
+					m_movePhase = wantWalk ? MovePhase::Walk : MovePhase::Run;
+				}
+			}
 
 			float speedMultiplier = 1.0f;
 
@@ -634,9 +693,6 @@ namespace app
 
 			// 計算した倍率をステートマシンに渡し、物理処理(Lerp)の目標速度を落とす
 			m_stateMachine->SetSpeedMultiplier(speedMultiplier);
-
-			// 陣形のパッシブ/ウルト速度倍率を反映する（1.0f超もありうるためクランプなしの別枠に渡す）
-			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
 
 			/** フェーズに応じてAIControllerInputを組み立てる */
 			switch (m_movePhase)
@@ -660,17 +716,10 @@ namespace app
 			case MovePhase::Slide:
 				/**
 				 * 滑り：isSneak=false, isDash=true, isSlide=true。
-				 * ただし上り坂では滑らず走る。傾斜モデルの強化（GAIN_UP 3.5）で
-				 * 上りのスライドは走りより大幅に遅くなるため、AIには選ばせない
+				 * 上りで滑らない判断は slideRule::Decide() が速度で行う
+				 * （坂の速度が走りを下回り、勢いも切れたら Stand になる）
 				 */
-				if (m_stateMachine->GetSlideSlopeSigned() < CHILD_SLIDE_UPHILL_LIMIT)
-				{
-					m_stateMachine->SetActionInput(moveDirection, false, true, false, false);
-				}
-				else
-				{
-					m_stateMachine->SetActionInput(moveDirection, false, true, false, true);
-				}
+				m_stateMachine->SetActionInput(moveDirection, false, true, false, true, isSlideCoast);
 				break;
 			}
 		}

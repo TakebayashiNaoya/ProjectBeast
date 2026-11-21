@@ -10,6 +10,7 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Character/Penguin/PenguinSlideRule.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
@@ -53,38 +54,26 @@ namespace app
 
 
 			/**
-			 * @brief 自動スライドを始める下り傾斜（符号つき傾斜 sinθ。正が下り）
-			 * @details 子ペンギンAIの CHILD_SLOPE_SLIDE_ENTER と同じ値（約3.4度）。
-			 */
-			constexpr float AUTO_SLIDE_SLOPE_ENTER = 0.06f;
-			/**
-			 * @brief 自動スライドを続ける下り傾斜（符号つき傾斜 sinθ）
-			 * @details 開始より緩くして、凸凹での開始・終了のばたつきを防ぐ。
-			 */
-			constexpr float AUTO_SLIDE_SLOPE_EXIT = 0.02f;
-			/** 継続条件を外れてから自動スライドを終えるまでの猶予（秒） */
-			constexpr float AUTO_SLIDE_EXIT_GRACE_TIME = 0.2f;
-
-
-			/**
 			 * @brief 下り坂で自動スライドするかどうかを決める
-			 * @details 開始: 滑走していないとき、スティック全倒し・接地・下り傾斜 > ENTER。
-			 *          継続: 移動入力ありで下り傾斜 > EXIT。外れたら EXIT_GRACE の猶予後に終了。
-			 *          空中: SLIDE_AIR_GRACE_TIME までは継続し（小さな段差で途切れないため）、超えたら終了。
+			 * @details 判定そのものは slideRule::Decide()（PenguinSlideRule.h）に任せ、ここでは空中の扱いだけ足す。
+			 *          開始: 滑走していないとき、スティック全倒し・接地を開始条件として Decide() に渡す。
+			 *          空中: 滑走中は SLIDE_AIR_GRACE_TIME まで勢いで続け（小さな段差で途切れないため）、超えたら立つ。
+			 *          終了は速度で決まる（坂に運ばれず、勢いが立ち速度まで落ちたら立つ）。
 			 * @param isSliding    現在スライド中（SlideStart / Sliding）か
 			 * @param slope        進行方向に対する符号つき傾斜（下り正）
 			 * @param isDashInput  スティックが全倒しされているか
 			 * @param hasMoveInput 移動入力があるか
 			 * @param isOnGround   接地しているか
+			 * @param speeds       判定用の速度（倒し量・陣形倍率込み）
 			 * @param deltaTime    経過時間（秒）
-			 * @param exitTimer    継続条件を外れてからの時間（秒。この関数が更新する）
 			 * @param airTimer     空中にいる時間（秒。この関数が更新する）
-			 * @return スライド入力を立てるかどうか
+			 * @return 判定結果
 			 */
-			bool DecideAutoSlide(
+			slideRule::EnDecision DecideAutoSlide(
 				const bool isSliding, const float slope,
 				const bool isDashInput, const bool hasMoveInput, const bool isOnGround,
-				const float deltaTime, float& exitTimer, float& airTimer)
+				const PenguinStateMachine::SlideSpeeds& speeds,
+				const float deltaTime, float& airTimer)
 			{
 				// 空中にいる時間（接地で0に戻す）
 				if (isOnGround)
@@ -96,27 +85,19 @@ namespace app
 					airTimer += deltaTime;
 				}
 
-				// 開始判定（空中では新たに滑走を始めない）
-				if (!isSliding)
+				// 滑走中の空中：猶予内は勢いで続け、超えたら立つ
+				if (isSliding && !isOnGround)
 				{
-					exitTimer = 0.0f;
-					return isDashInput && isOnGround && slope > AUTO_SLIDE_SLOPE_ENTER;
+					return (airTimer <= DaddyPenguinStateMachine::SLIDE_AIR_GRACE_TIME)
+						? slideRule::EnDecision::Coast
+						: slideRule::EnDecision::Stand;
 				}
 
-				// 滑走中の空中：猶予内は続け、超えたら終える
-				if (!isOnGround)
-				{
-					return airTimer <= DaddyPenguinStateMachine::SLIDE_AIR_GRACE_TIME;
-				}
-
-				// 滑走中の接地：継続条件を満たす限り続け、外れたら猶予後に終える
-				if (hasMoveInput && slope > AUTO_SLIDE_SLOPE_EXIT)
-				{
-					exitTimer = 0.0f;
-					return true;
-				}
-				exitTimer += deltaTime;
-				return exitTimer < AUTO_SLIDE_EXIT_GRACE_TIME;
+				// 空中では新たに滑走を始めない
+				const bool canStart = isDashInput && isOnGround;
+				return slideRule::Decide(
+					isSliding, hasMoveInput, canStart,
+					slope, speeds.slope, speeds.standing, speeds.current);
 			}
 		}
 
@@ -387,18 +368,6 @@ namespace app
 			bool isRegroupCall = (g_pad[0]->IsTrigger(enButtonY) || botRegroupCall)
 				&& childPenguinManager != nullptr
 				&& childPenguinManager->CanCallRegroup();
-			// スライドはボタンではなく、下り坂で自動発動する
-			const bool isSliding = m_stateMachine->IsEqualCurrentState(PenguinSlideStartState::ID())
-				|| m_stateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
-			const bool isSlide = DecideAutoSlide(
-				isSliding,
-				m_stateMachine->GetSlideSlopeSigned(),
-				isDash,
-				moveDirection.LengthSq() > FLT_EPSILON,
-				m_owner->GetCharacterController()->IsOnGround(),
-				g_gameTime->GetFrameDeltaTime(),
-				m_autoSlideExitTimer,
-				m_autoSlideAirTimer);
 			bool isEnterIgloo = false;
 
 			// かまくら近接判定（毎フレーム実行）
@@ -458,17 +427,25 @@ namespace app
 			// 陣形のパッシブ/ウルト速度倍率を親ペンギン自身にも反映する（1.0f超もありうるためクランプなしの別枠に渡す）
 			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
 
-			// SlideEnd アニメーション中はプレイヤー入力を無視し、
-			// 自然に滑り止まるのを待つ
-			if (m_stateMachine->IsEqualCurrentState(PenguinSlideEndState::ID()))
-			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
-			}
-			else
-			{
-				// 共通のアクション入力（ジャンプ入力は撤廃したので常に false）
-				m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, false, isSlide);
-			}
+			// スライドはボタンではなく、下り坂で自動発動する。
+			// 陣形倍率込みの速度で「ダッシュより速いか」を比べるため、倍率の設定後に判定する
+			const bool isSliding = m_stateMachine->IsEqualCurrentState(PenguinSlideStartState::ID())
+				|| m_stateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
+			const slideRule::EnDecision slideDecision = DecideAutoSlide(
+				isSliding,
+				m_stateMachine->GetSlideSlopeSigned(),
+				isDash,
+				moveDirection.LengthSq() > FLT_EPSILON,
+				m_owner->GetCharacterController()->IsOnGround(),
+				m_stateMachine->CalcSlideSpeeds(moveDirection, isDash),
+				g_gameTime->GetFrameDeltaTime(),
+				m_autoSlideAirTimer);
+			const bool isSlide = (slideDecision != slideRule::EnDecision::Stand);
+			const bool isSlideCoast = (slideDecision == slideRule::EnDecision::Coast);
+
+			// 共通のアクション入力（ジャンプ入力は撤廃したので常に false）。
+			// SlideEnd 中も入力を通す（入力が来たら SlideEnd を抜けて走り出す）
+			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, false, isSlide, isSlideCoast);
 
 			// 親ペンギン固有の入力
 			m_stateMachine->SetIsCommandToggle(isRegroupCall);

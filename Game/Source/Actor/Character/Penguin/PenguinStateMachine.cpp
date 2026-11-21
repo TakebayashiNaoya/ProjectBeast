@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "PenguinBase.h"
 #include "PenguinIState.h"
+#include "PenguinSlideRule.h"
 #include "PenguinStateMachine.h"
 
 
@@ -31,9 +32,9 @@ namespace app
 
 			/**
 			 * @brief 下りの効き
-			 * @details 親のスライド基準速度を 120（ダッシュ130の少し下）へ落としたのに合わせて
-			 *          係数を上げ、滑り台感を維持している。約3度の下りでダッシュを追い越し、
-			 *          16.8度（Normalの中央値）で 224 ≒ 泳ぎ、30度で 300。
+			 * @details 親のスライド基準速度は 200（2026-11-21 試遊フィードバック「スライドが遅い」で 120 から上げた）。
+			 *          滑り始め（3.4度の下り）で 236、10度で 304、16.8度（Normalの中央値）で 373、30度で 500。
+			 *          平地では坂に運ばれず、勢い（惰性）が切れたらダッシュへ戻る（PenguinSlideRule.h）。
 			 *          「平地は走り、下りが見えたらスライド」の読み合いを作るのが狙い
 			 *          （2026-08-23 試遊フィードバック）。
 			 */
@@ -48,7 +49,7 @@ namespace app
 			constexpr float SLIDE_SLOPE_GAIN_UP = 3.5f;
 			/**
 			 * @brief 速度倍率の上限
-			 * @details 親の基準120に対して上限312。32度を超える下りで頭打ちになる。
+			 * @details 親の基準200に対して上限520。32度を超える下りで頭打ちになる。
 			 *          ハイトマップ由来の法線の尖りで一瞬だけ極端な値が出る事故の対策も兼ねる。
 			 */
 			constexpr float SLIDE_SLOPE_MUL_MAX = 2.6f;
@@ -173,6 +174,50 @@ namespace app
 			if (status == nullptr) return 0.0f;
 
 			return status->GetSlideSpeed() * m_slideSlopeMultiplier;
+		}
+
+
+		PenguinStateMachine::SlideSpeeds PenguinStateMachine::CalcSlideSpeeds(const Vector3& moveDirection, const bool isDash) const
+		{
+			SlideSpeeds speeds = { 0.0f, 0.0f, 0.0f };
+
+			// 現在の水平速度（上下動は判定に入れない）
+			Vector3 horizontalVelocity = m_currentVelocity;
+			horizontalVelocity.y = 0.0f;
+			speeds.current = horizontalVelocity.Length();
+
+			const PenguinStatus* status = GetPenguinStatus();
+			if (status == nullptr) return speeds;
+
+			// Move() と同じく、倒し量と陣形倍率を掛けた実速度で比べる
+			// （目標手前のブレーキ m_speedMultiplier は判定に入れない）
+			const float multiplier = moveDirection.Length() * m_externalSpeedMultiplier;
+			speeds.slope = CalcSlideSpeedWithSlope() * multiplier;
+			speeds.standing = (isDash ? status->GetRunSpeed() : status->GetSneakSpeed()) * multiplier;
+			return speeds;
+		}
+
+
+		float PenguinStateMachine::CalcSlideMoveSpeed() const
+		{
+			// 勢いだけで滑っているときは立ち速度を目標にし、惰性でそこまで落ちていく
+			if (m_isSlideCoast)
+			{
+				const PenguinStatus* status = GetPenguinStatus();
+				if (status == nullptr) return 0.0f;
+				return m_isDash ? status->GetRunSpeed() : status->GetSneakSpeed();
+			}
+			return CalcSlideSpeedWithSlope();
+		}
+
+
+		float PenguinStateMachine::CalcSlideCoastDeceleration() const
+		{
+			// 急な上りは従来どおり速く減速する（上りの罰を残す）
+			if (!slideRule::UsesCoast(m_slideSlopeSigned)) return 0.0f;
+
+			// 陣形で速度が変わっても、惰性で滑る時間は変えない
+			return m_slideCoastDeceleration * m_externalSpeedMultiplier;
 		}
 
 

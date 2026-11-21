@@ -21,6 +21,9 @@ namespace app
 			, m_type(type)
 			, m_attackerEnemy(nullptr)
 		{
+			/** 子は親（120）より惰性の減速を緩くして「なかなか止まれない」を表現する（u/s²） */
+			SetSlideCoastDeceleration(80.0f);
+
 			/** 共通ステートの追加 */
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSneakState>(static_cast<PenguinStateMachine*>(this));
@@ -154,17 +157,17 @@ namespace app
 				if (CanChangeSlidingState()) return FindState(PenguinSlidingState::ID());
 			}
 
-			// スライド終了アニメ継続中
+			// スライド終了アニメ継続中（無入力で止まるとき専用。移動入力が来たらアニメを待たずに抜ける）
 			if (IsEqualCurrentState(PenguinSlideEndState::ID()))
 			{
-				if (!IsFinishedSlideEndState()) return FindState(PenguinSlideEndState::ID());
+				if (!IsFinishedSlideEndState() && !CanChangeMoveState()) return FindState(PenguinSlideEndState::ID());
 			}
 
-			// スライド中の維持/終了
+			// スライド中の維持/終了。移動入力があれば SlideEnd を通らず下の Run / Sneak 判定へ進む
 			if (IsEqualCurrentState(PenguinSlidingState::ID()))
 			{
 				if (CanKeepSlidingState()) return FindState(PenguinSlidingState::ID());
-				else return FindState(PenguinSlideEndState::ID());
+				if (!CanChangeMoveState()) return FindState(PenguinSlideEndState::ID());
 			}
 
 			// スライド開始判定
