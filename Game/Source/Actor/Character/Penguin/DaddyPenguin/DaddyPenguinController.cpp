@@ -55,11 +55,11 @@ namespace app
 
 			/**
 			 * @brief 下り坂で自動スライドするかどうかを決める
-			 * @details 判定そのものは slideRule::Decide()（PenguinSlideRule.h）に任せ、ここでは空中の扱いだけ足す。
-			 *          開始: 滑走していないとき、スティック全倒し・接地を開始条件として Decide() に渡す。
-			 *          空中: 滑走中は SLIDE_AIR_GRACE_TIME まで勢いで続け（小さな段差で途切れないため）、超えたら立つ。
+			 * @details 判定そのものはslideRule::Decide()（PenguinSlideRule.h）に任せ、ここでは空中の扱いだけ足す。
+			 *          開始:滑走していないとき、スティック全倒し・接地を開始条件としてDecide()に渡す。
+			 *          空中:滑走中はSLIDE_AIR_GRACE_TIMEまで勢いで続け（小さな段差で途切れないため）、超えたら立つ。
 			 *          終了は速度で決まる（坂に運ばれず、勢いが立ち速度まで落ちたら立つ）。
-			 * @param isSliding    現在スライド中（SlideStart / Sliding）か
+			 * @param isSliding    現在スライド中（SlideStart/Sliding）か
 			 * @param slope        進行方向に対する符号つき傾斜（下り正）
 			 * @param isDashInput  スティックが全倒しされているか
 			 * @param hasMoveInput 移動入力があるか
@@ -443,8 +443,8 @@ namespace app
 			const bool isSlide = (slideDecision != slideRule::EnDecision::Stand);
 			const bool isSlideCoast = (slideDecision == slideRule::EnDecision::Coast);
 
-			// 共通のアクション入力（ジャンプ入力は撤廃したので常に false）。
-			// SlideEnd 中も入力を通す（入力が来たら SlideEnd を抜けて走り出す）
+			// 共通のアクション入力（ジャンプ入力は撤廃したので常にfalse）。
+			// SlideEnd中も入力を通す（入力が来たらSlideEndを抜けて走り出す）
 			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, false, isSlide, isSlideCoast);
 
 			// 親ペンギン固有の入力

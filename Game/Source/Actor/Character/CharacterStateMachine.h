@@ -144,11 +144,11 @@ namespace app
 			}
 			/**
 			 * @brief 加速度の倍率を設定
-			 * @details Move() の Lerp 係数（m_acceleration）に乗算される。
+			 * @details Move()のLerp係数（m_acceleration）に乗算される。
 			 *          スライド中だけ目標速度への到達を早めるために使う。
 			 *          倍率を戻し忘れると別ステートまで加速が速くなるため、
-			 *          使う側は必ずステートの Exit() で 1.0f に戻すこと。
-			 * @param multiplier 倍率（0.0f 未満は 0.0f に丸める。上限クランプなし）
+			 *          使う側は必ずステートのExit()で1.0fに戻すこと。
+			 * @param multiplier 倍率（0.0f未満は0.0fに丸める。上限クランプなし）
 			 */
 			inline void SetAccelerationMultiplier(const float multiplier)
 			{
@@ -156,12 +156,12 @@ namespace app
 			}
 			/**
 			 * @brief 惰性の減速度を設定
-			 * @details 0 より大きいと、Move() は速度の「入力方向の成分」をこの減速度（u/s²）でしか落とさない
+			 * @details 0より大きいと、Move()は速度の「入力方向の成分」をこの減速度（u/s²）でしか落とさない
 			 *          （加速・切り返し・横成分・無入力時の摩擦は従来どおり）。
 			 *          スライドの「勢いで滑り続ける」を表現するために使う。
 			 *          戻し忘れると別ステートまで止まりにくくなるため、
-			 *          使う側は必ずステートの Exit() で 0.0f に戻すこと。
-			 * @param deceleration 減速度（u/s²。0.0f 以下で無効＝従来の計算）
+			 *          使う側は必ずステートのExit()で0.0fに戻すこと。
+			 * @param deceleration 減速度（u/s²。0.0f以下で無効＝従来の計算）
 			 */
 			inline void SetCoastDeceleration(const float deceleration)
 			{
@@ -284,9 +284,9 @@ namespace app
 
 			/** 加速度（目標速度への到達の早さ） */
 			float m_acceleration;
-			/** 加速度の倍率（スライド中の加速用：既定 1.0f） */
+			/** 加速度の倍率（スライド中の加速用：既定1.0f） */
 			float m_accelerationMultiplier;
-			/** 惰性の減速度（u/s²。スライドの惰性用：既定 0.0f = 無効） */
+			/** 惰性の減速度（u/s²。スライドの惰性用：既定0.0f=無効） */
 			float m_coastDeceleration;
 			/** 摩擦係数（入力がないときの減速の早さ） */
 			float m_friction;

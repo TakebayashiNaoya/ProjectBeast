@@ -30,7 +30,7 @@ namespace app
 			SetSlideAccelerationMultiplier(3.0f);
 
 			// 坂を下り終えたあと、勢いでゆっくり減速しながら滑り続ける（u/s²）。
-			// 236 → ダッシュ130まで約0.9秒、373 → 約2.0秒
+			// 236→ダッシュ130まで約0.9秒、373→約2.0秒
 			SetSlideCoastDeceleration(120.0f);
 
 			// 共通ステートの追加
@@ -84,7 +84,7 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
-			// 空中にいる時間を更新する（Update() の遷移判定から毎フレーム呼ばれる）
+			// 空中にいる時間を更新する（Update()の遷移判定から毎フレーム呼ばれる）
 			if (IsOnGround())
 			{
 				m_slideAirTimer = 0.0f;
@@ -177,8 +177,8 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::CheckActionState()
 		{
-			/** 0. スライド系ステート中に空中にいる時間が猶予を超えたら（崖から落ちたなど）、
-					SlideEnd を経由せず直接ジャンプ（落下）ステートへ */
+			/** 0.スライド系ステート中に空中にいる時間が猶予を超えたら（崖から落ちたなど）、
+					SlideEndを経由せず直接ジャンプ（落下）ステートへ */
 			if (IsEqualCurrentState(PenguinSlideStartState::ID())
 				|| IsEqualCurrentState(PenguinSlidingState::ID())
 				|| IsEqualCurrentState(PenguinSlideEndState::ID()))
@@ -191,15 +191,15 @@ namespace app
 				if (CanChangeSlidingState()) return FindState(PenguinSlidingState::ID());
 			}
 
-			/** 2. スライド終了ステートは無入力で止まるとき専用。アニメーションが終わるまで続行するが、
+			/** 2.スライド終了ステートは無入力で止まるとき専用。アニメーションが終わるまで続行するが、
 					移動入力が来たらアニメーションを待たずに抜けて走り出す（その場に拘束しない） */
 			if (IsEqualCurrentState(PenguinSlideEndState::ID())) {
 				if (!IsFinishedSlideEndState() && !CanChangeMoveState()) return FindState(PenguinSlideEndState::ID());
 			}
 
-			/** 3. スライド中で、スライドをキープできるならスライドを維持する。
-					キープできないとき、移動入力があれば SlideEnd を通らず下の Run / Sneak 判定へ進み、
-					無入力のときだけ SlideEnd で滑り止まる */
+			/** 3.スライド中で、スライドをキープできるならスライドを維持する。
+					キープできないとき、移動入力があればSlideEndを通らず下のRun/Sneak判定へ進み、
+					無入力のときだけSlideEndで滑り止まる */
 			if (IsEqualCurrentState(PenguinSlidingState::ID())) {
 				if (CanKeepSlidingState()) return FindState(PenguinSlidingState::ID());
 				if (!CanChangeMoveState()) return FindState(PenguinSlideEndState::ID());

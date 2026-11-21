@@ -32,8 +32,8 @@ namespace app
 
 			/**
 			 * @brief 下りの効き
-			 * @details 親のスライド基準速度は 200（2026-11-21 試遊フィードバック「スライドが遅い」で 120 から上げた）。
-			 *          滑り始め（3.4度の下り）で 236、10度で 304、16.8度（Normalの中央値）で 373、30度で 500。
+			 * @details 親のスライド基準速度は200（2026-11-21試遊フィードバック「スライドが遅い」で120から上げた）。
+			 *          滑り始め（3.4度の下り）で236、10度で304、16.8度（Normalの中央値）で373、30度で500。
 			 *          平地では坂に運ばれず、勢い（惰性）が切れたらダッシュへ戻る（PenguinSlideRule.h）。
 			 *          「平地は走り、下りが見えたらスライド」の読み合いを作るのが狙い
 			 *          （2026-08-23 試遊フィードバック）。
@@ -189,8 +189,8 @@ namespace app
 			const PenguinStatus* status = GetPenguinStatus();
 			if (status == nullptr) return speeds;
 
-			// Move() と同じく、倒し量と陣形倍率を掛けた実速度で比べる
-			// （目標手前のブレーキ m_speedMultiplier は判定に入れない）
+			// Move()と同じく、倒し量と陣形倍率を掛けた実速度で比べる
+			// （目標手前のブレーキm_speedMultiplierは判定に入れない）
 			const float multiplier = moveDirection.Length() * m_externalSpeedMultiplier;
 			speeds.slope = CalcSlideSpeedWithSlope() * multiplier;
 			speeds.standing = (isDash ? status->GetRunSpeed() : status->GetSneakSpeed()) * multiplier;

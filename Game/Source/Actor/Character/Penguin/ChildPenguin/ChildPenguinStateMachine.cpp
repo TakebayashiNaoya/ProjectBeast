@@ -163,7 +163,7 @@ namespace app
 				if (!IsFinishedSlideEndState() && !CanChangeMoveState()) return FindState(PenguinSlideEndState::ID());
 			}
 
-			// スライド中の維持/終了。移動入力があれば SlideEnd を通らず下の Run / Sneak 判定へ進む
+			// スライド中の維持/終了。移動入力があればSlideEndを通らず下のRun/Sneak判定へ進む
 			if (IsEqualCurrentState(PenguinSlidingState::ID()))
 			{
 				if (CanKeepSlidingState()) return FindState(PenguinSlidingState::ID());

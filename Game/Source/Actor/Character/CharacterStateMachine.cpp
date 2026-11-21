@@ -19,13 +19,13 @@ namespace app
 
 			/**
 			 * @brief 惰性の減速を掛けたあとの「入力方向の速さ」を求める
-			 * @details 加速・切り返し（現在の速さ <= 目標）は従来の Lerp と同じ値を返す。
-			 *          減速（現在の速さ > 目標）のときだけ、1フレームに落とせる量を maxDrop までに制限する
-			 *          （目標は下回らない）。Lerp のほうが落ち方が緩ければ Lerp の値を使う。
+			 * @details 加速・切り返し（現在の速さ<=目標）は従来のLerpと同じ値を返す。
+			 *          減速（現在の速さ>目標）のときだけ、1フレームに落とせる量をmaxDropまでに制限する
+			 *          （目標は下回らない）。Lerpのほうが落ち方が緩ければLerpの値を使う。
 			 * @param along        現在の速度の入力方向成分
 			 * @param targetSpeed  目標速度の入力方向成分
-			 * @param followFactor Lerp の係数（0〜1）
-			 * @param maxDrop      このフレームで落とせる速さの上限（減速度 × dt）
+			 * @param followFactor Lerpの係数（0〜1）
+			 * @param maxDrop      このフレームで落とせる速さの上限（減速度×dt）
 			 * @return 新しい入力方向成分
 			 */
 			constexpr float CalcCoastAlongSpeed(
@@ -39,11 +39,11 @@ namespace app
 				return (lerpAlong > limitedAlong) ? lerpAlong : limitedAlong;
 			}
 
-			/** 加速は従来の Lerp のまま */
+			/** 加速は従来のLerpのまま */
 			static_assert(CalcCoastAlongSpeed(100.0f, 200.0f, 0.5f, 10.0f) == 150.0f, "coast: accelerate by lerp");
-			/** 減速は maxDrop までしか落ちない */
+			/** 減速はmaxDropまでしか落ちない */
 			static_assert(CalcCoastAlongSpeed(300.0f, 130.0f, 0.5f, 2.0f) == 298.0f, "coast: decelerate by maxDrop");
-			/** 切り返し（逆向きの速度）は従来の Lerp のまま */
+			/** 切り返し（逆向きの速度）は従来のLerpのまま */
 			static_assert(CalcCoastAlongSpeed(-200.0f, 130.0f, 0.5f, 2.0f) == -35.0f, "coast: turn back by lerp");
 		}
 
@@ -66,8 +66,8 @@ namespace app
 				const Vector3 prevVelocity = m_currentVelocity;
 				m_currentVelocity.Lerp(lerpFactor, m_currentVelocity, targetVelocity);
 
-				// 惰性（スライド用）：入力方向の速さだけ、減速度 m_coastDeceleration でしか落とさない。
-				// 横成分は Lerp のままなので、惰性中でも曲がれる。0 のときは従来の計算のまま
+				// 惰性（スライド用）：入力方向の速さだけ、減速度m_coastDecelerationでしか落とさない。
+				// 横成分はLerpのままなので、惰性中でも曲がれる。0のときは従来の計算のまま
 				if (m_coastDeceleration > 0.0f)
 				{
 					Vector3 inputDir = m_moveDirection;

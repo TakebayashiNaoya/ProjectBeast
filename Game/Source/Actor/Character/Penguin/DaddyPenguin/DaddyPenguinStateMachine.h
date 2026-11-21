@@ -25,8 +25,8 @@ namespace app
 			/**
 			 * @brief スライド中に空中にいても滑走を続ける猶予（秒）
 			 * @details 小さな段差で滑走が途切れないようにするための猶予。
-			 *          これを超えて空中にいたら、SlideEnd を経由せず直接ジャンプ（落下）ステートへ移る。
-			 *          DaddyPenguinController の自動スライド判定も同じ値を使う。
+			 *          これを超えて空中にいたら、SlideEndを経由せず直接ジャンプ（落下）ステートへ移る。
+			 *          DaddyPenguinControllerの自動スライド判定も同じ値を使う。
 			 */
 			static constexpr float SLIDE_AIR_GRACE_TIME = 0.3f;
 
