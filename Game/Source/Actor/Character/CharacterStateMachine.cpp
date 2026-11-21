@@ -15,6 +15,23 @@ namespace app
 		{
 			/** 重力の値 */
 			constexpr float GRAVITY = -9.8f * 150;
+
+
+			/** 減速のときだけ1フレームの減速量をmaxDropまでに抑える（加速と切り返しはLerpのまま） */
+			constexpr float CalcCoastAlongSpeed(
+				const float along, const float targetSpeed, const float followFactor, const float maxDrop)
+			{
+				const float lerpAlong = along + (targetSpeed - along) * followFactor;
+				if (along <= targetSpeed) return lerpAlong;
+
+				const float droppedAlong = along - maxDrop;
+				const float limitedAlong = (droppedAlong > targetSpeed) ? droppedAlong : targetSpeed;
+				return (lerpAlong > limitedAlong) ? lerpAlong : limitedAlong;
+			}
+
+			static_assert(CalcCoastAlongSpeed(100.0f, 200.0f, 0.5f, 10.0f) == 150.0f, "coast: accelerate by lerp");
+			static_assert(CalcCoastAlongSpeed(300.0f, 130.0f, 0.5f, 2.0f) == 298.0f, "coast: decelerate by maxDrop");
+			static_assert(CalcCoastAlongSpeed(-200.0f, 130.0f, 0.5f, 2.0f) == -35.0f, "coast: turn back by lerp");
 		}
 
 
@@ -31,9 +48,25 @@ namespace app
 				Vector3 targetVelocity = m_moveDirection * (m_moveSpeed * m_speedMultiplier * m_externalSpeedMultiplier);
 
 				// ★修正：1.0f の代わりに MAX_LERP_FACTOR を使う
-				float lerpFactor = min(MAX_LERP_FACTOR, m_acceleration * deltaTime);
+				float lerpFactor = min(MAX_LERP_FACTOR, m_acceleration * m_accelerationMultiplier * deltaTime);
 
+				const Vector3 prevVelocity = m_currentVelocity;
 				m_currentVelocity.Lerp(lerpFactor, m_currentVelocity, targetVelocity);
+
+				// スライド後はゆっくり減速させる（進行方向の成分だけ。横はLerpのままなので曲がれる）
+				if (m_coastDeceleration > 0.0f)
+				{
+					Vector3 inputDir = m_moveDirection;
+					inputDir.Normalize();
+
+					const float along = prevVelocity.Dot(inputDir);
+					const float lerpAlong = m_currentVelocity.Dot(inputDir);
+					const float targetAlong = targetVelocity.Dot(inputDir);
+					const float coastAlong = CalcCoastAlongSpeed(
+						along, targetAlong, lerpFactor, m_coastDeceleration * deltaTime);
+
+					m_currentVelocity += inputDir * (coastAlong - lerpAlong);
+				}
 			}
 			else
 			{
@@ -144,6 +177,8 @@ namespace app
 			, m_prevPositionY(0.0f)
 			, m_currentVelocity(Vector3::Zero)
 			, m_acceleration(10.0f)
+			, m_accelerationMultiplier(1.0f)
+			, m_coastDeceleration(0.0f)
 			, m_friction(5.0f)
 			, m_turnSpeed(8.0f)
 		{}

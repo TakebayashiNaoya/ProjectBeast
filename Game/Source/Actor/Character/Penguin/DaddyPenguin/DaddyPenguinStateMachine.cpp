@@ -26,6 +26,12 @@ namespace app
 			// プレイヤー操作の親ペンギンだけ、急な上り坂でのずり落ちを有効にする
 			SetSlideBackAllowed(true);
 
+			// 親だけ滑り出しを速くする
+			SetSlideAccelerationMultiplier(3.0f);
+
+			// スライド後の減速度
+			SetSlideCoastDeceleration(120.0f);
+
 			// 共通ステートの追加
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSneakState>(static_cast<PenguinStateMachine*>(this));
@@ -77,6 +83,16 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::GetChangeState()
 		{
+			// 空中にいる時間を更新する
+			if (IsOnGround())
+			{
+				m_slideAirTimer = 0.0f;
+			}
+			else
+			{
+				m_slideAirTimer += g_gameTime->GetFrameDeltaTime();
+			}
+
 			core::IState* nextState = nullptr;
 
 			// 1. システム・環境系の判定（ダメージ、死亡、水泳など）
@@ -160,20 +176,28 @@ namespace app
 
 		core::IState* DaddyPenguinStateMachine::CheckActionState()
 		{
-			/** 1. スライド開始ステートのアニメーションが終わっていて、かつスライド状態が続いているならスライドステートへ */
+			/** 0.スライド中に空中にいる時間が猶予を超えたら落下ステートへ */
+			if (IsEqualCurrentState(PenguinSlideStartState::ID())
+				|| IsEqualCurrentState(PenguinSlidingState::ID())
+				|| IsEqualCurrentState(PenguinSlideEndState::ID()))
+			{
+				if (m_slideAirTimer > SLIDE_AIR_GRACE_TIME) return FindState(PenguinJumpState::ID());
+			}
+
+			/** 1.スライド開始ステートのアニメーションが終わっていて、かつスライド状態が続いているならスライドステートへ */
 			if (IsEqualCurrentState(PenguinSlideStartState::ID())) {
 				if (CanChangeSlidingState()) return FindState(PenguinSlidingState::ID());
 			}
 
-			/** 2. スライド終了ステートのアニメーションが終わっていなければスライド終了ステートを続行する */
+			/** 2.スライド終了ステートはアニメーションが終わるまで続行する（移動入力が来たら抜ける） */
 			if (IsEqualCurrentState(PenguinSlideEndState::ID())) {
-				if (!IsFinishedSlideEndState()) return FindState(PenguinSlideEndState::ID());
+				if (!IsFinishedSlideEndState() && !CanChangeMoveState()) return FindState(PenguinSlideEndState::ID());
 			}
 
-			/** 3. スライド中で、スライドをキープできるならスライドを維持し、そうでなければスライドを終わらせる */
+			/** 3.スライドをキープできるなら維持する（終わるときは無入力のときだけSlideEndへ） */
 			if (IsEqualCurrentState(PenguinSlidingState::ID())) {
 				if (CanKeepSlidingState()) return FindState(PenguinSlidingState::ID());
-				else return FindState(PenguinSlideEndState::ID());
+				if (!CanChangeMoveState()) return FindState(PenguinSlideEndState::ID());
 			}
 
 			/** 4. スライドステートに切り替えられるならスライドステートへ */

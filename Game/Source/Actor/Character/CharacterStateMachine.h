@@ -142,6 +142,20 @@ namespace app
 			{
 				m_turnSpeedMultiplier = (multiplier < 0.0f) ? 0.0f : multiplier;
 			}
+			/**
+			 * @brief 加速度の倍率を設定（使ったステートのExit()で1.0fに戻す）
+			 */
+			inline void SetAccelerationMultiplier(const float multiplier)
+			{
+				m_accelerationMultiplier = (multiplier < 0.0f) ? 0.0f : multiplier;
+			}
+			/**
+			 * @brief スライド後の減速度を設定（0で無効。使ったステートのExit()で0に戻す）
+			 */
+			inline void SetCoastDeceleration(const float deceleration)
+			{
+				m_coastDeceleration = (deceleration < 0.0f) ? 0.0f : deceleration;
+			}
 
 
 			/**
@@ -259,6 +273,10 @@ namespace app
 
 			/** 加速度（目標速度への到達の早さ） */
 			float m_acceleration;
+			/** 加速度の倍率 */
+			float m_accelerationMultiplier;
+			/** スライド後の減速度（0で無効） */
+			float m_coastDeceleration;
 			/** 摩擦係数（入力がないときの減速の早さ） */
 			float m_friction;
 			/** 旋回速度（Slerpによる回転の滑らかさ） */

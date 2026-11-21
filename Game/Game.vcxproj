@@ -506,6 +506,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinIState.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinParameter.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinSlideRule.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />
     <ClInclude Include="Source\Actor\IK\IKMath.h" />

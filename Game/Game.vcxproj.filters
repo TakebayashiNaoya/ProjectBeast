@@ -912,6 +912,9 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Character\Penguin\PenguinSlideRule.h">
+      <Filter>Source\Actor\Character\penguin</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h">
       <Filter>Source\Actor\Character\penguin</Filter>
     </ClInclude>

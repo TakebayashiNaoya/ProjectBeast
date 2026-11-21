@@ -60,20 +60,7 @@ namespace app
 				/** Ult（LT / RT のどちらでも撃てるため両方見せる） */
 				{ { "HintIconUltL", "HintIconSlash", "HintIconUlt" },
 					"ひっさつわざが うてるよ！", -165.0f, 630.0f, true },
-				/** Sneak */
-				{ { "HintIconSneak", nullptr, nullptr },
-					"そーっと あるこう！", -235.0f, 475.0f, false },
-				/** Slide */
-				{ { "HintIconSlide", nullptr, nullptr },
-					"さかは すべると はやい！", -235.0f, 575.0f, false },
 			};
-
-			/** スニークヒント：寝ているシロクマを探す半径。
-			 *  近すぎる値にすると、到達する前に足音でクマが起きてしまい一度も発火しない
-			 *  （250ではボット実測で最接近344止まり。2026-08-26） */
-			constexpr float SNEAK_HINT_RANGE = 600.0f;
-			/** スライドヒント：下り坂とみなす符号つき傾斜（sin値。子AIのスライド選択と同じ） */
-			constexpr float SLIDE_HINT_SLOPE = 0.06f;
 
 			/** 全ヒント共通パーツのUI名 */
 			constexpr const char* BAND_NAME = "HintBand";
@@ -159,27 +146,6 @@ namespace app
 			{
 				Enqueue(EnHintType::Ult);
 			}
-
-			// スニーク：寝ているシロクマに近づいたとき（そっと歩けば起こさない）
-			auto* em = actor::EnemyManager::GetInstance();
-			if (em != nullptr
-				&& em->GetNearestSleepingEnemy(cpm->GetDaddyPosition(), SNEAK_HINT_RANGE) != nullptr)
-			{
-				Enqueue(EnHintType::Sneak);
-			}
-
-			// スライド：歩き・走りで下り坂にさしかかったとき（すでに滑っていれば教える必要はない）
-			auto* daddy = cpm->GetDaddyPenguin();
-			if (daddy != nullptr && daddy->GetStateMachine() != nullptr)
-			{
-				auto* stateMachine = daddy->GetStateMachine();
-				if (!stateMachine->GetIsSlide()
-					&& stateMachine->GetSlideSlopeSigned() > SLIDE_HINT_SLOPE)
-				{
-					Enqueue(EnHintType::Slide);
-				}
-			}
-
 		}
 
 

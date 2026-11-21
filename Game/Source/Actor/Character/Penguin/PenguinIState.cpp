@@ -38,19 +38,23 @@ namespace app
 			 */
 			void ApplySlideSlope(app::actor::PenguinStateMachine* owner)
 			{
-				owner->SetMoveSpeed(owner->CalcSlideSpeedWithSlope());
+				owner->SetMoveSpeed(owner->CalcSlideMoveSpeed());
 				owner->SetTurnSpeedMultiplier(owner->CalcSlideTurnMultiplier());
+				owner->SetAccelerationMultiplier(owner->GetSlideAccelerationMultiplier());
+				owner->SetCoastDeceleration(owner->CalcSlideCoastDeceleration());
 			}
 
 			/**
-			 * @brief 旋回速度の倍率を既定へ戻す
-			 * @details スライドを抜けたあとまで曲がりにくいままにしないため、
+			 * @brief スライド用の旋回・加速・減速の設定を既定へ戻す
+			 * @details スライドを抜けたあとまで設定が残らないよう、
 			 *          スライド系ステートの Exit() から必ず呼ぶ。
 			 * @param owner ペンギンのステートマシン
 			 */
 			void ClearSlideSlope(app::actor::PenguinStateMachine* owner)
 			{
 				owner->SetTurnSpeedMultiplier(1.0f);
+				owner->SetAccelerationMultiplier(1.0f);
+				owner->SetCoastDeceleration(0.0f);
 			}
 		}
 

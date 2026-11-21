@@ -10,12 +10,12 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/PenguinIState.h"
+#include "Source/Actor/Character/Penguin/PenguinSlideRule.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Camera/CameraManager.h"
 #include "Source/Nature/Whirlpool.h"
 #include "Source/Nature/WhirlpoolManager.h"
-#include "Source/Manager/BattleManager.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
 #include "Source/Util/RandomDevice.h"
 #include <algorithm> // std::min用
@@ -44,8 +44,6 @@ namespace app
 			constexpr float BOT_REPICK_INTERVAL = 4.0f;
 			/** ボットが目標に到達したとみなす距離 */
 			constexpr float BOT_ARRIVE_DISTANCE = 150.0f;
-			/** ボットがスライド移動に切り替える目標までの距離 */
-			constexpr float BOT_SLIDE_DISTANCE = 700.0f;
 			/** ボットが再集合を呼ぶ間隔（秒） */
 			constexpr float BOT_REGROUP_INTERVAL = 10.0f;
 			/** 子が誰も残っていないときにボットがうろつく半径 */
@@ -53,6 +51,38 @@ namespace app
 			/** ボットが渦潮を迂回し始める距離と反発の強さ */
 			constexpr float BOT_WHIRLPOOL_AVOID_RADIUS = 350.0f;
 			constexpr float BOT_WHIRLPOOL_AVOID_WEIGHT = 2.0f;
+
+
+			/** 下り坂で自動スライドするかを決める（空中でも少しの間は滑り続ける） */
+			slideRule::EnDecision DecideAutoSlide(
+				const bool isSliding, const float slope,
+				const bool isDashInput, const bool hasMoveInput, const bool isOnGround,
+				const PenguinStateMachine::SlideSpeeds& speeds,
+				const float deltaTime, float& airTimer)
+			{
+				if (isOnGround)
+				{
+					airTimer = 0.0f;
+				}
+				else
+				{
+					airTimer += deltaTime;
+				}
+
+				// 滑走中に空中へ出たら、猶予の間だけ滑り続ける
+				if (isSliding && !isOnGround)
+				{
+					return (airTimer <= DaddyPenguinStateMachine::SLIDE_AIR_GRACE_TIME)
+						? slideRule::EnDecision::Coast
+						: slideRule::EnDecision::Stand;
+				}
+
+				// 空中では新たに滑走を始めない
+				const bool canStart = isDashInput && isOnGround;
+				return slideRule::Decide(
+					isSliding, hasMoveInput, canStart,
+					slope, speeds.slope, speeds.standing, speeds.current);
+			}
 		}
 
 
@@ -65,7 +95,7 @@ namespace app
 
 		void DaddyPenguinController::UpdateAutoplayBot(
 			float& inputX, float& inputY, float& stickLength,
-			bool& outSlide, bool& outRegroupCall)
+			bool& outRegroupCall)
 		{
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
 			const Vector3 myPos = m_owner->GetTransform().m_position;
@@ -156,9 +186,7 @@ namespace app
 				}
 			}
 
-			// スタック検出：移動する意思があるのに動けていなければ、目標を捨てて
-			// しばらくスライドを禁止する。上り坂でスライドを押しっぱなしにすると
-			// ずり落ちで無限に足踏みする（人間ならXを離す場面）ため
+			// スタック検出：移動する意思があるのに動けていなければ、目標を選び直す
 			Vector3 movedFromCheck = myPos - m_botStuckCheckPos;
 			movedFromCheck.y = 0.0f;
 			if (movedFromCheck.LengthSq() > 30.0f * 30.0f)
@@ -174,17 +202,9 @@ namespace app
 					m_botStuckTimer = 0.0f;
 					m_botStuckCheckPos = myPos;
 					m_botRepickTimer = 0.0f;		// 次フレームで目標を選び直す
-					m_botNoSlideTimer = 5.0f;		// 走りで迂回する
 				}
 			}
-			if (m_botNoSlideTimer > 0.0f)
-			{
-				m_botNoSlideTimer -= deltaTime;
-			}
 
-			// 遠距離はスライドで移動する（傾斜モデルの経路を実プレイ同様に通す）
-			outSlide = (m_botNoSlideTimer <= 0.0f)
-				&& distToTargetSq > BOT_SLIDE_DISTANCE * BOT_SLIDE_DISTANCE;
 
 			// 再集合はクールダウンが明けるたびに呼ぶ
 			m_botRegroupTimer -= deltaTime;
@@ -266,19 +286,11 @@ namespace app
 			}
 
 			// 自動プレイ（デバッグ）：ボットの入力でスティックを上書きする
-			bool botSlide = false;
 			bool botRegroupCall = false;
 			if (IsAutoplayBotEnabled())
 			{
-				UpdateAutoplayBot(inputX, inputY, stickLength, botSlide, botRegroupCall);
+				UpdateAutoplayBot(inputX, inputY, stickLength, botRegroupCall);
 			}
-
-			/** Bボタンが押されているか（スニークのトグル用） */
-			bool isPressB = g_pad[0]->IsPress(enButtonB);
-
-			// シロクマに近づいているときだけ、Bボタンによる強制忍び足を有効にする
-			// （遠いときにBを押しても、歩き自体は別途スティック量で判定されるので問題ない）
-			bool isForceSneakByButton = isPressB && BattleManager::GetInstance().IsSneakAvailable();
 
 			Vector3 moveDirection = Vector3::Zero;
 			bool isSneak = false;
@@ -308,9 +320,9 @@ namespace app
 
 				moveDirection = inputDir * finalStickLength;
 
-				/** Bボタンの状態でスニークかダッシュかを決める */
+				/** スティックの倒し具合でスニークかダッシュかを決める */
 				const float SNEAK_THRESHOLD = 0.9f;
-				if (stickLength <= SNEAK_THRESHOLD || isForceSneakByButton) {
+				if (stickLength <= SNEAK_THRESHOLD) {
 					isSneak = true;
 					isDash = false;
 				}
@@ -329,7 +341,8 @@ namespace app
 			// =========================================================
 			// アクション入力の更新
 			// =========================================================
-			bool isJump = g_pad[0]->IsTrigger(enButtonA);
+			// Aボタンはかまくらへの入場に使う
+			const bool isPressA = g_pad[0]->IsTrigger(enButtonA);
 			// Yボタン＝散ってしまった子ペンギンの再集合を呼びかける。
 			// 逃走をシロクマ最優先にした代わりに置いた手段なので、
 			// クールダウン中は空振りさせず、鳴き声もモーションも出さない
@@ -337,7 +350,6 @@ namespace app
 			bool isRegroupCall = (g_pad[0]->IsTrigger(enButtonY) || botRegroupCall)
 				&& childPenguinManager != nullptr
 				&& childPenguinManager->CanCallRegroup();
-			bool isSlide = g_pad[0]->IsPress(enButtonX) || botSlide;
 			bool isEnterIgloo = false;
 
 			// かまくら近接判定（毎フレーム実行）
@@ -385,10 +397,9 @@ namespace app
 			}
 
 			// Aボタンが押されていて、かつかまくら近くにいるならイベント開始
-			if (isJump && isNearIgloo)
+			if (isPressA && isNearIgloo)
 			{
 				isEnterIgloo = true;
-				isJump = false;
 			}
 
 			// =========================================================
@@ -398,17 +409,23 @@ namespace app
 			// 陣形のパッシブ/ウルト速度倍率を親ペンギン自身にも反映する（1.0f超もありうるためクランプなしの別枠に渡す）
 			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
 
-			// SlideEnd アニメーション中はプレイヤー入力を無視し、
-			// 自然に滑り止まるのを待つ
-			if (m_stateMachine->IsEqualCurrentState(PenguinSlideEndState::ID()))
-			{
-				m_stateMachine->SetActionInput(Vector3::Zero, false, false, false, false);
-			}
-			else
-			{
-				// 共通のアクション入力
-				m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, isJump, isSlide);
-			}
+			// 下り坂で自動スライドする（陣形倍率の設定後に判定する）
+			const bool isSliding = m_stateMachine->IsEqualCurrentState(PenguinSlideStartState::ID())
+				|| m_stateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
+			const slideRule::EnDecision slideDecision = DecideAutoSlide(
+				isSliding,
+				m_stateMachine->GetSlideSlopeSigned(),
+				isDash,
+				moveDirection.LengthSq() > FLT_EPSILON,
+				m_owner->GetCharacterController()->IsOnGround(),
+				m_stateMachine->CalcSlideSpeeds(moveDirection, isDash),
+				g_gameTime->GetFrameDeltaTime(),
+				m_autoSlideAirTimer);
+			const bool isSlide = (slideDecision != slideRule::EnDecision::Stand);
+			const bool isSlideCoast = (slideDecision == slideRule::EnDecision::Coast);
+
+			// 共通のアクション入力（ジャンプは使わない）
+			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, false, isSlide, isSlideCoast);
 
 			// 親ペンギン固有の入力
 			m_stateMachine->SetIsCommandToggle(isRegroupCall);

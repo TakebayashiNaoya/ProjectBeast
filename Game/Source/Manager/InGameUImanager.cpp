@@ -539,15 +539,11 @@ namespace app
 			}
 		}
 
-		// ジャンプスタミナとY（再集合の呼びかけ）のクールダウンをボタンUIへ通知する（毎フレーム）
+		// Y（再集合の呼びかけ）のクールダウンをボタンUIへ通知する（毎フレーム）
 		if (m_daddyPenguin && m_inGameButtonPacket)
 		{
 			if (auto* menu = m_inGameButtonPacket->GetMenu())
 			{
-				if (auto* sm = m_daddyPenguin->GetStateMachine())
-				{
-					menu->SetJumpStaminaInfo(sm->GetJumpStaminaRatio(), !sm->CanUseJump());
-				}
 				if (auto* cpm = actor::ChildPenguinManager::GetInstance())
 				{
 					/** ゲージは「回復していく」見た目に合わせて、残りクールダウンを反転して渡す */

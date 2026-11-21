@@ -21,6 +21,11 @@ namespace app
 		 */
 		class DaddyPenguinStateMachine : public PenguinStateMachine
 		{
+		public:
+			/** スライド中に空中にいても滑走を続ける猶予（秒） */
+			static constexpr float SLIDE_AIR_GRACE_TIME = 0.3f;
+
+
 			// ここに親ペンギン固有のセッター関数を追加していく
 		public:
 			/**
@@ -186,6 +191,8 @@ namespace app
 			bool m_isIglooEventFinished;
 			/** かまくら内にいるかどうか */
 			bool m_isInsideIgloo;
+			/** 空中にいる時間（秒） */
+			float m_slideAirTimer = 0.0f;
 		};
 	}
 }

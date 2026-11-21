@@ -6,7 +6,6 @@
 #include "InGameButtonGaugeAnimStatus.h"
 #include "InGameButtonMenu.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
-#include "Source/Manager/BattleManager.h"
 #include "Source/UI/Animation/UIAnimationFactory.h"
 #include "Source/Util/CRC32.h"
 
@@ -42,16 +41,14 @@ namespace app
 				m_startingAnimLogic.Initialize(
 					this,
 					{
-						"NotInputJumpIcon", "NotInputSneakIcon", "NotInputSlideIcon", "NotInputOrderIcon",
-						"InputJumpIcon",    "InputSneakIcon",    "InputSlideIcon",    "InputOrderIcon",
-						"NotInputAbuttonIcon", "NotInputBbuttonIcon", "NotInputXbuttonIcon", "NotInputYbuttonIcon",
-						"InputAbuttonIcon",    "InputBbuttonIcon",    "InputXbuttonIcon",    "InputYbuttonIcon"
+						"NotInputOrderIcon",   "InputOrderIcon",
+						"NotInputYbuttonIcon", "InputYbuttonIcon"
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
 					Vector3(300.0f, 0.0f, 0.0f),
 					1.0f, // duration（既存と同じ値を明示）
 					{},   // テキストUIは使用しない
-					{ "JumpStaminaGaugeA", "JumpStaminaGaugeB", "OrderCooldownGaugeA", "OrderCooldownGaugeB" } // ゲージUIも同じ演出で入場させる
+					{ "OrderCooldownGaugeA", "OrderCooldownGaugeB" } // ゲージUIも同じ演出で入場させる
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())
@@ -183,11 +180,6 @@ namespace app
 					}
 				};
 
-			updateGauge("JumpStaminaGaugeA", "JumpStaminaGaugeB",
-				m_jumpStaminaRatio, m_isJumpStaminaLocked, m_wasJumpStaminaLocked,
-				m_jumpDisplayRatio, m_gaugeStatus->GetJumpFollowSpeed(),
-				animKey::JUMP_GAUGE_LOCK_ANIM_KEY, animKey::JUMP_GAUGE_UNLOCK_ANIM_KEY);
-
 			// Y（再集合の呼びかけ）のクールダウン。ロック演出はスライド時代の
 			// アニメーション定義（slideGauge*Anim）をそのまま流用している
 			updateGauge("OrderCooldownGaugeA", "OrderCooldownGaugeB",
@@ -208,17 +200,8 @@ namespace app
 					if (auto* ui = GetUI<UIIcon>(Hash32(inputBtn)))    ui->m_isDraw = isInput;
 				};
 
-			// スニークが使用可能かどうか（シロクマとの距離）
-			const bool isSneakAvailable = BattleManager::GetInstance().IsSneakAvailable();
-
-			// 各ボタンに対して一括処理
-			updateUI(IsInputAButton(), "NotInputJumpIcon", "InputJumpIcon", "NotInputAbuttonIcon", "InputAbuttonIcon");
-			// isSneakAvailable が false なら、Bボタンを押していても isInput は常に false 
-			updateUI(IsInputBButton() && isSneakAvailable, "NotInputSneakIcon", "InputSneakIcon", "NotInputBbuttonIcon", "InputBbuttonIcon");
-			updateUI(IsInputXButton(), "NotInputSlideIcon", "InputSlideIcon", "NotInputXbuttonIcon", "InputXbuttonIcon");
+			// Y（再集合）だけを表示する
 			updateUI(IsInputYButton(), "NotInputOrderIcon", "InputOrderIcon", "NotInputYbuttonIcon", "InputYbuttonIcon");
-
-			UpdateSneakIconColor();
 		}
 
 
@@ -229,10 +212,8 @@ namespace app
 
 			// 初期化対象のアイコン名リスト
 			const char* iconNames[] = {
-				"NotInputJumpIcon", "NotInputSneakIcon", "NotInputSlideIcon", "NotInputOrderIcon",
-				"InputJumpIcon",    "InputSneakIcon",    "InputSlideIcon",    "InputOrderIcon",
-				"NotInputAbuttonIcon", "NotInputBbuttonIcon", "NotInputXbuttonIcon", "NotInputYbuttonIcon",
-				"InputAbuttonIcon",    "InputBbuttonIcon",    "InputXbuttonIcon",    "InputYbuttonIcon"
+				"NotInputOrderIcon",   "InputOrderIcon",
+				"NotInputYbuttonIcon", "InputYbuttonIcon"
 			};
 
 			for (const char* name : iconNames)
@@ -245,7 +226,6 @@ namespace app
 
 			// サークルゲージも初期状態では非表示にする
 			const char* gaugeNames[] = {
-				"JumpStaminaGaugeA", "JumpStaminaGaugeB",
 				"OrderCooldownGaugeA", "OrderCooldownGaugeB"
 			};
 
@@ -256,44 +236,6 @@ namespace app
 					ui->m_isDraw = false;
 				}
 			}
-		}
-
-
-		void InGameButtonMenu::UpdateSneakIconColor()
-		{
-			const Vector4 normalColor(1.0f, 1.0f, 1.0f, 1.0f);   // 通常（白）
-			const Vector4 grayColor(0.4f, 0.4f, 0.4f, 1.0f);     // グレーアウト
-			const Vector4& color = BattleManager::GetInstance().IsSneakAvailable() ? normalColor : grayColor;
-
-			const char* sneakIconNames[] = {
-				"NotInputSneakIcon",   "InputSneakIcon",
-				"NotInputBbuttonIcon", "InputBbuttonIcon"
-			};
-			for (const char* name : sneakIconNames)
-			{
-				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
-				{
-					ui->m_color = color;
-				}
-			}
-		}
-
-
-		bool InGameButtonMenu::IsInputAButton() const
-		{
-			return g_pad[0]->IsPress(enButtonA);
-		}
-
-
-		bool InGameButtonMenu::IsInputBButton() const
-		{
-			return g_pad[0]->IsPress(enButtonB);
-		}
-
-
-		bool InGameButtonMenu::IsInputXButton() const
-		{
-			return g_pad[0]->IsPress(enButtonX);
 		}
 
 

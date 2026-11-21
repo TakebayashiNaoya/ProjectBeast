@@ -207,6 +207,59 @@ namespace app
 			 * @return 旋回速度の倍率
 			 */
 			float CalcSlideTurnMultiplier() const;
+			/**
+			 * @brief スライド中だけ掛ける加速度の倍率を設定する
+			 */
+			void SetSlideAccelerationMultiplier(const float multiplier)
+			{
+				m_slideAccelerationMultiplier = multiplier;
+			}
+			/**
+			 * @brief スライド中だけ掛ける加速度の倍率を取得する
+			 */
+			float GetSlideAccelerationMultiplier() const
+			{
+				return m_slideAccelerationMultiplier;
+			}
+			/**
+			 * @brief スライド後の減速度を設定する
+			 */
+			void SetSlideCoastDeceleration(const float deceleration)
+			{
+				m_slideCoastDeceleration = deceleration;
+			}
+			/**
+			 * @brief 勢いだけで滑っているかを取得する
+			 */
+			bool GetIsSlideCoast() const
+			{
+				return m_isSlideCoast;
+			}
+
+			/**
+			 * @brief 自動スライドの判定に使う速度（倒し量と陣形倍率を掛けた値）
+			 */
+			struct SlideSpeeds
+			{
+				/** 坂で滑った場合の速度 */
+				float slope;
+				/** 通常の移動速度 */
+				float standing;
+				/** 現在の水平速度 */
+				float current;
+			};
+			/**
+			 * @brief 自動スライドの判定に使う速度を求める（陣形倍率を先に設定しておく）
+			 */
+			SlideSpeeds CalcSlideSpeeds(const Vector3& moveDirection, const bool isDash) const;
+			/**
+			 * @brief スライド中の目標速度を求める
+			 */
+			float CalcSlideMoveSpeed() const;
+			/**
+			 * @brief スライド後の減速度を求める（急な上りでは0）
+			 */
+			float CalcSlideCoastDeceleration() const;
 
 
 			/** ステートの変更先を取得する */
@@ -251,13 +304,18 @@ namespace app
 			 */
 			virtual void OnDead() {}
 
-			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide)
+			/**
+			 * @brief 移動・アクションの入力をまとめて設定する
+			 * @param isSlideCoast 勢いだけで滑るか（isSlideが偽なら無視）
+			 */
+			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide, bool isSlideCoast = false)
 			{
 				m_moveDirection = moveDirection;
 				m_isSneak = isSneak;
 				m_isDash = isDash; // または SetIsDash(isDash);
 				m_isJump = isJump;
 				m_isSlide = isSlide;
+				m_isSlideCoast = isSlide && isSlideCoast;
 				m_isSwimming = IsInWater();
 
 				// 毎フレーム呼ばれるこの関数内で、ジャンプ・スライドのスタミナゲージを更新する。
@@ -370,6 +428,12 @@ namespace app
 			float m_slideSlopeSigned = 0.0f;
 			/** 上り坂でのずり落ち（負の速度倍率）を許可するか。親ペンギンだけtrue */
 			bool  m_isSlideBackAllowed = false;
+			/** スライド中だけ掛ける加速度の倍率 */
+			float m_slideAccelerationMultiplier = 1.0f;
+			/** スライド後の減速度（陣形倍率を掛ける前） */
+			float m_slideCoastDeceleration = 0.0f;
+			/** 勢いだけで滑っているか */
+			bool  m_isSlideCoast = false;
 		};
 	}
 }
