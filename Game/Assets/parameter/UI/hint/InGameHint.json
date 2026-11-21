@@ -122,54 +122,6 @@
                 ]
             },
             {
-                "type": "UIIcon",
-                "name": "HintIconSneak",
-                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_b.DDS",
-                "width": 64,
-                "height": 64,
-                "position": [
-                    -290,
-                    200,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "HintIconSlide",
-                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_button_color_x.DDS",
-                "width": 64,
-                "height": 64,
-                "position": [
-                    -290,
-                    200,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
                 "type": "UIText",
                 "name": "HintText",
                 "text": "",
