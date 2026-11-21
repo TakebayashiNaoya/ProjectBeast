@@ -34,8 +34,6 @@ namespace app
 			 * @brief スライドの傾斜倍率を移動速度と旋回速度へ反映する
 			 * @details スライド系3ステート（SlideStart / Sliding / SlideEnd）が共通で使う。
 			 *          倍率そのものの計算は PenguinStateMachine 側にある。
-			 *          スライド中だけの加速度倍率と、惰性の減速度もここで掛ける。
-			 *          勢いだけで滑っている（Coast）ときは目標速度が立ち速度になり、惰性でそこまで落ちる。
 			 * @param owner ペンギンのステートマシン
 			 */
 			void ApplySlideSlope(app::actor::PenguinStateMachine* owner)
@@ -47,8 +45,8 @@ namespace app
 			}
 
 			/**
-			 * @brief 旋回速度・加速度の倍率と惰性の減速度を既定へ戻す
-			 * @details スライドを抜けたあとまで曲がりにくい・加速が速い・止まりにくいままにしないため、
+			 * @brief スライド用の旋回・加速・減速の設定を既定へ戻す
+			 * @details スライドを抜けたあとまで設定が残らないよう、
 			 *          スライド系ステートの Exit() から必ず呼ぶ。
 			 * @param owner ペンギンのステートマシン
 			 */

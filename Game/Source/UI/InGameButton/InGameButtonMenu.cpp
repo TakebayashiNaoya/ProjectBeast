@@ -200,7 +200,7 @@ namespace app
 					if (auto* ui = GetUI<UIIcon>(Hash32(inputBtn)))    ui->m_isDraw = isInput;
 				};
 
-			// A/B/X（ジャンプ・スニーク・スライド）のボタン操作は撤廃したため、Y（再集合）だけを表示する
+			// Y（再集合）だけを表示する
 			updateUI(IsInputYButton(), "NotInputOrderIcon", "InputOrderIcon", "NotInputYbuttonIcon", "InputYbuttonIcon");
 		}
 

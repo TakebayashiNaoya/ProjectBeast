@@ -53,29 +53,13 @@ namespace app
 			constexpr float BOT_WHIRLPOOL_AVOID_WEIGHT = 2.0f;
 
 
-			/**
-			 * @brief 下り坂で自動スライドするかどうかを決める
-			 * @details 判定そのものはslideRule::Decide()（PenguinSlideRule.h）に任せ、ここでは空中の扱いだけ足す。
-			 *          開始:滑走していないとき、スティック全倒し・接地を開始条件としてDecide()に渡す。
-			 *          空中:滑走中はSLIDE_AIR_GRACE_TIMEまで勢いで続け（小さな段差で途切れないため）、超えたら立つ。
-			 *          終了は速度で決まる（坂に運ばれず、勢いが立ち速度まで落ちたら立つ）。
-			 * @param isSliding    現在スライド中（SlideStart/Sliding）か
-			 * @param slope        進行方向に対する符号つき傾斜（下り正）
-			 * @param isDashInput  スティックが全倒しされているか
-			 * @param hasMoveInput 移動入力があるか
-			 * @param isOnGround   接地しているか
-			 * @param speeds       判定用の速度（倒し量・陣形倍率込み）
-			 * @param deltaTime    経過時間（秒）
-			 * @param airTimer     空中にいる時間（秒。この関数が更新する）
-			 * @return 判定結果
-			 */
+			/** 下り坂で自動スライドするかを決める（空中でも少しの間は滑り続ける） */
 			slideRule::EnDecision DecideAutoSlide(
 				const bool isSliding, const float slope,
 				const bool isDashInput, const bool hasMoveInput, const bool isOnGround,
 				const PenguinStateMachine::SlideSpeeds& speeds,
 				const float deltaTime, float& airTimer)
 			{
-				// 空中にいる時間（接地で0に戻す）
 				if (isOnGround)
 				{
 					airTimer = 0.0f;
@@ -85,7 +69,7 @@ namespace app
 					airTimer += deltaTime;
 				}
 
-				// 滑走中の空中：猶予内は勢いで続け、超えたら立つ
+				// 滑走中に空中へ出たら、猶予の間だけ滑り続ける
 				if (isSliding && !isOnGround)
 				{
 					return (airTimer <= DaddyPenguinStateMachine::SLIDE_AIR_GRACE_TIME)
@@ -221,8 +205,6 @@ namespace app
 				}
 			}
 
-			// スライドはボタンを撤廃し下り坂で自動発動になった。
-			// ボットは常にスティックを全倒しするので、坂では実プレイと同じく自動で滑る
 
 			// 再集合はクールダウンが明けるたびに呼ぶ
 			m_botRegroupTimer -= deltaTime;
@@ -359,7 +341,7 @@ namespace app
 			// =========================================================
 			// アクション入力の更新
 			// =========================================================
-			// Aボタンはかまくらへの入場だけに使う（ジャンプは撤廃した）
+			// Aボタンはかまくらへの入場に使う
 			const bool isPressA = g_pad[0]->IsTrigger(enButtonA);
 			// Yボタン＝散ってしまった子ペンギンの再集合を呼びかける。
 			// 逃走をシロクマ最優先にした代わりに置いた手段なので、
@@ -427,8 +409,7 @@ namespace app
 			// 陣形のパッシブ/ウルト速度倍率を親ペンギン自身にも反映する（1.0f超もありうるためクランプなしの別枠に渡す）
 			m_stateMachine->SetExternalSpeedMultiplier(ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier());
 
-			// スライドはボタンではなく、下り坂で自動発動する。
-			// 陣形倍率込みの速度で「ダッシュより速いか」を比べるため、倍率の設定後に判定する
+			// 下り坂で自動スライドする（陣形倍率の設定後に判定する）
 			const bool isSliding = m_stateMachine->IsEqualCurrentState(PenguinSlideStartState::ID())
 				|| m_stateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
 			const slideRule::EnDecision slideDecision = DecideAutoSlide(
@@ -443,8 +424,7 @@ namespace app
 			const bool isSlide = (slideDecision != slideRule::EnDecision::Stand);
 			const bool isSlideCoast = (slideDecision == slideRule::EnDecision::Coast);
 
-			// 共通のアクション入力（ジャンプ入力は撤廃したので常にfalse）。
-			// SlideEnd中も入力を通す（入力が来たらSlideEndを抜けて走り出す）
+			// 共通のアクション入力（ジャンプは使わない）
 			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, false, isSlide, isSlideCoast);
 
 			// 親ペンギン固有の入力

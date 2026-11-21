@@ -209,9 +209,6 @@ namespace app
 			float CalcSlideTurnMultiplier() const;
 			/**
 			 * @brief スライド中だけ掛ける加速度の倍率を設定する
-			 * @details スライド系ステートがSetAccelerationMultiplier()に渡す。
-			 *          親ペンギンだけ1.0fより大きくして滑り出しを速くする（子は既定のまま）。
-			 * @param multiplier 倍率（既定1.0f）
 			 */
 			void SetSlideAccelerationMultiplier(const float multiplier)
 			{
@@ -219,25 +216,20 @@ namespace app
 			}
 			/**
 			 * @brief スライド中だけ掛ける加速度の倍率を取得する
-			 * @return 倍率（既定1.0f）
 			 */
 			float GetSlideAccelerationMultiplier() const
 			{
 				return m_slideAccelerationMultiplier;
 			}
 			/**
-			 * @brief スライドの惰性の減速度を設定する
-			 * @details 坂に運ばれなくなったあと、勢いで滑り続けるときの減速の緩さ。
-			 *          親子で値を変えて「子はなかなか止まれない」を表現する。コンストラクタで呼ぶ。
-			 * @param deceleration 減速度（u/s²。陣形倍率を掛ける前の値）
+			 * @brief スライド後の減速度を設定する
 			 */
 			void SetSlideCoastDeceleration(const float deceleration)
 			{
 				m_slideCoastDeceleration = deceleration;
 			}
 			/**
-			 * @brief 勢いだけで滑っている（Coast）かどうかを取得する
-			 * @return SetActionInput()で惰性の滑走を指示されていればtrue
+			 * @brief 勢いだけで滑っているかを取得する
 			 */
 			bool GetIsSlideCoast() const
 			{
@@ -245,39 +237,27 @@ namespace app
 			}
 
 			/**
-			 * @brief 自動スライドの判定に使う3つの速度
-			 * @details すべてスティックの倒し量と陣形倍率（m_externalSpeedMultiplier）込みの実速度。
-			 *          目標手前のブレーキ（m_speedMultiplier）は含めない。
+			 * @brief 自動スライドの判定に使う速度（倒し量と陣形倍率を掛けた値）
 			 */
 			struct SlideSpeeds
 			{
-				/** 傾斜モデルで滑った場合の速度 */
+				/** 坂で滑った場合の速度 */
 				float slope;
-				/** 立って動いた場合の目標速度 */
+				/** 通常の移動速度 */
 				float standing;
 				/** 現在の水平速度 */
 				float current;
 			};
 			/**
-			 * @brief 自動スライドの判定に使う速度を求める
-			 * @details slideRule::Decide()に渡すための値。陣形倍率は呼ぶ前に設定しておくこと。
-			 * @param moveDirection このフレームの移動入力（長さ＝倒し量）
-			 * @param isDash        ダッシュ入力中か（立ち速度がrunSpeed、偽ならsneakSpeed。子は常にtrueを渡す）
-			 * @return 判定用の速度
+			 * @brief 自動スライドの判定に使う速度を求める（陣形倍率を先に設定しておく）
 			 */
 			SlideSpeeds CalcSlideSpeeds(const Vector3& moveDirection, const bool isDash) const;
 			/**
-			 * @brief スライド系ステートの目標速度を求める
-			 * @details 勢いだけで滑っている（Coast）ときは立ち速度、それ以外はCalcSlideSpeedWithSlope()。
-			 * @return 移動速度（倒し量・陣形倍率はMove()側で掛かる）
+			 * @brief スライド中の目標速度を求める
 			 */
 			float CalcSlideMoveSpeed() const;
 			/**
-			 * @brief スライド系ステートの惰性の減速度を求める
-			 * @details 下り・平地・緩い上り（slideRule::UsesCoast()）なら 減速度×陣形倍率、
-			 *          急な上りは0（従来の速い追従で減速する）。
-			 *          陣形倍率を掛けるのは、陣形で速度が変わっても惰性の時間を変えないため。
-			 * @return 減速度（u/s²）
+			 * @brief スライド後の減速度を求める（急な上りでは0）
 			 */
 			float CalcSlideCoastDeceleration() const;
 
@@ -326,7 +306,7 @@ namespace app
 
 			/**
 			 * @brief 移動・アクションの入力をまとめて設定する
-			 * @param isSlideCoast スライドを勢いだけで続ける（坂に運ばれない）か。isSlideが偽なら無視する
+			 * @param isSlideCoast 勢いだけで滑るか（isSlideが偽なら無視）
 			 */
 			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide, bool isSlideCoast = false)
 			{
@@ -448,11 +428,11 @@ namespace app
 			float m_slideSlopeSigned = 0.0f;
 			/** 上り坂でのずり落ち（負の速度倍率）を許可するか。親ペンギンだけtrue */
 			bool  m_isSlideBackAllowed = false;
-			/** スライド中だけ掛ける加速度の倍率（既定1.0f。親ペンギンだけ大きくする） */
+			/** スライド中だけ掛ける加速度の倍率 */
 			float m_slideAccelerationMultiplier = 1.0f;
-			/** スライドの惰性の減速度（u/s²。陣形倍率を掛ける前。親子のコンストラクタで設定する） */
+			/** スライド後の減速度（陣形倍率を掛ける前） */
 			float m_slideCoastDeceleration = 0.0f;
-			/** 勢いだけで滑っている（Coast）か。SetActionInput()が毎フレーム設定する */
+			/** 勢いだけで滑っているか */
 			bool  m_isSlideCoast = false;
 		};
 	}

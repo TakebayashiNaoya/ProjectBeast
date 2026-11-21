@@ -32,9 +32,7 @@ namespace app
 
 			/**
 			 * @brief 下りの効き
-			 * @details 親のスライド基準速度は200（2026-11-21試遊フィードバック「スライドが遅い」で120から上げた）。
-			 *          滑り始め（3.4度の下り）で236、10度で304、16.8度（Normalの中央値）で373、30度で500。
-			 *          平地では坂に運ばれず、勢い（惰性）が切れたらダッシュへ戻る（PenguinSlideRule.h）。
+			 * @details 親の基準速度200で、3.4度の下りで236、16.8度（Normalの中央値）で373、30度で500。
 			 *          「平地は走り、下りが見えたらスライド」の読み合いを作るのが狙い
 			 *          （2026-08-23 試遊フィードバック）。
 			 */
@@ -181,7 +179,7 @@ namespace app
 		{
 			SlideSpeeds speeds = { 0.0f, 0.0f, 0.0f };
 
-			// 現在の水平速度（上下動は判定に入れない）
+			// 現在の水平速度
 			Vector3 horizontalVelocity = m_currentVelocity;
 			horizontalVelocity.y = 0.0f;
 			speeds.current = horizontalVelocity.Length();
@@ -189,8 +187,7 @@ namespace app
 			const PenguinStatus* status = GetPenguinStatus();
 			if (status == nullptr) return speeds;
 
-			// Move()と同じく、倒し量と陣形倍率を掛けた実速度で比べる
-			// （目標手前のブレーキm_speedMultiplierは判定に入れない）
+			// Move()と同じく倒し量と陣形倍率を掛ける（目標手前のブレーキは含めない）
 			const float multiplier = moveDirection.Length() * m_externalSpeedMultiplier;
 			speeds.slope = CalcSlideSpeedWithSlope() * multiplier;
 			speeds.standing = (isDash ? status->GetRunSpeed() : status->GetSneakSpeed()) * multiplier;
@@ -200,7 +197,7 @@ namespace app
 
 		float PenguinStateMachine::CalcSlideMoveSpeed() const
 		{
-			// 勢いだけで滑っているときは立ち速度を目標にし、惰性でそこまで落ちていく
+			// 勢いだけで滑っているときは通常の移動速度まで落としていく
 			if (m_isSlideCoast)
 			{
 				const PenguinStatus* status = GetPenguinStatus();
@@ -213,10 +210,10 @@ namespace app
 
 		float PenguinStateMachine::CalcSlideCoastDeceleration() const
 		{
-			// 急な上りは従来どおり速く減速する（上りの罰を残す）
+			// 急な上りではすぐ減速する
 			if (!slideRule::UsesCoast(m_slideSlopeSigned)) return 0.0f;
 
-			// 陣形で速度が変わっても、惰性で滑る時間は変えない
+			// 陣形の速度倍率が変わっても滑り続ける時間を揃える
 			return m_slideCoastDeceleration * m_externalSpeedMultiplier;
 		}
 
