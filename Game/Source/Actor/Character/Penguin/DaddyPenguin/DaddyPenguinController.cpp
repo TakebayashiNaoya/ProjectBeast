@@ -424,8 +424,8 @@ namespace app
 			const bool isSlide = (slideDecision != slideRule::EnDecision::Stand);
 			const bool isSlideCoast = (slideDecision == slideRule::EnDecision::Coast);
 
-			// 共通のアクション入力（ジャンプは使わない）
-			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, false, isSlide, isSlideCoast);
+			// 共通のアクション入力
+			m_stateMachine->SetActionInput(moveDirection, isSneak, isDash, isSlide, isSlideCoast);
 
 			// 親ペンギン固有の入力
 			m_stateMachine->SetIsCommandToggle(isRegroupCall);

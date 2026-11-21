@@ -1,6 +1,6 @@
 ﻿/**
  * @file InGameButtonGaugeAnimStatus.cpp
- * @brief インゲームボタンのスタミナゲージ専用のアニメーションステータスクラス
+ * @brief インゲームボタンの再集合ゲージ専用のアニメーションステータスクラス
  */
 #include "stdafx.h"
 #include "InGameButtonGaugeAnimStatus.h"
@@ -13,7 +13,7 @@ namespace app
 	{
 		namespace
 		{
-			// インゲームボタンのスタミナゲージ専用のアニメーションパラメータのJSONファイルパス名。
+			// インゲームボタンの再集合ゲージ専用のアニメーションパラメータのJSONファイルパス名。
 			const char* JSON_PATH = "Assets/parameter/UI/inGameButton/InGameButtonGaugeAnimParameter.json";
 		}
 
@@ -33,41 +33,23 @@ namespace app
 		{
 			const auto& param = UIAnimationParameter::Get();
 
-			// ジャンプゲージのロック演出の定義を取得。
-			if (const auto* jumpLock = param.Find(animKey::JUMP_GAUGE_LOCK_ANIM_KEY))
+			// 再集合ゲージのロック演出の定義を取得。
+			if (const auto* regroupLock = param.Find(animKey::REGROUP_GAUGE_LOCK_ANIM_KEY))
 			{
-				m_jumpLockAnimData.startColor = jumpLock->startV4;
-				m_jumpLockAnimData.endColor = jumpLock->endV4;
-				m_jumpLockAnimData.duration = jumpLock->duration;
-				m_jumpLockAnimData.easingType = jumpLock->easingType;
-				m_jumpLockAnimData.loopMode = jumpLock->loopMode;
+				m_regroupLockAnimData.startColor = regroupLock->startV4;
+				m_regroupLockAnimData.endColor = regroupLock->endV4;
+				m_regroupLockAnimData.duration = regroupLock->duration;
+				m_regroupLockAnimData.easingType = regroupLock->easingType;
+				m_regroupLockAnimData.loopMode = regroupLock->loopMode;
 			}
-			// ジャンプゲージの復帰演出の定義を取得。
-			if (const auto* jumpUnlock = param.Find(animKey::JUMP_GAUGE_UNLOCK_ANIM_KEY))
+			// 再集合ゲージの復帰演出の定義を取得。
+			if (const auto* regroupUnlock = param.Find(animKey::REGROUP_GAUGE_UNLOCK_ANIM_KEY))
 			{
-				m_jumpUnlockAnimData.startColor = jumpUnlock->startV4;
-				m_jumpUnlockAnimData.endColor = jumpUnlock->endV4;
-				m_jumpUnlockAnimData.duration = jumpUnlock->duration;
-				m_jumpUnlockAnimData.easingType = jumpUnlock->easingType;
-				m_jumpUnlockAnimData.loopMode = jumpUnlock->loopMode;
-			}
-			// スライドゲージのロック演出の定義を取得。
-			if (const auto* slideLock = param.Find(animKey::SLIDE_GAUGE_LOCK_ANIM_KEY))
-			{
-				m_slideLockAnimData.startColor = slideLock->startV4;
-				m_slideLockAnimData.endColor = slideLock->endV4;
-				m_slideLockAnimData.duration = slideLock->duration;
-				m_slideLockAnimData.easingType = slideLock->easingType;
-				m_slideLockAnimData.loopMode = slideLock->loopMode;
-			}
-			// スライドゲージの復帰演出の定義を取得。
-			if (const auto* slideUnlock = param.Find(animKey::SLIDE_GAUGE_UNLOCK_ANIM_KEY))
-			{
-				m_slideUnlockAnimData.startColor = slideUnlock->startV4;
-				m_slideUnlockAnimData.endColor = slideUnlock->endV4;
-				m_slideUnlockAnimData.duration = slideUnlock->duration;
-				m_slideUnlockAnimData.easingType = slideUnlock->easingType;
-				m_slideUnlockAnimData.loopMode = slideUnlock->loopMode;
+				m_regroupUnlockAnimData.startColor = regroupUnlock->startV4;
+				m_regroupUnlockAnimData.endColor = regroupUnlock->endV4;
+				m_regroupUnlockAnimData.duration = regroupUnlock->duration;
+				m_regroupUnlockAnimData.easingType = regroupUnlock->easingType;
+				m_regroupUnlockAnimData.loopMode = regroupUnlock->loopMode;
 			}
 		}
 

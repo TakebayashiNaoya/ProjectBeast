@@ -39,14 +39,12 @@ namespace app
 			 * @param swimSpeed  泳ぎ速度の個体値
 			 * @param sneakSpeed スニーク速度の個体値
 			 * @param slideSpeed スライド速度の個体値
-			 * @param jumpPower  ジャンプパワーの個体値
 			 */
 			void SetIndividualValues(
 				float runSpeed,
 				float swimSpeed,
 				float sneakSpeed,
-				float slideSpeed,
-				float jumpPower);
+				float slideSpeed);
 
 
 		public:

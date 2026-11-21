@@ -128,11 +128,11 @@ namespace app
 
 
 		/**
-		 * @brief ペンギンのジャンプステートクラス
+		 * @brief ペンギンの落下ステートクラス
 		 */
-		class PenguinJumpState : public PenguinIState
+		class PenguinFallState : public PenguinIState
 		{
-			appState(PenguinJumpState);
+			appState(PenguinFallState);
 		public:
 			// IStateの仮想関数のオーバーライド
 			void Enter() override final;
@@ -141,8 +141,8 @@ namespace app
 
 
 		public:
-			PenguinJumpState(PenguinStateMachine* owner);
-			~PenguinJumpState() override = default;
+			PenguinFallState(PenguinStateMachine* owner);
+			~PenguinFallState() override = default;
 		};
 
 

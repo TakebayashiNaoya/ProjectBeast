@@ -105,8 +105,8 @@ namespace app
 
 		bool PenguinBase::ShouldSuppressFootprint() const
 		{
-			// ジャンプ中、泳ぎ中、スライド中は出さない
-			return m_characterStateMachine->IsEqualCurrentState(PenguinJumpState::ID()) ||
+			// 落下中、泳ぎ中、スライド中は出さない
+			return m_characterStateMachine->IsEqualCurrentState(PenguinFallState::ID()) ||
 				m_characterStateMachine->IsEqualCurrentState(PenguinSwimmingState::ID()) ||
 				m_characterStateMachine->IsEqualCurrentState(PenguinSlidingState::ID());
 		}

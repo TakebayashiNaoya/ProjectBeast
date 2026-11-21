@@ -49,11 +49,6 @@ namespace app
 			m_hp = parameter->hp;
 			m_radius = parameter->radius;
 			m_height = parameter->height;
-			m_jumpStaminaMax = parameter->jumpStaminaMax;                     // ← 追加
-			m_jumpStaminaRecoverSpeed = parameter->jumpStaminaRecoverSpeed;   // ← 追加
-			m_slideStaminaMax = parameter->slideStaminaMax;                   // ← 追加
-			m_slideStaminaDecreaseSpeed = parameter->slideStaminaDecreaseSpeed; // ← 追加
-			m_slideStaminaRecoverSpeed = parameter->slideStaminaRecoverSpeed; // ← 追加
 		}
 
 
@@ -71,14 +66,12 @@ namespace app
 			float runSpeed,
 			float swimSpeed,
 			float sneakSpeed,
-			float slideSpeed,
-			float jumpPower)
+			float slideSpeed)
 		{
 			m_runSpeed = runSpeed;
 			m_swimSpeed = swimSpeed;
 			m_sneakSpeed = sneakSpeed;
 			m_slideSpeed = slideSpeed;
-			m_jumpPower = jumpPower;
 			m_isIndividualValueLocked = true;
 		}
 	}

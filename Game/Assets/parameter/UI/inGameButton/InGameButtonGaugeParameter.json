@@ -1,7 +1,6 @@
 [
     {
-        "comment":"インゲームボタンのスタミナゲージ専用のステータス（表示追従用イージング設定）",
-        "jumpFollowSpeed":2.0,
-        "slideFollowSpeed":2.0
+        "comment":"インゲームボタンの再集合ゲージ専用のステータス（表示追従用イージング設定）",
+        "regroupFollowSpeed":2.0
     }
 ]

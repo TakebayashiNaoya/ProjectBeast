@@ -301,7 +301,6 @@
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinEffectStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinIState.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinParameter.cpp" />
-    <ClCompile Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\PenguinStatus.cpp" />
     <ClCompile Include="Source\Actor\IK\LegIKComponent.cpp" />
@@ -505,7 +504,6 @@
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinEffectStatus.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinIState.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinParameter.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\PenguinStaminaGauge.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinSlideRule.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\PenguinStatus.h" />

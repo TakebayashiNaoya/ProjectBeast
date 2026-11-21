@@ -96,8 +96,8 @@ namespace app
 			constexpr float DADDY_NOISE_RADIUS_RUN = 400.0f;
 			/** 滑り（NoiseManager の Slide と同値） */
 			constexpr float DADDY_NOISE_RADIUS_SLIDE = 500.0f;
-			/** ジャンプ（着地音。NoiseManager の Fall より控えめにしてある） */
-			constexpr float DADDY_NOISE_RADIUS_JUMP = 300.0f;
+			/** 落下（着地音。NoiseManager の Fall より控えめにしてある） */
+			constexpr float DADDY_NOISE_RADIUS_FALL = 300.0f;
 			/** 泳ぎ（水音。歩きより少し広い程度） */
 			constexpr float DADDY_NOISE_RADIUS_SWIM = 250.0f;
 
@@ -998,9 +998,9 @@ namespace app
 			{
 				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_RUN;
 			}
-			else if (sm->IsEqualCurrentState(PenguinJumpState::ID()))
+			else if (sm->IsEqualCurrentState(PenguinFallState::ID()))
 			{
-				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_JUMP;
+				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_FALL;
 			}
 			else if (sm->IsEqualCurrentState(PenguinSwimmingState::ID()))
 			{

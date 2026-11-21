@@ -19,36 +19,12 @@ namespace app
 			CommandShout = 0,
 			// うつ伏せで死亡する
 			DeathFaceDown,
-			// 仰向けで死亡する
-			DeathFaceUp,
-			// 食べ物をついばむ
-			EatCrouching,
-			// 食べ物を飲み込む
-			EatDrink,
-			// 食べるのをやめる
-			EatRising,
-			// その場で翼をばたつかせる
-			IdleFlapingWings,
-			// その場で体を振るう
-			IdleShake,
-			// その場で眠る
-			IdleSleep,
-			// その場で周りを見回す
-			IdleLoocAround,
 			// その場で何もしない
 			IdleStanding,
-			// 走りながらジャンプする
-			JumpRunning,
 			// 歩きながらジャンプする
 			JumpWalking,
 			// 水中から出ようとする
 			LaunchBegin,
-			// 水中から出て着地する
-			LaunchEnd,
-			// 水中から出て空中にいるときに翼を速くばたつかせる
-			LaunchFlapingWingsQuickly,
-			// 水中から出て空中にいるときに翼をゆっくりばたつかせる				
-			LaunchFkapingWingsSlowly,
 			// 走る
 			MoveRun,
 			// 泳ぐ
@@ -63,12 +39,6 @@ namespace app
 			StandUp,
 			// こける
 			Trip,
-			// 回れ右
-			TurnBack,
-			// 左向け左
-			TurnLeft,
-			// 右向け右
-			TurnRight,
 			Max
 		};
 
@@ -80,36 +50,12 @@ namespace app
 			{ "Assets/animData/penguin/commandShout.tka", false },
 			// うつ伏せで死亡する
 			{ "Assets/animData/penguin/deathFaceDown.tka", false },
-			// 仰向けで死亡する
-			{ "Assets/animData/penguin/deathFaceUp.tka", false },
-			// 食べ物をついばむ
-			{ "Assets/animData/penguin/eatCrouching.tka", true },
-			// 食べ物を飲み込む
-			{ "Assets/animData/penguin/eatDrink.tka", false },
-			// 食べるのをやめる
-			{ "Assets/animData/penguin/eatRising.tka", false },
-			// その場で翼をばたつかせる
-			{ "Assets/animData/penguin/idleFlappingWings.tka", true },
-			// その場で周りを見回す
-			{ "Assets/animData/penguin/idleLooKAround.tka", false },
-			// その場で体を振るう
-			{ "Assets/animData/penguin/idleShake.tka", false },
-			// その場で眠る
-			{ "Assets/animData/penguin/idleSleep.tka", true },
 			// その場で何もしない
 			{ "Assets/animData/penguin/idleStanding.tka", true },
-			// 走りながらジャンプする
-			{ "Assets/animData/penguin/jumpRunning.tka", true },
 			// 歩きながらジャンプする
 			{ "Assets/animData/penguin/jumpWalking.tka", true },
 			// 水中から出ようとする
 			{ "Assets/animData/penguin/launchBegin.tka", false },
-			// 水中から出て着地する
-			{ "Assets/animData/penguin/launchEnd.tka", false },
-			// 水中から出て空中にいるときに翼を速くばたつかせる
-			{ "Assets/animData/penguin/launchFlappingWingsQuickly.tka", false },
-			// 水中から出て空中にいるときに翼をゆっくりばたつかせる
-			{ "Assets/animData/penguin/launchFlappingWingsSlowly.tka", false },
 			// 走る
 			{ "Assets/animData/penguin/moveRun.tka", true },
 			// 泳ぐ
@@ -123,13 +69,7 @@ namespace app
 			// 起き上がる
 			{ "Assets/animData/penguin/standUp.tka", false },
 			// こける
-			{ "Assets/animData/penguin/trip.tka", false },
-			// 回れ右
-			{ "Assets/animData/penguin/turnBack.tka", false },
-			// 左向け左
-			{ "Assets/animData/penguin/turnLeft.tka", false },
-			// 右向け右
-			{ "Assets/animData/penguin/turnRight.tka", false }
+			{ "Assets/animData/penguin/trip.tka", false }
 		};
 	}
 }
