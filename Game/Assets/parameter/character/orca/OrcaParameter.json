@@ -1,7 +1,7 @@
 [
     {
         "comment": "シャチのパラメーター。並びと意味は Game/Source/Actor/Character/Orca/OrcaParameter.h。変更したら Tools/ParameterConvert.py を実行して .bin を作り直す",
-        "runSpeed": 330.0,
+        "runSpeed": 430.0,
         "swimSpeed": 160.0,
         "radius": 60.0,
         "height": 100.0,
@@ -16,7 +16,7 @@
         "mouthOffset": 125.0,
         "attackImpactTime": 0.5,
         "roarDuration": 0.8,
-        "lostChaseDistance": 900.0,
+        "lostChaseDistance": 1100.0,
         "maxEat": 3,
         "maxStamina": 30.0,
         "staminaDrainRate": 1.0,

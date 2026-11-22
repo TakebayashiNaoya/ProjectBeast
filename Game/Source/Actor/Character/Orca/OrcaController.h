@@ -4,6 +4,7 @@
  */
 #pragma once
 #include <vector>
+#include "Source/Actor/Character/PlayerFront.h"
 
 
 namespace app
@@ -136,10 +137,20 @@ namespace app
 			 */
 			EnState GiveUpAndPatrol(const char* reason);
 
+			/**
+			 * @brief 正面への回り込みを1フレーム進める（CheckChaseの先頭で、現在の標的に対して呼ぶ。EnemyControllerと同じ）
+			 * @details 結果の状態とsteerPointはm_approachに入る。UpdateChaseはそれをSteerToに渡すだけ
+			 */
+			void EvaluateFrontApproach();
+			/** @brief 回り込み中なら終えて、ログを残す */
+			void EndFrontApproach(PlayerFront::EnApproachPhase nextPhase, const char* reason);
+			/** @brief 攻撃してよいか（回り込み中でなく、画面に映っている） */
+			bool CanAttackFromFront() const;
+
 
 		private:
 			/**
-			 * @brief 泳いでいる子を視界で探す（EnemyController::FindTarget :217-273 と同じ判定に、泳いでいるかの条件を足したもの）
+			 * @brief 泳いでいる子を視界で探す（EnemyController::FindTarget :266-322と同じ判定に、泳いでいるかの条件を足したもの）
 			 * @details 視線は水面の高さ + 少しの位置から水平に飛ばす（水面下から飛ばすと地形の下をくぐって流氷の向こうが見えるため）
 			 */
 			ChildPenguin* FindTarget() const;
@@ -209,6 +220,9 @@ namespace app
 			/** 停滞の検出 */
 			Vector3 m_lastCheckPosition = Vector3::Zero;
 			float m_stuckTimer = 0.0f;
+
+			/** 正面への回り込みの状態（追跡に入るたびに初期化する） */
+			PlayerFront::ApproachState m_approach;
 		};
 	}
 }
