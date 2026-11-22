@@ -83,17 +83,15 @@ namespace app
 #endif
 
 			auto* parameterManager = core::ParameterManager::Get();
-			const auto* circleParam   = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Circle));
 			const auto* triangleParam = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Triangle));
 			const auto* clusterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Cluster));
 			const auto* scatterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Scatter));
 
-			m_formations[static_cast<size_t>(EnFormationType::Circle)]   = std::make_unique<CircleFormation>(*circleParam);
 			m_formations[static_cast<size_t>(EnFormationType::Triangle)] = std::make_unique<TriangleFormation>(*triangleParam);
 			m_formations[static_cast<size_t>(EnFormationType::Cluster)]  = std::make_unique<ClusterFormation>(*clusterParam);
 			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>(*scatterParam);
 
-			SwitchFormation(EnFormationType::Circle);
+			SwitchFormation(INITIAL_FORMATION_TYPE);
 
 			// 陣形切り替え演出時間の初期読み込み
 			{

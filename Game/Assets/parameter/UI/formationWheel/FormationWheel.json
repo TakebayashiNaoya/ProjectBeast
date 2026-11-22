@@ -27,30 +27,6 @@
             },
             {
                 "type": "UIIcon",
-                "name": "CircleIcon",
-                "asset": "Assets/spriteData/UI/Icon/Formation/Penguin.DDS",
-                "width": 80,
-                "height": 80,
-                "position": [
-                    0,
-                    -400,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
                 "name": "TriangleIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
                 "width": 80,
@@ -302,30 +278,6 @@
                 "position": [
                     0,
                     143,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    255,
-                    255,
-                    255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "CutInIconCircle",
-                "asset": "Assets/spriteData/UI/Icon/Formation/Penguin.DDS",
-                "width": 96,
-                "height": 96,
-                "position": [
-                    -230,
-                    200,
                     0
                 ],
                 "scale": [

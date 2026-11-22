@@ -132,13 +132,13 @@ namespace app
 			/** 青い火の玉の初期スケール */
 			const Vector3 BLUR_FIRE_BALL_SCALE_UP = Vector3(10.0f, 10.0f, 10.0f);
 
-			/** 陣形色（EnFormationTypeの並び順：円陣/三角陣/密集陣/散開陣） */
+			/** 陣形色（EnFormationTypeの並び順：三角陣/密集陣/散開陣） */
 			const Vector4 FORMATION_COLORS[] = {
-				Vector4(0.35f, 1.0f,  0.55f, 1.0f),   // 円陣：緑
-				Vector4(1.0f,  0.9f,  0.3f,  1.0f),   // 三角陣：黄
+				Vector4(0.35f, 1.0f,  0.55f, 1.0f),   // 三角陣：緑
 				Vector4(0.45f, 0.7f,  1.0f,  1.0f),   // 密集陣：青
 				Vector4(1.0f,  0.6f,  0.25f, 1.0f),   // 散開陣：橙
 			};
+			static_assert(std::size(FORMATION_COLORS) == static_cast<size_t>(EnFormationType::Num), "陣形色の数が陣形の数と合わない");
 			/** 親へのフローフィールドを作り直す最短間隔（秒） */
 			constexpr float FLOW_FIELD_REBUILD_INTERVAL = 0.5f;
 			/** 親がこの距離以上動いていたらフローフィールドを作り直す（動いていなければ再利用） */

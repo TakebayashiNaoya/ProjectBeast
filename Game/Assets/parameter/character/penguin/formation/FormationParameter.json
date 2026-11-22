@@ -1,18 +1,5 @@
 [
   {
-    "comment": "円陣（通常）：パッシブでレベル連動加速（他陣形と共通）",
-    "passiveSpeedMultiplier": 1.0,
-    "passiveSpeedBase": 1.0,
-    "passiveSpeedPerLevel": 0.1,
-    "passiveWhirlpoolResistance": false,
-    "passiveBearAttackNullify": false,
-    "radiusPerRing": 35.0,
-    "joinMargin": 20.0,
-    "rowSpacing": 0.0,
-    "colSpacing": 0.0,
-    "baseFollowers": 9
-  },
-  {
     "comment": "三角陣（スピード特化）：パッシブでレベル連動加速（他陣形と共通）×1.4倍",
     "passiveSpeedMultiplier": 1.4,
     "passiveSpeedBase": 1.0,
@@ -45,7 +32,7 @@
     "passiveSpeedPerLevel": 0.1,
     "passiveWhirlpoolResistance": false,
     "passiveBearAttackNullify": false,
-    "radiusPerRing": 40.0,
+    "radiusPerRing": 35.0,
     "joinMargin": 50.0,
     "rowSpacing": 0.0,
     "colSpacing": 0.0,

@@ -92,22 +92,6 @@ namespace app
 		/****************************************/
 
 
-		CircleFormation::CircleFormation(const MasterFormationParameter& param) : RingFormation(param)
-		{
-			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
-			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
-			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
-
-			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::CircleAuraBegin, EnEffectKind::CircleAuraEnd);
-		}
-
-
-		
-
-		/****************************************/
-
-
 		ClusterFormation::ClusterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
 			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率 + 渦潮耐性 + シロクマ・シャチの攻撃無効化
