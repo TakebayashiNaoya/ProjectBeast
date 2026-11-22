@@ -27,7 +27,7 @@
             },
             {
                 "type": "UIIcon",
-                "name": "TriangleIcon",
+                "name": "SpeedIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
                 "width": 80,
                 "height": 80,
@@ -51,7 +51,7 @@
             },
             {
                 "type": "UIIcon",
-                "name": "ClusterIcon",
+                "name": "DefenseIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shield.DDS",
                 "width": 80,
                 "height": 80,
@@ -75,7 +75,7 @@
             },
             {
                 "type": "UIIcon",
-                "name": "ScatterIcon",
+                "name": "GatherIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Megaphone.DDS",
                 "width": 80,
                 "height": 80,
@@ -295,7 +295,7 @@
             },
             {
                 "type": "UIIcon",
-                "name": "CutInIconTriangle",
+                "name": "CutInIconSpeed",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
                 "width": 96,
                 "height": 96,
@@ -319,7 +319,7 @@
             },
             {
                 "type": "UIIcon",
-                "name": "CutInIconCluster",
+                "name": "CutInIconDefense",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shield.DDS",
                 "width": 96,
                 "height": 96,
@@ -343,7 +343,7 @@
             },
             {
                 "type": "UIIcon",
-                "name": "CutInIconScatter",
+                "name": "CutInIconGather",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Megaphone.DDS",
                 "width": 96,
                 "height": 96,

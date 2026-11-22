@@ -92,7 +92,7 @@ namespace app
 		/****************************************/
 
 
-		ClusterFormation::ClusterFormation(const MasterFormationParameter& param) : RingFormation(param)
+		DefenseFormation::DefenseFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
 			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率 + 渦潮耐性 + シロクマ・シャチの攻撃無効化
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
@@ -107,7 +107,7 @@ namespace app
 			}
 
 			// パッシブ演出: バリア（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::ClusterBarrierBegin, EnEffectKind::ClusterBarrierEnd);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::DefenseBarrierBegin, EnEffectKind::DefenseBarrierEnd);
 		}
 
 
@@ -116,14 +116,14 @@ namespace app
 		/****************************************/
 
 
-		ScatterFormation::ScatterFormation(const MasterFormationParameter& param) : RingFormation(param)
+		GatherFormation::GatherFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
 			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
 			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
 			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::ScatterAura, EnEffectKind::None);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::GatherAura, EnEffectKind::None);
 		}
 
 
@@ -132,7 +132,7 @@ namespace app
 		/****************************************/
 
 
-		TriangleFormation::TriangleFormation(const MasterFormationParameter& param)
+		SpeedFormation::SpeedFormation(const MasterFormationParameter& param)
 			: IFormation(param)
 		{
 			// パッシブ: レベル連動速度 × 固定倍率（スピード特化）
@@ -140,11 +140,11 @@ namespace app
 			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
 			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::TriangleAuraBegin, EnEffectKind::TriangleAuraEnd);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::SpeedAuraBegin, EnEffectKind::SpeedAuraEnd);
 		}
 
 
-		void TriangleFormation::CalculatePositions(
+		void SpeedFormation::CalculatePositions(
 			const Vector3& center,
 			const Vector3& forward,
 			std::vector<Vector3>& out,

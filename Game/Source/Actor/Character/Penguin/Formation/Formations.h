@@ -106,7 +106,7 @@ namespace app
 		 * @details
 		 *   リング k（1始まり）に baseFollowers*k 体を等間隔配置する。
 		 *   各リングの半径は radiusPerRing*k。全リングで隣接間隔が均一になる。
-		 *   Cluster・Scatterはこのクラスを継承し、パラメーターだけ変える。
+		 *   Defense・Gatherはこのクラスを継承し、パラメーターだけ変える。
 		 */
 		class RingFormation : public IFormation
 		{
@@ -149,11 +149,11 @@ namespace app
 		 *   ＋ シロクマ・シャチの攻撃無効化（MasterFormationParameterで調整）。
 		 *   パッシブ演出: バリアを陣形中ずっと出す。
 		 */
-		class ClusterFormation : public RingFormation
+		class DefenseFormation : public RingFormation
 		{
 		public:
 			/** @param param JSONから読み込んだ密集陣のパラメーター */
-			explicit ClusterFormation(const MasterFormationParameter& param);
+			explicit DefenseFormation(const MasterFormationParameter& param);
 		};
 
 
@@ -167,11 +167,11 @@ namespace app
 		 * @details
 		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameterで調整）。
 		 */
-		class ScatterFormation : public RingFormation
+		class GatherFormation : public RingFormation
 		{
 		public:
 			/** @param param JSONから読み込んだ散開陣のパラメーター */
-			explicit ScatterFormation(const MasterFormationParameter& param);
+			explicit GatherFormation(const MasterFormationParameter& param);
 		};
 
 
@@ -185,11 +185,11 @@ namespace app
 		 * @details
 		 *   パッシブ: レベル連動速度 × 固定倍率（1.4で他陣形より明確に速い。MasterFormationParameterで調整）。
 		 */
-		class TriangleFormation : public IFormation
+		class SpeedFormation : public IFormation
 		{
 		public:
 			/** @param param JSONから読み込んだ三角陣のパラメーター */
-			explicit TriangleFormation(const MasterFormationParameter& param);
+			explicit SpeedFormation(const MasterFormationParameter& param);
 
 			void CalculatePositions(
 				const Vector3& center,

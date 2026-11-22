@@ -23,9 +23,9 @@ namespace app
 			{
 				switch (type)
 				{
-				case EnFormationType::Triangle: return u8"三角陣（スピード特化）";
-				case EnFormationType::Cluster:  return u8"密集陣（防御特化）";
-				case EnFormationType::Scatter:  return u8"散開陣（収集特化）";
+				case EnFormationType::Speed:   return u8"三角陣（スピード特化）";
+				case EnFormationType::Defense: return u8"密集陣（防御特化）";
+				case EnFormationType::Gather:  return u8"散開陣（収集特化）";
 				default:                        return u8"不明";
 				}
 			}

@@ -83,13 +83,13 @@ namespace app
 #endif
 
 			auto* parameterManager = core::ParameterManager::Get();
-			const auto* triangleParam = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Triangle));
-			const auto* clusterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Cluster));
-			const auto* scatterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Scatter));
+			const auto* speedParam   = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Speed));
+			const auto* defenseParam = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Defense));
+			const auto* gatherParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Gather));
 
-			m_formations[static_cast<size_t>(EnFormationType::Triangle)] = std::make_unique<TriangleFormation>(*triangleParam);
-			m_formations[static_cast<size_t>(EnFormationType::Cluster)]  = std::make_unique<ClusterFormation>(*clusterParam);
-			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>(*scatterParam);
+			m_formations[static_cast<size_t>(EnFormationType::Speed)]   = std::make_unique<SpeedFormation>(*speedParam);
+			m_formations[static_cast<size_t>(EnFormationType::Defense)] = std::make_unique<DefenseFormation>(*defenseParam);
+			m_formations[static_cast<size_t>(EnFormationType::Gather)]  = std::make_unique<GatherFormation>(*gatherParam);
 
 			SwitchFormation(INITIAL_FORMATION_TYPE);
 

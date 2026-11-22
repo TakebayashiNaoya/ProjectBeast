@@ -16,7 +16,7 @@ namespace app
 		namespace
 		{
 			/** 陣形種別(EnFormationTypeの値)ごとのJSON要素名 */
-			constexpr const char* FORMATION_ICON_NAMES[] = { "TriangleIcon", "ClusterIcon", "ScatterIcon" };
+			constexpr const char* FORMATION_ICON_NAMES[] = { "SpeedIcon", "DefenseIcon", "GatherIcon" };
 			constexpr int FORMATION_NUM = static_cast<int>(actor::EnFormationType::Num);
 			static_assert(std::size(FORMATION_ICON_NAMES) == FORMATION_NUM, "アイコンの数が陣形の数と合わない");
 			// 3枚なら全アイコンが-1/0/+1に並ぶため、端の1枚を回り込ませる
@@ -51,7 +51,7 @@ namespace app
 			//============================================//
 
 			/** カットインのアイコン要素名（EnFormationTypeの並び順） */
-			constexpr const char* CUT_IN_ICON_NAMES[] = { "CutInIconTriangle", "CutInIconCluster", "CutInIconScatter" };
+			constexpr const char* CUT_IN_ICON_NAMES[] = { "CutInIconSpeed", "CutInIconDefense", "CutInIconGather" };
 			/** 陣形名（EnFormationTypeの並び順） */
 			constexpr const char* CUT_IN_NAME_TEXTS[] = {
 				"はやい",
@@ -113,7 +113,7 @@ namespace app
 					this,
 					{
 						"BackgroundIcon",
-						"TriangleIcon", "ClusterIcon", "ScatterIcon",
+						"SpeedIcon", "DefenseIcon", "GatherIcon",
 						"LBButtonIcon", "RBButtonIcon",
 						"LevelText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
 					},
