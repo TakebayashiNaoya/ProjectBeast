@@ -529,12 +529,6 @@ namespace nsBeastEngine
 		void SetOutlineMaxDistance(const float distance) { m_outlineMaxDistance = distance; }
 
 		/**
-		 * @brief 小窓（サブビュー）に描く最大距離を設定
-		 * @details 小窓のカメラからこれより遠ければ小窓には描かない（0で制限なし）。メインビュー・影には影響しない
-		 */
-		void SetSubViewMaxDrawDistance(const float distance) { m_subViewMaxDrawDistance = distance; }
-
-		/**
 		 * @brief 初期化時に影用モデル（カスケードごと）を作るかを設定
 		 * @details 影を描かないと決まっているモデルは、作らないことでディスクリプタヒープの数を減らせる
 		 *          （モデル1つにつきカスケード数ぶん作るため、数の多いモデルでは上限に近づく）。
@@ -662,8 +656,6 @@ namespace nsBeastEngine
 		bool           m_isCreateShadowModels = true;
 		/** 輪郭線を描く最大距離（0で制限なし） */
 		float          m_outlineMaxDistance = 0.0f;
-		/** 小窓（サブビュー）に描く最大距離（0で制限なし） */
-		float          m_subViewMaxDrawDistance = 0.0f;
 
 		/**
 		 * @brief 描画中のカメラからの距離が、指定した最大距離を超えているか

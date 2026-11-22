@@ -126,9 +126,6 @@
     <ClCompile Include="Graphics\Camera\CameraSystem.cpp">
       <Filter>Graphics\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Camera\SubCameraManager.cpp">
-      <Filter>Graphics\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\Video\VideoClip.cpp">
       <Filter>Graphics\Video</Filter>
     </ClCompile>
@@ -299,9 +296,6 @@
       <Filter>Graphics\Shadow</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Camera\CameraSystem.h">
-      <Filter>Graphics\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Camera\SubCameraManager.h">
       <Filter>Graphics\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\RenderViewContext.h">

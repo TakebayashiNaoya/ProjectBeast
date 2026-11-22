@@ -40,9 +40,7 @@
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/PauseScreenMenu.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
-#include "Source/UI/Menus/TutorialMenu.h"
 
-#include "Graphics/Camera/SubCameraManager.h"
 #include "Source/Scene/SceneManager.h"
 #include "TitleScene.h"
 
@@ -67,14 +65,10 @@ namespace
 	 *  1枚8ms前後かかるため、ロード画面のアニメが固まらない程度に刻む */
 	constexpr int DECAL_PREWARM_PER_FRAME = 6;
 
-	/** ミニマップアイコンのロード中分割生成で1フレームに作る個数。
-	 *  アイコンはフィーバー予約分も含め数百個あり、一括生成は1秒以上フレームが止まる */
-	constexpr int MAP_ICON_INIT_PER_FRAME = 16;
-
 	/** ロードフェーズ名（LoadPhase の並び順と一致させること。ロード時間トレース用） */
 	constexpr const char* LOAD_PHASE_NAMES[] = {
 		"None", "Stage", "StageWait", "DecalPrewarm", "Daddy",
-		"Children", "Enemy", "Camera", "Ocean", "MapIcon", "ModelFinalize", "Done"
+		"Children", "Enemy", "Camera", "Ocean", "ModelFinalize", "Done"
 	};
 
 	/** ロードの1フレームがこの時間を超えたらトレースへ記録する（ミリ秒）。
@@ -258,9 +252,6 @@ namespace app
 		 *  中断したプレイのログが次のプレイへ合流してしまう */
 		GameLogManager::DestroyInstance();
 
-		/** シーン破棄時にサブカメラを強制停止する（タイトル遷移後に残らないよう） */
-		nsBeastEngine::SubCameraManager::Get().ForceEnd();
-
 		/** タイトルへ戻る場合は ResultScene を経由しないため、ここで破棄する。
 		 *  リザルト遷移の場合は ResultScene::~ResultScene が担当する。 */
 		if (m_goTitle) {
@@ -413,13 +404,6 @@ namespace app
 				 *  （配置JSONのYは生成スクリプトの近似値なので、ここで正確な高さに直す） */
 				system->SnapObjectsToTerrain();
 
-				// イグルーとクマの巣の数をミニマップへ登録
-				const uint8_t iglooCount = system->GetNumbaringObjectCount("igloo");
-				const uint8_t bearHomeCount = system->GetNumbaringObjectCount("bearHome");
-
-				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Igloo, iglooCount);
-				InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::BearNest, bearHomeCount);
-
 				m_loadPhase = LoadPhase::DecalPrewarm;
 			}
 			break;
@@ -483,15 +467,6 @@ namespace app
 				cfg.groundRayStartY
 			);
 
-			/** フィーバーで降ってくる分のミニマップアイコン枠をあらかじめ確保する
-			 *  （SpawnFromSkyは初期数が0のタイプを選ばないため、0のタイプには足さない） */
-			const int feverExtra = FeverTimeManager::GetInstance()->GetFeverDropCount();
-			auto* ui = InGameUIManager::GetInstance();
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Serious, cfg.serious > 0 ? cfg.serious + feverExtra : 0);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clingy, cfg.clingy > 0 ? cfg.clingy + feverExtra : 0);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Naughty, cfg.naughty > 0 ? cfg.naughty + feverExtra : 0);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Clumsy, cfg.clumsy > 0 ? cfg.clumsy + feverExtra : 0);
-			ui->SetMiniMapIconNum(ui::EnMiniMapIconType::Caring, cfg.caring > 0 ? cfg.caring + feverExtra : 0);
 
 			auto* manager = actor::ChildPenguinManager::GetInstance();
 			manager->SetDaddyPenguin(m_daddyPenguin);
@@ -534,10 +509,6 @@ namespace app
 				actor::EnemyManager::GetInstance()->GetEnemies().size()
 				+ actor::OrcaManager::GetInstance()->GetOrcas().size()
 			);
-
-			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Bear, enemies.size());
-			InGameUIManager::GetInstance()->SetMiniMapIconNum(ui::EnMiniMapIconType::Orca,
-				static_cast<uint8_t>(actor::OrcaManager::GetInstance()->GetOrcas().size()));
 
 			m_loadPhase = LoadPhase::Camera;
 			break;
@@ -588,22 +559,6 @@ namespace app
 				GetWhirlpoolPositionsJsonPath(),
 				GetWhirlpoolParameterBinaryPath()
 			);
-
-			InGameUIManager::GetInstance()->SetMiniMapIconNum(
-				ui::EnMiniMapIconType::Whirlpool,
-				nature::WhirlpoolManager::GetInstance()->GetWhirlpoolCountMax());
-
-			m_loadPhase = LoadPhase::MapIcon;
-			break;
-		}
-
-		case LoadPhase::MapIcon:
-		{
-			/** ミニマップのアイコン生成を分割実行する（一括だと1.3秒フレームが止まる） */
-			if (!InGameUIManager::GetInstance()->InitializeMapIconStep(MAP_ICON_INIT_PER_FRAME))
-			{
-				break;
-			}
 
 			m_loadPhase = LoadPhase::ModelFinalize;
 			break;
@@ -681,11 +636,10 @@ namespace app
 
 		case LoadPhase::Done:
 		{
-			/** ポーズ終了後の初回フレームでポーズ入場フラグとサブビューをリセットする
+			/** ポーズ終了後の初回フレームでポーズ入場フラグをリセットする
 			 *  通常ポーズ解除（IsRetry）と異なりチュートリアルポーズはここでリセットされる */
 			if (m_isPauseEntered)
 			{
-				nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(false);
 				m_isPauseEntered = false;
 			}
 			/** ゲームフェーズへ移譲 */
@@ -703,6 +657,8 @@ namespace app
 			QueryPerformanceFrequency(&tickFreq);
 			const double tickMs =
 				1000.0 * (tickEnd.QuadPart - tickBegin.QuadPart) / tickFreq.QuadPart;
+			static_assert(std::size(LOAD_PHASE_NAMES) == static_cast<size_t>(LoadPhase::Done) + 1,
+				"LOAD_PHASE_NAMES と LoadPhase の並びを一致させること");
 			if (tickMs > LOAD_TICK_LOG_THRESHOLD_MS)
 			{
 				FILE* fp = nullptr;
@@ -1084,14 +1040,13 @@ namespace app
 			return;
 		}
 
-		/** ポーズ開始フレームに1回だけ全SEを停止し、サブビューを非表示にする
+		/** ポーズ開始フレームに1回だけ全SEを停止する
 		 *  チュートリアルポーズを含むすべてのポーズ種別に適用するため
 		 *  OnPauseUpdate() の前に実行する */
 		if (!m_isPauseEntered)
 		{
 			SoundManager::Get().StopAllSE();
 			SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
-			nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(true);
 			m_isPauseEntered = true;
 		}
 
@@ -1125,7 +1080,6 @@ namespace app
 			if (pauseMenu->IsRetry())
 			{
 				pauseMenu->IsRetry(false);
-				nsBeastEngine::SubCameraManager::Get().SetRenderingBlocked(false);
 				SceneManager::GetInstance()->SetPause(false);
 				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonBack);
 				/** ポーズ解除時にフラグをリセットする */
@@ -1137,19 +1091,6 @@ namespace app
 				pauseMenu->IsSound(false);
 				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 				m_pauseState = PauseState::SoundOption;
-			}
-			/** ルール画面へ */
-			else if (pauseMenu->IsRule())
-			{
-				pauseMenu->IsRule(false);
-				auto* tutorialMenu = uiMngr->GetTutorialMenu();
-				if (tutorialMenu)
-				{
-					tutorialMenu->SetClosed(false);
-					tutorialMenu->InitializeLogic();
-				}
-				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
-				m_pauseState = PauseState::Tutorial;
 			}
 			/** タイトルへ戻る */
 			else if (pauseMenu->IsGoTitle())
@@ -1184,28 +1125,6 @@ namespace app
 			}
 			break;
 		}
-
-		//------------------------------------------------------------
-		// チュートリアル画面（ポーズ中のサブ画面）
-		//------------------------------------------------------------
-		case PauseState::Tutorial:
-		{
-			auto* uiMngr = InGameUIManager::GetInstance();
-			auto* tutorialMenu = uiMngr->GetTutorialMenu();
-			if (tutorialMenu)
-			{
-				tutorialMenu->Update();
-
-				/** TutorialMenu 内で Bボタンが押されたら閉じる */
-				if (tutorialMenu->IsClosed())
-				{
-					tutorialMenu->SetClosed(false);
-					SoundManager::Get().PlaySE(enSoundKind_ButtonBack);
-					m_pauseState = PauseState::Pause;
-				}
-			}
-			break;
-		}
 		}
 	}
 
@@ -1233,9 +1152,6 @@ namespace app
 					break;
 				case PauseState::SoundOption:
 					uiMngr->RenderSoundOption(rc);
-					break;
-				case PauseState::Tutorial:
-					uiMngr->RenderTutorial(rc);
 					break;
 				}
 			}

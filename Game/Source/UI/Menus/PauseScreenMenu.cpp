@@ -43,7 +43,6 @@ namespace app
 					{ Hash32("PauseTitleIcon"),              PauseScreenType::TitleType      }
 				,	{ Hash32("PauseRetryIcon"),              PauseScreenType::ReturnPlayType }
 				,	{ Hash32("PauseSoundOptionTextIcon"),    PauseScreenType::SoundOptionType}
-				,	{ Hash32("PauseRuleTextIcon"),           PauseScreenType::RuleType       }
 				,	{ Hash32("PauseGoBackTileTextIcon"),     PauseScreenType::GoBackTitleType}
 			};
 
@@ -52,8 +51,7 @@ namespace app
 			{
 					{ Hash32("PauseOnePartsButton"),   PauseScreenType::ReturnPlayType }
 				,	{ Hash32("PauseTwoPartsButton"),   PauseScreenType::SoundOptionType}
-				,	{ Hash32("PauseThreePartsButton"), PauseScreenType::RuleType       }
-				,	{ Hash32("PauseFourPartsButton"),  PauseScreenType::GoBackTitleType}
+				,	{ Hash32("PauseThreePartsButton"), PauseScreenType::GoBackTitleType}
 			};
 
 		}
@@ -148,7 +146,6 @@ namespace app
 			, m_isRetry(false)
 			, m_isGoTitle(false)
 			, m_isSound(false)
-			, m_isRule(false)
 			, m_isStickNeutralY(true)
 			, m_axisInputDetector()
 			, m_cursorSelector(PAUSE_SCREEN_BUTTON_SIZE)
@@ -216,10 +213,6 @@ namespace app
 			case PauseScreenType::SoundOptionType:
 				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
 				m_isSound = true;
-				break;
-			case PauseScreenType::RuleType:
-				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);
-				m_isRule = true;
 				break;
 			case PauseScreenType::GoBackTitleType:
 				SoundManager::Get().PlaySE(enSoundKind::enSoundKind_ButtonEnter);

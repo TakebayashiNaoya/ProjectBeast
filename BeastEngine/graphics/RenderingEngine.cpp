@@ -4,7 +4,6 @@
  */
 #include "BeastEnginePreCompile.h"
 #include "RenderingEngine.h"
-#include "Camera/SubCameraManager.h"
 #include "Camera/CameraSystem.h"
 
 
@@ -51,16 +50,9 @@ namespace nsBeastEngine
 
 	namespace
 	{
-		/** サブカメラのRenderTarget幅 */
-		constexpr UINT SUB_CAMERA_RT_WIDTH = 480;
-		/** サブカメラのRenderTarget高さ */
-		constexpr UINT SUB_CAMERA_RT_HEIGHT = 270;
-
 		/**
 		 * @brief トーンマップの方式
-		 * @details メインビュー（PostEffectManager）とサブビュー（m_subViewToneMap）の
-		 *          両方で使うため、ここで一箇所にまとめる。
-		 *          片方だけ書き換えて色味がずれることを防ぐ。
+		 * @details PostEffectManager（メインビュー）で使う方式をここで一箇所にまとめる。
 		 */
 		constexpr EnToneMapType TONE_MAP_TYPE = EnToneMapType::enReinhard;
 		// enNone / enExposure / enReinhard / enReinhardExtended / enACES / enUncharted2
@@ -108,21 +100,6 @@ namespace nsBeastEngine
 		InitGBuffer(m_mainView);
 		InitDeferredLightingSprite(m_mainView);
 
-		// サブビューの初期化
-		m_subView.width = SUB_CAMERA_RT_WIDTH;
-		m_subView.height = SUB_CAMERA_RT_HEIGHT;
-		m_subView.camera = CameraSystem::Get().GetSubCamera();
-		m_subView.renderTarget.Create(
-			m_subView.width,
-			m_subView.height,
-			1,
-			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			DXGI_FORMAT_D32_FLOAT
-		);
-		InitGBuffer(m_subView);
-		InitDeferredLightingSprite(m_subView);
-
 		// メインレンダリングターゲットの内容をフレームバッファにコピーするためのスプライトの初期化
 		InitCopyMainRenderTargetToFrameBufferSprite();
 
@@ -131,9 +108,6 @@ namespace nsBeastEngine
 
 		// ポストエフェクトマネージャーの初期化
 		InitPostEffectManager();
-
-		// サブビュー用トーンマップの初期化
-		InitSubViewToneMap();
 
 		// アクティブフラスタムのデフォルトをメインビューに設定する
 		m_activeFrustum = &m_mainView.frustum;
@@ -203,58 +177,16 @@ namespace nsBeastEngine
 			PostEffect(rc);
 		}
 
-		// 2D描画処理（小窓スプライトの描画も含む）
+		// 2D描画処理
 		{
 			BEAST_PROFILE_GPU_SCOPE(rc, u8"2D描画");
 			Render2D(rc);
-		}
-
-		// サブカメラの描画パスを実行する（メイン描画パス完了後）
-		if (CameraSystem::Get().HasSubCamera())
-		{
-			BEAST_PROFILE_GPU_SCOPE(rc, u8"サブビュー描画");
-			auto* subCamera = CameraSystem::Get().GetSubCamera();
-			m_subView.camera = subCamera;
-			Matrix subViewProjMatrix;
-			subViewProjMatrix.Multiply(subCamera->GetViewMatrix(), subCamera->GetProjectionMatrix());
-#if defined(_DEBUG)
-			m_subView.frustum.Update(subViewProjMatrix, Frustum::DEBUG_FRUSTUM_SHRINK_SCALE);
-#else
-			m_subView.frustum.Update(subViewProjMatrix);
-#endif
-
-			// サブビューパスではもう一方のフレームバッファインデックスを使用する。
-			// 同フレーム内でメインビューとサブビューが同じ定数バッファスロットに書き込むと
-			// サブビューがメインビューのマトリクスを上書きしてしまうため、別スロットを使う。
-			g_graphicsEngine->SetResourceViewSlot(1);
-
-			// DeferredLightingのワールド座標復元・影判定をサブカメラ基準に一時的に切り替える
-			// ※切り替えないとメインカメラの行列のままサブビューを描いてしまい、
-			//   小窓のスペキュラ・リムライト・影がジオメトリと無関係な位置で判定される
-			m_sceneLight.SetViewCamera(*subCamera);
-
-			m_isRenderingSubView = true;
-			ExecuteViewPass(rc, m_subView);
-			m_isRenderingSubView = false;
-
-			// サブビューにもメインビューと同じトーンマップを適用し、小窓の色味を合わせる
-			// ※メインビューはPostEffect()内でブルームと合わせて処理するが、
-			//   小窓はブルームなし・トーンマップのみで簡易的に色味だけ揃える
-			m_subViewToneMap.Render(rc, m_subView.renderTarget);
-
-			// メインカメラ基準に戻す
-			// ※次フレームのUpdate()で上書きされるが、このフレーム内でまだ
-			//   メインカメラ基準の値を参照するコードが残っていても壊れないようにする
-			m_sceneLight.SetViewCamera(mainCamera);
-
-			g_graphicsEngine->SetResourceViewSlot(0);
 		}
 
 		// メインレンダリングターゲットの内容をフレームバッファにコピー
 		CopyMainRenderTargetToFrameBufferSprite(rc);
 
 		// 全ビューの描画完了後、アクティブカメラをメインカメラに戻す
-		// フレーム間でGetActiveCamera()が呼ばれた際にサブカメラが返らないようにするため
 		CameraSystem::Get().SetActiveCamera(&CameraSystem::Get().GetMainCamera());
 		m_activeFrustum = &m_mainView.frustum;
 
@@ -373,7 +305,6 @@ namespace nsBeastEngine
 
 		// テクスチャのリソースを作り直したので、参照しているディスクリプタも作り直す
 		m_mainView.deferredLightingSprite.RecommitDescriptorHeap();
-		m_subView.deferredLightingSprite.RecommitDescriptorHeap();
 
 		Light* light = m_sceneLight.GetLight();
 		light->m_terrainShadowUVScaleOffset = uvScaleOffset;
@@ -484,15 +415,6 @@ namespace nsBeastEngine
 		m_sceneLight.GetLight()->m_shadowConstBiasTexels = m_shadowMap.GetConstBiasTexels();
 		m_sceneLight.GetLight()->m_shadowSlopeBiasScale = m_shadowMap.GetSlopeBiasScale();
 		m_sceneLight.GetLight()->m_shadowDebugView = static_cast<int>(m_shadowMap.GetDebugView());
-	}
-
-
-	void RenderingEngine::InitSubViewToneMap()
-	{
-		// メインビューと同じ方式・既定露出で初期化する
-		// （デバッグUIでの調整はメインビュー側のToneMapにしか反映されないため、
-		//   実行中に露出等を変えるとサブビューとの色味がずれる点に注意）
-		m_subViewToneMap.Init(m_subView.renderTarget, TONE_MAP_TYPE);
 	}
 
 
@@ -637,12 +559,6 @@ namespace nsBeastEngine
 			{
 				renderObj->OnRender2D(rc);
 			}
-		}
-
-		// 小窓（サブカメラ）の描画
-		{
-			BEAST_PROFILE_SCOPE(u8"小窓描画 (SubCameraManager)");
-			SubCameraManager::Get().RenderToScreen(rc);
 		}
 
 		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);

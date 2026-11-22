@@ -4,7 +4,6 @@
  */
 #pragma once
 #include "Source/UI/CPReaction/CPReactionTypes.h"
-#include "Source/UI/MiniMap/MiniMapTypes.h"
 
 
 namespace app
@@ -171,15 +170,6 @@ namespace app
 		}
 
 
-		/**
-		 * @brief ミニマップUI通知functionを設定
-		 * @param func 引数なし。lambda内でUIへのセットを行う
-		 */
-		inline void SetOnMiniMapChanged(std::function<void(const ui::ActorPositions&)> func)
-		{
-			m_onMiniMapChanged = std::move(func);
-		}
-
 
 
 		void SetOnWpWarningChanged(std::function<void(std::vector<Vector3>)> func)
@@ -199,7 +189,7 @@ namespace app
 
 		/**
 		 * @brief 子ペンギンのリアクション再生を通知する
-		 * @detail 他のUI通知（タイム・ミニマップ等）と異なり、Update()内でのポーリングではなく、
+		 * @detail 他のUI通知（タイム等）と異なり、Update()内でのポーリングではなく、
 		 *         状態が変化した瞬間（AddFollower/RemoveFollowerや各AIControllerの状態遷移時など）に
 		 *         呼び出し側から明示的に呼ぶ。typeの確定は呼び出し側の責務。
 		 * @param penguin 対象の子ペンギン
@@ -334,7 +324,7 @@ namespace app
 
 		/**
 		 * @brief 陣形レベルアップを通知する
-		 * @detail 他のUI通知（タイム・ミニマップ等）と異なり、Update()内でのポーリングではなく、
+		 * @detail 他のUI通知（タイム等）と異なり、Update()内でのポーリングではなく、
 		 *         レベルが上昇した瞬間（FormationController::CalculatePositions内）に
 		 *         呼び出し側から明示的に呼ぶ。
 		 * @param level 新しい陣形レベル
@@ -377,9 +367,6 @@ namespace app
 		std::function<void()> m_onBearReactionChanged;
 
 
-		/** ミニマップUI更新通知 */
-		std::function<void(const ui::ActorPositions&)> m_onMiniMapChanged;
-
 
 		/** 渦潮UI更新通知 */
 		std::function<void(std::vector<Vector3>)> m_wpWarningChanged;
@@ -413,31 +400,6 @@ namespace app
 		/** 現在の位置 */
 		Vector3 m_currentPosition;
 
-
-
-		//============================================//
-		// サブカメラ関連
-		//============================================//
-
-	private:
-		/**
-		 * @brief サブカメラの更新処理
-		 * @details 攻撃中のシロクマを監視し、サブカメラのON/OFFと座標を制御する
-		 */
-		void UpdateSubCamera();
-
-
-	private:
-		/** サブカメラが起動中かどうか */
-		bool m_isSubCameraActive = false;
-
-		/**
-		 * 最後に特定できた攻撃ターゲットの子ペンギン。
-		 * EnemyController::EnterAttack()でm_foundPenguinがクリアされるため、
-		 * 攻撃フェーズ中はここにキャッシュした値でカメラを追従し続ける。
-		 * サブビュー終了時にnullptrへリセットする。
-		 */
-		const actor::ChildPenguin* m_lastTargetChild = nullptr;
 
 
 

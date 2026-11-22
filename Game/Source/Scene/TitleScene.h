@@ -14,7 +14,6 @@ namespace app
 	{
 		class SoundOptionMenu;
 		class TitleEventMenu;
-		class TutorialMenu;
 		class StageSelectMenu;
 	}
 
@@ -42,8 +41,6 @@ namespace app
 		void StageSelectUpdate();
 		/** @brief サウンドオプション画面の更新 */
 		void SoundOptionUpdate();
-		/** @brief チュートリアル画面の更新 */
-		void TutorialUpdate();
 
 
 	private:
@@ -51,8 +48,7 @@ namespace app
 		{
 			Title,
 			StageSelect,
-			SoundOption,
-			Tutorial
+			SoundOption
 		};
 
 		TitleState m_state;
@@ -72,7 +68,6 @@ namespace app
 	private:
 		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
 		ui::UIPacket<ui::SoundOptionMenu> m_soundOptionPacket;
-		ui::UIPacket<ui::TutorialMenu> m_tutorialPacket;
 		ui::UIPacket<ui::StageSelectMenu> m_stageSelectPacket;
 	};
 }

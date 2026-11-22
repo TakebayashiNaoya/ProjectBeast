@@ -79,9 +79,6 @@
     <Filter Include="Source\Actor\Stage">
       <UniqueIdentifier>{998cbe10-d5bf-4193-b3b7-4a264cfbf66f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI\Hint">
-      <UniqueIdentifier>{8e1f4a2b-93c7-4d15-b6a8-2f50c1d97e34}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\UI\InGameButton">
       <UniqueIdentifier>{6cf23173-7acb-4026-9850-4f2cb0624d76}</UniqueIdentifier>
     </Filter>
@@ -97,14 +94,8 @@
     <Filter Include="Source\UI\StageSelect">
       <UniqueIdentifier>{b5a183ba-712c-4d2c-9fbc-957f670f8c0a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI\MiniMap">
-      <UniqueIdentifier>{4948fc8c-fd5e-4b23-b2dd-3fcfeaa6d56b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\UI\CPReaction">
       <UniqueIdentifier>{9f2e90cb-287a-41c6-862d-67239f9bef28}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\UI\DangerArrow">
-      <UniqueIdentifier>{62914d05-498f-48ae-bbd7-1f6000ebc36a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\UI\Fever">
       <UniqueIdentifier>{bee24a0c-e665-49ce-b826-1f942d473f3b}</UniqueIdentifier>
@@ -424,9 +415,6 @@
     <ClCompile Include="Source\UI\Menus\TitleEventMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Menus\TutorialMenu.cpp">
-      <Filter>Source\UI\Menus</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\Menus\CountDownMenu.cpp">
       <Filter>Source\UI\Menus</Filter>
     </ClCompile>
@@ -511,9 +499,6 @@
     <ClCompile Include="Source\UI\FormationWheel\FormationWheelMenu.cpp">
       <Filter>Source\UI\FormationWheel</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI\Hint\InGameHintMenu.cpp">
-      <Filter>Source\UI\Hint</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\InGameButton\InGameButtonMenu.cpp">
       <Filter>Source\UI\InGameButton</Filter>
     </ClCompile>
@@ -525,12 +510,6 @@
     </ClCompile>
     <ClCompile Include="Source\UI\RemainingChild\RemainingChildMenu.cpp">
       <Filter>Source\UI\RemainingChild</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\MiniMap\MiniMapStatus.cpp">
-      <Filter>Source\UI\MiniMap</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\MiniMap\MiniMapMenu.cpp">
-      <Filter>Source\UI\MiniMap</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.cpp">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
@@ -552,12 +531,6 @@
     </ClCompile>
     <ClCompile Include="Source\UI\CPReaction\MasterCPReactionParameter.cpp">
       <Filter>Source\UI\CPReaction</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\DangerArrow\DangerArrowMenu.cpp">
-      <Filter>Source\UI\DangerArrow</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\DangerArrow\DangerArrowSystem.cpp">
-      <Filter>Source\UI\DangerArrow</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI\Fever\FeverIconMenu.cpp">
       <Filter>Source\UI\Fever</Filter>
@@ -996,9 +969,6 @@
     <ClInclude Include="Source\UI\Menus\TitleEventMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Menus\TutorialMenu.h">
-      <Filter>Source\UI\Menus</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\Menus\CountDownMenu.h">
       <Filter>Source\UI\Menus</Filter>
     </ClInclude>
@@ -1101,9 +1071,6 @@
     <ClInclude Include="Source\UI\WpWarning\WpWarningAnimStatus.h">
       <Filter>Source\UI\WpWarning</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI\Hint\InGameHintMenu.h">
-      <Filter>Source\UI\Hint</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI\InGameButton\InGameButtonMenu.h">
       <Filter>Source\UI\InGameButton</Filter>
     </ClInclude>
@@ -1115,15 +1082,6 @@
     </ClInclude>
     <ClInclude Include="Source\UI\RemainingChild\RemainingAnimStatus.h">
       <Filter>Source\UI\RemainingChild</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\MiniMap\MiniMapStatus.h">
-      <Filter>Source\UI\MiniMap</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\MiniMap\MiniMapMenu.h">
-      <Filter>Source\UI\MiniMap</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\MiniMap\MiniMapParameter.h">
-      <Filter>Source\UI\MiniMap</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.h">
       <Filter>Source\Actor\Character\penguin\ChildPenguin</Filter>
@@ -1145,15 +1103,6 @@
     </ClInclude>
     <ClInclude Include="Source\UI\CPReaction\MasterCPReactionParameter.h">
       <Filter>Source\UI\CPReaction</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\DangerArrow\DangerArrowCalc.h">
-      <Filter>Source\UI\DangerArrow</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\DangerArrow\DangerArrowMenu.h">
-      <Filter>Source\UI\DangerArrow</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\DangerArrow\DangerArrowSystem.h">
-      <Filter>Source\UI\DangerArrow</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\Fever\FeverIconMenu.h">
       <Filter>Source\UI\Fever</Filter>
@@ -1256,9 +1205,6 @@
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\penguin\Formation\Ult\UltController.h">
       <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\MiniMap\MiniMapTypes.h">
-      <Filter>Source\UI\MiniMap</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h">
       <Filter>Source\UI\BearReaction</Filter>

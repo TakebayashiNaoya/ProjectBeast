@@ -89,13 +89,12 @@ namespace app
 		public:
 			/**
 			 * @brief イベントの種類のenum
-			 * @details Start:スタート、Sound:サウンドオプション、Rule:ルール説明、End:おわり
+			 * @details Start:スタート、Sound:サウンドオプション、End:おわり
 			 */
 			enum class EnEventType : uint8_t
 			{
 				Start,
 				Sound,
-				Rule,
 				End,
 				Num
 			};

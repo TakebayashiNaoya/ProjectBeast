@@ -22,14 +22,12 @@ namespace app
 		class FinishMenu;
 		class PauseScreenMenu;
 		class SoundOptionMenu;
-		class TutorialMenu;
 		class SearchMenu;
 		class RemainingChildMenu;
 		class EnemySleepingMenu;
 		class PBWakingUpTimerMenu;
 		class IglooPromptMenu;
 		class InGameAchievementMenu;
-		class MiniMapMenu;
 		class TitleEventMenu;
 		class AchievementNotificationMenu;
 		class InGameButtonMenu;
@@ -38,11 +36,9 @@ namespace app
 		class FeverIconMenu;
 		class LevelUpIconMenu;
 		class SpeedLineMenu;
-		class InGameHintMenu;
 
 		class CPReactionSystem;
 		class WpWarningSystem;
-		class DangerArrowSystem;
 		class BearReactionSystem;
 	}
 
@@ -133,12 +129,6 @@ namespace app
 		 */
 		void RenderSoundOption(RenderContext& rc);
 
-		/**
-		 * @brief チュートリアル画面の描画
-		 * @param rc レンダーコンテキスト
-		 */
-		void RenderTutorial(RenderContext& rc);
-
 
 		//------------------------------------------------------------
 		// 外部から参照が必要なMenuのゲッター
@@ -156,8 +146,6 @@ namespace app
 		inline ui::PauseScreenMenu* GetPauseMenu() const { return m_pausePacket->GetMenu(); }
 		/** @brief サウンドオプションMenuを取得 */
 		inline ui::SoundOptionMenu* GetSoundOptionMenu() const { return m_soundOptionPacket->GetMenu(); }
-		/** @brief チュートリアルMenuを取得 */
-		inline ui::TutorialMenu* GetTutorialMenu() const { return m_tutorialPacket->GetMenu(); }
 		/** @brief 救助数Menuを取得 */
 		inline ui::RemainingChildMenu* GetRemainingChildMenu() const { return m_remainingChildPacket->GetMenu(); }
 		/** @brief タイマーMenuを取得（外部から直接値を設定したい場合に使用） */
@@ -166,16 +154,6 @@ namespace app
 		inline ui::IglooPromptMenu* GetIglooPromptMenu() const { return m_iglooPromptPacket->GetMenu(); }
 
 
-
-		void SetMiniMapIconNum(ui::EnMiniMapIconType type, uint8_t num);
-		void InitializeMapIcon();
-
-		/**
-		 * @brief マップアイコンの分割生成を1回分進める（ロード画面のフレームを止めないため）
-		 * @param maxCount この呼び出しで生成する最大個数
-		 * @return 全て生成し終えたらtrue
-		 */
-		bool InitializeMapIconStep(const int maxCount);
 
 		/**
 		 * @brief 実績一覧UIの表示位置にYオフセットを設定する（チュートリアル等、特定ステージのみ使用）
@@ -208,7 +186,7 @@ namespace app
 		 * @brief タイマー・救助数UIだけを更新する
 		 * @detail BattleManager等のシーン専用シングルトンを経由せず、外部（リプレイ再生など）
 		 *         から直接値を設定して表示したい場合に、UpdatePlaying()の代わりに使う軽量版。
-		 *         ミニマップ・実績通知等の他のUIには一切触れない。
+		 *         実績通知等の他のUIには一切触れない。
 		 */
 		void UpdateTimerAndScoreOnly();
 
@@ -226,12 +204,10 @@ namespace app
 		ui::UIPacket<ui::RemainingChildMenu> m_remainingChildPacket;
 		ui::UIPacket<ui::PauseScreenMenu> m_pausePacket;
 		ui::UIPacket<ui::SoundOptionMenu> m_soundOptionPacket;
-		ui::UIPacket<ui::TutorialMenu> m_tutorialPacket;
 		ui::UIPacket<ui::EnemySleepingMenu> m_enemySleepingPacket;
 		ui::UIPacket<ui::PBWakingUpTimerMenu> m_pbWakingUpTimerPacket;
 		ui::UIPacket<ui::IglooPromptMenu> m_iglooPromptPacket;
 		ui::UIPacket<ui::InGameAchievementMenu> m_achievementPacket;
-		ui::UIPacket<ui::MiniMapMenu> m_miniMapPacket;
 		ui::UIPacket<ui::TitleEventMenu> m_titleEventPacket;
 		ui::UIPacket<ui::AchievementNotificationMenu> m_achievementNotificationPacket;
 		ui::UIPacket<ui::InGameButtonMenu> m_inGameButtonPacket;
@@ -240,12 +216,10 @@ namespace app
 		ui::UIPacket<ui::FeverIconMenu> m_feverIconPacket;
 		ui::UIPacket<ui::LevelUpIconMenu> m_levelUpIconPacket;
 		ui::UIPacket<ui::SpeedLineMenu> m_speedLinePacket;
-		ui::UIPacket<ui::InGameHintMenu> m_hintPacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;
 		std::unique_ptr<ui::WpWarningSystem> m_wpWarningSystem;
-		std::unique_ptr<ui::DangerArrowSystem> m_dangerArrowSystem;
 		std::unique_ptr<ui::BearReactionSystem> m_bearReactionSystem;
 
 		/** ボタンUIの再集合ゲージ通知用に、親ペンギンのポインタをキャッシュしておく */

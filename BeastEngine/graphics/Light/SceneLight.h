@@ -552,12 +552,7 @@ namespace nsBeastEngine
 
 		/**
 		 * @brief 指定したカメラを基準にカメラ位置・逆ビュープロジェクション行列を更新する
-		 * @details Update()は毎フレームメインカメラ基準で更新するが、サブビュー（小窓）の
-		 *          DeferredLighting描画中だけはサブカメラ基準の値に一時的に差し替える必要がある。
-		 *          差し替えないとサブビューがメインカメラの行列でワールド座標を復元してしまい、
-		 *          スペキュラ・リムライト・影の判定が不整合を起こす。
-		 * @details 呼び出し側は、サブビューの描画が終わったら必ずメインカメラで呼び直し、
-		 *          元に戻すこと（RenderingEngine::Execute()参照）。
+		 * @details Update()から毎フレームメインカメラを渡して呼ばれる。
 		 * @param camera 基準にするカメラ
 		 */
 		void SetViewCamera(nsK2EngineLow::Camera& camera)

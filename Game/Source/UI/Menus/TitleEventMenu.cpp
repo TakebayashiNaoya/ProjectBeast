@@ -19,7 +19,6 @@ namespace app
 			{
 				Hash32("StartIcon"),
 				Hash32("SoundIcon"),
-				Hash32("RuleIcon"),
 				Hash32("EndIcon")
 			};
 
@@ -96,8 +95,8 @@ namespace app
 			, m_selectNoteIcon(nullptr)
 			, m_selectUnderlineIcon(nullptr)
 			, m_eventIcon{ nullptr }
-			, m_eventBaseScales{ Vector2(1.0f, 1.0f), Vector2(1.0f, 1.0f), Vector2(1.0f, 1.0f), Vector2(1.0f, 1.0f) }
-			, m_eventBaseColors{ Vector4::White, Vector4::White, Vector4::White, Vector4::White }
+			, m_eventBaseScales{ Vector2(1.0f, 1.0f), Vector2(1.0f, 1.0f), Vector2(1.0f, 1.0f) }
+			, m_eventBaseColors{ Vector4::White, Vector4::White, Vector4::White }
 			, m_axisInputDetector()
 			, m_cursorSelector(static_cast<int>(EnEventType::Num))
 			, m_musicalNoteEffectRenders()

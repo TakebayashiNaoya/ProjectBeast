@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "BattleManager.h"
 
-#include "Graphics/Camera/SubCameraManager.h"
 #include "Source/Actor/Character/Enemy/Enemy.h"
 #include "Source/Actor/Character/Enemy/EnemyController.h"
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
@@ -25,17 +24,6 @@
 
 namespace app
 {
-	namespace
-	{
-		/** サブカメラのターゲットからの距離 */
-		constexpr float SUB_CAMERA_DISTANCE = 150.0f;
-		/** サブカメラのターゲットからの高さ */
-		constexpr float SUB_CAMERA_HEIGHT = 60.0f;
-		/** ペンギンのルート座標から注視点までのYオフセット */
-		constexpr float SUB_CAMERA_TARGET_HEIGHT = 0.0f;
-	}
-
-
 	BattleManager* BattleManager::m_instance = nullptr;
 
 
@@ -44,15 +32,9 @@ namespace app
 		/** バトルの状態を確認 */
 		m_battleState = CheckBattleState();
 
-		/** ゲーム終了なら更新処理をブロック。サブカメラが出ていれば閉じる */
+		/** ゲーム終了なら更新処理をブロック */
 		if (m_battleState != EnBattleState::Playing)
 		{
-			if (m_isSubCameraActive)
-			{
-				nsBeastEngine::SubCameraManager::Get().End();
-				m_isSubCameraActive = false;
-				m_lastTargetChild = nullptr;
-			}
 			return;
 		}
 
@@ -94,118 +76,6 @@ namespace app
 		}
 
 
-		//--------------------------------------------//
-		// ミニマップの更新
-		//--------------------------------------------//
-		if (m_onMiniMapChanged)
-		{
-			ui::ActorPositions positions;
-
-
-			// 子ペンギンの座標取得
-			const auto& childs = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
-
-			for (const auto* child : childs)
-			{
-				switch (child->GetChildPenguinType())
-				{
-				case actor::EnChildPenguinType::Serious:
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Serious)).push_back(child->GetTransform().m_position);
-					break;
-				case actor::EnChildPenguinType::Clingy:
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Clingy)).push_back(child->GetTransform().m_position);
-					break;
-				case actor::EnChildPenguinType::Naughty:
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Naughty)).push_back(child->GetTransform().m_position);
-					break;
-				case actor::EnChildPenguinType::Clumsy:
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Clumsy)).push_back(child->GetTransform().m_position);
-					break;
-				case actor::EnChildPenguinType::Caring:
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Caring)).push_back(child->GetTransform().m_position);
-					break;
-				default:
-					break;
-				}
-			}
-
-			// ステージオブジェクトの座標を取得する
-			auto GetObjectPosition = [&](const std::string& name, ui::EnMiniMapIconType type)
-				{
-					auto* system = actor::StageSystem::GetInstance();
-
-					// 座標を取得する
-					Vector3 objectPosition = Vector3::One;
-
-					// 座標の取得に失敗するとVector3::Zeroが返ってくる
-					// Vector3::Zeroが帰ってきたら終了する
-					int index = 1;
-					while (true)
-					{
-						const std::string keyName = name + std::to_string(index);
-
-						objectPosition = system->GetObjectPosition(keyName);
-
-						if (objectPosition.IsEqual(Vector3::Zero)) break;
-
-						positions.at(static_cast<uint8_t>(type)).push_back(objectPosition);
-						index++;
-					}
-				};
-
-
-			GetObjectPosition("bearHome_", ui::EnMiniMapIconType::BearNest);
-			GetObjectPosition("igloo_", ui::EnMiniMapIconType::Igloo);
-
-
-			// シロクマの座標を取得する
-			const auto& enemies = actor::EnemyManager::GetInstance()->GetEnemies();
-
-			for (const auto* enemy : enemies)
-			{
-				K2_ASSERT(enemy, "エネミーがnullptr");
-				positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Bear)).push_back(enemy->GetTransform().m_position);
-			}
-
-			// シャチの座標を取得する（体は水面下にあるので、真上の水面の点を使う）
-			if (auto* orcaManager = actor::OrcaManager::GetInstance())
-			{
-				for (const auto* orca : orcaManager->GetOrcas())
-				{
-					if (orca == nullptr) continue;
-					positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Orca)).push_back(orca->GetSurfacePosition());
-				}
-			}
-
-
-			// 渦潮の座標を取得する
-			// 配置インデックスをそのまま添字にした固定長配列として渡すことで、
-			// 他の渦潮の生成・削除によって既存の渦潮の配列位置がずれないようにする
-			// （ミニマップ側は配列位置だけでアイコンと渦潮を対応付けているため、
-			//   ずれると既存アイコンが別の渦潮の座標を指してしまい点滅して見える）。
-			// 未使用の添字はミニマップの表示範囲外になる座標で埋めておき、非表示のままにする。
-			if (auto* wm = nature::WhirlpoolManager::GetInstance())
-			{
-				const Vector3 OUT_OF_MAP_RANGE_POS(1.0e8f, 0.0f, 1.0e8f);
-
-				auto& whirlpoolPositions = positions.at(static_cast<uint8_t>(ui::EnMiniMapIconType::Whirlpool));
-				whirlpoolPositions.assign(wm->GetWhirlpoolCountMax(), OUT_OF_MAP_RANGE_POS);
-
-				wm->ForEach([&](nature::Whirlpool* whirlpool)
-					{
-						const uint8_t index = whirlpool->GetIndex();
-						if (index < whirlpoolPositions.size())
-						{
-							whirlpoolPositions[index] = whirlpool->GetTransform().m_position;
-						}
-					});
-			}
-
-
-			m_onMiniMapChanged(positions);
-		}
-
-
 
 		//--------------------------------------------//
 		// 渦潮の警告座標の通知
@@ -239,154 +109,6 @@ namespace app
 
 			m_speedLineChanged(isUlt && (isTriangle || isCircle) && isMove);
 		}
-
-
-
-		//--------------------------------------------//
-		// サブカメラの更新
-		//--------------------------------------------//
-		UpdateSubCamera();
-	}
-
-
-	void BattleManager::UpdateSubCamera()
-	{
-		const auto enemies = actor::EnemyManager::GetInstance()->GetEnemies();
-		const auto controllers = actor::EnemyManager::GetInstance()->GetControllers();
-		const int enemyCount = static_cast<int>(enemies.size());
-		const Vector3 daddyPos = actor::ChildPenguinManager::GetInstance()->GetDaddyPosition();
-
-		/**
-		 * チェイス状態（攻撃前）のシロクマからターゲットをキャッシュする。
-		 * GetFoundPenguin()はEnterAttack()でクリアされるため、
-		 * 攻撃フェーズに入る前のチェイス中に毎フレーム更新しておく必要がある。
-		 * IsAttack()を条件にしないことで、チェイス中にも確実にキャッシュできる。
-		 */
-		{
-			float nearestDistSq = FLT_MAX;
-			for (int i = 0; i < enemyCount; i++)
-			{
-				auto* enemy = enemies[i];
-				if (enemy == nullptr) continue;
-				auto* controller = controllers[i];
-				if (controller == nullptr) continue;
-				const auto* child = controller->GetFoundPenguin();
-				if (child == nullptr) continue;
-				Vector3 diff = child->GetTransform().m_position - daddyPos;
-				diff.y = 0.0f;
-				const float distSq = diff.LengthSq();
-				if (distSq < nearestDistSq)
-				{
-					nearestDistSq = distSq;
-					m_lastTargetChild = child;
-				}
-			}
-		}
-
-		/** チェイス中またはアタック中のシロクマを探す */
-		bool isAnyActive = false;
-		const actor::Enemy* attackingEnemy = nullptr;
-		const actor::Enemy* chasingEnemy = nullptr;
-		for (auto* enemy : enemies)
-		{
-			if (enemy == nullptr) continue;
-			const auto* sm = enemy->GetEnemyStateMachine();
-			if (sm->IsAttack())
-			{
-				isAnyActive = true;
-				if (attackingEnemy == nullptr) attackingEnemy = enemy;
-			}
-			else if (sm->IsChasing())
-			{
-				isAnyActive = true;
-				if (chasingEnemy == nullptr) chasingEnemy = enemy;
-			}
-		}
-
-		/** チェイスもアタックもしていなければサブカメラを停止する */
-		if (!isAnyActive)
-		{
-			if (m_isSubCameraActive)
-			{
-				nsBeastEngine::SubCameraManager::Get().End();
-				m_isSubCameraActive = false;
-				m_lastTargetChild = nullptr;
-			}
-			return;
-		}
-
-		/** チェイスまたはアタック中のシロクマがいればサブカメラを起動する */
-		if (!m_isSubCameraActive)
-		{
-			nsBeastEngine::SubCameraManager::Get().Begin();
-			m_isSubCameraActive = true;
-		}
-
-		/** チェイス中にキャッシュしたターゲットを使用してカメラを追従する */
-		const actor::ChildPenguin* targetChild = m_lastTargetChild;
-
-		/** ダングリングポインタのガード：遅延deleteにより解放済みの場合はリストに存在しない */
-		if (targetChild != nullptr)
-		{
-			const auto& list = actor::ChildPenguinManager::GetInstance()->GetChildPenguin();
-			bool stillExists = false;
-			for (const auto* p : list)
-			{
-				if (p == targetChild) { stillExists = true; break; }
-			}
-			if (!stillExists || targetChild->GetStatus<actor::ChildPenguinStatus>()->IsDead())
-			{
-				m_lastTargetChild = nullptr;
-				targetChild = nullptr;
-			}
-		}
-
-		/** 攻撃対象の子ペンギンが特定できなければ終了 */
-		if (targetChild == nullptr) return;
-
-		/** ターゲット座標・カメラ座標をセットする */
-		const Vector3 basePos = targetChild->GetTransform().m_position;
-		const Vector3 targetPos = basePos + Vector3(0.0f, SUB_CAMERA_TARGET_HEIGHT, 0.0f);
-
-		// カメラ方向: 子ペンギン→シロクマ方向にカメラを向ける。
-		// カメラはペンギンの「シロクマと反対側」に置き、ペンギン越しにシロクマが迫る画を映す。
-		// bearToPenguin = penguinPos - bearPos（シロクマ→ペンギン方向）
-		// 攻撃中シロクマを優先し、いなければチェイス中シロクマを使う。
-		const actor::Enemy* relevantEnemy = (attackingEnemy != nullptr) ? attackingEnemy : chasingEnemy;
-		Vector3 bearToPenguin;
-		if (relevantEnemy != nullptr)
-		{
-			bearToPenguin = basePos - relevantEnemy->GetTransform().m_position;
-		}
-		else
-		{
-			bearToPenguin = basePos - daddyPos;
-		}
-		bearToPenguin.y = 0.0f;
-		const float bearToPenguinLen = bearToPenguin.Length();
-		if (bearToPenguinLen < 0.01f)
-		{
-			bearToPenguin = Vector3(0.0f, 0.0f, 1.0f);
-		}
-		else
-		{
-			bearToPenguin /= bearToPenguinLen;
-		}
-
-		// + bearToPenguin でペンギンのシロクマ反対側にカメラを配置する
-		const Vector3 cameraPos = Vector3(
-			targetPos.x + bearToPenguin.x * SUB_CAMERA_DISTANCE,
-			targetPos.y + SUB_CAMERA_HEIGHT,
-			targetPos.z + bearToPenguin.z * SUB_CAMERA_DISTANCE
-		);
-
-		// 注視点: シロクマを中心に映す。シロクマがいない場合のみペンギンにフォールバック。
-		const Vector3 lookAtPos = (attackingEnemy != nullptr)
-			? attackingEnemy->GetTransform().m_position + Vector3(0.0f, SUB_CAMERA_TARGET_HEIGHT, 0.0f)
-			: targetPos;
-
-		nsBeastEngine::SubCameraManager::Get().SetTargetPosition(lookAtPos);
-		nsBeastEngine::SubCameraManager::Get().SetCameraPosition(cameraPos);
 	}
 
 
@@ -396,7 +118,6 @@ namespace app
 		m_onRescuedNumChanged = nullptr;
 		m_onSleepingEnemyChanged = nullptr;
 		m_onBearReactionChanged = nullptr;
-		m_onMiniMapChanged = nullptr;
 		m_wpWarningChanged = nullptr;
 		m_onCPReactionChanged = nullptr;
 		m_onEnemyReactionChanged = nullptr;

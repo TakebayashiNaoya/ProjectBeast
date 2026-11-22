@@ -4,7 +4,6 @@
  */
 #include "BeastEnginePreCompile.h"
 #include "BeastEngine.h"
-#include "Graphics/Camera/SubCameraManager.h"
 
 
 namespace nsBeastEngine
@@ -32,7 +31,6 @@ namespace nsBeastEngine
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
 
-		SubCameraManager::DestroyInstance();
 		CameraSystem::DestroyInstance();
 		g_renderingEngine = nullptr;
 		g_engine = nullptr;
@@ -50,9 +48,6 @@ namespace nsBeastEngine
 			initData.frameBufferWidth,
 			initData.frameBufferHeight
 		);
-
-		// サブカメラマネージャーの初期化
-		SubCameraManager::CreateInstance();
 
 		// カメラシステムの初期化（メインカメラの生成）
 		CameraSystem::CreateInstance();
@@ -199,13 +194,6 @@ namespace nsBeastEngine
 			BEAST_PROFILE_SCOPE(u8"エフェクト更新 (Effekseer)");
 			const float effectDeltaTime = m_isPause ? 0.0f : g_gameTime->GetFrameDeltaTime();
 			EffectEngine::GetInstance()->Update(effectDeltaTime);
-		}
-
-		// カメラの更新
-		{
-			BEAST_PROFILE_SCOPE(u8"カメラ更新");
-			SubCameraManager::Get().Update();
-			CameraSystem::Get().Update();
 		}
 
 		// レンダリングエンジンの更新
