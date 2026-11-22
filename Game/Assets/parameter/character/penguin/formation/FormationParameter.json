@@ -19,12 +19,12 @@
     "baseFollowers": 9
   },
   {
-    "comment": "三角陣（スピード特化）：パッシブで初期値のみ高い（伸び率は他陣形と共通）／ウルトで速度1.5倍",
+    "comment": "三角陣（スピード特化）：パッシブでレベル連動加速（他陣形と共通）×1.4倍／ウルトで速度1.5倍",
     "ultDuration": 10.0,
     "ultCooldown": 20.0,
-    "passiveSpeedMultiplier": 1.0,
-    "passiveSpeedBase": 1.1,
-    "passiveSpeedPerLevel": 0.2,
+    "passiveSpeedMultiplier": 1.4,
+    "passiveSpeedBase": 1.0,
+    "passiveSpeedPerLevel": 0.1,
     "passiveWhirlpoolResistance": false,
     "ultSpeedMultiplier": 1.5,
     "ultWhirlpoolResistance": false,
@@ -38,10 +38,10 @@
     "baseFollowers": 0
   },
   {
-    "comment": "密集陣（防御特化）：パッシブでレベル連動加速（他陣形と共通）＋渦潮耐性／ウルトで渦潮に飛び込むと速度2倍＋シロクマ攻撃無効化＋入隊半径を控えめに拡大",
+    "comment": "密集陣（防御特化）：パッシブでレベル連動加速（他陣形と共通）×0.85倍＋渦潮耐性＋シロクマ・シャチ攻撃無効化（ultBearAttackNullify）／ウルトで渦潮に飛び込むと速度2倍＋入隊半径を控えめに拡大",
     "ultDuration": 10.0,
     "ultCooldown": 20.0,
-    "passiveSpeedMultiplier": 1.0,
+    "passiveSpeedMultiplier": 0.85,
     "passiveSpeedBase": 1.0,
     "passiveSpeedPerLevel": 0.1,
     "passiveWhirlpoolResistance": true,

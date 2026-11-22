@@ -133,7 +133,7 @@ namespace app
 			/**
 			 * @brief 追跡・巡回をやめて巡回をやり直す（クマなら帰巣する場面）
 			 * @details スタミナを全回復し、食べた数を0に戻す。ログに理由を残す
-			 * @param reason ログに残す理由（debuff / full / stamina / lost）
+			 * @param reason ログに残す理由（debuff / full / stamina / lost / nullified）
 			 */
 			EnState GiveUpAndPatrol(const char* reason);
 
@@ -223,6 +223,8 @@ namespace app
 
 			/** 正面への回り込みの状態（追跡に入るたびに初期化する） */
 			PlayerFront::ApproachState m_approach;
+			/** 密集陣に弾かれたあと、視界で子を探さない残り時間（秒） */
+			float m_retargetBlockTimer = 0.0f;
 		};
 	}
 }

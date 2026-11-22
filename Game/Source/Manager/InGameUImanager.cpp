@@ -429,14 +429,12 @@ namespace app
 		// スピードアップ中の通知
 		//--------------------------------------------//
 		bm.SetOnSpeedLineChanged(
-			[this, CheckMenu](bool isSpeedUp)
+			[this, CheckMenu](float strength)
 			{
-				const float acceleration = isSpeedUp ? 1.0f : 0.0f;
-
 				auto* menu = m_speedLinePacket->GetMenu();
 				CheckMenu(menu);
-				menu->SetActive(isSpeedUp);
-				menu->SetAcceleration(acceleration);
+				menu->SetActive(strength > 0.0f);
+				menu->SetAcceleration(strength);
 			}
 		);
 	}

@@ -281,7 +281,7 @@ namespace app
 			if (m_daddyPenguin != nullptr)
 			{
 				BEAST_PROFILE_SCOPE(u8"ウルト更新");
-				UltContext ctx{ this, m_daddyPenguin };
+				UltContext ctx{ this, m_daddyPenguin, m_formationController.GetOuterRadius() };
 				m_formationController.UpdateUlt(g_gameTime->GetDeltaTime(), ctx);
 			}
 
@@ -338,6 +338,14 @@ namespace app
 					m_formationPositions.clear();
 					m_formationController.CalculatePositions(
 						m_daddyPenguin->GetTransform().m_position, forward, m_formationPositions, 1, 0);
+				}
+
+				/** 陣形ごとのパッシブ（密集陣の弾き・バリアなど）を更新する。
+				 *  陣形計算の直後に呼び、その時点の最外半径でバリアの大きさを決める */
+				{
+					BEAST_PROFILE_SCOPE(u8"陣形パッシブ更新");
+					UltContext ctx{ this, m_daddyPenguin, m_formationController.GetOuterRadius() };
+					m_formationController.UpdatePassive(g_gameTime->GetDeltaTime(), ctx);
 				}
 			}
 
@@ -758,10 +766,18 @@ namespace app
 		}
 
 
+		const Vector4& ChildPenguinManager::GetFormationColor(EnFormationType type)
+		{
+			int index = static_cast<int>(type);
+			if (index < 0 || index >= static_cast<int>(EnFormationType::Num)) index = 0;
+			return ULT_RING_COLORS[index];
+		}
+
+
 		void ChildPenguinManager::ActivateUlt()
 		{
 			if (!m_daddyPenguin) return;
-			UltContext ctx{ this, m_daddyPenguin };
+			UltContext ctx{ this, m_daddyPenguin, m_formationController.GetOuterRadius() };
 			m_formationController.ActivateUlt(ctx);
 		}
 

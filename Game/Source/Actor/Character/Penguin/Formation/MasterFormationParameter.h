@@ -36,7 +36,7 @@ namespace app
 			float ultDuration;
 			/** ウルトクールダウン（秒） */
 			float ultCooldown;
-			/** パッシブ: 固定速度倍率（未使用、全陣形とも passiveSpeedBase/PerLevel のレベル連動速度に統一） */
+			/** パッシブ: 固定速度倍率（全陣形で使用。passiveSpeedBase/PerLevelのレベル連動速度に掛ける） */
 			float passiveSpeedMultiplier;
 			/** パッシブ: レベル0の速度倍率（全陣形で使用） */
 			float passiveSpeedBase;
@@ -61,7 +61,7 @@ namespace app
 			int passiveWhirlpoolResistance;
 			/** ウルト: 渦潮免疫を持つか（0/1） */
 			int ultWhirlpoolResistance;
-			/** ウルト: シロクマ攻撃を無効化するか（0/1） */
+			/** シロクマ・シャチの攻撃を無効化するか（0/1）。名前は旧仕様のままだが、いまはパッシブ（陣形中ずっと）で効く */
 			int ultBearAttackNullify;
 			/** 形状: リング1の配置数（RingFormation系のみ使用。リング k は baseFollowers*k 体） */
 			int baseFollowers;

@@ -239,6 +239,8 @@ namespace app
 			int m_maxEatCount;
 			int m_eatCount;
 			bool m_isFull;
+			/** 密集陣に攻撃を弾かれたか（気絶が明けたら巣へ帰る。EnterReturnHomeで戻す） */
+			bool m_isRepelled = false;
 
 			float m_attackTimer;
 			float m_attackDuration;

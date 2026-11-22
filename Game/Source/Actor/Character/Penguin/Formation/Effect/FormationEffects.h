@@ -113,8 +113,9 @@ namespace app
 
 
 		/**
-		 * @brief シロクマ攻撃無効化エフェクト（防御陣形ウルト）
-		 * @details ウルト発動中、シロクマからの攻撃ダメージを無効にする。
+		 * @brief シロクマ・シャチの攻撃無効化エフェクト（密集陣パッシブ）
+		 * @details 密集陣でいる間、隊列の子へのシロクマ・シャチの攻撃を無効にする。
+		 *          FormationControllerが陣形の切り替え時にEnter/Exitを呼ぶ。
 		 */
 		class BearAttackNullifyEffect : public IFormationEffect
 		{

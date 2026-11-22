@@ -1053,7 +1053,7 @@ namespace app
 			// =======================================================
 			if (enemy->m_foundPenguin != nullptr)
 			{
-				// 密集陣ウルト中は、隊列の子への攻撃を無効化してクマへ反撃する。
+				// 密集陣でいる間は、隊列の子への攻撃を無効化してクマへ反撃する。
 				// 「守り切った」だけで終わらせず、弾き飛ばし＋スタン＋短いヒットストップで
 				// プレイヤーに意趣返しの手応えを返す
 				auto* cpManager = actor::ChildPenguinManager::GetInstance();
@@ -1078,6 +1078,9 @@ namespace app
 
 					/** スタンさせる（StunStateが時間経過で自動解除する） */
 					bear->GetEnemyStateMachine()->SetStun(true);
+
+					/** 弾かれたクマは、気絶が明けたら巣へ帰る（CheckAttackでReturnHomeへ） */
+					enemy->m_isRepelled = true;
 
 					/** 「弾いた！」の手応えを演出側へ通知する（見せ方は受け取る側が決める） */
 					BattleManager::GetInstance().NotifyImpact(
@@ -1151,8 +1154,8 @@ namespace app
 				return enEnemyState_Invalid;
 			}
 
-			// 満腹なら帰る
-			if (enemy->m_isFull)
+			// 満腹か、密集陣に弾かれたなら帰る
+			if (enemy->m_isFull || enemy->m_isRepelled)
 			{
 				return enEnemyState_ReturnHome;
 			}
@@ -1171,6 +1174,7 @@ namespace app
 		void EnemyController::EnterReturnHome(EnemyController* enemy)
 		{
 			enemy->m_target->GetEnemyStateMachine()->SetReturnHome(true);
+			enemy->m_isRepelled = false;
 
 			// スタック検出タイマーをリセット
 			enemy->m_stuckTimer = 0.0f;

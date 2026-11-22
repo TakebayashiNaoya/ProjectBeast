@@ -28,16 +28,55 @@ namespace app
 			float Lerp(float a, float b, float t) { return a + (b - a) * t; }
 			float Clamp01(float v) { return v < 0.0f ? 0.0f : (v > 1.0f ? 1.0f : v); }
 
-			/** 陣形切替バナーの表示時間（秒）。
-			 *  主張しすぎない長さにする（位置・文字サイズはFormationWheel.json側） */
-			constexpr float BANNER_DURATION = 1.0f;
-			/** 陣形ごとのバナー文言（EnFormationType の並び順）。効果をひとことだけ */
-			constexpr const char* BANNER_TEXTS[] = {
+			//============================================//
+			// 陣形切替カットイン
+			// 配置・大きさ・色の基準はFormationWheel.jsonのCutIn* 要素。ここでは動きだけを決める
+			//============================================//
+
+			/** カットインのアイコン要素名（EnFormationTypeの並び順） */
+			constexpr const char* CUT_IN_ICON_NAMES[] = { "CutInIconCircle", "CutInIconTriangle", "CutInIconCluster", "CutInIconScatter" };
+			/** 陣形名（EnFormationTypeの並び順） */
+			constexpr const char* CUT_IN_NAME_TEXTS[] = {
 				"バランス",
 				"はやい",
 				"まもり",
 				"あつめる",
 			};
+			/** 副題（EnFormationTypeの並び順）。陣形の効果をひとことで */
+			constexpr const char* CUT_IN_SUB_TEXTS[] = {
+				"ふつうの じんけい",
+				"スピード アップ!",
+				"クマと シャチを はじく!",
+				"ひろく あつめる",
+			};
+
+			/** 入り（帯が縦に開き、アイコンと文字が滑り込む）の長さ（秒） */
+			constexpr float CUT_IN_IN_TIME = 0.15f;
+			/** 見せる時間（アイコンがポップする）の長さ（秒） */
+			constexpr float CUT_IN_HOLD_TIME = 0.75f;
+			/** 抜け（右へ抜けながら消える）の長さ（秒） */
+			constexpr float CUT_IN_OUT_TIME = 0.2f;
+			/** HOLDの始まりの時刻（秒） */
+			constexpr float CUT_IN_HOLD_BEGIN = CUT_IN_IN_TIME;
+			/** OUTの始まりの時刻（秒） */
+			constexpr float CUT_IN_OUT_BEGIN = CUT_IN_IN_TIME + CUT_IN_HOLD_TIME;
+			/** 全体の長さ（秒）。1.1秒 */
+			constexpr float CUT_IN_TOTAL_TIME = CUT_IN_OUT_BEGIN + CUT_IN_OUT_TIME;
+
+			/** 入りでアイコン・文字が滑り込んでくる距離（アイコンは左から、文字は右から） */
+			constexpr float CUT_IN_SLIDE_IN_DISTANCE = 300.0f;
+			/** 抜けで右へ流れる距離 */
+			constexpr float CUT_IN_SLIDE_OUT_DISTANCE = 250.0f;
+			/** アイコンのポップの長さ（秒。HOLDの頭から） */
+			constexpr float CUT_IN_POP_TIME = 0.25f;
+			/** アイコンのポップでの最大拡大率（1.0に足す量） */
+			constexpr float CUT_IN_POP_AMOUNT = 0.3f;
+
+
+			/** 減速する補間（入りに使う） */
+			float EaseOutCubic(float t) { const float u = 1.0f - t; return 1.0f - u * u * u; }
+			/** 加速する補間（抜けに使う） */
+			float EaseInQuad(float t) { return t * t; }
 		}
 
 
@@ -74,9 +113,9 @@ namespace app
 #if defined(APP_DEBUG)
 			ReloadTuningIfChanged(dt);
 #endif
-			/** バナーは切り替え開始エッジ（m_wasSwitching）を使うため、
-			 *  m_wasSwitching を更新する UpdateFormationIcons() より先に呼ぶ */
-			UpdateFormationBanner();
+			/** カットインは前フレームの陣形（m_lastFrameType）との比較で発火するため、
+			 *  m_lastFrameTypeを更新するUpdateFormationIcons()より先に呼ぶ */
+			UpdateFormationCutIn();
 			UpdateFormationIcons();
 			UpdateUltIconColor();
 			UpdateLevelDisplay();
@@ -84,38 +123,118 @@ namespace app
 		}
 
 
-		void FormationWheelMenu::UpdateFormationBanner()
+		void FormationWheelMenu::UpdateFormationCutIn()
 		{
-			auto* banner = GetUI<UIText>(Hash32("FormationBannerText"));
-			if (banner == nullptr) return;
-
 			auto* cpm = actor::ChildPenguinManager::GetInstance();
 			if (cpm == nullptr)
 			{
-				banner->m_isDraw = false;
+				m_cutInTimer = -1.0f;
+				HideFormationCutIn();
 				return;
 			}
 
-			/** 切り替え開始の瞬間にバナーを出し直す（文言は切り替え先の陣形） */
+			/** 陣形が前フレームから変わった瞬間に出す。
+			 *  表示中にまた切り替えたら、中身を差し替えてHOLDの頭から見せ直す
+			 *  （入りからやり直すと、連打で帯が開閉を繰り返してちらつくため） */
 			const actor::EnFormationType currentType = cpm->GetCurrentFormationType();
-			if (cpm->IsSwitchingFormation() && !m_wasSwitching)
+			if (currentType != m_lastFrameType)
 			{
-				banner->SetText(BANNER_TEXTS[static_cast<int>(currentType)]);
-				m_bannerTimer = BANNER_DURATION;
+				const bool isShowing = (m_cutInTimer >= 0.0f);
+				m_cutInTimer = isShowing ? CUT_IN_HOLD_BEGIN : 0.0f;
+				m_cutInType  = currentType;
 			}
 
-			if (m_bannerTimer <= 0.0f)
+			if (m_cutInTimer < 0.0f) return;
+
+			m_cutInTimer += g_gameTime->GetFrameDeltaTime();
+			if (m_cutInTimer >= CUT_IN_TOTAL_TIME)
 			{
-				banner->m_isDraw = false;
+				m_cutInTimer = -1.0f;
+				HideFormationCutIn();
 				return;
 			}
+			const float t = m_cutInTimer;
 
-			m_bannerTimer -= g_gameTime->GetFrameDeltaTime();
-			banner->m_isDraw = true;
+			/** 入り: 0→1（減速）。抜け: 0→1（加速） */
+			const float inRate  = EaseOutCubic(Clamp01(t / CUT_IN_IN_TIME));
+			const float outRate = EaseInQuad(Clamp01((t - CUT_IN_OUT_BEGIN) / CUT_IN_OUT_TIME));
+			const float alpha    = inRate * (1.0f - outRate);
+			const float slideIn  = CUT_IN_SLIDE_IN_DISTANCE * (1.0f - inRate);
+			const float slideOut = CUT_IN_SLIDE_OUT_DISTANCE * outRate;
+			/** HOLDの頭でアイコンを一度だけ膨らませて戻す */
+			const float popRate = Clamp01((t - CUT_IN_HOLD_BEGIN) / CUT_IN_POP_TIME);
+			const float pop     = 1.0f + CUT_IN_POP_AMOUNT * sinf(popRate * Math::PI);
 
-			/** 終わり際はフェードアウトする */
-			const float fadeOut = Clamp01(m_bannerTimer / 0.3f);
-			banner->m_color.w = fadeOut;
+			const int typeIndex = static_cast<int>(m_cutInType);
+			const Vector4& formationColor = actor::ChildPenguinManager::GetFormationColor(m_cutInType);
+
+			/** 黒帯: 中心から縦に開き、抜けではその場で消える */
+			if (auto* band = GetUI<UIIcon>(Hash32("CutInBand")))
+			{
+				band->m_isDraw = true;
+				band->m_transform.m_localTransform.m_position = m_cutInBandPos;
+				band->m_transform.m_localTransform.m_scale =
+					Vector3(m_cutInBandScale.x, m_cutInBandScale.y * inRate, m_cutInBandScale.z);
+				band->m_color.w = m_cutInBandAlpha * (1.0f - outRate);
+			}
+
+			/** 陣形色の線: 帯の縁について開き、抜けでは右へ流れる */
+			if (auto* accent = GetUI<UIIcon>(Hash32("CutInAccent")))
+			{
+				accent->m_isDraw = true;
+				Vector3 pos = m_cutInAccentPos;
+				pos.x += slideOut;
+				pos.y = m_cutInBandPos.y + (m_cutInAccentPos.y - m_cutInBandPos.y) * inRate;
+				accent->m_transform.m_localTransform.m_position = pos;
+				accent->m_color = Vector4(formationColor.x, formationColor.y, formationColor.z, alpha);
+			}
+
+			/** 陣形アイコン: 左から滑り込み、ポップして、右へ抜ける。表示するのは今の陣形の1枚だけ */
+			for (int i = 0; i < FORMATION_NUM; i++)
+			{
+				auto* icon = GetUI<UIIcon>(Hash32(CUT_IN_ICON_NAMES[i]));
+				if (icon == nullptr) continue;
+
+				icon->m_isDraw = (i == typeIndex);
+				if (!icon->m_isDraw) continue;
+
+				const Vector3& basePos   = m_cutInIconPos[i];
+				const Vector3& baseScale = m_cutInIconScale[i];
+				icon->m_transform.m_localTransform.m_position = Vector3(basePos.x - slideIn + slideOut, basePos.y, basePos.z);
+				icon->m_transform.m_localTransform.m_scale = Vector3(baseScale.x * pop, baseScale.y * pop, baseScale.z);
+				icon->m_color.w = alpha;
+			}
+
+			/** 陣形名（陣形色）と副題: 右から滑り込み、右へ抜ける */
+			if (auto* name = GetUI<UIText>(Hash32("CutInNameText")))
+			{
+				name->SetText(CUT_IN_NAME_TEXTS[typeIndex]);
+				name->m_isDraw = true;
+				name->m_transform.m_localTransform.m_position =
+					Vector3(m_cutInNamePos.x + slideIn + slideOut, m_cutInNamePos.y, m_cutInNamePos.z);
+				name->m_color = Vector4(formationColor.x, formationColor.y, formationColor.z, alpha);
+			}
+			if (auto* sub = GetUI<UIText>(Hash32("CutInSubText")))
+			{
+				sub->SetText(CUT_IN_SUB_TEXTS[typeIndex]);
+				sub->m_isDraw = true;
+				sub->m_transform.m_localTransform.m_position =
+					Vector3(m_cutInSubPos.x + slideIn + slideOut, m_cutInSubPos.y, m_cutInSubPos.z);
+				sub->m_color.w = alpha;
+			}
+		}
+
+
+		void FormationWheelMenu::HideFormationCutIn()
+		{
+			if (auto* band = GetUI<UIIcon>(Hash32("CutInBand")))       band->m_isDraw = false;
+			if (auto* accent = GetUI<UIIcon>(Hash32("CutInAccent")))   accent->m_isDraw = false;
+			for (const char* iconName : CUT_IN_ICON_NAMES)
+			{
+				if (auto* icon = GetUI<UIIcon>(Hash32(iconName)))      icon->m_isDraw = false;
+			}
+			if (auto* name = GetUI<UIText>(Hash32("CutInNameText")))   name->m_isDraw = false;
+			if (auto* sub = GetUI<UIText>(Hash32("CutInSubText")))     sub->m_isDraw = false;
 		}
 
 
@@ -129,11 +248,39 @@ namespace app
 				}
 			}
 
-			/** 陣形切替バナーも初期状態では非表示 */
-			if (auto* banner = GetUI<UIText>(Hash32("FormationBannerText")))
+			/** カットインのJSON上の配置を演出の基準として取り込む（ホットリロードのたびに呼ばれる） */
+			if (auto* band = GetUI<UIIcon>(Hash32("CutInBand")))
 			{
-				banner->m_isDraw = false;
+				m_cutInBandPos   = band->m_transform.m_localTransform.m_position;
+				m_cutInBandScale = band->m_transform.m_localTransform.m_scale;
+				m_cutInBandAlpha = band->m_color.w;
 			}
+			if (auto* accent = GetUI<UIIcon>(Hash32("CutInAccent")))
+			{
+				m_cutInAccentPos = accent->m_transform.m_localTransform.m_position;
+			}
+			for (int i = 0; i < FORMATION_NUM; i++)
+			{
+				m_cutInIconPos[i]   = Vector3::Zero;
+				m_cutInIconScale[i] = Vector3::One;
+				if (auto* icon = GetUI<UIIcon>(Hash32(CUT_IN_ICON_NAMES[i])))
+				{
+					m_cutInIconPos[i]   = icon->m_transform.m_localTransform.m_position;
+					m_cutInIconScale[i] = icon->m_transform.m_localTransform.m_scale;
+				}
+			}
+			if (auto* name = GetUI<UIText>(Hash32("CutInNameText")))
+			{
+				m_cutInNamePos = name->m_transform.m_localTransform.m_position;
+			}
+			if (auto* sub = GetUI<UIText>(Hash32("CutInSubText")))
+			{
+				m_cutInSubPos = sub->m_transform.m_localTransform.m_position;
+			}
+
+			/** カットインは初期状態では非表示 */
+			m_cutInTimer = -1.0f;
+			HideFormationCutIn();
 		}
 
 
@@ -198,11 +345,16 @@ namespace app
 				BeginTransition(m_lastFrameType, currentType);
 			}
 
-			// ウルトの充填率：発動中は残り時間割合(上から白くなっていく)、それ以外はチャージ進行度(下から黄色くなる)
+			// ウルトの充填率：発動中は残り時間割合(上から白くなっていく)、それ以外はチャージ進行度(下から黄色くなる)。
+			// ウルト自体が無効なら塗らない（クールダウンが進まないので、途中の値で止まって見えるのを防ぐ）
 			const bool isUltActive = cpm->IsUltActive();
-			const float ultFillAmount = isUltActive
-				? cpm->GetUltActiveRemainingRate()
-				: (1.0f - cpm->GetUltCooldownRate());
+			float ultFillAmount = 0.0f;
+			if (actor::ChildPenguinManager::IsUltEnabled())
+			{
+				ultFillAmount = isUltActive
+					? cpm->GetUltActiveRemainingRate()
+					: (1.0f - cpm->GetUltCooldownRate());
+			}
 
 			// パルス演出・ウルト充填演出は「現在選択中の陣形」のアイコンにのみ反映する
 			const bool pulseFormation = cpm->CanActivateUlt() || isUltActive;
@@ -249,6 +401,21 @@ namespace app
 			const Vector4 readyColor(1.0f, 1.0f, 0.0f, 1.0f);    // 黄色（発動可能）
 			const Vector4 grayColor(0.4f, 0.4f, 0.4f, 1.0f);     // グレーアウト（発動不可）
 
+			const char* ultIconNames[] = { "LTButtonIcon", "RTButtonIcon" };
+
+			// ウルト自体が無効ならボタンの案内も出さない
+			if (!actor::ChildPenguinManager::IsUltEnabled())
+			{
+				for (const char* name : ultIconNames)
+				{
+					if (auto* ui = GetUI<UIIcon>(Hash32(name)))
+					{
+						ui->m_isDraw = false;
+					}
+				}
+				return;
+			}
+
 			auto* cpm = actor::ChildPenguinManager::GetInstance();
 			const bool canActivate = (cpm != nullptr) && cpm->CanActivateUlt();
 			const Vector4& color = canActivate ? readyColor : grayColor;
@@ -256,7 +423,6 @@ namespace app
 			// 発動可能な間だけボタンをドクンドクン拡縮させる（発動中は等倍に戻す）
 			const float pulseScale = CalculatePulseScale(canActivate);
 
-			const char* ultIconNames[] = { "LTButtonIcon", "RTButtonIcon" };
 			for (const char* name : ultIconNames)
 			{
 				if (auto* ui = GetUI<UIIcon>(Hash32(name)))

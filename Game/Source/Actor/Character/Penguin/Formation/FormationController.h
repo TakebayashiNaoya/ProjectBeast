@@ -149,7 +149,17 @@ namespace app
 			 */
 			void ActivateUlt(const UltContext& ctx) { m_ultController.Activate(ctx); }
 
-			/** 
+			/**
+			 * @brief パッシブ（効果チェーンと演出）を毎フレーム更新する（ChildPenguinManager::Updateから呼ぶ）
+			 * @details 前回Enterした陣形と現在の陣形が違えば、旧陣形のExit → 新陣形のEnterを呼んでから
+			 *          現在の陣形のUpdateを呼ぶ。SwitchFormationで行わないのは、コンストラクタからも
+			 *          呼ばれ、親ペンギンのポインタ（演出の追従先）が無いため。
+			 * @param dt 前フレームとの時間差（秒）
+			 * @param ctx 陣形の最外半径を詰めたコンテキスト
+			 */
+			void UpdatePassive(float dt, const UltContext& ctx);
+
+			/**
 			 * @brief ウルトを毎フレーム更新する（ChildPenguinManager::Update から呼ぶ）
 			 * @param dt 前フレームとの時間差（秒）
 			 * @param ctx ウルト更新時のコンテキスト情報
@@ -238,6 +248,7 @@ namespace app
 				static_cast<size_t>(EnFormationType::Num)> m_formations;	/** 陣形の種類ごとのインスタンスを保持する配列 */
 
 			IFormation*     m_currentFormation = nullptr;					/** 現在の陣形インスタンスへのポインタ */
+			IFormation*     m_passiveFormation = nullptr;					/** パッシブをEnter済みの陣形（UpdatePassiveで陣形の変化を検知する） */
 			EnFormationType m_currentType      = EnFormationType::Circle;	/** 現在の陣形種別 */
 			int             m_formationLevel   = 0;							/** 現在の陣形レベル */
 			int             m_ringProgress     = 0;							/** 現在進行中のリング内の進行人数 */

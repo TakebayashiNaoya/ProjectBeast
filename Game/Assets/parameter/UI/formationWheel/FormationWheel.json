@@ -386,15 +386,159 @@
                 ]
             },
             {
+                "type": "UIIcon",
+                "name": "CutInBand",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 1600,
+                "height": 120,
+                "position": [
+                    0,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    0,
+                    0,
+                    0,
+                    170
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "CutInAccent",
+                "asset": "Assets/spriteData/UI/white.DDS",
+                "width": 1600,
+                "height": 6,
+                "position": [
+                    0,
+                    143,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "CutInIconCircle",
+                "asset": "Assets/spriteData/UI/Icon/Formation/Penguin.DDS",
+                "width": 96,
+                "height": 96,
+                "position": [
+                    -230,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "CutInIconTriangle",
+                "asset": "Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
+                "width": 96,
+                "height": 96,
+                "position": [
+                    -230,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "CutInIconCluster",
+                "asset": "Assets/spriteData/UI/Icon/Formation/Shield.DDS",
+                "width": 96,
+                "height": 96,
+                "position": [
+                    -230,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
+                "type": "UIIcon",
+                "name": "CutInIconScatter",
+                "asset": "Assets/spriteData/UI/Icon/Formation/Megaphone.DDS",
+                "width": 96,
+                "height": 96,
+                "position": [
+                    -230,
+                    200,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ]
+            },
+            {
                 "type": "UIText",
-                "name": "FormationBannerText",
+                "name": "CutInNameText",
                 "text": "",
-                "fontSize": 1.0,
+                "fontSize": 1.4,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    0,
-                    -240,
+                    -160,
+                    222,
                     0
                 ],
                 "rotation": 0,
@@ -405,7 +549,31 @@
                     255
                 ],
                 "pivot": [
-                    0.5,
+                    0.0,
+                    0.5
+                ]
+            },
+            {
+                "type": "UIText",
+                "name": "CutInSubText",
+                "text": "",
+                "fontSize": 0.7,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "position": [
+                    -160,
+                    168,
+                    0
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "pivot": [
+                    0.0,
                     0.5
                 ]
             }

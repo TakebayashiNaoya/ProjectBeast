@@ -289,6 +289,13 @@ namespace app
 			EnFormationType GetCurrentFormationType() const { return m_formationController.GetCurrentType(); }
 
 			/**
+			 * @brief 陣形の色を取得する（ウルトリング・陣形切替カットインで共通の色）
+			 * @param type 陣形種別
+			 * @return 陣形色（RGBA、0.0〜1.0）
+			 */
+			static const Vector4& GetFormationColor(EnFormationType type);
+
+			/**
 			 * @brief 陣形切り替え演出（スライドUI）の最中か
 			 * @details true の間はLB/RBによる再切り替え入力を無視する
 			 */
@@ -324,6 +331,12 @@ namespace app
 			 * @brief ウルトを発動する（入力ハンドラから呼ぶ）
 			 */
 			void ActivateUlt();
+
+			/**
+			 * @brief ウルト機能そのものが有効か（UltController::IS_ENABLED）
+			 * @details falseの間、UIはウルトのボタン表示とゲージを出さない
+			 */
+			static constexpr bool IsUltEnabled() { return UltController::IS_ENABLED; }
 
 			/**
 			 * @brief ウルト発動中か

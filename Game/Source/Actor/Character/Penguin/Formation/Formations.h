@@ -25,7 +25,9 @@ namespace app
 		 *   m_passive:   常時有効なエフェクトチェーン（ロジックのみ）
 		 *   m_ult:       ウルト発動中のみ有効なエフェクトチェーン（ロジックのみ）
 		 *   m_ultVisual: ウルトの演出（ビジュアルエフェクト）。効果とは分離して所有する。
+		 *   m_passiveVisual: パッシブの演出（陣形中ずっと出すビジュアルエフェクト）。
 		 *   FormationController がパッシブ・ウルトの2本を組み合わせて速度倍率・渦潮耐性を返し、
+		 *   陣形が変わったときにm_passiveとm_passiveVisualのExit/Enter、毎フレームUpdateを呼ぶ。
 		 *   UltController が m_ult と m_ultVisual の両方に Enter/Update/Exit を転送する。
 		 */
 		class IFormation
@@ -42,6 +44,15 @@ namespace app
 
 			/** @brief パッシブエフェクトチェーンを返す */
 			const FormationEffectChain& GetPassive() const { return m_passive; }
+
+			/** @brief パッシブエフェクトチェーンを返す（FormationControllerがEnter/Update/Exitを呼ぶ） */
+			FormationEffectChain& GetPassive() { return m_passive; }
+
+			/**
+			 * @brief パッシブの演出を返す（FormationControllerが陣形中ずっとEnter/Update/Exitを呼ぶ）
+			 * @return 演出インスタンス。演出を持たない陣形はnullptr
+			 */
+			IUltEffect* GetPassiveVisual() { return m_passiveVisual.get(); }
 
 			/** @brief ウルトエフェクトチェーンを返す（UltController が Enter/Update/Exit を呼ぶ） */
 			FormationEffectChain& GetUlt() { return m_ult; }
@@ -114,7 +125,8 @@ namespace app
 			FormationEffectChain m_passive;  /** 常時有効なエフェクトチェーン（ロジックのみ） */
 			FormationEffectChain m_ult;      /** ウルト発動中のみ有効なエフェクトチェーン（ロジックのみ） */
 
-			std::unique_ptr<IUltEffect> m_ultVisual;  /** ウルトの演出（ビジュアルエフェクト） */
+			std::unique_ptr<IUltEffect> m_ultVisual;      /** ウルトの演出（ビジュアルエフェクト） */
+			std::unique_ptr<IUltEffect> m_passiveVisual;  /** パッシブの演出（陣形中ずっと出すビジュアルエフェクト） */
 
 			const MasterFormationParameter* m_param;  /** 陣形パラメーターへの非所有ポインタ（ホットリロード対応） */
 		};
@@ -196,10 +208,11 @@ namespace app
 		/**
 		 * @brief 密集陣（狭間隔）
 		 * @details
-		 *   パッシブ: レベル連動速度（他陣形と共通）＋ 渦潮耐性（MasterFormationParameter で調整）。
-		 *   ウルト: 渦潮に飛び込んでいる間だけ速度2倍 ＋ シロクマ攻撃無効化 ＋ 入隊判定半径の
+		 *   パッシブ: レベル連動速度（他陣形と共通）× 固定倍率（0.85で円陣より遅い）＋ 渦潮耐性
+		 *   ＋ シロクマ・シャチの攻撃無効化（MasterFormationParameterで調整）。
+		 *   パッシブ演出: UltEffectCluster（バリア）を陣形中ずっと出す。
+		 *   ウルト: 渦潮に飛び込んでいる間だけ速度2倍 ＋ 入隊判定半径の
 		 *   一時拡大（拡大幅は控えめ、MasterFormationParameter で調整）。
-		 *   演出: UltEffectCluster（Barrier）。
 		 */
 		class ClusterFormation : public RingFormation
 		{
@@ -238,7 +251,7 @@ namespace app
 		/**
 		 * @brief 三角陣
 		 * @details
-		 *   パッシブ: レベル連動速度（初期値のみ他陣形より高い。伸び率は他陣形と共通、MasterFormationParameter で調整）。
+		 *   パッシブ: レベル連動速度 × 固定倍率（1.4で他陣形より明確に速い。MasterFormationParameterで調整）。
 		 *   ウルト: 速度1.5倍（MasterFormationParameter で調整）。
 		 *   演出: UltEffectTriangle（SpeedBoost）。
 		 */

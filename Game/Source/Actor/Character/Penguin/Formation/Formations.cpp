@@ -112,8 +112,9 @@ namespace app
 
 		CircleFormation::CircleFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: レベル連動速度（他陣形と共通）
+			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
 			// ウルト: 速度up + 渦潮免疫 + ペンギン呼び出し
 			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));
@@ -138,22 +139,23 @@ namespace app
 
 		ClusterFormation::ClusterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: レベル連動速度（他陣形と共通）+ 渦潮耐性
+			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率 + 渦潮耐性 + シロクマ・シャチの攻撃無効化
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 			if (param.passiveWhirlpoolResistance)
 			{
 				m_passive.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
 			}
-
-			// ウルト: 渦潮近傍で速度up + シロクマ攻撃無効化
-			m_ult.AddEffect(std::make_unique<WhirlpoolSpeedBoostEffect>(&param.ultWhirlpoolBoostMultiplier));
 			if (param.ultBearAttackNullify)
 			{
-				m_ult.AddEffect(std::make_unique<BearAttackNullifyEffect>());
+				m_passive.AddEffect(std::make_unique<BearAttackNullifyEffect>());
 			}
 
-			// 演出: バリア
-			m_ultVisual = std::make_unique<UltEffectCluster>();
+			// パッシブ演出: バリア（陣形中ずっと出す）
+			m_passiveVisual = std::make_unique<UltEffectCluster>();
+
+			// ウルト: 渦潮近傍で速度up（弾きとバリアはパッシブへ移したのでウルト演出は無し）
+			m_ult.AddEffect(std::make_unique<WhirlpoolSpeedBoostEffect>(&param.ultWhirlpoolBoostMultiplier));
 		}
 
 
@@ -164,8 +166,9 @@ namespace app
 
 		ScatterFormation::ScatterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: レベル連動速度（他陣形と共通）
+			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
 			// ウルト: 入隊判定半径の一時拡大のみ（速度・渦潮などの効果は無し）
 			// 拡大自体は RingFormation::GetUltJoinRadius() 経由で FormationController::GetJoinRadius() が処理する
@@ -183,8 +186,9 @@ namespace app
 		TriangleFormation::TriangleFormation(const MasterFormationParameter& param)
 			: IFormation(param)
 		{
-			// パッシブ: レベル連動速度
+			// パッシブ: レベル連動速度 × 固定倍率（スピード特化）
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
 			// ウルト: 純粋なスピード特化
 			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));

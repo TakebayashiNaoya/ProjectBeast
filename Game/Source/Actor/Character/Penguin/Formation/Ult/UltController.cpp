@@ -51,7 +51,7 @@ namespace app
 
 		bool UltController::CanActivate() const
 		{
-			return m_ult && !m_isActive && m_cooldownTimer <= 0.0f;
+			return IS_ENABLED && m_ult && !m_isActive && m_cooldownTimer <= 0.0f;
 		}
 
 
@@ -90,6 +90,9 @@ namespace app
 
 		void UltController::Update(float dt, const UltContext& ctx)
 		{
+			// ウルト無効中はタイマーもSEも進めない
+			if (!IS_ENABLED) return;
+
 			// クールダウン更新前の発動可否を控えておき、明けた瞬間を検知する
 			const bool wasReady = CanActivate();
 

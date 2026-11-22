@@ -1294,8 +1294,9 @@ namespace app
 			// 爽快感よりストレスが勝つ（2026-08-24 試遊フィードバック）。
 			// 密集陣では逃げないことが攻撃無効化＋反撃の前提でもある
 			// （逃走は RemoveFollower で隊列から抜けるため、逃げると無効化の対象外になる）。
-			// 隊列外の子はウルトの恩恵を受けていないので、今までどおり逃げる
-			if (m_isFollowing && manager->IsUltActive())
+			// 隊列外の子はウルトの恩恵を受けていないので、今までどおり逃げる。
+			// 密集陣は攻撃無効化がパッシブになったので、密集陣でいる間も隊列の子は逃げない
+			if (m_isFollowing && (manager->IsUltActive() || BattleManager::GetInstance().IsBearAttackNullified()))
 			{
 				m_fleeHoldTimer = 0.0f;
 				if (m_isFleeing)

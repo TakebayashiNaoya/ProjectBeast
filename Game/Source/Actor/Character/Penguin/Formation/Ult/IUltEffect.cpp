@@ -8,6 +8,7 @@
 
 #include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
 #include "Source/Effect/EffectManager.h"
+#include "graphics/effect/BeastEffectEmitter.h"
 
 
 namespace app
@@ -32,6 +33,8 @@ namespace app
 			constexpr float MIN_SCALE = 4.0f;
 			/** スケールの上限（陣形が巨大化しても演出が破綻しないようにする） */
 			constexpr float MAX_SCALE = 100.0f;
+			/** 密集陣のバリアが陣形半径に追従する速さ（1秒あたりの補間率） */
+			constexpr float CLUSTER_SCALE_FOLLOW_SPEED = 4.0f;
 
 
 			/**
@@ -99,11 +102,12 @@ namespace app
 		void UltEffectCluster::Enter(const UltContext& ctx)
 		{
 			auto& em = EffectManager::Get();
+			m_scale = CalcScale(ctx);
 			m_ultHandle = em.PlayEffect(
 				EnEffectKind::ClusterUltBegin,
 				ctx.daddyPenguin->GetTransform().m_position,
 				Quaternion::Identity,
-				Vector3(Vector3::One * CalcScale(ctx))
+				Vector3(Vector3::One * m_scale)
 			);
 			em.AttachEffect(
 				m_ultHandle,
@@ -114,7 +118,15 @@ namespace app
 
 
 		void UltEffectCluster::Update(float dt, const UltContext& ctx)
-		{}
+		{
+			auto* effect = EffectManager::Get().FindEffect(m_ultHandle);
+			if (effect == nullptr) return;
+
+			// 隊列が増えて陣形が広がったら、バリアも追いかけて広げる（一気に変わらないよう補間する）
+			const float t = std::clamp(dt * CLUSTER_SCALE_FOLLOW_SPEED, 0.0f, 1.0f);
+			m_scale += (CalcScale(ctx) - m_scale) * t;
+			effect->SetScale(Vector3(Vector3::One * m_scale));
+		}
 
 
 		void UltEffectCluster::Exit(const UltContext& ctx)

@@ -107,7 +107,16 @@ namespace app
 			const bool isSwim = dsm->IsSwimming();
 			const bool isMove = isDash || isSwim;
 
-			m_speedLineChanged(isUlt && (isTriangle || isCircle) && isMove);
+			// 強さ: ウルト中の三角陣・円陣は最大、三角陣のパッシブ（スピード特化）は弱め、それ以外は出さない
+			constexpr float SPEED_LINE_STRENGTH_ULT = 1.0f;
+			constexpr float SPEED_LINE_STRENGTH_TRIANGLE_PASSIVE = 0.5f;
+			float strength = 0.0f;
+			if (isMove)
+			{
+				if (isUlt && (isTriangle || isCircle)) strength = SPEED_LINE_STRENGTH_ULT;
+				else if (isTriangle)                   strength = SPEED_LINE_STRENGTH_TRIANGLE_PASSIVE;
+			}
+			m_speedLineChanged(strength);
 		}
 	}
 

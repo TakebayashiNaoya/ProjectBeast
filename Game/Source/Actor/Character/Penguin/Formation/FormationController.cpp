@@ -209,6 +209,28 @@ namespace app
 		}
 
 
+		void FormationController::UpdatePassive(float dt, const UltContext& ctx)
+		{
+			if (!m_currentFormation) return;
+
+			// 陣形が変わったら、旧陣形のパッシブを抜けてから新陣形のパッシブに入る
+			if (m_passiveFormation != m_currentFormation)
+			{
+				if (m_passiveFormation)
+				{
+					m_passiveFormation->GetPassive().Exit(ctx);
+					if (IUltEffect* visual = m_passiveFormation->GetPassiveVisual()) visual->Exit(ctx);
+				}
+				m_passiveFormation = m_currentFormation;
+				m_passiveFormation->GetPassive().Enter(ctx);
+				if (IUltEffect* visual = m_passiveFormation->GetPassiveVisual()) visual->Enter(ctx);
+			}
+
+			m_passiveFormation->GetPassive().Update(dt, ctx);
+			if (IUltEffect* visual = m_passiveFormation->GetPassiveVisual()) visual->Update(dt, ctx);
+		}
+
+
 		float FormationController::GetSpeedMultiplier() const
 		{
 			if (!m_currentFormation) return 1.0f;

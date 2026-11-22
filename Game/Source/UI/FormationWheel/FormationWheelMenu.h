@@ -20,7 +20,9 @@ namespace app
 		 *   LB/RBで切り替わる陣形アイコンを並べる。
 		 *   陣形切り替え中は各アイコンが横にスライドするアニメーションを行う
 		 *   (演出中はChildPenguinManager側で入力がロックされる)。
-		 *   LT/RTアイコンはウルトが発動可能な間のみ通常色、それ以外はグレーアウトする。
+		 *   LT/RTアイコンはウルトが発動可能な間のみ通常色、それ以外はグレーアウトする
+		 *   (ウルト自体が無効(ChildPenguinManager::IsUltEnabled())なら非表示にし、ゲージも塗らない)。
+		 *   陣形を切り替えた瞬間には画面中央上寄りにカットインを出す。
 		 *   見た目の座標・サイズ・色はFormationWheelTuning.jsonからホットリロードで調整できる。
 		 */
 		class FormationWheelMenu : public MenuBase
@@ -40,11 +42,16 @@ namespace app
 			void UpdateUltIconColor();
 
 			/**
-			 * @brief 陣形切替バナー（画面中央の大きな陣形名＋一言）の更新
-			 * @details 切り替えた瞬間に「さんかくじん！はやい！」のような一言を
-			 *          画面中央に短時間ポップさせ、陣形の意味をその場で学習させる。
+			 * @brief 陣形切替カットイン（黒帯＋陣形アイコン＋陣形名＋副題）の更新
+			 * @details 陣形が変わった瞬間に、黒帯が縦に開き、アイコンが左から・文字が右から
+			 *          滑り込んで、右へ抜けて消える。陣形の意味をその場で学習させる。
+			 *          タイマー1本から位置・スケール・α を直書きする（UpdateFormationIconsと同じ流儀）。
+			 *          連続で切り替えたときは中身を差し替え、HOLDの頭から再生し直す。
 			 */
-			void UpdateFormationBanner();
+			void UpdateFormationCutIn();
+
+			/** @brief カットインの要素をすべて非表示にする */
+			void HideFormationCutIn();
 
 			/** 陣形レベルと次のレベルアップまでの隊員数ゲージの表示を更新する */
 			void UpdateLevelDisplay();
@@ -118,8 +125,20 @@ namespace app
 			/** パルス演出用の経過時間(常時加算し続ける) */
 			float m_pulseTimer = 0.0f;
 
-			/** 陣形切替バナーの残り表示時間（秒） */
-			float m_bannerTimer = 0.0f;
+			/** 陣形切替カットインの経過時間（秒）。負の値なら非表示 */
+			float m_cutInTimer = -1.0f;
+			/** カットインに表示中の陣形 */
+			actor::EnFormationType m_cutInType = actor::EnFormationType::Circle;
+
+			/** カットイン各要素のJSON上の配置（演出の基準。InitializeLogicで取り込む） */
+			Vector3 m_cutInBandPos = Vector3::Zero;
+			Vector3 m_cutInBandScale = Vector3::One;
+			float   m_cutInBandAlpha = 1.0f;
+			Vector3 m_cutInAccentPos = Vector3::Zero;
+			Vector3 m_cutInIconPos[static_cast<int>(actor::EnFormationType::Num)];
+			Vector3 m_cutInIconScale[static_cast<int>(actor::EnFormationType::Num)];
+			Vector3 m_cutInNamePos = Vector3::Zero;
+			Vector3 m_cutInSubPos = Vector3::Zero;
 
 #if defined(APP_DEBUG)
 			time_t m_tuningLastWriteTime = 0;    /** チューニングJSONの最終更新日時 */

@@ -29,6 +29,16 @@ namespace app
 		class UltController
 		{
 		public:
+			/**
+			 * @brief ウルトを有効にするか
+			 * @details falseの間はCanActivate()が常にfalseになり、Update()も何もしない。
+			 *          入力・発動・SE・リング・発光・集中線（ウルト由来）・三角陣の拾得がすべて止まる。
+			 *          UIはChildPenguinManager::IsUltEnabled()経由でこの値を見る。
+			 *          trueに戻せば復帰する（密集陣の弾きとバリアはパッシブへ移したので、
+			 *          密集陣のウルトは渦潮ブーストと入隊半径の拡大だけになる）
+			 */
+			static constexpr bool IS_ENABLED = false;
+
 			UltController() = default;
 			/**
 			 * @brief デストラクタ

@@ -83,8 +83,10 @@ namespace app
 
 
 		/**
-		 * @brief 密集陣（防御特化）ウルトの演出
-		 * @details 発動中 BarrierBegin をアタッチし、終了時に BarrierEnd に差し替える。
+		 * @brief 密集陣（防御特化）の演出
+		 * @details 密集陣のパッシブ演出として、陣形中ずっとBarrierBeginをアタッチし、
+		 *          陣形を抜けたときにBarrierEndに差し替える。
+		 *          Update()で陣形の最外半径に合わせてスケールを補間する（隊列が増えると広がる）。
 		 */
 		class UltEffectCluster : public IUltEffect
 		{
@@ -94,6 +96,10 @@ namespace app
 			void Enter(const UltContext& ctx) override final;
 			void Update(float dt, const UltContext& ctx) override final;
 			void Exit(const UltContext& ctx) override final;
+
+		private:
+			/** 現在のエフェクトスケール（陣形半径から求めた目標値へ補間する） */
+			float m_scale = 0.0f;
 		};
 
 
