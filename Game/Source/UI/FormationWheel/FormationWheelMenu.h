@@ -106,7 +106,6 @@ namespace app
 			float m_currentSize = 80.0f;   /** 中央アイコンのサイズ */
 			float m_sideSize = 50.0f;   /** 隣接アイコンのサイズ */
 			float m_sideAlpha = 0.78f;   /** 隣接アイコンのアルファ値 */
-			Vector3 m_iconColor = Vector3(255.0f, 255.0f, 255.0f);   /** アイコンのRGB色 */
 
 			/** 陣形切替カットインの経過時間（秒）。負の値なら非表示 */
 			float m_cutInTimer = -1.0f;

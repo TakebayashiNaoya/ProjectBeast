@@ -378,7 +378,9 @@ namespace app
 					const float scaleFactor = size / m_currentSize;
 					ui->m_transform.m_localTransform.m_position = Vector3(CalculateSlotX(slot), m_rowY, 0.0f);
 					ui->m_transform.m_localTransform.m_scale = Vector3(scaleFactor, scaleFactor, scaleFactor);
-					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, CalculateSlotAlpha(slot));
+					// アイコンは陣形の色（カットインと同じ）で塗る
+					const Vector4& formationColor = actor::ChildPenguinManager::GetFormationColor(static_cast<actor::EnFormationType>(i));
+					ui->m_color = Vector4(formationColor.x, formationColor.y, formationColor.z, CalculateSlotAlpha(slot));
 				}
 			}
 
@@ -426,7 +428,6 @@ namespace app
 				m_currentSize = util::JsonConverter::ToFloat(j, "currentSize", m_currentSize);
 				m_sideSize    = util::JsonConverter::ToFloat(j, "sideSize", m_sideSize);
 				m_sideAlpha   = util::JsonConverter::ToFloat(j, "sideAlpha", m_sideAlpha);
-				m_iconColor   = util::JsonConverter::ToVector3(j, "iconColor", false, m_iconColor);
 			}
 #if defined(APP_DEBUG)
 			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(TUNING_JSON_PATH);
