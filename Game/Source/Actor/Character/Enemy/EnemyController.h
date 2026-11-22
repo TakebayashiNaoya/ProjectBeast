@@ -56,6 +56,8 @@ namespace app
 		private:
 			/** 子ペンギンを探す */
 			ChildPenguin* FindTarget();
+			/** @brief maxDistance以内でいちばん近い生きている子を返す（視界は見ない） */
+			ChildPenguin* FindNearestTarget(float maxDistance) const;
 
 		private:
 			/**
@@ -236,11 +238,14 @@ namespace app
 			/** 索敵時の諦めタイマー */
 			float m_searchTimer = 0.0f;
 
-			int m_maxEatCount;
-			int m_eatCount;
-			bool m_isFull;
 			/** 密集陣に攻撃を弾かれたか（気絶が明けたら巣へ帰る。EnterReturnHomeで戻す） */
 			bool m_isRepelled = false;
+			/** 密集陣の子を狙った攻撃か（振り下ろしの瞬間に弾く） */
+			bool m_isNullifyPending = false;
+			/** 弾く向きを決める、狙った子の位置（攻撃開始時） */
+			Vector3 m_nullifyFromPosition = Vector3::Zero;
+			/** 狙った子のログID（攻撃開始時） */
+			int m_nullifyPenguinId = -1;
 
 			float m_attackTimer;
 			float m_attackDuration;
