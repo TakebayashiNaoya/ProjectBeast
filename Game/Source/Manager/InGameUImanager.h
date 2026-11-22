@@ -35,7 +35,6 @@ namespace app
 		class DebufMenu;
 		class FeverIconMenu;
 		class LevelUpIconMenu;
-		class SpeedLineMenu;
 
 		class CPReactionSystem;
 		class WpWarningSystem;
@@ -215,7 +214,6 @@ namespace app
 		ui::UIPacket<ui::DebufMenu> m_debufPacket;
 		ui::UIPacket<ui::FeverIconMenu> m_feverIconPacket;
 		ui::UIPacket<ui::LevelUpIconMenu> m_levelUpIconPacket;
-		ui::UIPacket<ui::SpeedLineMenu> m_speedLinePacket;
 		std::vector<ui::UIPacket<ui::SearchMenu>> m_searchPackets;
 
 		std::unique_ptr<ui::CPReactionSystem> m_cpReactionSystem;

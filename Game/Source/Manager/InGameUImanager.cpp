@@ -42,7 +42,6 @@
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
-#include "Source/UI/Ult/SpeedLineMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
 
 #include "Source/Sound/SoundManager.h"
@@ -139,8 +138,6 @@ namespace app
 		ui::InitUIPacket(m_levelUpIconPacket, "Assets/parameter/UI/levelUp/LevelUpIcon.json");
 		// 陣形のボタン表示を生成
 		ui::InitUIPacket(m_formationWheelPacket, "Assets/parameter/UI/formationWheel/FormationWheel.json");
-
-		ui::InitUIPacket(m_speedLinePacket, "Assets/parameter/UI/ult/SpeedLine.json");
 
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
@@ -423,20 +420,6 @@ namespace app
 				m_wpWarningSystem->UpdateDrawFlags();
 			}
 		);
-
-
-		//--------------------------------------------//
-		// スピードアップ中の通知
-		//--------------------------------------------//
-		bm.SetOnSpeedLineChanged(
-			[this, CheckMenu](float strength)
-			{
-				auto* menu = m_speedLinePacket->GetMenu();
-				CheckMenu(menu);
-				menu->SetActive(strength > 0.0f);
-				menu->SetAcceleration(strength);
-			}
-		);
 	}
 
 
@@ -466,7 +449,6 @@ namespace app
 		if (m_iglooPromptPacket) m_iglooPromptPacket->Update();
 		if (m_achievementPacket) m_achievementPacket->Update();
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Update();
-		if (m_speedLinePacket) m_speedLinePacket->Update();
 
 		if (m_achievementPacket)
 		{
@@ -558,7 +540,6 @@ namespace app
 
 	void InGameUIManager::RenderPlaying(RenderContext& rc)
 	{
-		if (m_speedLinePacket) m_speedLinePacket->Render(rc);
 		for (auto& packet : m_searchPackets)
 		{
 			if (packet) packet->Render(rc);
