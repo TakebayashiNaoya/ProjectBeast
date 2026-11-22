@@ -98,24 +98,16 @@ namespace app
 		if (m_speedLineChanged)
 		{
 			const auto* cm = actor::ChildPenguinManager::GetInstance();
-			const bool isUlt = cm->IsUltActive();
 			const bool isTriangle = cm->GetCurrentFormationType() == actor::EnFormationType::Triangle;
-			const bool isCircle = cm->GetCurrentFormationType() == actor::EnFormationType::Circle;
 
 			const auto* dsm = m_daddyPenguin->GetStateMachine();
 			const bool isDash = dsm->GetIsDash();
 			const bool isSwim = dsm->IsSwimming();
 			const bool isMove = isDash || isSwim;
 
-			// 強さ: ウルト中の三角陣・円陣は最大、三角陣のパッシブ（スピード特化）は弱め、それ以外は出さない
-			constexpr float SPEED_LINE_STRENGTH_ULT = 1.0f;
+			// 三角陣のパッシブ（スピード特化）で動いている間だけ弱めに出す
 			constexpr float SPEED_LINE_STRENGTH_TRIANGLE_PASSIVE = 0.5f;
-			float strength = 0.0f;
-			if (isMove)
-			{
-				if (isUlt && (isTriangle || isCircle)) strength = SPEED_LINE_STRENGTH_ULT;
-				else if (isTriangle)                   strength = SPEED_LINE_STRENGTH_TRIANGLE_PASSIVE;
-			}
+			const float strength = (isMove && isTriangle) ? SPEED_LINE_STRENGTH_TRIANGLE_PASSIVE : 0.0f;
 			m_speedLineChanged(strength);
 		}
 	}

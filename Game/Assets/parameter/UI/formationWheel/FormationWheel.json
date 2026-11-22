@@ -26,10 +26,9 @@
                 ]
             },
             {
-                "type": "UILinearFillGauge",
+                "type": "UIIcon",
                 "name": "CircleIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Penguin.DDS",
-                "fx": "Assets/shader/LinearFillGauge.fx",
                 "width": 80,
                 "height": 80,
                 "position": [
@@ -43,34 +42,17 @@
                     1
                 ],
                 "rotation": 0,
-                "pivot": [
-                    0.5,
-                    0.5
-                ],
                 "color": [
                     255,
                     255,
                     255,
                     255
-                ],
-                "baseColor": [
-                    255,
-                    255,
-                    255,
-                    255
-                ],
-                "fillColor": [
-                    255,
-                    255,
-                    0,
-                    255
                 ]
             },
             {
-                "type": "UILinearFillGauge",
+                "type": "UIIcon",
                 "name": "TriangleIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
-                "fx": "Assets/shader/LinearFillGauge.fx",
                 "width": 80,
                 "height": 80,
                 "position": [
@@ -84,34 +66,17 @@
                     0.625
                 ],
                 "rotation": 0,
-                "pivot": [
-                    0.5,
-                    0.5
-                ],
                 "color": [
                     255,
                     255,
                     255,
                     199
-                ],
-                "baseColor": [
-                    255,
-                    255,
-                    255,
-                    255
-                ],
-                "fillColor": [
-                    255,
-                    255,
-                    0,
-                    255
                 ]
             },
             {
-                "type": "UILinearFillGauge",
+                "type": "UIIcon",
                 "name": "ClusterIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shield.DDS",
-                "fx": "Assets/shader/LinearFillGauge.fx",
                 "width": 80,
                 "height": 80,
                 "position": [
@@ -125,34 +90,17 @@
                     0.625
                 ],
                 "rotation": 0,
-                "pivot": [
-                    0.5,
-                    0.5
-                ],
                 "color": [
                     255,
                     255,
                     255,
                     0
-                ],
-                "baseColor": [
-                    255,
-                    255,
-                    255,
-                    255
-                ],
-                "fillColor": [
-                    255,
-                    255,
-                    0,
-                    255
                 ]
             },
             {
-                "type": "UILinearFillGauge",
+                "type": "UIIcon",
                 "name": "ScatterIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Megaphone.DDS",
-                "fx": "Assets/shader/LinearFillGauge.fx",
                 "width": 80,
                 "height": 80,
                 "position": [
@@ -166,27 +114,11 @@
                     0.625
                 ],
                 "rotation": 0,
-                "pivot": [
-                    0.5,
-                    0.5
-                ],
                 "color": [
                     255,
                     255,
                     255,
                     199
-                ],
-                "baseColor": [
-                    255,
-                    255,
-                    255,
-                    255
-                ],
-                "fillColor": [
-                    255,
-                    255,
-                    0,
-                    255
                 ]
             },
             {
@@ -234,54 +166,6 @@
                     255,
                     255,
                     255,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "LTButtonIcon",
-                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_lt.DDS",
-                "width": 50,
-                "height": 50,
-                "position": [
-                    -70,
-                    -340,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    102,
-                    102,
-                    102,
-                    255
-                ]
-            },
-            {
-                "type": "UIIcon",
-                "name": "RTButtonIcon",
-                "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_rt.DDS",
-                "width": 50,
-                "height": 50,
-                "position": [
-                    70,
-                    -340,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "rotation": 0,
-                "color": [
-                    102,
-                    102,
-                    102,
                     255
                 ]
             },

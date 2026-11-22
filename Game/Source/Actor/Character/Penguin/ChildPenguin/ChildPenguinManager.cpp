@@ -8,7 +8,7 @@
 #include "ChildPenguinManager.h"
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
-#include "Source/Actor/Character/Penguin/Formation/Ult/UltContext.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationContext.h"
 #if defined(_DEBUG) || defined(K2_DEBUG)
 #include "Source/Actor/Character/Penguin/Formation/FormationDebugMonitor.h"
 #endif
@@ -132,26 +132,13 @@ namespace app
 			/** 青い火の玉の初期スケール */
 			const Vector3 BLUR_FIRE_BALL_SCALE_UP = Vector3(10.0f, 10.0f, 10.0f);
 
-			/** 三角陣ウルト中、スライドで触れた子を自動入隊させる半径 */
-			constexpr float TRIANGLE_ULT_PICKUP_RADIUS = 80.0f;
-
-			/** ウルトリングの陣形色（EnFormationType の並び順：円陣/三角陣/密集陣/散開陣） */
-			const Vector4 ULT_RING_COLORS[] = {
+			/** 陣形色（EnFormationTypeの並び順：円陣/三角陣/密集陣/散開陣） */
+			const Vector4 FORMATION_COLORS[] = {
 				Vector4(0.35f, 1.0f,  0.55f, 1.0f),   // 円陣：緑
 				Vector4(1.0f,  0.9f,  0.3f,  1.0f),   // 三角陣：黄
 				Vector4(0.45f, 0.7f,  1.0f,  1.0f),   // 密集陣：青
 				Vector4(1.0f,  0.6f,  0.25f, 1.0f),   // 散開陣：橙
 			};
-			/** ウルトリングの不透明度（残り時間1.0でMAX、0でMIN。主張しすぎない薄さに） */
-			constexpr float ULT_RING_ALPHA_MIN = 0.08f;
-			constexpr float ULT_RING_ALPHA_MAX = 0.35f;
-
-			/** 散開陣ウルト中の入隊SE（音階コンボ）の設定。
-			 *  1入隊ごとにピッチが PITCH_STEP ずつ上がり、COMBO_MAX で頭打ち */
-			constexpr float SCATTER_JOIN_SE_VOLUME = 0.8f;
-			constexpr float SCATTER_JOIN_PITCH_STEP = 0.08f;
-			constexpr int   SCATTER_JOIN_COMBO_MAX = 12;
-
 			/** 親へのフローフィールドを作り直す最短間隔（秒） */
 			constexpr float FLOW_FIELD_REBUILD_INTERVAL = 0.5f;
 			/** 親がこの距離以上動いていたらフローフィールドを作り直す（動いていなければ再利用） */
@@ -245,19 +232,6 @@ namespace app
 				BEAST_PROFILE_SCOPE(u8"フローフィールド");
 				UpdateDaddyFlowField();
 			}
-			{
-				BEAST_PROFILE_SCOPE(u8"三角ウルト拾得");
-				UpdateTriangleUltPickup();
-			}
-
-			/** 散開陣ウルトの入隊音階コンボは、ウルトが終わったらリセットする */
-			if (!m_formationController.IsUltActive())
-			{
-				m_scatterJoinCombo = 0;
-			}
-
-			/** ウルト発動中は隊列メンバー全員を発光させる（効果の担い手を見せる） */
-			const bool isUltGlowActive = m_formationController.IsUltActive();
 
 			/** 各子ペンギンのUpdateを呼び出す */
 			for (auto& cp : m_childPenguinList) {
@@ -269,7 +243,7 @@ namespace app
 				const bool isTargeted =
 					std::find(m_bearTargetedPenguins.begin(), m_bearTargetedPenguins.end(), cp)
 						!= m_bearTargetedPenguins.end();
-				cp->UpdateBearTargetHighlight(isTargeted, isUltGlowActive && IsFollower(cp));
+				cp->UpdateBearTargetHighlight(isTargeted);
 			}
 
 			{
@@ -277,22 +251,13 @@ namespace app
 				UpdateGhostPenguins();
 			}
 
-			/** ウルト更新 */
-			if (m_daddyPenguin != nullptr)
-			{
-				BEAST_PROFILE_SCOPE(u8"ウルト更新");
-				UltContext ctx{ this, m_daddyPenguin, m_formationController.GetOuterRadius() };
-				m_formationController.UpdateUlt(g_gameTime->GetDeltaTime(), ctx);
-			}
-
 			/** 陣形切り替え演出（スライドUI）のロックタイマー更新 */
 			m_formationController.UpdateSwitchLock(g_gameTime->GetFrameDeltaTime());
 
 			/** L1/R1 で陣形を循環切り替え（スライド演出中は入力を無視する） */
 			const bool isSwitching = m_formationController.IsSwitchingFormation();
-			const bool isUltActive = m_formationController.IsUltActive();
 
-			if (!isSwitching && !isUltActive)
+			if (!isSwitching)
 			{
 				if (g_pad[0]->IsTrigger(enButtonRB1))
 				{
@@ -310,12 +275,6 @@ namespace app
 					// 前の陣形へ（左方向）の選択SEを鳴らす
 					SoundManager::Get().PlaySE(enSoundKind_UltSwipeLeft, FORMATION_SWIPE_SE_VOLUME);
 				}
-			}
-
-			/** LB2/RB2 でウルト発動 */
-			if (g_pad[0]->IsTrigger(enButtonLB2) || g_pad[0]->IsTrigger(enButtonRB2))
-			{
-				ActivateUlt();
 			}
 
 			/** 陣形の更新処理 */
@@ -344,7 +303,7 @@ namespace app
 				 *  陣形計算の直後に呼び、その時点の最外半径でバリアの大きさを決める */
 				{
 					BEAST_PROFILE_SCOPE(u8"陣形パッシブ更新");
-					UltContext ctx{ this, m_daddyPenguin, m_formationController.GetOuterRadius() };
+					FormationContext ctx{ this, m_daddyPenguin, m_formationController.GetOuterRadius() };
 					m_formationController.UpdatePassive(g_gameTime->GetDeltaTime(), ctx);
 				}
 			}
@@ -359,24 +318,6 @@ namespace app
 				/** 次レベルの空きスロット（スロットマーカーTODO用。現状は未描画） */
 				CalculateNextLevelSlots(center);
 				m_rangeVisualizer.Update(center, GetRegroupCallRadius(), m_nextLevelSlots);
-			}
-
-			/** ウルト発動中は隊列の外周（入隊半径）に陣形色のリングを出す。
-			 *  「今すごい状態」と効果の及ぶ群れの範囲を子供にも分かる形で見せる。
-			 *  残り時間が減るほど薄くなり、切れかけも伝わる */
-			const bool showUltRing =
-				m_formationController.IsUltActive() && m_daddyPenguin != nullptr;
-			m_rangeVisualizer.SetUltRingVisible(showUltRing);
-			if (showUltRing)
-			{
-				const float remaining = m_formationController.GetUltActiveRemainingRate();
-				const float ringAlpha =
-					ULT_RING_ALPHA_MIN + (ULT_RING_ALPHA_MAX - ULT_RING_ALPHA_MIN) * remaining;
-				m_rangeVisualizer.UpdateUltRing(
-					m_daddyPenguin->GetTransform().m_position,
-					m_formationController.GetJoinRadius(),
-					ringAlpha,
-					ULT_RING_COLORS[static_cast<int>(m_formationController.GetCurrentType())]);
 			}
 
 			/** DaddyPenguinに近い上位N匹を可聴対象として更新する */
@@ -689,21 +630,6 @@ namespace app
 				ScoreManager::GetInstance().AddCollectedCount();
 				BattleManager::GetInstance().NotifyCPReactionChanged(penguin, ui::EnCPReactionType::Happy);
 
-				/** 散開陣ウルト「呼び声」：発動中の入隊は音階が上がるSEで
-				 *  「ごっそり拾う」快感を鳴らす（入隊が続くほどピッチが上がる） */
-				if (m_formationController.IsUltActive()
-					&& m_formationController.GetCurrentType() == EnFormationType::Scatter)
-				{
-					const SEHandle handle = SoundManager::Get().PlaySE(
-						enSoundKind_CPReactionHappy, SCATTER_JOIN_SE_VOLUME);
-					if (auto* se = SoundManager::Get().FindSE(handle))
-					{
-						se->SetFrequencyRatio(
-							1.0f + SCATTER_JOIN_PITCH_STEP * static_cast<float>(m_scatterJoinCombo));
-					}
-					m_scatterJoinCombo = min(m_scatterJoinCombo + 1, SCATTER_JOIN_COMBO_MAX);
-				}
-
 				if (auto* menu = InGameUIManager::GetInstance()->GetRemainingChildMenu())
 				{
 					menu->SetTarget(penguin);
@@ -770,15 +696,7 @@ namespace app
 		{
 			int index = static_cast<int>(type);
 			if (index < 0 || index >= static_cast<int>(EnFormationType::Num)) index = 0;
-			return ULT_RING_COLORS[index];
-		}
-
-
-		void ChildPenguinManager::ActivateUlt()
-		{
-			if (!m_daddyPenguin) return;
-			UltContext ctx{ this, m_daddyPenguin, m_formationController.GetOuterRadius() };
-			m_formationController.ActivateUlt(ctx);
+			return FORMATION_COLORS[index];
 		}
 
 
@@ -1025,38 +943,6 @@ namespace app
 			else if (sm->IsEqualCurrentState(PenguinSneakState::ID()))
 			{
 				m_daddyNoiseRadius = DADDY_NOISE_RADIUS_SNEAK;
-			}
-		}
-
-
-		void ChildPenguinManager::UpdateTriangleUltPickup()
-		{
-			/** 三角陣ウルト「突進」：ウルト中のスライドで触れた子を自動入隊させる。
-			 *  速度特化の三角陣に「速さで集める」個性を持たせる（円陣の下位互換解消） */
-			if (m_daddyPenguin == nullptr) return;
-			if (!m_formationController.IsUltActive()) return;
-			if (m_formationController.GetCurrentType() != EnFormationType::Triangle) return;
-
-			/** スライド中（滑走ステート）のみ */
-			auto* daddySm = m_daddyPenguin->GetStateMachine();
-			if (daddySm == nullptr) return;
-			if (!daddySm->IsEqualCurrentState(PenguinSlidingState::ID())) return;
-
-			const Vector3 daddyPos = m_daddyPenguin->GetTransform().m_position;
-			for (auto* cp : m_childPenguinList)
-			{
-				if (cp == nullptr || IsFollower(cp)) continue;
-				if (cp->GetStateMachine()->GetIsInWhirlpool()) continue;
-
-				const auto* status = cp->GetStateMachine()->GetChildPenguinStatus();
-				if (status == nullptr || status->IsDead()) continue;
-
-				Vector3 diff = cp->GetTransform().m_position - daddyPos;
-				diff.y = 0.0f;
-				if (diff.LengthSq() <= TRIANGLE_ULT_PICKUP_RADIUS * TRIANGLE_ULT_PICKUP_RADIUS)
-				{
-					AddFollower(cp);
-				}
 			}
 		}
 

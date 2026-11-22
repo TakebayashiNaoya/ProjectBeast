@@ -4,6 +4,7 @@
  */
 #include "stdafx.h"
 #include "FormationController.h"
+#include "FormationContext.h"
 #include "Formations.h"
 #include "MasterFormationParameter.h"
 #include "Source/Core/ParameterManager.h"
@@ -22,9 +23,6 @@ namespace app
 			constexpr const char* PARAMETER_BINARY_FILE_PATH = "Assets/parameter/character/penguin/formation/FormationParameter.bin";
 			/** 陣形切り替え演出（スライド）時間のチューニングファイルパス（ホットリロード対応） */
 			constexpr const char* SWITCH_TUNING_JSON_PATH = "Assets/parameter/character/penguin/formation/FormationSwitchTuning.json";
-
-			/** ゲーム開始時の初回ウルトのクールダウン倍率（0.5=半分の待ち時間で最初のウルトに到達） */
-			constexpr float FIRST_ULT_COOLDOWN_RATE = 0.5f;
 
 			/**
 			 * @brief フォロワー数から陣形レベルと現在進行中のリングの内訳を求める
@@ -67,17 +65,11 @@ namespace app
 				PARAMETER_JSON_FILE_PATH,
 				[](const nlohmann::json& j, MasterFormationParameter& p)
 				{
-					p.ultDuration                 = util::JsonConverter::ToFloat(j, "ultDuration");
-					p.ultCooldown                 = util::JsonConverter::ToFloat(j, "ultCooldown");
 					p.passiveSpeedMultiplier      = util::JsonConverter::ToFloat(j, "passiveSpeedMultiplier");
 					p.passiveSpeedBase            = util::JsonConverter::ToFloat(j, "passiveSpeedBase");
 					p.passiveSpeedPerLevel        = util::JsonConverter::ToFloat(j, "passiveSpeedPerLevel");
 					p.passiveWhirlpoolResistance  = util::JsonConverter::ToBool(j, "passiveWhirlpoolResistance");
-					p.ultSpeedMultiplier          = util::JsonConverter::ToFloat(j, "ultSpeedMultiplier");
-					p.ultWhirlpoolResistance      = util::JsonConverter::ToBool(j, "ultWhirlpoolResistance");
-					p.ultWhirlpoolBoostMultiplier = util::JsonConverter::ToFloat(j, "ultWhirlpoolBoostMultiplier");
-					p.ultBearAttackNullify        = util::JsonConverter::ToBool(j, "ultBearAttackNullify");
-					p.ultCallDistance             = util::JsonConverter::ToFloat(j, "ultCallDistance");
+					p.passiveBearAttackNullify    = util::JsonConverter::ToBool(j, "passiveBearAttackNullify");
 					p.radiusPerRing               = util::JsonConverter::ToFloat(j, "radiusPerRing");
 					p.joinMargin                  = util::JsonConverter::ToFloat(j, "joinMargin");
 					p.rowSpacing                  = util::JsonConverter::ToFloat(j, "rowSpacing");
@@ -102,11 +94,6 @@ namespace app
 			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>(*scatterParam);
 
 			SwitchFormation(EnFormationType::Circle);
-
-			// ゲーム開始直後はウルトが貯まっていない状態から始めるが、
-			// 待ち時間は半分にして最初のウルト体験を早める
-			// （一度も撃たずに終わる子供が多い、という試遊フィードバック対応）
-			m_ultController.ResetCooldown(FIRST_ULT_COOLDOWN_RATE);
 
 			// 陣形切り替え演出時間の初期読み込み
 			{
@@ -186,15 +173,6 @@ namespace app
 			m_currentType      = type;
 			m_currentFormation = m_formations[static_cast<size_t>(type)].get();
 
-			// 陣形切り替えと同時にウルトチェーンと演出も差し替える
-			m_ultController.SetUlt(
-				&m_currentFormation->GetUlt(),
-				m_currentFormation->GetUltVisual(),
-				m_currentFormation->GetUltDuration(),
-				m_currentFormation->GetUltCooldown(),
-				FormationTypeName(type)
-			);
-
 			if (isChanged)
 			{
 				if (auto* lm = GameLogManager::GetInstance())
@@ -209,7 +187,7 @@ namespace app
 		}
 
 
-		void FormationController::UpdatePassive(float dt, const UltContext& ctx)
+		void FormationController::UpdatePassive(float dt, const FormationContext& ctx)
 		{
 			if (!m_currentFormation) return;
 
@@ -219,15 +197,15 @@ namespace app
 				if (m_passiveFormation)
 				{
 					m_passiveFormation->GetPassive().Exit(ctx);
-					if (IUltEffect* visual = m_passiveFormation->GetPassiveVisual()) visual->Exit(ctx);
+					if (IFormationVisual* visual = m_passiveFormation->GetPassiveVisual()) visual->Exit(ctx);
 				}
 				m_passiveFormation = m_currentFormation;
 				m_passiveFormation->GetPassive().Enter(ctx);
-				if (IUltEffect* visual = m_passiveFormation->GetPassiveVisual()) visual->Enter(ctx);
+				if (IFormationVisual* visual = m_passiveFormation->GetPassiveVisual()) visual->Enter(ctx);
 			}
 
 			m_passiveFormation->GetPassive().Update(dt, ctx);
-			if (IUltEffect* visual = m_passiveFormation->GetPassiveVisual()) visual->Update(dt, ctx);
+			if (IFormationVisual* visual = m_passiveFormation->GetPassiveVisual()) visual->Update(dt, ctx);
 		}
 
 
@@ -235,13 +213,7 @@ namespace app
 		{
 			if (!m_currentFormation) return 1.0f;
 
-			// パッシブ倍率 × (ウルト中ならウルト倍率)
-			float speed = m_currentFormation->GetPassive().GetSpeedMultiplier(m_formationLevel);
-			if (m_ultController.IsActive())
-			{
-				speed *= m_currentFormation->GetUlt().GetSpeedMultiplier(m_formationLevel);
-			}
-			return speed;
+			return m_currentFormation->GetPassive().GetSpeedMultiplier(m_formationLevel);
 		}
 
 
@@ -249,10 +221,7 @@ namespace app
 		{
 			if (!m_currentFormation) return false;
 
-			// パッシブ耐性 OR (ウルト中かつウルト耐性)
-			if (m_currentFormation->GetPassive().HasWhirlpoolResistance()) return true;
-			return m_ultController.IsActive()
-				&& m_currentFormation->GetUlt().HasWhirlpoolResistance();
+			return m_currentFormation->GetPassive().HasWhirlpoolResistance();
 		}
 
 
@@ -260,14 +229,7 @@ namespace app
 		{
 			if (!m_currentFormation) return 0.0f;
 
-			float radius = m_currentFormation->GetJoinRadius(count);
-
-			// ウルト発動中は、陣形固有の拡大距離（散開陣のみ非0）との大きい方を採用する
-			if (m_ultController.IsActive())
-			{
-				radius = max(radius, m_currentFormation->GetUltJoinRadius());
-			}
-			return radius;
+			return m_currentFormation->GetJoinRadius(count);
 		}
 
 
@@ -307,14 +269,7 @@ namespace app
 		{
 			if (!m_currentFormation) return 0.0f;
 
-			float radius = m_currentFormation->GetJoinRadius();
-
-			// ウルト発動中は、陣形固有の拡大距離（散開陣のみ非0）との大きい方を採用する
-			if (m_ultController.IsActive())
-			{
-				radius = max(radius, m_currentFormation->GetUltJoinRadius());
-			}
-			return radius;
+			return m_currentFormation->GetJoinRadius();
 		}
 	}
 }

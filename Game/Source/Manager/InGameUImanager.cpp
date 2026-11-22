@@ -137,7 +137,7 @@ namespace app
 		ui::InitUIPacket(m_feverIconPacket, "Assets/parameter/UI/fever/FeverIcon.json");
 		// 陣形レベルアップアイコンを生成
 		ui::InitUIPacket(m_levelUpIconPacket, "Assets/parameter/UI/levelUp/LevelUpIcon.json");
-		// 陣形/ウルトのボタン表示を生成
+		// 陣形のボタン表示を生成
 		ui::InitUIPacket(m_formationWheelPacket, "Assets/parameter/UI/formationWheel/FormationWheel.json");
 
 		ui::InitUIPacket(m_speedLinePacket, "Assets/parameter/UI/ult/SpeedLine.json");

@@ -122,7 +122,7 @@ namespace app
 			}
 			/**
 			 * @brief 外部要因による移動速度の倍率を設定
-			 * @details 陣形のパッシブ/ウルト速度倍率など、1.0f を超えうる倍率に使用する。
+			 * @details 陣形のパッシブ速度倍率など、1.0fを超えうる倍率に使用する。
 			 *          減速・ブレーキ用の SetSpeedMultiplier() とは別枠で Move() に乗算される。
 			 * @param multiplier 倍率（上限・下限クランプなし）
 			 */

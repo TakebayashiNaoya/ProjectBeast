@@ -56,23 +56,6 @@ namespace app
 			void Update(const Vector3& center, float joinRadius, const std::vector<Vector3>& slotPositions);
 
 			/**
-			 * @brief ウルトリングの表示/非表示を設定する
-			 * @param visible 表示するならtrue
-			 */
-			void SetUltRingVisible(bool visible) { m_isUltRingVisible = visible; }
-
-			/**
-			 * @brief ウルトリングの毎フレーム更新
-			 * @details ウルト発動中、隊列の外周（入隊半径）に陣形色の帯リングを出す。
-			 *          残り時間に応じてアルファを下げれば「効果が切れかけている」ことも伝わる。
-			 * @param center 中心座標（親ペンギンの座標）
-			 * @param radius リングの半径
-			 * @param alpha  帯の不透明度係数（残り時間割合などを渡す）
-			 * @param color  帯の色（陣形色）
-			 */
-			void UpdateUltRing(const Vector3& center, float radius, float alpha, const Vector4& color);
-
-			/**
 			 * @brief 描画
 			 * @param rc   レンダリングコンテキスト
 			 * @param view 描画対象ビュー（カメラ行列の取得に使用）
@@ -120,11 +103,6 @@ namespace app
 			TerrainCircle m_joinCircle;                   /** 範囲の外周の帯（薄いオレンジ） */
 			TerrainCircle m_rippleCircles[RIPPLE_COUNT];  /** 外周から中心へ収束する波紋の帯 */
 			float         m_rippleTimer = 0.0f;           /** 波紋アニメーションの経過時間（秒） */
-
-			TerrainCircle m_ultRing;                      /** ウルト発動中の陣形色リング */
-			bool          m_isUltRingVisible = false;     /** ウルトリングを表示するかどうか */
-
-			static constexpr float ULT_RING_HALF_WIDTH = 30.0f;  /** ウルトリングの帯の半幅 */
 
 			RootSignature  m_rootSignature;      /** ルートシグネチャ */
 			Shader         m_vs;                 /** 頂点シェーダ */

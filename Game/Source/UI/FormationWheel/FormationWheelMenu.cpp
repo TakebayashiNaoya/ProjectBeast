@@ -1,6 +1,6 @@
 ﻿/**
  * @file FormationWheelMenu.cpp
- * @brief 陣形切り替え(LB/RB)とウルト発動可否(LT/RT)をアイコンで表示するクラス
+ * @brief 陣形切り替え(LB/RB)をアイコンで表示するクラス
  */
 #include "stdafx.h"
 #include "FormationWheelMenu.h"
@@ -96,7 +96,7 @@ namespace app
 					{
 						"BackgroundIcon",
 						"CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon",
-						"LBButtonIcon", "RBButtonIcon", "LTButtonIcon", "RTButtonIcon",
+						"LBButtonIcon", "RBButtonIcon",
 						"LevelText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
@@ -108,16 +108,13 @@ namespace app
 				m_startingAnimLogic.Update();
 			}
 
-			const float dt = g_gameTime->GetFrameDeltaTime();
-			m_pulseTimer += dt;
 #if defined(APP_DEBUG)
-			ReloadTuningIfChanged(dt);
+			ReloadTuningIfChanged(g_gameTime->GetFrameDeltaTime());
 #endif
 			/** カットインは前フレームの陣形（m_lastFrameType）との比較で発火するため、
 			 *  m_lastFrameTypeを更新するUpdateFormationIcons()より先に呼ぶ */
 			UpdateFormationCutIn();
 			UpdateFormationIcons();
-			UpdateUltIconColor();
 			UpdateLevelDisplay();
 			MenuBase::Update();
 		}
@@ -242,7 +239,7 @@ namespace app
 		{
 			for (const char* name : FORMATION_ICON_NAMES)
 			{
-				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(name)))
+				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
 				{
 					ui->m_isDraw = true;
 				}
@@ -305,13 +302,6 @@ namespace app
 		}
 
 
-		float FormationWheelMenu::CalculatePulseScale(bool isPulsing) const
-		{
-			if (!isPulsing) return 1.0f;
-			return 1.0f + m_pulseAmplitude * sinf(m_pulseTimer * m_pulseSpeed);
-		}
-
-
 		void FormationWheelMenu::BeginTransition(actor::EnFormationType oldType, actor::EnFormationType newType)
 		{
 			const int oldIndex = static_cast<int>(oldType);
@@ -345,21 +335,6 @@ namespace app
 				BeginTransition(m_lastFrameType, currentType);
 			}
 
-			// ウルトの充填率：発動中は残り時間割合(上から白くなっていく)、それ以外はチャージ進行度(下から黄色くなる)。
-			// ウルト自体が無効なら塗らない（クールダウンが進まないので、途中の値で止まって見えるのを防ぐ）
-			const bool isUltActive = cpm->IsUltActive();
-			float ultFillAmount = 0.0f;
-			if (actor::ChildPenguinManager::IsUltEnabled())
-			{
-				ultFillAmount = isUltActive
-					? cpm->GetUltActiveRemainingRate()
-					: (1.0f - cpm->GetUltCooldownRate());
-			}
-
-			// パルス演出・ウルト充填演出は「現在選択中の陣形」のアイコンにのみ反映する
-			const bool pulseFormation = cpm->CanActivateUlt() || isUltActive;
-			const float pulseScale = CalculatePulseScale(pulseFormation);
-
 			const int currentIndex = static_cast<int>(currentType);
 
 			for (int i = 0; i < FORMATION_NUM; i++)
@@ -379,58 +354,18 @@ namespace app
 					else                                           slot = 2.0f; // 非表示側（見えないので向きは任意）
 				}
 
-				if (auto* ui = GetUI<UILinearFillGauge>(Hash32(FORMATION_ICON_NAMES[i])))
+				if (auto* ui = GetUI<UIIcon>(Hash32(FORMATION_ICON_NAMES[i])))
 				{
-					const bool isCurrent = (i == currentIndex);
 					const float size = CalculateSlotSize(slot);
-					const float scaleFactor = (size / m_currentSize) * (isCurrent ? pulseScale : 1.0f);
+					const float scaleFactor = size / m_currentSize;
 					ui->m_transform.m_localTransform.m_position = Vector3(CalculateSlotX(slot), m_rowY, 0.0f);
 					ui->m_transform.m_localTransform.m_scale = Vector3(scaleFactor, scaleFactor, scaleFactor);
 					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, CalculateSlotAlpha(slot));
-					ui->SetFillAmount(isCurrent ? ultFillAmount : 0.0f);
 				}
 			}
 
 			m_wasSwitching = isSwitching;
 			m_lastFrameType = currentType;
-		}
-
-
-		void FormationWheelMenu::UpdateUltIconColor()
-		{
-			const Vector4 readyColor(1.0f, 1.0f, 0.0f, 1.0f);    // 黄色（発動可能）
-			const Vector4 grayColor(0.4f, 0.4f, 0.4f, 1.0f);     // グレーアウト（発動不可）
-
-			const char* ultIconNames[] = { "LTButtonIcon", "RTButtonIcon" };
-
-			// ウルト自体が無効ならボタンの案内も出さない
-			if (!actor::ChildPenguinManager::IsUltEnabled())
-			{
-				for (const char* name : ultIconNames)
-				{
-					if (auto* ui = GetUI<UIIcon>(Hash32(name)))
-					{
-						ui->m_isDraw = false;
-					}
-				}
-				return;
-			}
-
-			auto* cpm = actor::ChildPenguinManager::GetInstance();
-			const bool canActivate = (cpm != nullptr) && cpm->CanActivateUlt();
-			const Vector4& color = canActivate ? readyColor : grayColor;
-
-			// 発動可能な間だけボタンをドクンドクン拡縮させる（発動中は等倍に戻す）
-			const float pulseScale = CalculatePulseScale(canActivate);
-
-			for (const char* name : ultIconNames)
-			{
-				if (auto* ui = GetUI<UIIcon>(Hash32(name)))
-				{
-					ui->m_color = color;
-					ui->m_transform.m_localTransform.m_scale = Vector3(pulseScale, pulseScale, pulseScale);
-				}
-			}
 		}
 
 
@@ -474,8 +409,6 @@ namespace app
 				m_sideSize    = util::JsonConverter::ToFloat(j, "sideSize", m_sideSize);
 				m_sideAlpha   = util::JsonConverter::ToFloat(j, "sideAlpha", m_sideAlpha);
 				m_iconColor   = util::JsonConverter::ToVector3(j, "iconColor", false, m_iconColor);
-				m_pulseAmplitude = util::JsonConverter::ToFloat(j, "pulseAmplitude", m_pulseAmplitude);
-				m_pulseSpeed     = util::JsonConverter::ToFloat(j, "pulseSpeed", m_pulseSpeed);
 			}
 #if defined(APP_DEBUG)
 			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(TUNING_JSON_PATH);

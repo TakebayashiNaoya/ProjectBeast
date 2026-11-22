@@ -19,9 +19,6 @@ namespace app
 		 *   GetSpeedMultiplier() は全エフェクトの乗算、
 		 *   HasWhirlpoolResistance() は全エフェクトの OR で結果を合成する。
 		 *   Enter/Update/Exit は登録された全エフェクトに順番に転送する。
-		 *
-		 *   パッシブチェーン（常時）とウルトチェーン（発動時のみ）の
-		 *   2本を FormationController が使い分ける。
 		 */
 		class FormationEffectChain
 		{
@@ -64,29 +61,29 @@ namespace app
 			}
 
 			/**
-			 * @brief 全エフェクトの Enter を呼ぶ（ウルト発動時）
-			 * @param ctx ウルトコンテキスト
+			 * @brief 全エフェクトのEnterを呼ぶ（陣形に入ったとき）
+			 * @param ctx 陣形コンテキスト
 			 */
-			void Enter(const UltContext& ctx)
+			void Enter(const FormationContext& ctx)
 			{
 				for (auto& e : m_effects) e->Enter(ctx);
 			}
 
 			/**
-			 * @brief 全エフェクトの Update を呼ぶ（ウルト中・毎フレーム）
+			 * @brief 全エフェクトのUpdateを呼ぶ（陣形中・毎フレーム）
 			 * @param dt  デルタタイム（秒）
-			 * @param ctx ウルトコンテキスト
+			 * @param ctx 陣形コンテキスト
 			 */
-			void Update(float dt, const UltContext& ctx)
+			void Update(float dt, const FormationContext& ctx)
 			{
 				for (auto& e : m_effects) e->Update(dt, ctx);
 			}
 
 			/**
-			 * @brief 全エフェクトの Exit を呼ぶ（ウルト終了時）
-			 * @param ctx ウルトコンテキスト
+			 * @brief 全エフェクトのExitを呼ぶ（陣形を抜けたとき）
+			 * @param ctx 陣形コンテキスト
 			 */
-			void Exit(const UltContext& ctx)
+			void Exit(const FormationContext& ctx)
 			{
 				for (auto& e : m_effects) e->Exit(ctx);
 			}

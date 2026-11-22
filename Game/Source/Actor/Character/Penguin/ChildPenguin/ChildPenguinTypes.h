@@ -40,7 +40,7 @@ namespace app
 		 * @brief 陣形の名前を返す
 		 * @param type 陣形の種類
 		 * @return 陣形の名前
-		 * @note プレイログに陣形の切り替えやウルトを残すために使う
+		 * @note プレイログに陣形の切り替えを残すために使う
 		 */
 		inline const char* FormationTypeName(EnFormationType type)
 		{

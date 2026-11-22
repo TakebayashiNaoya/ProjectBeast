@@ -124,14 +124,12 @@ namespace app
 			/**
 			 * @brief 体色ハイライト（点滅・発光）の更新
 			 * @details 優先度の高い順に、①クマに狙われている赤点滅（輝度1超で
-			 *          ブルームが拾って光る）②ウルト発動中の隊列発光（ゆっくりした
-			 *          呼吸のような明滅）③勇敢時間の明滅、を適用する。
+			 *          ブルームが拾って光る）②勇敢時間の明滅、を適用する。
 			 *          どれでもなければタイプ別カラーへ戻す。
 			 *          毎フレーム ChildPenguinManager::Update() から呼ばれる。
-			 * @param isTargeted   このフレームにクマに狙われているかどうか
-			 * @param isUltGlowing ウルト発動中の隊列メンバーとして発光させるかどうか
+			 * @param isTargeted このフレームにクマに狙われているかどうか
 			 */
-			void UpdateBearTargetHighlight(const bool isTargeted, const bool isUltGlowing);
+			void UpdateBearTargetHighlight(const bool isTargeted);
 
 
 		private:

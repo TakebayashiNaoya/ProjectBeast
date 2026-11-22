@@ -29,10 +29,6 @@ namespace app
 			float m_shakeStrength = 0.0f;   /** 画面揺れの最大振幅（ワールド単位） */
 			float m_shakeTime = 0.0f;       /** 画面揺れの経過時間（ノイズの位相に使う、秒） */
 
-			float m_punchTimer = 0.0f;      /** パンチイン（一瞬寄る）の残り時間（秒） */
-			float m_punchDuration = 0.0f;   /** パンチインの全体時間（秒） */
-			float m_punchAmount = 0.0f;     /** パンチインで詰める距離の割合（0.15 = 15%） */
-
 
 		public:
 			/**
@@ -57,19 +53,6 @@ namespace app
 				m_shakeStrength = strength;
 				m_shakeDuration = duration;
 				m_shakeTimer = duration;
-			}
-
-			/**
-			 * @brief パンチイン（注視点へ一瞬寄って戻る）を開始する
-			 * @details ウルト発動などの「タメ」の瞬間用。sinカーブで寄って戻る。
-			 * @param amount   距離を詰める割合（0.15 = 15%）
-			 * @param duration 演出の長さ（秒）
-			 */
-			void StartPunchIn(const float amount, const float duration)
-			{
-				m_punchAmount = amount;
-				m_punchDuration = duration;
-				m_punchTimer = duration;
 			}
 
 			void Update() override;

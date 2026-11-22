@@ -286,8 +286,7 @@
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\TerrainCircle.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\Formations.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffects.cpp" />
-    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.cpp" />
-    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\UltController.cpp" />
+    <ClCompile Include="Source\Actor\Character\Penguin\Formation\FormationVisual.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.cpp" />
@@ -483,9 +482,8 @@
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\IFormationEffect.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffectChain.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffects.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\UltContext.h" />
-    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\UltController.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationContext.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationVisual.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\DaddyPenguin\DaddyPenguin.h" />

@@ -50,13 +50,6 @@ namespace app
 			constexpr float BRAVE_BLINK_FREQUENCY = 1.2f;
 			constexpr float BRAVE_BLINK_GAIN = 0.9f;
 
-			/** ウルト発動中の隊列発光。ゆっくりした呼吸（0.8Hz）で 1.3〜1.7 倍の明るさを
-			 *  往復し、山ではブルームしきい値を超えて淡く光る。勇敢明滅（1.2Hz・暗→明）
-			 *  とはリズムと下限を変えて見分けが付くようにしている */
-			constexpr float ULT_GLOW_FREQUENCY = 0.8f;
-			constexpr float ULT_GLOW_GAIN_BASE = 0.2f;
-			constexpr float ULT_GLOW_GAIN_WAVE = 0.25f;
-
 			/**
 			 * @brief 点滅ピークの乗算カラー
 			 * @details 輝度が1を超える赤にしてあるので、点滅の山でブルームが拾って光る。
@@ -203,7 +196,7 @@ namespace app
 		}
 
 
-		void ChildPenguin::UpdateBearTargetHighlight(const bool isTargeted, const bool isUltGlowing)
+		void ChildPenguin::UpdateBearTargetHighlight(const bool isTargeted)
 		{
 			// タイプ別カラーの適用前に触ると、適用処理に上書きされたり戻し先が狂ったりする
 			if (!m_modelReady || !m_colorApplied) return;
@@ -223,26 +216,6 @@ namespace app
 				color.y = m_typeColor.y + (BEAR_TARGET_BLINK_COLOR.y - m_typeColor.y) * wave;
 				color.z = m_typeColor.z + (BEAR_TARGET_BLINK_COLOR.z - m_typeColor.z) * wave;
 				color.w = m_typeColor.w;
-				m_modelRender.SetMulColor(color);
-				return;
-			}
-
-			// ウルト発動中の隊列メンバーは、ゆっくりした呼吸のような明滅で発光させる。
-			// 効果の担い手は「ついてきている子ペンギン全員」なので、範囲表示ではなく
-			// 本人たちを光らせて「今強化されている」ことを見せる
-			if (isUltGlowing)
-			{
-				m_isHighlighted = true;
-				m_highlightTimer += g_gameTime->GetFrameDeltaTime();
-
-				const float wave =
-					0.5f - 0.5f * cosf(2.0f * Math::PI * ULT_GLOW_FREQUENCY * m_highlightTimer);
-				const float gain = 1.0f + ULT_GLOW_GAIN_BASE + ULT_GLOW_GAIN_WAVE * wave;
-
-				Vector4 color = m_typeColor;
-				color.x *= gain;
-				color.y *= gain;
-				color.z *= gain;
 				m_modelRender.SetMulColor(color);
 				return;
 			}
