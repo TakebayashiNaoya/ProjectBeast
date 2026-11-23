@@ -47,13 +47,11 @@ import struct
 
 def pack_daddy_penguin(data):
     # Character: runSpeed(f), swimSpeed(f), radius(f), height(f)
-    # Penguin  : maxHp(i), hp(i), sneakSpeed(f), slideSpeed(f), jumpPower(f),
-    #            jumpStaminaMax(f), jumpStaminaRecoverSpeed(f),
-    #            slideStaminaMax(f), slideStaminaDecreaseSpeed(f), slideStaminaRecoverSpeed(f)
+    # Penguin  : maxHp(i), hp(i), sneakSpeed(f), slideSpeed(f)
     # Daddy    : enableCommandRange(f)
-    # 計: float×4, int×2, float×9 = 60 bytes
+    # 計: float×4, int×2, float×3 = 36 bytes
     return struct.pack(
-        "<ffffiifffffffff",
+        "<ffffiifff",
         float(data.get("runSpeed", 0.0)),
         float(data.get("swimSpeed", 0.0)),
         float(data.get("radius", 0.0)),
@@ -62,12 +60,6 @@ def pack_daddy_penguin(data):
         int(data.get("hp", 0)),
         float(data.get("sneakSpeed", 0.0)),
         float(data.get("slideSpeed", 0.0)),
-        float(data.get("jumpPower", 0.0)),
-        float(data.get("jumpStaminaMax", 0.0)),
-        float(data.get("jumpStaminaRecoverSpeed", 0.0)),
-        float(data.get("slideStaminaMax", 0.0)),
-        float(data.get("slideStaminaDecreaseSpeed", 0.0)),
-        float(data.get("slideStaminaRecoverSpeed", 0.0)),
         float(data.get("enableCommandRange", 0))
     )
 
@@ -107,9 +99,9 @@ def pack_penguin_effect_parameter(data):
 
 
 def pack_child_penguin_parameter(data):
-     # "<ffffiiffffffff" = f×4 + i×2 + f×8 = 56 bytes
+     # "<ffffiiff" = f×4 + i×2 + f×2 = 32 bytes
      return struct.pack(
-         "<ffffiiffffffff",
+         "<ffffiiff",
          float(data.get("runSpeed",   0.0)),
          float(data.get("swimSpeed",  0.0)),
          float(data.get("radius",     0.0)),
@@ -118,12 +110,6 @@ def pack_child_penguin_parameter(data):
          int(data.get("hp",           0)),
          float(data.get("sneakSpeed", 0.0)),
          float(data.get("slideSpeed", 0.0)),
-         float(data.get("jumpPower",  0.0)),
-         float(data.get("jumpStaminaMax", 0.0)),
-         float(data.get("jumpStaminaRecoverSpeed", 0.0)),
-         float(data.get("slideStaminaMax", 0.0)),
-         float(data.get("slideStaminaDecreaseSpeed", 0.0)),
-         float(data.get("slideStaminaRecoverSpeed", 0.0)),
      )
 
 
@@ -139,13 +125,12 @@ def pack_child_penguin_type_parameter(data):
         return float(val[1]) if isinstance(val, list) and len(val) > 1 else float(val)
 
     return struct.pack(
-        "<28f",
+        "<26f",
         float(color[0]), float(color[1]), float(color[2]), float(color[3]),  # colorR/G/B/A
         rmin("runSpeed"),       rmax("runSpeed"),
         rmin("swimSpeed"),      rmax("swimSpeed"),
         rmin("sneakSpeed"),     rmax("sneakSpeed"),
         rmin("slideSpeed"),     rmax("slideSpeed"),
-        rmin("jumpPower"),      rmax("jumpPower"),
         rmin("stopDistance"),   rmax("stopDistance"),
         rmin("walkDistance"),   rmax("walkDistance"),
         rmin("runDistance"),    rmax("runDistance"),

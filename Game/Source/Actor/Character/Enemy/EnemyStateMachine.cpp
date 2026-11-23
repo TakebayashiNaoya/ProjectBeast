@@ -56,7 +56,6 @@ namespace app
 			AddState<EnemySearchState>(this);
 			AddState<EnemyWalkState>(this);
 			AddState<EnemyChaseState>(this);
-			AddState<EnemyJumpState>(this);
 			AddState<EnemySwimState>(this);
 			AddState<EnemyAttackState>(this);
 			AddState<EnemyReturnHomeState>(this);
@@ -285,7 +284,6 @@ namespace app
 			if (IsEqualCurrentState(EnemySearchState::ID()))   return "Search";
 			if (IsEqualCurrentState(EnemyWalkState::ID()))     return "Walk";
 			if (IsEqualCurrentState(EnemySwimState::ID()))     return "Swim";
-			if (IsEqualCurrentState(EnemyJumpState::ID()))     return "Jump";
 			if (IsEqualCurrentState(EnemyReturnHomeState::ID())) return "Return";
 			return "Idle";
 		}

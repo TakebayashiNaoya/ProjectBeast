@@ -53,11 +53,9 @@ namespace app
 			constexpr uint32_t SCORE_POPUP_FADE_IN_ANIM_KEY = Hash32("scorePopupFadeIn");
 			constexpr uint32_t SCORE_POPUP_FADE_OUT_ANIM_KEY = Hash32("scorePopupFadeOut");
 
-			/** インゲームボタンのスタミナゲージ専用のUIAnimationKey */
-			constexpr uint32_t JUMP_GAUGE_LOCK_ANIM_KEY = Hash32("jumpGaugeLockAnim");
-			constexpr uint32_t JUMP_GAUGE_UNLOCK_ANIM_KEY = Hash32("jumpGaugeUnlockAnim");
-			constexpr uint32_t SLIDE_GAUGE_LOCK_ANIM_KEY = Hash32("slideGaugeLockAnim");
-			constexpr uint32_t SLIDE_GAUGE_UNLOCK_ANIM_KEY = Hash32("slideGaugeUnlockAnim");
+			/** インゲームボタンの再集合ゲージ専用のUIAnimationKey */
+			constexpr uint32_t REGROUP_GAUGE_LOCK_ANIM_KEY = Hash32("regroupGaugeLockAnim");
+			constexpr uint32_t REGROUP_GAUGE_UNLOCK_ANIM_KEY = Hash32("regroupGaugeUnlockAnim");
 
 			/** 陣形レベルアップアイコン用のUIAnimationKey */
 			constexpr uint32_t LEVELUP_ICON_FADE_IN_ANIM_KEY = Hash32("levelUpIconFadeIn");

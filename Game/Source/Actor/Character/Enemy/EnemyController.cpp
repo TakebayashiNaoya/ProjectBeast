@@ -296,8 +296,6 @@ namespace app
 			RegisterState(enEnemyState_Wandering, EnterWandering, UpdateWandering, ExitWandering, CheckWandering);
 			/** チェイス */
 			RegisterState(enEnemyState_Chase, EnterChase, UpdateChase, ExitChase, CheckChase);
-			/** ジャンプ */
-			RegisterState(enEnemyState_Jump, EnterJump, UpdateJump, ExitJump, CheckJump);
 			/** 泳ぐ */
 			RegisterState(enEnemyState_Swim, EnterSwim, UpdateSwim, ExitSwim, CheckSwim);
 			/** 攻撃 */
@@ -726,25 +724,6 @@ namespace app
 					return enEnemyState_Idle;
 				}
 			}
-			return enEnemyState_Invalid;
-		}
-
-
-		/** ジャンプ */
-		void EnemyController::EnterJump(EnemyController* enemy)
-		{}
-
-
-		void EnemyController::UpdateJump(EnemyController* enemy)
-		{}
-
-
-		void EnemyController::ExitJump(EnemyController* enemy)
-		{}
-
-
-		int EnemyController::CheckJump(EnemyController* enemy)
-		{
 			return enEnemyState_Invalid;
 		}
 

@@ -43,7 +43,7 @@ namespace app
 			void ButtonIconUpdate();
 
 			/** Yクールダウンのサークルゲージの更新処理（追従イージング＋色演出） */
-			void UpdateStaminaGauge();
+			void UpdateRegroupGauge();
 
 			/**
 			 * @brief クマに襲われている間のYボタン強調表示の更新
@@ -56,9 +56,9 @@ namespace app
 
 			InGameStartingAnimLogic m_startingAnimLogic;
 
-			/** スタミナゲージ専用のステータス（追従速度などの数値設定） */
+			/** 再集合ゲージ専用のステータス（追従速度などの数値設定） */
 			std::unique_ptr<InGameButtonGaugeStatus> m_gaugeStatus;
-			/** スタミナゲージ専用のアニメーションステータス（色演出） */
+			/** 再集合ゲージ専用のアニメーションステータス（色演出） */
 			std::unique_ptr<InGameButtonGaugeAnimStatus> m_gaugeAnimStatus;
 
 			/** Yクールダウンの回復割合(0〜1、実値。1.0で使用可能) */

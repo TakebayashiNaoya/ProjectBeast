@@ -7,12 +7,6 @@
   "maxHp": 1,
   "hp": 1,
   "sneakSpeed": 70.0,
-  "slideSpeed": 130.0,
-  "jumpPower": 250.0,
-  "jumpStaminaMax": 100.0,
-  "jumpStaminaRecoverSpeed": 60.0,
-  "slideStaminaMax": 100.0,
-  "slideStaminaDecreaseSpeed": 55.0,
-  "slideStaminaRecoverSpeed": 30.0
+  "slideSpeed": 130.0
   }
 ]

@@ -4,7 +4,6 @@
  */
 #pragma once
 #include "PenguinEffectStatus.h"
-#include "PenguinStaminaGauge.h"
 #include "Source/Actor/Character/CharacterStateMachine.h"
 #include "Source/Actor/Character/penguin/PenguinStatus.h"
 
@@ -22,22 +21,6 @@ namespace app
 		class PenguinStateMachine : public CharacterStateMachine
 		{
 		public:
-			/**
-			 * @brief ジャンプパワーを設定
-			 * @param jumpPower ジャンプパワー
-			 */
-			inline void SetJumpPower(const float jumpPower)
-			{
-				m_jumpPower = jumpPower;
-			}
-			/**
-			 * @brief ジャンプするかどうかを設定
-			 * @param isJump ジャンプするかどうか
-			 */
-			inline void SetIsJump(const bool isJump)
-			{
-				m_isJump = isJump;
-			}
 			/**
 			 * @brief スライドするかどうかを設定
 			 * @param isSlide スライドするかどうか
@@ -71,22 +54,6 @@ namespace app
 			 * @return ペンギンのステータスポインタ
 			 */
 			virtual const PenguinStatus* GetPenguinStatus() const = 0;
-			/**
-			 * @brief ジャンプパワーを取得
-			 * @return ジャンプパワー
-			 */
-			inline float GetJumpPower() const
-			{
-				return m_jumpPower;
-			}
-			/**
-			 * @brief ジャンプするかどうかを取得
-			 * @return ジャンプするかどうか
-			 */
-			inline bool GetIsJump() const
-			{
-				return m_isJump;
-			}
 			/**
 			 * @被弾したかどうか取得
 			 */
@@ -125,41 +92,6 @@ namespace app
 			 * @return エフェクトステータスのポインタ
 			 */
 			PenguinEffectStatus* GetEffectStatus() const;
-
-			/**
-			 * @brief ジャンプが使用可能かどうかを取得
-			 * @return スタミナが枯渇しクールダウン中でなければtrue
-			 */
-			bool CanUseJump() const
-			{
-				return m_jumpStaminaGauge.CanUse();
-			}
-			/**
-			 * @brief スライドが使用可能かどうかを取得
-			 * @details スライドのスタミナは撤廃した（2026-08-23 試遊フィードバック）。
-			 *          スライドの制限は傾斜モデル（上り坂で滑れない）が担う
-			 * @return 常にtrue
-			 */
-			bool CanUseSlide() const
-			{
-				return true;
-			}
-			/**
-			 * @brief ジャンプのスタミナゲージの割合を取得（UI表示用）
-			 * @return 0.0(空)〜1.0(満タン)の割合
-			 */
-			float GetJumpStaminaRatio() const
-			{
-				return m_jumpStaminaGauge.GetRatio();
-			}
-			/**
-			 * @brief スライドのスタミナゲージの割合を取得（UI表示用）
-			 * @return 0.0(空)〜1.0(満タン)の割合
-			 */
-			float GetSlideStaminaRatio() const
-			{
-				return m_slideStaminaGauge.GetRatio();
-			}
 
 			/**
 			 * @brief スライドの傾斜による速度倍率を取得する
@@ -268,32 +200,12 @@ namespace app
 
 		public:
 			/**
-			 * @brief ジャンプ処理
-			 */
-			void Jump();
-			/**
-			 * @brief ジャンプのスタミナを即座に全消費し、クールダウンに入れる
-			 */
-			void ConsumeJumpStamina()
-			{
-				m_jumpStaminaGauge.ConsumeAll();
-			}
-			/**
-			 * @brief ジャンプ・スライドのスタミナゲージを毎フレーム更新する
-			 * @details スライド側の消費速度には傾斜倍率が掛かる（下りほど減らない）。
-			 */
-			void UpdateStaminaGauges();
-			/**
 			 * @brief スライドの傾斜倍率を毎フレーム更新する
 			 * @details 足元の地面法線と移動入力から符号つき傾斜を求めて倍率へ変換し、
 			 *          法線のちらつきで速度が脈打たないよう時定数で追従させる。
-			 *          UpdateStaminaGauges() の先頭から呼ばれるため個別に呼ぶ必要はない。
+			 *          SetActionInput()から呼ばれるため個別に呼ぶ必要はない。
 			 */
 			void UpdateSlideSlope();
-			/**
-			 * @brief ジャンプ・スライドのスタミナゲージをPenguinStatusの値で初期化する
-			 */
-			void SetupStaminaGauges();
 			/**
 			 * @brief ダメージ処理
 			 */
@@ -308,31 +220,22 @@ namespace app
 			 * @brief 移動・アクションの入力をまとめて設定する
 			 * @param isSlideCoast 勢いだけで滑るか（isSlideが偽なら無視）
 			 */
-			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isJump, bool isSlide, bool isSlideCoast = false)
+			inline void SetActionInput(const Vector3& moveDirection, bool isSneak, bool isDash, bool isSlide, bool isSlideCoast = false)
 			{
 				m_moveDirection = moveDirection;
 				m_isSneak = isSneak;
 				m_isDash = isDash; // または SetIsDash(isDash);
-				m_isJump = isJump;
 				m_isSlide = isSlide;
 				m_isSlideCoast = isSlide && isSlideCoast;
 				m_isSwimming = IsInWater();
 
-				// 毎フレーム呼ばれるこの関数内で、ジャンプ・スライドのスタミナゲージを更新する。
-				UpdateStaminaGauges();
+				// 毎フレーム呼ばれるこの関数内で傾斜倍率を更新する
+				UpdateSlideSlope();
 			}
 			/** ログ用：現在の状態名を返す（PenguinStateMachine.cpp で定義） */
 			const char* GetStateNameForLog() const;
 
 		protected:
-			/**
-			 * @brief ジャンプステートに切り替えられるかどうか
-			 * @return ジャンプステートに切り替えられるかどうか
-			 */
-			bool CanChangeJumpState() const
-			{
-				return m_isJump && IsOnGround() && CanUseJump();
-			}
 			/**
 			 * @brief スライド開始ステートに切り替えられるかどうか
 			 * @return スライド開始ステートに切り替えられるかどうか
@@ -340,7 +243,7 @@ namespace app
 			bool CanChangeSlideStartState() const
 			{
 				const float height = m_transform.m_position.y;
-				return  m_isSlide && height >= 0.0f && CanUseSlide();
+				return  m_isSlide && height >= 0.0f;
 			}
 			/**
 			 * @brief スライドステートに切り替えられるかどうか
@@ -348,7 +251,7 @@ namespace app
 			 */
 			bool CanChangeSlidingState() const
 			{
-				return m_isSlide && CanUseSlide();
+				return m_isSlide;
 			}
 			/**
 			 * @brief スライドをキープできるかどうか
@@ -356,7 +259,7 @@ namespace app
 			 */
 			bool CanKeepSlidingState() const
 			{
-				return m_isSlide && CanUseSlide();
+				return m_isSlide;
 			}
 			/**
 			 * @brief スライド終了ステートが終わったかどうか
@@ -400,10 +303,6 @@ namespace app
 		protected:
 			/** 親ペンギンのポインタ */
 			PenguinBase* m_ownerPenguinBase;
-			/** ジャンプパワー */
-			float m_jumpPower;
-			/** ジャンプするかどうか */
-			bool m_isJump;
 			/** スニークするかどうか */
 			bool m_isSneak;
 			/** スライドするかどうか */
@@ -412,18 +311,11 @@ namespace app
 			bool m_isDamaged;
 			/** 渦潮の中にいるかどうか */
 			bool m_isInWhirlpool;
-			/** ジャンプのスタミナ(オーバーヒート式)ゲージ */
-			PenguinStaminaGauge m_jumpStaminaGauge;
-			/** スライドのスタミナ(オーバーヒート式)ゲージ */
-			PenguinStaminaGauge m_slideStaminaGauge;
-			/** スタミナゲージの初期化が完了したかどうか */
-			bool m_isStaminaGaugeSetup = false;
 			/** スライドの傾斜による速度倍率（平滑化済み。既定 1.0f） */
 			float m_slideSlopeMultiplier = 1.0f;
 			/**
 			 * @brief 進行方向に対する符号つき傾斜（平滑化済み）
 			 * @details 下りで正、上りで負、斜面を横切ると0。値は sinθ 相当で -1〜+1。
-			 *          スタミナ消費倍率の算出にも使うため倍率とは別に保持する。
 			 */
 			float m_slideSlopeSigned = 0.0f;
 			/** 上り坂でのずり落ち（負の速度倍率）を許可するか。親ペンギンだけtrue */

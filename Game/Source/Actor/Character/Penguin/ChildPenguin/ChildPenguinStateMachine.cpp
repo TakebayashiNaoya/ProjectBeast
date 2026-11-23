@@ -28,7 +28,7 @@ namespace app
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSneakState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinRunState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinJumpState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinFallState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlideStartState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlidingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlideEndState>(static_cast<PenguinStateMachine*>(this));
@@ -143,13 +143,13 @@ namespace app
 			}
 
 			// 2. タイプ固有の判定（転倒・起き上がりなど）
-			// アクション系より先に評価することで、転倒中にジャンプ等へ割り込まれるのを防ぐ
+			// アクション系より先に評価することで、転倒中に落下等へ割り込まれるのを防ぐ
 			if (auto* typeState = GetTypeSpecificChangeState())
 			{
 				return typeState;
 			}
 
-			// 3. アクション系の判定（スライド、ジャンプ、移動など）
+			// 3. アクション系の判定（スライド、落下、移動など）
 
 			// スライド開始アニメ中→スライド
 			if (IsEqualCurrentState(PenguinSlideStartState::ID()))
@@ -176,10 +176,10 @@ namespace app
 				return FindState(PenguinSlideStartState::ID());
 			}
 
-			// ジャンプ判定（または空中にいる場合）
-			if (CanChangeJumpState() || !IsOnGround())
+			// 空中にいる場合は落下
+			if (!IsOnGround())
 			{
-				return FindState(PenguinJumpState::ID());
+				return FindState(PenguinFallState::ID());
 			}
 
 			// ダッシュ判定

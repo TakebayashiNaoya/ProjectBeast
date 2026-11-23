@@ -100,8 +100,6 @@ namespace app
 			RegisterState(enAIState_Idle, EnterIdle, UpdateIdle, ExitIdle, CheckIdle);
 			/** 移動 */
 			RegisterState(enAIState_Move, EnterMove, UpdateMove, ExitMove, CheckMove);
-			/** ジャンプ */
-			RegisterState(enAIState_Jump, EnterJump, UpdateJump, ExitJump, CheckJump);
 			/** 泳ぐ */
 			RegisterState(enAIState_Swim, EnterSwim, UpdateSwim, ExitSwim, CheckSwim);
 		}
@@ -153,26 +151,6 @@ namespace app
 		int NPCController::CheckMove(NPCController* npc)
 		{
 
-			return enAIState_Invalid;
-		}
-
-
-
-		/** ジャンプ */
-		void NPCController::EnterJump(NPCController* npc)
-		{}
-
-
-		void NPCController::UpdateJump(NPCController* npc)
-		{}
-
-
-		void NPCController::ExitJump(NPCController* npc)
-		{}
-
-
-		int NPCController::CheckJump(NPCController* npc)
-		{
 			return enAIState_Invalid;
 		}
 

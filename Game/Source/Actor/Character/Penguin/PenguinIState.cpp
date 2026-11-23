@@ -242,20 +242,10 @@ namespace app
 		/************************************/
 
 
-		void PenguinJumpState::Enter()
+		void PenguinFallState::Enter()
 		{
-			const float jumpPower = m_owner->GetPenguinStatus()->GetJumpPower();
 			const float moveSpeed = m_owner->GetPenguinStatus()->GetSneakSpeed();
 			m_owner->SetMoveSpeed(moveSpeed);
-
-			// ボタン入力による正規のジャンプ遷移の場合のみJump()を呼ぶ（崖からの落下時は呼ばない）
-			if (m_owner->GetIsJump())
-			{
-				m_owner->SetJumpPower(jumpPower);
-				m_owner->Jump();
-
-				m_owner->ConsumeJumpStamina();
-			}
 
 			m_owner->PlayAnimation(EnPenguinAnimationID::JumpWalking);
 
@@ -267,13 +257,13 @@ namespace app
 		}
 
 
-		void PenguinJumpState::Update()
+		void PenguinFallState::Update()
 		{
 			m_owner->Move();
 		}
 
 
-		void PenguinJumpState::Exit()
+		void PenguinFallState::Exit()
 		{
 			/** 子ペンギンのみ着地音をエネミーに検知させる（親ペンギンは検知対象外） */
 			auto* child = dynamic_cast<ChildPenguin*>(m_owner->GetOwnerPenguinBase());
@@ -299,7 +289,7 @@ namespace app
 		}
 
 
-		PenguinJumpState::PenguinJumpState(PenguinStateMachine* owner)
+		PenguinFallState::PenguinFallState(PenguinStateMachine* owner)
 			: PenguinIState(owner)
 		{}
 

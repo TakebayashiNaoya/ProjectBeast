@@ -302,7 +302,7 @@ namespace app
 
 				// 海にいる子ペンギンはアニメーションを再生させる
 				// ステートマシンのUpdate()は呼ばない：カウントダウン中はキャラクターコントローラーの
-				// 接地判定がまだ安定しておらず、誤ってジャンプステートに遷移してSEが鳴ってしまうため
+				// 接地判定がまだ安定しておらず、誤って落下ステートに遷移してSEが鳴ってしまうため
 				if (m_stateMachine && m_stateMachine->IsInWater() && m_modelRender.IsPlayingAnimation())
 				{
 					m_modelRender.PlayAnimation(
@@ -319,7 +319,7 @@ namespace app
 
 		bool ChildPenguin::ShouldSuppressFootprint() const
 		{
-			// 共通条件（ジャンプ・泳ぎ・スライド中）
+			// 共通条件（落下・泳ぎ・スライド中）
 			if (PenguinBase::ShouldSuppressFootprint()) return true;
 
 			// 親から遠い（＝画面外の）子は出さない。見えない足跡でプールの枠を

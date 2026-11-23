@@ -36,7 +36,7 @@ namespace app
 			AddState<PenguinIdleState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSneakState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinRunState>(static_cast<PenguinStateMachine*>(this));
-			AddState<PenguinJumpState>(static_cast<PenguinStateMachine*>(this));
+			AddState<PenguinFallState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlideStartState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlidingState>(static_cast<PenguinStateMachine*>(this));
 			AddState<PenguinSlideEndState>(static_cast<PenguinStateMachine*>(this));
@@ -104,7 +104,7 @@ namespace app
 			// 2. 追従命令・待機命令の判定
 			if ((nextState = CheckCommandState()) != nullptr) return nextState;
 
-			// 3. アクション系の判定（ウォーク、ダッシュ、スライド、ジャンプ）
+			// 3. アクション系の判定（ウォーク、ダッシュ、スライド、落下）
 			if ((nextState = CheckActionState()) != nullptr) return nextState;
 
 			// どれにも当てはまらなければ待機状態へ
@@ -181,7 +181,7 @@ namespace app
 				|| IsEqualCurrentState(PenguinSlidingState::ID())
 				|| IsEqualCurrentState(PenguinSlideEndState::ID()))
 			{
-				if (m_slideAirTimer > SLIDE_AIR_GRACE_TIME) return FindState(PenguinJumpState::ID());
+				if (m_slideAirTimer > SLIDE_AIR_GRACE_TIME) return FindState(PenguinFallState::ID());
 			}
 
 			/** 1.スライド開始ステートのアニメーションが終わっていて、かつスライド状態が続いているならスライドステートへ */
@@ -205,9 +205,9 @@ namespace app
 				return FindState(PenguinSlideStartState::ID());
 			}
 
-			/** 5. ジャンプステートに切り替えられるor足が付いていなければジャンプステートへ */
-			if (CanChangeJumpState() || !IsOnGround()) {
-				return FindState(PenguinJumpState::ID());
+			/** 5. 足が付いていなければ落下ステートへ */
+			if (!IsOnGround()) {
+				return FindState(PenguinFallState::ID());
 			}
 
 			/** 6. 走行ステートに切り替えられるなら走行ステートへ */
