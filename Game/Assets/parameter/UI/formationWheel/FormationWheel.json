@@ -4,7 +4,7 @@
             {
                 "type": "UIIcon",
                 "name": "BackgroundIcon",
-                "asset": "Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.DDS",
+                "asset": "Assets/spriteData/UI/Icon/Formation/back.DDS",
                 "width": 300,
                 "height": 168,
                 "position": [
@@ -19,10 +19,10 @@
                 ],
                 "rotation": 0,
                 "color": [
-                    16,
-                    44,
-                    64,
-                    205
+                    0,
+                    0,
+                    0,
+                    150
                 ]
             },
             {

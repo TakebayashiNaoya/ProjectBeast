@@ -41,7 +41,6 @@ namespace app
 				m_startingAnimLogic.Initialize(
 					this,
 					{
-						"OrderPlate",
 						"NotInputOrderIcon",   "InputOrderIcon",
 						"NotInputYbuttonIcon", "InputYbuttonIcon"
 					},
