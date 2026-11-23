@@ -15,6 +15,7 @@
 #include "Source/Actor/Character/Enemy/EnemyManager.h"
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Orca/OrcaManager.h"
+#include "Source/Actor/Character/PlayerFront.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
@@ -482,6 +483,11 @@ namespace app
 
 		case LoadPhase::Enemy:
 		{
+#ifdef APP_DEBUG
+			/** 敵の回り込み（PlayerFront）の計算の約束を確かめる。失敗するとK2_ASSERTで止まる */
+			actor::PlayerFront::SelfTest();
+#endif // APP_DEBUG
+
 			nlohmann::json json;
 			util::JsonConverter::IsLoadJsonFile(json, GetEnemyJsonPath());
 			actor::EnemyManager::GetInstance()->LoadEnemies(json);

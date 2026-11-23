@@ -216,6 +216,9 @@
     <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp">
       <Filter>Source\Actor\Character</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Actor\Character\PlayerFront.cpp">
+      <Filter>Source\Actor\Character</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Sound\SoundManager.cpp">
       <Filter>Source\Sound</Filter>
     </ClCompile>
@@ -750,6 +753,9 @@
       <Filter>Source\Actor\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h">
+      <Filter>Source\Actor\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Actor\Character\PlayerFront.h">
       <Filter>Source\Actor\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Sound\SoundHandle.h">

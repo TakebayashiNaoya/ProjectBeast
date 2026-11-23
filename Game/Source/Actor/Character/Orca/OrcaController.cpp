@@ -16,6 +16,9 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
+#include "Source/Actor/Character/PlayerFront.h"
 #include "Source/Noise/NoiseManager.h"
 
 
@@ -41,6 +44,46 @@ namespace app
 			constexpr float ARRIVE_LAST_KNOWN_POS_DISTANCE = 40.0f;
 			/** 視線を飛ばす高さ（水面からの高さ） */
 			constexpr float VIEW_RAY_HEIGHT = 10.0f;
+
+			// --- 正面への回り込み（PlayerFront。EnemyController.cpp FLANK_*）---
+			/** 親を中心に回る半径（クマは400） */
+			constexpr float FLANK_ORBIT_RADIUS = 450.0f;
+			/** 回り込みを打ち切るまでの時間（秒。クマは5） */
+			constexpr float FLANK_TIME_LIMIT = 6.0f;
+			/** 回り込み中にこの時間（秒）停滞したら直行へ戻す */
+			constexpr float FLANK_STUCK_TIME_LIMIT = 1.0f;
+			/** 向かう点の最寄りの航行可能な点がこれ以上ずれていたら、陸で回り込めないとみなして直行へ戻す */
+			constexpr float FLANK_NAVIGABLE_OFFSET_LIMIT = 150.0f;
+
+
+			/** @brief 親がかまくらの中にいるか */
+			bool IsDaddyInsideIgloo()
+			{
+				auto* cpManager = ChildPenguinManager::GetInstance();
+				DaddyPenguin* daddy = (cpManager != nullptr) ? cpManager->GetDaddyPenguin() : nullptr;
+				if (daddy == nullptr || daddy->GetStateMachine() == nullptr) return false;
+				return daddy->GetStateMachine()->GetIsInsideIgloo();
+			}
+
+
+			/** @brief 子がかまくらの中にいるか（シャチは泳いでいる子しか狙わないので通常はfalseだが、クマと条件を揃える） */
+			bool IsPenguinInsideIgloo(const ChildPenguin* penguin)
+			{
+				return penguin != nullptr && penguin->IsInsideIgloo();
+			}
+
+
+			/** @brief 回り込みを抜けた理由の名前（ログ用） */
+			const char* GetFlankEndReasonName(PlayerFront::EnApproachEndReason reason)
+			{
+				switch (reason)
+				{
+				case PlayerFront::EnApproachEndReason::Front:   return "front";
+				case PlayerFront::EnApproachEndReason::Timeout: return "timeout";
+				case PlayerFront::EnApproachEndReason::Far:     return "far";
+				default:                                        return "none";
+				}
+			}
 		}
 
 
@@ -98,7 +141,7 @@ namespace app
 				m_foundPenguin = nullptr;
 			}
 
-			// 初回の Enter（EnemyController::Update :147-150 と同じ）
+			// 初回のEnter（EnemyController::Update :196-199と同じ）
 			if (!m_isInitialized)
 			{
 				EnterState(m_state);
@@ -115,7 +158,7 @@ namespace app
 			m_repathTimer -= g_gameTime->GetFrameDeltaTime();
 			UpdateState(m_state);
 
-			// 視界で子を探す（EnemyController::Update :168-179 と同じく、探索・巡回・追跡の間だけ）
+			// 視界で子を探す（EnemyController::Update :217-228と同じく、探索・巡回・追跡の間だけ）
 			if (m_state == EnState::Search || m_state == EnState::Wandering || m_state == EnState::Chase)
 			{
 				if (ChildPenguin* found = FindTarget())
@@ -223,7 +266,128 @@ namespace app
 
 
 		//============================================//
-		// 待機（EnemyController.cpp :318-360）
+		// 正面への回り込み（EnemyController.cpp EvaluateFrontApproachと同じ。地形の判定だけ海の地図を使う）
+		//============================================//
+
+		void OrcaController::EvaluateFrontApproach()
+		{
+			using Phase = PlayerFront::EnApproachPhase;
+
+			// 見失った・親がいないときは回り込みをやめる（次に見つけたら判定し直す）
+			Vector3 parentPos;
+			Vector3 frontDir;
+			if (m_foundPenguin == nullptr || !PlayerFront::GetFront(parentPos, frontDir))
+			{
+				if (m_approach.phase == Phase::Flanking)
+				{
+					EndFrontApproach(Phase::Idle, m_foundPenguin == nullptr ? "lost" : "no_parent");
+				}
+				return;
+			}
+
+			// 子か親がかまくらの中なら直行する
+			if (IsPenguinInsideIgloo(m_foundPenguin) || IsDaddyInsideIgloo())
+			{
+				EndFrontApproach(Phase::Done, "igloo");
+				return;
+			}
+
+			const Vector3 position = m_target->GetTransform().m_position;
+
+			PlayerFront::ApproachInput input;
+			input.enemyPosition = position;
+			input.targetPosition = m_foundPenguin->GetTransform().m_position;
+			input.parentPosition = parentPos;
+			input.frontDirection = frontDir;
+			input.deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			PlayerFront::ApproachParams params;
+			params.orbitRadius = FLANK_ORBIT_RADIUS;
+			params.timeLimit = FLANK_TIME_LIMIT;
+
+			const Phase before = m_approach.phase;
+			m_approach = PlayerFront::StepApproach(m_approach, input, params);
+
+			if (before == Phase::Flanking && m_approach.phase != Phase::Flanking)
+			{
+				// StepApproachが抜けた（正面に入った・時間切れ・子が群れから離れた）。ログを残すために一度戻してから終える
+				const Phase after = m_approach.phase;
+				m_approach.phase = Phase::Flanking;
+				EndFrontApproach(after, GetFlankEndReasonName(m_approach.endReason));
+				return;
+			}
+			if (m_approach.phase != Phase::Flanking)
+			{
+				return;
+			}
+			if (before != Phase::Flanking)
+			{
+				// 回り込みを始めたので停滞の計測をやり直す
+				ResetStuckTimer();
+			}
+
+			// 地形で回り込めないときは直行へ戻す（その場で固まる・陸へ向かうのを防ぐ）
+			if (m_stuckTimer >= FLANK_STUCK_TIME_LIMIT)
+			{
+				EndFrontApproach(Phase::Done, "stuck");
+				return;
+			}
+			const OrcaSeaGrid* grid = GetSeaGrid();
+			if (grid != nullptr && grid->IsBuilt())
+			{
+				Vector3 navigable;
+				if (!grid->FindNearestNavigable(m_approach.steerPoint, grid->GetComponent(position), navigable))
+				{
+					EndFrontApproach(Phase::Done, "land");
+					return;
+				}
+				Vector3 offset = navigable - m_approach.steerPoint;
+				offset.y = 0.0f;
+				if (offset.LengthSq() >= FLANK_NAVIGABLE_OFFSET_LIMIT * FLANK_NAVIGABLE_OFFSET_LIMIT)
+				{
+					EndFrontApproach(Phase::Done, "land");
+					return;
+				}
+			}
+		}
+
+
+		void OrcaController::EndFrontApproach(PlayerFront::EnApproachPhase nextPhase, const char* reason)
+		{
+			if (m_approach.phase == PlayerFront::EnApproachPhase::Flanking && nextPhase != PlayerFront::EnApproachPhase::Flanking)
+			{
+				if (auto* lm = GameLogManager::GetInstance())
+				{
+					lm->QueueEvent({
+						{ "ev",      "orca_flank_end" },
+						{ "orca_id", m_target->GetLogId() },
+						{ "reason",  reason },
+						{ "time",    m_approach.flankTimer }
+					});
+				}
+			}
+			m_approach.phase = nextPhase;
+		}
+
+
+		bool OrcaController::CanAttackFromFront() const
+		{
+			// 回り込み中は攻撃しない
+			if (m_approach.phase == PlayerFront::EnApproachPhase::Flanking)
+			{
+				return false;
+			}
+
+			// どんな場合でも、攻撃する瞬間にシャチが画面に映っていること（背びれの出る水面の位置で、体の長さの半分を半径にする）
+			const OrcaStateMachine* sm = GetStateMachine();
+			const MasterOrcaParameter* parameter = GetParameter();
+			const float radius = (parameter != nullptr) ? max(parameter->radius, parameter->mouthOffset) : 0.0f;
+			return PlayerFront::IsVisible(sm->GetSurfacePosition(), radius);
+		}
+
+
+		//============================================//
+		// 待機（EnemyController.cpp :479-521）
 		//============================================//
 
 		void OrcaController::EnterIdle()
@@ -264,7 +428,7 @@ namespace app
 
 
 		//============================================//
-		// 探索（音のした場所へ向かう。EnemyController.cpp :383-478）
+		// 探索（音のした場所へ向かう。EnemyController.cpp :544-639）
 		//============================================//
 
 		void OrcaController::EnterSearch()
@@ -340,7 +504,7 @@ namespace app
 
 
 		//============================================//
-		// 巡回（EnemyController.cpp :482-571）
+		// 巡回（EnemyController.cpp :643-732）
 		//============================================//
 
 		void OrcaController::EnterWandering()
@@ -391,7 +555,7 @@ namespace app
 			{
 				return EnState::Idle;
 			}
-			// 一定時間進めなければ次の巡回点へ（EnemyController.cpp :564-568）
+			// 一定時間進めなければ次の巡回点へ（EnemyController.cpp :725-729）
 			if (m_stuckTimer >= STUCK_TIME_LIMIT)
 			{
 				return EnState::Idle;
@@ -401,7 +565,7 @@ namespace app
 
 
 		//============================================//
-		// 咆哮（「！」を出して標的の方を向く。EnemyController.cpp :1126-1159）
+		// 咆哮（「！」を出して標的の方を向く。EnemyController.cpp :1323-1356）
 		//============================================//
 
 		void OrcaController::EnterRoar()
@@ -442,13 +606,17 @@ namespace app
 
 
 		//============================================//
-		// 追跡（EnemyController.cpp :575-730）
+		// 追跡（EnemyController.cpp :736-927）
 		//============================================//
 
 		void OrcaController::EnterChase()
 		{
 			GetStateMachine()->SetIsChasing(true);
 			m_path.clear();
+
+			// 正面への回り込みは追跡に入るたびにやり直す
+			m_approach = PlayerFront::ApproachState();
+			ResetStuckTimer();
 		}
 
 
@@ -458,10 +626,17 @@ namespace app
 			const MasterOrcaParameter* parameter = GetParameter();
 			sm->SetDepthLevel(EnOrcaDepthLevel::Swim);
 
-			const Vector3 targetPos = m_foundPenguin ? m_foundPenguin->GetTransform().m_position : m_lastKnownPenguinPos;
+			Vector3 targetPos = m_foundPenguin ? m_foundPenguin->GetTransform().m_position : m_lastKnownPenguinPos;
+			// 回り込み中は、CheckChaseで求めた正面寄りの点へ経路探索で向かう
+			if (m_approach.phase == PlayerFront::EnApproachPhase::Flanking)
+			{
+				targetPos = m_approach.steerPoint;
+			}
 			SteerTo(targetPos, parameter->runSpeed);
+			// 追跡中も停滞を数える（回り込みが地形で進めないときに直行へ戻すため）
+			UpdateStuckTimer();
 
-			// 追跡中はスタミナが減る（EnemyController.cpp :625-631）
+			// 追跡中はスタミナが減る（EnemyController.cpp :798-804）
 			if (OrcaStatus* status = sm->GetOwnerStatus())
 			{
 				status->DecreaseStamina(parameter->staminaDrainRate * g_gameTime->GetFrameDeltaTime());
@@ -478,6 +653,10 @@ namespace app
 
 		OrcaController::EnState OrcaController::CheckChase()
 		{
+			// 回り込みの判定は攻撃判定より先に、現在の標的で確定させる（EnemyController::CheckChaseと同じ理由）
+			EvaluateFrontApproach();
+			const bool isFlanking = (m_approach.phase == PlayerFront::EnApproachPhase::Flanking);
+
 			OrcaStateMachine* sm = GetStateMachine();
 			const MasterOrcaParameter* parameter = GetParameter();
 			OrcaStatus* status = sm->GetOwnerStatus();
@@ -487,7 +666,7 @@ namespace app
 				m_foundPenguin = nullptr;
 				return GiveUpAndPatrol("debuff");
 			}
-			// スタミナが尽きたら諦めて帰る（EnemyController.cpp :665-669）
+			// スタミナが尽きたら諦めて帰る（EnemyController.cpp :860-864）
 			if (status != nullptr && status->IsStaminaEmpty())
 			{
 				m_foundPenguin = nullptr;
@@ -498,17 +677,18 @@ namespace app
 			{
 				Vector3 diff = m_foundPenguin->GetTransform().m_position - sm->GetTransform().m_position;
 				diff.y = 0.0f;
-				// 離れすぎたら諦めて帰る（EnemyController.cpp :679-686）
-				if (diff.LengthSq() > parameter->lostChaseDistance * parameter->lostChaseDistance)
+				// 離れすぎたら諦めて帰る（EnemyController.cpp :875-882）。回り込み中は遠回りで離れるので判定しない
+				if (!isFlanking && diff.LengthSq() > parameter->lostChaseDistance * parameter->lostChaseDistance)
 				{
 					m_foundPenguin = nullptr;
 					return GiveUpAndPatrol("lost");
 				}
 
-				// 口先から攻撃距離に入ったら噛みつく（クマは体の中心から測る）
+				// 口先から攻撃距離に入ったら噛みつく（クマは体の中心から測る）。
+				// 回り込み中でなく、画面に映っているときだけ（画面外の間はそのまま追い続ける）
 				Vector3 fromMouth = m_foundPenguin->GetTransform().m_position - sm->GetMouthPosition();
 				fromMouth.y = 0.0f;
-				if (fromMouth.LengthSq() <= parameter->attackDistance * parameter->attackDistance)
+				if (fromMouth.LengthSq() <= parameter->attackDistance * parameter->attackDistance && CanAttackFromFront())
 				{
 					return EnState::Attack;
 				}
@@ -528,7 +708,7 @@ namespace app
 
 
 		//============================================//
-		// 攻撃（EnemyController.cpp :807-991）
+		// 攻撃（EnemyController.cpp :1004-1188）
 		//============================================//
 
 		void OrcaController::EnterAttack()
@@ -549,7 +729,7 @@ namespace app
 			const Vector3 ahead = sm->GetTransform().m_position + sm->GetForward() * 100.0f;
 			SteerTo(ahead, parameter->swimSpeed);
 
-			// 噛みついた瞬間に食べた数を増やす（EnemyController.cpp :846-874。かまくらの処理はシャチには無い）
+			// 噛みついた瞬間に食べた数を増やす（EnemyController.cpp :1043-1071。かまくらの処理はシャチには無い）
 			if (sm->IsAttackImpact())
 			{
 				sm->SetAttackImpact(false);
@@ -560,10 +740,10 @@ namespace app
 				}
 			}
 
-			// 攻撃に入った最初のフレームで当てる（EnemyController.cpp :878-957 と同じタイミング）
+			// 攻撃に入った最初のフレームで当てる（EnemyController.cpp :1075-1154と同じタイミング）
 			if (m_foundPenguin == nullptr) return;
 
-			// 密集陣ウルト中は、隊列の子への攻撃を無効化して弾き返す（EnemyController.cpp :884-921）
+			// 密集陣ウルト中は、隊列の子への攻撃を無効化して弾き返す（EnemyController.cpp :1081-1118）
 			auto* cpManager = ChildPenguinManager::GetInstance();
 			if (BattleManager::GetInstance().IsBearAttackNullified()
 				&& cpManager != nullptr
@@ -620,7 +800,7 @@ namespace app
 				}
 			}
 
-			// 一度攻撃に入ったら標的は手放す（EnemyController.cpp :956）
+			// 一度攻撃に入ったら標的は手放す（EnemyController.cpp :1153）
 			m_foundPenguin = nullptr;
 		}
 
@@ -794,7 +974,7 @@ namespace app
 				if (diff.LengthSq() <= FLT_EPSILON) return penguin;
 				diff.Normalize();
 
-				// 視界の向きは体の正面を使う（EnemyController.cpp :232-249 と同じ理由）
+				// 視界の向きは体の正面を使う（EnemyController.cpp :281-298と同じ理由）
 				if (forward.Dot(diff) < cosViewAngle) continue;
 
 				// 地形に遮られていないか。水面の少し上から水平に視線を飛ばす

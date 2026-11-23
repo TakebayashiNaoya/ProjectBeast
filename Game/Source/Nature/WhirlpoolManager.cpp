@@ -3,6 +3,7 @@
  * @brief 渦潮を管理するクラス
  */
 #include "stdafx.h"
+#include "Source/Actor/Character/PlayerFront.h"
 #include "Source/Core/ParameterManager.h"
 #include "Source/Util/JsonConverter.h"
 #include "Whirlpool.h"
@@ -31,6 +32,11 @@ namespace app
 
 			/** 渦潮のY座標 */
 			constexpr float WHIRLPOOL_Y = 0.0f;
+
+			/** 親の足元に出さないための余白（渦潮の影響範囲半径にこれを足した距離より内側には出さない） */
+			constexpr float SPAWN_MARGIN_FROM_PARENT = 250.0f;
+			/** パラメーターが無いときの渦潮の影響範囲半径 */
+			constexpr float DEFAULT_WHIRLPOOL_RADIUS = 200.0f;
 
 
 			/**
@@ -206,15 +212,38 @@ namespace app
 
 		void WhirlpoolManager::CreateWhirlpool()
 		{
+			// プレイヤーの前方かつ画面内にだけ出す（足元・背後には出さない）。親がいなければ絞り込まない
+			Vector3 parentPos;
+			Vector3 frontDir;
+			const bool hasParent = actor::PlayerFront::GetFront(parentPos, frontDir);
+			const MasterWhirlpoolParameter* param = core::ParameterManager::Get()->GetParameter<MasterWhirlpoolParameter>();
+			const float whirlpoolRadius = (param != nullptr) ? param->whirlpoolRadius : DEFAULT_WHIRLPOOL_RADIUS;
+			const float minDistanceFromParent = whirlpoolRadius + SPAWN_MARGIN_FROM_PARENT;
+
 			// 生成済みでないインデックスを候補として収集する
 			std::vector<uint8_t> candidates;
 			for (const auto& entry : m_positionMap)
 			{
 				const bool isOccupied = entry.first < m_whirlpoolSlots.size() && m_whirlpoolSlots[entry.first];
-				if (!isOccupied)
+				if (isOccupied)
 				{
-					candidates.push_back(entry.first);
+					continue;
 				}
+
+				if (hasParent)
+				{
+					const Vector3& position = entry.second;
+					Vector3 fromParent = position - parentPos;
+					fromParent.y = 0.0f;
+					// 足元に出さない
+					if (fromParent.LengthSq() < minDistanceFromParent * minDistanceFromParent) continue;
+					// 背後に出さない
+					if (!actor::PlayerFront::IsInFrontXZ(parentPos, frontDir, position, 0.0f)) continue;
+					// 画面の外に出さない（中心が画面に入っていること）
+					if (!actor::PlayerFront::IsPointVisible(position)) continue;
+				}
+
+				candidates.push_back(entry.first);
 			}
 
 			if (candidates.empty()) return;

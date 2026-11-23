@@ -271,6 +271,7 @@
     <ClCompile Include="Source\Actor\Character\Orca\OrcaStatus.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCController.cpp" />
     <ClCompile Include="Source\Actor\Character\NPCControllerManager.cpp" />
+    <ClCompile Include="Source\Actor\Character\PlayerFront.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinAIController.cpp" />
     <ClCompile Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.cpp" />
@@ -464,6 +465,7 @@
     <ClInclude Include="Source\Actor\Character\Orca\OrcaTypes.h" />
     <ClInclude Include="Source\Actor\Character\NPCController.h" />
     <ClInclude Include="Source\Actor\Character\NPCControllerManager.h" />
+    <ClInclude Include="Source\Actor\Character\PlayerFront.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguin.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinAIController.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\ChildPenguinManager.h" />

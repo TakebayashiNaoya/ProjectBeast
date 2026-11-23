@@ -16,6 +16,9 @@
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStateMachine.h"
 #include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinStatus.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguin.h"
+#include "Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinStateMachine.h"
+#include "Source/Actor/Character/PlayerFront.h"
 #include "Source/Actor/Stage/StageSystem.h"
 #include "Source/Manager/BattleManager.h"
 #include "Source/Manager/IglooManager.h"
@@ -81,6 +84,52 @@ namespace app
 
 			/** 無効化時にクマを弾き飛ばす距離 */
 			constexpr float NULLIFY_KNOCKBACK_DISTANCE = 150.0f;
+
+			//============================================//
+			// 正面への回り込み（PlayerFront）
+			//============================================//
+
+			/** 親を中心に回る半径 */
+			constexpr float FLANK_ORBIT_RADIUS = 400.0f;
+			/** 回り込みを打ち切るまでの時間（秒） */
+			constexpr float FLANK_TIME_LIMIT = 5.0f;
+			/** 回り込み中にこの時間（秒）停滞したら直行へ戻す */
+			constexpr float FLANK_STUCK_TIME_LIMIT = 1.0f;
+			/** 向かう点の地形の高さがこれ以下なら水とみなして直行へ戻す */
+			constexpr float FLANK_WATER_HEIGHT = -6.0f;
+
+
+			/** @brief 子がかまくらの中にいるか */
+			bool IsPenguinInsideIgloo(const ChildPenguin* penguin)
+			{
+				if (penguin == nullptr) return false;
+				if (penguin->IsInsideIgloo()) return true;
+				const auto& insidePenguins = IglooManager::GetInstance().GetInsidePenguins();
+				return std::find(insidePenguins.begin(), insidePenguins.end(), penguin) != insidePenguins.end();
+			}
+
+
+			/** @brief 親がかまくらの中にいるか */
+			bool IsDaddyInsideIgloo()
+			{
+				auto* cpManager = ChildPenguinManager::GetInstance();
+				DaddyPenguin* daddy = (cpManager != nullptr) ? cpManager->GetDaddyPenguin() : nullptr;
+				if (daddy == nullptr || daddy->GetStateMachine() == nullptr) return false;
+				return daddy->GetStateMachine()->GetIsInsideIgloo();
+			}
+
+
+			/** @brief 回り込みを抜けた理由の名前（ログ用） */
+			const char* GetFlankEndReasonName(PlayerFront::EnApproachEndReason reason)
+			{
+				switch (reason)
+				{
+				case PlayerFront::EnApproachEndReason::Front:   return "front";
+				case PlayerFront::EnApproachEndReason::Timeout: return "timeout";
+				case PlayerFront::EnApproachEndReason::Far:     return "far";
+				default:                                        return "none";
+				}
+			}
 		}
 
 
@@ -283,6 +332,118 @@ namespace app
 				return true;
 			}
 			return false;
+		}
+
+
+		void EnemyController::EvaluateFrontApproach()
+		{
+			using Phase = PlayerFront::EnApproachPhase;
+
+			// 見失った・親がいないときは回り込みをやめる（次に見つけたら判定し直す）
+			Vector3 parentPos;
+			Vector3 frontDir;
+			if (m_foundPenguin == nullptr || !PlayerFront::GetFront(parentPos, frontDir))
+			{
+				if (m_approach.phase == Phase::Flanking)
+				{
+					EndFrontApproach(Phase::Idle, m_foundPenguin == nullptr ? "lost" : "no_parent");
+				}
+				return;
+			}
+
+			// 子か親がかまくらの中なら直行する（かまくらを叩きに行く）
+			if (IsPenguinInsideIgloo(m_foundPenguin) || IsDaddyInsideIgloo())
+			{
+				EndFrontApproach(Phase::Done, "igloo");
+				return;
+			}
+
+			PlayerFront::ApproachInput input;
+			input.enemyPosition = m_target->GetTransform().m_position;
+			input.targetPosition = m_foundPenguin->GetTransform().m_position;
+			input.parentPosition = parentPos;
+			input.frontDirection = frontDir;
+			input.deltaTime = g_gameTime->GetFrameDeltaTime();
+
+			PlayerFront::ApproachParams params;
+			params.orbitRadius = FLANK_ORBIT_RADIUS;
+			params.timeLimit = FLANK_TIME_LIMIT;
+
+			const Phase before = m_approach.phase;
+			m_approach = PlayerFront::StepApproach(m_approach, input, params);
+
+			if (before == Phase::Flanking && m_approach.phase != Phase::Flanking)
+			{
+				// StepApproachが抜けた（正面に入った・時間切れ・子が群れから離れた）。ログを残すために一度戻してから終える
+				const Phase after = m_approach.phase;
+				m_approach.phase = Phase::Flanking;
+				EndFrontApproach(after, GetFlankEndReasonName(m_approach.endReason));
+				return;
+			}
+			if (m_approach.phase != Phase::Flanking)
+			{
+				return;
+			}
+			if (before != Phase::Flanking)
+			{
+				// 回り込みを始めたので停滞の計測をやり直す
+				m_stuckTimer = 0.0f;
+				m_lastCheckPosition = m_target->GetTransform().m_position;
+			}
+
+			// 地形で回り込めないときは直行へ戻す（その場で固まるのを防ぐ）
+			if (m_stuckTimer >= FLANK_STUCK_TIME_LIMIT)
+			{
+				EndFrontApproach(Phase::Done, "stuck");
+				return;
+			}
+			if (m_target->GetEnemyStateMachine()->IsSwim())
+			{
+				EndFrontApproach(Phase::Done, "swim");
+				return;
+			}
+			const TerrainObject* terrain = StageSystem::GetInstance() ? StageSystem::GetInstance()->GetTerrain() : nullptr;
+			if (terrain != nullptr && terrain->GetHeightAt(m_approach.steerPoint) <= FLANK_WATER_HEIGHT)
+			{
+				EndFrontApproach(Phase::Done, "water");
+				return;
+			}
+		}
+
+
+		void EnemyController::EndFrontApproach(PlayerFront::EnApproachPhase nextPhase, const char* reason)
+		{
+			if (m_approach.phase == PlayerFront::EnApproachPhase::Flanking && nextPhase != PlayerFront::EnApproachPhase::Flanking)
+			{
+				if (auto* lm = GameLogManager::GetInstance())
+				{
+					lm->QueueEvent({
+						{ "ev",      "bear_flank_end" },
+						{ "bear_id", m_target->GetLogId() },
+						{ "reason",  reason },
+						{ "time",    m_approach.flankTimer }
+					});
+				}
+			}
+			m_approach.phase = nextPhase;
+		}
+
+
+		bool EnemyController::CanAttackFromFront() const
+		{
+			// 回り込み中は攻撃しない
+			if (m_approach.phase == PlayerFront::EnApproachPhase::Flanking)
+			{
+				return false;
+			}
+
+			// どんな場合でも、攻撃する瞬間に敵が画面に映っていること（体の一部でも映っていれば可）
+			const EnemyStatus* status = m_target->GetEnemyStateMachine()->GetOwnerStatus();
+			const float height = (status != nullptr) ? status->GetHeight() : 0.0f;
+			const float radius = (status != nullptr) ? max(status->GetRadius(), height * 0.5f) : 0.0f;
+			Vector3 center = m_target->GetTransform().m_position;
+			center.y += height * 0.5f;
+			return PlayerFront::IsVisible(center, radius);
 		}
 
 
@@ -586,6 +747,11 @@ namespace app
 			}
 
 			enemy->m_prePosition = enemy->m_target->GetTransform().m_position;
+
+			// 正面への回り込みは追跡に入るたびにやり直す
+			enemy->m_approach = PlayerFront::ApproachState();
+			enemy->m_stuckTimer = 0.0f;
+			enemy->m_lastCheckPosition = enemy->m_target->GetTransform().m_position;
 		}
 
 
@@ -608,6 +774,13 @@ namespace app
 				targetPos = enemy->m_lastKnownPenguinPos;
 			}
 
+			// 回り込み中は、CheckChaseで求めた正面寄りの点へ向かう
+			const bool isFlanking = (enemy->m_approach.phase == PlayerFront::EnApproachPhase::Flanking);
+			if (isFlanking)
+			{
+				targetPos = enemy->m_approach.steerPoint;
+			}
+
 			Vector3 dir = targetPos - enemyPos;
 			dir.y = 0.0f;
 
@@ -626,6 +799,22 @@ namespace app
 				// フレーム時間 × 減衰率(staminaDrainRate) を計算して減らす
 				float drainAmount = mutableStatus->GetStaminaDrainRate() * g_gameTime->GetFrameDeltaTime();
 				mutableStatus->DecreaseStamina(drainAmount);
+			}
+
+			// 回り込み中の停滞を数える（地形で回り込めないときに直行へ戻すため）
+			if (isFlanking)
+			{
+				Vector3 moved = enemyPos - enemy->m_lastCheckPosition;
+				moved.y = 0.0f;
+				if (moved.LengthSq() < STUCK_MOVE_THRESHOLD * STUCK_MOVE_THRESHOLD)
+				{
+					enemy->m_stuckTimer += g_gameTime->GetFrameDeltaTime();
+				}
+				else
+				{
+					enemy->m_stuckTimer = 0.0f;
+					enemy->m_lastCheckPosition = enemyPos;
+				}
 			}
 		}
 
@@ -650,6 +839,12 @@ namespace app
 
 		int EnemyController::CheckChase(EnemyController* enemy)
 		{
+			// 回り込みの判定は攻撃判定より先に、現在の標的で確定させる。
+			// 標的はUpdateChaseの後のFindTargetで変わるので、ここで判定し直さないと
+			// 標的が変わった直後の1フレームだけ古い判定のまま攻撃できてしまう
+			enemy->EvaluateFrontApproach();
+			const bool isFlanking = (enemy->m_approach.phase == PlayerFront::EnApproachPhase::Flanking);
+
 			auto* sm = enemy->m_target->GetEnemyStateMachine();
 			auto* status = sm->GetOwnerStatus();
 
@@ -666,7 +861,8 @@ namespace app
 				return enEnemyState_ReturnHome;
 			}
 
-			if (enemy->m_foundPenguin != nullptr)
+			// 回り込み中は遠回りで離れるので、見失う距離の判定はしない（時間切れで打ち切られる）
+			if (enemy->m_foundPenguin != nullptr && !isFlanking)
 			{
 				Vector3 enemyPos = enemy->m_target->GetTransform().m_position;
 				Vector3 penguinPos = enemy->m_foundPenguin->GetTransform().m_position;
@@ -705,7 +901,8 @@ namespace app
 					attackDist = IGLOO_ATTACK_DIST;
 				}
 
-				if (distSq <= attackDist * attackDist)
+				// 回り込み中でなく、画面に映っているときだけ攻撃する（画面外の間はそのまま追い続ける）
+				if (distSq <= attackDist * attackDist && enemy->CanAttackFromFront())
 				{
 					return enEnemyState_Attack;
 				}

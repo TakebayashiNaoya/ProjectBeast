@@ -3,6 +3,7 @@
  * @brief エネミーのコントローラー
  */
 #pragma once
+#include "Source/Actor/Character/PlayerFront.h"
 
 namespace app
 {
@@ -104,6 +105,17 @@ namespace app
 
 		private:
 			bool IsFarFromHome()const;
+
+		private:
+			/**
+			 * @brief 正面への回り込みを1フレーム進める（CheckChaseの先頭で、現在の標的に対して呼ぶ）
+			 * @details 結果の状態とsteerPointはm_approachに入る。UpdateChaseはそれを使うだけ
+			 */
+			void EvaluateFrontApproach();
+			/** @brief 回り込み中なら終えて、ログを残す */
+			void EndFrontApproach(PlayerFront::EnApproachPhase nextPhase, const char* reason);
+			/** @brief 攻撃してよいか（回り込み中でなく、画面に映っている） */
+			bool CanAttackFromFront() const;
 
 		private:
 			/**
@@ -239,6 +251,9 @@ namespace app
 			Vector3 m_lastCheckPosition = Vector3::Zero;
 			/** スタック検出：同じ位置に留まっている時間 */
 			float m_stuckTimer = 0.0f;
+
+			/** 正面への回り込みの状態（追跡に入るたびに初期化する） */
+			PlayerFront::ApproachState m_approach;
 
 			/** 現在の状態 */
 			EnEnemyStateID m_currentState = enEnemyState_Idle;
