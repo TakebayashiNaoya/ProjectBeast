@@ -118,7 +118,7 @@ namespace app
 						"LevelText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
-					Vector3(0.0f, -300.0f, 0.0f)
+					Vector3(-400.0f, 0.0f, 0.0f)
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())

@@ -4,21 +4,21 @@
       {
         "type": "UIIcon",
         "name": "AchieveBackGroundIcon",
-        "asset": "Assets/spriteData/UI/Achievement/achievementBack.DDS",
-        "width": 400,
-        "height": 100,
-        "position": [600, 240, 0],
+        "asset": "Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.DDS",
+        "width": 380,
+        "height": 76,
+        "position": [578, 130, 0],
         "scale": [1, 1, 1],
         "rotation": 0,
-        "color": [255, 255, 255, 255]
+        "color": [16, 44, 64, 205]
       },
       {
         "type": "UIIcon",
         "name": "CheckBoxIcon",
         "asset": "Assets/spriteData/UI/Achievement/checkBox.DDS",
-        "width": 50,
-        "height": 50,
-        "position": [370, 240, 0],
+        "width": 44,
+        "height": 44,
+        "position": [420, 130, 0],
         "scale": [1, 1, 1],
         "rotation": 0,
         "color": [255, 255, 255, 255]
@@ -27,9 +27,9 @@
         "type": "UIIcon",
         "name": "Stamp",
         "asset": "Assets/spriteData/UI/Achievement/check.DDS",
-        "width": 50,
-        "height": 50,
-        "position": [370, 240, 0],
+        "width": 44,
+        "height": 44,
+        "position": [420, 130, 0],
         "scale": [1, 1, 1],
         "rotation": 0,
         "color": [255, 255, 255, 255]
@@ -39,7 +39,7 @@
         "name": "AchieveNameText",
         "text": "",
         "fontSize": 0.4,
-        "position": [450, 240, 0],
+        "position": [452, 130, 0],
         "color": [255, 255, 255, 255],
         "pivot": [0.0, 0.5]
       }

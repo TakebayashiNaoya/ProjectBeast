@@ -570,6 +570,7 @@ namespace app
 	void InGameUIManager::RenderFinishing(RenderContext& rc)
 	{
 		if (m_timerPacket) m_timerPacket->Render(rc);
+		if (m_remainingChildPacket) m_remainingChildPacket->Render(rc);
 		if (m_finishPacket) m_finishPacket->Render(rc);
 	}
 

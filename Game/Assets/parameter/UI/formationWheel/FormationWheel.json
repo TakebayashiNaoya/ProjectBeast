@@ -4,12 +4,12 @@
             {
                 "type": "UIIcon",
                 "name": "BackgroundIcon",
-                "asset": "Assets/spriteData/UI/Icon/Formation/back.DDS",
-                "width": 350,
-                "height": 170,
+                "asset": "Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.DDS",
+                "width": 300,
+                "height": 168,
                 "position": [
-                    0,
-                    -363,
+                    -618,
+                    -334,
                     0
                 ],
                 "scale": [
@@ -19,21 +19,21 @@
                 ],
                 "rotation": 0,
                 "color": [
-                    0,
-                    0,
-                    0,
-                    150
+                    16,
+                    44,
+                    64,
+                    205
                 ]
             },
             {
                 "type": "UIIcon",
                 "name": "SpeedIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
-                "width": 80,
-                "height": 80,
+                "width": 72,
+                "height": 72,
                 "position": [
-                    80,
-                    -400,
+                    -550,
+                    -325,
                     0
                 ],
                 "scale": [
@@ -53,11 +53,11 @@
                 "type": "UIIcon",
                 "name": "DefenseIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shield.DDS",
-                "width": 80,
-                "height": 80,
+                "width": 72,
+                "height": 72,
                 "position": [
-                    160,
-                    -400,
+                    -686,
+                    -325,
                     0
                 ],
                 "scale": [
@@ -77,11 +77,11 @@
                 "type": "UIIcon",
                 "name": "GatherIcon",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Megaphone.DDS",
-                "width": 80,
-                "height": 80,
+                "width": 72,
+                "height": 72,
                 "position": [
-                    -80,
-                    -400,
+                    -618,
+                    -325,
                     0
                 ],
                 "scale": [
@@ -101,11 +101,11 @@
                 "type": "UIIcon",
                 "name": "LBButtonIcon",
                 "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_lb.DDS",
-                "width": 50,
-                "height": 50,
+                "width": 44,
+                "height": 44,
                 "position": [
-                    -140,
-                    -400,
+                    -736,
+                    -325,
                     0
                 ],
                 "scale": [
@@ -125,11 +125,11 @@
                 "type": "UIIcon",
                 "name": "RBButtonIcon",
                 "asset": "Assets/spriteData/UI/Icon/ButtonIcon/xbox_rb.DDS",
-                "width": 50,
-                "height": 50,
+                "width": 44,
+                "height": 44,
                 "position": [
-                    140,
-                    -400,
+                    -500,
+                    -325,
                     0
                 ],
                 "scale": [
@@ -149,12 +149,12 @@
                 "type": "UIText",
                 "name": "LevelText",
                 "text": "Lv1",
-                "fontSize": 0.8,
+                "fontSize": 0.5,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    0,
-                    -340,
+                    -488,
+                    -276,
                     0
                 ],
                 "rotation": 0,
@@ -165,7 +165,7 @@
                     255
                 ],
                 "pivot": [
-                    0.5,
+                    1,
                     0.5
                 ]
             },
@@ -173,11 +173,11 @@
                 "type": "UIIcon",
                 "name": "MemberGaugeBg",
                 "asset": "Assets/spriteData/UI/white.DDS",
-                "width": 90,
+                "width": 188,
                 "height": 16,
                 "position": [
-                    -45,
-                    -300,
+                    -654,
+                    -389,
                     0
                 ],
                 "scale": [
@@ -197,11 +197,11 @@
                 "type": "UIGauge",
                 "name": "MemberGaugeFill",
                 "asset": "Assets/spriteData/UI/white.DDS",
-                "width": 80,
+                "width": 184,
                 "height": 12,
                 "position": [
-                    -85,
-                    -300,
+                    -746,
+                    -389,
                     0
                 ],
                 "scale": [
@@ -225,12 +225,12 @@
                 "type": "UIText",
                 "name": "MemberGaugeText",
                 "text": "0/9",
-                "fontSize": 0.55,
+                "fontSize": 0.46,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    50,
-                    -300,
+                    -488,
+                    -389,
                     0
                 ],
                 "rotation": 0,
@@ -241,19 +241,19 @@
                     255
                 ],
                 "pivot": [
-                    0.5,
+                    1,
                     0.5
                 ]
             },
             {
                 "type": "UIIcon",
                 "name": "CutInBand",
-                "asset": "Assets/spriteData/UI/white.DDS",
-                "width": 1600,
-                "height": 120,
+                "asset": "Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.DDS",
+                "width": 300,
+                "height": 76,
                 "position": [
-                    0,
-                    200,
+                    -618,
+                    -76,
                     0
                 ],
                 "scale": [
@@ -263,21 +263,21 @@
                 ],
                 "rotation": 0,
                 "color": [
-                    0,
-                    0,
-                    0,
-                    170
+                    16,
+                    44,
+                    64,
+                    205
                 ]
             },
             {
                 "type": "UIIcon",
                 "name": "CutInAccent",
                 "asset": "Assets/spriteData/UI/white.DDS",
-                "width": 1600,
-                "height": 6,
+                "width": 260,
+                "height": 4,
                 "position": [
-                    0,
-                    143,
+                    -618,
+                    -110,
                     0
                 ],
                 "scale": [
@@ -297,11 +297,11 @@
                 "type": "UIIcon",
                 "name": "CutInIconSpeed",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shoes.DDS",
-                "width": 96,
-                "height": 96,
+                "width": 52,
+                "height": 52,
                 "position": [
-                    -230,
-                    200,
+                    -734,
+                    -76,
                     0
                 ],
                 "scale": [
@@ -321,11 +321,11 @@
                 "type": "UIIcon",
                 "name": "CutInIconDefense",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Shield.DDS",
-                "width": 96,
-                "height": 96,
+                "width": 52,
+                "height": 52,
                 "position": [
-                    -230,
-                    200,
+                    -734,
+                    -76,
                     0
                 ],
                 "scale": [
@@ -345,11 +345,11 @@
                 "type": "UIIcon",
                 "name": "CutInIconGather",
                 "asset": "Assets/spriteData/UI/Icon/Formation/Megaphone.DDS",
-                "width": 96,
-                "height": 96,
+                "width": 52,
+                "height": 52,
                 "position": [
-                    -230,
-                    200,
+                    -734,
+                    -76,
                     0
                 ],
                 "scale": [
@@ -369,12 +369,12 @@
                 "type": "UIText",
                 "name": "CutInNameText",
                 "text": "",
-                "fontSize": 1.4,
+                "fontSize": 0.62,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    -160,
-                    222,
+                    -696,
+                    -60,
                     0
                 ],
                 "rotation": 0,
@@ -393,12 +393,12 @@
                 "type": "UIText",
                 "name": "CutInSubText",
                 "text": "",
-                "fontSize": 0.7,
+                "fontSize": 0.36,
                 "fontScaleX": 1.0,
                 "fontScaleY": 1.0,
                 "position": [
-                    -160,
-                    168,
+                    -696,
+                    -94,
                     0
                 ],
                 "rotation": 0,
