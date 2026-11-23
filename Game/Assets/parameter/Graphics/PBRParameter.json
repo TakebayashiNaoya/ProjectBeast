@@ -8,14 +8,17 @@
     "comment3": "metallicOffset(-1.0〜1.0): メタリックオフセット （低いほど：非金属的になり、鏡面反射が白に近づく、0.0：デフォルト、高いほど：金属的な見た目になり、鏡面反射がアルベドカラーに近づく）",
     "metallicOffset": 0.0,
     "comment4": "smoothOffset(-1.0〜1.0): スムーズオフセット （低いほど：表面が粗くなり拡散反射が支配的になる（雪・布的）、0.0：デフォルト、高いほど：表面が滑らかになり鏡面反射が鋭くなる（金属・水面的））",
-    "smoothOffset": 0.0
+    "smoothOffset": 0.0,
+    "comment5": "shadowUseFaceNormal(0.0 or 1.0): 影の判定に使う面の向き （0.0：頂点法線（曲面の明暗が滑らか）、1.0：ポリゴンの向き（光とほぼ平行な大きな面のまだらを防ぐ。ステージの壁用））",
+    "shadowUseFaceNormal": 0.0
   },
   {
     "name": "wall",
     "dirLightScale": 1.0,
     "ambientScale": 2.0,
     "metallicOffset": 1.0,
-    "smoothOffset": 1.0
+    "smoothOffset": 1.0,
+    "shadowUseFaceNormal": 1.0
   },
   {
     "name": "igloo",

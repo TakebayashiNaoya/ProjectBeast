@@ -192,16 +192,18 @@ def pack_ocean_parameter(data):
 
 def pack_pbr_parameter(data):
     # name     : char[32] = 32 bytes（固定長文字列）
-    # 残4フィールド : float × 4   = 16 bytes
-    # 合計 48 bytes
+    # 残5フィールド : float × 5   = 20 bytes
+    # パディング   : 12 bytes（PBRParamを16バイト境界にそろえる m_pad[3]）
+    # 合計 64 bytes
     name = data.get("name", "").encode("utf-8")[:32].ljust(32, b"\x00")
     return struct.pack(
-        "<32s4f",
+        "<32s5f12x",
         name,                                           # 32s : name（オブジェクト識別名）
         float(data.get("dirLightScale",  0.0)),         # f   : dirLightScale（ディレクションライト強度倍率）
         float(data.get("ambientScale",   0.0)),         # f   : ambientScale（環境光強度倍率）
         float(data.get("metallicOffset", 0.0)),         # f   : metallicOffset（メタリックオフセット）
         float(data.get("smoothOffset",   0.0)),         # f   : smoothOffset（スムーズオフセット）
+        float(data.get("shadowUseFaceNormal", 0.0)),    # f   : shadowUseFaceNormal（影の判定にポリゴンの向きを使う）
     )
 
 def pack_formation_parameter(data):
