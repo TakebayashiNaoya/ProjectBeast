@@ -1,6 +1,6 @@
 /**
  * @file LevelUpIconMenu.h
- * @brief 陣形レベルアップ時に親ペンギンの頭上へ表示するアイコンの演出メニュー
+ * @brief 陣形レベルアップ時に陣形パネルの上へ表示するアイコンの演出メニュー
  */
 #pragma once
 #include "Source/UI/Menu.h"
@@ -12,10 +12,9 @@ namespace app
 	namespace ui
 	{
 		/**
-		 * @brief 陣形レベルアップ時に親ペンギンの頭上へ表示するアイコンの演出メニュー
+		 * @brief 陣形レベルアップ時に陣形パネルの上へ表示するアイコンの演出メニュー
 		 * @details
-		 *   内部にUIIconを1つ持つ。ワールド座標をスクリーン座標へ変換して
-		 *   親ペンギンの頭上に追従させつつ、Play()から一定時間かけて
+		 *   内部にUIIconを1つ持つ。JSONの位置を基準に、Play()から一定時間かけて
 		 *   上昇させながら、透明→不透明→透明とフェードさせる。
 		 *   色のフェードはUIAnimationFactoryで生成したUIColorAnimationを
 		 *   フェードイン用→フェードアウト用に差し替えながら再生し、
@@ -34,12 +33,6 @@ namespace app
 
 		public:
 			/**
-			 * @brief 追従対象のワールド座標を設定する（親ペンギンの座標を毎フレーム渡す）
-			 * @param position 追従対象のワールド座標
-			 */
-			inline void SetTargetPosition(const Vector3& position) { m_targetPosition = position; }
-
-			/**
 			 * @brief レベルアップ演出を再生する
 			 */
 			void Play();
@@ -52,8 +45,8 @@ namespace app
 			/** レベルアップアイコン */
 			UIIcon* m_icon;
 
-			/** 追従対象のワールド座標（毎フレーム外部から設定される） */
-			Vector3 m_targetPosition;
+			/** JSONの位置（浮き上がりの始点） */
+			Vector3 m_basePosition;
 
 			bool m_isPlaying;
 			bool m_isFadeInFinished;

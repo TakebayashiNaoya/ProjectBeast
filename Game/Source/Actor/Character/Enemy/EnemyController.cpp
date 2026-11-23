@@ -181,6 +181,12 @@ namespace app
 				m_isParamInitialized = true;
 			}
 
+			// 追っている子が消えていないか先に確かめる（削除済みのポインタを触らないため）
+			if (m_foundPenguin != nullptr && !IsTargetAlive(m_foundPenguin))
+			{
+				m_foundPenguin = nullptr;
+			}
+
 			auto* currentState = FindAIState(m_currentState);
 			if (currentState == nullptr) {
 				K2_ASSERT(false, "対象の処理が見つかりません\n");
@@ -278,6 +284,15 @@ namespace app
 				}
 			}
 			return nearest;
+		}
+
+
+		bool EnemyController::IsTargetAlive(const ChildPenguin* penguin) const
+		{
+			auto* cpManager = actor::ChildPenguinManager::GetInstance();
+			if (cpManager == nullptr) return false;
+			const auto& list = cpManager->GetChildPenguin();
+			return std::find(list.begin(), list.end(), penguin) != list.end();
 		}
 
 

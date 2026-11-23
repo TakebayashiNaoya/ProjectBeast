@@ -17,3 +17,4 @@
 | 円陣(陣形) | 竹林尚哉 | [Game/Source/Actor/Character/Penguin/Formation/Formations.cpp](https://github.com/TakebayashiNaoya/ProjectBeast/blob/v1.1.0/Game/Source/Actor/Character/Penguin/Formation/Formations.cpp) |
 | ウルト中の集中線 | 藤谷尊哉 | [Game/Source/UI/Ult/SpeedLineMenu.cpp](https://github.com/TakebayashiNaoya/ProjectBeast/blob/v1.1.0/Game/Source/UI/Ult/SpeedLineMenu.cpp) |
 | 操作ボタン表示(ジャンプ・スニーク・スライド) | 立山虎太朗 | [Game/Source/UI/InGameButton](https://github.com/TakebayashiNaoya/ProjectBeast/tree/v1.1.0/Game/Source/UI/InGameButton) |
+| 甘えん坊による親ペンギンの減速と表示 | 忽那悠生 | [Game/Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.cpp](https://github.com/TakebayashiNaoya/ProjectBeast/blob/v1.1.0/Game/Source/Actor/Character/Penguin/DaddyPenguin/DaddyPenguinController.cpp)、[Game/Source/UI/Menus/DebufMenu.cpp](https://github.com/TakebayashiNaoya/ProjectBeast/blob/v1.1.0/Game/Source/UI/Menus/DebufMenu.cpp) |

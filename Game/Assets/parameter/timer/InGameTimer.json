@@ -4,36 +4,22 @@
             {
                 "type":"UIIcon",
                 "name":"InGameTimerFrameBackGroundIcon",
-                "asset":"Assets/spriteData/UI/Time/InGameTimerFrameBackGround.dds",
-                "width":280,
-                "height":90,
-                "position":[ 0,370,0],
+                "asset":"Assets/spriteData/UI/Achievement/AchieveBackGroundIcon.DDS",
+                "width":248,
+                "height":92,
+                "position":[-132, 380, 0],
                 "scale":[1,1,1],
                 "rotation":0,
-                "color":[255,255,255,120]
+                "color":[16, 44, 64, 205]
             },
-            {
-                "type":"UIIcon",
-                "name":"InGameTimerFrameIcon",
-                "asset":"Assets/spriteData/UI/Time/InGameTimerFrame.dds",
-                "width":320,
-                "height":120,
-                "position":[0,370,0],
-                "scale":[1,1,1],
-                "rotation":0,
-                "color":[255,255,255,255]
-            },
-
-
-
             {
                 "type":"UIText",
                 "name":"TimerText",
                 "text":"3:00",
-                "fontSize":1.2,
+                "fontSize":1.0,
                 "fontScaleX":1.0,
                 "fontScaleY":1.0,
-                "position":[ 30, 365, 0],
+                "position":[-104, 378, 0],
                 "rotation":0,
                 "color":[255,255,255,255],
                 "pivot":[0.5, 0.5]
@@ -47,9 +33,9 @@
                 "type":"UIIcon",
                 "name":"TimeClockIcon",
                 "asset":"Assets/spriteData/UI/Icon/InGameTimerIcon/Clock.dds",
-                "width":55,
-                "height":50,
-                "position":[ -90, 370, 0],
+                "width":44,
+                "height":40,
+                "position":[-214, 380, 0],
                 "scale":[ 1, 1, 1],
                 "rotation":0,
                 "color":[255,255,255,255]

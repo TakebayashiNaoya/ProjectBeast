@@ -820,6 +820,8 @@ namespace app
 					[follower](const FetchEntry& e) { return e.fetcher == follower; });
 				if (isBusy) continue;
 				if (IsDowning(follower) || follower->IsInsideIgloo() || IsPenguinInWhirlpool(follower)) continue;
+				// 甘えん坊は親から離れないので迎えに行かせない
+				if (follower->GetChildPenguinType() == EnChildPenguinType::Clingy) continue;
 				freeFollowers.push_back(follower);
 				freePositions.push_back(follower->GetTransform().m_position);
 			}

@@ -229,20 +229,16 @@ namespace app
 		// フィールド名をキーとして毎tick書き出すとログサイズが膨れ上がる（数百体分×数千tick）ため、
 		// 固定順の配列で記録する。読み込み側（ReplayScene）はオブジェクト形式の旧ログも
 		// 判別して読めるようにしてあるため、過去に記録したログも引き続き再生できる
-		// 配列レイアウト: [pos, rot_y, state, clingy_count, speed_mul]
-		// clingy_count/speed_mul は後から足した要素。読み込み側は範囲チェックしてから読むため、
-		// これらを持たない旧ログもそのまま再生できる
+		// 配列レイアウト: [pos, rot_y, state]
+		// 旧ログの末尾にある clingy_count/speed_mul(甘えん坊の減速)は読み込み側が読まない
 		if (daddy)
 		{
 			auto* sm = daddy->GetStateMachine();
-			auto* ctrl = daddy->GetController();
 			const auto& tf = daddy->GetTransform();
 			snap["parent"] = nlohmann::json::array({
 				V3toJson(tf.m_position),
 				GetYawDeg(tf.m_rotation),
-				sm ? sm->GetStateNameForLog() : "Unknown",
-				ctrl ? ctrl->GetClingyCount() : 0,
-				RoundForLog(ctrl ? ctrl->GetSpeedMultiplier() : 1.0f, 0.01)
+				sm ? sm->GetStateNameForLog() : "Unknown"
 			});
 		}
 

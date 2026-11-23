@@ -36,7 +36,7 @@ namespace app
 					this,
 					{ "ChildPenguinIcon", "SlashIcon", "BgIcon" },
 					{ "RemainingNum", "TotalNum" },
-					Vector3(-400.0f, 0.0f, 0.0f)
+					Vector3(0.0f, 200.0f, 0.0f)
 				);
 			}
 			if (!m_startingAnimLogic.IsAnimationFinished())

@@ -30,7 +30,6 @@
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
 #include "Source/UI/Menus/CountDownMenu.h"
-#include "Source/UI/Menus/DebufMenu.h"
 #include "Source/UI/Menus/EnemySleepingMenu.h"
 #include "Source/UI/Menus/FinishMenu.h"
 #include "Source/UI/Menus/IglooPromptMenu.h"
@@ -100,10 +99,6 @@ namespace app
 		ui::InitUIPacket(m_soundOptionPacket, "Assets/parameter/sound/SoundOption.json");
 		// 睡眠中クマの起床ゲージを生成
 		ui::InitUIPacket(m_enemySleepingPacket, "Assets/parameter/UI/enemySleepGauge/sleepGauge.json");
-		// デバフメニューを生成
-		ui::InitUIPacket(m_debufPacket, "Assets/parameter/UI/penguinDebuff/Debuf.json");
-
-		if (auto* menu = m_debufPacket->GetMenu()) menu->SetDraw(false);
 
 		if (auto* menu = m_enemySleepingPacket->GetMenu())
 		{
@@ -484,21 +479,9 @@ namespace app
 
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Update();
 		if (m_formationWheelPacket) m_formationWheelPacket->Update();
-		if (m_debufPacket) m_debufPacket->Update();
 		if (m_feverIconPacket) m_feverIconPacket->Update();
 
-		// 陣形レベルアップアイコンを親ペンギンの頭上へ追従させる（再生中に位置がずれないよう毎フレーム更新）
-		if (m_levelUpIconPacket)
-		{
-			if (m_daddyPenguin)
-			{
-				if (auto* menu = m_levelUpIconPacket->GetMenu())
-				{
-					menu->SetTargetPosition(m_daddyPenguin->GetTransform().m_position);
-				}
-			}
-			m_levelUpIconPacket->Update();
-		}
+		if (m_levelUpIconPacket) m_levelUpIconPacket->Update();
 	}
 
 
@@ -555,7 +538,6 @@ namespace app
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Render(rc);
 		if (m_inGameButtonPacket) m_inGameButtonPacket->Render(rc);
 		if (m_formationWheelPacket) m_formationWheelPacket->Render(rc);
-		if (m_debufPacket) m_debufPacket->Render(rc);
 		if (m_feverIconPacket) m_feverIconPacket->Render(rc);
 		if (m_levelUpIconPacket) m_levelUpIconPacket->Render(rc);
 	}
@@ -570,6 +552,7 @@ namespace app
 	void InGameUIManager::RenderFinishing(RenderContext& rc)
 	{
 		if (m_timerPacket) m_timerPacket->Render(rc);
+		if (m_remainingChildPacket) m_remainingChildPacket->Render(rc);
 		if (m_finishPacket) m_finishPacket->Render(rc);
 	}
 

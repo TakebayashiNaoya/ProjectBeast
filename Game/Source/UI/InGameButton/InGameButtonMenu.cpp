@@ -41,6 +41,7 @@ namespace app
 				m_startingAnimLogic.Initialize(
 					this,
 					{
+						"OrderPlate",
 						"NotInputOrderIcon",   "InputOrderIcon",
 						"NotInputYbuttonIcon", "InputYbuttonIcon"
 					},
@@ -170,14 +171,9 @@ namespace app
 
 					wasLocked = isLocked;
 
-					if (displayRatio >= 1.0f && targetRatio >= 1.0f) {
-						gaugeA->m_isDraw = false;
-						gaugeB->m_isDraw = false;
-					}
-					else {
-						gaugeA->m_isDraw = true;
-						gaugeB->m_isDraw = false;
-					}
+					// 満量でもリングを残し、使えることを示す
+					gaugeA->m_isDraw = true;
+					gaugeB->m_isDraw = false;
 				};
 
 			// Y（再集合の呼びかけ）のクールダウン

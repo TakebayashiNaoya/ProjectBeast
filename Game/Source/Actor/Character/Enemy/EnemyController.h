@@ -58,6 +58,8 @@ namespace app
 			ChildPenguin* FindTarget();
 			/** @brief maxDistance以内でいちばん近い生きている子を返す（視界は見ない） */
 			ChildPenguin* FindNearestTarget(float maxDistance) const;
+			/** @brief 子がまだ子ペンギンの一覧にいるか（削除済みのポインタを触らないため） */
+			bool IsTargetAlive(const ChildPenguin* penguin) const;
 
 		private:
 			/**
