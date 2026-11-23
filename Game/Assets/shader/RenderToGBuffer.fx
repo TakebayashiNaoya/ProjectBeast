@@ -41,7 +41,6 @@ struct SPSIn
     float3 biNormal : BINORMAL;      // ワールド空間に変換済みの従ベクトル
     float2 uv       : TEXCOORD0;     // UV座標（そのまま引き継ぐ）
     float3 worldPos : TEXCOORD1;     // ワールド座標（ライティング計算・ディザリング判定用）
-    nointerpolation float isSkinned : TEXCOORD2; // スキンありメッシュなら1（影の判定に使う面の向きの選び方を変える）
 };
 
 // ピクセルシェーダーからの出力（GBufferに書き込まれる）
@@ -80,6 +79,7 @@ cbuffer PBRParamCb : register(b2)
     float ambientScale;    // 環境光強度倍率
     float metallicOffset;  // metallicオフセット
     float smoothOffset;    // smoothオフセット
+    float shadowUseFaceNormal; // 1なら影の判定にポリゴンの向きを使う（0は頂点法線）
 };
 
 // ディザリング用の定数バッファ（b3）
@@ -170,7 +170,6 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin, uniform bool isEnableInstanci
     psIn.biNormal = normalize(mul(m3x3, vsIn.biNormal));
 
     psIn.uv = vsIn.uv;
-    psIn.isSkinned = hasSkin ? 1.0f : 0.0f;
 
     // 法線や接ベクトル、従ベクトルがNaNになっていたら0ベクトルにする。
     if (any(isnan(psIn.tangent)))
@@ -317,15 +316,14 @@ SPSOut PSMainCore(SPSIn psIn, bool isShadowReciever)
     // DeferredLighting.fx が影の判定（傾きに応じたバイアスと、すれすれ・裏向きの面の影）に使う。
     // （isShadowReciever は以前このw成分に入れていたフラグ。現在は使わない）
     //
-    // 面の向きの取り方をモデルの種類で変える。
-    // ・スキンなし（壁・建物などの背景）: ポリゴンそのものの向き。
+    // 面の向きの取り方をPBR補正パラメータの shadowUseFaceNormal で変える。
+    // ・1（ステージの壁）: ポリゴンそのものの向き。
     //   ローダーが法線を角で丸めており（壁の上端で約45度）、頂点法線ではシャドウマップに写る実際の面の傾きと合わない。
     //   光とほぼ平行な大きな面は、実際の傾きで影へ寄せないと三角形単位のまだら・ちらつきが出る。
-    // ・スキンあり（キャラクター）: 補間した頂点法線。
-    //   ポリゴンの向きを使うと、曲面の明暗の境界がポリゴン1枚ごとの段になって目立つ。
-    //   キャラクターは小さく近景のカスケードで細かく写るので、滑らかな向きで判定しても誤判定は出にくい。
+    // ・0（それ以外）: 補間した頂点法線。
+    //   ポリゴンの向きを使うと、イグルーなどの曲面の明暗の境界がポリゴン1枚ごとの段になって目立つ。
     float3 faceNormal = normalize(psIn.normal);
-    if (psIn.isSkinned < 0.5f)
+    if (shadowUseFaceNormal > 0.5f)
     {
         float3 geomNormal = cross(ddx(psIn.worldPos), ddy(psIn.worldPos));
         float geomNormalLenSq = dot(geomNormal, geomNormal);

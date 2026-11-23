@@ -23,6 +23,8 @@ namespace nsBeastEngine
 		float m_ambientScale = 1.0f;	/** 環境光強度倍率 */
 		float m_metallicOffset = 0.0f;	/** metallicオフセット */
 		float m_smoothOffset = 0.0f;	/** smoothオフセット */
+		float m_shadowUseFaceNormal = 0.0f;	/** 1なら影の判定にポリゴンの向きを使う（0は頂点法線） */
+		float m_pad[3] = {};	/** 16バイト境界へのパディング */
 	};
 
 	/**
