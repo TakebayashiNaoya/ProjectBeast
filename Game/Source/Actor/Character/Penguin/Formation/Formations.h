@@ -165,7 +165,7 @@ namespace app
 		/**
 		 * @brief 散開陣（広間隔）
 		 * @details
-		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameterで調整）。
+		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameterで調整）＋範囲に入った野良の迎え。
 		 */
 		class GatherFormation : public RingFormation
 		{

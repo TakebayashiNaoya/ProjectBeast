@@ -121,6 +121,8 @@ namespace app
 			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
 			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
+			// 範囲に入った野良を仲間が迎えに行く
+			m_passive.AddEffect(std::make_unique<WildChildFetchEffect>(&param.passiveFetchRadiusBase, &param.passiveFetchRadiusPerLevel, &param.passiveFetchSpeedMultiplier, &param.passiveFetchTimeLimit));
 
 			// パッシブ演出（陣形中ずっと出す）
 			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::GatherAura, EnEffectKind::None);

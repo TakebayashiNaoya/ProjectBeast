@@ -1197,6 +1197,9 @@
     <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationContext.h">
       <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationFetchRule.h">
+      <Filter>Source\Actor\Character\penguin\Formation</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h">
       <Filter>Source\UI\BearReaction</Filter>
     </ClInclude>

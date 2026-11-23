@@ -62,7 +62,7 @@ namespace app
 			constexpr const char* CUT_IN_SUB_TEXTS[] = {
 				"スピード アップ!",
 				"クマと シャチを はじく!",
-				"ひろく あつめる",
+				"子ペンギンが むかえに いく",
 			};
 			static_assert(std::size(CUT_IN_ICON_NAMES) == FORMATION_NUM, "カットインのアイコンの数が陣形の数と合わない");
 			static_assert(std::size(CUT_IN_NAME_TEXTS) == FORMATION_NUM, "陣形名の数が陣形の数と合わない");

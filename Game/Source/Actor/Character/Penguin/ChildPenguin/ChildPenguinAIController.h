@@ -59,6 +59,9 @@ namespace app
 			 */
 			bool IsBraveFromRegroup() const { return m_braveTimer > 0.0f; }
 
+			/** @brief 散開陣の仲間に迎えられた（親を察知した扱いにして、次の更新で入隊させる） */
+			void OnFetched() { NoticeDaddy(); }
+
 		protected:
 			/**
 			 * @brief タイプごとの更新処理
@@ -154,10 +157,12 @@ namespace app
 
 			/**
 			 * @brief 任意の目標座標へ向かう入力を組み立てる（BuildInputの座標指定版）
-			 * @param targetPos 移動先の座標
+			 * @param targetPos    移動先の座標
+			 * @param useDaddyFlow 親の近くの目標で、親へのフローフィールドに乗るか（迎えは親から離れるので乗らない）
+			 * @param speedScale   速度にさらに掛ける倍率（迎えで速く走らせる）
 			 * @note 世話焼きペンギンの介入移動などに使用する
 			 */
-			void BuildInputToTarget(const Vector3& targetPos);
+			void BuildInputToTarget(const Vector3& targetPos, bool useDaddyFlow = true, float speedScale = 1.0f);
 
 			/**
 			 * @brief ナビゲーションを織り込んだ移動方向を求める
@@ -165,9 +170,10 @@ namespace app
 			 *          水路や崖を回り込む。それ以外は目標への直進方向を返す。
 			 * @param targetPos    移動先の座標
 			 * @param distToTarget 目標までの距離（呼び出し側で計算済みの値）
+			 * @param useDaddyFlow 親へのフローフィールドを使ってよいか
 			 * @return 移動方向（正規化済み）
 			 */
-			Vector3 CalculateMoveDirectionWithNav(const Vector3& targetPos, const float distToTarget);
+			Vector3 CalculateMoveDirectionWithNav(const Vector3& targetPos, const float distToTarget, bool useDaddyFlow = true);
 
 			/**
 			 * @brief 移動方向にアクティブな渦潮からの反発を織り込む

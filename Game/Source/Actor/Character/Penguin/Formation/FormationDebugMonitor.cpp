@@ -64,6 +64,8 @@ namespace app
 			ImGui::SeparatorText(u8"発動中の効果");
 			ImGui::Text(u8"速度倍率: %.2fx", m_manager->GetFormationSpeedMultiplier());
 			ImGui::Text(u8"渦潮耐性: %s", m_manager->HasWhirlpoolResistance() ? u8"あり" : u8"なし");
+			ImGui::Text(u8"迎えの範囲: %.1f", m_manager->GetFetchRadius());
+			ImGui::Text(u8"迎え中の数: %d", m_manager->GetFetchingCount());
 		}
 	}
 }

@@ -16,6 +16,7 @@
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Orca/OrcaManager.h"
 #include "Source/Actor/Character/PlayerFront.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationFetchRule.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
@@ -475,6 +476,8 @@ namespace app
 #ifdef APP_DEBUG
 			/** 敵の回り込み（PlayerFront）の計算の約束を確かめる。失敗するとK2_ASSERTで止まる */
 			actor::PlayerFront::SelfTest();
+			/** 散開陣の迎えの組み合わせの約束を確かめる */
+			actor::fetchRule::SelfTest();
 #endif // APP_DEBUG
 
 			nlohmann::json json;

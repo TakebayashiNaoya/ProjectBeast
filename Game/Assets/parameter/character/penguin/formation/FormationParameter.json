@@ -10,6 +10,10 @@
     "joinMargin": 15.0,
     "rowSpacing": 15.0,
     "colSpacing": 15.0,
+    "passiveFetchRadiusBase": 0.0,
+    "passiveFetchRadiusPerLevel": 0.0,
+    "passiveFetchSpeedMultiplier": 1.0,
+    "passiveFetchTimeLimit": 0.0,
     "baseFollowers": 0
   },
   {
@@ -23,10 +27,14 @@
     "joinMargin": 20.0,
     "rowSpacing": 0.0,
     "colSpacing": 0.0,
+    "passiveFetchRadiusBase": 0.0,
+    "passiveFetchRadiusPerLevel": 0.0,
+    "passiveFetchSpeedMultiplier": 1.0,
+    "passiveFetchTimeLimit": 0.0,
     "baseFollowers": 9
   },
   {
-    "comment": "散開陣（収集特化）：パッシブでレベル連動加速（他陣形と共通）",
+    "comment": "散開陣（収集特化）：パッシブでレベル連動加速（他陣形と共通）＋範囲に入った野良を仲間が迎えに行く",
     "passiveSpeedMultiplier": 1.0,
     "passiveSpeedBase": 1.0,
     "passiveSpeedPerLevel": 0.1,
@@ -36,6 +44,10 @@
     "joinMargin": 50.0,
     "rowSpacing": 0.0,
     "colSpacing": 0.0,
+    "passiveFetchRadiusBase": 650.0,
+    "passiveFetchRadiusPerLevel": 35.0,
+    "passiveFetchSpeedMultiplier": 1.5,
+    "passiveFetchTimeLimit": 6.0,
     "baseFollowers": 9
   }
 ]

@@ -363,6 +363,73 @@ namespace app
 			 */
 			float GetOuterRadius() const { return m_formationController.GetOuterRadius(); }
 
+
+
+
+			//============================================//
+			// 散開陣の迎え
+			//============================================//
+
+		public:
+			/**
+			 * @brief 迎えを1フレーム進める（散開陣のパッシブから毎フレーム呼ばれる）
+			 * @details 範囲に入った野良へ、いちばん近い空いた仲間を1体ずつ向かわせる。
+			 *          迎え役は隊列にいたまま、向かう先だけが変わる。触れた野良は親を察知した扱いにして、次の更新で入隊させる。
+			 * @param radius          迎えの範囲（親からの距離。0以下なら全部やめる）
+			 * @param speedMultiplier 迎え役の速度倍率
+			 * @param timeLimit       迎えを打ち切るまでの時間（秒）
+			 * @param dt              経過時間（秒）
+			 */
+			void UpdateFetch(float radius, float speedMultiplier, float timeLimit, float dt);
+
+			/** @brief 迎えを全部やめる（陣形を抜けたときなど） */
+			void CancelAllFetches();
+
+			/**
+			 * @brief 迎え役が向かう野良の位置を取得する
+			 * @param fetcher 迎え役かどうかを調べる子
+			 * @param outPos  向かう位置（出力）
+			 * @return 迎え中ならtrue
+			 */
+			bool TryGetFetchTargetPosition(const ChildPenguin* fetcher, Vector3& outPos) const;
+
+			/** @brief 迎え中の組の数 */
+			int GetFetchingCount() const { return static_cast<int>(m_fetchEntries.size()); }
+
+			/** @brief 今の迎えの範囲（散開陣でなければ0） */
+			float GetFetchRadius() const { return m_fetchRadius; }
+
+			/** @brief 迎え役の速度倍率 */
+			float GetFetchSpeedMultiplier() const { return m_fetchSpeedMultiplier; }
+
+		private:
+			/** 迎えの組 */
+			struct FetchEntry
+			{
+				ChildPenguin* fetcher = nullptr;
+				ChildPenguin* target  = nullptr;
+				float elapsed = 0.0f;
+			};
+			/** 迎え終えた野良（すぐ同じ野良を迎え直さないための待ち時間） */
+			struct FetchCooldown
+			{
+				ChildPenguin* target = nullptr;
+				float remaining = 0.0f;
+			};
+
+			/** @brief 迎えを続けてよいか（だめなら理由を返す） */
+			const char* CheckFetchCancelReason(const FetchEntry& entry, float radius) const;
+			/** @brief 野良を迎えの候補にしてよいか */
+			bool CanBeFetched(ChildPenguin* penguin) const;
+			/** @brief 子を迎えから外す（消える子の後始末） */
+			void RemoveFromFetch(const ChildPenguin* penguin);
+
+			std::vector<FetchEntry> m_fetchEntries;
+			std::vector<FetchCooldown> m_fetchCooldowns;
+			float m_fetchRadius = 0.0f;
+			float m_fetchSpeedMultiplier = 1.0f;
+			float m_fetchTimeLimit = 0.0f;
+
 		private:
 			/** 親ペンギンのポインタ（GameSceneなどで設定される） */
 			DaddyPenguin* m_daddyPenguin = nullptr;

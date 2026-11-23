@@ -482,6 +482,7 @@
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffectChain.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\Effect\FormationEffects.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationContext.h" />
+    <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationFetchRule.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\Formation\FormationVisual.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinIState.h" />
     <ClInclude Include="Source\Actor\Character\Penguin\ChildPenguin\NaughtyChildPenguinStateMachine.h" />

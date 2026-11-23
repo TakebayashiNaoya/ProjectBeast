@@ -476,6 +476,14 @@ namespace app
 
 		void ChildPenguinAIController::BuildInput()
 		{
+			// 散開陣の迎え中は、隊列の位置の代わりに野良へ向かう
+			Vector3 fetchPos;
+			if (ChildPenguinManager::GetInstance()->TryGetFetchTargetPosition(m_owner, fetchPos))
+			{
+				BuildInputToTarget(fetchPos, false, ChildPenguinManager::GetInstance()->GetFetchSpeedMultiplier());
+				return;
+			}
+
 			// SlideEnd中も入力を受け付ける（入力が来たら走り出す）
 			const Vector3 targetPos = m_owner->GetFormationTargetPosition();
 			BuildInputToTarget(targetPos);
@@ -491,7 +499,7 @@ namespace app
 		}
 
 
-		Vector3 ChildPenguinAIController::CalculateMoveDirectionWithNav(const Vector3& targetPos, const float distToTarget)
+		Vector3 ChildPenguinAIController::CalculateMoveDirectionWithNav(const Vector3& targetPos, const float distToTarget, bool useDaddyFlow)
 		{
 			/**
 			 * 親（隊列）へ向かう遠距離移動だけ、親へのフローフィールドに沿って
@@ -500,7 +508,7 @@ namespace app
 			 * 精密な寄せを乱さないよう直進にする
 			 */
 			auto* manager = ChildPenguinManager::GetInstance();
-			if (distToTarget > NAV_FLOW_MIN_DISTANCE)
+			if (useDaddyFlow && distToTarget > NAV_FLOW_MIN_DISTANCE)
 			{
 				Vector3 targetToDaddy = targetPos - manager->GetDaddyPosition();
 				targetToDaddy.y = 0.0f;
@@ -552,7 +560,7 @@ namespace app
 		}
 
 
-		void ChildPenguinAIController::BuildInputToTarget(const Vector3& targetPos)
+		void ChildPenguinAIController::BuildInputToTarget(const Vector3& targetPos, bool useDaddyFlow, float speedScale)
 		{
 			const float distToTarget = GetDistanceToTarget(targetPos);
 
@@ -576,13 +584,14 @@ namespace app
 			 * moveDirectionのスケール（長さ）を変えると本来の速度設定が崩れてしまう。
 			 * 基本速度の調整はSetMoveSpeed()、目標手前での減速やブレーキはSetSpeedMultiplier()経由で行う。
 			 */
-			const Vector3 targetMoveDirection = CalculateMoveDirectionWithNav(targetPos, distToTarget);
+			const Vector3 targetMoveDirection = CalculateMoveDirectionWithNav(targetPos, distToTarget, useDaddyFlow);
 			Vector3 moveDirection = targetMoveDirection;
 
 			// 陣形と追いつき補正の速度倍率（滑走の判定に使うので先に設定する）
 			m_stateMachine->SetExternalSpeedMultiplier(
 				ChildPenguinManager::GetInstance()->GetFormationSpeedMultiplier()
-				* CalcCatchUpMultiplier(distToTarget, m_runDistance));
+				* CalcCatchUpMultiplier(distToTarget, m_runDistance)
+				* speedScale);
 
 			// おっちょこちょいは滑走中に切り返せず、目標を通り過ぎても勢いのまま滑る
 			const bool isSliding = m_stateMachine->IsEqualCurrentState(PenguinSlideStartState::ID())

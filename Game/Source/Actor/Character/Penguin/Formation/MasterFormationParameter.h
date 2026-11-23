@@ -46,6 +46,14 @@ namespace app
 			float rowSpacing;
 			/** 形状: 三角陣の列間隔（三角陣のみ使用） */
 			float colSpacing;
+			/** パッシブ: 迎えの範囲のレベル0の値（親からの距離。0で迎えない） */
+			float passiveFetchRadiusBase;
+			/** パッシブ: 迎えの範囲の陣形レベルごとの増分 */
+			float passiveFetchRadiusPerLevel;
+			/** パッシブ: 迎え役の速度倍率 */
+			float passiveFetchSpeedMultiplier;
+			/** パッシブ: 迎えを打ち切るまでの時間（秒） */
+			float passiveFetchTimeLimit;
 
 			/** パッシブ: 渦潮耐性を持つか（0/1） */
 			int passiveWhirlpoolResistance;

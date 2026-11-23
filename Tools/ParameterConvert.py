@@ -205,11 +205,11 @@ def pack_pbr_parameter(data):
     )
 
 def pack_formation_parameter(data):
-    # MasterFormationParameter（float×7 → int×3 の順でメモリレイアウトに合わせる）
+    # MasterFormationParameter（float×11 → int×3 の順でメモリレイアウトに合わせる）
     # データが8の倍数なので末尾パディングは発生しない（基底クラスのアライメントは8）。
-    # "<7f3i" = f(4)×7 + i(4)×3 = 40 bytes
+    # "<11f3i" = f(4)×11 + i(4)×3 = 56 bytes
     return struct.pack(
-        "<7f3i",
+        "<11f3i",
         float(data.get("passiveSpeedMultiplier",       0.0)),  # f : パッシブ固定速度倍率
         float(data.get("passiveSpeedBase",             0.0)),  # f : パッシブ レベル0の速度倍率
         float(data.get("passiveSpeedPerLevel",         0.0)),  # f : パッシブ レベルごとの速度増分
@@ -217,6 +217,10 @@ def pack_formation_parameter(data):
         float(data.get("joinMargin",                   0.0)),  # f : 形状 入隊判定マージン
         float(data.get("rowSpacing",                   0.0)),  # f : 形状 三角陣の行間隔
         float(data.get("colSpacing",                   0.0)),  # f : 形状 三角陣の列間隔
+        float(data.get("passiveFetchRadiusBase",       0.0)),  # f : パッシブ 迎えの範囲のレベル0の値
+        float(data.get("passiveFetchRadiusPerLevel",   0.0)),  # f : パッシブ 迎えの範囲のレベルごとの増分
+        float(data.get("passiveFetchSpeedMultiplier",  1.0)),  # f : パッシブ 迎え役の速度倍率
+        float(data.get("passiveFetchTimeLimit",        0.0)),  # f : パッシブ 迎えを打ち切るまでの時間（秒）
         int(bool(data.get("passiveWhirlpoolResistance", False))),  # i : パッシブ 渦潮耐性 (0/1)
         int(bool(data.get("passiveBearAttackNullify",   False))),  # i : パッシブ シロクマ・シャチの攻撃無効化 (0/1)
         int(data.get("baseFollowers",                  0)),        # i : 形状 リング1の配置数

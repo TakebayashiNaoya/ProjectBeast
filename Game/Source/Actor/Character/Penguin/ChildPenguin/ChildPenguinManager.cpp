@@ -9,6 +9,7 @@
 #include "ChildPenguinStateMachine.h"
 #include "ChildPenguinTypes.h"
 #include "Source/Actor/Character/Penguin/Formation/FormationContext.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationFetchRule.h"
 #if defined(_DEBUG) || defined(K2_DEBUG)
 #include "Source/Actor/Character/Penguin/Formation/FormationDebugMonitor.h"
 #endif
@@ -594,6 +595,7 @@ namespace app
 			ScoreManager::GetInstance().SubTotalCount();
 
 			/** 状態管理セットからも取り除く */
+			RemoveFromFetch(penguin);
 			m_downingPenguins.erase(penguin);
 			m_attemptingPenguins.erase(penguin);
 			m_roamingPenguins.erase(penguin);
@@ -697,6 +699,208 @@ namespace app
 			int index = static_cast<int>(type);
 			if (index < 0 || index >= static_cast<int>(EnFormationType::Num)) index = 0;
 			return FORMATION_COLORS[index];
+		}
+
+
+
+		//============================================//
+		// 散開陣の迎え
+		//============================================//
+
+		namespace
+		{
+			/** 迎え役が野良に触れたとみなす距離（世話焼きの手が届く距離と同じ） */
+			constexpr float FETCH_CONTACT_DISTANCE = 25.0f;
+			/** 迎えの途中で野良が範囲からこれ以上はみ出したらやめる */
+			constexpr float FETCH_RADIUS_MARGIN = 100.0f;
+			/** 野良のこの距離に狩り中のクマがいたら迎えない */
+			constexpr float FETCH_BEAR_DANGER_RADIUS = 300.0f;
+			/** 迎え終えた野良をまた迎えるまでの時間（秒） */
+			constexpr float FETCH_COOLDOWN_TIME = 5.0f;
+
+
+			/** @brief 死んでいるか */
+			bool IsPenguinDead(ChildPenguin* penguin)
+			{
+				const auto* status = penguin->GetStateMachine()->GetChildPenguinStatus();
+				return status == nullptr || status->IsDead();
+			}
+
+
+			/** @brief 渦潮に巻き込まれているか */
+			bool IsPenguinInWhirlpool(ChildPenguin* penguin)
+			{
+				return penguin->GetStateMachine()->GetIsInWhirlpool();
+			}
+		}
+
+
+		void ChildPenguinManager::UpdateFetch(float radius, float speedMultiplier, float timeLimit, float dt)
+		{
+			if (radius <= 0.0f || m_daddyPenguin == nullptr || m_command != EnPenguinCommand::Follow)
+			{
+				CancelAllFetches();
+				return;
+			}
+			m_fetchRadius = radius;
+			m_fetchSpeedMultiplier = speedMultiplier;
+			m_fetchTimeLimit = timeLimit;
+
+			for (auto it = m_fetchCooldowns.begin(); it != m_fetchCooldowns.end(); )
+			{
+				it->remaining -= dt;
+				it = (it->remaining <= 0.0f) ? m_fetchCooldowns.erase(it) : it + 1;
+			}
+
+			// 続いている組を確かめる。触れたら入隊させ、続けられなければやめる
+			for (auto it = m_fetchEntries.begin(); it != m_fetchEntries.end(); )
+			{
+				it->elapsed += dt;
+				bool isFinished = (CheckFetchCancelReason(*it, radius) != nullptr);
+				if (!isFinished)
+				{
+					Vector3 diff = it->target->GetTransform().m_position - it->fetcher->GetTransform().m_position;
+					diff.y = 0.0f;
+					if (diff.LengthSq() <= FETCH_CONTACT_DISTANCE * FETCH_CONTACT_DISTANCE)
+					{
+						it->target->GetAIController()->OnFetched();
+						if (auto* lm = GameLogManager::GetInstance())
+						{
+							lm->QueueEvent({
+								{ "ev",         "penguin_fetch" },
+								{ "fetcher_id", it->fetcher->GetLogId() },
+								{ "penguin_id", it->target->GetLogId() }
+							});
+						}
+						isFinished = true;
+					}
+				}
+
+				if (isFinished)
+				{
+					m_fetchCooldowns.push_back({ it->target, FETCH_COOLDOWN_TIME });
+					it = m_fetchEntries.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+			}
+
+			// 空いた仲間を、範囲に入った野良に割り当てる
+			const Vector3 daddyPos = GetDaddyPosition();
+			std::vector<ChildPenguin*> wilds;
+			std::vector<Vector3> wildPositions;
+			for (auto* penguin : m_childPenguinList)
+			{
+				if (penguin == nullptr) continue;
+				Vector3 diff = penguin->GetTransform().m_position - daddyPos;
+				diff.y = 0.0f;
+				if (diff.LengthSq() > radius * radius) continue;
+				if (!CanBeFetched(penguin)) continue;
+				wilds.push_back(penguin);
+				wildPositions.push_back(penguin->GetTransform().m_position);
+			}
+			if (wilds.empty()) return;
+
+			std::vector<ChildPenguin*> freeFollowers;
+			std::vector<Vector3> freePositions;
+			for (auto* follower : m_followers)
+			{
+				if (follower == nullptr) continue;
+				const bool isBusy = std::any_of(m_fetchEntries.begin(), m_fetchEntries.end(),
+					[follower](const FetchEntry& e) { return e.fetcher == follower; });
+				if (isBusy) continue;
+				if (IsDowning(follower) || follower->IsInsideIgloo() || IsPenguinInWhirlpool(follower)) continue;
+				freeFollowers.push_back(follower);
+				freePositions.push_back(follower->GetTransform().m_position);
+			}
+
+			for (const auto& pair : fetchRule::SelectPairs(daddyPos, radius, wildPositions, freePositions))
+			{
+				m_fetchEntries.push_back({ freeFollowers[pair.followerIndex], wilds[pair.wildIndex], 0.0f });
+			}
+		}
+
+
+		void ChildPenguinManager::CancelAllFetches()
+		{
+			m_fetchEntries.clear();
+			m_fetchRadius = 0.0f;
+		}
+
+
+		bool ChildPenguinManager::TryGetFetchTargetPosition(const ChildPenguin* fetcher, Vector3& outPos) const
+		{
+			for (const auto& entry : m_fetchEntries)
+			{
+				if (entry.fetcher != fetcher) continue;
+				outPos = entry.target->GetTransform().m_position;
+				return true;
+			}
+			return false;
+		}
+
+
+		const char* ChildPenguinManager::CheckFetchCancelReason(const FetchEntry& entry, float radius) const
+		{
+			ChildPenguin* fetcher = entry.fetcher;
+			ChildPenguin* target = entry.target;
+
+			if (!IsFollower(fetcher) || IsPenguinDead(fetcher)) return "fetcher_left";
+			if (IsDowning(fetcher)) return "fetcher_down";
+			if (fetcher->IsInsideIgloo()) return "fetcher_igloo";
+			if (IsPenguinInWhirlpool(fetcher)) return "fetcher_whirlpool";
+
+			if (IsFollower(target)) return "target_joined";
+			if (IsPenguinDead(target)) return "target_dead";
+			if (target->IsInsideIgloo()) return "target_igloo";
+			if (IsPenguinInWhirlpool(target)) return "target_whirlpool";
+			if (IsAttempting(target)) return "target_attempting";
+
+			const Vector3 targetPos = target->GetTransform().m_position;
+			Vector3 diff = targetPos - GetDaddyPosition();
+			diff.y = 0.0f;
+			const float limit = radius + FETCH_RADIUS_MARGIN;
+			if (diff.LengthSq() > limit * limit) return "target_far";
+
+			Vector3 bearPos;
+			if (FindNearestBearThreat(targetPos, FETCH_BEAR_DANGER_RADIUS, bearPos)) return "bear";
+
+			if (m_fetchTimeLimit > 0.0f && entry.elapsed > m_fetchTimeLimit) return "timeout";
+			return nullptr;
+		}
+
+
+		bool ChildPenguinManager::CanBeFetched(ChildPenguin* penguin) const
+		{
+			if (IsFollower(penguin) || IsPenguinDead(penguin)) return false;
+			if (penguin->IsInsideIgloo() || IsPenguinInWhirlpool(penguin) || IsAttempting(penguin)) return false;
+
+			for (const auto& entry : m_fetchEntries)
+			{
+				if (entry.target == penguin) return false;
+			}
+			for (const auto& cooldown : m_fetchCooldowns)
+			{
+				if (cooldown.target == penguin) return false;
+			}
+
+			Vector3 bearPos;
+			return !FindNearestBearThreat(penguin->GetTransform().m_position, FETCH_BEAR_DANGER_RADIUS, bearPos);
+		}
+
+
+		void ChildPenguinManager::RemoveFromFetch(const ChildPenguin* penguin)
+		{
+			m_fetchEntries.erase(
+				std::remove_if(m_fetchEntries.begin(), m_fetchEntries.end(),
+					[penguin](const FetchEntry& e) { return e.fetcher == penguin || e.target == penguin; }),
+				m_fetchEntries.end());
+			m_fetchCooldowns.erase(
+				std::remove_if(m_fetchCooldowns.begin(), m_fetchCooldowns.end(),
+					[penguin](const FetchCooldown& c) { return c.target == penguin; }),
+				m_fetchCooldowns.end());
 		}
 
 

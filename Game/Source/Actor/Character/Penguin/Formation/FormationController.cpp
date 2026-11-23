@@ -74,6 +74,10 @@ namespace app
 					p.joinMargin                  = util::JsonConverter::ToFloat(j, "joinMargin");
 					p.rowSpacing                  = util::JsonConverter::ToFloat(j, "rowSpacing");
 					p.colSpacing                  = util::JsonConverter::ToFloat(j, "colSpacing");
+					p.passiveFetchRadiusBase      = util::JsonConverter::ToFloat(j, "passiveFetchRadiusBase");
+					p.passiveFetchRadiusPerLevel  = util::JsonConverter::ToFloat(j, "passiveFetchRadiusPerLevel");
+					p.passiveFetchSpeedMultiplier = util::JsonConverter::ToFloat(j, "passiveFetchSpeedMultiplier");
+					p.passiveFetchTimeLimit       = util::JsonConverter::ToFloat(j, "passiveFetchTimeLimit");
 					p.baseFollowers               = util::JsonConverter::ToInt(j, "baseFollowers");
 				}
 			);
