@@ -216,36 +216,8 @@ namespace app
 			}
 		}
 
-		void DaddyPenguinController::UpdateClingySlow()
-		{
-			// ChildPenguinManagerから隊列の中に甘えん坊が何匹いるかを取得する。
-			m_clingyCount = ChildPenguinManager::GetInstance()->GetClingyCount();
-
-			// 甘えん坊がいなければ等倍のまま。
-			if (m_clingyCount <= 0)
-			{
-				m_speedMultiplier = 1.0f;
-				return;
-			}
-
-			const int MAX_SLOW_PERCENT = 20;	// 最大減速率（%）
-			const int MAX_PERCENT = 100;		// 最大値（%）
-
-			// float計算だとずれが出るので、int計算で減速率を決める。
-			int slowPercent = min(m_clingyCount * 1, MAX_SLOW_PERCENT);
-			// 現在の減速率を計算。
-			int currentPercent = MAX_PERCENT - slowPercent;
-
-			m_speedMultiplier = currentPercent / static_cast<float>(MAX_PERCENT);
-		}
-
-
 		void DaddyPenguinController::Update()
 		{
-			// 減速率は移動入力の有無にかかわらず毎フレーム更新する
-			// （ログのtickが入力していないフレームでも正しい値を拾えるようにするため）
-			UpdateClingySlow();
-
 			// =========================================================
 			// 移動入力の更新
 			// =========================================================
@@ -310,15 +282,7 @@ namespace app
 					inputDir.Normalize();
 				}
 
-
-				//===========================================================//
-				// 甘えん坊の数に応じて親ペンギンの移動速度を調整するロジック//
-				//===========================================================//
-				// 減速率は UpdateClingySlow() で算出済みのものを使う。
-				// 最終的なスティックの入力値。
-				float finalStickLength = util::clamp<float>(stickLength * m_speedMultiplier, 0.0f, 1.0f);
-
-				moveDirection = inputDir * finalStickLength;
+				moveDirection = inputDir * stickLength;
 
 				/** スティックの倒し具合でスニークかダッシュかを決める */
 				const float SNEAK_THRESHOLD = 0.9f;
