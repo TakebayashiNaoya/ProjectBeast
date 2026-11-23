@@ -402,6 +402,13 @@ namespace app
 			/** @brief 迎え役の速度倍率 */
 			float GetFetchSpeedMultiplier() const { return m_fetchSpeedMultiplier; }
 
+			/**
+			 * @brief 演出の大きさ合わせ用の円を親の足元に描く（調整用）
+			 * @param radius 半径（0以下で消す）
+			 * @param type   陣形（円の色を選ぶ）
+			 */
+			void SetFormationFitCircle(float radius, EnFormationType type);
+
 		private:
 			/** 迎えの組 */
 			struct FetchEntry

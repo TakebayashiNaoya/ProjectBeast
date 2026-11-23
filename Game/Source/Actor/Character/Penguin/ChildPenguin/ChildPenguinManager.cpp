@@ -735,6 +735,14 @@ namespace app
 		}
 
 
+		void ChildPenguinManager::SetFormationFitCircle(float radius, EnFormationType type)
+		{
+			if (m_daddyPenguin == nullptr) radius = 0.0f;
+			const Vector3 center = (m_daddyPenguin != nullptr) ? m_daddyPenguin->GetTransform().m_position : Vector3::Zero;
+			m_rangeVisualizer.SetFitCircle(center, radius, type);
+		}
+
+
 		void ChildPenguinManager::UpdateFetch(float radius, float speedMultiplier, float timeLimit, float dt)
 		{
 			if (radius <= 0.0f || m_daddyPenguin == nullptr || m_command != EnPenguinCommand::Follow)
