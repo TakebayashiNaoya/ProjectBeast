@@ -65,8 +65,6 @@ namespace app
 			 * @details シロクマはポリゴンが多く、輪郭線でもう一度描くとGPU時間がかかる。遠くでは輪郭線が目立たないので省く
 			 */
 			constexpr float OUTLINE_MAX_DISTANCE = 2000.0f;
-			/** 小窓（サブビュー）に描く最大距離（小窓のカメラから）。小窓は小さく、遠くのシロクマはほとんど見えない */
-			constexpr float SUB_VIEW_MAX_DRAW_DISTANCE = 2000.0f;
 
 		}
 
@@ -78,7 +76,6 @@ namespace app
 			// 近いカスケードにだけ影を描き、遠くでは省く
 			GetModelRender().SetCastShadowInFarCascades(false);
 			GetModelRender().SetOutlineMaxDistance(OUTLINE_MAX_DISTANCE);
-			GetModelRender().SetSubViewMaxDrawDistance(SUB_VIEW_MAX_DRAW_DISTANCE);
 
 			m_stateMachine = std::make_unique<EnemyStateMachine>(this);
 			m_status = std::make_unique<EnemyStatus>();

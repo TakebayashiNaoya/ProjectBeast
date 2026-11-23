@@ -178,7 +178,7 @@ namespace app
 		//------------------------------------------------------------
 		enum class LoadPhase
 		{
-			None, Stage, StageWait, DecalPrewarm, Daddy, Children, Enemy, Camera, Ocean, MapIcon, ModelFinalize, Done
+			None, Stage, StageWait, DecalPrewarm, Daddy, Children, Enemy, Camera, Ocean, ModelFinalize, Done
 		};
 		LoadPhase m_loadPhase = LoadPhase::None;
 		/** ロードを始めた時刻（ロード時間のログ用） */
@@ -217,7 +217,7 @@ namespace app
 		//------------------------------------------------------------
 		// ポーズ
 		//------------------------------------------------------------
-		enum class PauseState { Pause, SoundOption, Tutorial };
+		enum class PauseState { Pause, SoundOption };
 		PauseState m_pauseState = PauseState::Pause;
 
 		bool m_isPauseEntered = false;

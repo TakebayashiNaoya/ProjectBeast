@@ -31,7 +31,6 @@
     <ClCompile Include="Graphics\BeastMeshParts.cpp" />
     <ClCompile Include="Graphics\BeastModel.cpp" />
     <ClCompile Include="Graphics\Camera\CameraSystem.cpp" />
-    <ClCompile Include="Graphics\Camera\SubCameraManager.cpp" />
     <ClCompile Include="Graphics\Effect\BeastEffectEmitter.cpp" />
     <ClCompile Include="Graphics\FontRender.cpp" />
     <ClCompile Include="Graphics\Font\SDFFontEngine.cpp" />
@@ -87,7 +86,6 @@
     <ClInclude Include="Graphics\BeastMeshParts.h" />
     <ClInclude Include="Graphics\BeastModel.h" />
     <ClInclude Include="Graphics\Camera\CameraSystem.h" />
-    <ClInclude Include="Graphics\Camera\SubCameraManager.h" />
     <ClInclude Include="Graphics\Effect\BeastEffectEmitter.h" />
     <ClInclude Include="Graphics\FontRender.h" />
     <ClInclude Include="Graphics\Font\SDFFontEngine.h" />

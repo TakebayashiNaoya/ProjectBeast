@@ -14,7 +14,6 @@
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/StageSelect/StageSelectMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
-#include "Source/UI/Menus/TutorialMenu.h"
 
 
 namespace
@@ -48,7 +47,6 @@ namespace app
 		, m_nextScene(false)
 		, m_titleEventPacket(nullptr)
 		, m_soundOptionPacket(nullptr)
-		, m_tutorialPacket(nullptr)
 		, m_stageSelectPacket(nullptr)
 	{}
 
@@ -67,8 +65,6 @@ namespace app
 		ui::InitUIPacket(m_titleEventPacket, "Assets/parameter/title/Title.json");
 
 		ui::InitUIPacket(m_soundOptionPacket, "Assets/parameter/sound/SoundOption.json");
-
-		ui::InitUIPacket(m_tutorialPacket, "Assets/parameter/tutorial/Tutorial.json");
 
 		ui::InitUIPacket(m_stageSelectPacket, "Assets/parameter/UI/stageSelect/StageSelect.json");
 
@@ -138,12 +134,6 @@ namespace app
 			SoundOptionUpdate();
 			break;
 		}
-
-		case TitleState::Tutorial:
-		{
-			TutorialUpdate();
-			break;
-		}
 		}
 	}
 
@@ -171,10 +161,6 @@ namespace app
 
 		case TitleState::SoundOption:
 			if (m_soundOptionPacket) { m_soundOptionPacket->Render(rc); }
-			break;
-
-		case TitleState::Tutorial:
-			if (m_tutorialPacket) { m_tutorialPacket->Render(rc); }
 			break;
 
 		default:
@@ -230,15 +216,6 @@ namespace app
 			else if (selectKey == Hash32("SoundIcon"))
 			{
 				m_state = TitleState::SoundOption;
-			}
-			else if (selectKey == Hash32("RuleIcon"))
-			{
-				// ルール画面。
-				m_state = TitleState::Tutorial;
-				if (m_tutorialPacket->GetMenu())
-				{
-					m_tutorialPacket->GetMenu()->SetClosed(false);
-				}
 			}
 			else if (selectKey == Hash32("EndIcon"))
 			{
@@ -320,20 +297,4 @@ namespace app
 		}
 	}
 
-
-	void TitleScene::TutorialUpdate()
-	{
-		if (m_tutorialPacket)
-		{
-			m_tutorialPacket->Update();
-		}
-
-		// TutorialMenu 内で Bボタンが押されたら閉じる。
-		if (m_tutorialPacket->GetMenu() && m_tutorialPacket->GetMenu()->IsClosed())
-		{
-			SoundManager::Get().PlaySE(enSoundKind_ButtonBack);
-			m_tutorialPacket->GetMenu()->SetClosed(false);
-			m_state = TitleState::Title;
-		}
-	}
 }

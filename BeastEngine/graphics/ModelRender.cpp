@@ -397,8 +397,6 @@ namespace nsBeastEngine
 	{
 		if (!m_visible || m_isShadowOnly) return;
 		if (m_outlineModel == nullptr) return;
-		// 小窓（サブビュー）では輪郭線を描かない（小さく表示されるので目立たない割に、戦闘中のキャラが集まって重い）
-		if (g_renderingEngine->IsRenderingSubView()) return;
 		// 遠くでは輪郭線を描かない
 		if (IsFartherThanFromActiveCamera(m_outlineMaxDistance)) return;
 
@@ -709,8 +707,6 @@ namespace nsBeastEngine
 	{
 		/** 描画が有効でない場合・影だけを描く設定の場合は処理しない */
 		if (!m_visible || m_isShadowOnly) return;
-		/** 小窓では遠くのモデルを描かない */
-		if (g_renderingEngine->IsRenderingSubView() && IsFartherThanFromActiveCamera(m_subViewMaxDrawDistance)) return;
 
 		// デバイスロスト調査：この直後のドローがハングした場合にDREDレポートで
 		// モデル名を特定できるよう、コマンドリストへマーカーを刻む。
@@ -730,8 +726,7 @@ namespace nsBeastEngine
 		{
 			// トゥーン有効: GBufferへの書き込みをスキップし、フォワードパスで描画する
 			// アウトラインを先に描画して、トゥーンモデルで上書きする
-			// 小窓（サブビュー）では輪郭線を描かない（小さく表示されるので目立たない割に、戦闘中のキャラが集まって重い）
-			if (m_outlineModel != nullptr && !g_renderingEngine->IsRenderingSubView())
+			if (m_outlineModel != nullptr)
 			{
 				m_outlineModel->Draw(rc, frustum, m_maxInstance);
 			}

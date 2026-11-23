@@ -62,12 +62,6 @@ namespace nsBeastEngine
 		const RenderViewContext& GetMainView() const { return m_mainView; }
 
 		/**
-		 * @brief サブビューを取得する
-		 * @return サブビューの参照
-		 */
-		const RenderViewContext& GetSubView() const { return m_subView; }
-
-		/**
 		 * @brief メインカメラのフラスタムを取得する
 		 * @details WhirlpoolManagerなど、RenderingEngine外部から
 		 *          カリング判定を行う場合に使用する。
@@ -84,12 +78,6 @@ namespace nsBeastEngine
 		const Frustum& GetActiveFrustum() const { return *m_activeFrustum; }
 
 		/**
-		 * @brief サブカメラ用レンダリングターゲットを取得する
-		 * @return サブカメラ用レンダリングターゲットの参照
-		 */
-		RenderTarget& GetSubCameraRenderTarget() { return m_subView.renderTarget; }
-
-		/**
 		 * @brief ポストエフェクトマネージャーを取得する
 		 * @details デバッグUIから実行中にパラメーターを調整するために使う
 		 * @return ポストエフェクトマネージャーの参照
@@ -101,9 +89,6 @@ namespace nsBeastEngine
 		 * @return シャドウマップの参照
 		 */
 		ShadowMap& GetShadowMap() { return m_shadowMap; }
-
-		/** @brief 小窓（サブビュー）を描いている最中か */
-		bool IsRenderingSubView() const { return m_isRenderingSubView; }
 
 		/**
 		 * @brief 地形のベイク影（影の高さマップ）を設定する
@@ -272,13 +257,6 @@ namespace nsBeastEngine
 		 */
 		void RenderShadowMap(RenderContext& rc);
 
-		/**
-		 * @brief サブビュー用トーンマップの初期化
-		 * @details メインビューはPostEffectManager内でブルームと合わせて処理するが、
-		 *          小窓はトーンマップのみを掛けて色味をメインビューに合わせる。
-		 */
-		void InitSubViewToneMap();
-
 
 		//============================================//
 		// Execute内で呼ばれる描画処理
@@ -344,8 +322,6 @@ namespace nsBeastEngine
 	private:
 		/** メインカメラで映すビュー */
 		RenderViewContext m_mainView;
-		/** サブカメラで映すビュー */
-		RenderViewContext m_subView;
 
 		/** シーンライト */
 		SceneLight		m_sceneLight;
@@ -364,18 +340,8 @@ namespace nsBeastEngine
 		PostEffectManager m_postEffectManager;
 		/** シャドウマップ */
 		ShadowMap m_shadowMap;
-		/** 小窓（サブビュー）を描いている最中か */
-		bool m_isRenderingSubView = false;
 		/** 地形のベイク影（影の高さマップ）。地形が無いときは1x1のダミー */
 		Texture m_terrainShadowTexture;
-		/**
-		 * @brief サブビュー（小窓）専用のトーンマップ
-		 * @details サブビューはPostEffectManagerとは別の解像度のRenderTargetを使うため、
-		 *          メインビューと共有せず専用のインスタンスを持つ。
-		 *          方式・露出はメインビューと同じ既定値で初期化するが、
-		 *          デバッグUIからの調整はメインビュー側のみに反映される点に注意。
-		 */
-		ToneMap m_subViewToneMap;
 
 		/** ディファードモデルリスト */
 		std::vector<ModelRender*> m_deferredModelList;

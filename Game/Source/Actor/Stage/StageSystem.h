@@ -70,14 +70,6 @@ namespace app
 			void InitTerrainFromJson(const std::string& jsonPath);
 
 
-			/**
-			 * @brief 指定したオブジェクトキーの個数を返す
-			 * @param objectKey オブジェクトキー（"igloo" や "bearHome" など）
-			 * @return 個数
-			 */
-			uint8_t GetNumbaringObjectCount(const std::string& objectKey) const;
-
-
 		public:
 			StageSystem();
 			~StageSystem() = default;

@@ -59,7 +59,7 @@
                 "rotation": 0,
                 "position": [
                     -500,
-                    180,
+                    120,
                     0
                 ],
                 "color": [
@@ -83,31 +83,7 @@
                 "rotation": 0,
                 "position": [
                     -500,
-                    60,
-                    0
-                ],
-                "color": [
                     0,
-                    0,
-                    0,
-                    255
-                ],
-                "pivot": [
-                    0.5,
-                    0.5
-                ]
-            },
-            {
-                "type": "UIText",
-                "name": "RuleIcon",
-                "text": "ヒント",
-                "fontSize": 0.7,
-                "fontScaleX": 1.0,
-                "fontScaleY": 1.0,
-                "rotation": 0,
-                "position": [
-                    -500,
-                    -60,
                     0
                 ],
                 "color": [
@@ -131,7 +107,7 @@
                 "rotation": 0,
                 "position": [
                     -500,
-                    -180,
+                    -120,
                     0
                 ],
                 "color": [

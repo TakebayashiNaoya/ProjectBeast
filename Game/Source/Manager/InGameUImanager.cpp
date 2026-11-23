@@ -24,10 +24,8 @@
 #include "Source/UI/BearReaction/BearReactionSystem.h"
 #include "Source/UI/BearReaction/BearReactionTypes.h"
 #include "Source/UI/CPReaction/CPReactionSystem.h"
-#include "Source/UI/DangerArrow/DangerArrowSystem.h"
 #include "Source/UI/Fever/FeverIconMenu.h"
 #include "Source/UI/FormationWheel/FormationWheelMenu.h"
-#include "Source/UI/Hint/InGameHintMenu.h"
 #include "Source/UI/InGameButton/InGameButtonMenu.h"
 #include "Source/UI/InGameTimer/InGameTimerMenu.h"
 #include "Source/UI/Menus/AchievementNotificationMenu.h"
@@ -43,8 +41,6 @@
 #include "Source/UI/Menus/SearchMenu.h"
 #include "Source/UI/Menus/SoundOptionMenu.h"
 #include "Source/UI/Menus/TitleEventMenu.h"
-#include "Source/UI/Menus/TutorialMenu.h"
-#include "Source/UI/MiniMap/MiniMapMenu.h"
 #include "Source/UI/RemainingChild/RemainingChildMenu.h"
 #include "Source/UI/Ult/SpeedLineMenu.h"
 #include "Source/UI/WpWarning/WpWarningSystem.h"
@@ -121,9 +117,6 @@ namespace app
 
 		if (auto* menu = m_pbWakingUpTimerPacket->GetMenu()) menu->SetDraw(false);
 
-		// ミニマップを生成
-		ui::InitUIPacket(m_miniMapPacket, "Assets/parameter/UI/miniMap/MiniMap.json");
-
 
 		// タイトルイベントを生成
 		ui::InitUIPacket(m_titleEventPacket, "Assets/parameter/event/TitleEvent.json");
@@ -136,8 +129,6 @@ namespace app
 		ui::InitUIPacket(m_iglooPromptPacket, "Assets/parameter/UI/iglooPrompt/IglooPrompt.json");
 
 
-		// チュートリアルを生成
-		ui::InitUIPacket(m_tutorialPacket, "Assets/parameter/tutorial/Tutorial.json");
 		// 実績を生成
 		ui::InitUIPacket(m_achievementPacket, "Assets/parameter/UI/inGameAchievement/InGameAchievement.json");
 		// インゲームボタンを生成
@@ -151,8 +142,6 @@ namespace app
 
 		ui::InitUIPacket(m_speedLinePacket, "Assets/parameter/UI/ult/SpeedLine.json");
 
-		ui::InitUIPacket(m_hintPacket, "Assets/parameter/UI/hint/InGameHint.json");
-
 		// 子ペンギンリアクションシステムを生成
 		m_cpReactionSystem = std::make_unique<ui::CPReactionSystem>();
 		m_cpReactionSystem->Initialize();
@@ -161,27 +150,6 @@ namespace app
 		m_wpWarningSystem = std::make_unique<ui::WpWarningSystem>();
 		m_wpWarningSystem->Initialize();
 
-		// 危険矢印システムを生成
-		m_dangerArrowSystem = std::make_unique<ui::DangerArrowSystem>();
-		m_dangerArrowSystem->Initialize();
-	}
-
-
-	void InGameUIManager::SetMiniMapIconNum(ui::EnMiniMapIconType type, uint8_t num)
-	{
-		m_miniMapPacket->GetMenu()->SetIconNum(type, num);
-	}
-
-
-	void InGameUIManager::InitializeMapIcon()
-	{
-		m_miniMapPacket->GetMenu()->InitializeMapIcon();
-	}
-
-
-	bool InGameUIManager::InitializeMapIconStep(const int maxCount)
-	{
-		return m_miniMapPacket->GetMenu()->InitializeMapIconStep(maxCount);
 	}
 
 
@@ -427,23 +395,6 @@ namespace app
 
 
 		//--------------------------------------------//
-		// ミニマップUI通知
-		//--------------------------------------------//
-		bm.SetOnMiniMapChanged(
-			[this, daddyPenguin, CheckMenu](const ui::ActorPositions& actorPositions)
-			{
-				auto* menu = m_miniMapPacket->GetMenu();
-				CheckMenu(menu);
-
-				menu->SetActorPositions(
-					daddyPenguin->GetTransform().m_position,
-					actorPositions
-				);
-			}
-		);
-
-
-		//--------------------------------------------//
 		// 陣形レベルアップUI通知
 		//--------------------------------------------//
 		bm.SetOnFormationLevelUp(
@@ -512,15 +463,12 @@ namespace app
 		if (m_cpReactionSystem) m_cpReactionSystem->Update();
 		if (m_bearReactionSystem) m_bearReactionSystem->Update();
 		if (m_wpWarningSystem) m_wpWarningSystem->Update();
-		if (m_dangerArrowSystem) m_dangerArrowSystem->Update();
 		if (m_enemySleepingPacket) m_enemySleepingPacket->Update();
 		if (m_pbWakingUpTimerPacket) m_pbWakingUpTimerPacket->Update();
 		if (m_iglooPromptPacket) m_iglooPromptPacket->Update();
-		if (m_miniMapPacket) m_miniMapPacket->Update();
 		if (m_achievementPacket) m_achievementPacket->Update();
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Update();
 		if (m_speedLinePacket) m_speedLinePacket->Update();
-		if (m_hintPacket) m_hintPacket->Update();
 
 		if (m_achievementPacket)
 		{
@@ -621,10 +569,8 @@ namespace app
 		if (m_bearReactionSystem) m_bearReactionSystem->Render(rc);
 		if (m_cpReactionSystem) m_cpReactionSystem->Render(rc);
 		if (m_wpWarningSystem) m_wpWarningSystem->Render(rc);
-		if (m_dangerArrowSystem) m_dangerArrowSystem->Render(rc);
 		if (m_pbWakingUpTimerPacket) m_pbWakingUpTimerPacket->Render(rc);
 		if (m_iglooPromptPacket) m_iglooPromptPacket->Render(rc);
-		if (m_miniMapPacket) m_miniMapPacket->Render(rc);
 		if (m_timerPacket) m_timerPacket->Render(rc);
 		if (m_remainingChildPacket) m_remainingChildPacket->Render(rc);
 		if (m_achievementNotificationPacket) m_achievementNotificationPacket->Render(rc);
@@ -633,7 +579,6 @@ namespace app
 		if (m_debufPacket) m_debufPacket->Render(rc);
 		if (m_feverIconPacket) m_feverIconPacket->Render(rc);
 		if (m_levelUpIconPacket) m_levelUpIconPacket->Render(rc);
-		if (m_hintPacket) m_hintPacket->Render(rc);
 	}
 
 
@@ -662,9 +607,4 @@ namespace app
 		if (m_soundOptionPacket) m_soundOptionPacket->Render(rc);
 	}
 
-
-	void InGameUIManager::RenderTutorial(RenderContext& rc)
-	{
-		if (m_tutorialPacket) m_tutorialPacket->Render(rc);
-	}
 }

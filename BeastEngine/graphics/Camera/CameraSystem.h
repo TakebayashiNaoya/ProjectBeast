@@ -1,6 +1,6 @@
 ﻿/**
  * @file CameraSystem.h
- * @brief カメラシステム。メイン・サブカメラの保持と更新を行う
+ * @brief カメラシステム。メインカメラの保持を行う
  */
 #pragma once
 
@@ -11,11 +11,8 @@ namespace nsBeastEngine
 
 	/**
 	 * @brief カメラシステム
-	 * @details メインカメラとサブカメラの実体を保持し、毎フレーム更新する。
+	 * @details メインカメラの参照と、描画中のアクティブカメラを保持する。
 	 *          メインカメラは g_camera3D をラップして提供する。
-	 *          g_camera3D の Update は GraphicsEngine::BeginRender() が行うため、
-	 *          CameraSystem::Update() ではサブカメラのみ更新する。
-	 *          サブカメラの生成・破棄は SubCameraManager から呼び出す。
 	 */
 	class CameraSystem
 	{
@@ -25,24 +22,6 @@ namespace nsBeastEngine
 		 * @details g_camera3D をメインカメラとして設定する
 		 */
 		void Init();
-
-		/**
-		 * @brief 毎フレームの更新処理
-		 * @details サブカメラのみ更新する。メインカメラは GraphicsEngine が更新する
-		 */
-		void Update();
-
-		/**
-		 * @brief サブカメラを生成する
-		 * @details SubCameraManager から呼び出す
-		 */
-		void CreateSubCamera();
-
-		/**
-		 * @brief サブカメラを破棄する
-		 * @details SubCameraManager から呼び出す
-		 */
-		void DestroySubCamera();
 
 
 	public:
@@ -85,39 +64,10 @@ namespace nsBeastEngine
 			m_activeCamera = camera;
 		}
 
-		/**
-		 * @brief サブカメラを取得する
-		 * @return サブカメラのポインタ。未生成の場合はnullptr
-		 */
-		nsK2EngineLow::Camera* GetSubCamera()
-		{
-			return m_subCamera;
-		}
-
-		/**
-		 * @brief サブカメラを取得する（const版）
-		 * @return サブカメラのconstポインタ。未生成の場合はnullptr
-		 */
-		const nsK2EngineLow::Camera* GetSubCamera() const
-		{
-			return m_subCamera;
-		}
-
-		/**
-		 * @brief サブカメラが有効かどうかを返す
-		 * @return サブカメラが生成されていればtrue
-		 */
-		bool HasSubCamera() const
-		{
-			return m_subCamera != nullptr;
-		}
-
 
 	private:
 		/** メインカメラ（g_camera3D をラップ。実体は k2EngineLow が所有） */
 		nsK2EngineLow::Camera* m_mainCamera = nullptr;
-		/** サブカメラ */
-		nsK2EngineLow::Camera* m_subCamera = nullptr;
 		/** 現在描画中のカメラ（ExecuteViewPass前にセットされる） */
 		nsK2EngineLow::Camera* m_activeCamera = nullptr;
 
