@@ -23,10 +23,9 @@ namespace app
 			{
 				switch (type)
 				{
-				case EnFormationType::Circle:   return u8"円陣（通常）";
-				case EnFormationType::Triangle: return u8"三角陣（スピード特化）";
-				case EnFormationType::Cluster:  return u8"密集陣（防御特化）";
-				case EnFormationType::Scatter:  return u8"散開陣（収集特化）";
+				case EnFormationType::Speed:   return u8"三角陣（スピード特化）";
+				case EnFormationType::Defense: return u8"密集陣（防御特化）";
+				case EnFormationType::Gather:  return u8"散開陣（収集特化）";
 				default:                        return u8"不明";
 				}
 			}
@@ -65,6 +64,8 @@ namespace app
 			ImGui::SeparatorText(u8"発動中の効果");
 			ImGui::Text(u8"速度倍率: %.2fx", m_manager->GetFormationSpeedMultiplier());
 			ImGui::Text(u8"渦潮耐性: %s", m_manager->HasWhirlpoolResistance() ? u8"あり" : u8"なし");
+			ImGui::Text(u8"迎えの範囲: %.1f", m_manager->GetFetchRadius());
+			ImGui::Text(u8"迎え中の数: %d", m_manager->GetFetchingCount());
 		}
 	}
 }

@@ -92,23 +92,7 @@ namespace app
 		/****************************************/
 
 
-		CircleFormation::CircleFormation(const MasterFormationParameter& param) : RingFormation(param)
-		{
-			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
-			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
-			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
-
-			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::CircleAuraBegin, EnEffectKind::CircleAuraEnd);
-		}
-
-
-		
-
-		/****************************************/
-
-
-		ClusterFormation::ClusterFormation(const MasterFormationParameter& param) : RingFormation(param)
+		DefenseFormation::DefenseFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
 			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率 + 渦潮耐性 + シロクマ・シャチの攻撃無効化
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
@@ -123,7 +107,7 @@ namespace app
 			}
 
 			// パッシブ演出: バリア（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::ClusterBarrierBegin, EnEffectKind::ClusterBarrierEnd);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Defense, EnEffectKind::DefenseBarrierBegin, EnEffectKind::DefenseBarrierEnd, EnAuraFit::OuterRadius, EnAuraScale::Uniform, param);
 		}
 
 
@@ -132,14 +116,16 @@ namespace app
 		/****************************************/
 
 
-		ScatterFormation::ScatterFormation(const MasterFormationParameter& param) : RingFormation(param)
+		GatherFormation::GatherFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
 			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
 			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
+			// 範囲に入った野良を仲間が迎えに行く
+			m_passive.AddEffect(std::make_unique<WildChildFetchEffect>(&param.passiveFetchRadiusBase, &param.passiveFetchRadiusPerLevel, &param.passiveFetchSpeedMultiplier, &param.passiveFetchTimeLimit));
 
 			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::ScatterAura, EnEffectKind::None);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Gather, EnEffectKind::GatherAura, EnEffectKind::None, EnAuraFit::FetchRange, EnAuraScale::Horizontal, param);
 		}
 
 
@@ -148,7 +134,7 @@ namespace app
 		/****************************************/
 
 
-		TriangleFormation::TriangleFormation(const MasterFormationParameter& param)
+		SpeedFormation::SpeedFormation(const MasterFormationParameter& param)
 			: IFormation(param)
 		{
 			// パッシブ: レベル連動速度 × 固定倍率（スピード特化）
@@ -156,11 +142,11 @@ namespace app
 			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
 			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::TriangleAuraBegin, EnEffectKind::TriangleAuraEnd);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Speed, EnEffectKind::SpeedAuraBegin, EnEffectKind::SpeedAuraEnd, EnAuraFit::OuterRadius, EnAuraScale::Horizontal, param);
 		}
 
 
-		void TriangleFormation::CalculatePositions(
+		void SpeedFormation::CalculatePositions(
 			const Vector3& center,
 			const Vector3& forward,
 			std::vector<Vector3>& out,

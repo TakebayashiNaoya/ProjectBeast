@@ -200,7 +200,7 @@ namespace app
 
 			IFormation*     m_currentFormation = nullptr;					/** 現在の陣形インスタンスへのポインタ */
 			IFormation*     m_passiveFormation = nullptr;					/** パッシブをEnter済みの陣形（UpdatePassiveで陣形の変化を検知する） */
-			EnFormationType m_currentType      = EnFormationType::Circle;	/** 現在の陣形種別 */
+			EnFormationType m_currentType      = INITIAL_FORMATION_TYPE;	/** 現在の陣形種別 */
 			int             m_formationLevel   = 0;							/** 現在の陣形レベル */
 			int             m_ringProgress     = 0;							/** 現在進行中のリング内の進行人数 */
 			int             m_ringRequirement  = FOLLOWERS_PER_LEVEL;			/** 現在進行中のリングの満員人数 */

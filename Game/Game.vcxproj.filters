@@ -136,9 +136,6 @@
     <Filter Include="Source\UI\Modules\FrontChecker">
       <UniqueIdentifier>{79145728-3639-4801-90bd-867ec9ce8236}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI\Ult">
-      <UniqueIdentifier>{0322ab75-2fbc-4ff0-a739-654fef038f85}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Actor\IK">
       <UniqueIdentifier>{0100f162-d084-4604-b33f-cbcf9405e8aa}</UniqueIdentifier>
     </Filter>
@@ -654,9 +651,6 @@
     </ClCompile>
     <ClCompile Include="Source\Util\RandomDevice.cpp">
       <Filter>Source\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UI\Ult\SpeedLineMenu.cpp">
-      <Filter>Source\UI\Ult</Filter>
     </ClCompile>
     <ClCompile Include="Source\Actor\Character\penguin\Formation\FormationVisual.cpp">
       <Filter>Source\Actor\Character\penguin\Formation</Filter>
@@ -1203,6 +1197,9 @@
     <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationContext.h">
       <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationFetchRule.h">
+      <Filter>Source\Actor\Character\penguin\Formation</Filter>
+    </ClInclude>
     <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h">
       <Filter>Source\UI\BearReaction</Filter>
     </ClInclude>
@@ -1262,9 +1259,6 @@
     </ClInclude>
     <ClInclude Include="Source\Util\RandomDevice.h">
       <Filter>Source\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UI\Ult\SpeedLineMenu.h">
-      <Filter>Source\UI\Ult</Filter>
     </ClInclude>
     <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationVisual.h">
       <Filter>Source\Actor\Character\penguin\Formation</Filter>

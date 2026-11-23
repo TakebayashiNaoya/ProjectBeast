@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "FormationEffects.h"
 #include "Source/Manager/BattleManager.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 
 
 namespace app
@@ -22,6 +23,20 @@ namespace app
 		void BearAttackNullifyEffect::Exit(const FormationContext& ctx)
 		{
 			BattleManager::GetInstance().SetBearAttackNullified(false);
+		}
+
+
+		void WildChildFetchEffect::Update(float dt, const FormationContext& ctx)
+		{
+			if (ctx.penguinManager == nullptr) return;
+			const float radius = *m_radiusBase + *m_radiusPerLevel * static_cast<float>(ctx.penguinManager->GetFormationLevel());
+			ctx.penguinManager->UpdateFetch(radius, *m_speedMultiplier, *m_timeLimit, dt);
+		}
+
+
+		void WildChildFetchEffect::Exit(const FormationContext& ctx)
+		{
+			if (ctx.penguinManager != nullptr) ctx.penguinManager->CancelAllFetches();
 		}
 	}
 }

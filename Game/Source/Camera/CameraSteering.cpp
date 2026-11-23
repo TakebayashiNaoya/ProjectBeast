@@ -55,6 +55,28 @@ namespace
 		if (timeConstant <= 0.0f) return 1.0f;
 		return 1.0f - expf(-deltaTime / timeConstant);
 	}
+
+	/** @brief 動き出しが速く、最後に減速する補間（easeOutExpo） */
+	float EaseOutExpo(const float t)
+	{
+		if (t >= 1.0f) return 1.0f;
+		return 1.0f - powf(2.0f, -10.0f * t);
+	}
+
+
+	/** @brief 視野角を広げる割合（0〜1）。広げる区間はease-out、戻す区間はease-in-out */
+	float CalcFovKickRate(const float elapsed, const float attackTime, const float returnTime)
+	{
+		if (elapsed < attackTime)
+		{
+			const float t = elapsed / attackTime;
+			return 1.0f - (1.0f - t) * (1.0f - t) * (1.0f - t);
+		}
+		if (returnTime <= 0.0f) return 0.0f;
+		const float t = (std::min)((elapsed - attackTime) / returnTime, 1.0f);
+		const float easeInOut = (t < 0.5f) ? 4.0f * t * t * t : 1.0f - powf(-2.0f * t + 2.0f, 3.0f) / 2.0f;
+		return 1.0f - easeInOut;
+	}
 }
 
 
@@ -176,8 +198,16 @@ namespace app
 			m_currentFov += (fovTarget - m_currentFov) * SmoothFactor(deltaTime, FOV_SMOOTH_TIME);
 
 			/** 理想のカメラ位置：高速時は少し低いアングルから */
+			/** 距離の倍率を行き先へ寄せる */
+			if (m_zoomFactor != m_zoomTo)
+			{
+				m_zoomElapsed += deltaTime;
+				const float t = (m_zoomDuration > 0.0f) ? m_zoomElapsed / m_zoomDuration : 1.0f;
+				m_zoomFactor = m_zoomFrom + (m_zoomTo - m_zoomFrom) * EaseOutExpo(t);
+			}
+
 			const Vector3 lookTarget = targetPosition + m_lookAheadOffset;
-			Vector3 idealPosition = lookTarget + m_toVector;
+			Vector3 idealPosition = lookTarget + m_toVector * m_zoomFactor;
 			idealPosition.y -= HIGH_SPEED_HEIGHT_DROP * speedT;
 
 			/** 位置のバネ追従。加速すると親が画面の先へ引っ張り、止まるとふわっと収まる。
@@ -198,8 +228,36 @@ namespace app
 			// 最終的なカメラ位置と注視点をセット
 			nextData.position = m_smoothedPosition;
 			nextData.target = lookTarget;
-			nextData.fov = m_currentFov;
+			// 引いた瞬間は視野角を減速しながら広げ、ゆっくり戻す
+			float fovKick = 0.0f;
+			if (m_fovKickElapsed < m_fovKickAttackTime + m_fovKickReturnTime)
+			{
+				m_fovKickElapsed += deltaTime;
+				fovKick = Math::DegToRad(m_fovKickDeg) * CalcFovKickRate(m_fovKickElapsed, m_fovKickAttackTime, m_fovKickReturnTime);
+			}
+			nextData.fov = m_currentFov + fovKick;
 			data = nextData;
+		}
+
+
+		void CameraSteering::StartZoom(const float target, const float duration)
+		{
+			if (target == m_zoomTo) return;
+			// 途中で行き先が変わっても、今の倍率から動き直す
+			m_zoomFrom = m_zoomFactor;
+			m_zoomTo = target;
+			m_zoomElapsed = 0.0f;
+			m_zoomDuration = duration;
+			if (duration <= 0.0f) m_zoomFactor = target;
+		}
+
+
+		void CameraSteering::StartFovKick(const float addDeg, const float attackTime, const float returnTime)
+		{
+			m_fovKickDeg = addDeg;
+			m_fovKickAttackTime = attackTime;
+			m_fovKickReturnTime = returnTime;
+			m_fovKickElapsed = 0.0f;
 		}
 	}
 }

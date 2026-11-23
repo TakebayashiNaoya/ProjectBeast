@@ -4,6 +4,7 @@
  */
 #include "stdafx.h"
 #include "FormationRangeVisualizer.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinManager.h"
 
 
 namespace app
@@ -31,6 +32,11 @@ namespace app
 			for (int i = 0; i < RIPPLE_COUNT; ++i)
 			{
 				m_rippleCircles[i].InitBand(RANGE_SEGS, RIPPLE_COLOR);
+			}
+
+			for (int i = 0; i < static_cast<int>(EnFormationType::Num); ++i)
+			{
+				m_fitCircles[i].InitBand(RANGE_SEGS * 2, ChildPenguinManager::GetFormationColor(static_cast<EnFormationType>(i)));
 			}
 
 			// TODO: スロットマーカーの初期化。実装時は以下を有効化する。
@@ -196,10 +202,23 @@ namespace app
 		}
 
 
+		void FormationRangeVisualizer::SetFitCircle(const Vector3& center, float radius, EnFormationType type)
+		{
+			const int index = static_cast<int>(type);
+			if (!m_isInitialized || radius <= 0.0f || index < 0 || index >= static_cast<int>(EnFormationType::Num))
+			{
+				m_fitCircleIndex = -1;
+				return;
+			}
+			m_fitCircleIndex = index;
+			m_fitCircles[index].UpdateBand(center, radius, FIT_HALF_WIDTH, 1.0f);
+		}
+
+
 		void FormationRangeVisualizer::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			if (!m_isInitialized) return;
-			if (!m_isVisible) return;
+			if (!m_isVisible && m_fitCircleIndex < 0) return;
 
 			// 定数バッファに VP 行列をコピー
 			Matrix VP;
@@ -211,10 +230,17 @@ namespace app
 
 			// 外周の帯と波紋の帯を、アルファブレンド有効の塗りつぶし用PSOで描画する
 			rc.SetPipelineState(m_fillPipelineState);
-			m_joinCircle.RenderBand(rc);
-			for (int i = 0; i < RIPPLE_COUNT; ++i)
+			if (m_isVisible)
 			{
-				m_rippleCircles[i].RenderBand(rc);
+				m_joinCircle.RenderBand(rc);
+				for (int i = 0; i < RIPPLE_COUNT; ++i)
+				{
+					m_rippleCircles[i].RenderBand(rc);
+				}
+			}
+			if (m_fitCircleIndex >= 0)
+			{
+				m_fitCircles[m_fitCircleIndex].RenderBand(rc);
 			}
 			// TODO: スロットマーカーの描画。実装時は m_linePipelineState をセットして
 			//       以下を有効化する。

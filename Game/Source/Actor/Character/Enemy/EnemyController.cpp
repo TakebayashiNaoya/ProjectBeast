@@ -147,9 +147,6 @@ namespace app
 			, m_isStun(false)
 			, m_isHomeInitialized(false)
 			, m_coolDownTimer(0.0f)
-			, m_maxEatCount(3)
-			, m_eatCount(0)
-			, m_isFull(false)
 			, m_isParamInitialized(false)
 			, m_attackDuration(1.5f)
 			, m_attackTimer(0.0f)
@@ -181,8 +178,6 @@ namespace app
 		{
 			if (!m_isParamInitialized)
 			{
-				m_maxEatCount = m_target->GetEnemyStateMachine()->GetOwnerStatus()->GetMaxEat();
-
 				m_isParamInitialized = true;
 			}
 
@@ -260,6 +255,29 @@ namespace app
 			/** 新しいステートのEnterを呼ぶ */
 			currentState = FindAIState(m_currentState);
 			currentState->enter(this);
+		}
+
+
+		ChildPenguin* EnemyController::FindNearestTarget(float maxDistance) const
+		{
+			const Vector3 myPos = m_target->GetTransform().m_position;
+			ChildPenguin* nearest = nullptr;
+			float nearestDistSq = maxDistance * maxDistance;
+			for (auto* penguin : actor::ChildPenguinManager::GetInstance()->GetChildPenguin())
+			{
+				if (penguin == nullptr) continue;
+				const auto* status = penguin->GetStateMachine()->GetChildPenguinStatus();
+				if (status == nullptr || status->IsDead()) continue;
+				Vector3 diff = penguin->GetTransform().m_position - myPos;
+				diff.y = 0.0f;
+				const float distSq = diff.LengthSq();
+				if (distSq < nearestDistSq)
+				{
+					nearestDistSq = distSq;
+					nearest = penguin;
+				}
+			}
+			return nearest;
 		}
 
 
@@ -995,6 +1013,7 @@ namespace app
 			// =======================================================
 			enemy->m_isTargetInsideIglooAtStart = false;
 			enemy->m_targetIglooKeyAtStart = "";
+			enemy->m_isNullifyPending = false;
 
 			if (enemy->m_foundPenguin != nullptr)
 			{
@@ -1024,6 +1043,50 @@ namespace app
 				// 二重実行防止のため、すぐに合図をリセット
 				sm->SetAttackImpact(false);
 
+				// 密集陣の子を狙っていたら、ここで弾き返す（満腹度は増やさない）
+				if (enemy->m_isNullifyPending)
+				{
+					enemy->m_isNullifyPending = false;
+					auto* bear = enemy->m_target;
+
+					/** 攻撃した子と反対方向へ弾き飛ばす（キノマティック移動） */
+					Vector3 away = bear->GetTransform().m_position
+						- enemy->m_nullifyFromPosition;
+					away.y = 0.0f;
+					if (away.LengthSq() > FLT_EPSILON) { away.Normalize(); }
+					else { away = Vector3::Front; }
+
+					Vector3 knockbackPos = bear->GetTransform().m_position
+						+ away * NULLIFY_KNOCKBACK_DISTANCE;
+					bear->GetCharacterController()->SetPosition(knockbackPos);
+					bear->GetCharacterController()->RequestTeleport();
+					bear->GetEnemyStateMachine()->SetPosition(knockbackPos);
+
+					/** スタンさせる（StunStateが時間経過で自動解除する） */
+					bear->GetEnemyStateMachine()->SetStun(true);
+					// 攻撃の旗を下ろす。残すと気絶が明けた瞬間に攻撃をやり直す
+					bear->GetEnemyStateMachine()->SetActionButtonX(false);
+					bear->GetEnemyStateMachine()->SetIsNearPenguin(false);
+
+					/** 弾かれたクマは、気絶が明けたら落ち込んで巣へ帰る（CheckAttackでReturnHomeへ） */
+					enemy->m_isRepelled = true;
+					bear->GetEnemyStateMachine()->SetDebuffReturnHome(true);
+
+					/** 「弾いた！」の手応えを演出側へ通知する（見せ方は受け取る側が決める） */
+					BattleManager::GetInstance().NotifyImpact(
+						EnImpactType::BearNullified, bear->GetTransform().m_position);
+
+					if (auto* lm = GameLogManager::GetInstance())
+					{
+						lm->QueueEvent({
+							{ "ev",         "bear_attack_nullified" },
+							{ "bear_id",    bear->GetLogId() },
+							{ "penguin_id", enemy->m_nullifyPenguinId }
+						});
+					}
+					return;
+				}
+
 				// 1. かまくらの破壊処理（開始時に「中にいる」と判定されていた場合）
 				if (enemy->m_isTargetInsideIglooAtStart && !enemy->m_targetIglooKeyAtStart.empty())
 				{
@@ -1037,15 +1100,6 @@ namespace app
 					IglooManager::GetInstance().EjectAllPenguins(iglooPos);
 					if (auto* lm = GameLogManager::GetInstance())
 						lm->QueueEvent({ {"ev", "igloo_broken"}, {"key", enemy->m_targetIglooKeyAtStart}, {"bear_id", enemy->m_target->GetLogId()} });
-				}
-				else
-				{
-					// ★修正：かまくらの外で「完全に叩きつけが成功した瞬間」に満腹度を増やす
-					enemy->m_eatCount++;
-					if (enemy->m_eatCount >= enemy->m_maxEatCount)
-					{
-						enemy->m_isFull = true;
-					}
 				}
 			}
 			// =======================================================
@@ -1061,40 +1115,10 @@ namespace app
 					&& cpManager != nullptr
 					&& cpManager->IsFollower(enemy->m_foundPenguin))
 				{
-					auto* bear = enemy->m_target;
-
-					/** 攻撃した子と反対方向へ弾き飛ばす（キノマティック移動） */
-					Vector3 away = bear->GetTransform().m_position
-						- enemy->m_foundPenguin->GetTransform().m_position;
-					away.y = 0.0f;
-					if (away.LengthSq() > FLT_EPSILON) { away.Normalize(); }
-					else { away = Vector3::Front; }
-
-					Vector3 knockbackPos = bear->GetTransform().m_position
-						+ away * NULLIFY_KNOCKBACK_DISTANCE;
-					bear->GetCharacterController()->SetPosition(knockbackPos);
-					bear->GetCharacterController()->RequestTeleport();
-					bear->GetEnemyStateMachine()->SetPosition(knockbackPos);
-
-					/** スタンさせる（StunStateが時間経過で自動解除する） */
-					bear->GetEnemyStateMachine()->SetStun(true);
-
-					/** 弾かれたクマは、気絶が明けたら巣へ帰る（CheckAttackでReturnHomeへ） */
-					enemy->m_isRepelled = true;
-
-					/** 「弾いた！」の手応えを演出側へ通知する（見せ方は受け取る側が決める） */
-					BattleManager::GetInstance().NotifyImpact(
-						EnImpactType::BearNullified, bear->GetTransform().m_position);
-
-					if (auto* lm = GameLogManager::GetInstance())
-					{
-						lm->QueueEvent({
-							{ "ev",         "bear_attack_nullified" },
-							{ "bear_id",    bear->GetLogId() },
-							{ "penguin_id", enemy->m_foundPenguin->GetLogId() }
-						});
-					}
-
+					// 攻撃のモーションは流し、振り下ろしの瞬間に弾く
+					enemy->m_isNullifyPending = true;
+					enemy->m_nullifyFromPosition = enemy->m_foundPenguin->GetTransform().m_position;
+					enemy->m_nullifyPenguinId = enemy->m_foundPenguin->GetLogId();
 					enemy->m_foundPenguin = nullptr;
 					return;
 				}
@@ -1149,18 +1173,20 @@ namespace app
 
 		int EnemyController::CheckAttack(EnemyController* enemy)
 		{
+			// 弾かれたら気絶が明けしだい帰る。気絶のあとは待機のループのアニメになり、再生中の判定を待つと抜けられない
+			if (enemy->m_isRepelled)
+			{
+				return enemy->m_target->GetEnemyStateMachine()->IsStun() ? enEnemyState_Invalid : enEnemyState_ReturnHome;
+			}
+
 			if (enemy->m_target->GetEnemyStateMachine()->IsPlayingAnimation())
 			{
 				return enEnemyState_Invalid;
 			}
 
-			// 満腹か、密集陣に弾かれたなら帰る
-			if (enemy->m_isFull || enemy->m_isRepelled)
-			{
-				return enEnemyState_ReturnHome;
-			}
-
-			// まだターゲットいるなら追跡
+			// 近くに子がいれば待機を挟まずに追い続ける（吠えるのは最初に見つけたときだけになる）
+			enemy->m_foundPenguin = enemy->FindNearestTarget(
+				enemy->m_target->GetEnemyStateMachine()->GetOwnerStatus()->GetLostChaseDistance());
 			if (enemy->m_foundPenguin != nullptr)
 			{
 				return enEnemyState_Chase;
@@ -1267,9 +1293,6 @@ namespace app
 		void EnemyController::ExitCoolDown(EnemyController* enemy)
 		{
 			enemy->m_coolDownTimer = 0.0f;
-
-			enemy->m_eatCount = 0;
-			enemy->m_isFull = false;
 
 			enemy->m_target->GetEnemyStateMachine()->SetCoolDown(false);
 			enemy->m_target->GetEnemyStateMachine()->SetStickLAmount(0.0f);

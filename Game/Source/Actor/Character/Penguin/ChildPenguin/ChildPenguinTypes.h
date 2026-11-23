@@ -28,12 +28,14 @@ namespace app
 		 */
 		enum class EnFormationType : uint8_t
 		{
-			Circle   = 0,	// 円陣（通常）
-			Triangle,		// 三角陣（スピード特化）
-			Cluster,		// 密集陣（防御特化）
-			Scatter,		// 散開陣（収集特化）
+			Speed = 0,		// 三角陣（スピード特化）
+			Defense,		// 密集陣（防御特化）
+			Gather,			// 散開陣（収集特化）
 			Num
 		};
+
+		/** ゲーム開始時の陣形 */
+		constexpr EnFormationType INITIAL_FORMATION_TYPE = EnFormationType::Gather;
 
 
 		/**
@@ -46,10 +48,9 @@ namespace app
 		{
 			switch (type)
 			{
-			case EnFormationType::Circle:   return "Circle";
-			case EnFormationType::Triangle: return "Triangle";
-			case EnFormationType::Cluster:  return "Cluster";
-			case EnFormationType::Scatter:  return "Scatter";
+			case EnFormationType::Speed:   return "Speed";
+			case EnFormationType::Defense: return "Defense";
+			case EnFormationType::Gather:  return "Gather";
 			default:                        return "Unknown";
 			}
 		}

@@ -16,8 +16,25 @@ namespace app
 		namespace
 		{
 			/** 陣形種別(EnFormationTypeの値)ごとのJSON要素名 */
-			constexpr const char* FORMATION_ICON_NAMES[] = { "CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon" };
+			constexpr const char* FORMATION_ICON_NAMES[] = { "SpeedIcon", "DefenseIcon", "GatherIcon" };
 			constexpr int FORMATION_NUM = static_cast<int>(actor::EnFormationType::Num);
+			static_assert(std::size(FORMATION_ICON_NAMES) == FORMATION_NUM, "アイコンの数が陣形の数と合わない");
+			// 3枚なら全アイコンが-1/0/+1に並ぶため、端の1枚を回り込ませる
+			static_assert(FORMATION_NUM == 3, "スロットの計算は陣形3つを前提にしている");
+
+			/**
+			 * @brief 切り替え中に反対の端へ回り込むアイコンのスロット
+			 * @param direction 切り替え方向（+1: 次へ / -1: 前へ）
+			 * @param progress  切り替えの進行度（0〜1）
+			 * @return 前半は外へ出て消え、後半は反対側から入ってくるスロット
+			 */
+			constexpr float CalculateWrapSlot(int direction, float progress)
+			{
+				const float d = static_cast<float>(direction);
+				return (progress < 0.5f) ? -d * (1.0f + 2.0f * progress) : d * (3.0f - 2.0f * progress);
+			}
+			static_assert(CalculateWrapSlot(1, 0.0f) == -1.0f && CalculateWrapSlot(1, 1.0f) == 1.0f, "回り込みの始点と終点がずれている");
+			static_assert(CalculateWrapSlot(-1, 0.0f) == 1.0f && CalculateWrapSlot(-1, 1.0f) == -1.0f, "回り込みの始点と終点がずれている");
 
 			/** 見た目チューニングのホットリロード対象JSON */
 			constexpr const char* TUNING_JSON_PATH = "Assets/parameter/UI/formationWheel/FormationWheelTuning.json";
@@ -34,21 +51,22 @@ namespace app
 			//============================================//
 
 			/** カットインのアイコン要素名（EnFormationTypeの並び順） */
-			constexpr const char* CUT_IN_ICON_NAMES[] = { "CutInIconCircle", "CutInIconTriangle", "CutInIconCluster", "CutInIconScatter" };
+			constexpr const char* CUT_IN_ICON_NAMES[] = { "CutInIconSpeed", "CutInIconDefense", "CutInIconGather" };
 			/** 陣形名（EnFormationTypeの並び順） */
 			constexpr const char* CUT_IN_NAME_TEXTS[] = {
-				"バランス",
 				"はやい",
 				"まもり",
 				"あつめる",
 			};
 			/** 副題（EnFormationTypeの並び順）。陣形の効果をひとことで */
 			constexpr const char* CUT_IN_SUB_TEXTS[] = {
-				"ふつうの じんけい",
 				"スピード アップ!",
 				"クマと シャチを はじく!",
-				"ひろく あつめる",
+				"子ペンギンが むかえに いく",
 			};
+			static_assert(std::size(CUT_IN_ICON_NAMES) == FORMATION_NUM, "カットインのアイコンの数が陣形の数と合わない");
+			static_assert(std::size(CUT_IN_NAME_TEXTS) == FORMATION_NUM, "陣形名の数が陣形の数と合わない");
+			static_assert(std::size(CUT_IN_SUB_TEXTS) == FORMATION_NUM, "副題の数が陣形の数と合わない");
 
 			/** 入り（帯が縦に開き、アイコンと文字が滑り込む）の長さ（秒） */
 			constexpr float CUT_IN_IN_TIME = 0.15f;
@@ -95,7 +113,7 @@ namespace app
 					this,
 					{
 						"BackgroundIcon",
-						"CircleIcon", "TriangleIcon", "ClusterIcon", "ScatterIcon",
+						"SpeedIcon", "DefenseIcon", "GatherIcon",
 						"LBButtonIcon", "RBButtonIcon",
 						"LevelText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
 					},
@@ -313,10 +331,9 @@ namespace app
 			for (int i = 0; i < FORMATION_NUM; i++)
 			{
 				const int diffFromOld = (i - oldIndex + FORMATION_NUM) % FORMATION_NUM;
-				if (diffFromOld == 0)                      m_fromSlot[i] = 0;
-				else if (diffFromOld == 1)                 m_fromSlot[i] = 1;
-				else if (diffFromOld == FORMATION_NUM - 1) m_fromSlot[i] = -1;
-				else                                       m_fromSlot[i] = (m_direction > 0) ? 2 : -2;
+				if (diffFromOld == 0)      m_fromSlot[i] = 0;
+				else if (diffFromOld == 1) m_fromSlot[i] = 1;
+				else                       m_fromSlot[i] = -1;
 			}
 		}
 
@@ -343,15 +360,16 @@ namespace app
 				if (isSwitching)
 				{
 					const float progress = cpm->GetFormationSwitchProgress();
-					slot = static_cast<float>(m_fromSlot[i]) - static_cast<float>(m_direction) * progress;
+					slot = (m_fromSlot[i] == -m_direction)
+						? CalculateWrapSlot(m_direction, progress)
+						: static_cast<float>(m_fromSlot[i]) - static_cast<float>(m_direction) * progress;
 				}
 				else
 				{
 					const int diffFromCurrent = (i - currentIndex + FORMATION_NUM) % FORMATION_NUM;
-					if (diffFromCurrent == 0)                      slot = 0.0f;
-					else if (diffFromCurrent == 1)                 slot = 1.0f;
-					else if (diffFromCurrent == FORMATION_NUM - 1) slot = -1.0f;
-					else                                           slot = 2.0f; // 非表示側（見えないので向きは任意）
+					if (diffFromCurrent == 0)      slot = 0.0f;
+					else if (diffFromCurrent == 1) slot = 1.0f;
+					else                           slot = -1.0f;
 				}
 
 				if (auto* ui = GetUI<UIIcon>(Hash32(FORMATION_ICON_NAMES[i])))
@@ -360,7 +378,9 @@ namespace app
 					const float scaleFactor = size / m_currentSize;
 					ui->m_transform.m_localTransform.m_position = Vector3(CalculateSlotX(slot), m_rowY, 0.0f);
 					ui->m_transform.m_localTransform.m_scale = Vector3(scaleFactor, scaleFactor, scaleFactor);
-					ui->m_color = Vector4(m_iconColor.x / 255.0f, m_iconColor.y / 255.0f, m_iconColor.z / 255.0f, CalculateSlotAlpha(slot));
+					// アイコンは陣形の色（カットインと同じ）で塗る
+					const Vector4& formationColor = actor::ChildPenguinManager::GetFormationColor(static_cast<actor::EnFormationType>(i));
+					ui->m_color = Vector4(formationColor.x, formationColor.y, formationColor.z, CalculateSlotAlpha(slot));
 				}
 			}
 
@@ -408,7 +428,6 @@ namespace app
 				m_currentSize = util::JsonConverter::ToFloat(j, "currentSize", m_currentSize);
 				m_sideSize    = util::JsonConverter::ToFloat(j, "sideSize", m_sideSize);
 				m_sideAlpha   = util::JsonConverter::ToFloat(j, "sideAlpha", m_sideAlpha);
-				m_iconColor   = util::JsonConverter::ToVector3(j, "iconColor", false, m_iconColor);
 			}
 #if defined(APP_DEBUG)
 			m_tuningLastWriteTime = util::JsonConverter::GetFileLastWriteTime(TUNING_JSON_PATH);

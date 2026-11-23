@@ -79,5 +79,31 @@ namespace app
 			void Enter(const FormationContext& ctx) override;
 			void Exit(const FormationContext& ctx) override;
 		};
+
+
+		/**
+		 * @brief 迎えエフェクト（散開陣パッシブ）
+		 * @details 範囲に入った野良へ、いちばん近い仲間を1体ずつ迎えに行かせる。
+		 *          範囲は「基本値+増分×陣形レベル」。迎えの状態はChildPenguinManagerが持つ。
+		 */
+		class WildChildFetchEffect : public IFormationEffect
+		{
+		private:
+			const float* m_radiusBase;
+			const float* m_radiusPerLevel;
+			const float* m_speedMultiplier;
+			const float* m_timeLimit;
+
+		public:
+			WildChildFetchEffect(const float* radiusBase, const float* radiusPerLevel, const float* speedMultiplier, const float* timeLimit)
+				: m_radiusBase(radiusBase)
+				, m_radiusPerLevel(radiusPerLevel)
+				, m_speedMultiplier(speedMultiplier)
+				, m_timeLimit(timeLimit)
+			{}
+
+			void Update(float dt, const FormationContext& ctx) override;
+			void Exit(const FormationContext& ctx) override;
+		};
 	}
 }

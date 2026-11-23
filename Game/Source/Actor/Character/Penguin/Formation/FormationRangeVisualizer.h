@@ -6,6 +6,7 @@
 #include <vector>
 #include "Graphics/ICustomRenderer.h"
 #include "TerrainCircle.h"
+#include "Source/Actor/Character/Penguin/ChildPenguin/ChildPenguinTypes.h"
 
 
 namespace app
@@ -56,6 +57,14 @@ namespace app
 			void Update(const Vector3& center, float joinRadius, const std::vector<Vector3>& slotPositions);
 
 			/**
+			 * @brief 演出の大きさ合わせ用の円を描く（調整用）
+			 * @param center 中心座標
+			 * @param radius 半径（0以下で消す）
+			 * @param type   陣形（円の色を選ぶ）
+			 */
+			void SetFitCircle(const Vector3& center, float radius, EnFormationType type);
+
+			/**
 			 * @brief 描画
 			 * @param rc   レンダリングコンテキスト
 			 * @param view 描画対象ビュー（カメラ行列の取得に使用）
@@ -102,6 +111,9 @@ namespace app
 
 			TerrainCircle m_joinCircle;                   /** 範囲の外周の帯（薄いオレンジ） */
 			TerrainCircle m_rippleCircles[RIPPLE_COUNT];  /** 外周から中心へ収束する波紋の帯 */
+			static constexpr float FIT_HALF_WIDTH = 6.0f;  /** 合わせ円の帯の半幅 */
+			TerrainCircle m_fitCircles[static_cast<int>(EnFormationType::Num)];  /** 演出の大きさ合わせ用の円（陣形の色ごと） */
+			int           m_fitCircleIndex = -1;          /** 描く合わせ円（-1で描かない） */
 			float         m_rippleTimer = 0.0f;           /** 波紋アニメーションの経過時間（秒） */
 
 			RootSignature  m_rootSignature;      /** ルートシグネチャ */

@@ -48,6 +48,25 @@ namespace app
 			/** 現在の視野角（ラジアン。速度に応じて基準値〜最大値を行き来する） */
 			float m_currentFov = 0.0f;
 
+			/** ターゲットからの距離に掛ける倍率（陣形レベルで引く） */
+			float m_zoomFactor = 1.0f;
+			/** 倍率の補間の始まりの値 */
+			float m_zoomFrom = 1.0f;
+			/** 倍率の補間の行き先 */
+			float m_zoomTo = 1.0f;
+			/** 倍率の補間を始めてからの時間（秒） */
+			float m_zoomElapsed = 0.0f;
+			/** 倍率の補間にかける時間（秒） */
+			float m_zoomDuration = 0.0f;
+			/** 視野角を一瞬広げる量（度） */
+			float m_fovKickDeg = 0.0f;
+			/** 視野角を広げきるまでの時間（秒） */
+			float m_fovKickAttackTime = 0.0f;
+			/** 視野角が元へ戻るまでの時間（秒） */
+			float m_fovKickReturnTime = 0.0f;
+			/** 視野角を広げてからの経過時間（秒） */
+			float m_fovKickElapsed = 0.0f;
+
 
 		public:
 			/**
@@ -72,6 +91,19 @@ namespace app
 			 * @param character ターゲットキャラクター
 			 */
 			void SetTargetCharacter(app::actor::CharacterBase* character) { m_targetCharacter = character; }
+			/**
+			 * @brief ターゲットからの距離の倍率をtargetへ動かす（動き出しが速く、最後に減速する）
+			 * @param target   行き先の倍率（1で元の距離）
+			 * @param duration 動かす時間（秒。0以下ならすぐ切り替える）
+			 */
+			void StartZoom(const float target, const float duration);
+			/**
+			 * @brief 視野角を広げてから元へ戻す（カメラを引いたことを見せる）
+			 * @param addDeg     広げる角度（度）
+			 * @param attackTime 広げきるまでの時間（秒）
+			 * @param returnTime 元へ戻るまでの時間（秒）
+			 */
+			void StartFovKick(const float addDeg, const float attackTime, const float returnTime);
 		};
 	}
 }

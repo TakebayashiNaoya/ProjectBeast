@@ -74,6 +74,10 @@ namespace app
 					p.joinMargin                  = util::JsonConverter::ToFloat(j, "joinMargin");
 					p.rowSpacing                  = util::JsonConverter::ToFloat(j, "rowSpacing");
 					p.colSpacing                  = util::JsonConverter::ToFloat(j, "colSpacing");
+					p.passiveFetchRadiusBase      = util::JsonConverter::ToFloat(j, "passiveFetchRadiusBase");
+					p.passiveFetchRadiusPerLevel  = util::JsonConverter::ToFloat(j, "passiveFetchRadiusPerLevel");
+					p.passiveFetchSpeedMultiplier = util::JsonConverter::ToFloat(j, "passiveFetchSpeedMultiplier");
+					p.passiveFetchTimeLimit       = util::JsonConverter::ToFloat(j, "passiveFetchTimeLimit");
 					p.baseFollowers               = util::JsonConverter::ToInt(j, "baseFollowers");
 				}
 			);
@@ -83,17 +87,15 @@ namespace app
 #endif
 
 			auto* parameterManager = core::ParameterManager::Get();
-			const auto* circleParam   = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Circle));
-			const auto* triangleParam = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Triangle));
-			const auto* clusterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Cluster));
-			const auto* scatterParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Scatter));
+			const auto* speedParam   = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Speed));
+			const auto* defenseParam = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Defense));
+			const auto* gatherParam  = parameterManager->GetParameter<MasterFormationParameter>(static_cast<int>(EnFormationType::Gather));
 
-			m_formations[static_cast<size_t>(EnFormationType::Circle)]   = std::make_unique<CircleFormation>(*circleParam);
-			m_formations[static_cast<size_t>(EnFormationType::Triangle)] = std::make_unique<TriangleFormation>(*triangleParam);
-			m_formations[static_cast<size_t>(EnFormationType::Cluster)]  = std::make_unique<ClusterFormation>(*clusterParam);
-			m_formations[static_cast<size_t>(EnFormationType::Scatter)]  = std::make_unique<ScatterFormation>(*scatterParam);
+			m_formations[static_cast<size_t>(EnFormationType::Speed)]   = std::make_unique<SpeedFormation>(*speedParam);
+			m_formations[static_cast<size_t>(EnFormationType::Defense)] = std::make_unique<DefenseFormation>(*defenseParam);
+			m_formations[static_cast<size_t>(EnFormationType::Gather)]  = std::make_unique<GatherFormation>(*gatherParam);
 
-			SwitchFormation(EnFormationType::Circle);
+			SwitchFormation(INITIAL_FORMATION_TYPE);
 
 			// 陣形切り替え演出時間の初期読み込み
 			{

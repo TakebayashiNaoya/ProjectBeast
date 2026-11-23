@@ -91,13 +91,13 @@ namespace app
 
 		private:
 			/** 前フレームの陣形種別（切り替え開始検知・遷移前スロット計算に使用） */
-			actor::EnFormationType m_lastFrameType = actor::EnFormationType::Circle;
+			actor::EnFormationType m_lastFrameType = actor::INITIAL_FORMATION_TYPE;
 			/** 前フレームで切り替え演出中だったか（開始エッジ検知用） */
 			bool m_wasSwitching = false;
 			/** 切り替え方向（+1: 次へ / -1: 前へ） */
 			int m_direction = 1;
-			/** 各陣形種別(EnFormationTypeの値)ごとの遷移前スロット位置（-2〜2） */
-			int m_fromSlot[4] = { 0, 1, 2, -1 };
+			/** 各陣形種別(EnFormationTypeの値)ごとの遷移前スロット位置（-1〜1） */
+			int m_fromSlot[static_cast<int>(actor::EnFormationType::Num)] = {};
 
 			/** FormationWheelTuning.json からホットリロードされる見た目パラメーター */
 			float m_centerX = 0.0f;  /** 中央X座標 */
@@ -106,12 +106,11 @@ namespace app
 			float m_currentSize = 80.0f;   /** 中央アイコンのサイズ */
 			float m_sideSize = 50.0f;   /** 隣接アイコンのサイズ */
 			float m_sideAlpha = 0.78f;   /** 隣接アイコンのアルファ値 */
-			Vector3 m_iconColor = Vector3(255.0f, 255.0f, 255.0f);   /** アイコンのRGB色 */
 
 			/** 陣形切替カットインの経過時間（秒）。負の値なら非表示 */
 			float m_cutInTimer = -1.0f;
 			/** カットインに表示中の陣形 */
-			actor::EnFormationType m_cutInType = actor::EnFormationType::Circle;
+			actor::EnFormationType m_cutInType = actor::INITIAL_FORMATION_TYPE;
 
 			/** カットイン各要素のJSON上の配置（演出の基準。InitializeLogicで取り込む） */
 			Vector3 m_cutInBandPos = Vector3::Zero;

@@ -16,6 +16,7 @@
 #include "Source/Actor/Character/Enemy/EnemyStateMachine.h"
 #include "Source/Actor/Character/Orca/OrcaManager.h"
 #include "Source/Actor/Character/PlayerFront.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationFetchRule.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguin.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinManager.h"
 #include "Source/Actor/Character/penguin/childPenguin/ChildPenguinStateMachine.h"
@@ -475,6 +476,8 @@ namespace app
 #ifdef APP_DEBUG
 			/** 敵の回り込み（PlayerFront）の計算の約束を確かめる。失敗するとK2_ASSERTで止まる */
 			actor::PlayerFront::SelfTest();
+			/** 散開陣の迎えの組み合わせの約束を確かめる */
+			actor::fetchRule::SelfTest();
 #endif // APP_DEBUG
 
 			nlohmann::json json;
@@ -514,6 +517,7 @@ namespace app
 			camera::CameraSteering::Config config;
 			m_cameraSteering.SetConfig(config);
 			m_cameraSteering.SetTargetCharacter(m_daddyPenguin);
+			LoadCameraZoomTuning();
 
 			/** 2周目以降は Unregister 済みのため、毎回新しいインスタンスを登録できる */
 			auto gameCamera = std::make_shared<camera::GameCamera>();
@@ -722,6 +726,62 @@ namespace app
 	}
 
 
+	void InGameSceneBase::LoadCameraZoomTuning()
+	{
+		constexpr const char* CAMERA_ZOOM_TUNING_PATH = "Assets/parameter/camera/CameraZoomTuning.json";
+		nlohmann::json j;
+		if (util::JsonConverter::IsLoadJsonFile(j, CAMERA_ZOOM_TUNING_PATH))
+		{
+			m_cameraZoomPerLevel = util::JsonConverter::ToFloat(j, "zoomPerLevel", m_cameraZoomPerLevel);
+			m_cameraZoomDuration = util::JsonConverter::ToFloat(j, "zoomDuration", m_cameraZoomDuration);
+			m_cameraZoomFovKickDeg = util::JsonConverter::ToFloat(j, "fovKickDeg", m_cameraZoomFovKickDeg);
+			m_cameraZoomFovKickAttackTime = util::JsonConverter::ToFloat(j, "fovKickAttackTime", m_cameraZoomFovKickAttackTime);
+			m_cameraZoomFovKickReturnTime = util::JsonConverter::ToFloat(j, "fovKickReturnTime", m_cameraZoomFovKickReturnTime);
+			m_cameraZoomBlurStrength = util::JsonConverter::ToFloat(j, "blurStrength", m_cameraZoomBlurStrength);
+			m_cameraZoomBlurAttackTime = util::JsonConverter::ToFloat(j, "blurAttackTime", m_cameraZoomBlurAttackTime);
+			m_cameraZoomBlurDuration = util::JsonConverter::ToFloat(j, "blurDuration", m_cameraZoomBlurDuration);
+		}
+		// 値が変わったら今のレベルで引き直す
+		m_cameraZoomLevel = -1;
+#if defined(APP_DEBUG)
+		m_cameraZoomTuningWriteTime = util::JsonConverter::GetFileLastWriteTime(CAMERA_ZOOM_TUNING_PATH);
+#endif
+	}
+
+
+	void InGameSceneBase::UpdateCameraZoom()
+	{
+#if defined(APP_DEBUG)
+		constexpr float CAMERA_ZOOM_TUNING_RELOAD_INTERVAL = 0.5f;
+		m_cameraZoomTuningReloadTimer += g_gameTime->GetFrameDeltaTime();
+		if (m_cameraZoomTuningReloadTimer >= CAMERA_ZOOM_TUNING_RELOAD_INTERVAL)
+		{
+			m_cameraZoomTuningReloadTimer = 0.0f;
+			if (util::JsonConverter::CheckFileModified("Assets/parameter/camera/CameraZoomTuning.json", m_cameraZoomTuningWriteTime))
+			{
+				LoadCameraZoomTuning();
+			}
+		}
+#endif
+
+		auto* manager = actor::ChildPenguinManager::GetInstance();
+		if (manager == nullptr) return;
+
+		// 上がっても下がっても、レベルに比例した距離へ動かす
+		const int level = manager->GetFormationLevel();
+		if (level == m_cameraZoomLevel) return;
+		// 引いたとき（読み込み直後は除く）は、視野角とブラーで引いたことを見せる
+		if (m_cameraZoomLevel >= 0 && level > m_cameraZoomLevel)
+		{
+			m_cameraSteering.StartFovKick(m_cameraZoomFovKickDeg, m_cameraZoomFovKickAttackTime, m_cameraZoomFovKickReturnTime);
+			nsBeastEngine::g_renderingEngine->GetPostEffectManager().GetRadialBlur().Start(
+				m_cameraZoomBlurStrength, m_cameraZoomBlurAttackTime, m_cameraZoomBlurDuration);
+		}
+		m_cameraZoomLevel = level;
+		m_cameraSteering.StartZoom(1.0f + m_cameraZoomPerLevel * static_cast<float>(level), m_cameraZoomDuration);
+	}
+
+
 	void InGameSceneBase::UpdateGamePhase()
 	{
 #if defined(BEAST_ENABLE_PROFILER)
@@ -750,6 +810,7 @@ namespace app
 			if (gameCamera)
 			{
 				camera::CameraData data = gameCamera->GetCameraData();
+				UpdateCameraZoom();
 				m_cameraSteering.Update(data, g_gameTime->GetFrameDeltaTime());
 				gameCamera->SetState(data);
 			}
