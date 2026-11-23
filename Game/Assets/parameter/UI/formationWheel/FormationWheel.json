@@ -170,6 +170,30 @@
                 ]
             },
             {
+                "type": "UIText",
+                "name": "FormationNameText",
+                "text": "はやい",
+                "fontSize": 0.5,
+                "fontScaleX": 1.0,
+                "fontScaleY": 1.0,
+                "position": [
+                    -748,
+                    -276,
+                    0
+                ],
+                "rotation": 0,
+                "color": [
+                    255,
+                    255,
+                    255,
+                    255
+                ],
+                "pivot": [
+                    0,
+                    0.5
+                ]
+            },
+            {
                 "type": "UIIcon",
                 "name": "MemberGaugeBg",
                 "asset": "Assets/spriteData/UI/white.DDS",

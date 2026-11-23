@@ -481,18 +481,7 @@ namespace app
 		if (m_formationWheelPacket) m_formationWheelPacket->Update();
 		if (m_feverIconPacket) m_feverIconPacket->Update();
 
-		// 陣形レベルアップアイコンを親ペンギンの頭上へ追従させる（再生中に位置がずれないよう毎フレーム更新）
-		if (m_levelUpIconPacket)
-		{
-			if (m_daddyPenguin)
-			{
-				if (auto* menu = m_levelUpIconPacket->GetMenu())
-				{
-					menu->SetTargetPosition(m_daddyPenguin->GetTransform().m_position);
-				}
-			}
-			m_levelUpIconPacket->Update();
-		}
+		if (m_levelUpIconPacket) m_levelUpIconPacket->Update();
 	}
 
 

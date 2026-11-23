@@ -82,9 +82,9 @@ namespace app
 			constexpr float CUT_IN_TOTAL_TIME = CUT_IN_OUT_BEGIN + CUT_IN_OUT_TIME;
 
 			/** 入りでアイコン・文字が滑り込んでくる距離（アイコンは左から、文字は右から） */
-			constexpr float CUT_IN_SLIDE_IN_DISTANCE = 300.0f;
+			constexpr float CUT_IN_SLIDE_IN_DISTANCE = 60.0f;
 			/** 抜けで右へ流れる距離 */
-			constexpr float CUT_IN_SLIDE_OUT_DISTANCE = 250.0f;
+			constexpr float CUT_IN_SLIDE_OUT_DISTANCE = 40.0f;
 			/** アイコンのポップの長さ（秒。HOLDの頭から） */
 			constexpr float CUT_IN_POP_TIME = 0.25f;
 			/** アイコンのポップでの最大拡大率（1.0に足す量） */
@@ -115,7 +115,7 @@ namespace app
 						"BackgroundIcon",
 						"SpeedIcon", "DefenseIcon", "GatherIcon",
 						"LBButtonIcon", "RBButtonIcon",
-						"LevelText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
+						"LevelText", "FormationNameText", "MemberGaugeBg", "MemberGaugeFill", "MemberGaugeText"
 					},
 					{}, // 数字UIは使用しないため空のリストを渡す
 					Vector3(-400.0f, 0.0f, 0.0f)
@@ -398,6 +398,15 @@ namespace app
 			const int level = cpm->GetFormationLevel() + 1;
 			const int progress = cpm->GetFormationLevelProgress();
 			const int required = cpm->GetFormationNextLevelRequirement();
+
+			// 陣形名はカットインと同じ文字と色で出す
+			if (auto* nameText = GetUI<UIText>(Hash32("FormationNameText")))
+			{
+				const actor::EnFormationType type = cpm->GetCurrentFormationType();
+				const Vector4& formationColor = actor::ChildPenguinManager::GetFormationColor(type);
+				nameText->SetText(CUT_IN_NAME_TEXTS[static_cast<int>(type)]);
+				nameText->m_color = Vector4(formationColor.x, formationColor.y, formationColor.z, nameText->m_color.w);
+			}
 
 			if (auto* levelText = GetUI<UIText>(Hash32("LevelText")))
 			{

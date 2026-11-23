@@ -1,6 +1,6 @@
 /**
  * @file LevelUpIconMenu.cpp
- * @brief 陣形レベルアップ時に親ペンギンの頭上へ表示するアイコンの演出メニュー
+ * @brief 陣形レベルアップ時に陣形パネルの上へ表示するアイコンの演出メニュー
  */
 #include "stdafx.h"
 #include "LevelUpIconMenu.h"
@@ -13,16 +13,15 @@ namespace app
 	{
 		namespace
 		{
-			constexpr float HEAD_OFFSET_Y = 150.0f;  // 親ペンギンの頭上に表示するためのスクリーン座標Yオフセット
 			constexpr float WAIT_DURATION = 0.6f;    // フェードイン後、フェードアウトまで表示を維持する秒数
 			constexpr float MOVE_DURATION = 1.5f;    // 浮き上がりにかける時間
-			constexpr float MOVE_DISTANCE = 80.0f;   // 浮き上がる距離
+			constexpr float MOVE_DISTANCE = 40.0f;   // 浮き上がる距離
 		}
 
 
 		LevelUpIconMenu::LevelUpIconMenu()
 			: m_icon(nullptr)
-			, m_targetPosition(Vector3::Zero)
+			, m_basePosition(Vector3::Zero)
 			, m_isPlaying(false)
 			, m_isFadeInFinished(false)
 			, m_isFadeOutStarted(false)
@@ -42,6 +41,7 @@ namespace app
 			m_icon = GetUI<UIIcon>(Hash32("levelUpIcon"));
 			K2_ASSERT(m_icon, "UIが見つかりません");
 
+			m_basePosition = m_icon->m_transform.m_localTransform.m_position;
 			m_icon->m_isDraw = false;
 		}
 
@@ -74,15 +74,12 @@ namespace app
 				const float deltaTime = g_gameTime->GetFrameDeltaTime();
 				m_elapsedTime += deltaTime;
 
-				// ワールド座標をスクリーン座標に変換し、頭上オフセット＋浮き上がり分を加算する
-				Vector2 screenPosition = Vector2::Zero;
-				CameraSystem::Get().GetMainCamera().CalcScreenPositionFromWorldPosition(screenPosition, m_targetPosition);
-
+				// JSONの位置から浮き上がらせる
 				const float moveT = (m_elapsedTime < MOVE_DURATION) ? (m_elapsedTime / MOVE_DURATION) : 1.0f;
 				m_icon->m_transform.m_localTransform.m_position = Vector3(
-					screenPosition.x,
-					screenPosition.y + HEAD_OFFSET_Y + MOVE_DISTANCE * moveT,
-					0.0f
+					m_basePosition.x,
+					m_basePosition.y + MOVE_DISTANCE * moveT,
+					m_basePosition.z
 				);
 
 				if (!m_isFadeInFinished)
