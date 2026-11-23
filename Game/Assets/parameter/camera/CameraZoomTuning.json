@@ -1,0 +1,10 @@
+{
+    "zoomPerLevel": 0.1,
+    "zoomDuration": 0.5,
+    "fovKickDeg": 10.0,
+    "fovKickAttackTime": 0.12,
+    "fovKickReturnTime": 0.6,
+    "blurStrength": 0.4,
+    "blurAttackTime": 0.1,
+    "blurDuration": 0.5
+}

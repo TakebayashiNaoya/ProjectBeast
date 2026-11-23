@@ -210,6 +210,33 @@ namespace app
 		// アクター
 		//------------------------------------------------------------
 		camera::CameraSteering m_cameraSteering;
+		/** 陣形レベル1つで引くカメラの距離の割合 */
+		float m_cameraZoomPerLevel = 0.1f;
+		/** カメラを引く・戻すのにかける時間（秒） */
+		float m_cameraZoomDuration = 0.5f;
+		/** カメラを引いた瞬間に広げる視野角（度） */
+		float m_cameraZoomFovKickDeg = 10.0f;
+		/** 視野角を広げきるまでの時間（秒） */
+		float m_cameraZoomFovKickAttackTime = 0.12f;
+		/** 広げた視野角が戻るまでの時間（秒） */
+		float m_cameraZoomFovKickReturnTime = 0.6f;
+		/** カメラを引いた瞬間のラジアルブラーの強さ（0〜1） */
+		float m_cameraZoomBlurStrength = 0.4f;
+		/** ラジアルブラーが最大になるまでの時間（秒） */
+		float m_cameraZoomBlurAttackTime = 0.1f;
+		/** ラジアルブラーの全体の時間（秒） */
+		float m_cameraZoomBlurDuration = 0.5f;
+		/** カメラの距離に反映した陣形レベル（-1で未反映） */
+		int m_cameraZoomLevel = -1;
+#if defined(APP_DEBUG)
+		time_t m_cameraZoomTuningWriteTime = 0;
+		float m_cameraZoomTuningReloadTimer = 0.0f;
+#endif
+
+		/** @brief カメラを引く量の調整値を読む */
+		void LoadCameraZoomTuning();
+		/** @brief 陣形レベルが変わったらカメラを引く・戻す */
+		void UpdateCameraZoom();
 
 		SkyCube* m_skyCube = nullptr;
 
