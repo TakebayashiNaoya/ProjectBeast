@@ -34,12 +34,16 @@ namespace app
 			constexpr float TUNING_RELOAD_INTERVAL = 0.5f;
 			/** 陣形ごとのJSONのキー（EnFormationTypeの並び順） */
 			constexpr const char* EFFECT_RADIUS_KEYS[] = { "speedEffectRadius", "defenseEffectRadius", "gatherEffectRadius" };
+			constexpr const char* EFFECT_MARGIN_KEYS[] = { "speedEffectMargin", "defenseEffectMargin", "gatherEffectMargin" };
 			static_assert(std::size(EFFECT_RADIUS_KEYS) == static_cast<size_t>(EnFormationType::Num), "調整値のキーの数が陣形の数と合わない");
+			static_assert(std::size(EFFECT_MARGIN_KEYS) == static_cast<size_t>(EnFormationType::Num), "調整値のキーの数が陣形の数と合わない");
 
 			struct VisualTuning
 			{
-				/** efkの大きさ1のときの半径（30の陣形で大きさ8になる値） */
-				float effectRadius[static_cast<int>(EnFormationType::Num)] = { 3.75f, 3.75f, 3.75f };
+				/** efkの大きさ1のときの半径 */
+				float effectRadius[static_cast<int>(EnFormationType::Num)] = { 12.0f, 10.0f, 15.5f };
+				/** 合わせる円に足す余白（隊列の半径は子の中心までで、体の幅が入っていないため） */
+				float effectMargin[static_cast<int>(EnFormationType::Num)] = { 8.0f, 10.0f, 0.0f };
 				/** 合わせる円を地面に描くか（デバッグビルドだけ） */
 				bool showFitCircle = false;
 				bool isLoaded = false;
@@ -63,6 +67,7 @@ namespace app
 					for (int i = 0; i < static_cast<int>(EnFormationType::Num); ++i)
 					{
 						tuning.effectRadius[i] = util::JsonConverter::ToFloat(j, EFFECT_RADIUS_KEYS[i], tuning.effectRadius[i]);
+						tuning.effectMargin[i] = util::JsonConverter::ToFloat(j, EFFECT_MARGIN_KEYS[i], tuning.effectMargin[i]);
 					}
 					tuning.showFitCircle = util::JsonConverter::ToBool(j, "showFitCircle", tuning.showFitCircle);
 				}
@@ -90,11 +95,12 @@ namespace app
 		}
 
 
-		FormationAuraVisual::FormationAuraVisual(EnFormationType type, EnEffectKind loopKind, EnEffectKind endKind, EnAuraFit fit, const MasterFormationParameter& param)
+		FormationAuraVisual::FormationAuraVisual(EnFormationType type, EnEffectKind loopKind, EnEffectKind endKind, EnAuraFit fit, EnAuraScale axis, const MasterFormationParameter& param)
 			: m_type(type)
 			, m_loopKind(loopKind)
 			, m_endKind(endKind)
 			, m_fit(fit)
+			, m_axis(axis)
 			, m_param(param)
 		{
 		}
@@ -102,12 +108,13 @@ namespace app
 
 		float FormationAuraVisual::CalcFitRadius(const FormationContext& ctx) const
 		{
+			const float margin = GetTuning(0.0f).effectMargin[static_cast<int>(m_type)];
 			if (m_fit == EnAuraFit::FetchRange)
 			{
 				const int level = (ctx.penguinManager != nullptr) ? ctx.penguinManager->GetFormationLevel() : 0;
-				return m_param.passiveFetchRadiusBase + m_param.passiveFetchRadiusPerLevel * static_cast<float>(level);
+				return m_param.passiveFetchRadiusBase + m_param.passiveFetchRadiusPerLevel * static_cast<float>(level) + margin;
 			}
-			return ctx.formationRadius;
+			return ctx.formationRadius + margin;
 		}
 
 
@@ -119,6 +126,13 @@ namespace app
 		}
 
 
+		Vector3 FormationAuraVisual::CalcScaleVector(float scale) const
+		{
+			if (m_axis == EnAuraScale::Horizontal) return Vector3(scale, 1.0f, scale);
+			return Vector3(Vector3::One * scale);
+		}
+
+
 		EffectHandle FormationAuraVisual::PlayAttached(EnEffectKind kind, float scale, const FormationContext& ctx)
 		{
 			auto& em = EffectManager::Get();
@@ -126,7 +140,7 @@ namespace app
 				kind,
 				ctx.daddyPenguin->GetTransform().m_position,
 				Quaternion::Identity,
-				Vector3(Vector3::One * scale)
+				CalcScaleVector(scale)
 			);
 			em.AttachEffect(
 				handle,
@@ -167,7 +181,7 @@ namespace app
 				m_handle = PlayAttached(m_loopKind, m_scale, ctx);
 				return;
 			}
-			effect->SetScale(Vector3(Vector3::One * m_scale));
+			effect->SetScale(CalcScaleVector(m_scale));
 		}
 
 

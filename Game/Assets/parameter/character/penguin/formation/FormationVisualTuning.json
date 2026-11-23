@@ -1,6 +1,9 @@
 {
-    "speedEffectRadius": 3.75,
-    "defenseEffectRadius": 3.75,
-    "gatherEffectRadius": 3.75,
+    "speedEffectRadius": 12.0,
+    "defenseEffectRadius": 10.0,
+    "gatherEffectRadius": 15.5,
+    "speedEffectMargin": 8.0,
+    "defenseEffectMargin": 10.0,
+    "gatherEffectMargin": 0.0,
     "showFitCircle": false
 }

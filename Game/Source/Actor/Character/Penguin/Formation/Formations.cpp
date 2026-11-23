@@ -107,7 +107,7 @@ namespace app
 			}
 
 			// パッシブ演出: バリア（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Defense, EnEffectKind::DefenseBarrierBegin, EnEffectKind::DefenseBarrierEnd, EnAuraFit::OuterRadius, param);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Defense, EnEffectKind::DefenseBarrierBegin, EnEffectKind::DefenseBarrierEnd, EnAuraFit::OuterRadius, EnAuraScale::Uniform, param);
 		}
 
 
@@ -125,7 +125,7 @@ namespace app
 			m_passive.AddEffect(std::make_unique<WildChildFetchEffect>(&param.passiveFetchRadiusBase, &param.passiveFetchRadiusPerLevel, &param.passiveFetchSpeedMultiplier, &param.passiveFetchTimeLimit));
 
 			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Gather, EnEffectKind::GatherAura, EnEffectKind::None, EnAuraFit::FetchRange, param);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Gather, EnEffectKind::GatherAura, EnEffectKind::None, EnAuraFit::FetchRange, EnAuraScale::Horizontal, param);
 		}
 
 
@@ -142,7 +142,7 @@ namespace app
 			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
 			// パッシブ演出（陣形中ずっと出す）
-			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Speed, EnEffectKind::SpeedAuraBegin, EnEffectKind::SpeedAuraEnd, EnAuraFit::OuterRadius, param);
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnFormationType::Speed, EnEffectKind::SpeedAuraBegin, EnEffectKind::SpeedAuraEnd, EnAuraFit::OuterRadius, EnAuraScale::Horizontal, param);
 		}
 
 

@@ -70,6 +70,14 @@ namespace app
 		};
 
 
+		/** @brief 演出をどの向きに広げるか */
+		enum class EnAuraScale : uint8_t
+		{
+			Uniform,		// XYZとも同じ倍率（ドーム型のバリア）
+			Horizontal,		// XZだけ広げ、Yは1のまま（地面から浮かないように）
+		};
+
+
 		/**
 		 * @brief 陣形中ずっと親に付けて出す演出
 		 * @details 再生が終わったら出し直してループさせる。抜けたときにendKindがあれば差し替える。
@@ -84,9 +92,10 @@ namespace app
 			 * @param loopKind 陣形中ずっと出すエフェクト
 			 * @param endKind  陣形を抜けたときに出すエフェクト（出さないならNone）
 			 * @param fit      大きさを合わせる円
+			 * @param axis     広げる向き
 			 * @param param    陣形のパラメーター（FetchRangeのときに迎えの範囲を読む）
 			 */
-			FormationAuraVisual(EnFormationType type, EnEffectKind loopKind, EnEffectKind endKind, EnAuraFit fit, const MasterFormationParameter& param);
+			FormationAuraVisual(EnFormationType type, EnEffectKind loopKind, EnEffectKind endKind, EnAuraFit fit, EnAuraScale axis, const MasterFormationParameter& param);
 			~FormationAuraVisual() override = default;
 			void Enter(const FormationContext& ctx) override final;
 			void Update(float dt, const FormationContext& ctx) override final;
@@ -99,12 +108,15 @@ namespace app
 			float CalcFitRadius(const FormationContext& ctx) const;
 			/** @brief 合わせる円の半径からエフェクトの大きさを出す */
 			float CalcScale(const FormationContext& ctx) const;
+			/** @brief 倍率を広げる向きに合わせたベクトルにする */
+			Vector3 CalcScaleVector(float scale) const;
 
 		private:
 			EnFormationType m_type;
 			EnEffectKind m_loopKind;
 			EnEffectKind m_endKind;
 			EnAuraFit m_fit;
+			EnAuraScale m_axis;
 			const MasterFormationParameter& m_param;
 			/** 現在のエフェクトスケール（陣形半径から求めた目標値へ補間する） */
 			float m_scale = 0.0f;
