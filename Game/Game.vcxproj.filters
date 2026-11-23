@@ -118,9 +118,6 @@
     <Filter Include="Source\Actor\Character\penguin\Formation\Effect">
       <UniqueIdentifier>{8f1a2b3c-4d5e-6f70-8192-a3b4c5d6e7f8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Actor\Character\penguin\Formation\Ult">
-      <UniqueIdentifier>{9a2b3c4d-5e6f-7081-92a3-b4c5d6e7f801}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\UI\BearReaction">
       <UniqueIdentifier>{65fa1729-2cfa-455d-96f1-6b17d7826e6e}</UniqueIdentifier>
     </Filter>
@@ -613,9 +610,6 @@
     <ClCompile Include="Source\Actor\Character\penguin\Formation\Effect\FormationEffects.cpp">
       <Filter>Source\Actor\Character\penguin\Formation\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\penguin\Formation\Ult\UltController.cpp">
-      <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI\BearReaction\BearReactionSystem.cpp">
       <Filter>Source\UI\BearReaction</Filter>
     </ClCompile>
@@ -664,8 +658,8 @@
     <ClCompile Include="Source\UI\Ult\SpeedLineMenu.cpp">
       <Filter>Source\UI\Ult</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.cpp">
-      <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
+    <ClCompile Include="Source\Actor\Character\penguin\Formation\FormationVisual.cpp">
+      <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClCompile>
     <ClCompile Include="Source\Effect\Decal.cpp">
       <Filter>Source\Effect</Filter>
@@ -1206,11 +1200,8 @@
     <ClInclude Include="Source\Actor\Character\penguin\Formation\Effect\FormationEffects.h">
       <Filter>Source\Actor\Character\penguin\Formation\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\penguin\Formation\Ult\UltContext.h">
-      <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Actor\Character\penguin\Formation\Ult\UltController.h">
-      <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
+    <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationContext.h">
+      <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI\BearReaction\BearReactionMenu.h">
       <Filter>Source\UI\BearReaction</Filter>
@@ -1275,8 +1266,8 @@
     <ClInclude Include="Source\UI\Ult\SpeedLineMenu.h">
       <Filter>Source\UI\Ult</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Actor\Character\Penguin\Formation\Ult\IUltEffect.h">
-      <Filter>Source\Actor\Character\penguin\Formation\Ult</Filter>
+    <ClInclude Include="Source\Actor\Character\penguin\Formation\FormationVisual.h">
+      <Filter>Source\Actor\Character\penguin\Formation</Filter>
     </ClInclude>
     <ClInclude Include="Source\Effect\Decal.h">
       <Filter>Source\Effect</Filter>

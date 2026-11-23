@@ -33,9 +33,6 @@ namespace app
 				m_rippleCircles[i].InitBand(RANGE_SEGS, RIPPLE_COLOR);
 			}
 
-			/** ウルトリング（色は陣形色を毎回セットする） */
-			m_ultRing.InitBand(RANGE_SEGS, Vector4(1.0f, 1.0f, 1.0f, 0.6f));
-
 			// TODO: スロットマーカーの初期化。実装時は以下を有効化する。
 			//for (int i = 0; i < MAX_SLOT_COUNT; ++i)
 			//{
@@ -199,19 +196,10 @@ namespace app
 		}
 
 
-		void FormationRangeVisualizer::UpdateUltRing(
-			const Vector3& center, float radius, float alpha, const Vector4& color)
-		{
-			if (!m_isInitialized) return;
-			m_ultRing.SetBandColor(color);
-			m_ultRing.UpdateBand(center, radius, ULT_RING_HALF_WIDTH, alpha);
-		}
-
-
 		void FormationRangeVisualizer::Render(RenderContext& rc, const nsBeastEngine::RenderViewContext& view)
 		{
 			if (!m_isInitialized) return;
-			if (!m_isVisible && !m_isUltRingVisible) return;
+			if (!m_isVisible) return;
 
 			// 定数バッファに VP 行列をコピー
 			Matrix VP;
@@ -223,17 +211,10 @@ namespace app
 
 			// 外周の帯と波紋の帯を、アルファブレンド有効の塗りつぶし用PSOで描画する
 			rc.SetPipelineState(m_fillPipelineState);
-			if (m_isVisible)
+			m_joinCircle.RenderBand(rc);
+			for (int i = 0; i < RIPPLE_COUNT; ++i)
 			{
-				m_joinCircle.RenderBand(rc);
-				for (int i = 0; i < RIPPLE_COUNT; ++i)
-				{
-					m_rippleCircles[i].RenderBand(rc);
-				}
-			}
-			if (m_isUltRingVisible)
-			{
-				m_ultRing.RenderBand(rc);
+				m_rippleCircles[i].RenderBand(rc);
 			}
 			// TODO: スロットマーカーの描画。実装時は m_linePipelineState をセットして
 			//       以下を有効化する。

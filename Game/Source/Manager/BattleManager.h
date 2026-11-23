@@ -22,14 +22,13 @@ namespace app
 	/**
 	 * @brief 画面演出をともなう衝撃の種類
 	 * @detail 揺れ・ブラー・ヒットストップをどう配分するかは受け取る側（演出）が決める。
-	 *         通知する側（AIやウルト）は「何が起きたか」だけを伝える。
+	 *         通知する側（AIなど）は「何が起きたか」だけを伝える。
 	 */
 	enum class EnImpactType : uint8_t
 	{
 		BearRoar,		//シロクマの咆哮。
 		IglooBreak,		//かまくらの破壊。
-		BearNullified,	//密集陣ウルトによる攻撃の弾き返し。
-		UltActivate,	//ウルトの発動。
+		BearNullified,	//密集陣による攻撃の弾き返し。
 	};
 
 
@@ -250,8 +249,8 @@ namespace app
 
 
 		/**
-		 * @brief シロクマ攻撃無効化（密集陣ウルト）の有効/無効を設定する
-		 * @details 密集陣ウルトの BearAttackNullifyEffect が Enter/Exit で切り替える。
+		 * @brief シロクマ攻撃無効化（密集陣のパッシブ）の有効/無効を設定する
+		 * @details 密集陣のBearAttackNullifyEffectがEnter/Exitで切り替える。
 		 *          有効な間、隊列の子への攻撃は EnemyController 側で無効化され、
 		 *          攻撃したクマは弾き飛ばされてスタンする。
 		 * @param enabled 有効にするならtrue
@@ -262,7 +261,7 @@ namespace app
 		}
 
 		/**
-		 * @brief シロクマ攻撃無効化（密集陣ウルト）が有効かどうか
+		 * @brief シロクマ攻撃無効化（密集陣のパッシブ）が有効かどうか
 		 * @return 有効ならtrue
 		 */
 		inline bool IsBearAttackNullified() const
@@ -336,9 +335,9 @@ namespace app
 
 		/**
 		 * @brief 速度ラインUI更新通知を設定
-		 * @param func 引数：速度ラインの表示状態
+		 * @param func 引数：速度ラインの強さ（0.0で非表示、1.0で最大）
 		 */
-		inline void SetOnSpeedLineChanged(std::function<void(const bool)> func)
+		inline void SetOnSpeedLineChanged(std::function<void(const float)> func)
 		{
 			m_speedLineChanged = std::move(func);
 		}
@@ -371,7 +370,7 @@ namespace app
 		/** 渦潮UI更新通知 */
 		std::function<void(std::vector<Vector3>)> m_wpWarningChanged;
 
-		/** シロクマ攻撃無効化（密集陣ウルト）が有効かどうか */
+		/** シロクマ攻撃無効化（密集陣のパッシブ）が有効かどうか */
 		bool m_isBearAttackNullified = false;
 
 		/** 子ペンギンリアクションUI更新通知 */
@@ -394,7 +393,7 @@ namespace app
 		//============================================//
 	private:
 		/** 速度ラインUI更新通知 */
-		std::function<void(const bool)> m_speedLineChanged;
+		std::function<void(const float)> m_speedLineChanged;
 		/** 前フレームの位置 */
 		Vector3 m_lastPosition;
 		/** 現在の位置 */

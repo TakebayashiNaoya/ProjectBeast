@@ -63,14 +63,8 @@ namespace app
 
 			// ── 発動中の効果 ──────────────────────
 			ImGui::SeparatorText(u8"発動中の効果");
-			ImGui::Text(u8"速度倍率(パッシブ×ウルト): %.2fx", m_manager->GetFormationSpeedMultiplier());
+			ImGui::Text(u8"速度倍率: %.2fx", m_manager->GetFormationSpeedMultiplier());
 			ImGui::Text(u8"渦潮耐性: %s", m_manager->HasWhirlpoolResistance() ? u8"あり" : u8"なし");
-
-			ImGui::Text(u8"ウルト発動中: %s", m_manager->IsUltActive() ? u8"はい" : u8"いいえ");
-			ImGui::Text(u8"ウルト発動可能: %s", m_manager->CanActivateUlt() ? u8"はい" : u8"いいえ");
-			ImGui::ProgressBar(m_manager->GetUltCooldownRate(), ImVec2(-1.0f, 0.0f));
-			ImGui::SameLine();
-			ImGui::TextDisabled(u8"クールダウン率");
 		}
 	}
 }

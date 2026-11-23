@@ -289,6 +289,13 @@ namespace app
 			EnFormationType GetCurrentFormationType() const { return m_formationController.GetCurrentType(); }
 
 			/**
+			 * @brief 陣形の色を取得する（陣形切替カットインで使う）
+			 * @param type 陣形種別
+			 * @return 陣形色（RGBA、0.0〜1.0）
+			 */
+			static const Vector4& GetFormationColor(EnFormationType type);
+
+			/**
 			 * @brief 陣形切り替え演出（スライドUI）の最中か
 			 * @details true の間はLB/RBによる再切り替え入力を無視する
 			 */
@@ -301,7 +308,6 @@ namespace app
 
 			/**
 			 * @brief 陣形の移動速度倍率を取得する
-			 * @details パッシブ倍率 × ウルト倍率の積を返す。
 			 */
 			float GetFormationSpeedMultiplier() const { return m_formationController.GetSpeedMultiplier(); }
 
@@ -311,40 +317,10 @@ namespace app
 			float GetJoinRadius()  const { return m_formationController.GetJoinRadius(); }
 
 			/**
-			 * @brief 現在の陣形が渦潮耐性を持つか（パッシブ OR ウルト免疫）
+			 * @brief 現在の陣形が渦潮耐性を持つか
 			 */
 			bool HasWhirlpoolResistance() const { return m_formationController.HasWhirlpoolResistance(); }
 
-
-			//============================================//
-			// ウルト操作
-			//============================================//
-
-			/**
-			 * @brief ウルトを発動する（入力ハンドラから呼ぶ）
-			 */
-			void ActivateUlt();
-
-			/**
-			 * @brief ウルト発動中か
-			 */
-			bool IsUltActive() const { return m_formationController.IsUltActive(); }
-
-			/**
-			 * @brief ウルトが発動可能か
-			 */
-			bool CanActivateUlt() const { return m_formationController.CanActivateUlt(); }
-
-			/**
-			 * @brief ウルトのクールダウン残量を 0.0〜1.0 で返す（UI表示用）
-			 */
-			float GetUltCooldownRate() const { return m_formationController.GetUltCooldownRate(); }
-
-			/**
-			 * @brief ウルト発動中の残り時間割合を 0.0〜1.0 で返す（UI表示用）
-			 * @return 発動直後は1.0、終了間際は0.0。発動中でなければ0.0
-			 */
-			float GetUltActiveRemainingRate() const { return m_formationController.GetUltActiveRemainingRate(); }
 
 			/**
 			 * @brief 指定フォロワー数に対応する入隊判定半径を返す
@@ -639,22 +615,12 @@ namespace app
 			 */
 			void UpdateDaddyFlowField();
 
-			/**
-			 * @brief 三角陣ウルト「突進」の自動入隊を更新する
-			 * @details 三角陣ウルト発動中、親がスライドで触れた（近接した）非フォロワーの子を
-			 *          自動的に隊列へ加える。速度特化の三角陣に「速さで集める」個性を持たせる。
-			 */
-			void UpdateTriangleUltPickup();
-
 			/** いま獲物を追っているシロクマの座標（毎フレーム更新） */
 			std::vector<Vector3> m_bearThreats;
 			/** いまクマに狙われている子ペンギン（毎フレーム更新。赤点滅の対象） */
 			std::vector<const ChildPenguin*> m_bearTargetedPenguins;
 			/** 隊列中に狙われ始めた子ペンギン（追跡が続く限り保持。Yボタン強調の判定用） */
 			std::vector<const ChildPenguin*> m_formationChasedPenguins;
-
-			/** 散開陣ウルト中の入隊音階コンボ（入隊のたびに増え、ウルト終了でリセット） */
-			int m_scatterJoinCombo = 0;
 
 			/** フローフィールドの再構築タイマー（秒） */
 			float m_flowFieldRebuildTimer = 0.0f;

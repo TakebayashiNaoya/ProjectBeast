@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 #include "Source/Actor/Character/Penguin/Formation/Effect/FormationEffectChain.h"
-#include "Source/Actor/Character/Penguin/Formation/Ult/IUltEffect.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationVisual.h"
 
 
 namespace app
@@ -22,11 +22,10 @@ namespace app
 		 *   m_outerRadius が更新され、GetJoinRadius() が
 		 *   現在の人数に応じた入隊判定半径を返す。
 		 *
-		 *   m_passive:   常時有効なエフェクトチェーン（ロジックのみ）
-		 *   m_ult:       ウルト発動中のみ有効なエフェクトチェーン（ロジックのみ）
-		 *   m_ultVisual: ウルトの演出（ビジュアルエフェクト）。効果とは分離して所有する。
-		 *   FormationController がパッシブ・ウルトの2本を組み合わせて速度倍率・渦潮耐性を返し、
-		 *   UltController が m_ult と m_ultVisual の両方に Enter/Update/Exit を転送する。
+		 *   m_passive:       常時有効なエフェクトチェーン（ロジックのみ）
+		 *   m_passiveVisual: パッシブの演出（陣形中ずっと出すビジュアルエフェクト）。効果とは分離して所有する。
+		 *   FormationControllerがm_passiveから速度倍率・渦潮耐性を返し、
+		 *   陣形が変わったときにm_passiveとm_passiveVisualのExit/Enter、毎フレームUpdateを呼ぶ。
 		 */
 		class IFormation
 		{
@@ -43,28 +42,14 @@ namespace app
 			/** @brief パッシブエフェクトチェーンを返す */
 			const FormationEffectChain& GetPassive() const { return m_passive; }
 
-			/** @brief ウルトエフェクトチェーンを返す（UltController が Enter/Update/Exit を呼ぶ） */
-			FormationEffectChain& GetUlt() { return m_ult; }
+			/** @brief パッシブエフェクトチェーンを返す（FormationControllerがEnter/Update/Exitを呼ぶ） */
+			FormationEffectChain& GetPassive() { return m_passive; }
 
 			/**
-			 * @brief ウルトの演出を返す（UltController が Enter/Update/Exit を呼ぶ）
-			 * @return 演出インスタンス。演出を持たない陣形は nullptr
+			 * @brief パッシブの演出を返す（FormationControllerが陣形中ずっとEnter/Update/Exitを呼ぶ）
+			 * @return 演出インスタンス。演出を持たない陣形はnullptr
 			 */
-			IUltEffect* GetUltVisual() { return m_ultVisual.get(); }
-
-			/**
-			 * @brief ウルト持続時間を返す（秒）
-			 * @details パラメーターを直接参照するのでホットリロードが即座に反映される。
-			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
-			 */
-			float GetUltDuration() const;
-
-			/**
-			 * @brief ウルトクールダウンを返す（秒）
-			 * @details パラメーターを直接参照するのでホットリロードが即座に反映される。
-			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
-			 */
-			float GetUltCooldown() const;
+			IFormationVisual* GetPassiveVisual() { return m_passiveVisual.get(); }
 
 			/** @brief 最外半径（CalculatePositions後に有効） */
 			float GetOuterRadius() const { return m_outerRadius; }
@@ -86,14 +71,6 @@ namespace app
 			virtual float GetJoinRadius(int count) const { return GetJoinRadius(); }
 
 			/**
-			 * @brief ウルト発動中のみ入隊判定半径を拡大する距離を返す（未使用の陣形は0）
-			 * @details FormationController::GetJoinRadius() がウルト発動中のみ、
-			 *          通常の入隊判定半径とこの値の大きい方を採用する。
-			 *          デフォルトは0（拡大なし）。散開陣のみオーバーライドする。
-			 */
-			virtual float GetUltJoinRadius() const { return 0.0f; }
-
-			/**
 			 * @brief 陣形座標を計算する
 			 * @param center  親ペンギンの座標
 			 * @param forward 親ペンギンの前方向（正規化済み）
@@ -112,9 +89,8 @@ namespace app
 			float m_outerRadius = 0.0f;  /** 最外半径 */
 
 			FormationEffectChain m_passive;  /** 常時有効なエフェクトチェーン（ロジックのみ） */
-			FormationEffectChain m_ult;      /** ウルト発動中のみ有効なエフェクトチェーン（ロジックのみ） */
 
-			std::unique_ptr<IUltEffect> m_ultVisual;  /** ウルトの演出（ビジュアルエフェクト） */
+			std::unique_ptr<IFormationVisual> m_passiveVisual;  /** パッシブの演出（陣形中ずっと出すビジュアルエフェクト） */
 
 			const MasterFormationParameter* m_param;  /** 陣形パラメーターへの非所有ポインタ（ホットリロード対応） */
 		};
@@ -158,12 +134,6 @@ namespace app
 			 *          定義は Formations.cpp（MasterFormationParameter の完全な定義が必要なため）
 			 */
 			float GetJoinRadius(int count) const override;
-
-			/**
-			 * @brief ウルト発動中はこの距離まで入隊判定半径を拡大する
-			 * @details Circle・Cluster・Scatter で共通。ultCallDistance が0の陣形は拡大なし。
-			 */
-			float GetUltJoinRadius() const override;
 		};
 
 
@@ -175,10 +145,7 @@ namespace app
 		/**
 		 * @brief 円陣（標準間隔）
 		 * @details
-		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameter で調整）。
-		 *   ウルト: 速度1.5倍 ＋ 渦潮免疫 ＋ ペンギン呼び出し ＋ 入隊判定半径の一時拡大
-		 *   （拡大幅は密集陣と散開陣の中間程度、MasterFormationParameter の ultCallDistance で調整）。
-		 *   演出: UltEffectCircle（NormalUltAura）。
+		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameterで調整）。
 		 */
 		class CircleFormation : public RingFormation
 		{
@@ -196,10 +163,9 @@ namespace app
 		/**
 		 * @brief 密集陣（狭間隔）
 		 * @details
-		 *   パッシブ: レベル連動速度（他陣形と共通）＋ 渦潮耐性（MasterFormationParameter で調整）。
-		 *   ウルト: 渦潮に飛び込んでいる間だけ速度2倍 ＋ シロクマ攻撃無効化 ＋ 入隊判定半径の
-		 *   一時拡大（拡大幅は控えめ、MasterFormationParameter で調整）。
-		 *   演出: UltEffectCluster（Barrier）。
+		 *   パッシブ: レベル連動速度（他陣形と共通）× 固定倍率（0.85で円陣より遅い）＋ 渦潮耐性
+		 *   ＋ シロクマ・シャチの攻撃無効化（MasterFormationParameterで調整）。
+		 *   パッシブ演出: バリアを陣形中ずっと出す。
 		 */
 		class ClusterFormation : public RingFormation
 		{
@@ -217,10 +183,7 @@ namespace app
 		/**
 		 * @brief 散開陣（広間隔）
 		 * @details
-		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameter で調整）。
-		 *   ウルト: 発動中だけ入隊判定半径が一時的に拡大する（MasterFormationParameter の
-		 *   ultCallDistance で調整。ウルトが終わると通常の半径に戻る）。
-		 *   演出: UltEffectScatter（CallAura）。
+		 *   パッシブ: レベル連動速度（他陣形と共通、MasterFormationParameterで調整）。
 		 */
 		class ScatterFormation : public RingFormation
 		{
@@ -238,9 +201,7 @@ namespace app
 		/**
 		 * @brief 三角陣
 		 * @details
-		 *   パッシブ: レベル連動速度（初期値のみ他陣形より高い。伸び率は他陣形と共通、MasterFormationParameter で調整）。
-		 *   ウルト: 速度1.5倍（MasterFormationParameter で調整）。
-		 *   演出: UltEffectTriangle（SpeedBoost）。
+		 *   パッシブ: レベル連動速度 × 固定倍率（1.4で他陣形より明確に速い。MasterFormationParameterで調整）。
 		 */
 		class TriangleFormation : public IFormation
 		{

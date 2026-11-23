@@ -84,6 +84,9 @@ namespace app
 				default:                                        return "none";
 				}
 			}
+
+			/** 密集陣に弾かれて巡回へ戻ったあと、視界で子を探さない時間（秒）。すぐ同じ群れへ突っ込み直すのを防ぐ */
+			constexpr float NULLIFIED_RETARGET_BLOCK_TIME = 5.0f;
 		}
 
 
@@ -156,10 +159,16 @@ namespace app
 			}
 
 			m_repathTimer -= g_gameTime->GetFrameDeltaTime();
+			if (m_retargetBlockTimer > 0.0f)
+			{
+				m_retargetBlockTimer -= g_gameTime->GetFrameDeltaTime();
+			}
 			UpdateState(m_state);
 
-			// 視界で子を探す（EnemyController::Update :217-228と同じく、探索・巡回・追跡の間だけ）
-			if (m_state == EnState::Search || m_state == EnState::Wandering || m_state == EnState::Chase)
+			// 視界で子を探す（EnemyController::Update :217-228と同じく、探索・巡回・追跡の間だけ）。
+			// 密集陣に弾かれた直後は探さない
+			if (m_retargetBlockTimer <= 0.0f
+				&& (m_state == EnState::Search || m_state == EnState::Wandering || m_state == EnState::Chase))
 			{
 				if (ChildPenguin* found = FindTarget())
 				{
@@ -743,7 +752,7 @@ namespace app
 			// 攻撃に入った最初のフレームで当てる（EnemyController.cpp :1075-1154と同じタイミング）
 			if (m_foundPenguin == nullptr) return;
 
-			// 密集陣ウルト中は、隊列の子への攻撃を無効化して弾き返す（EnemyController.cpp :1081-1118）
+			// 密集陣でいる間は、隊列の子への攻撃を無効化して弾き返す（EnemyController.cpp :1081-1121）
 			auto* cpManager = ChildPenguinManager::GetInstance();
 			if (BattleManager::GetInstance().IsBearAttackNullified()
 				&& cpManager != nullptr
@@ -858,7 +867,9 @@ namespace app
 		{
 			if (!GetStateMachine()->IsStun())
 			{
-				return EnState::Idle;
+				// 気絶は密集陣に弾かれたときだけ起きる。明けたら巡回へ戻り、しばらく子を探さない
+				m_retargetBlockTimer = NULLIFIED_RETARGET_BLOCK_TIME;
+				return GiveUpAndPatrol("nullified");
 			}
 			return EnState::Num;
 		}

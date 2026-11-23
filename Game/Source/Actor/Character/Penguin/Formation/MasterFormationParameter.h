@@ -1,6 +1,6 @@
 /**
  * @file MasterFormationParameter.h
- * @brief 陣形・ウルトのパラメーター管理クラス
+ * @brief 陣形のパラメーター管理クラス
  */
 #pragma once
 #include "Source/Core/IMasterParameter.h"
@@ -11,7 +11,7 @@ namespace app
 	namespace actor
 	{
 		/**
-		 * @brief 陣形・ウルトのパラメーター管理クラス
+		 * @brief 陣形のパラメーター管理クラス
 		 * @details インデックスは EnFormationType の値と対応する
 		 */
 		struct MasterFormationParameter : public core::IMasterParameter
@@ -32,22 +32,12 @@ namespace app
 #endif
 			/** JSONから受け取る変数群（バイナリ変換の都合上、float→intの順に並べる） */
 
-			/** ウルト持続時間（秒） */
-			float ultDuration;
-			/** ウルトクールダウン（秒） */
-			float ultCooldown;
-			/** パッシブ: 固定速度倍率（未使用、全陣形とも passiveSpeedBase/PerLevel のレベル連動速度に統一） */
+			/** パッシブ: 固定速度倍率（全陣形で使用。passiveSpeedBase/PerLevelのレベル連動速度に掛ける） */
 			float passiveSpeedMultiplier;
 			/** パッシブ: レベル0の速度倍率（全陣形で使用） */
 			float passiveSpeedBase;
 			/** パッシブ: レベルごとの速度増分（全陣形で共通の値を使用） */
 			float passiveSpeedPerLevel;
-			/** ウルト: 固定速度倍率（未使用の陣形は1.0） */
-			float ultSpeedMultiplier;
-			/** ウルト: 渦潮近傍時の速度倍率（密集陣のみ使用） */
-			float ultWhirlpoolBoostMultiplier;
-			/** ウルト: 発動中に入隊判定半径をこの距離まで拡大する（RingFormation系で使用、未使用なら0） */
-			float ultCallDistance;
 			/** 形状: リングの半径増分（RingFormation系のみ使用。陣形の広さを決める） */
 			float radiusPerRing;
 			/** 形状: 入隊判定マージン（最外半径に足す。全陣形共通） */
@@ -59,10 +49,8 @@ namespace app
 
 			/** パッシブ: 渦潮耐性を持つか（0/1） */
 			int passiveWhirlpoolResistance;
-			/** ウルト: 渦潮免疫を持つか（0/1） */
-			int ultWhirlpoolResistance;
-			/** ウルト: シロクマ攻撃を無効化するか（0/1） */
-			int ultBearAttackNullify;
+			/** パッシブ: シロクマ・シャチの攻撃を無効化するか（0/1） */
+			int passiveBearAttackNullify;
 			/** 形状: リング1の配置数（RingFormation系のみ使用。リング k は baseFollowers*k 体） */
 			int baseFollowers;
 		};

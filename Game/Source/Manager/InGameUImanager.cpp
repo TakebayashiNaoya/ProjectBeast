@@ -137,7 +137,7 @@ namespace app
 		ui::InitUIPacket(m_feverIconPacket, "Assets/parameter/UI/fever/FeverIcon.json");
 		// 陣形レベルアップアイコンを生成
 		ui::InitUIPacket(m_levelUpIconPacket, "Assets/parameter/UI/levelUp/LevelUpIcon.json");
-		// 陣形/ウルトのボタン表示を生成
+		// 陣形のボタン表示を生成
 		ui::InitUIPacket(m_formationWheelPacket, "Assets/parameter/UI/formationWheel/FormationWheel.json");
 
 		ui::InitUIPacket(m_speedLinePacket, "Assets/parameter/UI/ult/SpeedLine.json");
@@ -429,14 +429,12 @@ namespace app
 		// スピードアップ中の通知
 		//--------------------------------------------//
 		bm.SetOnSpeedLineChanged(
-			[this, CheckMenu](bool isSpeedUp)
+			[this, CheckMenu](float strength)
 			{
-				const float acceleration = isSpeedUp ? 1.0f : 0.0f;
-
 				auto* menu = m_speedLinePacket->GetMenu();
 				CheckMenu(menu);
-				menu->SetActive(isSpeedUp);
-				menu->SetAcceleration(acceleration);
+				menu->SetActive(strength > 0.0f);
+				menu->SetAcceleration(strength);
 			}
 		);
 	}

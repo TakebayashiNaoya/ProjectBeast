@@ -104,17 +104,6 @@ namespace
 	constexpr float NULLIFY_SHAKE_STRENGTH = 8.0f;
 	constexpr float NULLIFY_SHAKE_DURATION = 0.25f;
 
-	/** ウルト発動のヒットストップ（時間倍率・実時間秒） */
-	constexpr float ULT_HITSTOP_SCALE = 0.4f;
-	constexpr float ULT_HITSTOP_DURATION = 0.3f;
-	/** ウルト発動のラジアルブラー（強度・ピークまでの時間・長さ）。強さは咆哮の半分程度に抑える */
-	constexpr float ULT_BLUR_STRENGTH = 0.5f;
-	constexpr float ULT_BLUR_ATTACK_TIME = 0.12f;
-	constexpr float ULT_BLUR_DURATION = 0.5f;
-	/** ウルト発動のパンチイン（詰める割合・秒） */
-	constexpr float ULT_PUNCH_IN_AMOUNT = 0.07f;
-	constexpr float ULT_PUNCH_IN_DURATION = 0.3f;
-
 	/**
 	 * @brief BGMのWAVをバックグラウンドで先読みしてOSのファイルキャッシュへ乗せる
 	 * @details インゲームBGM(16MB)は初回再生の同期ロードでロード画面末尾を約1.3秒止め、
@@ -725,16 +714,6 @@ namespace app
 					if (gameCamera)
 					{
 						gameCamera->StartShake(NULLIFY_SHAKE_STRENGTH, NULLIFY_SHAKE_DURATION);
-					}
-					break;
-
-				case EnImpactType::UltActivate:
-					g_gameTime->StartSlowMotion(ULT_HITSTOP_SCALE, ULT_HITSTOP_DURATION);
-					postEffect.GetRadialBlur().Start(
-						ULT_BLUR_STRENGTH, ULT_BLUR_ATTACK_TIME, ULT_BLUR_DURATION);
-					if (gameCamera)
-					{
-						gameCamera->StartPunchIn(ULT_PUNCH_IN_AMOUNT, ULT_PUNCH_IN_DURATION);
 					}
 					break;
 				}

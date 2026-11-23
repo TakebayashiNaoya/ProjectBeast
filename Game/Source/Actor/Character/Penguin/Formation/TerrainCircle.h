@@ -59,13 +59,6 @@ namespace app
 			void InitBand(int segments, const Vector4& color);
 
 			/**
-			 * @brief グラデーション帯の色を変更する
-			 * @details 陣形色のウルトリングなど、実行時に色を切り替えたい帯で使う
-			 * @param color 帯の色（RGBA。アルファは帯中央の濃さ）
-			 */
-			void SetBandColor(const Vector4& color) { m_bandColor = color; }
-
-			/**
 			 * @brief グラデーション帯の毎フレーム更新
 			 * @param center     帯の中心座標
 			 * @param radius     帯の中心線の半径

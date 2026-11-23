@@ -17,18 +17,6 @@ namespace app
 		{}
 
 
-		float IFormation::GetUltDuration() const
-		{
-			return m_param->ultDuration;
-		}
-
-
-		float IFormation::GetUltCooldown() const
-		{
-			return m_param->ultCooldown;
-		}
-
-
 		float IFormation::GetJoinRadius() const
 		{
 			return m_outerRadius + m_param->joinMargin;
@@ -50,12 +38,6 @@ namespace app
 				++ring;
 			}
 			return m_param->radiusPerRing * ring + m_param->joinMargin;
-		}
-
-
-		float RingFormation::GetUltJoinRadius() const
-		{
-			return m_param->ultCallDistance;
 		}
 
 
@@ -112,22 +94,12 @@ namespace app
 
 		CircleFormation::CircleFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: レベル連動速度（他陣形と共通）
+			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
-			// ウルト: 速度up + 渦潮免疫 + ペンギン呼び出し
-			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));
-			if (param.ultWhirlpoolResistance)
-			{
-				m_ult.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
-			}
-			if (param.ultCallDistance > 0.0f)
-			{
-				m_ult.AddEffect(std::make_unique<PenguinCallEffect>(&param.ultCallDistance));
-			}
-
-			// 演出: 通常ウルトオーラ
-			m_ultVisual = std::make_unique<UltEffectCircle>();
+			// パッシブ演出（陣形中ずっと出す）
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::CircleAuraBegin, EnEffectKind::CircleAuraEnd);
 		}
 
 
@@ -138,22 +110,20 @@ namespace app
 
 		ClusterFormation::ClusterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: レベル連動速度（他陣形と共通）+ 渦潮耐性
+			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率 + 渦潮耐性 + シロクマ・シャチの攻撃無効化
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 			if (param.passiveWhirlpoolResistance)
 			{
 				m_passive.AddEffect(std::make_unique<WhirlpoolResistanceEffect>());
 			}
-
-			// ウルト: 渦潮近傍で速度up + シロクマ攻撃無効化
-			m_ult.AddEffect(std::make_unique<WhirlpoolSpeedBoostEffect>(&param.ultWhirlpoolBoostMultiplier));
-			if (param.ultBearAttackNullify)
+			if (param.passiveBearAttackNullify)
 			{
-				m_ult.AddEffect(std::make_unique<BearAttackNullifyEffect>());
+				m_passive.AddEffect(std::make_unique<BearAttackNullifyEffect>());
 			}
 
-			// 演出: バリア
-			m_ultVisual = std::make_unique<UltEffectCluster>();
+			// パッシブ演出: バリア（陣形中ずっと出す）
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::ClusterBarrierBegin, EnEffectKind::ClusterBarrierEnd);
 		}
 
 
@@ -164,14 +134,12 @@ namespace app
 
 		ScatterFormation::ScatterFormation(const MasterFormationParameter& param) : RingFormation(param)
 		{
-			// パッシブ: レベル連動速度（他陣形と共通）
+			// パッシブ: レベル連動速度（他陣形と共通）× 固定倍率
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
-			// ウルト: 入隊判定半径の一時拡大のみ（速度・渦潮などの効果は無し）
-			// 拡大自体は RingFormation::GetUltJoinRadius() 経由で FormationController::GetJoinRadius() が処理する
-
-			// 演出: 呼び出しオーラ
-			m_ultVisual = std::make_unique<UltEffectScatter>();
+			// パッシブ演出（陣形中ずっと出す）
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::ScatterAura, EnEffectKind::None);
 		}
 
 
@@ -183,14 +151,12 @@ namespace app
 		TriangleFormation::TriangleFormation(const MasterFormationParameter& param)
 			: IFormation(param)
 		{
-			// パッシブ: レベル連動速度
+			// パッシブ: レベル連動速度 × 固定倍率（スピード特化）
 			m_passive.AddEffect(std::make_unique<LevelSpeedEffect>(&param.passiveSpeedBase, &param.passiveSpeedPerLevel));
+			m_passive.AddEffect(std::make_unique<SpeedModifierEffect>(&param.passiveSpeedMultiplier));
 
-			// ウルト: 純粋なスピード特化
-			m_ult.AddEffect(std::make_unique<SpeedModifierEffect>(&param.ultSpeedMultiplier));
-
-			// 演出: スピードブースト
-			m_ultVisual = std::make_unique<UltEffectTriangle>();
+			// パッシブ演出（陣形中ずっと出す）
+			m_passiveVisual = std::make_unique<FormationAuraVisual>(EnEffectKind::TriangleAuraBegin, EnEffectKind::TriangleAuraEnd);
 		}
 
 

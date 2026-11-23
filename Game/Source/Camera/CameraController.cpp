@@ -45,21 +45,12 @@ namespace app
 
 		void GameCamera::Update()
 		{
-			/** 素の姿勢（m_baseData）から毎フレーム作り直したうえで、揺れとパンチインを上乗せする。
+			/** 素の姿勢（m_baseData）から毎フレーム作り直したうえで、揺れを上乗せする。
 			 *  m_data へ直接足し込むと、ポーズ中のように SetState() が呼ばれないフレームで
 			 *  オフセットが積み上がってしまう（CameraManager の更新はシーンのポーズと無関係に回る） */
 			m_data = m_baseData;
 
 			const float deltaTime = g_gameTime->GetFrameDeltaTime();
-
-			// パンチイン：sinカーブで注視点へ寄って戻る
-			if (m_punchTimer > 0.0f)
-			{
-				m_punchTimer -= deltaTime;
-				const float progress = 1.0f - (m_punchTimer / m_punchDuration);
-				const float envelope = sinf(Math::PI * std::clamp(progress, 0.0f, 1.0f));
-				m_data.position += (m_data.target - m_data.position) * (m_punchAmount * envelope);
-			}
 
 			// 画面揺れ：滑らかなノイズを画面の右・上方向にだけ乗せる。
 			// 毎フレームの乱数は60Hzの不連続なガタつきになり酔いやすいため、

@@ -1289,13 +1289,10 @@ namespace app
 			Vector3 threatPos;
 			bool hasThreat = manager->FindNearestBearThreat(myPos, FLEE_DETECTION_DISTANCE, threatPos);
 
-			// ウルト発動中の隊列の子は逃げない（全陣形共通）。
-			// ウルト中に群れが散ると、せっかくの強化時間が集め直しに消えて
-			// 爽快感よりストレスが勝つ（2026-08-24 試遊フィードバック）。
-			// 密集陣では逃げないことが攻撃無効化＋反撃の前提でもある
-			// （逃走は RemoveFollower で隊列から抜けるため、逃げると無効化の対象外になる）。
-			// 隊列外の子はウルトの恩恵を受けていないので、今までどおり逃げる
-			if (m_isFollowing && manager->IsUltActive())
+			// 密集陣でいる間、隊列の子は逃げない。逃げないことが攻撃無効化＋反撃の前提になる
+			// （逃走はRemoveFollowerで隊列から抜けるため、逃げると無効化の対象外になる）。
+			// 隊列外の子は今までどおり逃げる
+			if (m_isFollowing && BattleManager::GetInstance().IsBearAttackNullified())
 			{
 				m_fleeHoldTimer = 0.0f;
 				if (m_isFleeing)

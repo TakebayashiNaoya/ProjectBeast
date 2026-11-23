@@ -3,7 +3,7 @@
  * @brief 陣形効果のインターフェース
  */
 #pragma once
-#include "Source/Actor/Character/Penguin/Formation/Ult/UltContext.h"
+#include "Source/Actor/Character/Penguin/Formation/FormationContext.h"
 
 
 namespace app
@@ -13,7 +13,7 @@ namespace app
 		/**
 		 * @brief 陣形効果のインターフェース
 		 * @details
-		 *   パッシブ・ウルト両方の効果クラスが実装するインターフェース。
+		 *   陣形の効果クラスが実装するインターフェース。
 		 *   各クラスは「自分の効果分だけ」を返す独立した実装を持つ。
 		 *   FormationEffectChain が複数のエフェクトをまとめて結果を合成する。
 		 */
@@ -35,23 +35,23 @@ namespace app
 			virtual bool  HasWhirlpoolResistance() const { return false; }
 
 			/** 
-			 * @brief ウルト発動時
-			 * @param ctx ウルトコンテキスト
+			 * @brief 陣形に入ったとき
+			 * @param ctx 陣形コンテキスト
 			 */
-			virtual void  Enter (const UltContext& ctx) {}
+			virtual void  Enter (const FormationContext& ctx) {}
 
 			/** 
-			 * @brief ウルト中の毎フレーム更新
+			 * @brief 陣形中の毎フレーム更新
 			 * @param dt  デルタタイム（秒）
-			 * @param ctx ウルトコンテキスト
+			 * @param ctx 陣形コンテキスト
 			 */
-			virtual void  Update(float dt, const UltContext& ctx) {}
+			virtual void  Update(float dt, const FormationContext& ctx) {}
 
 			/** 
-			 * @brief ウルト終了時
-			 * @param ctx ウルトコンテキスト
+			 * @brief 陣形を抜けたとき
+			 * @param ctx 陣形コンテキスト
 			 */
-			virtual void  Exit  (const UltContext& ctx) {}
+			virtual void  Exit  (const FormationContext& ctx) {}
 		};
 	}
 }
